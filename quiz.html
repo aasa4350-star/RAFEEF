@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اختبارات ومراجعات الأبناء</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --accent:#0d9488; --accent-soft:#5eead4; --accent-deep:#0f766e;
+    --bg:#f6f8fa; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1216;--card:#121e25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c50;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;
+    line-height:1.7;-webkit-text-size-adjust:100%}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));
+    color:#fff;border-radius:22px;padding:26px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  header.top::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;
+    background:radial-gradient(circle,rgba(255,255,255,.28),transparent 70%);border-radius:50%}
+  header.top .eyebrow{font-size:.82rem;letter-spacing:.06em;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.7rem;font-weight:800}
+  header.top p{margin:8px 0 0;opacity:.93;font-size:.95rem}
+  .tabs{display:flex;gap:8px;margin:18px 0;position:sticky;top:8px;z-index:5}
+  .tabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:12px 6px;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;
+    font-family:inherit;box-shadow:var(--shadow);transition:.15s}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  section.panel{display:none}
+  section.panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .block-title{display:flex;align-items:center;gap:10px;margin:22px 4px 12px;font-size:1.05rem;font-weight:800}
+  .block-title .dot{width:11px;height:11px;border-radius:50%;background:var(--accent)}
+  .review{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 18px;box-shadow:var(--shadow)}
+  .review details{border-bottom:1px solid var(--line);padding:4px 0}
+  .review details:last-child{border-bottom:0}
+  .review summary{cursor:pointer;font-weight:700;padding:12px 4px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  .review summary::-webkit-details-marker{display:none}
+  .review summary::after{content:"+";color:var(--accent);font-weight:800;font-size:1.25rem}
+  .review details[open] summary::after{content:"–"}
+  .review .body{padding:0 4px 14px;color:var(--muted)}
+  .ltr{direction:ltr;text-align:left;unicode-bidi:isolate}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800;letter-spacing:.05em}
+  .q .stem{font-weight:700;margin:4px 0 12px;font-size:1.08rem}
+  .opts{display:grid;gap:8px}
+  .opts button{text-align:right;border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit;transition:.12s}
+  .opts button:hover:not(:disabled){border-color:var(--accent)}
+  .opts button:disabled{cursor:default}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.9rem;color:var(--muted);padding:8px 12px;background:var(--bg);border-radius:10px;display:none}
+  .explain.show{display:block}
+  .scorebar{position:sticky;bottom:12px;margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .scorebar .track{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+  .scorebar .fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+  .scorebar .txt{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .reset{margin:16px auto 0;display:block;background:none;border:1px solid var(--line);color:var(--muted);padding:9px 18px;border-radius:11px;cursor:pointer;font-family:inherit;font-size:.9rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:28px}
+  .res-hero{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow);text-align:center}
+  .res-emoji{font-size:2.6rem;line-height:1}
+  .res-hero h2{margin:8px 0 2px;font-size:1.3rem}
+  .res-hero .sub{color:var(--muted);font-size:.95rem;margin:0}
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+  .res-cell{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+  .res-cell .lbl{color:var(--muted);font-size:.9rem;margin-bottom:4px}
+  .res-cell .val{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .res-cell .pct{font-size:.85rem;color:var(--accent);font-weight:700}
+  .mistakes{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 16px;box-shadow:var(--shadow)}
+  .mistakes .mi{border-bottom:1px solid var(--line);padding:11px 2px;font-size:.95rem}
+  .mistakes .mi:last-child{border-bottom:0}
+  .mistakes .mi .qq{font-weight:700;margin-bottom:3px}
+  .mistakes .mi .pick{color:var(--bad)}
+  .mistakes .mi .corr{color:var(--good);font-weight:700}
+  .save-status{text-align:center;font-weight:800;margin:14px 0 4px;padding:12px;border-radius:13px;background:var(--card);border:1px solid var(--line)}
+  .note{color:var(--muted);font-size:.88rem;text-align:center;margin-top:6px}
+  .locked{color:var(--muted);text-align:center;padding:40px 10px}
+  .picker{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+  .picker a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);
+    padding:14px 18px;border-radius:14px;font-weight:700;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+
+const STUDENTS = {
+  hasan: {
+    name:"حسن", grade:"ثالث متوسط", emoji:"📘",
+    accent:"#0d9488", soft:"#5eead4", deep:"#0f766e",
+    en:{
+      review:[
+        ["Present Perfect — المضارع التام","نستخدم <b>have / has + التصريف الثالث</b>. مثال: <span class='ltr'>She <b>has lived</b> here since 2015.</span> مع <b>since / for / already / yet</b>."],
+        ["Passive Voice — المبني للمجهول","الصيغة: <b>be + past participle</b>. مثال: <span class='ltr'>The letter <b>was written</b> by Ali.</span>"],
+        ["First Conditional — الشرط الأول","<span class='ltr'>If + present simple, ... will + verb.</span> مثال: <span class='ltr'>If it rains, we <b>will stay</b> home.</span>"],
+        ["Comparatives / Superlatives","المقارنة: <span class='ltr'>taller <b>than</b></span> — التفضيل: <span class='ltr'>the <b>most</b> interesting</span>."]
+      ],
+      quiz:[
+        ["She ___ in this city since 2015.",["has lived","lived","is living"],0,"مع since نستخدم المضارع التام: has lived."],
+        ["The letter ___ by Ali yesterday.",["wrote","was written","is writing"],1,"مبني للمجهول في الماضي: was written."],
+        ["If it rains tomorrow, we ___ at home.",["stay","will stay","stayed"],1,"الشرط الأول: will + الفعل."],
+        ["This is the ___ book I have ever read.",["more interesting","most interesting","interesting"],1,"التفضيل: the most interesting."],
+        ["He is taller ___ his brother.",["then","than","that"],1,"المقارنة تستخدم than."],
+        ["I have ___ finished my homework.",["already","yet","since"],0,"already تعني (بالفعل)."],
+        ["Choose the synonym of \"happy\":",["sad","glad","angry"],1,"glad مرادف لـ happy."],
+        ["They ___ to London last summer.",["go","went","gone"],1,"last summer ماضٍ بسيط: went."],
+        ["Water ___ at 100 degrees.",["boil","boils","boiling"],1,"حقيقة عامة: boils."],
+        ["She doesn't like ___ coffee.",["drink","drinking","drinks"],1,"بعد like نستخدم v+ing: drinking."]
+      ]
+    },
+    ma:{
+      review:[
+        ["حل المعادلات","اعزل المتغير: من <b>2x + 5 = 15</b> → 2x = 10 → x = 5."],
+        ["الأسس (القوى)","<b>aⁿ × aᵐ = aⁿ⁺ᵐ</b>. مثال: 2³ × 2² = 2⁵ = 32."],
+        ["نظرية فيثاغورس","في المثلث القائم: <b>a² + b² = c²</b>. أضلاع 3 و 4 → الوتر = 5."],
+        ["النسبة المئوية","<b>%25 من 80</b> = 20."]
+      ],
+      quiz:[
+        ["حل المعادلة: 2x + 5 = 15",["x = 5","x = 10","x = 7"],0,"2x = 10 إذن x = 5."],
+        ["احسب: 3² + 4²",["25","12","49"],0,"9 + 16 = 25."],
+        ["كم يساوي %25 من 80؟",["16","20","25"],1,"ربع الثمانين = 20."],
+        ["بسّط: 2³ × 2²",["16","32","64"],1,"2⁵ = 32."],
+        ["مساحة مستطيل طوله 6 وعرضه 4",["24","10","20"],0,"6 × 4 = 24."],
+        ["حل: x ÷ 3 = 9",["12","27","3"],1,"x = 27."],
+        ["احسب: 7 × 8 − 6",["50","56","44"],0,"56 − 6 = 50."],
+        ["مثلث قائم ضلعاه 3 و 4، ما طول الوتر؟",["7","5","6"],1,"√25 = 5."],
+        ["احسب: −5 + 8",["−3","3","13"],1,"8 − 5 = 3."],
+        ["احسب: ½ + ¼",["¾","⅓","1"],0,"2/4 + 1/4 = 3/4."]
+      ]
+    }
+  },
+  rafeef: {
+    name:"رفيف", grade:"ثاني متوسط", emoji:"📗",
+    accent:"#4f46e5", soft:"#c7d2fe", deep:"#3730a3",
+    en:{
+      review:[
+        ["Present Simple — المضارع البسيط","نضيف <b>s</b> مع He/She/It: <span class='ltr'>She <b>goes</b> to school every day.</span>"],
+        ["Present Continuous","لما يحدث الآن: <b>am/is/are + verb-ing</b>: <span class='ltr'>The baby <b>is crying</b>.</span>"],
+        ["Past Simple — الماضي البسيط","<span class='ltr'>watch → <b>watched</b>, go → <b>went</b>.</span>"],
+        ["Comparatives","<span class='ltr'>small → <b>smaller than</b></span> · جمع شاذ: <span class='ltr'>child → <b>children</b>.</span>"]
+      ],
+      quiz:[
+        ["She ___ to school every day.",["go","goes","going"],1,"مع She نضيف s: goes."],
+        ["Look! The baby ___ now.",["cries","is crying","cried"],1,"يحدث الآن: is crying."],
+        ["Yesterday I ___ a film.",["watch","watched","watching"],1,"yesterday ماضٍ: watched."],
+        ["A mouse is ___ than an elephant.",["small","smaller","smallest"],1,"مقارنة: smaller."],
+        ["The book is ___ the table.",["in","on","at"],1,"فوق سطح → on."],
+        ["They ___ playing football now.",["is","are","am"],1,"They تأخذ are."],
+        ["Choose the synonym of \"big\":",["small","large","short"],1,"large مرادف لـ big."],
+        ["He ___ like vegetables.",["don't","doesn't","isn't"],1,"مع He: doesn't."],
+        ["The plural of \"child\" is:",["childs","children","childes"],1,"جمع شاذ: children."],
+        ["We ___ TV every evening.",["watches","watch","watching"],1,"مع We: watch."]
+      ]
+    },
+    ma:{
+      review:[
+        ["الأعداد الصحيحة","<b>−3 + 7 = 4</b> ، <b>−6 × 2 = −12</b> (سالب × موجب = سالب)."],
+        ["الكسور","نوحّد المقامات: <b>½ + ⅓ = 5/6</b>."],
+        ["الجبر البسيط","من <b>x + 4 = 10</b> → x = 6."],
+        ["المحيط والنسبة","محيط المربع = الضلع × 4 · <b>%15 من 200</b> = 30."]
+      ],
+      quiz:[
+        ["احسب: −3 + 7",["4","−4","10"],0,"7 − 3 = 4."],
+        ["احسب: ½ + ⅓",["⅔","5/6","2/5"],1,"3/6 + 2/6 = 5/6."],
+        ["حل: x + 4 = 10",["x = 6","x = 14","x = 4"],0,"x = 6."],
+        ["احسب: 12 × 5",["50","60","55"],1,"= 60."],
+        ["محيط مربع طول ضلعه 5",["10","20","25"],1,"5 × 4 = 20."],
+        ["كم يساوي ¾ من 20؟",["12","15","18"],1,"= 15."],
+        ["احسب: −6 × 2",["−12","12","−8"],0,"سالب × موجب = −12."],
+        ["احسب: 100 ÷ 4",["25","20","40"],0,"= 25."],
+        ["بسّط النسبة 2:4",["1:2","2:1","1:4"],0,"÷2 → 1:2."],
+        ["كم يساوي %15 من 200؟",["30","15","45"],0,"= 30."]
+      ]
+    }
+  },
+  osama: {
+    name:"أسامة", grade:"خامس ابتدائي", emoji:"📙",
+    accent:"#ea580c", soft:"#fed7aa", deep:"#c2410c",
+    en:{
+      review:[
+        ["to be — am/is/are","<span class='ltr'>I <b>am</b> · He/She <b>is</b> · We/They <b>are</b>.</span>"],
+        ["Plural — الجمع","<span class='ltr'>box → <b>boxes</b></span> (بعد x نضيف es) · book → books."],
+        ["This / These","<span class='ltr'><b>This</b> واحد · <b>These</b> جمع.</span>"],
+        ["Opposites","<span class='ltr'>big ↔ small · hot ↔ cold.</span>"]
+      ],
+      quiz:[
+        ["I ___ a student.",["is","am","are"],1,"مع I: am."],
+        ["The plural of \"box\" is:",["boxs","boxes","boxies"],1,"بعد x نضيف es: boxes."],
+        ["___ is a red apple.",["These","This","Those"],1,"شيء واحد → This."],
+        ["A dog ___ four legs.",["have","has","having"],1,"مع A dog: has."],
+        ["What color is the sky?",["blue","red","black"],0,"السماء زرقاء → blue."],
+        ["She ___ to music.",["listen","listens","listening"],1,"مع She: listens."],
+        ["The opposite of \"big\" is:",["tall","small","long"],1,"عكس big هو small."],
+        ["___ are my friends.",["This","These","That"],1,"جمع → These."],
+        ["Which one is an animal?",["table","cat","chair"],1,"cat = قطة."],
+        ["I have two ___ .",["book","books","bookes"],1,"مع two: books."]
+      ]
+    },
+    ma:{
+      review:[
+        ["الضرب","<b>6 × 7 = 42</b> ، <b>9 × 8 = 72</b>."],
+        ["القسمة","<b>48 ÷ 6 = 8</b> ، <b>144 ÷ 12 = 12</b>."],
+        ["الكسور","<b>½ من 10 = 5</b> · <b>¾ + ¼ = 1</b>."],
+        ["الأعداد العشرية","<b>0.5 أكبر من 0.05</b>."]
+      ],
+      quiz:[
+        ["احسب: 6 × 7",["42","36","48"],0,"= 42."],
+        ["احسب: 48 ÷ 6",["6","8","9"],1,"= 8."],
+        ["كم يساوي ½ من 10؟",["5","2","10"],0,"= 5."],
+        ["احسب: 25 + 37",["52","62","72"],1,"= 62."],
+        ["احسب: 100 − 45",["65","55","45"],1,"= 55."],
+        ["احسب: 9 × 8",["72","81","64"],0,"= 72."],
+        ["أيهما أكبر: 0.5 أم 0.05؟",["0.5","0.05","متساويان"],0,"0.5 أكبر."],
+        ["احسب: ¾ + ¼",["1","½","2"],0,"= 1."],
+        ["احسب: 144 ÷ 12",["11","12","14"],1,"= 12."],
+        ["احسب: 7 × 6",["42","48","36"],0,"= 42."]
+      ]
+    }
+  },
+  saud: {
+    name:"سعود", grade:"رابع ابتدائي", emoji:"📕",
+    accent:"#16a34a", soft:"#bbf7d0", deep:"#15803d",
+    en:{
+      review:[
+        ["Plural — الجمع","<span class='ltr'>cat → <b>cats</b></span> (نضيف s)."],
+        ["Colors","<span class='ltr'><b>red</b> أحمر · <b>green</b> أخضر · <b>blue</b> أزرق.</span>"],
+        ["to be — am","<span class='ltr'>I <b>am</b> happy.</span>"],
+        ["Opposites","<span class='ltr'>hot ↔ cold · big ↔ small.</span>"]
+      ],
+      quiz:[
+        ["The plural of \"cat\" is:",["cat","cats","caties"],1,"نضيف s: cats."],
+        ["Which one is a color?",["run","green","book"],1,"green لون."],
+        ["A ___ says \"meow\".",["dog","cat","cow"],1,"القطة (cat)."],
+        ["How many letters in \"dog\"?",["2","3","4"],1,"d-o-g = 3."],
+        ["I ___ happy.",["is","am","are"],1,"مع I: am."],
+        ["The opposite of \"hot\" is:",["cold","warm","big"],0,"عكس hot: cold."],
+        ["The first letter of \"Apple\" is:",["B","A","P"],1,"حرف A."],
+        ["The number after 7 is:",["6","8","9"],1,"بعد 7: 8."],
+        ["___ is a book.",["These","This","They"],1,"واحد → This."],
+        ["Which one is a fruit?",["apple","car","pen"],0,"apple فاكهة."]
+      ]
+    },
+    ma:{
+      review:[
+        ["الجمع","<b>5 + 3 = 8</b> ، <b>10 + 10 = 20</b>."],
+        ["الطرح","<b>9 − 4 = 5</b> ، <b>15 − 5 = 10</b>."],
+        ["الضرب البسيط","<b>2 × 3 = 6</b> ، <b>5 × 5 = 25</b>."],
+        ["مقارنة الأعداد","<b>7 أكبر من 5</b>."]
+      ],
+      quiz:[
+        ["احسب: 5 + 3",["7","8","9"],1,"= 8."],
+        ["احسب: 9 − 4",["5","6","4"],0,"= 5."],
+        ["احسب: 2 × 3",["5","6","8"],1,"= 6."],
+        ["أيهما أكبر: 7 أم 5؟",["7","5","متساويان"],0,"7 أكبر."],
+        ["احسب: 10 + 10",["20","110","12"],0,"= 20."],
+        ["احسب: 6 − 2",["3","4","5"],1,"= 4."],
+        ["احسب: 4 × 2",["6","8","10"],1,"= 8."],
+        ["احسب: 15 − 5",["5","10","20"],1,"= 10."],
+        ["احسب: 3 + 6",["8","9","10"],1,"= 9."],
+        ["احسب: 5 × 5",["20","25","30"],1,"= 25."]
+      ]
+    }
+  }
+};
+
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+let who = (qs("who")||"").toLowerCase();
+const app = document.getElementById("app");
+
+if(!STUDENTS[who]){
+  app.innerHTML = `<header class="top"><p class="eyebrow">اختبارات ومراجعات</p>
+    <h1>اختر الابن</h1><p>افتح رابط كل واحد لبدء المراجعة والاختبار.</p></header>
+    <div class="picker">
+      ${Object.keys(STUDENTS).map(k=>`<a href="?who=${k}">${STUDENTS[k].emoji} ${STUDENTS[k].name}</a>`).join("")}
+    </div>`;
+} else {
+  const S = STUDENTS[who];
+  document.documentElement.style.setProperty("--accent", S.accent);
+  document.documentElement.style.setProperty("--accent-soft", S.soft);
+  document.documentElement.style.setProperty("--accent-deep", S.deep);
+  document.title = `اختبار ${S.name} — ${S.grade}`;
+  app.innerHTML = `
+    <header class="top">
+      <p class="eyebrow">${S.grade} · مراجعة واختبار</p>
+      <h1>لوحة ${S.name}</h1>
+      <p>راجع ثم اختبر نفسك — تُحفظ نتيجتك تلقائيًا لوالدك بعد إكمال المادتين.</p>
+    </header>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
+      <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
+      <button role="tab" aria-selected="false" data-tab="res">النتيجة 🏁</button>
+    </div>
+    <section class="panel active" id="en" role="tabpanel"></section>
+    <section class="panel" id="ma" role="tabpanel"></section>
+    <section class="panel" id="res" role="tabpanel"></section>
+    <footer>صفحة تعليمية مجانية · لمتابعة الأبناء</footer>`;
+
+  const DATA = { en:S.en, ma:S.ma };
+  const RESULTS = { en:null, ma:null };
+  let savedThisRound = false;
+
+  async function saveResult(payload){
+    const el = ()=>document.getElementById("saveStatus");
+    if(el()) el().textContent = "⏳ جارٍ حفظ النتيجة...";
+    try{
+      const r = await fetch(SUPA_URL+"/rest/v1/attempts", {
+        method:"POST",
+        headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY,
+          "Content-Type":"application/json", "Prefer":"return=minimal" },
+        body: JSON.stringify(payload)
+      });
+      if(el()) el().textContent = r.ok ? "✅ تم حفظ النتيجة تلقائيًا لوالدك" : "⚠️ تعذّر الحفظ (رمز "+r.status+")";
+      if(!r.ok) savedThisRound = false;
+    }catch(e){
+      if(el()) el().textContent = "⚠️ تعذّر الحفظ — تأكد من الإنترنت";
+      savedThisRound = false;
+    }
+  }
+
+  function build(id){
+    const d = DATA[id], sec = document.getElementById(id);
+    const isEn = id === "en";
+    RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0};
+    let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
+    d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
+    html += `</div><div class="block-title"><span class="dot"></span> الاختبار</div>`;
+    d.quiz.forEach((q,i)=>{
+      html += `<div class="q" data-i="${i}"><div class="num">سؤال ${i+1}</div>
+        <div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
+      q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
+      html += `</div><div class="explain">${q[3]}</div></div>`;
+    });
+    html += `<div class="scorebar"><span class="txt" data-score>0 / ${d.quiz.length}</span>
+      <div class="track"><div class="fill" data-fill></div></div></div>
+      <button class="reset">إعادة المحاولة 🔄</button>`;
+    sec.innerHTML = html;
+    const answered = new Set(); const total = d.quiz.length;
+    const scoreEl = sec.querySelector("[data-score]"), fillEl = sec.querySelector("[data-fill]");
+    sec.querySelectorAll(".q").forEach(qEl=>{
+      const i = +qEl.dataset.i, ans = d.quiz[i][2];
+      qEl.querySelectorAll(".opts button").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          if(answered.has(i)) return; answered.add(i);
+          const j = +btn.dataset.j;
+          qEl.querySelectorAll(".opts button").forEach(b=>b.disabled=true);
+          if(j===ans){ btn.classList.add("correct"); RESULTS[id].correct++; }
+          else{
+            btn.classList.add("wrong");
+            qEl.querySelectorAll(".opts button")[ans].classList.add("correct");
+            RESULTS[id].wrong.push({q:d.quiz[i][0], picked:d.quiz[i][1][j], correct:d.quiz[i][1][ans]});
+          }
+          qEl.querySelector(".explain").classList.add("show");
+          RESULTS[id].done = answered.size;
+          scoreEl.textContent = `${RESULTS[id].correct} / ${total}`;
+          fillEl.style.width = (answered.size/total*100)+"%";
+          renderResults();
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click",()=>{ build(id); renderResults(); });
+  }
+
+  function renderResults(){
+    const sec = document.getElementById("res");
+    const en = RESULTS.en, ma = RESULTS.ma;
+    const bothDone = en && ma && en.done===en.total && ma.done===ma.total;
+    if(!bothDone){
+      savedThisRound = false;
+      const total = (en?en.total:0)+(ma?ma.total:0);
+      const done = (en?en.done:0)+(ma?ma.done:0);
+      sec.innerHTML = `<div class="locked">🏁 أكمل حل <b>الإنجليزي</b> و<b>الرياضيات</b> كاملين، وبعدها تظهر النتيجة وتُحفظ تلقائيًا.<br><br>
+        تم حلّ <b>${done}</b> من <b>${total}</b> سؤال.</div>`;
+      return;
+    }
+    const totCorrect = en.correct+ma.correct, totAll = en.total+ma.total;
+    const pct = Math.round(totCorrect/totAll*100);
+    const emoji = pct>=90?"🏆":pct>=70?"🌟":pct>=50?"👍":"💪";
+    const msg = pct>=90?"ممتاز جدًا!":pct>=70?"أداء حلو!":pct>=50?"جيد، وفي مجال للتحسّن":"يحتاج مراجعة أكثر — وهذا طبيعي!";
+    const enP = Math.round(en.correct/en.total*100), maP = Math.round(ma.correct/ma.total*100);
+    let mist = "";
+    const allWrong = [...en.wrong.map(w=>["إنجليزي",w]),...ma.wrong.map(w=>["رياضيات",w])];
+    if(allWrong.length===0){ mist = `<div class="mi" style="text-align:center">🎉 ما في أي خطأ! إجابات كاملة صحيحة.</div>`; }
+    else allWrong.forEach(a=>{
+      const sub=a[0], w=a[1];
+      mist += `<div class="mi"><div class="qq">[${sub}] ${w.q}</div>
+        <div>إجابته: <span class="pick">${w.picked}</span> · الصحيح: <span class="corr">${w.correct}</span></div></div>`;
+    });
+    sec.innerHTML = `
+      <div class="res-hero"><div class="res-emoji">${emoji}</div><h2>${msg}</h2>
+        <p class="sub">المجموع ${totCorrect} من ${totAll} · ${pct}%</p></div>
+      <div class="res-grid">
+        <div class="res-cell"><div class="lbl">الإنجليزي</div><div class="val">${en.correct}/${en.total}</div><div class="pct">${enP}%</div></div>
+        <div class="res-cell"><div class="lbl">الرياضيات</div><div class="val">${ma.correct}/${ma.total}</div><div class="pct">${maP}%</div></div>
+      </div>
+      <div class="block-title"><span class="dot"></span> الأخطاء والتصحيح</div>
+      <div class="mistakes">${mist}</div>
+      <p class="save-status" id="saveStatus">⏳ جارٍ حفظ النتيجة...</p>
+      <p class="note">تُحفظ تلقائيًا في لوحة متابعة والدك — لا حاجة لإرسال أي شيء.</p>`;
+
+    if(!savedThisRound){
+      savedThisRound = true;
+      saveResult({
+        student: S.name, grade: S.grade,
+        en_correct: en.correct, en_total: en.total,
+        ma_correct: ma.correct, ma_total: ma.total,
+        wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct}))
+      });
+    }
+  }
+
+  ["en","ma"].forEach(build);
+  renderResults();
+  document.querySelectorAll('.tabs button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected','false'));
+      b.setAttribute('aria-selected','true');
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById(b.dataset.tab).classList.add('active');
+      if(b.dataset.tab==="res") renderResults();
+    });
+  });
+}
+</script>
+</body>
+</html>
