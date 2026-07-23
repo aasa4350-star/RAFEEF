@@ -308,10 +308,17 @@ if(!STUDENTS[who]){
   const DATA = { en:S.en, ma:S.ma };
   const RESULTS = { en:null, ma:null };
   let savedThisRound = false;
+  let saveState = "pending"; // pending | ok | fail
+
+  function statusText(){
+    return saveState==="ok" ? "✅ تم حفظ النتيجة تلقائيًا لوالدك"
+      : saveState==="fail" ? "⚠️ تعذّر الحفظ — تأكد من الإنترنت وأعد فتح «النتيجة»"
+      : "⏳ جارٍ حفظ النتيجة...";
+  }
+  function paintStatus(){ const el=document.getElementById("saveStatus"); if(el) el.textContent = statusText(); }
 
   async function saveResult(payload){
-    const el = ()=>document.getElementById("saveStatus");
-    if(el()) el().textContent = "⏳ جارٍ حفظ النتيجة...";
+    saveState = "pending"; paintStatus();
     try{
       const r = await fetch(SUPA_URL+"/rest/v1/attempts", {
         method:"POST",
@@ -319,12 +326,13 @@ if(!STUDENTS[who]){
           "Content-Type":"application/json", "Prefer":"return=minimal" },
         body: JSON.stringify(payload)
       });
-      if(el()) el().textContent = r.ok ? "✅ تم حفظ النتيجة تلقائيًا لوالدك" : "⚠️ تعذّر الحفظ (رمز "+r.status+")";
+      saveState = r.ok ? "ok" : "fail";
       if(!r.ok) savedThisRound = false;
     }catch(e){
-      if(el()) el().textContent = "⚠️ تعذّر الحفظ — تأكد من الإنترنت";
+      saveState = "fail";
       savedThisRound = false;
     }
+    paintStatus();
   }
 
   function build(id){
@@ -379,7 +387,7 @@ if(!STUDENTS[who]){
     const en = RESULTS.en, ma = RESULTS.ma;
     const bothDone = en && ma && en.done===en.total && ma.done===ma.total;
     if(!bothDone){
-      savedThisRound = false;
+      savedThisRound = false; saveState = "pending";
       const total = (en?en.total:0)+(ma?ma.total:0);
       const done = (en?en.done:0)+(ma?ma.done:0);
       sec.innerHTML = `<div class="locked">🏁 أكمل حل <b>الإنجليزي</b> و<b>الرياضيات</b> كاملين، وبعدها تظهر النتيجة وتُحفظ تلقائيًا.<br><br>
@@ -408,7 +416,7 @@ if(!STUDENTS[who]){
       </div>
       <div class="block-title"><span class="dot"></span> الأخطاء والتصحيح</div>
       <div class="mistakes">${mist}</div>
-      <p class="save-status" id="saveStatus">⏳ جارٍ حفظ النتيجة...</p>
+      <p class="save-status" id="saveStatus">${statusText()}</p>
       <p class="note">تُحفظ تلقائيًا في لوحة متابعة والدك — لا حاجة لإرسال أي شيء.</p>`;
 
     if(!savedThisRound){
