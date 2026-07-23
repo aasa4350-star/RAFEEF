@@ -47,6 +47,11 @@
   .diag.warn{background:#fff7ed;border:1px solid var(--warn)}
   @media (prefers-color-scheme:dark){ .diag.warn{background:#2a1c07} }
   .diag b{font-weight:800}
+  .behav{display:flex;align-items:center;gap:10px;margin-top:10px;padding:11px 14px;border-radius:13px;font-size:.92rem}
+  .behav .be{font-size:1.3rem;line-height:1}
+  .behav.ok{background:var(--good-bg);border:1px solid var(--good)}
+  .behav.no{background:#fff7ed;border:1px solid var(--warn)}
+  @media (prefers-color-scheme:dark){ .behav.no{background:#2a1c07} }
   .weak{margin-top:12px}
   .weak .wt{font-weight:800;font-size:.9rem;margin-bottom:6px;color:var(--muted)}
   .weak ul{margin:0;padding-inline-start:20px}
@@ -116,6 +121,25 @@ function diagnose(name, rows){
   return {enAvg, maAvg, overall, html:txt, good:overall>=70};
 }
 
+function behavior(row){
+  const m = row.meta;
+  if(!m || !m.per || !m.per.length) return null;
+  const dts = m.per.map(p=>p.dt).filter(x=>x!=null);
+  const avg = dts.length ? dts.reduce((a,b)=>a+b,0)/dts.length : null;
+  const acc = (row.en_correct+row.ma_correct)/((row.en_total+row.ma_total)||1);
+  const cs = m.per.map(p=>p.c);
+  const counts = {}; cs.forEach(c=>counts[c]=(counts[c]||0)+1);
+  const sameRatio = cs.length ? Math.max.apply(null,Object.values(counts))/cs.length : 0;
+  let label, emoji, good;
+  if(avg!=null && avg < 4 && acc < 0.6){ label="حلّ عشوائي (تخمين سريع)"; emoji="🎲"; good=false; }
+  else if(sameRatio >= 0.7 && acc < 0.6){ label="يختار نفس الترتيب غالبًا (تخمين)"; emoji="🎲"; good=false; }
+  else if(avg!=null && avg < 4){ label="حلّ بسرعة ودقة"; emoji="🏃"; good=true; }
+  else if(avg!=null && avg > 20 && acc < 0.6){ label="يتعثّر ويحتاج مساعدة"; emoji="🐢"; good=false; }
+  else if(acc >= 0.8){ label="متأنٍّ ومركّز"; emoji="🎯"; good=true; }
+  else { label="أداء عادي — يحتاج تدريب"; emoji="📚"; good=false; }
+  return {label, emoji, good, avg: avg!=null? Math.round(avg*10)/10 : null};
+}
+
 function weakAreas(rows){
   const map = {};
   rows.forEach(r=>{
@@ -149,6 +173,7 @@ async function load(){
       const rows = byStudent[name];
       const d = diagnose(name, rows);
       const weak = weakAreas(rows);
+      const beh = behavior(rows[0]);
       const grade = rows[0].grade || "";
       const hist = rows.slice(0,8).map(x=>{
         const p = pctOf((x.en_correct+x.ma_correct),(x.en_total+x.ma_total));
@@ -166,6 +191,10 @@ async function load(){
             <div class="trend">${rows.length} محاولة</div></div>
         </div>
         <div class="diag ${d.good?'good':'warn'}">${d.html}</div>
+        ${beh? `<div class="behav ${beh.good?'ok':'no'}">
+          <span class="be">${beh.emoji}</span>
+          <span><b>أسلوب الحل (آخر محاولة):</b> ${beh.label}${beh.avg!=null? ` · متوسط ${beh.avg}ث/سؤال`:""}</span>
+        </div>`: ""}
         ${weak.length? `<div class="weak"><div class="wt">أكثر الأسئلة اللي يغلط فيها:</div><ul>
           ${weak.map(w=>`<li>${w[0]} <span class="cnt">(×${w[1]})</span></li>`).join("")}
         </ul></div>` : `<div class="weak"><div class="wt">ما فيه أخطاء متكررة 🎉</div></div>`}

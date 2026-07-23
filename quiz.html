@@ -330,7 +330,7 @@ if(!STUDENTS[who]){
   function build(id){
     const d = DATA[id], sec = document.getElementById(id);
     const isEn = id === "en";
-    RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0};
+    RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null};
     let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
     d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
     html += `</div><div class="block-title"><span class="dot"></span> الاختبار</div>`;
@@ -352,6 +352,9 @@ if(!STUDENTS[who]){
         btn.addEventListener("click",()=>{
           if(answered.has(i)) return; answered.add(i);
           const j = +btn.dataset.j;
+          const now = Date.now();
+          const dt = RESULTS[id].lastTs ? (now - RESULTS[id].lastTs)/1000 : null;
+          RESULTS[id].lastTs = now;
           qEl.querySelectorAll(".opts button").forEach(b=>b.disabled=true);
           if(j===ans){ btn.classList.add("correct"); RESULTS[id].correct++; }
           else{
@@ -359,6 +362,7 @@ if(!STUDENTS[who]){
             qEl.querySelectorAll(".opts button")[ans].classList.add("correct");
             RESULTS[id].wrong.push({q:d.quiz[i][0], picked:d.quiz[i][1][j], correct:d.quiz[i][1][ans]});
           }
+          RESULTS[id].events.push({ok:(j===ans), dt: dt!=null? Math.round(dt*10)/10 : null, c:j});
           qEl.querySelector(".explain").classList.add("show");
           RESULTS[id].done = answered.size;
           scoreEl.textContent = `${RESULTS[id].correct} / ${total}`;
@@ -409,11 +413,19 @@ if(!STUDENTS[who]){
 
     if(!savedThisRound){
       savedThisRound = true;
+      const per = [
+        ...en.events.map(e=>({s:"en", ok:e.ok, dt:e.dt, c:e.c})),
+        ...ma.events.map(e=>({s:"ma", ok:e.ok, dt:e.dt, c:e.c}))
+      ];
+      const dts = per.map(p=>p.dt).filter(x=>x!=null);
+      const avg = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)/dts.length*10)/10 : null;
+      const total = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)) : null;
       saveResult({
         student: S.name, grade: S.grade,
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
-        wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct}))
+        wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
+        meta: { per, avg_sec: avg, total_sec: total }
       });
     }
   }
