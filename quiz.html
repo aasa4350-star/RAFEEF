@@ -96,34 +96,78 @@ const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 
 const STUDENTS = {
   hasan: {
-    name:"حسن", grade:"ثاني متوسط", emoji:"📘",
+    name:"حسن", grade:"ثالث متوسط", emoji:"📘",
     accent:"#0d9488", soft:"#5eead4", deep:"#0f766e",
     en:{
       review:[
-        ["Present Simple / Continuous","عادة: <span class='ltr'>She <b>goes</b> every day.</span> · الآن: <span class='ltr'>She <b>is going</b> now.</span>"],
-        ["Past Simple — الماضي البسيط","<span class='ltr'>watch → <b>watched</b> · go → <b>went</b> · was / were.</span>"],
-        ["Comparatives — المقارنة","<span class='ltr'>big → <b>bigger than</b> · good → <b>better than</b>.</span>"],
-        ["Prepositions & Plurals","<span class='ltr'>in / on / at</span> · جمع شاذ: <span class='ltr'>child → <b>children</b>.</span>"]
+        ["Present Perfect — المضارع التام","نستخدم <b>have / has + التصريف الثالث</b>. مثال: <span class='ltr'>She <b>has lived</b> here since 2015.</span> مع <b>since / for / already / yet</b>."],
+        ["Passive Voice — المبني للمجهول","الصيغة: <b>be + past participle</b>. مثال: <span class='ltr'>The letter <b>was written</b> by Ali.</span>"],
+        ["First Conditional — الشرط الأول","<span class='ltr'>If + present simple, ... will + verb.</span> مثال: <span class='ltr'>If it rains, we <b>will stay</b> home.</span>"],
+        ["Comparatives / Superlatives","المقارنة: <span class='ltr'>taller <b>than</b></span> — التفضيل: <span class='ltr'>the <b>most</b> interesting</span>."]
+      ],
+      quiz:[
+        ["She ___ in this city since 2015.",["has lived","lived","is living"],0,"مع since نستخدم المضارع التام: has lived."],
+        ["The letter ___ by Ali yesterday.",["wrote","was written","is writing"],1,"مبني للمجهول في الماضي: was written."],
+        ["If it rains tomorrow, we ___ at home.",["stay","will stay","stayed"],1,"الشرط الأول: will + الفعل."],
+        ["This is the ___ book I have ever read.",["more interesting","most interesting","interesting"],1,"التفضيل: the most interesting."],
+        ["He is taller ___ his brother.",["then","than","that"],1,"المقارنة تستخدم than."],
+        ["I have ___ finished my homework.",["already","yet","since"],0,"already تعني (بالفعل)."],
+        ["Choose the synonym of \"happy\":",["sad","glad","angry"],1,"glad مرادف لـ happy."],
+        ["They ___ to London last summer.",["go","went","gone"],1,"last summer ماضٍ بسيط: went."],
+        ["Water ___ at 100 degrees.",["boil","boils","boiling"],1,"حقيقة عامة: boils."],
+        ["She doesn't like ___ coffee.",["drink","drinking","drinks"],1,"بعد like نستخدم v+ing: drinking."]
+      ]
+    },
+    ma:{
+      review:[
+        ["حل المعادلات","اعزل المتغير: من <b>2x + 5 = 15</b> → 2x = 10 → x = 5."],
+        ["الأسس (القوى)","<b>aⁿ × aᵐ = aⁿ⁺ᵐ</b>. مثال: 2³ × 2² = 2⁵ = 32."],
+        ["نظرية فيثاغورس","في المثلث القائم: <b>a² + b² = c²</b>. أضلاع 3 و 4 → الوتر = 5."],
+        ["النسبة المئوية","<b>%25 من 80</b> = 20."]
+      ],
+      quiz:[
+        ["حل المعادلة: 2x + 5 = 15",["x = 5","x = 10","x = 7"],0,"2x = 10 إذن x = 5."],
+        ["احسب: 3² + 4²",["25","12","49"],0,"9 + 16 = 25."],
+        ["كم يساوي %25 من 80؟",["16","20","25"],1,"ربع الثمانين = 20."],
+        ["بسّط: 2³ × 2²",["16","32","64"],1,"2⁵ = 32."],
+        ["مساحة مستطيل طوله 6 وعرضه 4",["24","10","20"],0,"6 × 4 = 24."],
+        ["حل: x ÷ 3 = 9",["12","27","3"],1,"x = 27."],
+        ["احسب: 7 × 8 − 6",["50","56","44"],0,"56 − 6 = 50."],
+        ["مثلث قائم ضلعاه 3 و 4، ما طول الوتر؟",["7","5","6"],1,"√25 = 5."],
+        ["احسب: −5 + 8",["−3","3","13"],1,"8 − 5 = 3."],
+        ["احسب: ½ + ¼",["¾","⅓","1"],0,"2/4 + 1/4 = 3/4."]
+      ]
+    }
+  },
+  rafeef: {
+    name:"رفيف", grade:"ثاني متوسط", emoji:"📗",
+    accent:"#4f46e5", soft:"#c7d2fe", deep:"#3730a3",
+    en:{
+      review:[
+        ["Present Simple — المضارع البسيط","نضيف <b>s</b> مع He/She/It: <span class='ltr'>She <b>goes</b> to school every day.</span>"],
+        ["Present Continuous","لما يحدث الآن: <b>am/is/are + verb-ing</b>: <span class='ltr'>The baby <b>is crying</b>.</span>"],
+        ["Past Simple — الماضي البسيط","<span class='ltr'>watch → <b>watched</b>, go → <b>went</b>.</span>"],
+        ["Comparatives","<span class='ltr'>small → <b>smaller than</b></span> · جمع شاذ: <span class='ltr'>child → <b>children</b>.</span>"]
       ],
       quiz:[
         ["She ___ to school every day.",["go","goes","going"],1,"مع She نضيف s: goes."],
         ["Look! The baby ___ now.",["cries","is crying","cried"],1,"يحدث الآن: is crying."],
         ["Yesterday I ___ a film.",["watch","watched","watching"],1,"yesterday ماضٍ: watched."],
-        ["An elephant is ___ than a mouse.",["big","bigger","biggest"],1,"مقارنة: bigger."],
+        ["A mouse is ___ than an elephant.",["small","smaller","smallest"],1,"مقارنة: smaller."],
         ["The book is ___ the table.",["in","on","at"],1,"فوق سطح → on."],
         ["They ___ playing football now.",["is","are","am"],1,"They تأخذ are."],
         ["Choose the synonym of \"big\":",["small","large","short"],1,"large مرادف لـ big."],
         ["He ___ like vegetables.",["don't","doesn't","isn't"],1,"مع He: doesn't."],
         ["The plural of \"child\" is:",["childs","children","childes"],1,"جمع شاذ: children."],
-        ["We ___ to the park last week.",["go","went","gone"],1,"last week ماضٍ: went."]
+        ["We ___ TV every evening.",["watches","watch","watching"],1,"مع We: watch."]
       ]
     },
     ma:{
       review:[
-        ["الأعداد الصحيحة","<b>−3 + 7 = 4</b> · <b>−6 × 2 = −12</b> (سالب × موجب = سالب)."],
+        ["الأعداد الصحيحة","<b>−3 + 7 = 4</b> ، <b>−6 × 2 = −12</b> (سالب × موجب = سالب)."],
         ["الكسور","نوحّد المقامات: <b>½ + ⅓ = 5/6</b>."],
         ["الجبر البسيط","من <b>x + 4 = 10</b> → x = 6."],
-        ["المحيط والنسبة المئوية","محيط المربع = الضلع × 4 · <b>%15 من 200</b> = 30."]
+        ["المحيط والنسبة","محيط المربع = الضلع × 4 · <b>%15 من 200</b> = 30."]
       ],
       quiz:[
         ["احسب: −3 + 7",["4","−4","10"],0,"7 − 3 = 4."],
@@ -139,59 +183,59 @@ const STUDENTS = {
       ]
     }
   },
-  rafeef: {
-    name:"رفيف", grade:"أول متوسط", emoji:"📗",
-    accent:"#4f46e5", soft:"#c7d2fe", deep:"#3730a3",
+  osama: {
+    name:"أسامة", grade:"خامس ابتدائي", emoji:"📙",
+    accent:"#ea580c", soft:"#fed7aa", deep:"#c2410c",
     en:{
       review:[
-        ["Present Simple — المضارع البسيط","نضيف <b>s</b> مع He/She/It: <span class='ltr'>She <b>goes</b> every day.</span>"],
-        ["Present Continuous — الآن","<b>am/is/are + verb-ing</b>: <span class='ltr'>They <b>are playing</b> now.</span>"],
-        ["Past — was / were / went","<span class='ltr'>I <b>was</b> · they <b>were</b> · go → <b>went</b>.</span>"],
-        ["Plurals & Comparatives","<span class='ltr'>city → <b>cities</b> · big → <b>bigger than</b>.</span>"]
+        ["to be — am/is/are","<span class='ltr'>I <b>am</b> · He/She <b>is</b> · We/They <b>are</b>.</span>"],
+        ["Plural — الجمع","<span class='ltr'>box → <b>boxes</b></span> (بعد x نضيف es) · book → books."],
+        ["This / These","<span class='ltr'><b>This</b> واحد · <b>These</b> جمع.</span>"],
+        ["Opposites","<span class='ltr'>big ↔ small · hot ↔ cold.</span>"]
       ],
       quiz:[
-        ["She ___ to school every day.",["go","goes","going"],1,"مع She نضيف s: goes."],
-        ["Look! They ___ football now.",["play","are playing","played"],1,"يحدث الآن: are playing."],
-        ["I ___ tired yesterday.",["am","was","were"],1,"yesterday مع I → was."],
-        ["An elephant is ___ than a cat.",["big","bigger","biggest"],1,"مقارنة: bigger."],
-        ["The cat is ___ the box.",["in","on","at"],0,"داخل → in."],
-        ["The plural of \"city\" is:",["citys","cities","cityes"],1,"y تتحول إلى ies: cities."],
-        ["He ___ not like fish.",["do","does","is"],1,"مع He في النفي: does not."],
-        ["We ___ to the park last week.",["go","went","gone"],1,"last week ماضٍ: went."],
-        ["Choose the synonym of \"happy\":",["sad","glad","angry"],1,"glad مرادف لـ happy."],
-        ["The sun ___ in the morning.",["rise","rises","rising"],1,"حقيقة عامة: rises."]
+        ["I ___ a student.",["is","am","are"],1,"مع I: am."],
+        ["The plural of \"box\" is:",["boxs","boxes","boxies"],1,"بعد x نضيف es: boxes."],
+        ["___ is a red apple.",["These","This","Those"],1,"شيء واحد → This."],
+        ["A dog ___ four legs.",["have","has","having"],1,"مع A dog: has."],
+        ["What color is the sky?",["blue","red","black"],0,"السماء زرقاء → blue."],
+        ["She ___ to music.",["listen","listens","listening"],1,"مع She: listens."],
+        ["The opposite of \"big\" is:",["tall","small","long"],1,"عكس big هو small."],
+        ["___ are my friends.",["This","These","That"],1,"جمع → These."],
+        ["Which one is an animal?",["table","cat","chair"],1,"cat = قطة."],
+        ["I have two ___ .",["book","books","bookes"],1,"مع two: books."]
       ]
     },
     ma:{
       review:[
-        ["الأعداد الصحيحة","<b>−2 + 5 = 3</b> · <b>−4 + 4 = 0</b>."],
-        ["الكسور","<b>½ + ¼ = ¾</b> (نوحّد المقام)."],
-        ["معادلة من خطوة","من <b>x + 3 = 8</b> → x = 5."],
-        ["المحيط والنسبة","محيط المربع = الضلع × 4 · <b>%20 من 50</b> = 10."]
+        ["الضرب","<b>6 × 7 = 42</b> ، <b>9 × 8 = 72</b>."],
+        ["القسمة","<b>48 ÷ 6 = 8</b> ، <b>144 ÷ 12 = 12</b>."],
+        ["الكسور","<b>½ من 10 = 5</b> · <b>¾ + ¼ = 1</b>."],
+        ["الأعداد العشرية","<b>0.5 أكبر من 0.05</b>."]
       ],
       quiz:[
-        ["احسب: −2 + 5",["3","−3","7"],0,"5 − 2 = 3."],
-        ["احسب: ½ + ¼",["¾","⅓","1"],0,"2/4 + 1/4 = 3/4."],
-        ["حل: x + 3 = 8",["x = 5","x = 11","x = 3"],0,"x = 5."],
-        ["احسب: 8 × 6",["42","48","54"],1,"= 48."],
-        ["محيط مربع طول ضلعه 4",["8","16","12"],1,"4 × 4 = 16."],
-        ["كم يساوي ½ من 12؟",["4","6","8"],1,"نصف 12 = 6."],
-        ["كم يساوي %20 من 50؟",["10","20","5"],0,"(20÷100)×50 = 10."],
+        ["احسب: 6 × 7",["42","36","48"],0,"= 42."],
+        ["احسب: 48 ÷ 6",["6","8","9"],1,"= 8."],
+        ["كم يساوي ½ من 10؟",["5","2","10"],0,"= 5."],
+        ["احسب: 25 + 37",["52","62","72"],1,"= 62."],
+        ["احسب: 100 − 45",["65","55","45"],1,"= 55."],
+        ["احسب: 9 × 8",["72","81","64"],0,"= 72."],
+        ["أيهما أكبر: 0.5 أم 0.05؟",["0.5","0.05","متساويان"],0,"0.5 أكبر."],
+        ["احسب: ¾ + ¼",["1","½","2"],0,"= 1."],
         ["احسب: 144 ÷ 12",["11","12","14"],1,"= 12."],
-        ["احسب: −4 + 4",["0","8","−8"],0,"= 0."],
-        ["احسب: 3 × 7",["21","24","18"],0,"= 21."]
+        ["احسب: 7 × 6",["42","48","36"],0,"= 42."]
       ]
     }
   },
-  osama: {
-    name:"أسامة", grade:"رابع ابتدائي", emoji:"📙",
-    accent:"#ea580c", soft:"#fed7aa", deep:"#c2410c",
+  saud: {
+    name:"سعود", grade:"رابع ابتدائي", emoji:"📕",
+    accent:"#16a34a", soft:"#bbf7d0", deep:"#15803d",
     en:{
       review:[
         ["Plural — الجمع","<span class='ltr'>cat → <b>cats</b></span> (نضيف s)."],
-        ["Colors — الألوان","<span class='ltr'><b>red</b> أحمر · <b>green</b> أخضر · <b>blue</b> أزرق.</span>"],
-        ["to be — am / is","<span class='ltr'>I <b>am</b> · He/She <b>is</b>.</span>"],
-        ["Opposites — الأضداد","<span class='ltr'>hot ↔ cold · big ↔ small.</span>"]
+        ["Colors","<span class='ltr'><b>red</b> أحمر · <b>green</b> أخضر · <b>blue</b> أزرق.</span>"],
+        ["to be — am","<span class='ltr'>I <b>am</b> happy.</span>"],
+        ["Opposites","<span class='ltr'>hot ↔ cold · big ↔ small.</span>"]
       ],
       quiz:[
         ["The plural of \"cat\" is:",["cat","cats","caties"],1,"نضيف s: cats."],
@@ -208,66 +252,22 @@ const STUDENTS = {
     },
     ma:{
       review:[
-        ["الجمع","<b>25 + 37 = 62</b> · <b>10 + 10 = 20</b>."],
-        ["الطرح","<b>100 − 45 = 55</b> · <b>15 − 5 = 10</b>."],
-        ["الضرب","<b>6 × 7 = 42</b> · <b>9 × 8 = 72</b>."],
-        ["القسمة","<b>48 ÷ 6 = 8</b>."]
+        ["الجمع","<b>5 + 3 = 8</b> ، <b>10 + 10 = 20</b>."],
+        ["الطرح","<b>9 − 4 = 5</b> ، <b>15 − 5 = 10</b>."],
+        ["الضرب البسيط","<b>2 × 3 = 6</b> ، <b>5 × 5 = 25</b>."],
+        ["مقارنة الأعداد","<b>7 أكبر من 5</b>."]
       ],
       quiz:[
-        ["احسب: 6 × 7",["42","36","48"],0,"= 42."],
-        ["احسب: 48 ÷ 6",["6","8","9"],1,"= 8."],
-        ["احسب: 25 + 37",["52","62","72"],1,"= 62."],
-        ["احسب: 100 − 45",["65","55","45"],1,"= 55."],
-        ["احسب: 9 × 8",["72","81","64"],0,"= 72."],
-        ["أيهما أكبر: 45 أم 54؟",["45","54","متساويان"],1,"54 أكبر."],
-        ["احسب: 7 × 6",["42","48","36"],0,"= 42."],
-        ["احسب: 63 − 8",["55","54","57"],0,"= 55."],
-        ["احسب: 8 × 5",["40","45","35"],0,"= 40."],
-        ["احسب: 36 ÷ 6",["5","6","7"],1,"= 6."]
-      ]
-    }
-  },
-  saud: {
-    name:"سعود", grade:"ثالث ابتدائي", emoji:"📕",
-    accent:"#16a34a", soft:"#bbf7d0", deep:"#15803d",
-    en:{
-      review:[
-        ["to be — am / is","<span class='ltr'>I <b>am</b> · He/She <b>is</b>.</span> مثال: <span class='ltr'>I <b>am</b> a boy.</span>"],
-        ["Plural — الجمع","نضيف <b>s</b>: <span class='ltr'>pen → <b>pens</b> · apple → apples.</span>"],
-        ["This — هذا","<span class='ltr'><b>This</b> is a cat.</span>"],
-        ["Colors & Opposites","<span class='ltr'>green أخضر · up ↔ down.</span>"]
-      ],
-      quiz:[
-        ["I ___ a boy.",["is","am","are"],1,"مع I: am."],
-        ["The plural of \"pen\" is:",["pen","pens","penes"],1,"نضيف s: pens."],
-        ["___ is a cat.",["These","This","Those"],1,"شيء واحد → This."],
-        ["What color is grass?",["blue","green","red"],1,"العشب أخضر → green."],
-        ["The opposite of \"up\" is:",["down","big","hot"],0,"عكس up: down."],
-        ["A cow says ___ .",["meow","moo","woof"],1,"البقرة تقول moo."],
-        ["She ___ happy.",["am","is","are"],1,"مع She: is."],
-        ["The first letter of \"Ball\" is:",["A","B","C"],1,"تبدأ بحرف B."],
-        ["One apple, two ___ .",["apple","apples","applies"],1,"مع two نجمع: apples."],
-        ["Which one is an animal?",["pen","dog","cup"],1,"dog = كلب."]
-      ]
-    },
-    ma:{
-      review:[
-        ["الجمع","<b>2 + 4 = 6</b> · <b>5 + 5 = 10</b>."],
-        ["الطرح","<b>7 − 3 = 4</b> · <b>10 − 4 = 6</b>."],
-        ["الضرب البسيط","<b>2 × 5 = 10</b> · <b>3 × 3 = 9</b>."],
-        ["مقارنة الأعداد","<b>8 أكبر من 3</b>."]
-      ],
-      quiz:[
-        ["احسب: 2 + 4",["5","6","7"],1,"= 6."],
-        ["احسب: 7 − 3",["3","4","5"],1,"= 4."],
-        ["احسب: 2 × 5",["8","10","12"],1,"= 10."],
-        ["أيهما أكبر: 8 أم 3؟",["8","3","متساويان"],0,"8 أكبر."],
-        ["احسب: 5 + 5",["9","10","11"],1,"= 10."],
-        ["احسب: 10 − 4",["5","6","7"],1,"= 6."],
-        ["احسب: 3 × 3",["6","9","12"],1,"= 9."],
-        ["احسب: 6 + 2",["7","8","9"],1,"= 8."],
-        ["احسب: 9 − 5",["3","4","5"],1,"= 4."],
-        ["احسب: 2 × 4",["6","8","10"],1,"= 8."]
+        ["احسب: 5 + 3",["7","8","9"],1,"= 8."],
+        ["احسب: 9 − 4",["5","6","4"],0,"= 5."],
+        ["احسب: 2 × 3",["5","6","8"],1,"= 6."],
+        ["أيهما أكبر: 7 أم 5؟",["7","5","متساويان"],0,"7 أكبر."],
+        ["احسب: 10 + 10",["20","110","12"],0,"= 20."],
+        ["احسب: 6 − 2",["3","4","5"],1,"= 4."],
+        ["احسب: 4 × 2",["6","8","10"],1,"= 8."],
+        ["احسب: 15 − 5",["5","10","20"],1,"= 10."],
+        ["احسب: 3 + 6",["8","9","10"],1,"= 9."],
+        ["احسب: 5 × 5",["20","25","30"],1,"= 25."]
       ]
     }
   }
