@@ -96,6 +96,7 @@ const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 const ORDER = ["حسن","رفيف","أسامة","سعود"];
 const EMOJI = {"حسن":"📘","رفيف":"📗","أسامة":"📙","سعود":"📕"};
+const SLUG = {"حسن":"hasan","رفيف":"rafeef","أسامة":"osama","سعود":"saud"};
 
 function pillColor(p){
   if(p>=80) return "background:var(--good-bg);color:var(--good)";
@@ -199,6 +200,7 @@ async function load(){
           ${weak.map(w=>`<li>${w[0]} <span class="cnt">(×${w[1]})</span></li>`).join("")}
         </ul></div>` : `<div class="weak"><div class="wt">ما فيه أخطاء متكررة 🎉</div></div>`}
         <div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>
+        ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
       </div>`;
     }).join("");
   }catch(e){

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>صفحة الابن</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --accent:#3b5bdb; --accent-soft:#bac8ff; --accent-deep:#2b3fa0;
+    --bg:#f5f7fb; --card:#ffffff; --ink:#131a2b; --muted:#5c6577;
+    --line:#e5e9f2; --good:#15803d; --good-bg:#e7f6ec; --warn:#b45309; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(19,26,43,.05),0 8px 24px rgba(19,26,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0a0f1a;--card:#121a2b;--ink:#e8edf7;--muted:#94a0b8;--line:#22304850;
+      --good:#4ade80;--good-bg:#12321f;--warn:#fbbf24;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",Tahoma,system-ui,-apple-system,sans-serif;line-height:1.7}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));
+    color:#fff;border-radius:22px;padding:24px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  header.top::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;
+    background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%);border-radius:50%}
+  header.top .eyebrow{font-size:.82rem;letter-spacing:.06em;opacity:.9;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.7rem;font-weight:800;display:flex;align-items:center;gap:8px}
+  header.top .big{margin-top:10px;font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums}
+  header.top .big small{font-size:1rem;font-weight:600;opacity:.9}
+  .bar{display:flex;gap:10px;align-items:center;margin:16px 0;flex-wrap:wrap}
+  .bar a,.bar button{background:var(--card);border:1px solid var(--line);color:var(--ink);
+    padding:10px 16px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:var(--shadow);text-decoration:none;font-size:.9rem}
+  .bar .muted{color:var(--muted);font-size:.82rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;
+    box-shadow:var(--shadow);margin-bottom:16px}
+  .sec-title{display:flex;align-items:center;gap:9px;margin:22px 4px 12px;font-size:1.05rem;font-weight:800}
+  .sec-title .dot{width:11px;height:11px;border-radius:50%;background:var(--accent)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat .lbl{color:var(--muted);font-size:.85rem;margin-bottom:4px}
+  .stat .val{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .trend{display:flex;align-items:flex-end;gap:8px;height:90px;margin-top:6px}
+  .trend .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end}
+  .trend .bxr{width:100%;max-width:42px;border-radius:8px 8px 4px 4px;background:var(--accent);min-height:6px}
+  .trend .pc{font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .trend .dt{font-size:.68rem;color:var(--muted)}
+  .behav{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:13px;font-size:.95rem}
+  .behav.ok{background:var(--good-bg);border:1px solid var(--good)}
+  .behav.no{background:#fff7ed;border:1px solid var(--warn)}
+  @media (prefers-color-scheme:dark){ .behav.no{background:#2a1c07} }
+  .behav .be{font-size:1.3rem}
+  ul.weak{margin:0;padding-inline-start:20px}
+  ul.weak li{margin-bottom:7px;font-size:.93rem}
+  ul.weak .cnt{color:var(--bad);font-weight:700}
+  .note{border-inline-start:4px solid var(--accent);background:var(--bg);border-radius:0 12px 12px 0;
+    padding:12px 16px;margin-bottom:12px}
+  .note .nd{font-size:.75rem;color:var(--muted);margin-bottom:4px;font-weight:700}
+  .note .nt{font-weight:800;margin-bottom:5px}
+  .note .nb{font-size:.95rem}
+  .note .nb b{font-weight:800}
+  .empty{text-align:center;color:var(--muted);padding:30px 12px}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--accent);
+    border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p class="empty"><span class="spin"></span> جارٍ التحميل...</p></div>
+
+<script>
+const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+const META = {
+  hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e"},
+  rafeef:{name:"رفيف",grade:"ثاني متوسط",emoji:"📗",accent:"#4f46e5",deep:"#3730a3"},
+  osama:{name:"أسامة",grade:"خامس ابتدائي",emoji:"📙",accent:"#ea580c",deep:"#c2410c"},
+  saud:{name:"سعود",grade:"رابع ابتدائي",emoji:"📕",accent:"#16a34a",deep:"#15803d"}
+};
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+const who = (qs("who")||"").toLowerCase();
+const app = document.getElementById("app");
+
+function pct(c,t){ return t?Math.round(c/t*100):0; }
+function behavior(row){
+  const m=row.meta; if(!m||!m.per||!m.per.length) return null;
+  const dts=m.per.map(p=>p.dt).filter(x=>x!=null);
+  const avg=dts.length?dts.reduce((a,b)=>a+b,0)/dts.length:null;
+  const acc=(row.en_correct+row.ma_correct)/((row.en_total+row.ma_total)||1);
+  const cs=m.per.map(p=>p.c),counts={}; cs.forEach(c=>counts[c]=(counts[c]||0)+1);
+  const sameR=cs.length?Math.max.apply(null,Object.values(counts))/cs.length:0;
+  let label,emoji,good;
+  if(avg!=null&&avg<4&&acc<0.6){label="حلّ عشوائي (تخمين سريع)";emoji="🎲";good=false;}
+  else if(sameR>=0.7&&acc<0.6){label="يختار نفس الترتيب (تخمين)";emoji="🎲";good=false;}
+  else if(avg!=null&&avg<4){label="حلّ بسرعة ودقة";emoji="🏃";good=true;}
+  else if(avg!=null&&avg>20&&acc<0.6){label="يتعثّر ويحتاج مساعدة";emoji="🐢";good=false;}
+  else if(acc>=0.8){label="متأنٍّ ومركّز";emoji="🎯";good=true;}
+  else{label="أداء عادي — يحتاج تدريب";emoji="📚";good=false;}
+  return {label,emoji,good,avg:avg!=null?Math.round(avg*10)/10:null};
+}
+
+async function main(){
+  if(!META[who]){ app.innerHTML='<p class="empty">اختر ابنًا صحيحًا من الرابط (?who=hasan…)</p>'; return; }
+  const S=META[who];
+  document.documentElement.style.setProperty("--accent",S.accent);
+  document.documentElement.style.setProperty("--accent-deep",S.deep);
+  document.title="صفحة "+S.name;
+
+  let rows=[];
+  try{
+    const r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
+      {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    rows=await r.json();
+  }catch(e){}
+
+  let notes=[];
+  try{ const nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
+
+  const latest=rows[0];
+  const latPct=latest?pct(latest.en_correct+latest.ma_correct,latest.en_total+latest.ma_total):null;
+  const enAvg=rows.length?Math.round(rows.reduce((s,r)=>s+pct(r.en_correct,r.en_total),0)/rows.length):0;
+  const maAvg=rows.length?Math.round(rows.reduce((s,r)=>s+pct(r.ma_correct,r.ma_total),0)/rows.length):0;
+  const beh=latest?behavior(latest):null;
+
+  // weak areas aggregate
+  const wmap={}; rows.forEach(r=>(r.wrong||[]).forEach(w=>{const k="["+(w.subject||"")+"] "+w.q; wmap[k]=(wmap[k]||0)+1;}));
+  const weak=Object.entries(wmap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+  // trend (oldest -> newest, last 6)
+  const tr=rows.slice(0,6).reverse().map(r=>pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total));
+
+  let html=`
+    <header class="top">
+      <p class="eyebrow">${S.grade} · صفحة المتابعة</p>
+      <h1>${S.emoji} ${S.name}</h1>
+      ${latPct!=null?`<div class="big">${latPct}% <small>آخر اختبار</small></div>`:`<div class="big"><small>ما فيه اختبارات بعد</small></div>`}
+    </header>
+    <div class="bar">
+      <button onclick="location.reload()">🔄 تحديث</button>
+      <a href="quiz.html?who=${who}">📝 اختبار جديد</a>
+      <a href="quiz.html?who=${who}&set=2">🔄 المجموعة 2</a>
+      <a href="index.html">📊 اللوحة</a>
+    </div>`;
+
+  if(rows.length){
+    html+=`
+    <div class="sec-title"><span class="dot"></span> المستوى (متوسط ${rows.length} محاولة)</div>
+    <div class="card"><div class="grid2">
+      <div class="stat"><div class="lbl">الإنجليزي</div><div class="val">${enAvg}%</div></div>
+      <div class="stat"><div class="lbl">الرياضيات</div><div class="val">${maAvg}%</div></div>
+    </div>
+    ${beh?`<div style="margin-top:12px" class="behav ${beh.good?'ok':'no'}"><span class="be">${beh.emoji}</span>
+      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}</span></div>`:''}
+    ${tr.length>1?`<div class="sec-title" style="margin:16px 4px 6px"><span class="dot"></span> التطوّر</div>
+      <div class="trend">${tr.map(p=>`<div class="col"><div class="pc">${p}%</div><div class="bxr" style="height:${Math.max(6,p*0.8)}px"></div></div>`).join("")}</div>`:''}
+    </div>`;
+
+    html+=`<div class="sec-title"><span class="dot"></span> نقاط يحتاج يراجعها</div><div class="card">`;
+    html+= weak.length? `<ul class="weak">${weak.map(w=>`<li>${w[0]} ${w[1]>1?`<span class="cnt">(×${w[1]})</span>`:''}</li>`).join("")}</ul>`
+      : `<p class="empty">ما فيه أخطاء متكررة 🎉</p>`;
+    html+=`</div>`;
+  }
+
+  html+=`<div class="sec-title"><span class="dot"></span> توصيات المعلّم 📌</div>`;
+  if(notes.length){
+    html+=notes.map(n=>`<div class="note"><div class="nd">${n.date||""}</div>
+      <div class="nt">${n.title||""}</div><div class="nb">${n.html||n.body||""}</div></div>`).join("");
+  }else{
+    html+=`<div class="card empty">لسه ما فيه توصيات مكتوبة. بتظهر هنا أول ما تُضاف.</div>`;
+  }
+
+  html+=`<footer>تتحدّث تلقائيًا · صفحة خاصة بـ ${S.name}</footer>`;
+  app.innerHTML=html;
+}
+main();
+</script>
+</body>
+</html>
