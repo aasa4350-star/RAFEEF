@@ -505,6 +505,7 @@ if(!STUDENTS[who]){
   const setNo = (qs("set")==="3") ? 3 : (qs("set")==="2") ? 2 : 1;
   const BANK = setNo===3 ? BANK3 : (setNo===2 ? BANK2 : null);
   const usePool = !hasSet; // بدون set في الرابط = أسئلة متنوّعة مخلوطة
+  const QN = (who==="hasan"||who==="rafeef") ? 12 : 10; // متوسط 12 · ابتدائي 10
   function pool(subj){
     var a = (S[subj].quiz || []).slice();
     if (BANK2[who]) a = a.concat(BANK2[who][subj]);
@@ -569,7 +570,7 @@ if(!STUDENTS[who]){
     const sec = document.getElementById(id);
     const isEn = id === "en";
     let quiz = DATA[id].quiz.slice();
-    if (usePool) { shuffle(quiz); quiz = quiz.slice(0, 10); }
+    if (usePool) { shuffle(quiz); quiz = quiz.slice(0, QN); }
     const d = { review: DATA[id].review, quiz: quiz };
     RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null};
     let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
