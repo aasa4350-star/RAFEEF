@@ -381,6 +381,36 @@ const BANK2 = {
   }
 };
 
+// المجموعة الثالثة — أصعب قليلًا (تطوير للمستوى)
+const BANK3 = {
+  rafeef: {
+    en:[
+      ["She has ___ her homework.",["do","did","done"],2,"مضارع تام: has + done."],
+      ["Yesterday they ___ to the market.",["go","went","gone"],1,"yesterday ماضٍ: went."],
+      ["This box is ___ than that one.",["heavy","heavier","heaviest"],1,"مقارنة: heavier than."],
+      ["He is the ___ student in class.",["good","better","best"],2,"التفضيل الشاذ: the best."],
+      ["I usually get up ___ 6 o'clock.",["in","on","at"],2,"مع الساعة نستخدم at."],
+      ["___ you like tea?",["Do","Does","Are"],0,"مع you نستخدم Do."],
+      ["The opposite of \"expensive\" is:",["cheap","rich","big"],0,"عكس expensive: cheap."],
+      ["We were watching TV when she ___ .",["arrive","arrived","arrives"],1,"حدث مقاطع في الماضي: arrived."],
+      ["There ___ some milk in the fridge.",["is","are","be"],0,"milk غير معدود → is."],
+      ["How ___ books do you have?",["much","many","more"],1,"مع المعدود (books): many."]
+    ],
+    ma:[
+      ["حل: 2x + 3 = 11",["x = 4","x = 5","x = 7"],0,"2x = 8 إذن x = 4."],
+      ["احسب: ½ + ⅓",["⅔","5/6","2/5"],1,"3/6 + 2/6 = 5/6."],
+      ["احسب: −4 − 3",["−7","−1","7"],0,"−4 ناقص 3 = −7."],
+      ["كم يساوي %15 من 60؟",["9","6","12"],0,"(15÷100)×60 = 9."],
+      ["مساحة مثلث قاعدته 6 وارتفاعه 4",["12","24","10"],0,"½ × 6 × 4 = 12."],
+      ["بسّط النسبة 6:9",["2:3","3:2","1:3"],0,"÷3 → 2:3."],
+      ["احسب: ⅔ × 9",["6","3","9"],0,"9 ÷ 3 × 2 = 6."],
+      ["احسب: −5 × −2",["10","−10","7"],0,"سالب × سالب = موجب: 10."],
+      ["محيط مستطيل طوله 7 وعرضه 3",["20","21","14"],0,"(7+3)×2 = 20."],
+      ["احسب: 0.5 + 0.25",["0.75","0.7","0.30"],0,"= 0.75."]
+    ]
+  }
+};
+
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 let who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
@@ -393,14 +423,15 @@ if(!STUDENTS[who]){
     </div>`;
 } else {
   const S = STUDENTS[who];
-  const setNo = (qs("set")==="2") ? 2 : 1;
+  const setNo = (qs("set")==="3") ? 3 : (qs("set")==="2") ? 2 : 1;
+  const BANK = setNo===3 ? BANK3 : (setNo===2 ? BANK2 : null);
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-soft", S.soft);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
   document.title = `اختبار ${S.name} — ${S.grade}`;
   app.innerHTML = `
     <header class="top">
-      <p class="eyebrow">${S.grade} · ${setNo===2?"المجموعة الثانية 🔄":"مراجعة واختبار"}</p>
+      <p class="eyebrow">${S.grade} · ${setNo===3?"المجموعة الثالثة (متطوّرة) ⬆️":setNo===2?"المجموعة الثانية 🔄":"مراجعة واختبار"}</p>
       <h1>لوحة ${S.name}</h1>
       <p>راجع ثم اختبر نفسك — تُحفظ نتيجتك تلقائيًا لوالدك بعد إكمال المادتين.</p>
     </header>
@@ -415,8 +446,8 @@ if(!STUDENTS[who]){
     <footer>صفحة تعليمية مجانية · لمتابعة الأبناء</footer>`;
 
   const DATA = {
-    en:{ review:S.en.review, quiz: (setNo===2 && BANK2[who]) ? BANK2[who].en : S.en.quiz },
-    ma:{ review:S.ma.review, quiz: (setNo===2 && BANK2[who]) ? BANK2[who].ma : S.ma.quiz }
+    en:{ review:S.en.review, quiz: (BANK && BANK[who]) ? BANK[who].en : S.en.quiz },
+    ma:{ review:S.ma.review, quiz: (BANK && BANK[who]) ? BANK[who].ma : S.ma.quiz }
   };
   const RESULTS = { en:null, ma:null };
   let savedThisRound = false;
