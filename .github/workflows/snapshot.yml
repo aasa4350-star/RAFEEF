@@ -1,0 +1,49 @@
+name: results-snapshot
+
+# Pulls the children's attempts from Supabase and commits a JSON snapshot
+# into the repo, so the results can be read from GitHub without any manual
+# export. Runs on every push to this branch (used as an on-demand refresh)
+# and can also be triggered manually.
+
+on:
+  push:
+    branches: [claude/children-tests-reviews-bq40n9]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: results-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/children-tests-reviews-bq40n9
+
+      - name: Fetch attempts from Supabase
+        run: |
+          mkdir -p results
+          curl -sS "https://kmopkxlhisrwxllagjbu.supabase.co/rest/v1/attempts?select=*&order=created_at.desc" \
+            -H "apikey: sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_" \
+            -H "Authorization: Bearer sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_" \
+            -o raw.json
+          python3 -m json.tool raw.json > results/attempts.json || cp raw.json results/attempts.json
+          rm -f raw.json
+          echo "snapshot taken at $(date -u +%FT%TZ)" > results/last-updated.txt
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "results-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add results/attempts.json results/last-updated.txt
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "results snapshot"
+            git push
+          fi
