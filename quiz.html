@@ -501,15 +501,24 @@ if(!STUDENTS[who]){
     </div>`;
 } else {
   const S = STUDENTS[who];
+  const hasSet = qs("set") != null;
   const setNo = (qs("set")==="3") ? 3 : (qs("set")==="2") ? 2 : 1;
   const BANK = setNo===3 ? BANK3 : (setNo===2 ? BANK2 : null);
+  const usePool = !hasSet; // بدون set في الرابط = أسئلة متنوّعة مخلوطة
+  function pool(subj){
+    var a = (S[subj].quiz || []).slice();
+    if (BANK2[who]) a = a.concat(BANK2[who][subj]);
+    if (BANK3[who]) a = a.concat(BANK3[who][subj]);
+    return a;
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-soft", S.soft);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
   document.title = `اختبار ${S.name} — ${S.grade}`;
   app.innerHTML = `
     <header class="top">
-      <p class="eyebrow">${S.grade} · ${setNo===3?"المجموعة الثالثة (متطوّرة) ⬆️":setNo===2?"المجموعة الثانية 🔄":"مراجعة واختبار"}</p>
+      <p class="eyebrow">${S.grade} · ${!hasSet?"أسئلة متنوّعة 🎲":setNo===3?"المجموعة الثالثة (متطوّرة) ⬆️":setNo===2?"المجموعة الثانية 🔄":"مراجعة واختبار"}</p>
       <h1>لوحة ${S.name}</h1>
       <p>راجع ثم اختبر نفسك — تُحفظ نتيجتك تلقائيًا لوالدك بعد إكمال المادتين.</p>
     </header>
@@ -524,8 +533,8 @@ if(!STUDENTS[who]){
     <footer>صفحة تعليمية مجانية · لمتابعة الأبناء</footer>`;
 
   const DATA = {
-    en:{ review:S.en.review, quiz: (BANK && BANK[who]) ? BANK[who].en : S.en.quiz },
-    ma:{ review:S.ma.review, quiz: (BANK && BANK[who]) ? BANK[who].ma : S.ma.quiz }
+    en:{ review:S.en.review, quiz: hasSet ? ((BANK && BANK[who]) ? BANK[who].en : S.en.quiz) : pool("en") },
+    ma:{ review:S.ma.review, quiz: hasSet ? ((BANK && BANK[who]) ? BANK[who].ma : S.ma.quiz) : pool("ma") }
   };
   const RESULTS = { en:null, ma:null };
   let savedThisRound = false;
@@ -557,8 +566,11 @@ if(!STUDENTS[who]){
   }
 
   function build(id){
-    const d = DATA[id], sec = document.getElementById(id);
+    const sec = document.getElementById(id);
     const isEn = id === "en";
+    let quiz = DATA[id].quiz.slice();
+    if (usePool) { shuffle(quiz); quiz = quiz.slice(0, 10); }
+    const d = { review: DATA[id].review, quiz: quiz };
     RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null};
     let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
     d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
