@@ -136,6 +136,16 @@ function speak(text, rate, lang){
     speechSynthesis.speak(u);
   }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function startRecognition(lang, onResult, onErr){
+  if(!SR){ onErr && onErr("no-support"); return; }
+  try{
+    var r = new SR(); r.lang = lang; r.interimResults = false; r.maxAlternatives = 5;
+    r.onresult = function(e){ var a=[]; for(var i=0;i<e.results[0].length;i++) a.push(e.results[0][i].transcript); onResult(a); };
+    r.onerror = function(e){ onErr && onErr((e && e.error) || "error"); };
+    r.start();
+  }catch(e){ onErr && onErr("error"); }
+}
 function norm(s, ar){
   s = (s||"").replace(/[ً-ْٰ]/g,"").replace(/[.,!?;:'"،؛؟]/g,"").replace(/\s+/g," ").trim();
   if(ar){ s = s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي"); }
@@ -249,8 +259,9 @@ if(!META[who] || !DATA[who]){
         '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
         '<span '+lab+'>معناها بالعربي:</span>'+
         '<input class="ainp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
-        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
-        '<div class="fb"></div></div>';
+        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button>'+
+        '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
+        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>';
     sec.innerHTML = html;
@@ -258,6 +269,19 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0], answers=V[i][1];
       var ein=qEl.querySelector(".einp"), ain=qEl.querySelector(".ainp"), fb=qEl.querySelector(".fb");
+      var mic=qEl.querySelector("[data-mic]"), pfb=qEl.querySelector(".pfb");
+      if(mic){ mic.addEventListener("click",function(){
+        pfb.style.color="var(--muted)"; pfb.textContent="🎤 تكلّم الآن... قل: "+word;
+        startRecognition("en-US", function(alts){
+          var target=norm(word,false);
+          var hit=alts.some(function(a){ var n=norm(a,false); return n===target || n.split(" ").indexOf(target)>=0; });
+          if(hit){ pfb.style.color="var(--good)"; pfb.textContent="✅ نطق صحيح! ("+alts[0]+")"; }
+          else{ pfb.style.color="var(--bad)"; pfb.textContent='❌ سمعتك: "'+(alts[0]||"")+'" · انطقها: '+word; }
+        }, function(err){
+          pfb.style.color="var(--bad)";
+          pfb.textContent = (err==="no-support") ? "⚠️ متصفح هذا الجهاز لا يدعم النطق بالمايك — جرّب Chrome على أندرويد أو كمبيوتر." : "⚠️ لم أسمع بوضوح، اسمح بالمايك وحاول ثانية.";
+        });
+      }); }
       qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,S.rate,"en-US"); });
       qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(word,0.55,"en-US"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الكلمة: <span class="corr">'+word+'</span> · المعنى: <span class="corr">'+answers[0]+'</span>'; });
