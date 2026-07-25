@@ -146,6 +146,38 @@ function startRecognition(lang, onResult, onErr){
     r.start();
   }catch(e){ onErr && onErr("error"); }
 }
+function speechMatch(alts, target, ar){
+  var t = normX(target, ar).split(" ").filter(Boolean);
+  var heard = alts[0] || "", best = 0;
+  alts.forEach(function(a){
+    var w = normX(a, ar).split(" ").filter(Boolean), setT = {}, hit = 0;
+    t.forEach(function(x){ setT[x] = (setT[x]||0)+1; });
+    w.forEach(function(x){ if(setT[x]>0){ hit++; setT[x]--; } });
+    var score = t.length ? hit/t.length : 0;
+    if(score > best) best = score;
+  });
+  return { ok: best >= 0.6, heard: heard, score: best };
+}
+function wireMic(qEl, text, ar){
+  var mic = qEl.querySelector("[data-mic]"), pfb = qEl.querySelector(".pfb");
+  if(!mic || !pfb) return;
+  mic.addEventListener("click", function(){
+    pfb.style.color = "var(--muted)"; pfb.textContent = "🎤 تكلّم الآن...";
+    startRecognition(ar?"ar-SA":"en-US", function(alts){
+      var m = speechMatch(alts, text, ar);
+      if(m.ok){ pfb.style.color = "var(--good)"; pfb.textContent = "✅ نطق صحيح! ("+m.heard+")"; }
+      else{ pfb.style.color = "var(--bad)"; pfb.textContent = '❌ سمعتك: "'+m.heard+'" · انطقها: '+text; }
+    }, function(err){
+      pfb.style.color = "var(--bad)";
+      pfb.textContent = (err==="no-support") ? "⚠️ متصفح الآيفون لا يدعم النطق بالمايك — يشتغل على أندرويد/كمبيوتر بمتصفح Chrome." : "⚠️ لم أسمع بوضوح، اسمح بالمايك وحاول ثانية.";
+    });
+  });
+}
+function normX(s, ar){
+  s = (s||"").replace(/[ً-ْٰ]/g,"").replace(/[.,!?;:'"،؛؟]/g,"").replace(/\s+/g," ").trim();
+  if(ar){ s = s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي"); } else { s = s.toLowerCase(); }
+  return s;
+}
 function norm(s, ar){
   s = (s||"").replace(/[ً-ْٰ]/g,"").replace(/[.,!?;:'"،؛؟]/g,"").replace(/\s+/g," ").trim();
   if(ar){ s = s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي"); }
@@ -193,8 +225,9 @@ if(!META[who] || !DATA[who]){
         '<button class="say small" data-slow>🐢 أبطأ</button></div>'+
         '<input class="dinp" placeholder="اكتب هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
         '<div class="row"><button class="chk">تحقّق</button>'+
-        '<button class="say small" data-show>👁️ أظهر</button></div>'+
-        '<div class="fb"></div></div>';
+        '<button class="say small" data-show>👁️ أظهر</button>'+
+        '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
+        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+D.dictation.length+'</div>';
     sec.innerHTML = html;
@@ -205,6 +238,7 @@ if(!META[who] || !DATA[who]){
       qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,S.rate,ar?"ar-SA":"en-US"); });
       qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.55,ar?"ar-SA":"en-US"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
+      wireMic(qEl, text, ar);
       qEl.querySelector(".chk").addEventListener("click",function(){
         var ok = norm(inp.value,ar)===norm(text,ar);
         if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
@@ -218,8 +252,10 @@ if(!META[who] || !DATA[who]){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("read");
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
-      '<div class="passage"><button class="say" data-read>🔊 استمع للنص</button>'+
-      '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+D.passage+'</div></div>'+
+      '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+
+      '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button></div>'+
+      '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+D.passage+'</div>'+
+      '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>';
     D.questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
@@ -229,6 +265,7 @@ if(!META[who] || !DATA[who]){
     html += '<div class="score" data-score>الفهم: 0 / '+D.questions.length+'</div>';
     sec.innerHTML = html;
     sec.querySelector("[data-read]").addEventListener("click",function(){ speak(D.passage,S.rate,ar?"ar-SA":"en-US"); });
+    wireMic(sec.querySelector("[data-mic-wrap]"), D.passage, ar);
     var ans={}, correct=0, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=D.questions[i][2];
