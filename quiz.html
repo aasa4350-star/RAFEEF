@@ -613,6 +613,86 @@ const BANK4 = {
   }
 };
 
+// ===== مادة اللغة العربية (أسئلة + إملاء) =====
+const ARABIC = {
+  hasan: {
+    dictation:["إنّ مع العسر يسرًا.","من جدّ وجد ومن زرع حصد.","العقلُ السليم في الجسم السليم.","الكلمةُ الطيبة صدقة.","خيرُ الناس أنفعهم للناس."],
+    quiz:[
+      ["أعرب كلمة «محمدٌ» في: محمدٌ مسافرٌ.",["مبتدأ مرفوع","فاعل","مفعول به"],0,"محمدٌ مبتدأ مرفوع بالضمة."],
+      ["جمع كلمة «أستاذ»:",["أستاذون","أساتذة","أستاذات"],1,"جمع تكسير: أساتذة."],
+      ["ضد كلمة «الإيجاز»:",["الاختصار","الإطناب","الوضوح"],1,"ضد الإيجاز: الإطناب."],
+      ["مرادف «البلاغة»:",["الفصاحة","الكتابة","السرعة"],0,"مرادفها: الفصاحة."],
+      ["الإملاء الصحيح:",["مسئول","مسؤول","مسوؤل"],1,"الصحيح: مسؤول."],
+      ["«ما أجملَ السماءَ!» أسلوب:",["استفهام","تعجّب","نداء"],1,"أسلوب تعجّب."],
+      ["الفعل بعد «أن» في «أريد أن أذهبَ»:",["مرفوع","منصوب","مجزوم"],1,"منصوب بعد أن."],
+      ["نوع «الذي»:",["اسم موصول","حرف","فعل"],0,"اسم موصول."]
+    ]
+  },
+  rafeef: {
+    dictation:["العلمُ نورٌ ينير طريق الإنسان.","الصدقُ صفةٌ يحبها الناس.","نظافةُ البيئة مسؤوليةُ الجميع.","القراءةُ غذاءُ العقل.","التعاونُ يقوّي المجتمع."],
+    quiz:[
+      ["«المجتهدُ ناجحٌ» نوع الجملة:",["فعلية","اسمية","شرطية"],1,"تبدأ باسم → اسمية."],
+      ["إعراب «ناجحٌ»:",["مبتدأ","خبر مرفوع","فاعل"],1,"خبر مرفوع بالضمة."],
+      ["جمع «قنديل»:",["قناديل","قندولات","أقندلة"],0,"جمع تكسير: قناديل."],
+      ["مرادف «الوطن»:",["البلد","البحر","الجبل"],0,"مرادفها: البلد."],
+      ["ضد «التفاؤل»:",["الأمل","التشاؤم","الفرح"],1,"ضدها: التشاؤم."],
+      ["الإملاء الصحيح:",["انشاء الله","إن شاء الله","إنشاءالله"],1,"الصحيح: إن شاء الله."],
+      ["الفاعل في «كتبَ الطالبُ الدرسَ»:",["الدرسَ","الطالبُ","كتبَ"],1,"الفاعل: الطالبُ."],
+      ["نوع «لن» في «لن يذهبَ»:",["حرف نصب","حرف جزم","حرف جر"],0,"حرف نصب."]
+    ]
+  },
+  osama: {
+    dictation:["مدرسة","صديق","حديقة","شجرة","عصفور","سماء","مكتبة","نظافة"],
+    quiz:[
+      ["جمع «معلّم»:",["معلّمون","معلّمهم","معلّمان"],0,"جمع مذكر سالم: معلّمون."],
+      ["عكس «قويّ»:",["كبير","ضعيف","سريع"],1,"عكسها: ضعيف."],
+      ["الإملاء الصحيح:",["مدرسه","مدرسة","مدرسا"],1,"الصحيح: مدرسة."],
+      ["نوع كلمة «يكتبُ»:",["اسم","فعل","حرف"],1,"فعل مضارع."],
+      ["مرادف «شجاع»:",["جبان","بطل","كسول"],1,"مرادفها: بطل."],
+      ["مفرد «أشجار»:",["شجر","شجرة","شجيرات"],1,"المفرد: شجرة."],
+      ["اختر المؤنث:",["قلم","كتاب","سيارة"],2,"سيارة مؤنثة."],
+      ["نوع كلمة «في»:",["اسم","فعل","حرف"],2,"حرف جر."]
+    ]
+  },
+  saud: {
+    dictation:["بيت","شمس","قلم","كتاب","ورد","باب","ماء","يد"],
+    quiz:[
+      ["جمع «بيت»:",["بيتين","بيوت","بيتات"],1,"الجمع: بيوت."],
+      ["عكس «نهار»:",["صباح","ليل","ظهر"],1,"عكسها: ليل."],
+      ["الإملاء الصحيح:",["سما","سماء","سماه"],1,"الصحيح: سماء."],
+      ["مرادف «سعيد»:",["حزين","فرحان","غاضب"],1,"مرادفها: فرحان."],
+      ["أول حرف في «قمر»:",["ف","ق","م"],1,"يبدأ بحرف ق."],
+      ["أيّها فاكهة؟",["تفاح","كرسي","باب"],0,"تفاح فاكهة."],
+      ["جمع «قلم»:",["أقلام","قلمين","قلمات"],0,"الجمع: أقلام."],
+      ["عكس «كبير»:",["طويل","صغير","واسع"],1,"عكسها: صغير."]
+    ]
+  }
+};
+
+function pickVoice(lang){
+  try{
+    var isAr = lang && lang.indexOf("ar")===0;
+    var langRe = isAr ? /^ar/i : /^en/i;
+    var cands = speechSynthesis.getVoices().filter(function(x){return langRe.test(x.lang);});
+    var good = cands.filter(function(x){return /(siri|enhanced|premium|natural|neural|eloquence|maged|majed|tarik|laila|samantha|daniel|karen|serena)/i.test(x.name);});
+    return good[0] || cands[0] || null;
+  }catch(e){ return null; }
+}
+try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+function speakAr(text, rate){
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "ar-SA"; u.rate = rate || 0.9;
+    var v = pickVoice("ar-SA"); if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+}
+function normAr(s){
+  s = (s||"").replace(/[ً-ْٰ]/g,"").replace(/[.,!?;:'"،؛؟]/g,"").replace(/\s+/g," ").trim();
+  return s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي");
+}
+
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 let who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
@@ -651,11 +731,13 @@ if(!STUDENTS[who]){
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
+      <button role="tab" aria-selected="false" data-tab="arb">العربية 🕌</button>
       <button role="tab" aria-selected="false" data-tab="res">النتيجة 🏁</button>
       <button role="tab" aria-selected="false" data-tab="log">محاولاتي 📚</button>
     </div>
     <section class="panel active" id="en" role="tabpanel"></section>
     <section class="panel" id="ma" role="tabpanel"></section>
+    <section class="panel" id="arb" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
     <section class="panel" id="log" role="tabpanel"></section>
     <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · صفحة تعليمية</footer>`;
@@ -799,6 +881,67 @@ if(!STUDENTS[who]){
     }
   }
 
+  let arbBuilt = false;
+  function renderArb(){
+    if(arbBuilt) return; arbBuilt = true;
+    const sec = document.getElementById("arb");
+    const A = ARABIC[who];
+    if(!A){ sec.innerHTML='<div class="locked">قسم العربية غير متاح.</div>'; return; }
+    let h = '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
+      '<p class="explain show" style="display:block">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
+    A.dictation.forEach(function(text,i){
+      h += '<div class="q" data-d="'+i+'"><div class="num">إملاء '+(i+1)+'</div>'+
+        '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
+        '<button type="button" data-say style="background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800">🔊 استمع</button>'+
+        '<button type="button" data-slow>🐢 أبطأ</button></div>'+
+        '<input class="dinp" placeholder="اكتب هنا..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)">'+
+        '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
+        '<button type="button" data-chk>تحقّق</button><button type="button" data-show>👁️ أظهر</button></div>'+
+        '<div class="dfb" style="margin-top:8px;font-weight:700;min-height:20px"></div></div>';
+    });
+    h += '<div class="block-title"><span class="dot"></span> أسئلة اللغة العربية</div>';
+    A.quiz.forEach(function(q,i){
+      h += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
+        '<div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+o+'</button>'; });
+      h += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    h += '<div class="scorebar"><span class="txt" data-ars>0 / '+A.quiz.length+'</span>'+
+         '<div class="track"><div class="fill" data-arf></div></div></div>';
+    sec.innerHTML = h;
+
+    // إملاء
+    sec.querySelectorAll('.q[data-d]').forEach(function(qEl){
+      var i = +qEl.dataset.d, text = A.dictation[i];
+      var inp = qEl.querySelector('.dinp'), fb = qEl.querySelector('.dfb');
+      qEl.querySelector('[data-say]').addEventListener('click', function(){ speakAr(text, 0.9); });
+      qEl.querySelector('[data-slow]').addEventListener('click', function(){ speakAr(text, 0.55); });
+      qEl.querySelector('[data-show]').addEventListener('click', function(){ fb.style.color='var(--good)'; fb.textContent='الإجابة: '+text; });
+      qEl.querySelector('[data-chk]').addEventListener('click', function(){
+        if(normAr(inp.value)===normAr(text)){ fb.style.color='var(--good)'; fb.textContent='✅ صحيح!'; }
+        else{ fb.style.color='var(--bad)'; fb.textContent='❌ حاول ثانية · الصحيح: '+text; }
+      });
+    });
+    // أسئلة
+    var answered = new Set(), correct = 0, total = A.quiz.length;
+    var scoreEl = sec.querySelector('[data-ars]'), fillEl = sec.querySelector('[data-arf]');
+    sec.querySelectorAll('.q[data-i]').forEach(function(qEl){
+      var i = +qEl.dataset.i, ans = A.quiz[i][2];
+      qEl.querySelectorAll('.opts button').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if(answered.has(i)) return; answered.add(i);
+          var j = +btn.dataset.j;
+          qEl.querySelectorAll('.opts button').forEach(function(b){b.disabled=true;});
+          if(j===ans){ btn.classList.add('correct'); correct++; }
+          else{ btn.classList.add('wrong'); qEl.querySelectorAll('.opts button')[ans].classList.add('correct'); }
+          qEl.querySelector('.explain').classList.add('show');
+          scoreEl.textContent = correct+' / '+total;
+          fillEl.style.width = (answered.size/total*100)+'%';
+        });
+      });
+    });
+  }
+
   let logLoaded = false;
   async function renderLog(force){
     const sec = document.getElementById("log");
@@ -845,6 +988,7 @@ if(!STUDENTS[who]){
       document.getElementById(b.dataset.tab).classList.add('active');
       if(b.dataset.tab==="res") renderResults();
       if(b.dataset.tab==="log") renderLog();
+      if(b.dataset.tab==="arb") renderArb();
     });
   });
 }
