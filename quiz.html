@@ -929,8 +929,8 @@ if(!STUDENTS[who]){
     sec.querySelectorAll('.q[data-d]').forEach(function(qEl){
       var i = +qEl.dataset.d, text = A.dictation[i];
       var inp = qEl.querySelector('.dinp'), fb = qEl.querySelector('.dfb');
-      qEl.querySelector('[data-say]').addEventListener('click', function(){ speakAr(text, 0.9); });
-      qEl.querySelector('[data-slow]').addEventListener('click', function(){ speakAr(text, 0.55); });
+      qEl.querySelector('[data-say]').addEventListener('click', function(){ speakAr(text, 1); });
+      qEl.querySelector('[data-slow]').addEventListener('click', function(){ speakAr(text, 0.7); });
       qEl.querySelector('[data-show]').addEventListener('click', function(){ fb.style.color='var(--good)'; fb.textContent='الإجابة: '+text; });
       qEl.querySelector('[data-chk]').addEventListener('click', function(){
         if(normAr(inp.value)===normAr(text)){ fb.style.color='var(--good)'; fb.textContent='✅ صحيح!'; }

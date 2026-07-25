@@ -254,8 +254,8 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=D.dictation[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
-      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,S.rate,ar?"ar-SA":"en-US"); });
-      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.55,ar?"ar-SA":"en-US"); });
+      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,1,ar?"ar-SA":"en-US"); });
+      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.7,ar?"ar-SA":"en-US"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
       wireMic(qEl, text, ar);
       qEl.querySelector(".chk").addEventListener("click",function(){
@@ -283,7 +283,7 @@ if(!META[who] || !DATA[who]){
     });
     html += '<div class="score" data-score>الفهم: 0 / '+D.questions.length+'</div>';
     sec.innerHTML = html;
-    sec.querySelector("[data-read]").addEventListener("click",function(){ speak(D.passage,S.rate,ar?"ar-SA":"en-US"); });
+    sec.querySelector("[data-read]").addEventListener("click",function(){ speak(D.passage,1,ar?"ar-SA":"en-US"); });
     wireMic(sec.querySelector("[data-mic-wrap]"), D.passage, ar);
     var ans={}, correct=0, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -338,8 +338,8 @@ if(!META[who] || !DATA[who]){
           pfb.textContent = (err==="no-support") ? "⚠️ متصفح هذا الجهاز لا يدعم النطق بالمايك — جرّب Chrome على أندرويد أو كمبيوتر." : "⚠️ لم أسمع بوضوح، اسمح بالمايك وحاول ثانية.";
         });
       }); }
-      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,S.rate,"en-US"); });
-      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(word,0.55,"en-US"); });
+      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,1,"en-US"); });
+      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(word,0.7,"en-US"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الكلمة: <span class="corr">'+word+'</span> · المعنى: <span class="corr">'+answers[0]+'</span>'; });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var enOk = norm(ein.value,false)===norm(word,false);
@@ -375,7 +375,7 @@ if(!META[who] || !DATA[who]){
   function tryVoice(){
     var d = (DATA[who] && DATA[who][curLang==="ar"?"ar":"en"]) || {};
     var sample = (d.dictation && d.dictation[0]) || (curLang==="ar"?"مدرسة":"school");
-    speak(sample, S.rate, curLang==="ar"?"ar-SA":"en-US");
+    speak(sample, 1, curLang==="ar"?"ar-SA":"en-US");
   }
   ["voiceTest","voiceTestFb"].forEach(function(id){
     var b = document.getElementById(id); if(b) b.addEventListener("click", tryVoice);
