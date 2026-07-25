@@ -89,7 +89,7 @@ const DATA = {
     en:{ dictation:["I go to school every day.","She is reading a book.","They played football yesterday.","We have two cats.","He does not like fish.","The weather is nice today."],
       passage:"Last weekend, Ali visited his grandparents in the village. They have a big farm with cows and chickens. Ali helped his grandfather feed the animals and pick fresh vegetables. In the evening, they sat together and told stories. Ali had a wonderful time.",
       questions:[["Where did Ali go last weekend?",["to the city","to his grandparents' village","to school"],1],["What animals are on the farm?",["cows and chickens","lions","fish"],0],["What did they do in the evening?",["watched TV","told stories","played football"],1]] },
-    ar:{ dictation:["العلمُ نورٌ ينير طريق الإنسان.","الصدقُ صفةٌ يحبها الناس.","نظافةُ البيئة مسؤوليةُ الجميع.","القراءةُ غذاءُ العقل.","التعاونُ يقوّي المجتمع.","في التأنّي السلامة."],
+    ar:{ dictation:["العِلْمُ نُورٌ يُنِيرُ طَرِيقَ الإِنْسَانِ.","الصِّدْقُ صِفَةٌ يُحِبُّهَا النَّاسُ.","نَظَافَةُ البِيئَةِ مَسْؤُولِيَّةُ الجَمِيعِ.","القِرَاءَةُ غِذَاءُ العَقْلِ.","التَّعَاوُنُ يُقَوِّي المُجْتَمَعَ.","فِي التَّأَنِّي السَّلَامَةُ."],
       passage:"يُعدّ الماء أساس الحياة على الأرض، فلا يستطيع إنسان ولا حيوان ولا نبات العيش بدونه. ورغم أهميته، يهدر كثير من الناس الماء دون وعي. لذلك يجب علينا ترشيد الاستهلاك وإغلاق الصنابير جيدًا والمحافظة على هذه النعمة.",
       questions:[["ما أساس الحياة على الأرض؟",["الهواء","الماء","الطعام"],1],["ما الخطأ الذي يقع فيه كثير من الناس؟",["يهدرون الماء","يشربون كثيرًا","يزرعون النبات"],0],["ماذا يجب علينا أن نفعل؟",["نهدر الماء","نرشّد الاستهلاك","نترك الصنابير مفتوحة"],1]] }
   },
@@ -97,7 +97,7 @@ const DATA = {
     en:{ dictation:["She has lived here since 2010.","The letter was written by Ali.","If it rains, we will stay home.","He has already finished his work.","They were watching TV when I arrived.","Water boils at one hundred degrees."],
       passage:"Technology has changed the way we learn. In the past, students depended only on books and teachers. Today, they can find information online, watch videos, and take courses from home. However, experts warn that spending too much time on screens can affect health and focus. Therefore, balance is important.",
       questions:[["How did students learn in the past?",["only online","from books and teachers","from videos"],1],["What do experts warn about?",["reading too much","too much screen time","studying at home"],1],["What is the main advice?",["stop using technology","balance","study all day"],1]] },
-    ar:{ dictation:["إنّ مع العسر يسرًا.","من جدّ وجد ومن زرع حصد.","العقلُ السليم في الجسم السليم.","الكلمةُ الطيبة صدقة.","خيرُ الناس أنفعهم للناس.","الأمانةُ تاجٌ على رؤوس الأصحاب."],
+    ar:{ dictation:["إنَّ مَعَ العُسْرِ يُسْرًا.","مَنْ جَدَّ وَجَدَ وَمَنْ زَرَعَ حَصَدَ.","العَقْلُ السَّلِيمُ فِي الجِسْمِ السَّلِيمِ.","الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ.","خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ.","الأَمَانَةُ تَاجٌ عَلَى رُؤُوسِ الأَصْحَابِ."],
       passage:"شهد العالم في العقود الأخيرة تطورًا هائلًا في مجال التقنية، فقد غيّرت وسائل التواصل الحديثة طريقة تعاملنا مع المعلومة والعالم من حولنا. ومع أنّ لهذه التقنية فوائد كثيرة في التعليم والعمل، إلا أنّ الإفراط في استخدامها قد يؤثّر سلبًا على العلاقات الاجتماعية والصحة. ولذلك فإنّ الاستخدام المتوازن هو مفتاح الاستفادة الحقيقية.",
       questions:[["ما الذي غيّرته وسائل التواصل الحديثة؟",["طريقة تعاملنا مع المعلومة","الطقس","أسعار السوق"],0],["ما سلبيات الإفراط في التقنية؟",["تزيد الصحة","تؤثّر على العلاقات والصحة","تحسّن النوم"],1],["ما مفتاح الاستفادة الحقيقية؟",["الاستخدام المتوازن","تركها كليًا","استخدامها طوال اليوم"],0]] }
   }
@@ -121,7 +121,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "hd3";
+var AUDIO_VER = "hd4";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
