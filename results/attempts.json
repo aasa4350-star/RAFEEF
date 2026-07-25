@@ -1,5 +1,1175 @@
 [
     {
+        "id": "b050d0a3-8180-4e79-ad7f-cddd1e9a8fde",
+        "created_at": "2026-07-25T01:02:40.041972+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 8,
+        "en_total": 10,
+        "ma_correct": 10,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "The plural of \"box\" is:",
+                "picked": "boxs",
+                "correct": "boxes",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "___ is a book.",
+                "picked": "These",
+                "correct": "This",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 10.3,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 10,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 4.7,
+            "total_sec": 85
+        }
+    },
+    {
+        "id": "2d07bdcb-e38a-461d-8f76-9bf5901539c7",
+        "created_at": "2026-07-25T01:02:30.282182+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 9,
+        "en_total": 10,
+        "ma_correct": 10,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "The opposite of \"fast\" is:",
+                "picked": "big",
+                "correct": "slow",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 8.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 11.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 17.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 12,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 5.3,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 4.1,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 5.4,
+            "total_sec": 97
+        }
+    },
+    {
+        "id": "7e222688-e6f2-4ff9-8a89-9e0ca402489b",
+        "created_at": "2026-07-25T01:01:41.675317+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 9,
+        "en_total": 10,
+        "ma_correct": 8,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "The opposite of \"fast\" is:",
+                "picked": "big",
+                "correct": "slow",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: \u2153 + \u2154",
+                "picked": "\u00bd",
+                "correct": "1",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 121 \u00f7 11",
+                "picked": "12",
+                "correct": "11",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 8.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 11.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 17.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 12,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.7,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 4.6,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 9.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.4,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 6,
+            "total_sec": 109
+        }
+    },
+    {
+        "id": "5e61023e-db22-401d-b374-1b7a6813c95e",
+        "created_at": "2026-07-25T01:01:34.364557+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 7,
+        "en_total": 10,
+        "ma_correct": 10,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "We are ___ now.",
+                "picked": "play",
+                "correct": "playing",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "The opposite of \"big\" is:",
+                "picked": "hot",
+                "correct": "small",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "___ is a book.",
+                "picked": "These",
+                "correct": "This",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.1,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 14.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 21.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.5,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 5.4,
+            "total_sec": 97
+        }
+    },
+    {
+        "id": "a435e669-e4d8-4f87-b4c7-214328d7f679",
+        "created_at": "2026-07-25T00:59:34.843166+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 9,
+        "en_total": 12,
+        "ma_correct": 9,
+        "ma_total": 12,
+        "wrong": [
+            {
+                "q": "Water ___ at 100 degrees.",
+                "picked": "boil",
+                "correct": "boils",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "Choose the synonym of \"big\":",
+                "picked": "tiny",
+                "correct": "huge",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "You ___ finish it now; there's time.",
+                "picked": "must",
+                "correct": "don't have to",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0628\u0633\u0651\u0637: 3\u00b2 \u00d7 3",
+                "picked": "18",
+                "correct": "27",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0645\u062b\u0644\u062b \u0642\u0627\u0626\u0645 \u0636\u0644\u0639\u0627\u0647 3 \u0648 4\u060c \u0645\u0627 \u0637\u0648\u0644 \u0627\u0644\u0648\u062a\u0631\u061f",
+                "picked": "7",
+                "correct": "5",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 3\u00b2 + 4\u00b2",
+                "picked": "12",
+                "correct": "25",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 7.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.1,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 31.3,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 15.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 5.5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 13.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 34.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 12.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 18,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.5,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 32.1,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 8.2,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 9.4,
+            "total_sec": 206
+        }
+    },
+    {
+        "id": "d00da204-f26b-45c7-9e78-76e80fab38ab",
+        "created_at": "2026-07-25T00:58:43.271323+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 6,
+        "en_total": 10,
+        "ma_correct": 10,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "You ___ my friend.",
+                "picked": "is",
+                "correct": "are",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "A ___ gives us milk.",
+                "picked": "cat",
+                "correct": "cow",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "I ___ happy.",
+                "picked": "is",
+                "correct": "am",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "The plural of \"box\" is:",
+                "picked": "boxs",
+                "correct": "boxes",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.7,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.8,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 29.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 7.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 3.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 5.8,
+            "total_sec": 104
+        }
+    },
+    {
+        "id": "0332615e-9979-4c2b-a547-9f055154fdf8",
+        "created_at": "2026-07-25T00:56:44.428768+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 9,
+        "en_total": 12,
+        "ma_correct": 8,
+        "ma_total": 12,
+        "wrong": [
+            {
+                "q": "We ___ TV every evening.",
+                "picked": "watching",
+                "correct": "watch",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "Last night we ___ a pizza.",
+                "picked": "eat",
+                "correct": "ate",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "The opposite of \"expensive\" is:",
+                "picked": "rich",
+                "correct": "cheap",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: \u22125 \u00d7 \u22122",
+                "picked": "\u221210",
+                "correct": "10",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0628\u0633\u0651\u0637 \u0627\u0644\u0646\u0633\u0628\u0629 6:9",
+                "picked": "3:2",
+                "correct": "2:3",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: \u22123 + 7",
+                "picked": "10",
+                "correct": "4",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u062d\u0644: 2x + 3 = 11",
+                "picked": "x = 7",
+                "correct": "x = 4",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 40,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 16.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 10.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 15,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 33.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 19.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 8.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 21.3,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 9.6,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 35.1,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 9.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.1,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.4,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 9.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.7,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 8.6,
+                    "ok": false
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 34.6,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 11.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 8.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.1,
+                    "ok": true
+                }
+            ],
+            "avg_sec": 14.8,
+            "total_sec": 325
+        }
+    },
+    {
         "id": "8fd81b79-e953-49cd-9f42-163ed0bcaf0b",
         "created_at": "2026-07-24T14:08:29.19939+00:00",
         "student": "\u0631\u0641\u064a\u0641",
