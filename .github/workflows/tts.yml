@@ -31,27 +31,29 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install gTTS
-        run: pip install gTTS
+      - name: Install edge-tts
+        run: pip install edge-tts
 
-      - name: Generate audio + manifest
+      - name: Generate natural neural audio + manifest
         run: |
           python3 - <<'PY'
-          import json, os, hashlib
-          from gtts import gTTS
+          import json, os, asyncio, edge_tts
           phrases = json.load(open("audio/phrases.json", encoding="utf-8"))
+          VOICES = {"en": "en-US-JennyNeural", "ar": "ar-SA-ZariyahNeural"}
           manifest = {"en": {}, "ar": {}}
-          for lang in ["en", "ar"]:
-              os.makedirs(f"audio/{lang}", exist_ok=True)
-              for i, text in enumerate(phrases.get(lang, [])):
-                  fn = f"{lang}/{lang}_{i}.mp3"
-                  path = f"audio/{fn}"
-                  if not os.path.exists(path):
+          async def one(text, voice, path):
+              await edge_tts.Communicate(text, voice, rate="-8%").save(path)
+          async def main():
+              for lang in ["en", "ar"]:
+                  os.makedirs(f"audio/{lang}", exist_ok=True)
+                  for i, text in enumerate(phrases.get(lang, [])):
+                      fn = f"{lang}/{lang}_{i}.mp3"
                       try:
-                          gTTS(text=text, lang=lang, slow=False).save(path)
+                          await one(text, VOICES[lang], f"audio/{fn}")
+                          manifest[lang][text] = fn
                       except Exception as e:
-                          print("skip", lang, i, repr(text), e); continue
-                  manifest[lang][text] = fn
+                          print("skip", lang, i, repr(text), e)
+          asyncio.run(main())
           json.dump(manifest, open("audio/manifest.json", "w", encoding="utf-8"),
                     ensure_ascii=False, indent=1)
           print("en:", len(manifest["en"]), "ar:", len(manifest["ar"]))
