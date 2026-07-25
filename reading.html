@@ -121,11 +121,16 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var MANIFEST = null, CUR_AUDIO = null;
-fetch("audio/manifest.json").then(function(r){ return r.ok ? r.json() : null; }).then(function(m){ MANIFEST = m; }).catch(function(){});
+var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
+var MANI_P = fetch("audio/manifest.json?v=14")
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(m){ MANIFEST = m; MANI_DONE = true; })
+  .catch(function(){ MANI_DONE = true; });
 function speak(text, rate, lang){
+  // ننتظر تحميل قائمة الصوت البشري قبل أي رجوع للصوت الآلي
+  if(!MANI_DONE){ MANI_P.then(function(){ speak(text, rate, lang); }); return; }
   var isAr = lang && lang.indexOf("ar")===0, lk = isAr ? "ar" : "en";
-  // صوت بشري جاهز (Google TTS) إن وُجد
+  // صوت بشري جاهز إن وُجد
   if(MANIFEST && MANIFEST[lk] && MANIFEST[lk][text]){
     try{
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
@@ -210,9 +215,11 @@ if(!META[who] || !DATA[who]){
       '<button data-lang="en" aria-selected="true">الإنجليزي 🇬🇧</button>'+
       '<button data-lang="ar" aria-selected="false">العربي 🇸🇦</button>'+
     '</div>'+
-    '<div class="bar" style="align-items:center"><span style="font-size:.85rem;color:var(--muted);font-weight:700;white-space:nowrap">🔈 الصوت:</span>'+
-      '<select id="voiceSel" style="flex:1;min-width:0;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:.85rem"></select>'+
+    '<div class="bar" id="humanBar" style="align-items:center;display:none"><span style="font-size:.85rem;color:var(--good);font-weight:800;white-space:nowrap">🔊 صوت بشري طبيعي</span>'+
       '<button class="say small" id="voiceTest">جرّب 🔊</button></div>'+
+    '<div class="bar" id="voiceBar" style="align-items:center;display:none"><span style="font-size:.85rem;color:var(--muted);font-weight:700;white-space:nowrap">🔈 الصوت:</span>'+
+      '<select id="voiceSel" style="flex:1;min-width:0;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:.85rem"></select>'+
+      '<button class="say small" id="voiceTestFb">جرّب 🔊</button></div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
@@ -364,11 +371,26 @@ if(!META[who] || !DATA[who]){
     if(CHOSEN[lk]) sel.value = CHOSEN[lk];
     sel.onchange = function(){ CHOSEN[lk] = sel.value; };
   }
-  var vtBtn = document.getElementById("voiceTest");
-  if(vtBtn) vtBtn.addEventListener("click", function(){ speak(curLang==="ar"?"مرحبًا، هذا هو الصوت":"Hello, this is the voice", S.rate, curLang==="ar"?"ar-SA":"en-US"); });
+  function tryVoice(){
+    var d = (DATA[who] && DATA[who][curLang==="ar"?"ar":"en"]) || {};
+    var sample = (d.dictation && d.dictation[0]) || (curLang==="ar"?"مدرسة":"school");
+    speak(sample, S.rate, curLang==="ar"?"ar-SA":"en-US");
+  }
+  ["voiceTest","voiceTestFb"].forEach(function(id){
+    var b = document.getElementById(id); if(b) b.addEventListener("click", tryVoice);
+  });
   try{ speechSynthesis.onvoiceschanged = function(){ populateVoices(); }; }catch(e){}
 
-  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); populateVoices(); }
+  // نعرض شريط «صوت بشري» عند توفره، ونخفي منتقي صوت الجهاز الآلي
+  function updateVoiceBars(){
+    var human = !!(MANIFEST && ((MANIFEST.en && Object.keys(MANIFEST.en).length) || (MANIFEST.ar && Object.keys(MANIFEST.ar).length)));
+    var hb = document.getElementById("humanBar"), vb = document.getElementById("voiceBar");
+    if(hb) hb.style.display = (MANI_DONE && human) ? "flex" : "none";
+    if(vb) vb.style.display = (MANI_DONE && !human) ? "flex" : "none";
+  }
+  MANI_P.then(updateVoiceBars);
+
+  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); populateVoices(); updateVoiceBars(); }
   renderAll();
 
   document.querySelectorAll(".langtabs button").forEach(function(b){
