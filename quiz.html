@@ -642,7 +642,7 @@ const ARABIC = {
     ]
   },
   osama: {
-    dictation:["مدرسة","صديق","حديقة","شجرة","عصفور","سماء","مكتبة","نظافة"],
+    dictation:["مَدْرَسَة","صَدِيق","حَدِيقَة","شَجَرَة","عُصْفُور","سَمَاء","مَكْتَبَة","نَظَافَة"],
     quiz:[
       ["جمع «معلّم»:",["معلّمون","معلّمهم","معلّمان"],0,"جمع مذكر سالم: معلّمون."],
       ["عكس «قويّ»:",["كبير","ضعيف","سريع"],1,"عكسها: ضعيف."],
@@ -655,7 +655,7 @@ const ARABIC = {
     ]
   },
   saud: {
-    dictation:["بيت","شمس","قلم","كتاب","ورد","باب","ماء","يد"],
+    dictation:["بَيْت","شَمْس","قَلَم","كِتَاب","وَرْد","بَاب","مَاء","يَد"],
     quiz:[
       ["جمع «بيت»:",["بيتين","بيوت","بيتات"],1,"الجمع: بيوت."],
       ["عكس «نهار»:",["صباح","ليل","ظهر"],1,"عكسها: ليل."],
@@ -679,7 +679,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "hd2";
+var AUDIO_VER = "hd3";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })

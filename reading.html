@@ -73,7 +73,7 @@ const DATA = {
     en:{ dictation:["cat","dog","red","book","sun","ball","fish","milk"],
       passage:"This is Sam. Sam has a red ball. He plays with his dog. The dog is happy.",
       questions:[["What color is the ball?",["red","blue","green"],0],["What animal does Sam have?",["a cat","a dog","a fish"],1],["Is the dog happy?",["yes","no","maybe"],0]] },
-    ar:{ dictation:["بيت","شمس","قلم","كتاب","ورد","باب","ماء","يد"],
+    ar:{ dictation:["بَيْت","شَمْس","قَلَم","كِتَاب","وَرْد","بَاب","مَاء","يَد"],
       passage:"ذهب سعد إلى المدرسة. أخذ حقيبته وكتابه. في المدرسة تعلّم سعد حروفًا جديدة. عاد سعد إلى البيت سعيدًا.",
       questions:[["إلى أين ذهب سعد؟",["المدرسة","الحديقة","السوق"],0],["ماذا أخذ معه؟",["كرته","حقيبته وكتابه","دراجته"],1],["كيف عاد سعد؟",["حزينًا","سعيدًا","متعبًا"],1]] }
   },
@@ -81,7 +81,7 @@ const DATA = {
     en:{ dictation:["school","friend","water","green","happy","family","seven","table"],
       passage:"Mona is a girl. She goes to school every day. She likes her teacher and her friends. After school, she reads books at home.",
       questions:[["Where does Mona go every day?",["to school","to the park","to the shop"],0],["What does she do after school?",["plays games","reads books","sleeps"],1],["Who does she like?",["her teacher and friends","her dog","nobody"],0]] },
-    ar:{ dictation:["مدرسة","صديق","حديقة","شجرة","عصفور","سماء","مكتبة","نظافة"],
+    ar:{ dictation:["مَدْرَسَة","صَدِيق","حَدِيقَة","شَجَرَة","عُصْفُور","سَمَاء","مَكْتَبَة","نَظَافَة"],
       passage:"تحب مُنى القراءة. تذهب كل أسبوع إلى المكتبة وتستعير كتابًا جديدًا. تقرأ مُنى قصص المغامرات والعلوم. القراءة تزيد معرفتها وتوسّع خيالها.",
       questions:[["ماذا تحب مُنى؟",["اللعب","القراءة","النوم"],1],["إلى أين تذهب كل أسبوع؟",["المكتبة","الحديقة","المدرسة"],0],["ماذا تقرأ مُنى؟",["قصص المغامرات والعلوم","الرسائل","الجرائد"],0]] }
   },
@@ -121,7 +121,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "hd2";
+var AUDIO_VER = "hd3";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
