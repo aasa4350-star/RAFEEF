@@ -154,7 +154,7 @@ if(!META[who] || !DATA[who]){
     '<div class="tabs" role="tablist">'+
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
-      '<button data-tab="vocab" aria-selected="false">المعنى بالعربي ✍️</button>'+
+      '<button data-tab="vocab" aria-selected="false">كلمات 🔊✍️</button>'+
     '</div>'+
     '<section class="panel active" id="dict"></section>'+
     '<section class="panel" id="read"></section>'+
@@ -229,12 +229,17 @@ if(!META[who] || !DATA[who]){
     var sec = document.getElementById("vocab");
     if(curLang!=="en"){ sec.innerHTML=""; return; }
     var V = VOCAB[who] || [];
-    var html = '<div class="block-title"><span class="dot"></span> اكتب معنى الكلمة بالعربي</div>'+
-      '<p class="hint">اسمع الكلمة الإنجليزية 🔊 ثم اكتب معناها بالعربي، ثم «تحقّق».</p>';
+    var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
+    var html = '<div class="block-title"><span class="dot"></span> اسمع الكلمة، اكتبها بالإنجليزي، ومعناها بالعربي</div>'+
+      '<p class="hint">اضغط 🔊 استمع، ثم اكتب الكلمة بالإنجليزي ومعناها بالعربي، ثم «تحقّق».</p>';
     V.forEach(function(item,i){
-      html += '<div class="q" data-i="'+i+'"><div class="row"><button class="say small" data-say>🔊 استمع</button>'+
-        '<span class="stem" style="direction:ltr;text-align:left;font-size:1.15rem">'+item[0]+'</span></div>'+
-        '<input class="dinp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
+      html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(i+1)+'</div>'+
+        '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
+        '<button class="say small" data-slow>🐢 أبطأ</button></div>'+
+        '<span '+lab+'>اكتبها بالإنجليزي:</span>'+
+        '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
+        '<span '+lab+'>معناها بالعربي:</span>'+
+        '<input class="ainp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
         '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
         '<div class="fb"></div></div>';
     });
@@ -243,14 +248,18 @@ if(!META[who] || !DATA[who]){
     var done={}, correct=0, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0], answers=V[i][1];
-      var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
+      var ein=qEl.querySelector(".einp"), ain=qEl.querySelector(".ainp"), fb=qEl.querySelector(".fb");
       qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,S.rate,"en-US"); });
-      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='المعنى: <span class="corr">'+answers[0]+'</span>'; });
+      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(word,0.55,"en-US"); });
+      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الكلمة: <span class="corr">'+word+'</span> · المعنى: <span class="corr">'+answers[0]+'</span>'; });
       qEl.querySelector(".chk").addEventListener("click",function(){
-        var val=norm(inp.value,true);
-        var ok=answers.some(function(a){return norm(a,true)===val;});
-        if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
-        else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · المعنى: <span class="corr">'+answers[0]+'</span>'; }
+        var enOk = norm(ein.value,false)===norm(word,false);
+        var arOk = answers.some(function(a){return norm(a,true)===norm(ain.value,true);});
+        if(enOk && arOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! الإنجليزي والعربي صحيحين"; if(!done[i]){done[i]=1;correct++;} }
+        else{
+          fb.className="fb no";
+          fb.innerHTML = 'الإنجليزي: '+(enOk?'✅':'❌ <span class="corr">'+word+'</span>')+' · العربي: '+(arOk?'✅':'❌ <span class="corr">'+answers[0]+'</span>');
+        }
         scoreEl.textContent="الدرجة: "+correct+" / "+V.length;
       });
     });
