@@ -527,10 +527,12 @@ if(!STUDENTS[who]){
       <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
       <button role="tab" aria-selected="false" data-tab="res">النتيجة 🏁</button>
+      <button role="tab" aria-selected="false" data-tab="log">محاولاتي 📚</button>
     </div>
     <section class="panel active" id="en" role="tabpanel"></section>
     <section class="panel" id="ma" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
+    <section class="panel" id="log" role="tabpanel"></section>
     <footer>صفحة تعليمية مجانية · لمتابعة الأبناء</footer>`;
 
   const DATA = {
@@ -672,6 +674,42 @@ if(!STUDENTS[who]){
     }
   }
 
+  let logLoaded = false;
+  async function renderLog(force){
+    const sec = document.getElementById("log");
+    if (logLoaded && !force) return;
+    sec.innerHTML = '<div class="locked">⏳ جارٍ تحميل محاولاتك السابقة...</div>';
+    try{
+      const r = await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
+        {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+      const rows = await r.json();
+      logLoaded = true;
+      if(!Array.isArray(rows) || !rows.length){
+        sec.innerHTML = '<div class="locked">ما عندك محاولات سابقة بعد. حل الاختبار وبتنحفظ هنا تلقائيًا.</div>'; return;
+      }
+      let h = '<div class="block-title"><span class="dot"></span> محاولاتك السابقة ('+rows.length+')</div>';
+      rows.forEach(function(x,i){
+        var tot = Math.round((x.en_correct+x.ma_correct)/((x.en_total+x.ma_total)||1)*100);
+        var dt = (x.created_at||"").slice(0,16).replace("T"," ");
+        var wrong = x.wrong || [];
+        h += '<div class="q"><div class="num">محاولة '+(rows.length-i)+' · '+dt+'</div>'+
+             '<div class="stem">النتيجة: '+tot+'% — إنجليزي '+x.en_correct+'/'+x.en_total+' · رياضيات '+x.ma_correct+'/'+x.ma_total+'</div>';
+        if(wrong.length){
+          h += '<div class="explain show"><b>الأخطاء للمراجعة:</b><br>'+
+               wrong.map(function(w){ return '• ['+(w.subject||'')+'] '+w.q+' → إجابتك: <span style="color:var(--bad)">'+w.picked+'</span> · الصحيح: <span style="color:var(--good);font-weight:700">'+w.correct+'</span>'; }).join('<br>')+'</div>';
+        }else{
+          h += '<div class="explain show">🎉 بدون أخطاء في هذي المحاولة</div>';
+        }
+        h += '</div>';
+      });
+      h += '<button class="reset" id="logRefresh">🔄 تحديث</button>';
+      sec.innerHTML = h;
+      var rb = document.getElementById("logRefresh"); if(rb) rb.addEventListener("click", function(){ renderLog(true); });
+    }catch(e){
+      sec.innerHTML = '<div class="locked">⚠️ تعذّر التحميل — تأكد من الاتصال بالإنترنت وأعد المحاولة.</div>';
+    }
+  }
+
   ["en","ma"].forEach(build);
   renderResults();
   document.querySelectorAll('.tabs button').forEach(b=>{
@@ -681,6 +719,7 @@ if(!STUDENTS[who]){
       document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
       document.getElementById(b.dataset.tab).classList.add('active');
       if(b.dataset.tab==="res") renderResults();
+      if(b.dataset.tab==="log") renderLog();
     });
   });
 }
