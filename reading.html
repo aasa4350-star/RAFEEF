@@ -38,6 +38,7 @@
   .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
   .say{background:var(--accent);color:#fff;border:0;padding:11px 16px;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit}
   .say.small{padding:8px 12px;font-size:.9rem}
+  .no-mic [data-mic]{display:none!important}
   .dinp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.15rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .chk{background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
@@ -74,7 +75,7 @@ const DATA = {
       passage:"This is Sam. Sam has a red ball. He plays with his dog. The dog is happy.",
       questions:[["What color is the ball?",["red","blue","green"],0],["What animal does Sam have?",["a cat","a dog","a fish"],1],["Is the dog happy?",["yes","no","maybe"],0]] },
     ar:{ dictation:["بَيْت","شَمْس","قَلَم","كِتَاب","وَرْد","بَاب","مَاء","يَد"],
-      passage:"ذهب سعد إلى المدرسة. أخذ حقيبته وكتابه. في المدرسة تعلّم سعد حروفًا جديدة. عاد سعد إلى البيت سعيدًا.",
+      passage:"ذَهَبَ سَعْدٌ إِلَى المَدْرَسَةِ. أَخَذَ حَقِيبَتَهُ وَكِتَابَهُ. فِي المَدْرَسَةِ تَعَلَّمَ سَعْدٌ حُرُوفًا جَدِيدَةً. عَادَ سَعْدٌ إِلَى البَيْتِ سَعِيدًا.",
       questions:[["إلى أين ذهب سعد؟",["المدرسة","الحديقة","السوق"],0],["ماذا أخذ معه؟",["كرته","حقيبته وكتابه","دراجته"],1],["كيف عاد سعد؟",["حزينًا","سعيدًا","متعبًا"],1]] }
   },
   osama:{
@@ -82,7 +83,7 @@ const DATA = {
       passage:"Mona is a girl. She goes to school every day. She likes her teacher and her friends. After school, she reads books at home.",
       questions:[["Where does Mona go every day?",["to school","to the park","to the shop"],0],["What does she do after school?",["plays games","reads books","sleeps"],1],["Who does she like?",["her teacher and friends","her dog","nobody"],0]] },
     ar:{ dictation:["مَدْرَسَة","صَدِيق","حَدِيقَة","شَجَرَة","عُصْفُور","سَمَاء","مَكْتَبَة","نَظَافَة"],
-      passage:"تحب مُنى القراءة. تذهب كل أسبوع إلى المكتبة وتستعير كتابًا جديدًا. تقرأ مُنى قصص المغامرات والعلوم. القراءة تزيد معرفتها وتوسّع خيالها.",
+      passage:"تُحِبُّ مُنى القِرَاءَةَ. تَذْهَبُ كُلَّ أُسْبُوعٍ إِلَى المَكْتَبَةِ وَتَسْتَعِيرُ كِتَابًا جَدِيدًا. تَقْرَأُ مُنى قِصَصَ المُغَامَرَاتِ وَالعُلُومِ. القِرَاءَةُ تَزِيدُ مَعْرِفَتَهَا وَتُوَسِّعُ خَيَالَهَا.",
       questions:[["ماذا تحب مُنى؟",["اللعب","القراءة","النوم"],1],["إلى أين تذهب كل أسبوع؟",["المكتبة","الحديقة","المدرسة"],0],["ماذا تقرأ مُنى؟",["قصص المغامرات والعلوم","الرسائل","الجرائد"],0]] }
   },
   rafeef:{
@@ -90,7 +91,7 @@ const DATA = {
       passage:"Last weekend, Ali visited his grandparents in the village. They have a big farm with cows and chickens. Ali helped his grandfather feed the animals and pick fresh vegetables. In the evening, they sat together and told stories. Ali had a wonderful time.",
       questions:[["Where did Ali go last weekend?",["to the city","to his grandparents' village","to school"],1],["What animals are on the farm?",["cows and chickens","lions","fish"],0],["What did they do in the evening?",["watched TV","told stories","played football"],1]] },
     ar:{ dictation:["العِلْمُ نُورٌ يُنِيرُ طَرِيقَ الإِنْسَانِ.","الصِّدْقُ صِفَةٌ يُحِبُّهَا النَّاسُ.","نَظَافَةُ البِيئَةِ مَسْؤُولِيَّةُ الجَمِيعِ.","القِرَاءَةُ غِذَاءُ العَقْلِ.","التَّعَاوُنُ يُقَوِّي المُجْتَمَعَ.","فِي التَّأَنِّي السَّلَامَةُ."],
-      passage:"يُعدّ الماء أساس الحياة على الأرض، فلا يستطيع إنسان ولا حيوان ولا نبات العيش بدونه. ورغم أهميته، يهدر كثير من الناس الماء دون وعي. لذلك يجب علينا ترشيد الاستهلاك وإغلاق الصنابير جيدًا والمحافظة على هذه النعمة.",
+      passage:"يُعَدُّ المَاءُ أَسَاسَ الحَيَاةِ عَلَى الأَرْضِ، فَلَا يَسْتَطِيعُ إِنْسَانٌ وَلَا حَيَوَانٌ وَلَا نَبَاتٌ العَيْشَ بِدُونِهِ. وَرَغْمَ أَهَمِّيَّتِهِ، يَهْدِرُ كَثِيرٌ مِنَ النَّاسِ المَاءَ دُونَ وَعْيٍ. لِذَلِكَ يَجِبُ عَلَيْنَا تَرْشِيدُ الاسْتِهْلَاكِ وَإِغْلَاقُ الصَّنَابِيرِ جَيِّدًا وَالمُحَافَظَةُ عَلَى هَذِهِ النِّعْمَةِ.",
       questions:[["ما أساس الحياة على الأرض؟",["الهواء","الماء","الطعام"],1],["ما الخطأ الذي يقع فيه كثير من الناس؟",["يهدرون الماء","يشربون كثيرًا","يزرعون النبات"],0],["ماذا يجب علينا أن نفعل؟",["نهدر الماء","نرشّد الاستهلاك","نترك الصنابير مفتوحة"],1]] }
   },
   hasan:{
@@ -98,7 +99,7 @@ const DATA = {
       passage:"Technology has changed the way we learn. In the past, students depended only on books and teachers. Today, they can find information online, watch videos, and take courses from home. However, experts warn that spending too much time on screens can affect health and focus. Therefore, balance is important.",
       questions:[["How did students learn in the past?",["only online","from books and teachers","from videos"],1],["What do experts warn about?",["reading too much","too much screen time","studying at home"],1],["What is the main advice?",["stop using technology","balance","study all day"],1]] },
     ar:{ dictation:["إنَّ مَعَ العُسْرِ يُسْرًا.","مَنْ جَدَّ وَجَدَ وَمَنْ زَرَعَ حَصَدَ.","العَقْلُ السَّلِيمُ فِي الجِسْمِ السَّلِيمِ.","الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ.","خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ.","الأَمَانَةُ تَاجٌ عَلَى رُؤُوسِ الأَصْحَابِ."],
-      passage:"شهد العالم في العقود الأخيرة تطورًا هائلًا في مجال التقنية، فقد غيّرت وسائل التواصل الحديثة طريقة تعاملنا مع المعلومة والعالم من حولنا. ومع أنّ لهذه التقنية فوائد كثيرة في التعليم والعمل، إلا أنّ الإفراط في استخدامها قد يؤثّر سلبًا على العلاقات الاجتماعية والصحة. ولذلك فإنّ الاستخدام المتوازن هو مفتاح الاستفادة الحقيقية.",
+      passage:"شَهِدَ العَالَمُ فِي العُقُودِ الأَخِيرَةِ تَطَوُّرًا هَائِلًا فِي مَجَالِ التِّقْنِيَةِ، فَقَدْ غَيَّرَتْ وَسَائِلُ التَّوَاصُلِ الحَدِيثَةُ طَرِيقَةَ تَعَامُلِنَا مَعَ المَعْلُومَةِ وَالعَالَمِ مِنْ حَوْلِنَا. وَمَعَ أَنَّ لِهَذِهِ التِّقْنِيَةِ فَوَائِدَ كَثِيرَةً فِي التَّعْلِيمِ وَالعَمَلِ، إِلَّا أَنَّ الإِفْرَاطَ فِي اسْتِخْدَامِهَا قَدْ يُؤَثِّرُ سَلْبًا عَلَى العَلَاقَاتِ الاجْتِمَاعِيَّةِ وَالصِّحَّةِ. وَلِذَلِكَ فَإِنَّ الاسْتِخْدَامَ المُتَوَازِنَ هُوَ مِفْتَاحُ الاسْتِفَادَةِ الحَقِيقِيَّةِ.",
       questions:[["ما الذي غيّرته وسائل التواصل الحديثة؟",["طريقة تعاملنا مع المعلومة","الطقس","أسعار السوق"],0],["ما سلبيات الإفراط في التقنية؟",["تزيد الصحة","تؤثّر على العلاقات والصحة","تحسّن النوم"],1],["ما مفتاح الاستفادة الحقيقية؟",["الاستخدام المتوازن","تركها كليًا","استخدامها طوال اليوم"],0]] }
   }
 };
@@ -121,7 +122,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "hd4";
+var AUDIO_VER = "hd5";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -154,6 +155,7 @@ function speak(text, rate, lang){
   }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if(!SR){ try{ document.documentElement.classList.add("no-mic"); }catch(e){} }
 function startRecognition(lang, onResult, onErr){
   if(!SR){ onErr && onErr("no-support"); return; }
   try{
