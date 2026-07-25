@@ -39,20 +39,34 @@ jobs:
           python3 - <<'PY'
           import json, os, asyncio, edge_tts
           phrases = json.load(open("audio/phrases.json", encoding="utf-8"))
-          VOICES = {"en": "en-US-JennyNeural", "ar": "ar-SA-ZariyahNeural"}
+          # أحدث أصوات مايكروسوفت الطبيعية (HD متعدد اللغات) مع بدائل احتياطية
+          VOICES = {
+              "en": ["en-US-AvaMultilingualNeural", "en-US-EmmaMultilingualNeural", "en-US-JennyNeural"],
+              "ar": ["ar-SA-ZariyahNeural", "ar-EG-SalmaNeural"],
+          }
           manifest = {"en": {}, "ar": {}}
-          async def one(text, voice, path):
-              await edge_tts.Communicate(text, voice, rate="-8%").save(path)
+          async def one(text, lang, path):
+              last = None
+              for voice in VOICES[lang]:
+                  try:
+                      await edge_tts.Communicate(text, voice, rate="-6%").save(path)
+                      if os.path.getsize(path) > 0:
+                          return voice
+                  except Exception as e:
+                      last = e
+              raise last or RuntimeError("no voice worked")
           async def main():
               for lang in ["en", "ar"]:
                   os.makedirs(f"audio/{lang}", exist_ok=True)
+                  used = None
                   for i, text in enumerate(phrases.get(lang, [])):
                       fn = f"{lang}/{lang}_{i}.mp3"
                       try:
-                          await one(text, VOICES[lang], f"audio/{fn}")
+                          used = await one(text, lang, f"audio/{fn}")
                           manifest[lang][text] = fn
                       except Exception as e:
                           print("skip", lang, i, repr(text), e)
+                  print(lang, "voice used:", used)
           asyncio.run(main())
           json.dump(manifest, open("audio/manifest.json", "w", encoding="utf-8"),
                     ensure_ascii=False, indent=1)
