@@ -24,8 +24,11 @@
   header.top::after{content:"";position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.28),transparent 70%);border-radius:50%}
   header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
   header.top h1{margin:0;font-size:1.6rem;font-weight:800}
-  .tabs{display:flex;gap:8px;margin:18px 0;position:sticky;top:8px;z-index:5}
-  .tabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 6px;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .langtabs{display:flex;gap:8px;margin:16px 0 6px}
+  .langtabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px;border-radius:14px;font-size:1.05rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .langtabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tabs{display:flex;gap:8px;margin:10px 0 18px}
+  .tabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.98rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   section.panel{display:none} section.panel.active{display:block;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -35,20 +38,20 @@
   .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
   .say{background:var(--accent);color:#fff;border:0;padding:11px 16px;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit}
   .say.small{padding:8px 12px;font-size:.9rem}
-  .dinp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink);direction:ltr;text-align:left}
+  .dinp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.15rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .chk{background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
-  .fb{margin-top:8px;font-size:.95rem;min-height:20px}
+  .fb{margin-top:8px;font-size:.98rem;min-height:20px}
   .fb.ok{color:var(--good);font-weight:700}
   .fb.no{color:var(--bad);font-weight:700}
-  .fb .corr{color:var(--good)}
+  .fb .corr{color:var(--good);font-weight:700}
   .passage{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
-  .passage .txt{direction:ltr;text-align:left;font-size:1.08rem;line-height:2;margin-top:12px}
+  .passage .txt{font-size:1.1rem;line-height:2.1;margin-top:12px}
   .opts{display:grid;gap:8px;margin-top:10px}
-  .opts button{text-align:left;direction:ltr;border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit}
   .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
   .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
-  .stem{font-weight:700;margin:4px 0 8px;direction:ltr;text-align:left}
+  .stem{font-weight:700;margin:4px 0 8px}
   .score{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
   .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
   .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
@@ -67,40 +70,36 @@ const META = {
 };
 const DATA = {
   saud:{
-    dictation:["cat","dog","red","book","sun","ball","fish","milk"],
-    passage:"This is Sam. Sam has a red ball. He plays with his dog. The dog is happy.",
-    questions:[
-      ["What color is the ball?",["red","blue","green"],0],
-      ["What animal does Sam have?",["a cat","a dog","a fish"],1],
-      ["Is the dog happy?",["yes","no","maybe"],0]
-    ]
+    en:{ dictation:["cat","dog","red","book","sun","ball","fish","milk"],
+      passage:"This is Sam. Sam has a red ball. He plays with his dog. The dog is happy.",
+      questions:[["What color is the ball?",["red","blue","green"],0],["What animal does Sam have?",["a cat","a dog","a fish"],1],["Is the dog happy?",["yes","no","maybe"],0]] },
+    ar:{ dictation:["بيت","شمس","قلم","كتاب","ورد","باب","ماء","يد"],
+      passage:"ذهب سعد إلى المدرسة. أخذ حقيبته وكتابه. في المدرسة تعلّم سعد حروفًا جديدة. عاد سعد إلى البيت سعيدًا.",
+      questions:[["إلى أين ذهب سعد؟",["المدرسة","الحديقة","السوق"],0],["ماذا أخذ معه؟",["كرته","حقيبته وكتابه","دراجته"],1],["كيف عاد سعد؟",["حزينًا","سعيدًا","متعبًا"],1]] }
   },
   osama:{
-    dictation:["school","friend","water","green","happy","family","seven","table"],
-    passage:"Mona is a girl. She goes to school every day. She likes her teacher and her friends. After school, she reads books at home.",
-    questions:[
-      ["Where does Mona go every day?",["to school","to the park","to the shop"],0],
-      ["What does she do after school?",["plays games","reads books","sleeps"],1],
-      ["Who does she like?",["her teacher and friends","her dog","nobody"],0]
-    ]
+    en:{ dictation:["school","friend","water","green","happy","family","seven","table"],
+      passage:"Mona is a girl. She goes to school every day. She likes her teacher and her friends. After school, she reads books at home.",
+      questions:[["Where does Mona go every day?",["to school","to the park","to the shop"],0],["What does she do after school?",["plays games","reads books","sleeps"],1],["Who does she like?",["her teacher and friends","her dog","nobody"],0]] },
+    ar:{ dictation:["مدرسة","صديق","حديقة","شجرة","عصفور","سماء","مكتبة","نظافة"],
+      passage:"تحب منى القراءة. تذهب كل أسبوع إلى المكتبة وتستعير كتابًا جديدًا. تقرأ منى قصص المغامرات والعلوم. القراءة تزيد معرفتها وتوسّع خيالها.",
+      questions:[["ماذا تحب منى؟",["اللعب","القراءة","النوم"],1],["إلى أين تذهب كل أسبوع؟",["المكتبة","الحديقة","المدرسة"],0],["ماذا تقرأ منى؟",["قصص المغامرات والعلوم","الرسائل","الجرائد"],0]] }
   },
   rafeef:{
-    dictation:["I go to school every day.","She is reading a book.","They played football yesterday.","We have two cats.","He does not like fish.","The weather is nice today."],
-    passage:"Last weekend, Ali visited his grandparents in the village. They have a big farm with cows and chickens. Ali helped his grandfather feed the animals and pick fresh vegetables. In the evening, they sat together and told stories. Ali had a wonderful time.",
-    questions:[
-      ["Where did Ali go last weekend?",["to the city","to his grandparents' village","to school"],1],
-      ["What animals are on the farm?",["cows and chickens","lions","fish"],0],
-      ["What did they do in the evening?",["watched TV","told stories","played football"],1]
-    ]
+    en:{ dictation:["I go to school every day.","She is reading a book.","They played football yesterday.","We have two cats.","He does not like fish.","The weather is nice today."],
+      passage:"Last weekend, Ali visited his grandparents in the village. They have a big farm with cows and chickens. Ali helped his grandfather feed the animals and pick fresh vegetables. In the evening, they sat together and told stories. Ali had a wonderful time.",
+      questions:[["Where did Ali go last weekend?",["to the city","to his grandparents' village","to school"],1],["What animals are on the farm?",["cows and chickens","lions","fish"],0],["What did they do in the evening?",["watched TV","told stories","played football"],1]] },
+    ar:{ dictation:["العلمُ نورٌ ينير طريق الإنسان.","الصدقُ صفةٌ يحبها الناس.","نظافةُ البيئة مسؤوليةُ الجميع.","القراءةُ غذاءُ العقل.","التعاونُ يقوّي المجتمع.","في التأنّي السلامة."],
+      passage:"يُعدّ الماء أساس الحياة على الأرض، فلا يستطيع إنسان ولا حيوان ولا نبات العيش بدونه. ورغم أهميته، يهدر كثير من الناس الماء دون وعي. لذلك يجب علينا ترشيد الاستهلاك وإغلاق الصنابير جيدًا والمحافظة على هذه النعمة.",
+      questions:[["ما أساس الحياة على الأرض؟",["الهواء","الماء","الطعام"],1],["ما الخطأ الذي يقع فيه كثير من الناس؟",["يهدرون الماء","يشربون كثيرًا","يزرعون النبات"],0],["ماذا يجب علينا أن نفعل؟",["نهدر الماء","نرشّد الاستهلاك","نترك الصنابير مفتوحة"],1]] }
   },
   hasan:{
-    dictation:["She has lived here since 2010.","The letter was written by Ali.","If it rains, we will stay home.","He has already finished his work.","They were watching TV when I arrived.","Water boils at one hundred degrees."],
-    passage:"Technology has changed the way we learn. In the past, students depended only on books and teachers. Today, they can find information online, watch videos, and take courses from home. However, experts warn that spending too much time on screens can affect health and focus. Therefore, balance is important.",
-    questions:[
-      ["How did students learn in the past?",["only online","from books and teachers","from videos"],1],
-      ["What do experts warn about?",["reading too much","too much screen time","studying at home"],1],
-      ["What is the main advice?",["stop using technology","balance","study all day"],1]
-    ]
+    en:{ dictation:["She has lived here since 2010.","The letter was written by Ali.","If it rains, we will stay home.","He has already finished his work.","They were watching TV when I arrived.","Water boils at one hundred degrees."],
+      passage:"Technology has changed the way we learn. In the past, students depended only on books and teachers. Today, they can find information online, watch videos, and take courses from home. However, experts warn that spending too much time on screens can affect health and focus. Therefore, balance is important.",
+      questions:[["How did students learn in the past?",["only online","from books and teachers","from videos"],1],["What do experts warn about?",["reading too much","too much screen time","studying at home"],1],["What is the main advice?",["stop using technology","balance","study all day"],1]] },
+    ar:{ dictation:["إنّ مع العسر يسرًا.","من جدّ وجد ومن زرع حصد.","العقلُ السليم في الجسم السليم.","الكلمةُ الطيبة صدقة.","خيرُ الناس أنفعهم للناس.","الأمانةُ تاجٌ على رؤوس الأصحاب."],
+      passage:"شهد العالم في العقود الأخيرة تطورًا هائلًا في مجال التقنية، فقد غيّرت وسائل التواصل الحديثة طريقة تعاملنا مع المعلومة والعالم من حولنا. ومع أنّ لهذه التقنية فوائد كثيرة في التعليم والعمل، إلا أنّ الإفراط في استخدامها قد يؤثّر سلبًا على العلاقات الاجتماعية والصحة. ولذلك فإنّ الاستخدام المتوازن هو مفتاح الاستفادة الحقيقية.",
+      questions:[["ما الذي غيّرته وسائل التواصل الحديثة؟",["طريقة تعاملنا مع المعلومة","الطقس","أسعار السوق"],0],["ما سلبيات الإفراط في التقنية؟",["تزيد الصحة","تؤثّر على العلاقات والصحة","تحسّن النوم"],1],["ما مفتاح الاستفادة الحقيقية؟",["الاستخدام المتوازن","تركها كليًا","استخدامها طوال اليوم"],0]] }
   }
 };
 
@@ -108,104 +107,123 @@ function qs(k){ return new URLSearchParams(location.search).get(k); }
 const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
-// حمّل الأصوات مبكرًا
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-function speak(text, rate){
+function speak(text, rate, lang){
   try{
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US"; u.rate = rate || 0.9;
-    var vs = speechSynthesis.getVoices();
-    var en = vs.filter(function(v){return /en(-|_)?/i.test(v.lang);})[0];
-    if(en) u.voice = en;
+    u.lang = lang || "en-US"; u.rate = rate || 0.9;
+    var pre = (lang && lang.indexOf("ar")===0) ? /ar/i : /en(-|_)?/i;
+    var v = speechSynthesis.getVoices().filter(function(x){return pre.test(x.lang);})[0];
+    if(v) u.voice = v;
     speechSynthesis.speak(u);
-  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب متصفح آخر (Chrome/Safari)."); }
+  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
-function norm(s){ return (s||"").toLowerCase().replace(/[.,!?;:'\"]/g,"").replace(/\s+/g," ").trim(); }
+function norm(s, ar){
+  s = (s||"").replace(/[ً-ْٰ]/g,"").replace(/[.,!?;:'"،؛؟]/g,"").replace(/\s+/g," ").trim();
+  if(ar){ s = s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي"); }
+  else { s = s.toLowerCase(); }
+  return s;
+}
 
 if(!META[who] || !DATA[who]){
   app.innerHTML = '<header class="top"><h1>القراءة والاستماع</h1></header><p style="text-align:center;color:var(--muted);padding:40px">افتح الرابط مع اسم الابن، مثل: ?who=hasan</p>';
 }else{
-  const S = META[who], D = DATA[who];
+  const S = META[who];
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
   document.title = "قراءة واستماع — " + S.name;
   app.innerHTML =
-    '<header class="top"><p class="eyebrow">'+S.grade+' · إنجليزي — استماع وكتابة</p><h1>'+S.emoji+' قراءة '+S.name+'</h1></header>'+
+    '<header class="top"><p class="eyebrow">'+S.grade+' · استماع وكتابة</p><h1>'+S.emoji+' قراءة '+S.name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار</a><a href="index.html">📊 اللوحة</a></div>'+
+    '<div class="langtabs" role="tablist">'+
+      '<button data-lang="en" aria-selected="true">الإنجليزي 🇬🇧</button>'+
+      '<button data-lang="ar" aria-selected="false">العربي 🇸🇦</button>'+
+    '</div>'+
     '<div class="tabs" role="tablist">'+
-      '<button role="tab" aria-selected="true" data-tab="dict">إملاء 🔊✍️</button>'+
-      '<button role="tab" aria-selected="false" data-tab="read">قراءة وفهم 📖</button>'+
+      '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
+      '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
     '</div>'+
     '<section class="panel active" id="dict"></section>'+
     '<section class="panel" id="read"></section>'+
     '<footer>استمع، اكتب، وافهم · صفحة تعليمية</footer>';
 
-  // ===== الإملاء =====
-  (function(){
+  var curLang = "en";
+
+  function renderDict(){
+    var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
     var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
-      '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته بالإنجليزي، ثم «تحقّق».</p>';
+      '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
     D.dictation.forEach(function(item,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">رقم '+(i+1)+'</div>'+
         '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
         '<button class="say small" data-slow>🐢 أبطأ</button></div>'+
-        '<input class="dinp" placeholder="اكتب هنا...">'+
+        '<input class="dinp" placeholder="اكتب هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
         '<div class="row"><button class="chk">تحقّق</button>'+
         '<button class="say small" data-show>👁️ أظهر</button></div>'+
         '<div class="fb"></div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+D.dictation.length+'</div>';
     sec.innerHTML = html;
-    var done = {}; var correct = 0;
-    var scoreEl = sec.querySelector("[data-score]");
+    var done={}, correct=0, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
-      var i = +qEl.dataset.i, text = D.dictation[i];
-      var inp = qEl.querySelector(".dinp"), fb = qEl.querySelector(".fb");
-      qEl.querySelector("[data-say]").addEventListener("click", function(){ speak(text, S.rate); });
-      qEl.querySelector("[data-slow]").addEventListener("click", function(){ speak(text, 0.55); });
-      qEl.querySelector("[data-show]").addEventListener("click", function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
-      qEl.querySelector(".chk").addEventListener("click", function(){
-        var ok = norm(inp.value) === norm(text);
+      var i=+qEl.dataset.i, text=D.dictation[i];
+      var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
+      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,S.rate,ar?"ar-SA":"en-US"); });
+      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.55,ar?"ar-SA":"en-US"); });
+      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
+      qEl.querySelector(".chk").addEventListener("click",function(){
+        var ok = norm(inp.value,ar)===norm(text,ar);
         if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
-        else { fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
-        scoreEl.textContent = "الدرجة: "+correct+" / "+D.dictation.length;
+        else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
+        scoreEl.textContent="الدرجة: "+correct+" / "+D.dictation.length;
       });
     });
-  })();
+  }
 
-  // ===== القراءة والفهم =====
-  (function(){
+  function renderRead(){
+    var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("read");
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage"><button class="say" data-read>🔊 استمع للنص</button>'+
-      '<div class="txt">'+D.passage+'</div></div>'+
+      '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+D.passage+'</div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>';
     D.questions.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="stem">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" style="direction:'+dir+';text-align:'+ta+'">'+o+'</button>'; });
       html += '</div></div>';
     });
     html += '<div class="score" data-score>الفهم: 0 / '+D.questions.length+'</div>';
     sec.innerHTML = html;
-    sec.querySelector("[data-read]").addEventListener("click", function(){ speak(D.passage, S.rate); });
-    var ans = {}; var correct = 0; var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelector("[data-read]").addEventListener("click",function(){ speak(D.passage,S.rate,ar?"ar-SA":"en-US"); });
+    var ans={}, correct=0, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
-      var i = +qEl.dataset.i, right = D.questions[i][2];
+      var i=+qEl.dataset.i, right=D.questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click", function(){
+        btn.addEventListener("click",function(){
           if(ans[i]!=null) return; ans[i]=+btn.dataset.j;
           qEl.querySelectorAll(".opts button").forEach(function(b){b.disabled=true;});
           if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
-          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[right].classList.add("correct"); }
-          scoreEl.textContent = "الفهم: "+correct+" / "+D.questions.length;
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[right].classList.add("correct"); }
+          scoreEl.textContent="الفهم: "+correct+" / "+D.questions.length;
         });
       });
     });
-  })();
+  }
 
+  function renderAll(){ renderDict(); renderRead(); }
+  renderAll();
+
+  document.querySelectorAll(".langtabs button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".langtabs button").forEach(function(x){x.setAttribute("aria-selected","false");});
+      b.setAttribute("aria-selected","true");
+      curLang = b.dataset.lang; renderAll();
+    });
+  });
   document.querySelectorAll(".tabs button").forEach(function(b){
-    b.addEventListener("click", function(){
+    b.addEventListener("click",function(){
       document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-selected","false");});
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
