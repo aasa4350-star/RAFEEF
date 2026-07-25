@@ -679,7 +679,17 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+var MANIFEST = null, CUR_AUDIO = null;
+fetch("audio/manifest.json").then(function(r){ return r.ok ? r.json() : null; }).then(function(m){ MANIFEST = m; }).catch(function(){});
 function speakAr(text, rate){
+  if(MANIFEST && MANIFEST.ar && MANIFEST.ar[text]){
+    try{
+      if(CUR_AUDIO){ CUR_AUDIO.pause(); }
+      var a = new Audio("audio/" + MANIFEST.ar[text]);
+      a.playbackRate = Math.max(0.5, rate || 1);
+      CUR_AUDIO = a; a.play(); return;
+    }catch(e){}
+  }
   try{
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);

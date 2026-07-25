@@ -121,13 +121,24 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
+var MANIFEST = null, CUR_AUDIO = null;
+fetch("audio/manifest.json").then(function(r){ return r.ok ? r.json() : null; }).then(function(m){ MANIFEST = m; }).catch(function(){});
 function speak(text, rate, lang){
+  var isAr = lang && lang.indexOf("ar")===0, lk = isAr ? "ar" : "en";
+  // صوت بشري جاهز (Google TTS) إن وُجد
+  if(MANIFEST && MANIFEST[lk] && MANIFEST[lk][text]){
+    try{
+      if(CUR_AUDIO){ CUR_AUDIO.pause(); }
+      var a = new Audio("audio/" + MANIFEST[lk][text]);
+      a.playbackRate = Math.max(0.5, rate || 1);
+      CUR_AUDIO = a; a.play(); return;
+    }catch(e){}
+  }
+  // بديل: نطق المتصفح
   try{
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
     u.lang = lang || "en-US"; u.rate = rate || 0.9;
-    var isAr = lang && lang.indexOf("ar")===0;
-    var lk = isAr ? "ar" : "en";
     var cands = voicesFor(isAr);
     var v = null;
     if(CHOSEN[lk]) v = cands.filter(function(x){return x.name===CHOSEN[lk];})[0];

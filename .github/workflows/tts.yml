@@ -1,0 +1,70 @@
+name: generate-tts
+
+# Generates natural human-like audio (Google TTS) for every phrase in
+# audio/phrases.json and commits the MP3s + a manifest, so the pages can
+# play real audio on any device (including iPhone) instead of robotic TTS.
+
+on:
+  push:
+    branches: [claude/children-tests-reviews-bq40n9]
+    paths:
+      - "audio/phrases.json"
+      - ".github/workflows/tts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tts
+  cancel-in-progress: false
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/children-tests-reviews-bq40n9
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install gTTS
+        run: pip install gTTS
+
+      - name: Generate audio + manifest
+        run: |
+          python3 - <<'PY'
+          import json, os, hashlib
+          from gtts import gTTS
+          phrases = json.load(open("audio/phrases.json", encoding="utf-8"))
+          manifest = {"en": {}, "ar": {}}
+          for lang in ["en", "ar"]:
+              os.makedirs(f"audio/{lang}", exist_ok=True)
+              for i, text in enumerate(phrases.get(lang, [])):
+                  fn = f"{lang}/{lang}_{i}.mp3"
+                  path = f"audio/{fn}"
+                  if not os.path.exists(path):
+                      try:
+                          gTTS(text=text, lang=lang, slow=False).save(path)
+                      except Exception as e:
+                          print("skip", lang, i, repr(text), e); continue
+                  manifest[lang][text] = fn
+          json.dump(manifest, open("audio/manifest.json", "w", encoding="utf-8"),
+                    ensure_ascii=False, indent=1)
+          print("en:", len(manifest["en"]), "ar:", len(manifest["ar"]))
+          PY
+
+      - name: Commit audio
+        run: |
+          git config user.name "tts-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add audio/
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "generate TTS audio [skip ci]"
+            git push
+          fi
