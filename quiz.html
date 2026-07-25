@@ -658,7 +658,7 @@ if(!STUDENTS[who]){
     <section class="panel" id="ma" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
     <section class="panel" id="log" role="tabpanel"></section>
-    <footer>صفحة تعليمية مجانية · لمتابعة الأبناء</footer>`;
+    <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · صفحة تعليمية</footer>`;
 
   const DATA = {
     en:{ review:S.en.review, quiz: hasSet ? ((BANK && BANK[who]) ? BANK[who].en : S.en.quiz) : pool("en") },
