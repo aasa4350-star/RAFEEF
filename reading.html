@@ -103,6 +103,14 @@ const DATA = {
   }
 };
 
+// معاني الكلمات الإنجليزية بالعربي (يُقبل أكثر من إجابة)
+const VOCAB = {
+  saud:[["cat",["قطة","قط"]],["dog",["كلب"]],["red",["أحمر"]],["book",["كتاب"]],["sun",["شمس"]],["apple",["تفاحة","تفاح"]],["fish",["سمكة","سمك"]],["milk",["حليب","لبن"]]],
+  osama:[["school",["مدرسة"]],["friend",["صديق","صاحب"]],["water",["ماء","مويه"]],["green",["أخضر"]],["happy",["سعيد","فرحان"]],["family",["عائلة","أسرة"]],["tree",["شجرة"]],["book",["كتاب"]]],
+  rafeef:[["weather",["طقس","جو"]],["student",["طالب","تلميذ"]],["beautiful",["جميل","جميلة"]],["difficult",["صعب","صعبة"]],["important",["مهم","مهمة"]],["answer",["إجابة","جواب"]],["question",["سؤال"]],["country",["دولة","بلد"]]],
+  hasan:[["knowledge",["معرفة","علم"]],["success",["نجاح"]],["experience",["خبرة","تجربة"]],["environment",["بيئة"]],["technology",["تقنية","تكنولوجيا"]],["future",["مستقبل"]],["health",["صحة"]],["develop",["يطور","تطوير","يطوّر"]]]
+};
+
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
@@ -146,9 +154,11 @@ if(!META[who] || !DATA[who]){
     '<div class="tabs" role="tablist">'+
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
+      '<button data-tab="vocab" aria-selected="false">المعنى بالعربي ✍️</button>'+
     '</div>'+
     '<section class="panel active" id="dict"></section>'+
     '<section class="panel" id="read"></section>'+
+    '<section class="panel" id="vocab"></section>'+
     '<footer>استمع، اكتب، وافهم · صفحة تعليمية</footer>';
 
   var curLang = "en";
@@ -215,7 +225,47 @@ if(!META[who] || !DATA[who]){
     });
   }
 
-  function renderAll(){ renderDict(); renderRead(); }
+  function renderVocab(){
+    var sec = document.getElementById("vocab");
+    if(curLang!=="en"){ sec.innerHTML=""; return; }
+    var V = VOCAB[who] || [];
+    var html = '<div class="block-title"><span class="dot"></span> اكتب معنى الكلمة بالعربي</div>'+
+      '<p class="hint">اسمع الكلمة الإنجليزية 🔊 ثم اكتب معناها بالعربي، ثم «تحقّق».</p>';
+    V.forEach(function(item,i){
+      html += '<div class="q" data-i="'+i+'"><div class="row"><button class="say small" data-say>🔊 استمع</button>'+
+        '<span class="stem" style="direction:ltr;text-align:left;font-size:1.15rem">'+item[0]+'</span></div>'+
+        '<input class="dinp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
+        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
+        '<div class="fb"></div></div>';
+    });
+    html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>';
+    sec.innerHTML = html;
+    var done={}, correct=0, scoreEl=sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, word=V[i][0], answers=V[i][1];
+      var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
+      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,S.rate,"en-US"); });
+      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='المعنى: <span class="corr">'+answers[0]+'</span>'; });
+      qEl.querySelector(".chk").addEventListener("click",function(){
+        var val=norm(inp.value,true);
+        var ok=answers.some(function(a){return norm(a,true)===val;});
+        if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
+        else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · المعنى: <span class="corr">'+answers[0]+'</span>'; }
+        scoreEl.textContent="الدرجة: "+correct+" / "+V.length;
+      });
+    });
+  }
+
+  function syncVocabTab(){
+    var vt = document.querySelector('.tabs [data-tab="vocab"]');
+    if(!vt) return;
+    vt.style.display = (curLang==="ar") ? "none" : "";
+    if(curLang==="ar" && vt.getAttribute("aria-selected")==="true"){
+      document.querySelector('.tabs [data-tab="dict"]').click();
+    }
+  }
+
+  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); }
   renderAll();
 
   document.querySelectorAll(".langtabs button").forEach(function(b){
