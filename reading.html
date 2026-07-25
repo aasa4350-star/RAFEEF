@@ -116,16 +116,22 @@ const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+var CHOSEN = { en:null, ar:null };
+function voicesFor(isAr){
+  var re = isAr ? /^ar/i : /^en/i;
+  return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
+}
 function speak(text, rate, lang){
   try{
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
     u.lang = lang || "en-US"; u.rate = rate || 0.9;
     var isAr = lang && lang.indexOf("ar")===0;
-    var langRe = isAr ? /^ar/i : /^en/i;
-    var cands = speechSynthesis.getVoices().filter(function(x){return langRe.test(x.lang);});
-    var good = cands.filter(function(x){return /(siri|enhanced|premium|natural|neural|eloquence|maged|majed|tarik|laila|samantha|daniel|karen|serena)/i.test(x.name);});
-    var v = good[0] || cands[0];
+    var lk = isAr ? "ar" : "en";
+    var cands = voicesFor(isAr);
+    var v = null;
+    if(CHOSEN[lk]) v = cands.filter(function(x){return x.name===CHOSEN[lk];})[0];
+    if(!v){ var good = cands.filter(function(x){return /(siri|enhanced|premium|natural|neural|eloquence|maged|majed|tarik|laila|samantha|daniel|karen|serena)/i.test(x.name);}); v = good[0] || cands[0]; }
     if(v) u.voice = v;
     speechSynthesis.speak(u);
   }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
@@ -151,6 +157,9 @@ if(!META[who] || !DATA[who]){
       '<button data-lang="en" aria-selected="true">الإنجليزي 🇬🇧</button>'+
       '<button data-lang="ar" aria-selected="false">العربي 🇸🇦</button>'+
     '</div>'+
+    '<div class="bar" style="align-items:center"><span style="font-size:.85rem;color:var(--muted);font-weight:700;white-space:nowrap">🔈 الصوت:</span>'+
+      '<select id="voiceSel" style="flex:1;min-width:0;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:.85rem"></select>'+
+      '<button class="say small" id="voiceTest">جرّب 🔊</button></div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
@@ -274,7 +283,20 @@ if(!META[who] || !DATA[who]){
     }
   }
 
-  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); }
+  function populateVoices(){
+    var sel = document.getElementById("voiceSel"); if(!sel) return;
+    var isAr = curLang==="ar", lk = isAr?"ar":"en";
+    var vs = voicesFor(isAr);
+    if(!vs.length){ sel.innerHTML='<option value="">(لا توجد أصوات — حمّلها من إعدادات الجوال)</option>'; return; }
+    sel.innerHTML = vs.map(function(v){ return '<option value="'+v.name+'">'+v.name+' — '+v.lang+'</option>'; }).join("");
+    if(CHOSEN[lk]) sel.value = CHOSEN[lk];
+    sel.onchange = function(){ CHOSEN[lk] = sel.value; };
+  }
+  var vtBtn = document.getElementById("voiceTest");
+  if(vtBtn) vtBtn.addEventListener("click", function(){ speak(curLang==="ar"?"مرحبًا، هذا هو الصوت":"Hello, this is the voice", S.rate, curLang==="ar"?"ar-SA":"en-US"); });
+  try{ speechSynthesis.onvoiceschanged = function(){ populateVoices(); }; }catch(e){}
+
+  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); populateVoices(); }
   renderAll();
 
   document.querySelectorAll(".langtabs button").forEach(function(b){
