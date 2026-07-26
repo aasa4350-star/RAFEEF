@@ -122,7 +122,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "hd7";
+var AUDIO_VER = "hd8";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -132,11 +132,12 @@ function speak(text, rate, lang){
   // ننتظر تحميل قائمة الصوت البشري قبل أي رجوع للصوت الآلي
   if(!MANI_DONE){ MANI_P.then(function(){ speak(text, rate, lang); }); return; }
   var isAr = lang && lang.indexOf("ar")===0, lk = isAr ? "ar" : "en";
+  var key = audioKey(text); // الصوت من نص بدون حركات (يُقرأ أصح)
   // صوت بشري جاهز إن وُجد
-  if(MANIFEST && MANIFEST[lk] && MANIFEST[lk][text]){
+  if(MANIFEST && MANIFEST[lk] && MANIFEST[lk][key]){
     try{
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
-      var a = new Audio("audio/" + MANIFEST[lk][text] + "?v=" + AUDIO_VER);
+      var a = new Audio("audio/" + MANIFEST[lk][key] + "?v=" + AUDIO_VER);
       a.playbackRate = Math.max(0.5, rate || 1);
       CUR_AUDIO = a; a.play(); return;
     }catch(e){}
@@ -144,7 +145,7 @@ function speak(text, rate, lang){
   // بديل: نطق المتصفح
   try{
     speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
+    var u = new SpeechSynthesisUtterance(key);
     u.lang = lang || "en-US"; u.rate = rate || 0.9;
     var cands = voicesFor(isAr);
     var v = null;
@@ -201,6 +202,10 @@ function normX(s, ar){
   if(ar){ s = s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي"); } else { s = s.toLowerCase(); }
   return s;
 }
+// نص الصوت: بدون حركات (يُقرأ أصح)، مع تصحيح أسماء يخطئ الصوت في نطقها
+var AUDIO_FIX = {"منى":"مُنى"};
+function stripTash(s){ return (s||"").replace(/[ً-ْٰ]/g,""); }
+function audioKey(s){ s = stripTash(s); for(var k in AUDIO_FIX){ s = s.split(k).join(AUDIO_FIX[k]); } return s; }
 // مقارنة نطق متسامحة: تتجاهل الرموز الخفية والحركات وتوحّد صيغ الحروف
 function normSpeak(s, ar){
   s = (s||"").replace(/[​-‏‪-‮⁦-⁩﻿ـ]/g,"")

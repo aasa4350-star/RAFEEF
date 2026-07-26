@@ -679,25 +679,29 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "hd5";
+var AUDIO_VER = "hd8";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
   .then(function(m){ MANIFEST = m; MANI_DONE = true; })
   .catch(function(){ MANI_DONE = true; });
+var AUDIO_FIX = {"منى":"مُنى"};
+function stripTash(s){ return (s||"").replace(/[ً-ْٰ]/g,""); }
+function audioKey(s){ s = stripTash(s); for(var k in AUDIO_FIX){ s = s.split(k).join(AUDIO_FIX[k]); } return s; }
 function speakAr(text, rate){
   if(!MANI_DONE){ MANI_P.then(function(){ speakAr(text, rate); }); return; }
-  if(MANIFEST && MANIFEST.ar && MANIFEST.ar[text]){
+  var key = audioKey(text); // بدون حركات ليُقرأ أصح
+  if(MANIFEST && MANIFEST.ar && MANIFEST.ar[key]){
     try{
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
-      var a = new Audio("audio/" + MANIFEST.ar[text] + "?v=" + AUDIO_VER);
+      var a = new Audio("audio/" + MANIFEST.ar[key] + "?v=" + AUDIO_VER);
       a.playbackRate = Math.max(0.5, rate || 1);
       CUR_AUDIO = a; a.play(); return;
     }catch(e){}
   }
   try{
     speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
+    var u = new SpeechSynthesisUtterance(key);
     u.lang = "ar-SA"; u.rate = rate || 0.9;
     var v = pickVoice("ar-SA"); if(v) u.voice = v;
     speechSynthesis.speak(u);
