@@ -932,6 +932,69 @@ const REMEDIAL = {
   }
 };
 
+// ===== دروس شرح مصغّرة (مثل فيديو مبسّط) لكل مفهوم صعب =====
+const LB = 'background:var(--good-bg);border:1px solid var(--good)';
+const LB2 = 'background:#eef2ff;border:1px solid #6366f1';
+const LESSONS = {
+  osama:[
+    ["🎬 متى نستخدم since ومتى for؟",
+     `<div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:140px;${LB};border-radius:10px;padding:10px">🟢 <b>since</b> = منذ (نقطة بداية محددة)<br><span class="ltr">since <b>2019</b> · since <b>Monday</b></span></div>
+        <div style="flex:1;min-width:140px;${LB2};border-radius:10px;padding:10px">🔵 <b>for</b> = لمدة (فترة زمنية)<br><span class="ltr">for <b>5 years</b> · for <b>an hour</b></span></div>
+      </div>
+      <p style="margin:10px 0 0"><b>القاعدة السهلة:</b> بعده <u>سنة/يوم/ساعة محددة</u> → <b>since</b>. بعده <u>مدة (كم سنة/ساعة)</u> → <b>for</b>.</p>
+      <p style="margin:6px 0 0"><span class="ltr">I have lived here <b>since</b> 2019</span> = أعيش هنا <b>منذ</b> 2019.<br><span class="ltr">I have lived here <b>for</b> 5 years</span> = أعيش هنا <b>لمدة</b> 5 سنوات.</p>`],
+    ["🎬 المقارنة والتفضيل (bigger / the biggest)",
+     `<p>🟢 <b>المقارنة</b> بين شيئين: نضيف <b>-er</b> + <b>than</b> للكلمة القصيرة، أو <b>more</b> للطويلة.<br><span class="ltr">taller <b>than</b> · <b>more</b> interesting <b>than</b></span></p>
+      <p>🔵 <b>التفضيل</b> (الأفضل بين الكل): <b>the</b> + <b>-est</b> أو <b>the most</b>.<br><span class="ltr">the tall<b>est</b> · the <b>most</b> interesting</span></p>`]
+  ],
+  rafeef:[
+    ["🎬 الأعداد السالبة (خط الأعداد)",
+     `<p>تخيّلي خط أعداد: <b>اليمين +</b> و <b>اليسار −</b>.</p>
+      <p><span class="ltr" dir="ltr">−3 −2 −1 <b>0</b> +1 +2 +3</span></p>
+      <p>• <b>الجمع</b> = تقدّمي يمين. −6 + 10 → من −6 تقدّمي 10 → <b>4</b>.<br>
+         • <b>الطرح</b> = ارجعي يسار. 4 − 9 → من 4 ارجعي 9 → <b>−5</b>.<br>
+         • <b>الضرب/القسمة:</b> إشارتان مختلفتان → الناتج <b>سالب</b> (−3×4=−12)، ومتشابهتان → <b>موجب</b> (−3×−4=+12).</p>`],
+    ["🎬 الأسس (القوى)",
+     `<p>الأس = <b>كم مرة نضرب العدد بنفسه</b> (مو ضرب عادي!).</p>
+      <p>2<sup>4</sup> = 2×2×2×2 = <b>16</b> &nbsp;(وليس 2×4=8 ❌)<br>5<sup>2</sup> = 5×5 = <b>25</b><br>3<sup>3</sup> = 3×3×3 = <b>27</b></p>`],
+    ["🎬 حل المعادلة خطوة بخطوة",
+     `<p>الهدف: نعزل <b>x</b> وحده.</p>
+      <p>مثال: <b>3x + 2 = 11</b><br>
+      1) ننقل الرقم: 3x = 11 − 2 = 9<br>
+      2) نقسم على معامل x: x = 9 ÷ 3 = <b>3</b> ✅</p>
+      <p>تحقّق: 3×3 + 2 = 11 ✔️</p>`],
+    ["🎬 النسبة المئوية %",
+     `<p>%15 من 200 يعني: <b>(15 ÷ 100) × 200</b>.</p>
+      <p>= 0.15 × 200 = <b>30</b>.<br>حيلة سريعة: %10 من 200 = 20، و%5 = 10، فـ%15 = 30.</p>`]
+  ],
+  saud:[
+    ["🎬 جمع الكسور المتشابهة",
+     `<p>لمّا يكون <b>المقام (تحت) واحد</b>: نجمع <b>البسط (فوق) فقط</b> ونثبّت المقام.</p>
+      <p>⅕ + ⅕ = (1+1)/5 = <b>⅖</b><br>⅓ + ⅓ = (1+1)/3 = <b>⅔</b></p>
+      <p>⚠️ لا نجمع المقامات! المقام يبقى زي ما هو.</p>`],
+    ["🎬 القسمة مع الباقي",
+     `<p>الباقي = اللي يفضل بعد ما نقسم.</p>
+      <p>17 ÷ 5: أكبر ضرب لـ5 أقل من 17 هو 5×3=15.<br>الباقي = 17 − 15 = <b>2</b>.</p>
+      <p>23 ÷ 4: 4×5=20، الباقي = 23−20 = <b>3</b>.</p>`]
+  ],
+  hasan:[
+    ["🎬 قواعد الأسس (ضرب وقسمة)",
+     `<p>عند <b>نفس الأساس</b>:</p>
+      <p>• <b>الضرب</b> → نجمع الأسس: 3<sup>3</sup> × 3<sup>2</sup> = 3<sup>5</sup> = 243.<br>
+         • <b>القسمة</b> → نطرح الأسس: 2<sup>5</sup> ÷ 2<sup>2</sup> = 2<sup>3</sup> = <b>8</b>.</p>`],
+    ["🎬 الأعداد السالبة",
+     `<p>• جمع: −8 + 5 → من −8 تقدّم 5 → <b>−3</b>.<br>
+         • قسمة/ضرب بإشارتين مختلفتين = <b>سالب</b>: −15 ÷ 3 = <b>−5</b>.<br>
+         • (−2)<sup>3</sup> = −8 (أس فردي يبقى سالب)، (−2)<sup>4</sup> = +16 (أس زوجي يصير موجب).</p>`],
+    ["🎬 نظرية فيثاغورس",
+     `<p>في المثلث القائم: <b>الوتر² = الضلع² + الضلع²</b>.</p>
+      <p>ضلعان 9 و 12 → الوتر = √(9² + 12²) = √(81+144) = √225 = <b>15</b>.</p>`],
+    ["🎬 حل المعادلة",
+     `<p><b>3x − 4 = 11</b><br>1) 3x = 11 + 4 = 15<br>2) x = 15 ÷ 3 = <b>5</b> ✅</p>`]
+  ]
+};
+
 // ===== مادة اللغة العربية (أسئلة + إملاء) =====
 const ARABIC = {
   hasan: {
@@ -998,7 +1061,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s2";
+var AUDIO_VER = "s3";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1325,8 +1388,14 @@ if(!STUDENTS[who]){
     const R = REMEDIAL[who];
     if(!R){ sec.innerHTML = '<p class="hint">لا توجد تمارين علاجية لهذا الطالب حاليًا.</p>'; return; }
     let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`+
-      `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`+
-      `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
+      `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`;
+    const lessons = LESSONS[who] || [];
+    if(lessons.length){
+      html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (افتحها قبل الحل)</div><div class="review">`;
+      lessons.forEach(l=>{ html += `<details><summary>${l[0]}</summary><div class="body">${l[1]}</div></details>`; });
+      html += `</div>`;
+    }
+    html += `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
     R.items.forEach((q,i)=>{
       const isEn = q[4]==="en";
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
