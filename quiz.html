@@ -677,6 +677,70 @@ const BANK5 = {
   }
 };
 
+// المجموعة السادسة — مطابقة لوحدات المنهج السعودي (رابع/خامس) + إثراء عالمي
+const BANK6 = {
+  osama: {
+    en:[
+      ["Look! The baby ___ now.",["sleep","is sleeping","sleeps"],1,"مضارع مستمر (الآن): is sleeping."],
+      ["We ___ to the zoo last Friday.",["go","went","gone"],1,"last Friday ماضٍ: went."],
+      ["An elephant is ___ than a cat.",["big","bigger","biggest"],1,"مقارنة: bigger than."],
+      ["I ___ brush my teeth twice a day.",["always","never","yesterday"],0,"ظرف تكرار مناسب: always."],
+      ["My birthday is ___ May.",["in","on","at"],0,"مع الأشهر نستخدم in."],
+      ["___ is your favourite colour?",["What","Who","When"],0,"للسؤال عن شيء: What."],
+      ["There isn't ___ water in the glass.",["many","much","few"],1,"غير معدود (water): much."],
+      ["The time 6:30 is ___ .",["half past six","six o'clock","quarter to six"],0,"6:30 = half past six."],
+      ["Sara reads a book every night. What does Sara like?",["swimming","reading","cooking"],1,"تقرأ كتابًا → reading."],
+      ["The opposite of \"difficult\" is:",["hard","easy","fast"],1,"عكس difficult: easy."],
+      ["\"She has been to Makkah\" means she ___ .",["will go","visited it before","is going now"],1,"المضارع التام: زارها من قبل."],
+      ["The plural of \"tooth\" is:",["tooths","teeth","toothes"],1,"جمع شاذ: teeth."]
+    ],
+    ma:[
+      ["ما قيمة الرقم 5 في العدد 3.45؟",["5 أعشار","5 أجزاء من مئة","5 آحاد"],1,"المنزلة الثانية بعد الفاصلة = أجزاء من مئة."],
+      ["احسب: 125 × 4",["500","480","520"],0,"= 500."],
+      ["احسب: 936 ÷ 8",["117","107","127"],0,"= 117."],
+      ["احسب: ½ + ¼",["¾","⅔","⅗"],0,"2/4 + 1/4 = 3/4."],
+      ["احسب: ⅚ − ⅓",["½","⅓","¼"],0,"5/6 − 2/6 = 3/6 = ½."],
+      ["احسب: 4.7 + 3.56",["8.26","8.16","7.26"],0,"= 8.26."],
+      ["احسب: 0.5 × 6",["3","30","0.3"],0,"= 3."],
+      ["كم يساوي %25 من 200؟",["40","50","60"],1,"(25÷100)×200 = 50."],
+      ["مساحة مستطيل طوله 8 وعرضه 5",["40","26","13"],0,"8×5 = 40."],
+      ["حجم مكعب طول حرفه 3",["9","27","18"],1,"3×3×3 = 27."],
+      ["متوسط الأعداد 4 و 6 و 8",["6","9","18"],0,"(4+6+8)÷3 = 6."],
+      ["احسب: 5 + 3 × 4",["32","17","23"],1,"نبدأ بالضرب: 5+12 = 17."]
+    ]
+  },
+  saud: {
+    en:[
+      ["Good morning! How ___ you?",["is","are","am"],1,"مع you نستخدم are."],
+      ["This is my father. ___ is a doctor.",["He","She","It"],0,"الأب مذكر → He."],
+      ["I have ten ___ .",["finger","fingers","fingeres"],1,"جمع: fingers."],
+      ["Today is Sunday. Tomorrow is ___ .",["Saturday","Monday","Friday"],1,"بعد الأحد: الاثنين (Monday)."],
+      ["The cat is ___ the table.",["in","on","under"],1,"على الطاولة: on."],
+      ["___ these your books?",["Is","Are","Am"],1,"جمع → Are."],
+      ["She ___ a red bag.",["have","has","having"],1,"مع She: has."],
+      ["What is \"twenty\" in numbers?",["12","20","2"],1,"twenty = 20."],
+      ["I ___ orange juice every day.",["drinks","drink","drinking"],1,"مع I: drink."],
+      ["The opposite of \"big\" is:",["tall","small","long"],1,"عكس big: small."],
+      ["A person who teaches is a ___ .",["doctor","teacher","farmer"],1,"المعلّم: teacher."],
+      ["How ___ apples are there?",["much","many","any"],1,"مع المعدود (apples): many."]
+    ],
+    ma:[
+      ["ما قيمة الرقم 7 في العدد 4735؟",["7","70","700"],2,"الرقم 7 في منزلة المئات = 700."],
+      ["احسب: 3456 + 1238",["4694","4684","4794"],0,"= 4694."],
+      ["احسب: 5000 − 2675",["2325","2425","2335"],0,"= 2325."],
+      ["احسب: 34 × 12",["408","398","418"],0,"= 408."],
+      ["كم باقي القسمة 47 ÷ 5؟",["1","2","3"],1,"5×9=45 والباقي 2."],
+      ["احسب: ⅖ + ⅕",["⅗","⅖","1"],0,"2/5 + 1/5 = 3/5."],
+      ["محيط مربع طول ضلعه 8 سم",["24","32","16"],1,"8×4 = 32."],
+      ["كم دقيقة في ساعتين؟",["100","120","90"],1,"2×60 = 120 دقيقة."],
+      ["كم سنتيمترًا في المتر الواحد؟",["10","100","1000"],1,"المتر = 100 سم."],
+      ["أكمل النمط: 5 ، 10 ، 15 ، ؟",["18","20","25"],1,"نزيد 5 كل مرة → 20."],
+      ["أيّ إشارة صحيحة: 4506 ⬜ 4560؟",["<",">","="],0,"4506 أصغر من 4560."],
+      ["في الصف 6 صفوف، كل صف 5 طلاب. كم العدد؟",["30","11","25"],0,"6×5 = 30."]
+    ]
+  }
+};
+
 // ===== مادة اللغة العربية (أسئلة + إملاء) =====
 const ARABIC = {
   hasan: {
@@ -799,6 +863,7 @@ if(!STUDENTS[who]){
     if (BANK3[who]) a = a.concat(BANK3[who][subj]);
     if (BANK4[who]) a = a.concat(BANK4[who][subj]);
     if (typeof BANK5!=="undefined" && BANK5[who]) a = a.concat(BANK5[who][subj]);
+    if (typeof BANK6!=="undefined" && BANK6[who]) a = a.concat(BANK6[who][subj]);
     return a;
   }
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
