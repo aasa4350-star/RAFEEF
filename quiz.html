@@ -1061,7 +1061,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s5";
+var AUDIO_VER = "s6";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1169,6 +1169,68 @@ if(!STUDENTS[who]){
   };
   function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var q=gpick(gens)(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
 
+  // ===== مولّد جمل إنجليزية (الأسماء والأفعال تتغيّر كل مرة) =====
+  function eSv(){
+    var subs=[["He",1],["She",1],["It",1],["They",0],["We",0],["I",0],["You",0]];
+    var s=gpick(subs), v=gpick(["play","read","eat","help","clean","open","jump","walk","work","sing","cook","call","talk","love","want"]);
+    var correct=s[1]?v+"s":v, o=opt3(correct,[v,v+"s",v+"ing"]);
+    return [s[0]+" ___ every day.",o[0],o[1],(s[1]?("مع "+s[0]+" نضيف s للفعل"):("مع "+s[0]+" الفعل يبقى مجرّد"))+".","en"];
+  }
+  function ePlural(){
+    var ns=[["box","boxes"],["baby","babies"],["man","men"],["child","children"],["foot","feet"],["tooth","teeth"],["bus","buses"],["city","cities"],["leaf","leaves"],["knife","knives"]];
+    var n=gpick(ns), o=opt3(n[1],[n[0]+"s",n[0]+"es",n[0]+"ies"]);
+    return ['The plural of "'+n[0]+'" is:',o[0],o[1],"جمع "+n[0]+" = "+n[1]+".","en"];
+  }
+  function ePrep(){
+    var t=gpick([["in","May"],["in","2020"],["in","summer"],["on","Monday"],["on","Friday"],["on","my birthday"],["at","night"],["at","6 o'clock"],["at","noon"]]);
+    return ["We meet ___ "+t[1]+".",["in","on","at"],["in","on","at"].indexOf(t[0]),"مع «"+t[1]+"» نستخدم "+t[0]+".","en"];
+  }
+  function eOpp(){
+    var ps=[["big","small"],["hot","cold"],["fast","slow"],["happy","sad"],["old","new"],["open","closed"],["day","night"],["up","down"],["easy","difficult"],["cheap","expensive"],["clean","dirty"],["strong","weak"]];
+    var p=gpick(ps), others=[]; ps.forEach(function(x){ if(x!==p){ others.push(x[0],x[1]); } });
+    others=shuffle(others).filter(function(w){return w!==p[0]&&w!==p[1];});
+    var o=opt3(p[1],others.slice(0,2));
+    return ['The opposite of "'+p[0]+'" is:',o[0],o[1],"عكس "+p[0]+" = "+p[1]+".","en"];
+  }
+  function eAan(){
+    var ns=[["apple","an"],["orange","an"],["egg","an"],["umbrella","an"],["book","a"],["car","a"],["hat","a"],["dog","a"],["pen","a"]];
+    var n=gpick(ns);
+    return ["I have ___ "+n[0]+".",["a","an","the"],["a","an","the"].indexOf(n[1]),(n[1]==="an"?("«"+n[0]+"» تبدأ بحرف متحرك → an"):("«"+n[0]+"» تبدأ بحرف ساكن → a"))+".","en"];
+  }
+  function ePast(){
+    var v=gpick(["play","work","walk","talk","cook","clean","help","wait","call","watch","rain","start","jump","open","visit"]);
+    var correct=v+"ed", o=opt3(correct,[v,v+"ing",v+"s"]);
+    return ["Yesterday, they ___ a lot.",o[0],o[1],"yesterday تدل على الماضي: "+correct+".","en"];
+  }
+  function ePresCont(){
+    var subs=[["I","am"],["He","is"],["She","is"],["It","is"],["They","are"],["We","are"],["You","are"]];
+    var s=gpick(subs), v=gpick(["play","read","eat","work","cook","clean","sleep","sing","walk","jump","help","watch","talk","call"]);
+    var correct=s[1]+" "+v+"ing", o=opt3(correct,[v+"s",v,s[1]+" "+v]);
+    return ["Look! "+s[0]+" ___ now.",o[0],o[1],"مع (now) نستخدم "+s[1]+" + "+v+"ing.","en"];
+  }
+  function eComp(){
+    var a=gpick(["tall","small","fast","old","young","strong","cheap","cold","warm","rich","long","short","weak","slow","clean","dark"]);
+    var correct=a+"er", o=opt3(correct,[a,"more "+a,a+"est"]);
+    return ["This one is ___ than that one.",o[0],o[1],"المقارنة: نضيف er + than → "+correct+" than.","en"];
+  }
+  function eColl(){
+    var c=gpick([["good","at"],["interested","in"],["afraid","of"],["proud","of"],["famous","for"],["married","to"]]);
+    var wrong=["in","on","at","of","to","for"].filter(function(x){return x!==c[1];});
+    var o=opt3(c[1],shuffle(wrong).slice(0,2));
+    return ["She is "+c[0]+" ___ it.",o[0],o[1],c[0]+" + "+c[1]+" (تلازم ثابت).","en"];
+  }
+  function ePluralAdv(){
+    var ns=[["man","men"],["woman","women"],["child","children"],["foot","feet"],["tooth","teeth"],["mouse","mice"],["leaf","leaves"],["knife","knives"],["life","lives"],["wife","wives"],["shelf","shelves"]];
+    var n=gpick(ns), o=opt3(n[1],[n[0]+"s",n[0]+"es",n[0]+"ies"]);
+    return ['The plural of "'+n[0]+'" is:',o[0],o[1],"جمع شاذ: "+n[0]+" = "+n[1]+".","en"];
+  }
+  const EGEN = {
+    saud:[eSv,ePlural,ePrep,eOpp,eAan],
+    osama:[eSv,ePlural,ePrep,eOpp,eAan],
+    rafeef:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp],
+    hasan:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp]
+  };
+
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-soft", S.soft);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
@@ -1233,8 +1295,10 @@ if(!STUDENTS[who]){
     const isEn = id === "en";
     let quiz;
     if (usePool) {
-      // نضيف أسئلة رياضية مولّدة (أرقام جديدة كل مرة) للرياضيات
-      var extra = (id==="ma" && MGEN[who]) ? genN(MGEN[who], 8) : [];
+      // أسئلة مولّدة (أرقام/جمل جديدة كل مرة) + المجموعات المنسّقة
+      var extra = [];
+      if (id==="ma" && MGEN[who]) extra = genN(MGEN[who], 8);
+      else if (id==="en" && EGEN[who]) extra = genN(EGEN[who], 6);
       quiz = shuffle(pool(id).concat(extra)).slice(0, QN);
     } else {
       quiz = DATA[id].quiz.slice();
@@ -1441,10 +1505,10 @@ if(!STUDENTS[who]){
     const sec = document.getElementById("rem");
     const R = REMEDIAL[who];
     if(!R){ sec.innerHTML = '<p class="hint">لا توجد تمارين علاجية لهذا الطالب حاليًا.</p>'; return; }
-    // رياضيات مولّدة بأرقام جديدة كل مرة + إنجليزي مخلوط
-    const engItems = R.items.filter(q=>q[4]==="en");
-    const mathItems = MGEN[who] ? genN(MGEN[who], 8) : R.items.filter(q=>q[4]==="ma");
-    const items = mathItems.concat(shuffle(engItems.slice()));
+    // رياضيات وإنجليزي مولّدان بأرقام/جمل جديدة كل مرة
+    const mathItems = MGEN[who] ? genN(MGEN[who], 7) : R.items.filter(q=>q[4]==="ma");
+    const engItems = EGEN[who] ? genN(EGEN[who], 5) : R.items.filter(q=>q[4]==="en");
+    const items = shuffle(mathItems.concat(engItems));
     let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`+
       `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`;
     const lessons = LESSONS[who] || [];
