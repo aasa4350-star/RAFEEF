@@ -861,6 +861,77 @@ const BANK6 = {
   }
 };
 
+// ===== تمارين علاجية مركّزة على ضعف كل طالب (من نتائجهم الفعلية) =====
+const REMEDIAL = {
+  rafeef: {
+    focus:"ركّزنا على الأخطاء المتكررة عندك: <b>الأعداد السالبة</b>، <b>الأسس</b>، <b>حل المعادلات</b>، <b>النسبة المئوية</b>، والأزمنة في الإنجليزي. اقرئي الشرح مع كل سؤال 💡",
+    items:[
+      ["احسب: −6 + 10",["4","−4","16"],0,"على خط الأعداد: ابدئي من −6 وتقدّمي 10 خطوات → 4.","ma"],
+      ["احسب: 4 − 9",["−5","5","13"],0,"4 أصغر من 9 فالناتج سالب: 9−4=5 ثم نضع سالب → −5.","ma"],
+      ["احسب: −3 × 4",["−12","12","−7"],0,"موجب × سالب = سالب: 3×4=12 → −12.","ma"],
+      ["احسب: 12 ÷ (−3)",["−4","4","−36"],0,"موجب ÷ سالب = سالب: 12÷3=4 → −4.","ma"],
+      ["احسب: 2⁴ (الأس)",["8","16","6"],1,"2×2×2×2 = 16 (الأس تكرار ضرب، مو 2×4).","ma"],
+      ["احسب: 5²",["10","25","7"],1,"5×5 = 25.","ma"],
+      ["حل: x + 4 = 9",["x=5","x=13","x=4"],0,"ننقل 4 للطرف الآخر: x = 9−4 = 5.","ma"],
+      ["حل: 2x = 14",["x=7","x=12","x=16"],0,"نقسم الطرفين على 2: x = 7.","ma"],
+      ["حل: 3x + 2 = 11",["x=3","x=4","x=5"],0,"3x = 11−2 = 9 → x = 3.","ma"],
+      ["كم يساوي %15 من 200؟",["30","15","45"],0,"(15÷100)×200 = 30.","ma"],
+      ["The plural of \"man\" is:",["mans","men","mens"],1,"جمع شاذ: man → men.","en"],
+      ["This house ___ in 2000.",["built","was built","builds"],1,"مبني للمجهول (ماضٍ): was + built.","en"],
+      ["She ___ done her homework.",["have","has","having"],1,"مع She نستخدم has: has done.","en"],
+      ["We ___ TV every evening.",["watch","watches","watching"],0,"مع We نستخدم الفعل مجرّد: watch.","en"]
+    ]
+  },
+  saud: {
+    focus:"ركّزنا على: <b>جمع الكسور</b>، <b>القسمة مع الباقي</b>، ومفردات الإنجليزي. اقرأ الشرح مع كل سؤال 💡",
+    items:[
+      ["احسب: ⅕ + ⅕",["⅖","⅕","1"],0,"نجمع البسط ونثبّت المقام: 1+1=2 → ⅖.","ma"],
+      ["احسب: ⅓ + ⅓",["⅔","⅙","1"],0,"1+1=2 والمقام يبقى 3 → ⅔ (لا نجمع المقامات).","ma"],
+      ["احسب: ¼ + ¼",["½","¼","⅛"],0,"2/4 = ½.","ma"],
+      ["احسب: ⅖ + ⅕",["⅗","⅖","1"],0,"2/5 + 1/5 = 3/5.","ma"],
+      ["كم باقي القسمة: 17 ÷ 5؟",["1","2","3"],1,"5×3=15، والباقي 17−15 = 2.","ma"],
+      ["كم باقي القسمة: 23 ÷ 4؟",["1","3","5"],1,"4×5=20، والباقي 23−20 = 3.","ma"],
+      ["كم باقي القسمة: 30 ÷ 7؟",["2","3","4"],0,"7×4=28، والباقي 30−28 = 2.","ma"],
+      ["احسب بتركيز: 8 + 7",["14","15","16"],1,"8+7 = 15.","ma"],
+      ["Which one is an animal?",["cup","bird","hat"],1,"bird = طائر (حيوان).","en"],
+      ["Which one is a color?",["yellow","cup","pen"],0,"yellow = أصفر (لون).","en"],
+      ["She ___ a red bag.",["have","has","having"],1,"مع She نستخدم has.","en"],
+      ["Which one is a fruit?",["apple","car","box"],0,"apple = تفاحة (فاكهة).","en"]
+    ]
+  },
+  hasan: {
+    focus:"مستواك عالٍ، بس نسدّ ثغرات أساسية ظهرت: <b>الأعداد السالبة</b>، <b>قواعد الأسس</b>، <b>الكسور</b>، <b>فيثاغورس</b>، وحل المعادلات 💡",
+    items:[
+      ["احسب: −8 + 5",["−3","−13","3"],0,"ابدأ من −8 وتقدّم 5 → −3.","ma"],
+      ["احسب: −15 ÷ 3",["−5","−12","5"],0,"سالب ÷ موجب = سالب: 15÷3=5 → −5.","ma"],
+      ["احسب: 2⁵ ÷ 2² (قاعدة الأسس)",["2³ = 8","2⁷","2¹⁰"],0,"عند قسمة نفس الأساس نطرح الأسس: 5−2=3 → 2³ = 8.","ma"],
+      ["احسب: ⅓ + ⅓",["⅔","⅙","1"],0,"نثبّت المقام: 1+1=2 → ⅔.","ma"],
+      ["احسب: ½ + ¼",["¾","⅔","⅓"],0,"نوحّد المقام: 2/4 + 1/4 = 3/4.","ma"],
+      ["مثلث قائم ضلعاه 9 و 12، ما الوتر؟",["15","18","21"],0,"الوتر = √(9²+12²) = √225 = 15.","ma"],
+      ["حل: 3x − 4 = 11",["x=5","x=4","x=7"],0,"3x = 15 → x = 5.","ma"],
+      ["حل: 4x = 20",["x=5","x=4","x=16"],0,"20 ÷ 4 = 5.","ma"],
+      ["احسب: (−2)³",["−8","8","−6"],0,"سالب لأس فردي = سالب: 2³=8 → −8.","ma"],
+      ["The opposite of \"temporary\" is:",["permanent","short","weak"],0,"temporary = مؤقّت، وعكسها permanent = دائم.","en"],
+      ["She is the ___ runner in the team.",["fast","faster","fastest"],2,"أفضل واحدة في المجموعة → التفضيل: the fastest.","en"],
+      ["She has ___ eaten lunch.",["yet","already","ever"],1,"في جملة إثبات نستخدم already (بالفعل).","en"]
+    ]
+  },
+  osama: {
+    focus:"مستواك ممتاز! نصقل نقاط بسيطة: <b>since/for</b> والمقارنة في الإنجليزي، ومعها تحدّي رياضي أصعب 🚀",
+    items:[
+      ["I have lived here ___ 2019.",["for","since","from"],1,"مع نقطة زمنية (سنة محددة) نستخدم since.","en"],
+      ["I have known him ___ five years.",["since","for","at"],1,"مع مدة زمنية (5 سنوات) نستخدم for.","en"],
+      ["This book is ___ than that one.",["interesting","more interesting","most interesting"],1,"الكلمة الطويلة نقارنها بـ more ... than.","en"],
+      ["He is the ___ boy in the class.",["tall","taller","tallest"],2,"الأطول بين الكل → التفضيل: the tallest.","en"],
+      ["احسب: 15 × 15",["215","225","250"],1,"15×15 = 225.","ma"],
+      ["احسب: %30 من 250",["65","75","80"],1,"(30÷100)×250 = 75.","ma"],
+      ["احسب: ⅔ + ¼",["11/12","⅚","⅗"],0,"نوحّد المقام 12: 8/12 + 3/12 = 11/12.","ma"],
+      ["احسب: 7.2 × 3",["21.6","20.6","21.2"],0,"7.2×3 = 21.6.","ma"],
+      ["متوسط الأعداد: 10 ، 20 ، 30 ، 40",["25","30","20"],0,"المجموع 100 ÷ 4 = 25.","ma"]
+    ]
+  }
+};
+
 // ===== مادة اللغة العربية (أسئلة + إملاء) =====
 const ARABIC = {
   hasan: {
@@ -927,7 +998,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "hd8";
+var AUDIO_VER = "s2";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1001,12 +1072,14 @@ if(!STUDENTS[who]){
       <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
       <button role="tab" aria-selected="false" data-tab="arb">العربية 🕌</button>
+      <button role="tab" aria-selected="false" data-tab="rem">علاجي 💪</button>
       <button role="tab" aria-selected="false" data-tab="res">النتيجة 🏁</button>
       <button role="tab" aria-selected="false" data-tab="log">محاولاتي 📚</button>
     </div>
     <section class="panel active" id="en" role="tabpanel"></section>
     <section class="panel" id="ma" role="tabpanel"></section>
     <section class="panel" id="arb" role="tabpanel"></section>
+    <section class="panel" id="rem" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
     <section class="panel" id="log" role="tabpanel"></section>
     <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · صفحة تعليمية</footer>`;
@@ -1247,6 +1320,43 @@ if(!STUDENTS[who]){
     }
   }
 
+  function renderRemedial(){
+    const sec = document.getElementById("rem");
+    const R = REMEDIAL[who];
+    if(!R){ sec.innerHTML = '<p class="hint">لا توجد تمارين علاجية لهذا الطالب حاليًا.</p>'; return; }
+    let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`+
+      `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`+
+      `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
+    R.items.forEach((q,i)=>{
+      const isEn = q[4]==="en";
+      html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
+        `<div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
+      q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
+      html += `</div><div class="explain">${q[3]}</div></div>`;
+    });
+    html += `<div class="scorebar"><span class="txt" data-score>0 / ${R.items.length}</span>`+
+      `<div class="track"><div class="fill" data-fill></div></div></div>`+
+      `<button class="reset">إعادة التمارين 🔄</button>`;
+    sec.innerHTML = html;
+    const answered = new Set(); const total = R.items.length; let correct = 0;
+    const scoreEl = sec.querySelector("[data-score]"), fillEl = sec.querySelector("[data-fill]");
+    sec.querySelectorAll(".q").forEach(qEl=>{
+      const i = +qEl.dataset.i, ans = R.items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          if(answered.has(i)) return; answered.add(i);
+          qEl.querySelectorAll(".opts button").forEach(b=>b.disabled=true);
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = `${correct} / ${total}`;
+          fillEl.style.width = (answered.size/total*100)+"%";
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", renderRemedial);
+  }
+
   ["en","ma"].forEach(build);
   renderResults();
   document.querySelectorAll('.tabs button').forEach(b=>{
@@ -1258,6 +1368,7 @@ if(!STUDENTS[who]){
       if(b.dataset.tab==="res") renderResults();
       if(b.dataset.tab==="log") renderLog();
       if(b.dataset.tab==="arb") renderArb();
+      if(b.dataset.tab==="rem") renderRemedial();
     });
   });
 }
