@@ -155,7 +155,11 @@ function speak(text, rate, lang){
   }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(!SR){ try{ document.documentElement.classList.add("no-mic"); }catch(e){} }
+// التعرّف على الكلام غير موثوق على آيفون/آيباد (قيد من آبل) — نخفي زر النطق هناك
+var IS_IOS = /iP(hone|od|ad)/.test(navigator.platform)
+  || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  || /iPad|iPhone|iPod/.test(navigator.userAgent);
+if(!SR || IS_IOS){ try{ document.documentElement.classList.add("no-mic"); }catch(e){} }
 function startRecognition(lang, onResult, onErr){
   if(!SR){ onErr && onErr("no-support"); return; }
   try{
