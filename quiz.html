@@ -1061,7 +1061,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s4";
+var AUDIO_VER = "s5";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1121,6 +1121,54 @@ if(!STUDENTS[who]){
     return a;
   }
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  // ===== مولّد أسئلة رياضية عشوائي (الأرقام تتغيّر كل مرة) =====
+  function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+  function gpick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function sup(n){ return ({1:"¹",2:"²",3:"³",4:"⁴",5:"⁵",6:"⁶"})[n] || ("^"+n); }
+  function opt3(correct, distractors){
+    var o=[correct];
+    (distractors||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<3) o.push(d); });
+    var p=1;
+    while(o.length<3){ var c=(typeof correct==="number")?correct+p:String(correct)+"×"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
+    for(var i=o.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; }
+    return [o.map(function(v){ return String(v).replace(/-/g,"−"); }), o.indexOf(correct)];
+  }
+  const MGEN = {
+    saud:[
+      function(){var a=ri(120,480),b=ri(120,480),s=a+b,o=opt3(s,[s+10,s-10,s+100]);return ["احسب: "+a+" + "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var a=ri(320,900),b=ri(60,a-60),s=a-b,o=opt3(s,[s+10,s-10,s+100]);return ["احسب: "+a+" − "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var a=ri(11,29),b=ri(3,9),s=a*b,o=opt3(s,[s+b,s-b,s+10]);return ["احسب: "+a+" × "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var b=ri(3,9),q=ri(4,9),a=b*q,o=opt3(q,[q+1,q-1,q+2]);return ["احسب: "+a+" ÷ "+b,o[0],o[1],"= "+q+".","ma"];},
+      function(){var d=ri(4,7),q=ri(3,8),r=ri(1,d-1),a=d*q+r,o=opt3(r,[r+1,(r>1?r-1:r+2),d-r]);return ["كم باقي القسمة "+a+" ÷ "+d+"؟",o[0],o[1],d+"×"+q+"="+(d*q)+" والباقي "+r+".","ma"];},
+      function(){var d=ri(3,8),a=ri(1,d-2),b=ri(1,d-a-1),n=a+b,o=opt3(n+"/"+d,[a+"/"+d,n+"/"+(2*d),(n+1)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d,o[0],o[1],"نجمع البسط: "+a+"+"+b+"="+n+" والمقام يبقى "+d+".","ma"];}
+    ],
+    osama:[
+      function(){var a=ri(12,39),b=ri(11,19),s=a*b,o=opt3(s,[s+10,s-10,s+b]);return ["احسب: "+a+" × "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var b=ri(4,9),q=ri(11,19),a=b*q,o=opt3(q,[q+1,q-1,q+2]);return ["احسب: "+a+" ÷ "+b,o[0],o[1],"= "+q+".","ma"];},
+      function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي %"+p+" من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+".","ma"];},
+      function(){var a=ri(2,8),b=ri(1,9),c=ri(2,8),d=ri(1,9),x=a+b/10,y=c+d/10,s=Math.round((x+y)*10)/10,o=opt3(s,[Math.round((x+y+0.1)*10)/10,Math.round((x+y-1)*10)/10,s+1]);return ["احسب: "+x+" + "+y,o[0],o[1],"= "+s+".","ma"];},
+      function(){var a=ri(2,9),b=ri(2,9),c=ri(2,9),s=a+b*c,o=opt3(s,[(a+b)*c,s+c,a+b+c]);return ["احسب: "+a+" + "+b+" × "+c,o[0],o[1],"نبدأ بالضرب: "+b+"×"+c+"="+(b*c)+" ثم +"+a+" = "+s+".","ma"];},
+      function(){var m=ri(6,20),arr=gpick([[m-4,m,m+4],[m-6,m-2,m+2,m+6]]),o=opt3(m,[m+2,m-2,m+5]);return ["متوسط الأعداد: "+arr.join(" ، "),o[0],o[1],"المجموع ÷ العدد = "+m+".","ma"];}
+    ],
+    rafeef:[
+      function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[a+b,-(a+b),-a-b]);return ["احسب: −"+a+" + "+b,o[0],o[1],"من −"+a+" نتقدّم "+b+" → "+s+".","ma"];},
+      function(){var a=ri(2,9),b=ri(a+1,18),s=a-b,o=opt3(s,[b-a,-(a+b),s+2]);return ["احسب: "+a+" − "+b,o[0],o[1],a+" أصغر من "+b+" → "+s+".","ma"];},
+      function(){var a=ri(2,9),b=ri(2,9),s=-a*b,o=opt3(s,[a*b,-a-b,s+2]);return ["احسب: −"+a+" × "+b,o[0],o[1],"إشارتان مختلفتان → سالب: "+s+".","ma"];},
+      function(){var base=ri(2,6),e=ri(2,4),v=Math.pow(base,e),o=opt3(v,[base*e,v+base,v-base]);return ["احسب: "+base+sup(e),o[0],o[1],base+" مضروب بنفسه "+e+" مرات = "+v+".","ma"];},
+      function(){var x=ri(2,9),a=ri(2,6),b=ri(1,9),c=a*x+b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x + "+b+" = "+c,o[0],o[1],a+"x = "+(c-b)+" → x = "+x+".","ma"];},
+      function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي %"+p+" من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+".","ma"];}
+    ],
+    hasan:[
+      function(){var base=ri(2,5),m=ri(3,6),n=ri(1,m-1),v=Math.pow(base,m-n),o=opt3(v,[Math.pow(base,m+n),base*(m-n),v+base]);return ["احسب: "+base+sup(m)+" ÷ "+base+sup(n),o[0],o[1],"نطرح الأسس: "+m+"−"+n+"="+(m-n)+" → "+base+sup(m-n)+" = "+v+".","ma"];},
+      function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[-a-b,a+b,s+3]);return ["احسب: −"+a+" + "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var x=ri(2,12),a=ri(2,7),b=ri(1,12),c=a*x-b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x − "+b+" = "+c,o[0],o[1],a+"x = "+(c+b)+" → x = "+x+".","ma"];},
+      function(){var t=gpick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17],[7,24,25]]),o=opt3(t[2],[t[2]+2,t[2]-2,t[0]+t[1]]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+".","ma"];},
+      function(){var base=ri(2,5),e=gpick([2,3,4]),v=Math.pow(-base,e),o=opt3(v,[-v,Math.pow(base,e),v+base]);return ["احسب: (−"+base+")"+sup(e),o[0],o[1],(e%2?"أس فردي → سالب: ":"أس زوجي → موجب: ")+v+".","ma"];}
+    ]
+  };
+  function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var q=gpick(gens)(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
+
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-soft", S.soft);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
@@ -1183,8 +1231,14 @@ if(!STUDENTS[who]){
   function build(id){
     const sec = document.getElementById(id);
     const isEn = id === "en";
-    let quiz = DATA[id].quiz.slice();
-    if (usePool) { shuffle(quiz); quiz = quiz.slice(0, QN); }
+    let quiz;
+    if (usePool) {
+      // نضيف أسئلة رياضية مولّدة (أرقام جديدة كل مرة) للرياضيات
+      var extra = (id==="ma" && MGEN[who]) ? genN(MGEN[who], 8) : [];
+      quiz = shuffle(pool(id).concat(extra)).slice(0, QN);
+    } else {
+      quiz = DATA[id].quiz.slice();
+    }
     const d = { review: DATA[id].review, quiz: quiz };
     RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null};
     let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
@@ -1387,6 +1441,10 @@ if(!STUDENTS[who]){
     const sec = document.getElementById("rem");
     const R = REMEDIAL[who];
     if(!R){ sec.innerHTML = '<p class="hint">لا توجد تمارين علاجية لهذا الطالب حاليًا.</p>'; return; }
+    // رياضيات مولّدة بأرقام جديدة كل مرة + إنجليزي مخلوط
+    const engItems = R.items.filter(q=>q[4]==="en");
+    const mathItems = MGEN[who] ? genN(MGEN[who], 8) : R.items.filter(q=>q[4]==="ma");
+    const items = mathItems.concat(shuffle(engItems.slice()));
     let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`+
       `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`;
     const lessons = LESSONS[who] || [];
@@ -1400,21 +1458,21 @@ if(!STUDENTS[who]){
       html += `</div>`;
     }
     html += `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
-    R.items.forEach((q,i)=>{
+    items.forEach((q,i)=>{
       const isEn = q[4]==="en";
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
         `<div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
       q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
       html += `</div><div class="explain">${q[3]}</div></div>`;
     });
-    html += `<div class="scorebar"><span class="txt" data-score>0 / ${R.items.length}</span>`+
+    html += `<div class="scorebar"><span class="txt" data-score>0 / ${items.length}</span>`+
       `<div class="track"><div class="fill" data-fill></div></div></div>`+
       `<button class="reset">إعادة التمارين 🔄</button>`;
     sec.innerHTML = html;
-    const answered = new Set(); const total = R.items.length; let correct = 0;
+    const answered = new Set(); const total = items.length; let correct = 0;
     const scoreEl = sec.querySelector("[data-score]"), fillEl = sec.querySelector("[data-fill]");
     sec.querySelectorAll(".q").forEach(qEl=>{
-      const i = +qEl.dataset.i, ans = R.items[i][2];
+      const i = +qEl.dataset.i, ans = items[i][2];
       qEl.querySelectorAll(".opts button").forEach(btn=>{
         btn.addEventListener("click",()=>{
           if(answered.has(i)) return; answered.add(i);
