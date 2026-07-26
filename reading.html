@@ -239,11 +239,18 @@ if(!META[who] || !DATA[who]){
 
   var curLang = "en";
 
+  // تدريب النطق مجاناً على الآيفون عبر مايك لوحة المفاتيح (الإملاء المدمج)
+  var PRON_TIP = '<div style="background:var(--good-bg);border:1px solid var(--good);border-radius:14px;padding:12px 14px;margin:4px 4px 14px;font-size:.92rem;line-height:1.9">'+
+    '🎤 <b>تدرّب على النطق (مجاناً):</b> بدل ما تكتب بيدك، اضغط زر المايك 🎤 في <b>لوحة مفاتيح الجوال</b> وانطق الكلمة بصوتك. '+
+    'إذا كتبها الجوال <b style="color:var(--good)">صح</b> فنطقك صحيح ✅، وإذا كتبها غلط أعِد المحاولة.'+
+    '</div>';
+
   function renderDict(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
     var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
-      '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
+      '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>'+
+      PRON_TIP;
     D.dictation.forEach(function(item,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">رقم '+(i+1)+'</div>'+
         '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
@@ -312,7 +319,8 @@ if(!META[who] || !DATA[who]){
     var V = VOCAB[who] || [];
     var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
     var html = '<div class="block-title"><span class="dot"></span> اسمع الكلمة، اكتبها بالإنجليزي، ومعناها بالعربي</div>'+
-      '<p class="hint">اضغط 🔊 استمع، ثم اكتب الكلمة بالإنجليزي ومعناها بالعربي، ثم «تحقّق».</p>';
+      '<p class="hint">اضغط 🔊 استمع، ثم اكتب الكلمة بالإنجليزي ومعناها بالعربي، ثم «تحقّق».</p>'+
+      PRON_TIP;
     V.forEach(function(item,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(i+1)+'</div>'+
         '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
