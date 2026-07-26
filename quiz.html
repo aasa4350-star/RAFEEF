@@ -1061,7 +1061,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s3";
+var AUDIO_VER = "s4";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1392,7 +1392,11 @@ if(!STUDENTS[who]){
     const lessons = LESSONS[who] || [];
     if(lessons.length){
       html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (افتحها قبل الحل)</div><div class="review">`;
-      lessons.forEach(l=>{ html += `<details><summary>${l[0]}</summary><div class="body">${l[1]}</div></details>`; });
+      lessons.forEach(l=>{
+        const q = encodeURIComponent((l[2] || l[0].replace('🎬','').trim()) + ' شرح مبسط للأطفال');
+        const vid = `<div style="margin-top:12px"><a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>`;
+        html += `<details><summary>${l[0]}</summary><div class="body">${l[1]}${vid}</div></details>`;
+      });
       html += `</div>`;
     }
     html += `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
