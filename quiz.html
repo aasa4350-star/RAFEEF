@@ -613,6 +613,70 @@ const BANK4 = {
   }
 };
 
+// المجموعة الخامسة — مستوى أعلى مناسب للصف (تطوير لأسامة وسعود)
+const BANK5 = {
+  osama: {
+    en:[
+      ["She has ___ her homework.",["do","did","done"],2,"مضارع تام: has + done."],
+      ["They ___ football when it started to rain.",["play","were playing","plays"],1,"حدث مستمر قطعه آخر: were playing."],
+      ["This book is ___ than that one.",["interesting","more interesting","most interesting"],1,"مقارنة الطويلة: more ... than."],
+      ["___ does the train leave?",["When","Who","Which"],0,"للوقت نستخدم When."],
+      ["The plural of \"leaf\" is:",["leafs","leaves","leafes"],1,"جمع شاذ: leaves."],
+      ["I have lived here ___ 2019.",["for","since","from"],1,"مع سنة محددة: since."],
+      ["He is the ___ boy in the class.",["tall","taller","tallest"],2,"التفضيل: the tallest."],
+      ["We didn't ___ the game.",["win","won","winning"],0,"بعد didn't نستخدم المصدر: win."],
+      ["The opposite of \"expensive\" is:",["cheap","rich","big"],0,"عكس expensive: cheap."],
+      ["There ___ some water in the bottle.",["is","are","were"],0,"water غير معدود → is."],
+      ["___ you ever been to Riyadh?",["Has","Have","Did"],1,"مع you: Have ... been."],
+      ["She ___ to music every evening.",["listen","listens","listening"],1,"مع She نضيف s: listens."]
+    ],
+    ma:[
+      ["احسب: 23 × 14",["322","312","332"],0,"23×14 = 322."],
+      ["احسب: 156 ÷ 12",["12","13","14"],1,"= 13."],
+      ["كم يساوي %20 من 150؟",["25","30","35"],1,"(20÷100)×150 = 30."],
+      ["احسب: 3.5 + 2.75",["6.25","5.25","6.15"],0,"= 6.25."],
+      ["احسب: ⅗ + ⅕",["⅘","⅖","1"],0,"3/5 + 1/5 = 4/5."],
+      ["مساحة مربع طول ضلعه 9",["72","81","36"],1,"9×9 = 81."],
+      ["محيط مستطيل طوله 12 وعرضه 5",["34","60","24"],0,"(12+5)×2 = 34."],
+      ["احسب: 7 × 8 + 6",["62","98","56"],0,"نبدأ بالضرب: 56+6 = 62."],
+      ["احسب: 1000 − 456",["544","554","644"],0,"= 544."],
+      ["قرّب 3847 لأقرب مئة",["3800","3900","3850"],0,"أقرب مئة: 3800."],
+      ["أي عدد من مضاعفات 6؟",["26","42","50"],1,"42 = 6×7."],
+      ["احسب: ¾ من 40",["30","28","32"],0,"40÷4×3 = 30."]
+    ]
+  },
+  saud: {
+    en:[
+      ["She ___ to school every day.",["go","goes","going"],1,"مع She نضيف es: goes."],
+      ["The plural of \"child\" is:",["childs","children","childrens"],1,"جمع شاذ: children."],
+      ["Yesterday I ___ a film.",["watch","watched","watching"],1,"yesterday ماضٍ: watched."],
+      ["There ___ three cats.",["is","are","am"],1,"جمع → are."],
+      ["I go to bed ___ night.",["in","on","at"],2,"مع night نستخدم at."],
+      ["___ do you live?",["What","Where","Who"],1,"للمكان نستخدم Where."],
+      ["He has two ___ .",["foots","feet","foot"],1,"جمع شاذ: feet."],
+      ["We ___ playing now.",["is","are","am"],1,"مع We: are."],
+      ["A ___ has a long neck.",["giraffe","rabbit","fish"],0,"الزرافة (giraffe)."],
+      ["Which day comes after Monday?",["Sunday","Tuesday","Friday"],1,"بعد الاثنين: الثلاثاء (Tuesday)."],
+      ["The opposite of \"up\" is:",["down","in","hot"],0,"عكس up: down."],
+      ["The opposite of \"happy\" is:",["sad","big","new"],0,"عكس happy: sad."]
+    ],
+    ma:[
+      ["احسب: 24 × 3",["62","72","82"],1,"24×3 = 72."],
+      ["احسب: 156 + 267",["413","423","433"],1,"= 423."],
+      ["احسب: 402 − 158",["244","254","234"],0,"= 244."],
+      ["احسب: 63 ÷ 7",["8","9","7"],1,"= 9."],
+      ["احسب: 9 × 6",["48","54","56"],1,"= 54."],
+      ["كم يساوي ¼ من 20؟",["4","5","6"],1,"20÷4 = 5."],
+      ["قرّب 68 لأقرب عشرة",["60","70","80"],1,"أقرب عشرة: 70."],
+      ["كم دقيقة في ساعة ونصف؟",["60","90","120"],1,"60+30 = 90 دقيقة."],
+      ["اشترى قلمًا بـ 3 ريال ودفترًا بـ 5 ريال، كم دفع؟",["7","8","9"],1,"3+5 = 8 ريال."],
+      ["أيّ عدد زوجي؟",["17","24","31"],1,"24 عدد زوجي."],
+      ["احسب: 8 × 7",["54","56","58"],1,"= 56."],
+      ["أيّ كسر أكبر: ½ أم ¼؟",["½","¼","متساويان"],0,"½ أكبر."]
+    ]
+  }
+};
+
 // ===== مادة اللغة العربية (أسئلة + إملاء) =====
 const ARABIC = {
   hasan: {
@@ -734,6 +798,7 @@ if(!STUDENTS[who]){
     if (BANK2[who]) a = a.concat(BANK2[who][subj]);
     if (BANK3[who]) a = a.concat(BANK3[who][subj]);
     if (BANK4[who]) a = a.concat(BANK4[who][subj]);
+    if (typeof BANK5!=="undefined" && BANK5[who]) a = a.concat(BANK5[who][subj]);
     return a;
   }
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
