@@ -122,7 +122,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "hd5";
+var AUDIO_VER = "hd6";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -241,8 +241,9 @@ if(!META[who] || !DATA[who]){
 
   // تدريب النطق مجاناً على الآيفون عبر مايك لوحة المفاتيح (الإملاء المدمج)
   var PRON_TIP = '<div style="background:var(--good-bg);border:1px solid var(--good);border-radius:14px;padding:12px 14px;margin:4px 4px 14px;font-size:.92rem;line-height:1.9">'+
-    '🎤 <b>تدرّب على النطق (مجاناً):</b> بدل ما تكتب بيدك، اضغط زر المايك 🎤 في <b>لوحة مفاتيح الجوال</b> وانطق الكلمة بصوتك. '+
-    'إذا كتبها الجوال <b style="color:var(--good)">صح</b> فنطقك صحيح ✅، وإذا كتبها غلط أعِد المحاولة.'+
+    '✍️ <b>خانة الكتابة:</b> اكتب الكلمة بيدك — هذا تدريب <b>الإملاء</b>.<br>'+
+    '🎤 <b>خانة «درّب نطقك»:</b> اضغط مايك 🎤 لوحة المفاتيح وانطق الكلمة بصوتك. إذا كتبها الجوال <b style="color:var(--good)">صح</b> فنطقك صحيح ✅.<br>'+
+    'كذا يتدرّب على <b>الكتابة والنطق</b> معاً.'+
     '</div>';
 
   function renderDict(){
@@ -259,7 +260,12 @@ if(!META[who] || !DATA[who]){
         '<div class="row"><button class="chk">تحقّق</button>'+
         '<button class="say small" data-show>👁️ أظهر</button>'+
         '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
-        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div></div>';
+        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div>'+
+        '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
+          '<span style="font-weight:700;font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px">🎤 درّب نطقك — انطقها بمايك الكيبورد:</span>'+
+          '<input class="dinp pinp" placeholder="انطق هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
+          '<div class="row"><button class="say small pchk">افحص النطق</button><span class="pfb2" style="font-weight:700"></span></div>'+
+        '</div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+D.dictation.length+'</div>';
     sec.innerHTML = html;
@@ -271,6 +277,12 @@ if(!META[who] || !DATA[who]){
       qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.7,ar?"ar-SA":"en-US"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
       wireMic(qEl, text, ar);
+      var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
+      qEl.querySelector(".pchk").addEventListener("click",function(){
+        var ok = norm(pin.value,ar)===norm(text,ar);
+        pfb2.style.color = ok?"var(--good)":"var(--bad)";
+        pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
+      });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var ok = norm(inp.value,ar)===norm(text,ar);
         if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
@@ -331,7 +343,12 @@ if(!META[who] || !DATA[who]){
         '<input class="ainp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
         '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button>'+
         '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
-        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div></div>';
+        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div>'+
+        '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
+          '<span '+lab+'>🎤 درّب نطقك — انطق الكلمة بمايك الكيبورد:</span>'+
+          '<input class="einp pinp" placeholder="Say it..." style="direction:ltr;text-align:left">'+
+          '<div class="row"><button class="say small pchk">افحص النطق</button><span class="pfb2" style="font-weight:700"></span></div>'+
+        '</div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>';
     sec.innerHTML = html;
@@ -364,6 +381,12 @@ if(!META[who] || !DATA[who]){
           fb.innerHTML = 'الإنجليزي: '+(enOk?'✅':'❌ <span class="corr">'+word+'</span>')+' · العربي: '+(arOk?'✅':'❌ <span class="corr">'+answers[0]+'</span>');
         }
         scoreEl.textContent="الدرجة: "+correct+" / "+V.length;
+      });
+      var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
+      qEl.querySelector(".pchk").addEventListener("click",function(){
+        var ok = norm(pin.value,false)===norm(word,false);
+        pfb2.style.color = ok?"var(--good)":"var(--bad)";
+        pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
     });
   }
