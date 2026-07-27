@@ -162,7 +162,9 @@ async function load(){
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY }
     });
     if(!r.ok){ throw new Error("HTTP "+r.status); }
-    const data = await r.json();
+    let data = await r.json();
+    // نستبعد صفوف النشاط (فتح درس/فيديو) من إحصاء النتائج
+    data = (Array.isArray(data)?data:[]).filter(row=> !(row.meta && row.meta.kind==="activity"));
     status.textContent = `آخر تحديث: ${new Date().toLocaleString("en-GB",{timeZone:"Asia/Riyadh"})} (السعودية) · ${data.length} محاولة`;
     if(!data.length){
       content.innerHTML = `<div class="card empty">ما فيه نتائج بعد.<br>افتح رابط أي ابن من تحت وخلّه يحل الاختبار، وبتظهر نتيجته هنا تلقائيًا.</div>`;

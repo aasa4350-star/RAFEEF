@@ -115,6 +115,7 @@ async function main(){
     const r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
       {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
     rows=await r.json();
+    rows=(Array.isArray(rows)?rows:[]).filter(x=> !(x.meta && x.meta.kind==="activity"));
   }catch(e){}
 
   let notes=[];
