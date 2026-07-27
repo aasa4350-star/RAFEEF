@@ -861,6 +861,36 @@ const BANK6 = {
   }
 };
 
+// المجموعة السابعة — أصعب (تحدٍّ لحسن بعد تحسّنه)
+const BANK7 = {
+  hasan: {
+    en:[
+      ["Hardly ___ he entered when the phone rang.",["had","did","was"],0,"مع Hardly في البداية: had + الفاعل."],
+      ["It's high time we ___ home.",["go","went","going"],1,"بعد It's high time نستخدم الماضي: went."],
+      ["No sooner had he arrived ___ it started to rain.",["then","when","than"],2,"No sooner ... than."],
+      ["Were I you, I ___ accept the offer.",["would","will","did"],0,"شرط بصيغة مقلوبة: would."],
+      ["She denied ___ the money.",["to take","having taken","take"],1,"بعد deny نستخدم v-ing/having + p.p."],
+      ["Little ___ he know the truth.",["does","done","did"],2,"مع Little في البداية (نفي): did he know."],
+      ["The book, ___ cover is torn, is mine.",["whose","which","who"],0,"للملكية لغير العاقل: whose."],
+      ["I look forward to ___ from you.",["hear","hearing","heard"],1,"بعد to (حرف جر): v-ing."],
+      ["Not only did she sing, ___ she also danced.",["and","so","but"],2,"Not only ... but also."],
+      ["If only I ___ studied harder!",["had","have","did"],0,"تمنٍّ للماضي: had + p.p."]
+    ],
+    ma:[
+      ["حل المعادلة: x² − 5x + 6 = 0",["2 و 3","−2 و −3","1 و 6"],0,"(x−2)(x−3)=0 → الجذران 2 و 3."],
+      ["إذا 2x + y = 7 و x − y = 2، فما قيمة x؟",["2","3","4"],1,"بجمع المعادلتين: 3x = 9 → x = 3."],
+      ["بسّط: (3x²)(2x³)",["5x⁵","6x⁶","6x⁵"],2,"3×2=6 و x²·x³ = x⁵ → 6x⁵."],
+      ["احسب: √169",["13","12","14"],0,"13×13 = 169."],
+      ["بسّط: (x + 3)²",["x²+9","x²+6x+9","x²+3x+9"],1,"(x+3)² = x²+6x+9."],
+      ["حل: 3(x − 2) = 2x + 4",["8","2","10"],2,"3x−6=2x+4 → x=10."],
+      ["قيمة x في: x/3 + 2 = 5",["9","3","1"],0,"x/3=3 → x=9."],
+      ["احسب: 2⁶ ÷ 2³ × 2",["8","16","4"],1,"64÷8=8 ثم ×2 = 16."],
+      ["مساحة دائرة نصف قطرها 10 (π≈3.14)",["100","314","31.4"],1,"3.14×10² = 314."],
+      ["ميل المستقيم المار بـ (1,2) و (3,8)",["3","2","6"],0,"(8−2)÷(3−1) = 3."]
+    ]
+  }
+};
+
 // ===== تمارين علاجية مركّزة على ضعف كل طالب (من نتائجهم الفعلية) =====
 const REMEDIAL = {
   rafeef: {
@@ -1095,7 +1125,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s8";
+var AUDIO_VER = "s9";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1152,6 +1182,7 @@ if(!STUDENTS[who]){
     if (BANK4[who]) a = a.concat(BANK4[who][subj]);
     if (typeof BANK5!=="undefined" && BANK5[who]) a = a.concat(BANK5[who][subj]);
     if (typeof BANK6!=="undefined" && BANK6[who]) a = a.concat(BANK6[who][subj]);
+    if (typeof BANK7!=="undefined" && BANK7[who]) a = a.concat(BANK7[who][subj]);
     return a;
   }
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
@@ -1198,7 +1229,10 @@ if(!STUDENTS[who]){
       function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[-a-b,a+b,s+3]);return ["احسب: −"+a+" + "+b,o[0],o[1],"= "+s+".","ma"];},
       function(){var x=ri(2,12),a=ri(2,7),b=ri(1,12),c=a*x-b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x − "+b+" = "+c,o[0],o[1],a+"x = "+(c+b)+" → x = "+x+".","ma"];},
       function(){var t=gpick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17],[7,24,25]]),o=opt3(t[2],[t[2]+2,t[2]-2,t[0]+t[1]]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+".","ma"];},
-      function(){var base=ri(2,5),e=gpick([2,3,4]),v=Math.pow(-base,e),o=opt3(v,[-v,Math.pow(base,e),v+base]);return ["احسب: (−"+base+")"+sup(e),o[0],o[1],(e%2?"أس فردي → سالب: ":"أس زوجي → موجب: ")+v+".","ma"];}
+      function(){var base=ri(2,5),e=gpick([2,3,4]),v=Math.pow(-base,e),o=opt3(v,[-v,Math.pow(base,e),v+base]);return ["احسب: (−"+base+")"+sup(e),o[0],o[1],(e%2?"أس فردي → سالب: ":"أس زوجي → موجب: ")+v+".","ma"];},
+      function(){var r1=ri(2,6),r2=ri(1,r1-1),b=r1+r2,c=r1*r2,ans=r2+" و "+r1,o=opt3(ans,["−"+r2+" و −"+r1,r2+" و "+(r1+1),(r2+1)+" و "+r1]);return ["حل: x² − "+b+"x + "+c+" = 0",o[0],o[1],"الجذران "+r2+" و "+r1+" (مجموعهما "+b+" وحاصل ضربهما "+c+").","ma"];},
+      function(){var x=ri(2,8),y=ri(1,7),s1=2*x+y,s2=x-y,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+y]);return ["إذا 2x + y = "+s1+" و x − y = "+s2+"، فما x؟",o[0],o[1],"بجمع المعادلتين: 3x = "+(s1+s2)+" → x = "+x+".","ma"];},
+      function(){var a=ri(2,7),o=opt3("x²+"+(2*a)+"x+"+(a*a),["x²+"+(a*a),"x²+"+a+"x+"+(a*a),"x²+"+(2*a)+"x+"+(2*a)]);return ["بسّط: (x + "+a+")²",o[0],o[1],"(x+"+a+")² = x²+"+(2*a)+"x+"+(a*a)+".","ma"];}
     ]
   };
   function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var q=gpick(gens)(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
