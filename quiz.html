@@ -888,6 +888,33 @@ const BANK7 = {
       ["مساحة دائرة نصف قطرها 10 (π≈3.14)",["100","314","31.4"],1,"3.14×10² = 314."],
       ["ميل المستقيم المار بـ (1,2) و (3,8)",["3","2","6"],0,"(8−2)÷(3−1) = 3."]
     ]
+  },
+  saud: {
+    en:[
+      ["She ___ to school every day.",["go","goes","going"],1,"مع She نضيف es: goes."],
+      ["The plural of \"child\" is:",["childs","children","childrens"],1,"جمع شاذ: children."],
+      ["The ball is ___ the box.",["in","on","under"],0,"داخل الصندوق: in."],
+      ["___ books over there are new.",["This","These","Those"],2,"جمع وبعيد: Those."],
+      ["___ is your name?",["What","Where","When"],0,"للاسم: What."],
+      ["The day before Sunday is:",["Saturday","Monday","Friday"],0,"قبل الأحد: السبت (Saturday)."],
+      ["The opposite of \"day\" is:",["night","sun","light"],0,"عكس day: night."],
+      ["I have ___ apple.",["a","an","the"],1,"قبل الحرف المتحرك: an."],
+      ["The day after Friday is:",["Thursday","Saturday","Sunday"],1,"بعد الجمعة: السبت (Saturday)."],
+      ["What is \"thirty\" in numbers?",["13","30","3"],1,"thirty = 30."]
+    ],
+    ma:[
+      ["احسب: 46 × 5",["220","230","240"],1,"46×5 = 230."],
+      ["احسب: 96 ÷ 8",["12","11","13"],0,"= 12."],
+      ["اشترى 3 دفاتر بـ 4 ريال للواحد، كم دفع؟",["10","12","14"],1,"3×4 = 12 ريال."],
+      ["احسب: ⅗ + ⅕",["⅘","⅖","1"],0,"3/5 + 1/5 = 4/5."],
+      ["معه 20 ريال واشترى بـ 13، كم الباقي؟",["6","7","8"],1,"20 − 13 = 7."],
+      ["أصغر عدد بين: 305 ، 350 ، 503؟",["305","350","503"],0,"305 هو الأصغر."],
+      ["الساعة 3:30، كم تصير بعد ساعة ونصف؟",["4:30","5:00","5:30"],1,"3:30 + 1:30 = 5:00."],
+      ["محيط مربع طول ضلعه 9؟",["36","18","81"],0,"9×4 = 36."],
+      ["ما قيمة الرقم 4 في العدد 3452؟",["4","40","400"],2,"الرقم 4 في منزلة المئات = 400."],
+      ["نصف العدد 84؟",["42","48","21"],0,"84 ÷ 2 = 42."],
+      ["احسب: 7 × 6 + 5",["47","77","42"],0,"نبدأ بالضرب: 42+5 = 47."]
+    ]
   }
 };
 
@@ -1125,7 +1152,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s9";
+var AUDIO_VER = "s10";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1206,7 +1233,10 @@ if(!STUDENTS[who]){
       function(){var a=ri(11,29),b=ri(3,9),s=a*b,o=opt3(s,[s+b,s-b,s+10]);return ["احسب: "+a+" × "+b,o[0],o[1],"= "+s+".","ma"];},
       function(){var b=ri(3,9),q=ri(4,9),a=b*q,o=opt3(q,[q+1,q-1,q+2]);return ["احسب: "+a+" ÷ "+b,o[0],o[1],"= "+q+".","ma"];},
       function(){var d=ri(4,7),q=ri(3,8),r=ri(1,d-1),a=d*q+r,o=opt3(r,[r+1,(r>1?r-1:r+2),d-r]);return ["كم باقي القسمة "+a+" ÷ "+d+"؟",o[0],o[1],d+"×"+q+"="+(d*q)+" والباقي "+r+".","ma"];},
-      function(){var d=ri(3,8),a=ri(1,d-2),b=ri(1,d-a-1),n=a+b,o=opt3(n+"/"+d,[a+"/"+d,n+"/"+(2*d),(n+1)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d,o[0],o[1],"نجمع البسط: "+a+"+"+b+"="+n+" والمقام يبقى "+d+".","ma"];}
+      function(){var d=ri(3,8),a=ri(1,d-2),b=ri(1,d-a-1),n=a+b,o=opt3(n+"/"+d,[a+"/"+d,n+"/"+(2*d),(n+1)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d,o[0],o[1],"نجمع البسط: "+a+"+"+b+"="+n+" والمقام يبقى "+d+".","ma"];},
+      function(){var a=ri(21,49),b=ri(3,8),s=a*b,o=opt3(s,[s+b,s-b,s+10]);return ["احسب: "+a+" × "+b,o[0],o[1],"= "+s+".","ma"];},
+      function(){var a=ri(2,9),b=ri(2,9),c=ri(2,5),s=a+b*c,o=opt3(s,[(a+b)*c,s+c,a+b+c]);return ["احسب: "+a+" + "+b+" × "+c,o[0],o[1],"نبدأ بالضرب: "+b+"×"+c+"="+(b*c)+" ثم +"+a+" = "+s+".","ma"];},
+      function(){var half=ri(11,49),n=half*2,o=opt3(half,[half+2,half-2,n]);return ["نصف العدد "+n+"؟",o[0],o[1],n+" ÷ 2 = "+half+".","ma"];}
     ],
     osama:[
       function(){var a=ri(12,39),b=ri(11,19),s=a*b,o=opt3(s,[s+10,s-10,s+b]);return ["احسب: "+a+" × "+b,o[0],o[1],"= "+s+".","ma"];},
