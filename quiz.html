@@ -1289,7 +1289,7 @@ if(!STUDENTS[who]){
     <section class="panel" id="rem" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
     <section class="panel" id="log" role="tabpanel"></section>
-    <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · صفحة تعليمية</footer>`;
+    <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · <a href="practice.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📊 قدرات وتحصيلي (تجريبي)</a></footer>`;
 
   const DATA = {
     en:{ review:S.en.review, quiz: hasSet ? ((BANK && BANK[who]) ? BANK[who].en : S.en.quiz) : pool("en") },

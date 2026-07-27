@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اختبارات تجريبية — قدرات وتحصيلي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#0d9488; --soft:#5eead4; --deep:#0f766e;
+    --bg:#f6f8fa; --card:#fff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1216;--card:#121e25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c50;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .tabs{display:flex;gap:8px;margin:12px 0 18px;flex-wrap:wrap}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--good-bg);border:1px solid var(--good);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:.9rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:6px 0 10px;font-size:1.05rem}
+  .stem.ltr{direction:ltr;text-align:left}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);display:none}
+  .explain.show{display:block}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
+var name = NAMES[who] || "الطالب";
+
+// ===== مولّدات كمي (أرقام جديدة كل مرة) =====
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function opt3(correct, ds){
+  var o=[correct];
+  (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<3) o.push(d); });
+  var p=1; while(o.length<3){ var c=(typeof correct==="number")?correct+p:String(correct)+"×"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
+  for(var i=o.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; }
+  return [o.map(function(v){return String(v).replace(/-/g,"−");}), o.indexOf(correct)];
+}
+var QUANT = [
+  function(){var cf=gp([[10,10],[15,20],[20,5],[25,4],[40,5],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي "+p+"% من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+"."];},
+  function(){var a=ri(2,9),b=ri(2,9),x=ri(2,12),c=a*x+b,o=opt3(x,[x+1,x-1,x+2]);return ["إذا كان "+a+"س + "+b+" = "+c+"، فما قيمة س؟",o[0],o[1],a+"س = "+(c-b)+" → س = "+x+"."];},
+  function(){var r1=ri(2,6),r2=ri(2,6),k=ri(2,8),o=opt3(r2*k,[r1*k,(r1+r2)*k,r2*k+1]);return ["إذا كانت النسبة "+r1+":"+r2+" وكان الأول "+(r1*k)+"، فما الثاني؟",o[0],o[1],"معامل التناسب "+k+" → الثاني = "+(r2*k)+"."];},
+  function(){var n=gp([3,4,5]),m=ri(6,20),arr=[];for(var i=0;i<n;i++)arr.push(m+(i-Math.floor(n/2))*2);var s=arr.reduce(function(a,b){return a+b;},0),av=s/n,o=opt3(av,[av+2,av-2,s]);return ["ما متوسط الأعداد: "+arr.join("، ")+"؟",o[0],o[1],"المجموع "+s+" ÷ "+n+" = "+av+"."];},
+  function(){var L=ri(5,15),W=ri(3,L-1),o=opt3(L*W,[2*(L+W),L*W+L,L*W-W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما مساحته؟",o[0],o[1],L+"×"+W+" = "+(L*W)+"."];},
+  function(){var L=ri(5,15),W=ri(3,L-1),o=opt3(2*(L+W),[L*W,L+W,2*L+W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما محيطه؟",o[0],o[1],"(الطول+العرض)×2 = "+(2*(L+W))+"."];},
+  function(){var t=gp([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]),o=opt3(t[2],[t[2]+1,t[0]+t[1],t[2]-2]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، فما طول الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+"."];},
+  function(){var a=ri(2,9),step=gp([2,3,5]),start=ri(1,5),seq=[start,start+step,start+2*step,start+3*step],nx=start+4*step,o=opt3(nx,[nx+step,nx-1,nx+1]);return ["أكمل النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد "+step+" كل مرة → "+nx+"."];},
+  function(){var base=ri(20,60),inc=gp([10,20,25,50]),nv=base+base*inc/100,o=opt3(nv,[base+inc,nv+5,base]);return ["زاد سعر من "+base+" بنسبة "+inc+"%، فما السعر الجديد؟",o[0],o[1],base+" + "+inc+"% = "+nv+"."];},
+  function(){var w=ri(2,9),d=ri(2,9),o=opt3(w*d,[w+d,w*d+w,w*d-d]);return ["عامل ينجز "+w+" قطع في الساعة، كم ينجز في "+d+" ساعات؟",o[0],o[1],w+"×"+d+" = "+(w*d)+" قطعة."];}
+];
+function genQuant(n){ var out=[],seen={},t=0; while(out.length<n && t<n*10){ var q=gp(QUANT)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
+
+// ===== لفظي (قدرات) — تدريبي =====
+var VERBAL = [
+  ["<b>تناظر لفظي:</b> طبيب : مستشفى ، معلم : ؟",["مدرسة","مريض","دواء"],0,"العلاقة: مكان العمل."],
+  ["<b>تناظر لفظي:</b> قلم : كتابة ، سكين : ؟",["قطع","طبخ","أكل"],0,"الأداة ووظيفتها."],
+  ["<b>تناظر لفظي:</b> ماء : عطش ، طعام : ؟",["جوع","شبع","طبخ"],0,"الشيء وما يزيله."],
+  ["<b>تناظر لفظي:</b> جندي : جيش ، لاعب : ؟",["فريق","ملعب","كرة"],0,"الفرد والمجموعة."],
+  ["<b>إكمال جمل:</b> لم يكن الطالب ______ في دراسته، لذلك رسب.",["مجتهدًا","كسولًا","نائمًا"],0,"السياق يدل على نفي الاجتهاد."],
+  ["<b>إكمال جمل:</b> رغم ______ الطريق، وصلنا في الوقت المحدد.",["صعوبة","سهولة","قصر"],0,"«رغم» تدل على تضاد مع الوصول."],
+  ["<b>الخطأ السياقي:</b> استيقظ مبكرًا، وتناول فطوره، ثم ______ إلى المدرسة.",["ذهب","نام","جلس"],0,"الكلمة المناسبة للسياق: ذهب."],
+  ["<b>معنى كلمة:</b> ما معنى «يافع»؟",["شاب","عجوز","طفل رضيع"],0,"اليافع: الشاب المراهق."],
+  ["<b>مرادف:</b> مرادف كلمة «مسرور»:",["سعيد","حزين","غاضب"],0,"مسرور = سعيد."],
+  ["<b>ضد:</b> ضد كلمة «كريم»:",["بخيل","شجاع","ذكي"],0,"ضد الكريم: البخيل."],
+  ["<b>استيعاب مقروء:</b> «الماء أساس الحياة، ويجب ترشيد استهلاكه.» ما فكرة النص؟",["أهمية الماء وترشيده","أنواع المياه","تلوث الهواء"],0,"الفكرة العامة عن أهمية الماء."],
+  ["<b>تناظر لفظي:</b> نجاح : اجتهاد ، فشل : ؟",["كسل","تعب","نوم"],0,"السبب المؤدي للنتيجة."]
+];
+
+// ===== تحصيلي — تدريبي (رياضيات + علوم) =====
+var TAHSILI = [
+  ["<b>رياضيات:</b> حلّل: س² − 16",["(س−4)(س+4)","(س−16)(س+1)","(س−4)²"],0,"فرق مربعين."],
+  ["<b>رياضيات:</b> ميل المستقيم y = 3x − 2 هو:",["3","−2","2"],0,"الميل = معامل x."],
+  ["<b>رياضيات:</b> إذا كان جا(30°) = ½، فإن الزاوية 30° تسمى:",["زاوية حادة","زاوية قائمة","زاوية منفرجة"],0,"أقل من 90° → حادة."],
+  ["<b>رياضيات:</b> قيمة 2³ × 2² =",["32","64","16"],0,"نجمع الأسس: 2⁵ = 32."],
+  ["<b>فيزياء:</b> قطع جسم 100 متر في 20 ثانية، فسرعته:",["5 م/ث","20 م/ث","2000 م/ث"],0,"السرعة = المسافة ÷ الزمن = 5."],
+  ["<b>فيزياء:</b> وحدة قياس القوة هي:",["نيوتن","جول","واط"],0,"القوة تُقاس بالنيوتن."],
+  ["<b>كيمياء:</b> رمز عنصر الأكسجين هو:",["O","Ox","Ag"],0,"الأكسجين = O."],
+  ["<b>كيمياء:</b> الماء يتكوّن من الهيدروجين و:",["الأكسجين","النيتروجين","الكربون"],0,"H₂O."],
+  ["<b>أحياء:</b> الوحدة الأساسية لبناء جسم الكائن الحي هي:",["الخلية","العضلة","العظم"],0,"الخلية هي وحدة البناء."],
+  ["<b>أحياء:</b> عملية صنع الغذاء في النبات تسمى:",["البناء الضوئي","التنفس","الهضم"],0,"البناء الضوئي."]
+];
+
+var app = document.getElementById("app");
+app.innerHTML =
+  '<header class="top"><p class="eyebrow">اختبارات تجريبية · بأسلوب قياس</p><h1>📊 قدرات وتحصيلي — '+name+'</h1></header>'+
+  '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="index.html">📊 اللوحة</a></div>'+
+  '<div class="tabs" role="tablist">'+
+    '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
+    '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
+    '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>'+
+  '</div>'+
+  '<section class="panel active" id="v"></section>'+
+  '<section class="panel" id="q"></section>'+
+  '<section class="panel" id="t"></section>'+
+  '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
+
+function shuffleQ(q){
+  var pairs = q[1].map(function(o,i){ return [o,i]; });
+  for(var i=pairs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pairs[i]; pairs[i]=pairs[j]; pairs[j]=t; }
+  var idx=0, newOpts=pairs.map(function(p,ni){ if(p[1]===q[2]) idx=ni; return p[0]; });
+  return [q[0], newOpts, idx, q[3]];
+}
+function renderSet(id, items, intro, regen){
+  var sec = document.getElementById(id);
+  items = items.map(shuffleQ);
+  var html = '<div class="intro">'+intro+'</div>';
+  items.forEach(function(q,i){
+    html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
+      '<div class="stem">'+q[0]+'</div><div class="opts">';
+    q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+    html += '</div><div class="explain">'+q[3]+'</div></div>';
+  });
+  html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>';
+  if(regen) html += '<button class="reset">أسئلة جديدة 🔄</button>';
+  sec.innerHTML = html;
+  var answered = {}, correct = 0, total = items.length;
+  var scoreEl = sec.querySelector("[data-score]");
+  sec.querySelectorAll(".q").forEach(function(qEl){
+    var i = +qEl.dataset.i, ans = items[i][2];
+    qEl.querySelectorAll(".opts button").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(answered[i]) return; answered[i]=1;
+        qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+        if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+        else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+        qEl.querySelector(".explain").classList.add("show");
+        scoreEl.textContent = correct+" / "+total;
+      });
+    });
+  });
+  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ renderSet(id, genQuant(10), intro, true); }); }
+}
+
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+renderSet("v", shuffle(VERBAL.slice()), "القسم اللفظي: تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false);
+renderSet("q", genQuant(10), "القسم الكمي: نِسب، معادلات، هندسة، متوسطات وأنماط — <b>أرقام جديدة كل مرة</b>.", true);
+renderSet("t", shuffle(TAHSILI.slice()), "تحصيلي (تحضيري): رياضيات وعلوم — مناسب للتهيئة المبكرة.", false);
+
+document.querySelectorAll(".tabs button").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+    b.setAttribute("aria-selected","true");
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    document.getElementById(b.dataset.tab).classList.add("active");
+  });
+});
+</script>
+</body>
+</html>
