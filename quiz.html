@@ -1061,7 +1061,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s6";
+var AUDIO_VER = "s7";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1465,6 +1465,14 @@ if(!STUDENTS[who]){
     });
   }
 
+  // توقيت السعودية (UTC+3، بدون توقيت صيفي)
+  function saTime(iso){
+    if(!iso) return "";
+    var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," ");
+    d=new Date(d.getTime()+3*3600*1000);
+    var p=function(n){return String(n).padStart(2,"0");};
+    return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes());
+  }
   let logLoaded = false;
   async function renderLog(force){
     const sec = document.getElementById("log");
@@ -1481,7 +1489,7 @@ if(!STUDENTS[who]){
       let h = '<div class="block-title"><span class="dot"></span> محاولاتك السابقة ('+rows.length+')</div>';
       rows.forEach(function(x,i){
         var tot = Math.round((x.en_correct+x.ma_correct)/((x.en_total+x.ma_total)||1)*100);
-        var dt = (x.created_at||"").slice(0,16).replace("T"," ");
+        var dt = saTime(x.created_at) + " (السعودية)";
         var wrong = x.wrong || [];
         h += '<div class="q"><div class="num">محاولة '+(rows.length-i)+' · '+dt+'</div>'+
              '<div class="stem">النتيجة: '+tot+'% — إنجليزي '+x.en_correct+'/'+x.en_total+' · رياضيات '+x.ma_correct+'/'+x.ma_total+'</div>';

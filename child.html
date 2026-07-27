@@ -85,6 +85,7 @@ const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
 function pct(c,t){ return t?Math.round(c/t*100):0; }
+function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
 function behavior(row){
   const m=row.meta; if(!m||!m.per||!m.per.length) return null;
   const dts=m.per.map(p=>p.dt).filter(x=>x!=null);
@@ -177,7 +178,7 @@ async function main(){
     rows.forEach((r,i)=>{
       const t=pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total);
       const col=t>=80?"var(--good)":t>=50?"var(--warn)":"var(--bad)";
-      const dt=(r.created_at||"").slice(0,16).replace("T"," ");
+      const dt=saTime(r.created_at);
       html+=`<tr style="border-top:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums">
         <td style="padding:11px 8px;color:var(--muted)">${rows.length-i}</td>
         <td style="padding:11px 8px;color:var(--muted);font-size:.82rem">${dt}</td>
