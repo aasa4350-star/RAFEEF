@@ -915,6 +915,33 @@ const BANK7 = {
       ["نصف العدد 84؟",["42","48","21"],0,"84 ÷ 2 = 42."],
       ["احسب: 7 × 6 + 5",["47","77","42"],0,"نبدأ بالضرب: 42+5 = 47."]
     ]
+  },
+  osama: {
+    en:[
+      ["Yesterday she ___ to school.",["go","went","gone"],1,"yesterday ماضٍ: went."],
+      ["I have ___ my homework.",["do","did","done"],2,"مضارع تام: have + done."],
+      ["This box is ___ than that one.",["heavy","heavier","heaviest"],1,"مقارنة: heavier than."],
+      ["___ do you go to school? By bus.",["How","What","Who"],0,"للوسيلة: How."],
+      ["I'm good ___ math.",["at","in","on"],0,"good at."],
+      ["The plural of \"leaf\" is:",["leafs","leaves","leaf"],1,"جمع شاذ: leaves."],
+      ["She sings very ___ .",["beautiful","beautifully","beauty"],1,"نصف الفعل بظرف: beautifully."],
+      ["How ___ water do you drink?",["many","much","some"],1,"غير معدود (water): much."],
+      ["There ___ two books on the desk.",["is","are","am"],1,"جمع → are."],
+      ["The opposite of \"expensive\" is:",["cheap","big","new"],0,"عكس expensive: cheap."]
+    ],
+    ma:[
+      ["احسب: 24 × 13",["302","312","322"],1,"24×13 = 312."],
+      ["احسب: 156 ÷ 6",["24","26","28"],1,"= 26."],
+      ["احسب: ½ + ⅓",["⅚","⅗","⅘"],0,"3/6 + 2/6 = 5/6."],
+      ["احسب: 5.4 − 2.7",["2.7","2.3","3.7"],0,"= 2.7."],
+      ["كم يساوي %40 من 150؟",["50","60","70"],1,"(40÷100)×150 = 60."],
+      ["احسب: 6 + 4 × 3",["30","18","22"],1,"نبدأ بالضرب: 6+12 = 18."],
+      ["مساحة مستطيل طوله 12 وعرضه 7؟",["84","38","19"],0,"12×7 = 84."],
+      ["حجم مكعب طول حرفه 4؟",["64","16","12"],0,"4×4×4 = 64."],
+      ["متوسط الأعداد 12 و 18 و 30؟",["20","25","18"],0,"المجموع 60 ÷ 3 = 20."],
+      ["احسب: ¾ من 40؟",["28","30","32"],1,"40÷4×3 = 30."],
+      ["4 صفوف كل صف 6 طلاب، غاب 3، كم الحاضر؟",["21","24","18"],0,"4×6=24 ثم −3 = 21."]
+    ]
   }
 };
 
@@ -1152,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s10";
+var AUDIO_VER = "s11";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1244,7 +1271,10 @@ if(!STUDENTS[who]){
       function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي %"+p+" من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+".","ma"];},
       function(){var a=ri(2,8),b=ri(1,9),c=ri(2,8),d=ri(1,9),x=a+b/10,y=c+d/10,s=Math.round((x+y)*10)/10,o=opt3(s,[Math.round((x+y+0.1)*10)/10,Math.round((x+y-1)*10)/10,s+1]);return ["احسب: "+x+" + "+y,o[0],o[1],"= "+s+".","ma"];},
       function(){var a=ri(2,9),b=ri(2,9),c=ri(2,9),s=a+b*c,o=opt3(s,[(a+b)*c,s+c,a+b+c]);return ["احسب: "+a+" + "+b+" × "+c,o[0],o[1],"نبدأ بالضرب: "+b+"×"+c+"="+(b*c)+" ثم +"+a+" = "+s+".","ma"];},
-      function(){var m=ri(6,20),arr=gpick([[m-4,m,m+4],[m-6,m-2,m+2,m+6]]),o=opt3(m,[m+2,m-2,m+5]);return ["متوسط الأعداد: "+arr.join(" ، "),o[0],o[1],"المجموع ÷ العدد = "+m+".","ma"];}
+      function(){var m=ri(6,20),arr=gpick([[m-4,m,m+4],[m-6,m-2,m+2,m+6]]),o=opt3(m,[m+2,m-2,m+5]);return ["متوسط الأعداد: "+arr.join(" ، "),o[0],o[1],"المجموع ÷ العدد = "+m+".","ma"];},
+      function(){var L=ri(6,15),W=ri(3,9),o=opt3(L*W,[L+W,2*(L+W),L*W-W]);return ["مساحة مستطيل طوله "+L+" وعرضه "+W+"؟",o[0],o[1],L+"×"+W+" = "+(L*W)+".","ma"];},
+      function(){var e=ri(2,6),v=e*e*e,o=opt3(v,[e*e,e*3,v+e]);return ["حجم مكعب طول حرفه "+e+"؟",o[0],o[1],e+"×"+e+"×"+e+" = "+v+".","ma"];},
+      function(){var a=ri(4,9),b=ri(1,9),c=ri(1,a-1),d=ri(1,9),x=a+b/10,y=c+d/10,res=Math.round((x-y)*10)/10,o=opt3(res,[Math.round((x-y+0.1)*10)/10,Math.round((x-y-1)*10)/10,res+1]);return ["احسب: "+x+" − "+y,o[0],o[1],"= "+res+".","ma"];}
     ],
     rafeef:[
       function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[a+b,-(a+b),-a-b]);return ["احسب: −"+a+" + "+b,o[0],o[1],"من −"+a+" نتقدّم "+b+" → "+s+".","ma"];},
