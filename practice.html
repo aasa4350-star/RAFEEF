@@ -165,6 +165,7 @@ var app = document.getElementById("app");
 app.innerHTML =
   '<header class="top"><p class="eyebrow">اختبارات تجريبية · بأسلوب قياس</p><h1>📊 قدرات وتحصيلي — '+name+'</h1></header>'+
   '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="index.html">📊 اللوحة</a></div>'+
+  '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>'+
   '<div class="tabs" role="tablist">'+
     '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
     '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
@@ -186,11 +187,12 @@ function shuffleQ(q){
   return [q[0], newOpts, idx, q[3]];
 }
 var SECS = { v:780, q:720, t:900, s:720 }; // ثواني كل قسم (مثل الاختبار الحقيقي)
+var TIMED = false; // الوضع المؤقّت اختياري
 function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
 function renderSet(id, items, intro, regen, label){
   var sec = document.getElementById(id);
   items = items.map(shuffleQ);
-  var secsAll = SECS[id] || 0;
+  var secsAll = TIMED ? (SECS[id] || 0) : 0;
   var html = '<div class="intro">'+intro+'</div>';
   if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
   items.forEach(function(q,i){
@@ -254,10 +256,15 @@ function renderSet(id, items, intro, regen, label){
 }
 
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-renderSet("v", shuffle(VERBAL.slice()).slice(0,13), "القسم اللفظي: 13 سؤال · 13 دقيقة. تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false, "قدرات لفظي");
-renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
-renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة. رياضيات وعلوم (تحضيري).", false, "تحصيلي");
-renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة. قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
+function buildAll(){
+  var tnote = TIMED ? "" : " (بدون توقيت)";
+  renderSet("v", shuffle(VERBAL.slice()).slice(0,13), "القسم اللفظي: 13 سؤال · 13 دقيقة"+tnote+". تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false, "قدرات لفظي");
+  renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
+  renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+  renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
+}
+document.getElementById("timedToggle").addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
+buildAll();
 
 // نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
 (function(){
