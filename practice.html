@@ -167,11 +167,13 @@ app.innerHTML =
     '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
     '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>'+
     '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
+    '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'+
   '</div>'+
   '<section class="panel active" id="v"></section>'+
   '<section class="panel" id="q"></section>'+
   '<section class="panel" id="t"></section>'+
   '<section class="panel" id="s"></section>'+
+  '<section class="panel" id="o"></section>'+
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
 function shuffleQ(q){
@@ -217,6 +219,22 @@ renderSet("v", shuffle(VERBAL.slice()), "القسم اللفظي: تناظر، �
 renderSet("q", genQuant(10), "القسم الكمي: نِسب، معادلات، هندسة، متوسطات وأنماط — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
 renderSet("t", shuffle(TAHSILI.slice()), "تحصيلي (تحضيري): رياضيات وعلوم — مناسب للتهيئة المبكرة.", false, "تحصيلي");
 renderSet("s", shuffle(STEP.slice()), "STEP: قواعد ومفردات وفهم مقروء بالإنجليزية (متقدّم).", false, "STEP إنجليزي");
+
+// نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
+(function(){
+  var link = function(href,title,desc){
+    return '<a href="'+href+'" target="_blank" rel="noopener" style="display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);color:var(--ink)">'+
+      '<div style="font-weight:800;color:var(--accent)">'+title+' ↗</div>'+
+      '<div style="font-size:.88rem;color:var(--muted);margin-top:4px">'+desc+'</div></a>';
+  };
+  document.getElementById("o").innerHTML =
+    '<div class="intro">هذي روابط <b>هيئة تقويم التعليم والتدريب (قياس)</b> الرسمية — فيها النماذج والتدريب المجاني الرسمي. الأسئلة الرسمية محفوظة الحقوق فنوجّهك لمصدرها مباشرة.</div>'+
+    link("https://elearning.etec.gov.sa/","🏛️ برنامج التهيئة والتدريب الرسمي (مجاني)","قدرات GAT + تحصيلي SAAT + كفايات STEP — مفاهيم وأمثلة تفاعلية ونماذج تحاكي الاختبار الفعلي.")+
+    link("https://exams.etec.gov.sa/Must/?lang=ar","📝 منصة الاختبارات الرسمية","نماذج رسمية لكل اختبار (كل نموذج يُؤدّى مرة واحدة).")+
+    link("https://etec.gov.sa/ar/programs/mustaqbalhum","👪 برنامج «مستقبلهم» لأولياء الأمور","متابعة رحلة الأبناء التعليمية والاستعداد للاختبارات.")+
+    link("https://etec.gov.sa/","🌐 الموقع الرئيسي للهيئة","كل ما يخص القدرات والتحصيلي وSTEP رسميًا.")+
+    '<p class="intro" style="background:transparent;border:0;color:var(--muted)">ملاحظة: الأقسام الأخرى في هذي الصفحة تدريبية من إعداد المعلّم بنمط قياس، وهذي الروابط هي المصدر الرسمي.</p>';
+})();
 
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.addEventListener("click", function(){
