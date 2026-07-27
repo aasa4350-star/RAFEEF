@@ -1179,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s11";
+var AUDIO_VER = "s12";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1434,11 +1434,16 @@ if(!STUDENTS[who]){
     const isEn = id === "en";
     let quiz;
     if (usePool) {
-      // أسئلة مولّدة (أرقام/جمل جديدة كل مرة) + المجموعات المنسّقة
-      var extra = [];
-      if (id==="ma" && MGEN[who]) extra = genN(MGEN[who], 8);
-      else if (id==="en" && EGEN[who]) extra = genN(EGEN[who], 6);
-      quiz = shuffle(pool(id).concat(extra)).slice(0, QN);
+      // نجعل معظم الأسئلة مولّدة (أرقام/جمل جديدة كل مرة) لتفادي التكرار
+      var gens = (id==="ma") ? MGEN[who] : EGEN[who];
+      if (gens) {
+        var gcount = (id==="ma") ? Math.max(QN-2, 6) : Math.ceil(QN*0.6);
+        var generated = genN(gens, gcount);
+        var curated = shuffle(pool(id).slice()).slice(0, QN); // عيّنة متنوّعة من المنسّق
+        quiz = shuffle(generated.concat(curated)).slice(0, QN);
+      } else {
+        quiz = shuffle(pool(id).slice()).slice(0, QN);
+      }
     } else {
       quiz = DATA[id].quiz.slice();
     }
