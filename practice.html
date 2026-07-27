@@ -100,7 +100,13 @@ var QUANT = [
   function(){var r=gp([7,14,21]),area=22*r*r/7,o=opt3(area,[2*22*r/7,area+r,r*r]);return ["مساحة دائرة نصف قطرها "+r+" (π≈22/7)؟",o[0],o[1],"22/7 × "+r+"² = "+area+"."];},
   function(){var arr=[ri(2,9),ri(11,19),ri(21,29)];shuffle(arr);var sorted=arr.slice().sort(function(x,y){return x-y;});var med=sorted[1],o=opt3(med,[sorted[0],sorted[2],sorted[0]+sorted[2]]);return ["ما الوسيط (القيمة الوسطى) للأعداد: "+arr.join("، ")+"؟",o[0],o[1],"بعد الترتيب الوسيط = "+med+"."];},
   function(){var st=ri(3,15),sum=st+(st+1)+(st+2),o=opt3(sum,[sum+3,sum-3,st*3]);return ["مجموع ثلاثة أعداد متتالية أولها "+st+"؟",o[0],o[1],st+"+"+(st+1)+"+"+(st+2)+" = "+sum+"."];},
-  function(){var base=ri(40,90),dec=gp([10,20,25,50]),nv=base-base*dec/100,o=opt3(nv,[base-dec,nv+5,base]);return ["نقص سعر من "+base+" بنسبة "+dec+"%، فما السعر الجديد؟",o[0],o[1],base+" − "+dec+"% = "+nv+"."];}
+  function(){var base=ri(40,90),dec=gp([10,20,25,50]),nv=base-base*dec/100,o=opt3(nv,[base-dec,nv+5,base]);return ["نقص سعر من "+base+" بنسبة "+dec+"%، فما السعر الجديد؟",o[0],o[1],base+" − "+dec+"% = "+nv+"."];},
+  function(){var den=gp([3,4,5,6]),mult=ri(2,9),N=den*mult,num=ri(1,den-1),v=N*num/den,o=opt3(v,[N-v,v+num,v+2]);return ["كم يساوي "+num+"/"+den+" من "+N+"؟",o[0],o[1],"("+N+"÷"+den+")×"+num+" = "+v+"."];},
+  function(){var a=ri(1,4),b=ri(1,4),k=ri(2,9),N=(a+b)*k,first=a*k,o=opt3(first,[b*k,N-first+1,N]);return ["قُسِّم مبلغ "+N+" ريال بين شخصين بنسبة "+a+":"+b+"، فما نصيب الأول؟",o[0],o[1],"الوحدة = "+N+"÷"+(a+b)+" = "+k+" → "+a+"×"+k+" = "+first+"."];},
+  function(){var cost=ri(20,80),profit=ri(5,40),sell=cost+profit,o=opt3(profit,[sell,cost,profit+5]);return ["اشترى تاجر سلعة بـ "+cost+" وباعها بـ "+sell+"، فما الربح؟",o[0],o[1],sell+" − "+cost+" = "+profit+" ريال."];},
+  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],price=cf[1]*ri(4,18),disc=price*p/100,fin=price-disc,o=opt3(fin,[disc,price,fin+5]);return ["خصم "+p+"% على سعر "+price+" ريال، فكم السعر بعد الخصم؟",o[0],o[1],"الخصم "+disc+" → "+price+"−"+disc+" = "+fin+"."];},
+  function(){var m=ri(2,9),o=opt3(m*100,[m*10,m*1000,m*60]);return ["كم سنتيمترًا في "+m+" أمتار؟ (المتر = 100 سم)",o[0],o[1],m+"×100 = "+(m*100)+" سم."];},
+  function(){var pr=gp([[2,3,6],[3,4,12],[4,6,12],[2,5,10],[6,8,24],[3,5,15]]),o=opt3(pr[2],[pr[0]*pr[1],pr[0]+pr[1],pr[2]+2]);return ["ما أصغر مضاعف مشترك للعددين "+pr[0]+" و "+pr[1]+"؟",o[0],o[1],"أصغر عدد يقبل القسمة على "+pr[0]+" و "+pr[1]+" هو "+pr[2]+"."];}
 ];
 function genQuant(n){ var out=[],seen={},t=0; while(out.length<n && t<n*10){ var q=gp(QUANT)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
 
