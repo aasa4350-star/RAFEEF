@@ -42,6 +42,9 @@
   .explain{margin-top:10px;font-size:.92rem;color:var(--muted);display:none}
   .explain.show{display:block}
   .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .timer{position:sticky;top:8px;z-index:5;background:var(--accent);color:#fff;border-radius:14px;padding:10px 16px;font-weight:800;text-align:center;box-shadow:var(--shadow);margin-bottom:12px;font-variant-numeric:tabular-nums}
+  .timer.low{background:var(--bad)}
+  .timer.done{background:var(--muted)}
   .reset{margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
@@ -182,10 +185,14 @@ function shuffleQ(q){
   var idx=0, newOpts=pairs.map(function(p,ni){ if(p[1]===q[2]) idx=ni; return p[0]; });
   return [q[0], newOpts, idx, q[3]];
 }
+var SECS = { v:780, q:720, t:900, s:720 }; // ثواني كل قسم (مثل الاختبار الحقيقي)
+function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
 function renderSet(id, items, intro, regen, label){
   var sec = document.getElementById(id);
   items = items.map(shuffleQ);
+  var secsAll = SECS[id] || 0;
   var html = '<div class="intro">'+intro+'</div>';
+  if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
   items.forEach(function(q,i){
     html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
       '<div class="stem">'+q[0]+'</div><div class="opts">';
@@ -207,18 +214,50 @@ function renderSet(id, items, intro, regen, label){
         else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
         qEl.querySelector(".explain").classList.add("show");
         scoreEl.textContent = correct+" / "+total;
-        if(Object.keys(answered).length===total && label){ saveScore(label, correct, total); }
+        if(Object.keys(answered).length===total){ finish(false); }
       });
     });
   });
+
+  // ===== المؤقّت =====
+  var tb = sec.querySelector("[data-timer]");
+  var remaining = secsAll, tId = null, started = false, ended = false;
+  function finish(auto){
+    if(ended) return; ended = true;
+    if(tId){ clearInterval(tId); tId = null; }
+    if(auto){
+      sec.querySelectorAll(".q").forEach(function(qEl){
+        var i = +qEl.dataset.i;
+        if(!answered[i]){
+          answered[i] = 1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled = true; });
+          qEl.querySelectorAll(".opts button")[items[i][2]].classList.add("correct");
+          qEl.querySelector(".explain").classList.add("show");
+        }
+      });
+      scoreEl.textContent = correct+" / "+total;
+    }
+    if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
+    if(label) saveScore(label, correct, total);
+  }
+  sec._start = function(){
+    if(started || !secsAll || ended) return; started = true;
+    tId = setInterval(function(){
+      remaining--;
+      if(tb){ tb.textContent = "⏱️ الوقت المتبقّي: "+fmt(remaining); if(remaining<=60) tb.classList.add("low"); }
+      if(remaining<=0){ finish(true); }
+    }, 1000);
+  };
+
   if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ renderSet(id, genQuant(10), intro, true, label); }); }
+  if(sec.classList.contains("active")) sec._start();
 }
 
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-renderSet("v", shuffle(VERBAL.slice()), "القسم اللفظي: تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false, "قدرات لفظي");
-renderSet("q", genQuant(10), "القسم الكمي: نِسب، معادلات، هندسة، متوسطات وأنماط — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
-renderSet("t", shuffle(TAHSILI.slice()), "تحصيلي (تحضيري): رياضيات وعلوم — مناسب للتهيئة المبكرة.", false, "تحصيلي");
-renderSet("s", shuffle(STEP.slice()), "STEP: قواعد ومفردات وفهم مقروء بالإنجليزية (متقدّم).", false, "STEP إنجليزي");
+renderSet("v", shuffle(VERBAL.slice()).slice(0,13), "القسم اللفظي: 13 سؤال · 13 دقيقة. تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false, "قدرات لفظي");
+renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
+renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة. رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة. قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
 
 // نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
 (function(){
@@ -241,7 +280,9 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
     b.setAttribute("aria-selected","true");
     document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
-    document.getElementById(b.dataset.tab).classList.add("active");
+    var pan = document.getElementById(b.dataset.tab);
+    pan.classList.add("active");
+    if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
 </script>
