@@ -52,7 +52,21 @@
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
+var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي"};
 var name = NAMES[who] || "الطالب";
+
+// حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", {
+      method:"POST",
+      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
 
 // ===== مولّدات كمي (أرقام جديدة كل مرة) =====
 function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
@@ -91,7 +105,35 @@ var VERBAL = [
   ["<b>مرادف:</b> مرادف كلمة «مسرور»:",["سعيد","حزين","غاضب"],0,"مسرور = سعيد."],
   ["<b>ضد:</b> ضد كلمة «كريم»:",["بخيل","شجاع","ذكي"],0,"ضد الكريم: البخيل."],
   ["<b>استيعاب مقروء:</b> «الماء أساس الحياة، ويجب ترشيد استهلاكه.» ما فكرة النص؟",["أهمية الماء وترشيده","أنواع المياه","تلوث الهواء"],0,"الفكرة العامة عن أهمية الماء."],
-  ["<b>تناظر لفظي:</b> نجاح : اجتهاد ، فشل : ؟",["كسل","تعب","نوم"],0,"السبب المؤدي للنتيجة."]
+  ["<b>تناظر لفظي:</b> نجاح : اجتهاد ، فشل : ؟",["كسل","تعب","نوم"],0,"السبب المؤدي للنتيجة."],
+  ["<b>تناظر لفظي:</b> صوف : خروف ، ريش : ؟",["طائر","سمكة","شجرة"],0,"الغطاء الخارجي للكائن."],
+  ["<b>تناظر لفظي:</b> بذرة : شجرة ، طفل : ؟",["رجل","حيوان","نبات"],0,"مرحلة النمو من صغير لكبير."],
+  ["<b>تناظر لفظي:</b> طبيب : مرض ، معلّم : ؟",["جهل","علم","مدرسة"],0,"كلٌّ يعالج/يزيل شيئًا."],
+  ["<b>إكمال جمل:</b> كان الجو ______ فحملنا المظلات.",["ممطرًا","مشمسًا","حارًّا"],0,"المظلات تدل على المطر."],
+  ["<b>إكمال جمل:</b> بذل الطالب ______ كبيرًا حتى تفوّق.",["جهدًا","كسلًا","نومًا"],0,"التفوّق يحتاج جهدًا."],
+  ["<b>الخطأ السياقي:</b> أحب القراءة لأنها تزيد ______ الإنسان.",["معرفة","جهل","كسل"],0,"القراءة تزيد المعرفة."],
+  ["<b>معنى كلمة:</b> ما معنى «الوجيز»؟",["المختصر","الطويل","الصعب"],0,"الوجيز = المختصر."],
+  ["<b>مرادف:</b> مرادف «شجاع»:",["جريء","جبان","بخيل"],0,"شجاع = جريء/مقدام."],
+  ["<b>ضد:</b> ضد «ظلام»:",["نور","ليل","خوف"],0,"ضد الظلام: النور."],
+  ["<b>استيعاب مقروء:</b> «من جدّ وجد، ومن زرع حصد؛ فالنجاح ثمرة الجهد.» ماذا يريد الكاتب؟",["الحثّ على العمل والاجتهاد","وصف الزراعة","ذمّ الكسل فقط"],0,"دعوة للاجتهاد لتحقيق النجاح."]
+];
+
+// ===== STEP — الكفايات اللغوية الإنجليزية (تدريبي) =====
+var STEP = [
+  ["<b>Grammar:</b> By the time we arrived, the movie ___ .",["had started","starts","is starting"],0,"الماضي التام: had + p.p."],
+  ["<b>Grammar:</b> If she ___ harder, she would have passed.",["had studied","studied","studies"],0,"الشرط الثالث: had + p.p."],
+  ["<b>Grammar:</b> The report must ___ by tomorrow.",["be finished","finished","finish"],0,"مبني للمجهول بعد modal: be + p.p."],
+  ["<b>Grammar:</b> He suggested ___ a short break.",["taking","to take","take"],0,"بعد suggest نستخدم v-ing."],
+  ["<b>Grammar:</b> This is the man ___ car was stolen.",["whose","who","which"],0,"للملكية: whose."],
+  ["<b>Grammar:</b> ___ hard he tried, he couldn't open it.",["However","Although","Because"],0,"However + صفة/حال = مهما."],
+  ["<b>Grammar:</b> She has been living here ___ 2015.",["since","for","during"],0,"مع سنة محددة: since."],
+  ["<b>Vocabulary:</b> A synonym for \"abundant\" is:",["plentiful","rare","empty"],0,"abundant = وفير = plentiful."],
+  ["<b>Vocabulary:</b> \"Reluctant\" means:",["unwilling","happy","quick"],0,"reluctant = متردد/غير راغب."],
+  ["<b>Vocabulary:</b> \"Enhance\" is closest to:",["improve","reduce","stop"],0,"enhance = يحسّن/يعزز."],
+  ["<b>Vocabulary:</b> The opposite of \"scarce\" is:",["plentiful","few","small"],0,"scarce = نادر، وعكسه plentiful."],
+  ["<b>Error:</b> Choose the incorrect part: \"She don't like coffee.\"",["don't","She","coffee"],0,"مع She نستخدم doesn't."],
+  ["<b>Reading:</b> \"Reading widens the mind and builds vocabulary.\" What is the main idea?",["Benefits of reading","Types of books","How to write"],0,"الفكرة: فوائد القراءة."],
+  ["<b>Grammar:</b> Neither the students nor the teacher ___ present.",["was","were","are"],0,"الفعل يتبع الأقرب (the teacher) → was."]
 ];
 
 // ===== تحصيلي — تدريبي (رياضيات + علوم) =====
@@ -105,7 +147,15 @@ var TAHSILI = [
   ["<b>كيمياء:</b> رمز عنصر الأكسجين هو:",["O","Ox","Ag"],0,"الأكسجين = O."],
   ["<b>كيمياء:</b> الماء يتكوّن من الهيدروجين و:",["الأكسجين","النيتروجين","الكربون"],0,"H₂O."],
   ["<b>أحياء:</b> الوحدة الأساسية لبناء جسم الكائن الحي هي:",["الخلية","العضلة","العظم"],0,"الخلية هي وحدة البناء."],
-  ["<b>أحياء:</b> عملية صنع الغذاء في النبات تسمى:",["البناء الضوئي","التنفس","الهضم"],0,"البناء الضوئي."]
+  ["<b>أحياء:</b> عملية صنع الغذاء في النبات تسمى:",["البناء الضوئي","التنفس","الهضم"],0,"البناء الضوئي."],
+  ["<b>رياضيات:</b> قيمة √81 =",["9","8","18"],0,"9×9 = 81."],
+  ["<b>رياضيات:</b> قيمة 3⁰ =",["1","0","3"],0,"أي عدد (عدا الصفر) أُس صفر = 1."],
+  ["<b>رياضيات:</b> محيط دائرة نصف قطرها 7 (2πر، π≈22/7):",["44","154","22"],0,"2×22/7×7 = 44."],
+  ["<b>فيزياء:</b> الطاقة الحركية تعتمد على السرعة و:",["الكتلة","اللون","الزمن"],0,"ط.حركية = ½ × الكتلة × السرعة²."],
+  ["<b>كيمياء:</b> محلول رقمه الهيدروجيني pH = 7 يكون:",["متعادلًا","حمضيًّا","قاعديًّا"],0,"pH=7 → متعادل."],
+  ["<b>كيمياء:</b> عدد ذرات الأكسجين في H₂O:",["1","2","3"],0,"H₂O فيها ذرة أكسجين واحدة."],
+  ["<b>أحياء:</b> الجهاز المسؤول عن ضخ الدم:",["الدوري","الهضمي","التنفسي"],0,"الجهاز الدوري (القلب والأوعية)."],
+  ["<b>أحياء:</b> الغاز الذي نُخرجه في الزفير:",["ثاني أكسيد الكربون","الأكسجين","النيتروجين"],0,"نُخرج ثاني أكسيد الكربون."]
 ];
 
 var app = document.getElementById("app");
@@ -116,10 +166,12 @@ app.innerHTML =
     '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
     '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
     '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>'+
+    '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
   '</div>'+
   '<section class="panel active" id="v"></section>'+
   '<section class="panel" id="q"></section>'+
   '<section class="panel" id="t"></section>'+
+  '<section class="panel" id="s"></section>'+
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
 function shuffleQ(q){
@@ -128,7 +180,7 @@ function shuffleQ(q){
   var idx=0, newOpts=pairs.map(function(p,ni){ if(p[1]===q[2]) idx=ni; return p[0]; });
   return [q[0], newOpts, idx, q[3]];
 }
-function renderSet(id, items, intro, regen){
+function renderSet(id, items, intro, regen, label){
   var sec = document.getElementById(id);
   items = items.map(shuffleQ);
   var html = '<div class="intro">'+intro+'</div>';
@@ -153,16 +205,18 @@ function renderSet(id, items, intro, regen){
         else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
         qEl.querySelector(".explain").classList.add("show");
         scoreEl.textContent = correct+" / "+total;
+        if(Object.keys(answered).length===total && label){ saveScore(label, correct, total); }
       });
     });
   });
-  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ renderSet(id, genQuant(10), intro, true); }); }
+  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ renderSet(id, genQuant(10), intro, true, label); }); }
 }
 
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-renderSet("v", shuffle(VERBAL.slice()), "القسم اللفظي: تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false);
-renderSet("q", genQuant(10), "القسم الكمي: نِسب، معادلات، هندسة، متوسطات وأنماط — <b>أرقام جديدة كل مرة</b>.", true);
-renderSet("t", shuffle(TAHSILI.slice()), "تحصيلي (تحضيري): رياضيات وعلوم — مناسب للتهيئة المبكرة.", false);
+renderSet("v", shuffle(VERBAL.slice()), "القسم اللفظي: تناظر، إكمال جمل، خطأ سياقي، معاني، واستيعاب مقروء.", false, "قدرات لفظي");
+renderSet("q", genQuant(10), "القسم الكمي: نِسب، معادلات، هندسة، متوسطات وأنماط — <b>أرقام جديدة كل مرة</b>.", true, "قدرات كمي");
+renderSet("t", shuffle(TAHSILI.slice()), "تحصيلي (تحضيري): رياضيات وعلوم — مناسب للتهيئة المبكرة.", false, "تحصيلي");
+renderSet("s", shuffle(STEP.slice()), "STEP: قواعد ومفردات وفهم مقروء بالإنجليزية (متقدّم).", false, "STEP إنجليزي");
 
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.addEventListener("click", function(){

@@ -165,11 +165,13 @@ async function load(){
     if(!r.ok){ throw new Error("HTTP "+r.status); }
     let data = await r.json();
     data = Array.isArray(data)?data:[];
-    // نفصل صفوف النشاط (فتح درس/فيديو) عن الاختبارات
+    // نفصل صفوف النشاط والاختبارات التجريبية عن اختبارات المدرسة
     const activity = data.filter(row=> row.meta && row.meta.kind==="activity");
     const actBy = {};
     activity.forEach(a=>{ (actBy[a.student] = actBy[a.student]||[]).push(a); });
-    data = data.filter(row=> !(row.meta && row.meta.kind==="activity"));
+    const practiceBy = {};
+    data.filter(row=> row.meta && row.meta.kind==="practice").forEach(p=>{ (practiceBy[p.student]=practiceBy[p.student]||[]).push(p); });
+    data = data.filter(row=> !(row.meta && (row.meta.kind==="activity"||row.meta.kind==="practice")));
     status.textContent = `آخر تحديث: ${new Date().toLocaleString("en-GB",{timeZone:"Asia/Riyadh"})} (السعودية) · ${data.length} محاولة`;
     if(!data.length){
       content.innerHTML = `<div class="card empty">ما فيه نتائج بعد.<br>افتح رابط أي ابن من تحت وخلّه يحل الاختبار، وبتظهر نتيجته هنا تلقائيًا.</div>`;
@@ -207,6 +209,7 @@ async function load(){
         ${weak.length? `<div class="weak"><div class="wt">أكثر الأسئلة اللي يغلط فيها:</div><ul>
           ${weak.map(w=>`<li>${w[0]} <span class="cnt">(×${w[1]})</span></li>`).join("")}
         </ul></div>` : `<div class="weak"><div class="wt">ما فيه أخطاء متكررة 🎉</div></div>`}
+        ${(function(){ var pr=practiceBy[name]||[]; if(!pr.length) return ""; var byTest={}; pr.forEach(function(p){ if(!byTest[p.meta.test]) byTest[p.meta.test]=p; }); return `<div class="weak"><div class="wt">📊 الاختبارات التجريبية (قدرات/تحصيلي/STEP):</div><ul>${Object.keys(byTest).map(function(t){ var p=byTest[t]; return `<li>${t}: <b>${p.meta.correct}/${p.meta.total}</b> <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")}</ul></div>`; })()}
         ${(function(){ var acts=actBy[name]||[]; return acts.length
           ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>`<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}</span></li>`).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
