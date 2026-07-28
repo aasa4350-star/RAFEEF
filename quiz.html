@@ -1179,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s13";
+var AUDIO_VER = "s14";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1698,7 +1698,9 @@ if(!STUDENTS[who]){
       const r = await fetch(SUPA_URL+"/rest/v1/attempts?select=wrong,meta&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc&limit=15",
         {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
       const rows = await r.json();
-      (Array.isArray(rows)?rows:[]).forEach(x=>{ if(x.meta && x.meta.kind) return; (x.wrong||[]).forEach(w=> wrongs.push(w)); });
+      // نأخذ أخطاء آخر 3 اختبارات مدرسية فقط — فأي مهارة يتقنها لاحقًا تختفي تلقائيًا
+      const school = (Array.isArray(rows)?rows:[]).filter(x=> !(x.meta && x.meta.kind));
+      school.slice(0, 3).forEach(x=> (x.wrong||[]).forEach(w=> wrongs.push(w)));
     }catch(e){}
     const counts = {};
     wrongs.forEach(w=>{ const t=(w.q||"")+" "+(w.subject||""); for(let i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(t)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
@@ -1706,7 +1708,7 @@ if(!STUDENTS[who]){
 
     let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`;
     if(top.length){
-      html += `<div class="review"><details open><summary>🎯 نقاط ضعفك الآن (تتحدّث تلقائيًا بعد كل اختبار)</summary><div class="body">ركّزنا على أكثر أخطائك تكرارًا في اختباراتك:<br>`+
+      html += `<div class="review"><details open><summary>🎯 نقاط ضعفك الآن (من آخر ٣ اختبارات)</summary><div class="body">هذي نقاط ضعفك الحالية — <b>لما تتقن أي مهارة وتجاوبها صح، تختفي تلقائيًا ✅</b>:<br>`+
         top.map(s=>`• <b>${s.name}</b> <span style="color:var(--accent)">(${counts[s.name]} مرة)</span>`).join("<br>")+`</div></details></div>`;
       html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (لنقاط ضعفك)</div><div class="review">`;
       top.forEach(s=>{
