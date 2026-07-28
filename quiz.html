@@ -1179,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s12";
+var AUDIO_VER = "s13";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1653,28 +1653,78 @@ if(!STUDENTS[who]){
     }
   }
 
-  function renderRemedial(){
+  // كتالوج المهارات — يكتشف الضعف من أخطاء الطالب الفعلية
+  const SKILLS = [
+    {name:"الجذور", rx:/√/, yt:"شرح الجذر التربيعي رياضيات",
+     lesson:`<p>√ العدد = ما نضربه بنفسه فيعطيه. √144 = 12 لأن 12×12 = 144.</p>`,
+     gen:function(){var r=ri(2,15),v=r*r,o=opt3(r,[r+1,r-1,v]);return ["احسب: √"+v,o[0],o[1],r+"×"+r+"="+v+" → √"+v+"="+r+".","ma"];}},
+    {name:"حل المعادلات", rx:/حل\s*:|معادلة|\dx|\dس|x\s*=|س\s*=|x²|س²/, yt:"شرح حل المعادلات",
+     lesson:`<p>نعزل x: ننقل الأرقام ثم نقسم على معامل x. 3x+2=11 → 3x=9 → x=3.</p>`,
+     gen:function(){var x=ri(2,9),a=ri(2,6),b=ri(1,9),c=a*x+b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x + "+b+" = "+c,o[0],o[1],a+"x="+(c-b)+" → x="+x+".","ma"];}},
+    {name:"الأسس", rx:/[²³⁴⁵⁶⁷]|الأس/, yt:"شرح الأسس والقوى رياضيات",
+     lesson:`<p>الأس = نضرب العدد بنفسه. 7² = 7×7 = 49 (وليس 7×2). 2⁴ = 16.</p>`,
+     gen:function(){var b=ri(2,7),e=gpick([2,3]),v=Math.pow(b,e),o=opt3(v,[b*e,v+b,v-b]);return ["احسب: "+b+sup(e),o[0],o[1],b+" مضروب بنفسه "+e+" مرات = "+v+".","ma"];}},
+    {name:"الهندسة", rx:/مساحة|محيط|حجم|مثلث|زاوية|الوتر|قطر/, yt:"شرح المساحة والمحيط رياضيات",
+     lesson:`<p>مساحة المستطيل = الطول×العرض. المحيط = (الطول+العرض)×2. مساحة المربع = الضلع².</p>`,
+     gen:function(){var L=ri(4,12),W=ri(3,9),o=opt3(L*W,[2*(L+W),L+W,L*W-W]);return ["مساحة مستطيل طوله "+L+" وعرضه "+W+"؟",o[0],o[1],L+"×"+W+"="+(L*W)+".","ma"];}},
+    {name:"النسبة المئوية", rx:/%|النسبة|نسبة/, yt:"شرح النسبة المئوية رياضيات",
+     lesson:`<p>p% من N = (p÷100)×N. مثال: 20% من 150 = 30.</p>`,
+     gen:function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي "+p+"% من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+"="+v+".","ma"];}},
+    {name:"الكسور", rx:/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚]|\d\/\d|كسر/, yt:"شرح جمع الكسور رياضيات",
+     lesson:`<p>عند تساوي المقام: نجمع البسط فقط والمقام يبقى. ⅓ + ⅓ = ⅔.</p>`,
+     gen:function(){var d=ri(3,8),a=ri(1,d-2),b=ri(1,d-a-1),n=a+b,o=opt3(n+"/"+d,[a+"/"+d,n+"/"+(2*d),(n+1)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d,o[0],o[1],"نجمع البسط: "+n+"/"+d+".","ma"];}},
+    {name:"ترتيب العمليات", rx:/[+\-−].*×|×.*[+\-−]/, yt:"شرح ترتيب العمليات الحسابية",
+     lesson:`<p>نبدأ بالضرب والقسمة قبل الجمع والطرح. 6+4×3 = 6+12 = 18.</p>`,
+     gen:function(){var a=ri(2,9),b=ri(2,9),c=ri(2,5),s=a+b*c,o=opt3(s,[(a+b)*c,s+c,a+b+c]);return ["احسب: "+a+" + "+b+" × "+c,o[0],o[1],b+"×"+c+"="+(b*c)+" ثم +"+a+"="+s+".","ma"];}},
+    {name:"الأعداد السالبة", rx:/−\d|احسب:\s*−/, yt:"شرح الأعداد السالبة رياضيات",
+     lesson:`<p>خط الأعداد: الجمع تقدّم يمين، الطرح رجوع يسار. −6+10=4. سالب×موجب=سالب.</p>`,
+     gen:function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[a+b,-(a+b),-a-b]);return ["احسب: −"+a+" + "+b,o[0],o[1],"من −"+a+" نتقدّم "+b+" → "+s+".","ma"];}},
+    {name:"الجموع الشاذة", rx:/plural/i, yt:"شرح الجموع الشاذة انجليزي",
+     lesson:`<p><span class="ltr">man→men · child→children · foot→feet · leaf→leaves · woman→women</span></p>`, gen:ePluralAdv},
+    {name:"الأضداد", rx:/opposite/i, yt:"شرح الأضداد opposites انجليزي",
+     lesson:`<p><span class="ltr">big↔small · hot↔cold · easy↔difficult · cheap↔expensive · ancient↔modern</span></p>`, gen:eOpp},
+    {name:"المقارنة والتفضيل", rx:/than|comparative/i, yt:"شرح المقارنة والتفضيل comparative انجليزي",
+     lesson:`<p><span class="ltr">taller than · the tallest · more famous than · the most famous</span></p>`, gen:eComp},
+    {name:"الأزمنة", rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i, yt:"شرح الأزمنة في اللغة الانجليزية",
+     lesson:`<p><span class="ltr">Past: went · Present perfect: has done · Past continuous: was playing</span></p>`, gen:ePast}
+  ];
+
+  async function renderRemedial(){
     const sec = document.getElementById("rem");
-    const R = REMEDIAL[who];
-    if(!R){ sec.innerHTML = '<p class="hint">لا توجد تمارين علاجية لهذا الطالب حاليًا.</p>'; return; }
-    // رياضيات وإنجليزي مولّدان بأرقام/جمل جديدة كل مرة
-    const mathItems = MGEN[who] ? genN(MGEN[who], 7) : R.items.filter(q=>q[4]==="ma");
-    const engItems = EGEN[who] ? genN(EGEN[who], 5) : R.items.filter(q=>q[4]==="en");
-    const items = shuffle(mathItems.concat(engItems));
-    let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`+
-      `<div class="review"><details open><summary>على وش نركّز؟</summary><div class="body">${R.focus}</div></details></div>`;
-    const lessons = LESSONS[who] || [];
-    if(lessons.length){
-      html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (افتحها قبل الحل)</div><div class="review">`;
-      lessons.forEach(l=>{
-        const lbl = l[0].replace(/"/g,'');
-        const q = encodeURIComponent((l[2] || l[0].replace('🎬','').trim()) + ' شرح مبسط للأطفال');
-        const vid = `<div style="margin-top:12px"><a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" data-vid="${lbl}" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>`;
-        html += `<details data-lesson="${lbl}"><summary>${l[0]}</summary><div class="body">${l[1]}${vid}</div></details>`;
+    sec.innerHTML = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div><div class="review"><p class="hint" style="padding:14px">⏳ نحلّل نقاط ضعفك من آخر اختباراتك...</p></div>`;
+    // نقرأ أخطاء الطالب الفعلية من قاعدة البيانات (تتحدّث بعد كل اختبار)
+    let wrongs = [];
+    try{
+      const r = await fetch(SUPA_URL+"/rest/v1/attempts?select=wrong,meta&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc&limit=15",
+        {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+      const rows = await r.json();
+      (Array.isArray(rows)?rows:[]).forEach(x=>{ if(x.meta && x.meta.kind) return; (x.wrong||[]).forEach(w=> wrongs.push(w)); });
+    }catch(e){}
+    const counts = {};
+    wrongs.forEach(w=>{ const t=(w.q||"")+" "+(w.subject||""); for(let i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(t)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
+    const top = SKILLS.filter(s=>counts[s.name]).sort((a,b)=>counts[b.name]-counts[a.name]).slice(0,4);
+
+    let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`;
+    if(top.length){
+      html += `<div class="review"><details open><summary>🎯 نقاط ضعفك الآن (تتحدّث تلقائيًا بعد كل اختبار)</summary><div class="body">ركّزنا على أكثر أخطائك تكرارًا في اختباراتك:<br>`+
+        top.map(s=>`• <b>${s.name}</b> <span style="color:var(--accent)">(${counts[s.name]} مرة)</span>`).join("<br>")+`</div></details></div>`;
+      html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (لنقاط ضعفك)</div><div class="review">`;
+      top.forEach(s=>{
+        const q = encodeURIComponent(s.yt);
+        const vid = `<div style="margin-top:12px"><a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" data-vid="${s.name}" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>`;
+        html += `<details data-lesson="${s.name}"><summary>🎬 ${s.name}</summary><div class="body">${s.lesson}${vid}</div></details>`;
       });
       html += `</div>`;
+    } else {
+      html += `<div class="review"><details open><summary>🎉 ما عندك أخطاء متكررة!</summary><div class="body">أداؤك ممتاز — هذي تمارين عامة للحفاظ على مستواك.</div></details></div>`;
     }
-    html += `<div class="block-title"><span class="dot"></span> تدرّب وتعلّم</div>`;
+
+    let items = [];
+    if(top.length){ top.forEach(s=>{ for(let k=0;k<3;k++){ try{ items.push(s.gen()); }catch(e){} } }); }
+    else { if(MGEN[who]) items=items.concat(genN(MGEN[who],6)); if(EGEN[who]) items=items.concat(genN(EGEN[who],4)); }
+    items = shuffle(items);
+
+    html += `<div class="block-title"><span class="dot"></span> تدرّب على نقاط ضعفك</div>`;
     items.forEach((q,i)=>{
       const isEn = q[4]==="en";
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
