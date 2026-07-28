@@ -214,7 +214,7 @@ async function load(){
           ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>`<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}</span></li>`).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
         <div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>
-        ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
+        ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
       </div>`;
     }).join("");
   }catch(e){
