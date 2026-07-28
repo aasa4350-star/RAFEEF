@@ -115,8 +115,11 @@ async function main(){
     const r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
       {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
     rows=await r.json();
-    rows=(Array.isArray(rows)?rows:[]).filter(x=> !(x.meta && x.meta.kind==="activity"));
+    rows=Array.isArray(rows)?rows:[];
   }catch(e){}
+  // نفصل الاختبارات التجريبية والنشاط عن اختبارات المدرسة
+  const practice=rows.filter(x=> x.meta && x.meta.kind==="practice");
+  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice")));
 
   let notes=[];
   try{ const nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
@@ -145,7 +148,17 @@ async function main(){
       <a href="quiz.html?who=${who}">📝 اختبار جديد</a>
       <a href="quiz.html?who=${who}&set=2">🔄 المجموعة 2</a>
       <a href="index.html">📊 اللوحة</a>
+      <a href="practice.html?who=${who}">📊 قدرات وتحصيلي</a>
     </div>`;
+
+  if(practice.length){
+    const byTest={}; practice.forEach(p=>{ if(!byTest[p.meta.test]) byTest[p.meta.test]=p; });
+    html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
+      <div class="card"><ul class="weak">`+
+      Object.keys(byTest).map(t=>{ const p=byTest[t]; const pc=pct(p.meta.correct,p.meta.total);
+        return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
+      `</ul></div>`;
+  }
 
   if(rows.length){
     html+=`
