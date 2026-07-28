@@ -86,6 +86,32 @@ const app = document.getElementById("app");
 
 function pct(c,t){ return t?Math.round(c/t*100):0; }
 function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
+function saToday(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
+var SKILLNAMES=[
+  {name:"الجذور",rx:/√/},{name:"حل المعادلات",rx:/حل\s*:|معادلة|\dx|\dس|x\s*=|س\s*=|x²|س²/},
+  {name:"الأسس",rx:/[²³⁴⁵⁶⁷]|الأس/},{name:"الهندسة",rx:/مساحة|محيط|حجم|مثلث|زاوية|الوتر|قطر/},
+  {name:"النسبة المئوية",rx:/%|نسبة/},{name:"الكسور",rx:/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚]|\d\/\d|كسر/},
+  {name:"ترتيب العمليات",rx:/[+\-−].*×|×.*[+\-−]/},{name:"الأعداد السالبة",rx:/−\d|احسب:\s*−/},
+  {name:"الجموع الشاذة",rx:/plural/i},{name:"الأضداد",rx:/opposite/i},
+  {name:"المقارنة والتفضيل",rx:/than|comparative/i},{name:"الأزمنة",rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i}
+];
+function autoRec(rows){
+  if(!rows.length) return null;
+  var latest=rows[0];
+  var lp=pct(latest.en_correct+latest.ma_correct,latest.en_total+latest.ma_total);
+  var trend="";
+  if(rows.length>=2){ var prev=pct(rows[1].en_correct+rows[1].ma_correct,rows[1].en_total+rows[1].ma_total);
+    trend= lp>prev+5?"📈 في تحسّن":lp<prev-5?"📉 نزل شوي":"➡️ ثابت"; }
+  var wrongs=[]; rows.slice(0,3).forEach(function(r){(r.wrong||[]).forEach(function(w){wrongs.push(w);});});
+  var counts={}; wrongs.forEach(function(w){ var t=(w.q||"")+" "+(w.subject||""); for(var i=0;i<SKILLNAMES.length;i++){ if(SKILLNAMES[i].rx.test(t)){ counts[SKILLNAMES[i].name]=(counts[SKILLNAMES[i].name]||0)+1; break; } } });
+  var top=SKILLNAMES.filter(function(s){return counts[s.name];}).sort(function(a,b){return counts[b.name]-counts[a.name];}).slice(0,3);
+  var beh=behavior(latest);
+  var h="المستوى الحالي: <b>"+lp+"%</b> "+trend+".<br>إنجليزي "+latest.en_correct+"/"+latest.en_total+" · رياضيات "+latest.ma_correct+"/"+latest.ma_total+".<br>";
+  if(top.length){ h+="<b>ركّز على:</b> "+top.map(function(s){return s.name+" ("+counts[s.name]+")";}).join(" · ")+" — روح تبويب علاجي 💪 فيه شرح وتمارين لها.<br>"; }
+  else { h+="🎉 ما فيه أخطاء متكررة — ممتاز!<br>"; }
+  if(beh && beh.avg!=null && beh.avg<4){ h+="⚠️ تروّى شوي — سرعتك عالية ("+beh.avg+"ث/سؤال) فتغلط في التفاصيل."; }
+  return {date:saToday(),title:"📊 تقرير تلقائي محدّث — المستوى "+lp+"% "+trend, html:h, auto:true};
+}
 function behavior(row){
   const m=row.meta; if(!m||!m.per||!m.per.length) return null;
   const dts=m.per.map(p=>p.dt).filter(x=>x!=null);
@@ -205,11 +231,13 @@ async function main(){
   }
 
   html+=`<div class="sec-title"><span class="dot"></span> توصيات المعلّم 📌</div>`;
-  if(notes.length){
-    html+=notes.map(n=>`<div class="note"><div class="nd">${n.date||""}</div>
+  const auto=autoRec(rows);
+  const allNotes=auto?[auto].concat(notes):notes;
+  if(allNotes.length){
+    html+=allNotes.map(n=>`<div class="note"${n.auto?' style="border-color:var(--accent)"':''}><div class="nd">${n.date||""}${n.auto?' · يتحدّث تلقائيًا':''}</div>
       <div class="nt">${n.title||""}</div><div class="nb">${n.html||n.body||""}</div></div>`).join("");
   }else{
-    html+=`<div class="card empty">لسه ما فيه توصيات مكتوبة. بتظهر هنا أول ما تُضاف.</div>`;
+    html+=`<div class="card empty">لسه ما فيه توصيات. بتظهر هنا أول ما يختبر.</div>`;
   }
 
   html+=`<footer>تتحدّث تلقائيًا · صفحة خاصة بـ ${S.name}</footer>`;
