@@ -180,6 +180,12 @@ async function load(){
     const byStudent = {};
     data.forEach(row=>{ (byStudent[row.student] = byStudent[row.student]||[]).push(row); });
     const names = ORDER.filter(n=>byStudent[n]).concat(Object.keys(byStudent).filter(n=>!ORDER.includes(n)));
+    // نجيب توصيات كل ولد لعرضها في اللوحة
+    const notesBy = {};
+    await Promise.all(names.map(async name=>{
+      const slug = SLUG[name]; if(!slug) return;
+      try{ const nr = await fetch("notes/"+slug+".json?t="+Date.now()); if(nr.ok) notesBy[name] = await nr.json(); }catch(e){}
+    }));
     content.innerHTML = names.map(name=>{
       const rows = byStudent[name];
       const d = diagnose(name, rows);
@@ -202,6 +208,7 @@ async function load(){
             <div class="trend">${rows.length} محاولة</div></div>
         </div>
         <div class="diag ${d.good?'good':'warn'}">${d.html}</div>
+        ${(function(){ var ns=notesBy[name]||[]; if(!ns.length) return ""; var n=ns[0]; return `<div class="weak"><div class="wt">📌 توصيات المعلّم (آخر تحديث ${n.date||""}):</div><div style="font-weight:700;margin-bottom:6px">${n.title||""}</div><div style="font-size:.88rem;line-height:1.9">${n.html||""}</div></div>`; })()}
         ${beh? `<div class="behav ${beh.good?'ok':'no'}">
           <span class="be">${beh.emoji}</span>
           <span><b>أسلوب الحل (آخر محاولة):</b> ${beh.label}${beh.avg!=null? ` · متوسط ${beh.avg}ث/سؤال`:""}</span>
