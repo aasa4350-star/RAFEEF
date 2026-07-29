@@ -1179,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s14";
+var AUDIO_VER = "s15";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1549,14 +1549,36 @@ if(!STUDENTS[who]){
   }
 
   let arbBuilt = false;
+  // ===== مولّد أسئلة اللغة العربية (يتجدّد كل مرة) =====
+  var AR_OPP=[["كبير","صغير"],["طويل","قصير"],["حار","بارد"],["سعيد","حزين"],["قديم","جديد"],["أبيض","أسود"],["فوق","تحت"],["نهار","ليل"],["قويّ","ضعيف"],["سريع","بطيء"],["جميل","قبيح"],["غنيّ","فقير"],["مفتوح","مغلق"],["صعب","سهل"],["بعيد","قريب"],["كثير","قليل"]];
+  var AR_SYN=[["سعيد","مسرور"],["شجاع","جريء"],["جميل","حسن"],["قويّ","متين"],["ذكيّ","فطن"],["سريع","عاجل"],["ضخم","كبير"],["منزل","بيت"],["طريق","سبيل"],["فرح","سرور"],["صديق","رفيق"],["بحر","يمّ"]];
+  var AR_PLU=[["كتاب","كتب"],["قلم","أقلام"],["بيت","بيوت"],["ولد","أولاد"],["باب","أبواب"],["طالب","طلاب"],["شجرة","أشجار"],["زهرة","زهور"],["نجمة","نجوم"],["جبل","جبال"],["نهر","أنهار"],["يد","أيدٍ"]];
+  var AR_COMP=[
+    ["الطالب المجتهد ______ في الامتحان.",["نجح","رسب","نام"],0],
+    ["نأكل الطعام عندما نشعر بـ ______.",["الجوع","الشبع","العطش"],0],
+    ["______ الشمس من جهة الشرق.",["تشرق","تغرب","تسقط"],0],
+    ["نشرب الماء عندما نشعر بـ ______.",["العطش","الجوع","النعاس"],0],
+    ["الكتاب خير ______ في الوحدة.",["جليس","عدوّ","طعام"],0],
+    ["ننظر يمينًا ويسارًا قبل ______ الطريق.",["عبور","إغلاق","فتح"],0],
+    ["______ الطفل فرحًا عندما فاز بالجائزة.",["قفز","بكى","نام"],0],
+    ["نضع الطعام البارد في ______.",["الثلاجة","الفرن","الخزانة"],0]
+  ];
+  function arDist(pool,pair){ var o=pool.filter(function(x){return x!==pair;}).map(function(x){return x[1];}); shuffle(o); return o.slice(0,2); }
+  function aOpp(){var p=gpick(AR_OPP),o=opt3(p[1],arDist(AR_OPP,p));return ["ضد كلمة «"+p[0]+"»:",o[0],o[1],"عكس "+p[0]+" هو "+p[1]+".","ar"];}
+  function aSyn(){var p=gpick(AR_SYN),o=opt3(p[1],arDist(AR_SYN,p));return ["مرادف كلمة «"+p[0]+"»:",o[0],o[1],p[0]+" = "+p[1]+".","ar"];}
+  function aPlu(){var p=gpick(AR_PLU),o=opt3(p[1],arDist(AR_PLU,p));return ["جمع كلمة «"+p[0]+"»:",o[0],o[1],"جمع "+p[0]+" = "+p[1]+".","ar"];}
+  function aComp(){var it=gpick(AR_COMP),c=it[1][it[2]],ds=it[1].filter(function(_,k){return k!==it[2];}),o=opt3(c,ds);return [it[0],o[0],o[1],"الكلمة المناسبة للسياق: "+c+".","ar"];}
+  var AGEN=[aOpp,aSyn,aPlu,aComp];
+
   function renderArb(){
-    if(arbBuilt) return; arbBuilt = true;
     const sec = document.getElementById("arb");
     const A = ARABIC[who];
     if(!A){ sec.innerHTML='<div class="locked">قسم العربية غير متاح.</div>'; return; }
+    const dict = shuffle(A.dictation.slice()).slice(0, Math.min(6, A.dictation.length));
+    const arq = genN(AGEN, 8);
     let h = '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
       '<p class="explain show" style="display:block">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
-    A.dictation.forEach(function(text,i){
+    dict.forEach(function(text,i){
       h += '<div class="q" data-d="'+i+'"><div class="num">إملاء '+(i+1)+'</div>'+
         '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
         '<button type="button" data-say style="background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800">🔊 استمع</button>'+
@@ -1567,19 +1589,20 @@ if(!STUDENTS[who]){
         '<div class="dfb" style="margin-top:8px;font-weight:700;min-height:20px"></div></div>';
     });
     h += '<div class="block-title"><span class="dot"></span> أسئلة اللغة العربية</div>';
-    A.quiz.forEach(function(q,i){
+    arq.forEach(function(q,i){
       h += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
         '<div class="stem">'+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+o+'</button>'; });
       h += '</div><div class="explain">'+q[3]+'</div></div>';
     });
-    h += '<div class="scorebar"><span class="txt" data-ars>0 / '+A.quiz.length+'</span>'+
-         '<div class="track"><div class="fill" data-arf></div></div></div>';
+    h += '<div class="scorebar"><span class="txt" data-ars>0 / '+arq.length+'</span>'+
+         '<div class="track"><div class="fill" data-arf></div></div></div>'+
+         '<button type="button" data-arreset style="margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">أسئلة جديدة 🔄</button>';
     sec.innerHTML = h;
 
     // إملاء
     sec.querySelectorAll('.q[data-d]').forEach(function(qEl){
-      var i = +qEl.dataset.d, text = A.dictation[i];
+      var i = +qEl.dataset.d, text = dict[i];
       var inp = qEl.querySelector('.dinp'), fb = qEl.querySelector('.dfb');
       qEl.querySelector('[data-say]').addEventListener('click', function(){ speakAr(text, 1); });
       qEl.querySelector('[data-slow]').addEventListener('click', function(){ speakAr(text, 0.7); });
@@ -1590,10 +1613,10 @@ if(!STUDENTS[who]){
       });
     });
     // أسئلة
-    var answered = new Set(), correct = 0, total = A.quiz.length;
+    var answered = new Set(), correct = 0, total = arq.length;
     var scoreEl = sec.querySelector('[data-ars]'), fillEl = sec.querySelector('[data-arf]');
     sec.querySelectorAll('.q[data-i]').forEach(function(qEl){
-      var i = +qEl.dataset.i, ans = A.quiz[i][2];
+      var i = +qEl.dataset.i, ans = arq[i][2];
       qEl.querySelectorAll('.opts button').forEach(function(btn){
         btn.addEventListener('click', function(){
           if(answered.has(i)) return; answered.add(i);
@@ -1607,6 +1630,7 @@ if(!STUDENTS[who]){
         });
       });
     });
+    var rb=sec.querySelector('[data-arreset]'); if(rb) rb.addEventListener('click', renderArb);
   }
 
   // توقيت السعودية (UTC+3، بدون توقيت صيفي)
