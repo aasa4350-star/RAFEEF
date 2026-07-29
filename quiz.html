@@ -1179,7 +1179,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s15";
+var AUDIO_VER = "s16";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1456,7 +1456,7 @@ if(!STUDENTS[who]){
       html += `<div class="q" data-i="${i}"><div class="num">سؤال ${i+1}</div>
         <div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
       q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
-      html += `</div><div class="explain">${q[3]}</div></div>`;
+      html += `</div><div class="explain" ${(id==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score>0 / ${d.quiz.length}</span>
       <div class="track"><div class="fill" data-fill></div></div></div>
@@ -1756,7 +1756,7 @@ if(!STUDENTS[who]){
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
         `<div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
       q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
-      html += `</div><div class="explain">${q[3]}</div></div>`;
+      html += `</div><div class="explain" ${(q[4]==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score>0 / ${items.length}</span>`+
       `<div class="track"><div class="fill" data-fill></div></div></div>`+
