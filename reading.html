@@ -318,7 +318,7 @@ if(!META[who] || !DATA[who]){
     '<div class="tabs" role="tablist">'+
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
-      '<button data-tab="vocab" aria-selected="false">كلمات 🔊✍️</button>'+
+      '<button data-tab="vocab" aria-selected="false">كلمات ✍️</button>'+
     '</div>'+
     '<section class="panel active" id="dict"></section>'+
     '<section class="panel" id="read"></section>'+
@@ -442,25 +442,21 @@ if(!META[who] || !DATA[who]){
     var sec = document.getElementById("vocab");
     if(curLang!=="en"){ sec.innerHTML=""; return; }
     var Vall = VOCAB[who] || [];
-    var V = shuffle(Vall.slice()).slice(0, Math.min(8, Vall.length));
+    var V = shuffle(Vall.slice()).slice(0, Math.min(10, Vall.length));
     var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
-    var html = '<div class="block-title"><span class="dot"></span> اسمع الكلمة، اكتبها بالإنجليزي، ومعناها بالعربي</div>'+
-      '<p class="hint">اضغط 🔊 استمع، ثم اكتب الكلمة بالإنجليزي ومعناها بالعربي، ثم «تحقّق».</p>'+
-      PRON_TIP;
+    var html = '<div class="block-title"><span class="dot"></span> اقرأ الكلمة بالعربي، اكتب معناها بالإنجليزي، ثم درّب نطقك</div>'+
+      '<p class="hint">اقرأ الكلمة العربية، اكتب معناها بالإنجليزي، ثم اكتب نطقها، واضغط «تحقّق».</p>';
     V.forEach(function(item,i){
+      var arWord = item[1][0];
       html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(i+1)+'</div>'+
-        '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
-        '<button class="say small" data-slow>🐢 أبطأ</button></div>'+
-        '<span '+lab+'>اكتبها بالإنجليزي:</span>'+
+        '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
+        '<span '+lab+'>اكتب معناها بالإنجليزي:</span>'+
         '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
-        '<span '+lab+'>معناها بالعربي:</span>'+
-        '<input class="ainp" placeholder="المعنى بالعربي..." style="direction:rtl;text-align:right">'+
-        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button>'+
-        '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
-        '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div>'+
+        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
+        '<div class="fb"></div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
-          '<span '+lab+'>🎤 درّب نطقك — انطق الكلمة بمايك الكيبورد:</span>'+
-          '<input class="einp pinp" placeholder="Say it..." style="direction:ltr;text-align:left">'+
+          '<span '+lab+'>🎤 درّب نطقك — اكتب نطق الكلمة (تقدر تستخدم مايك الكيبورد):</span>'+
+          '<input class="pinp" placeholder="Say it..." style="direction:ltr;text-align:left">'+
           '<div class="row"><button class="say small pchk">افحص النطق</button><span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
@@ -470,32 +466,13 @@ if(!META[who] || !DATA[who]){
     var done={}, tried={}, correct=0, saved=false, total=V.length, scoreEl=sec.querySelector("[data-score]");
     function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; saveScore("كلمات إنجليزي 🔤", correct, total); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
-      var i=+qEl.dataset.i, word=V[i][0], answers=V[i][1];
-      var ein=qEl.querySelector(".einp"), ain=qEl.querySelector(".ainp"), fb=qEl.querySelector(".fb");
-      var mic=qEl.querySelector("[data-mic]"), pfb=qEl.querySelector(".pfb");
-      if(mic){ mic.addEventListener("click",function(){
-        pfb.style.color="var(--muted)"; pfb.textContent="🎤 تكلّم الآن... قل: "+word;
-        startRecognition("en-US", function(alts){
-          var target=norm(word,false);
-          var hit=alts.some(function(a){ var n=norm(a,false); return n===target || n.split(" ").indexOf(target)>=0; });
-          if(hit){ pfb.style.color="var(--good)"; pfb.textContent="✅ نطق صحيح! ("+alts[0]+")"; }
-          else{ pfb.style.color="var(--bad)"; pfb.textContent='❌ سمعتك: "'+(alts[0]||"")+'" · انطقها: '+word; }
-        }, function(err){
-          pfb.style.color="var(--bad)";
-          pfb.textContent = (err==="no-support") ? "⚠️ متصفح هذا الجهاز لا يدعم النطق بالمايك — جرّب Chrome على أندرويد أو كمبيوتر." : "⚠️ لم أسمع بوضوح، اسمح بالمايك وحاول ثانية.";
-        });
-      }); }
-      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(word,1,"en-US"); });
-      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(word,0.7,"en-US"); });
-      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الكلمة: <span class="corr">'+word+'</span> · المعنى: <span class="corr">'+answers[0]+'</span>'; });
+      var i=+qEl.dataset.i, word=V[i][0], arWord=V[i][1][0];
+      var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
+      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>'; });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var enOk = norm(ein.value,false)===norm(word,false);
-        var arOk = answers.some(function(a){return norm(a,true)===norm(ain.value,true);});
-        if(enOk && arOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! الإنجليزي والعربي صحيحين"; if(!done[i]){done[i]=1;correct++;} }
-        else{
-          fb.className="fb no";
-          fb.innerHTML = 'الإنجليزي: '+(enOk?'✅':'❌ <span class="corr">'+word+'</span>')+' · العربي: '+(arOk?'✅':'❌ <span class="corr">'+answers[0]+'</span>');
-        }
+        if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
+        else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
         tried[i]=1;
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         maybeSave();
