@@ -196,9 +196,9 @@ var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
   .then(function(m){ MANIFEST = m; MANI_DONE = true; })
   .catch(function(){ MANI_DONE = true; });
-function speak(text, rate, lang){
+function speak(text, rate, lang, onEnd){
   // ننتظر تحميل قائمة الصوت البشري قبل أي رجوع للصوت الآلي
-  if(!MANI_DONE){ MANI_P.then(function(){ speak(text, rate, lang); }); return; }
+  if(!MANI_DONE){ MANI_P.then(function(){ speak(text, rate, lang, onEnd); }); return; }
   var isAr = lang && lang.indexOf("ar")===0, lk = isAr ? "ar" : "en";
   var key = audioKey(text); // الصوت من نص بدون حركات (يُقرأ أصح)
   // صوت بشري جاهز إن وُجد
@@ -207,6 +207,7 @@ function speak(text, rate, lang){
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
       var a = new Audio("audio/" + MANIFEST[lk][key] + "?v=" + AUDIO_VER);
       a.playbackRate = Math.max(0.5, rate || 1);
+      if(onEnd){ a.addEventListener("ended", onEnd); }
       CUR_AUDIO = a; a.play(); return;
     }catch(e){}
   }
@@ -220,8 +221,9 @@ function speak(text, rate, lang){
     if(CHOSEN[lk]) v = cands.filter(function(x){return x.name===CHOSEN[lk];})[0];
     if(!v){ var good = cands.filter(function(x){return /(siri|enhanced|premium|natural|neural|eloquence|maged|majed|tarik|laila|samantha|daniel|karen|serena)/i.test(x.name);}); v = good[0] || cands[0]; }
     if(v) u.voice = v;
+    if(onEnd){ u.onend = onEnd; }
     speechSynthesis.speak(u);
-  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+  }catch(e){ if(onEnd){ onEnd(); } alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // التعرّف على الكلام غير موثوق على آيفون/آيباد (قيد من آبل) — نخفي زر النطق هناك
@@ -396,22 +398,34 @@ if(!META[who] || !DATA[who]){
       '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button></div>'+
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passage+'</div>'+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
-      '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>';
+      '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
+      '<div data-lock style="background:var(--bad-bg);border:1px solid var(--bad);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-weight:700;color:var(--bad);font-size:.92rem">🔒 استمع للقطعة كاملة أولًا (اضغط 🔊 استمع للنص) حتى تُفتح الأسئلة.</div>';
     questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" style="direction:'+dir+';text-align:'+ta+'">'+o+'</button>'; });
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+o+'</button>'; });
       html += '</div></div>';
     });
     html += '<div class="score" data-score>الفهم: 0 / '+questions.length+'</div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:12px">نصّ جديد 🔄</button>';
     sec.innerHTML = html;
-    sec.querySelector("[data-read]").addEventListener("click",function(){ speak(passage,1,ar?"ar-SA":"en-US"); });
+    var unlocked=false, lockEl=sec.querySelector("[data-lock]"), qButtons=sec.querySelectorAll(".q .opts button");
+    var readBtn=sec.querySelector("[data-read]");
+    function unlock(){
+      if(unlocked) return; unlocked=true;
+      qButtons.forEach(function(b){ b.disabled=false; });
+      if(lockEl){ lockEl.style.background="var(--good-bg)"; lockEl.style.borderColor="var(--good)"; lockEl.style.color="var(--good)"; lockEl.textContent="✅ تمّ الاستماع — تقدر تحلّ الأسئلة الآن."; }
+    }
+    readBtn.addEventListener("click",function(){
+      if(lockEl && !unlocked){ lockEl.textContent="🔊 يستمع الآن... الأسئلة تُفتح بعد نهاية القطعة."; }
+      speak(passage,1,ar?"ar-SA":"en-US", unlock);
+    });
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
         btn.addEventListener("click",function(){
+          if(!unlocked) return;
           if(ans[i]!=null) return; ans[i]=+btn.dataset.j;
           qEl.querySelectorAll(".opts button").forEach(function(b){b.disabled=true;});
           if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
