@@ -207,8 +207,8 @@ function speak(text, rate, lang, onEnd){
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
       var a = new Audio("audio/" + MANIFEST[lk][key] + "?v=" + AUDIO_VER);
       a.playbackRate = Math.max(0.5, rate || 1);
-      if(onEnd){ a.addEventListener("ended", onEnd); }
-      CUR_AUDIO = a; a.play(); return;
+      if(onEnd){ a.addEventListener("ended", onEnd); a.addEventListener("error", onEnd); }
+      CUR_AUDIO = a; var pr=a.play(); if(pr&&pr.catch){ pr.catch(function(){ if(onEnd) onEnd(); }); } return;
     }catch(e){}
   }
   // بديل: نطق المتصفح
