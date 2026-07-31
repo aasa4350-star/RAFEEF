@@ -64,12 +64,12 @@ var name = NAMES[who] || "الطالب";
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total){
+function saveScore(test, correct, total, wrongs){
   try{
     fetch(SUPA_URL+"/rest/v1/attempts", {
       method:"POST",
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
-      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]) } })
     });
   }catch(e){}
 }
@@ -326,12 +326,14 @@ app.innerHTML =
     '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
     '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>'+
     '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
+    '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'+
   '</div>'+
   '<section class="panel active" id="v"></section>'+
   '<section class="panel" id="q"></section>'+
   '<section class="panel" id="t"></section>'+
   '<section class="panel" id="s"></section>'+
+  '<section class="panel" id="rem"></section>'+
   '<section class="panel" id="o"></section>'+
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
@@ -359,7 +361,7 @@ function renderSet(id, items, intro, regen, label){
   html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>';
   if(regen) html += '<button class="reset">أسئلة جديدة 🔄</button>';
   sec.innerHTML = html;
-  var answered = {}, correct = 0, total = items.length;
+  var answered = {}, correct = 0, total = items.length, wrongs = [];
   var scoreEl = sec.querySelector("[data-score]");
   sec.querySelectorAll(".q").forEach(function(qEl){
     var i = +qEl.dataset.i, ans = items[i][2];
@@ -368,7 +370,7 @@ function renderSet(id, items, intro, regen, label){
         if(answered[i]) return; answered[i]=1;
         qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
         if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
-        else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+        else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); wrongs.push(items[i][0]); }
         qEl.querySelector(".explain").classList.add("show");
         scoreEl.textContent = correct+" / "+total;
         if(Object.keys(answered).length===total){ finish(false); }
@@ -395,7 +397,7 @@ function renderSet(id, items, intro, regen, label){
       scoreEl.textContent = correct+" / "+total;
     }
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
-    if(label) saveScore(label, correct, total);
+    if(label) saveScore(label, correct, total, wrongs);
   }
   sec._start = function(){
     if(started || !secsAll || ended) return; started = true;
@@ -438,6 +440,128 @@ buildAll();
     '<p class="intro" style="background:transparent;border:0;color:var(--muted)">ملاحظة: الأقسام الأخرى في هذي الصفحة تدريبية من إعداد المعلّم بنمط قياس، وهذي الروابط هي المصدر الرسمي.</p>';
 })();
 
+// ===== قسم علاجي — يشرح نقاط ضعف القدرات الكمي والتحصيلي وSTEP + فيديو + تدريب =====
+function pickBank(arr, rx){ var f = arr.filter(function(x){ return rx.test(x[0]+" "+(x[3]||"")); }); return (f.length?gp(f):gp(arr)).slice(); }
+var SKILLS = [
+  // ---- كمي ----
+  {group:"كمي", name:"النسبة المئوية والخصم والربح", rx:/%|مئوي|خصم|ربح|زاد سعر|نقص سعر|السعر/, yt:"شرح النسبة المئوية قدرات كمي",
+   lesson:"النسبة المئوية = (الجزء ÷ الكل) × 100. لإيجاد نسبة من عدد: (النسبة ÷ 100) × العدد. مثال: 20% من 50 = 10. الخصم: اطرح قيمة الخصم من السعر. الربح = سعر البيع − سعر الشراء.",
+   gen:function(){ return QUANT[gp([0,8,18,21,22])](); }},
+  {group:"كمي", name:"حل المعادلات", rx:/س \+|س −|قيمة س|معادلة/, yt:"حل المعادلات من الدرجة الأولى قدرات",
+   lesson:"لعزل «س» انقل الأعداد للطرف الآخر بعكس العملية. مثال: 3س + 5 = 20 ← 3س = 15 ← س = 5.",
+   gen:function(){ return QUANT[1](); }},
+  {group:"كمي", name:"النسب والتناسب والتقسيم", rx:/النسبة|تناسب|نصيب/, yt:"النسبة والتناسب قدرات كمي",
+   lesson:"النسبة أ:ب تعني لكل «أ» يقابلها «ب». أوجد قيمة الوحدة بقسمة الكل على مجموع الأجزاء. مثال: قسّم 30 بنسبة 2:3 ← الوحدة = 30÷5 = 6 ← 12 و18.",
+   gen:function(){ return QUANT[gp([2,20])](); }},
+  {group:"كمي", name:"الهندسة (مساحات ومحيطات وزوايا)", rx:/مساحة|محيط|مستطيل|مثلث|الوتر|دائرة|زاوية|قطر/, yt:"المساحات والمحيطات والزوايا قدرات",
+   lesson:"مساحة المستطيل = الطول × العرض، ومحيطه = 2×(الطول+العرض). مساحة المثلث = ½ × القاعدة × الارتفاع. فيثاغورس: الوتر² = الضلع1² + الضلع2². المتكاملتان مجموعهما 180°، المتتامتان 90°.",
+   gen:function(){ return QUANT[gp([4,5,6,13,14,15])](); }},
+  {group:"كمي", name:"المتوسط والوسيط", rx:/متوسط|الوسيط/, yt:"المتوسط الحسابي والوسيط قدرات",
+   lesson:"المتوسط = مجموع القيم ÷ عددها. الوسيط = القيمة الوسطى بعد ترتيب الأعداد.",
+   gen:function(){ return QUANT[gp([3,16])](); }},
+  {group:"كمي", name:"المتتابعات والأنماط", rx:/النمط|متتالية|أكمل|متتابع/, yt:"المتتابعات والأنماط العددية قدرات",
+   lesson:"اكتشف القاعدة (نجمع أو نضرب بمقدار ثابت) ثم طبّقها. مثال: 3، 6، 9، 12 ← نزيد 3 ← التالي 15.",
+   gen:function(){ return QUANT[gp([7,17])](); }},
+  {group:"كمي", name:"السرعة والزمن والأعمار", rx:/سرعة|كم\/ساعة|قطع|ينجز|عمر|أكبر من ابنه/, yt:"مسائل السرعة والزمن قدرات كمي",
+   lesson:"السرعة = المسافة ÷ الزمن. المعدل = المقدار ÷ الزمن. مسائل الأعمار: عبّر بالعلاقة بينهم ثم كوّن معادلة.",
+   gen:function(){ return QUANT[gp([9,10,11])](); }},
+  {group:"كمي", name:"الكسور من كمية والاحتمال", rx:/يساوي.*\/|احتمال|كسر/, yt:"الكسور والاحتمال قدرات كمي",
+   lesson:"كسر من كمية: (الكمية ÷ المقام) × البسط. مثال: 3/4 من 20 = 15. الاحتمال = عدد الحالات المطلوبة ÷ العدد الكلي.",
+   gen:function(){ return QUANT[gp([19,12])](); }},
+  // ---- تحصيلي ----
+  {group:"تحصيلي", name:"التحليل وفرق المربعين", rx:/حلّل|فرق مربعين/, yt:"تحليل فرق مربعين تحصيلي",
+   lesson:"فرق مربعين: أ² − ب² = (أ−ب)(أ+ب). مثال: س² − 9 = (س−3)(س+3).",
+   gen:function(){ return pickBank(TAHSILI,/حلّل/); }},
+  {group:"تحصيلي", name:"ميل المستقيم", rx:/ميل|المستقيم/, yt:"ميل المستقيم تحصيلي",
+   lesson:"ميل المستقيم y = mx + c هو m (معامل x). بين نقطتين: الميل = (فرق y) ÷ (فرق x).",
+   gen:function(){ return pickBank(TAHSILI,/ميل/); }},
+  {group:"تحصيلي", name:"الأسس والجذور", rx:/أس|²|³|√|قوة/, yt:"قوانين الأسس والجذور تحصيلي",
+   lesson:"عند الضرب نجمع الأسس: أ^م × أ^ن = أ^(م+ن). أي عدد (عدا الصفر) أُس صفر = 1. الجذر √ عكس التربيع.",
+   gen:function(){ return pickBank(TAHSILI,/أس|²|³|√/); }},
+  {group:"تحصيلي", name:"الفيزياء (تحضيري)", rx:/فيزياء|القوة|الطاقة|الضغط|السرعة/, yt:"أساسيات الفيزياء تحصيلي",
+   lesson:"السرعة = المسافة ÷ الزمن. القوة تُقاس بالنيوتن، والطاقة بالجول. الضغط = القوة ÷ المساحة.",
+   gen:function(){ return pickBank(TAHSILI,/فيزياء/); }},
+  {group:"تحصيلي", name:"الكيمياء (تحضيري)", rx:/كيمياء|عنصر|pH|ذرّة|الذرة|صيغة|أكسجين/, yt:"أساسيات الكيمياء تحصيلي",
+   lesson:"الذرة أصغر وحدة في العنصر. الماء H₂O، وملح الطعام NaCl. الرقم الهيدروجيني pH=7 متعادل، أقل منه حمضي، أكثر قاعدي.",
+   gen:function(){ return pickBank(TAHSILI,/كيمياء/); }},
+  {group:"تحصيلي", name:"الأحياء (تحضيري)", rx:/أحياء|خلية|DNA|الجهاز|البناء الضوئي|الثغور/, yt:"أساسيات الأحياء تحصيلي",
+   lesson:"الخلية وحدة بناء الكائن الحي. البناء الضوئي هو صنع الغذاء في النبات. الحمض النووي DNA يحمل الصفات الوراثية.",
+   gen:function(){ return pickBank(TAHSILI,/أحياء/); }},
+  // ---- STEP ----
+  {group:"STEP", name:"القواعد والأزمنة (Grammar)", rx:/Grammar/, yt:"STEP English grammar tenses شرح",
+   lesson:"راجع الأزمنة: المضارع/الماضي/التام. «since» مع نقطة زمنية و«for» مع مدة. الماضي التام had + p.p. المبني للمجهول be + p.p.",
+   gen:function(){ return pickBank(STEP,/Grammar/); }},
+  {group:"STEP", name:"المفردات (Vocabulary)", rx:/Vocabulary|synonym|opposite/, yt:"STEP vocabulary synonyms antonyms",
+   lesson:"احفظ المرادفات والأضداد الشائعة. synonym = مرادف، وopposite/antonym = ضدّ. اقرأ كثيرًا لتوسيع حصيلتك.",
+   gen:function(){ return pickBank(STEP,/Vocabulary/); }},
+  {group:"STEP", name:"الأخطاء والاستيعاب (Error & Reading)", rx:/Error|Reading/, yt:"STEP reading comprehension error شرح",
+   lesson:"في الاستيعاب: اقرأ السؤال أولًا ثم ابحث عن الفكرة الرئيسة. في الخطأ النحوي: تأكّد من تطابق الفعل مع الفاعل والزمن.",
+   gen:function(){ return pickBank(STEP,/Error|Reading/); }}
+];
+
+function skillItems(s, n){ var out=[], seen={}, t=0; n=n||3; while(out.length<n && t<40){ var q; try{ q=s.gen(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+function renderMini(box, items){
+  items = items.map(shuffleQ);
+  var h="";
+  items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem">'+q[0]+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'">'+o+'</button>'; }); h+='</div><div class="explain">'+q[3]+'</div></div>'; });
+  box.innerHTML=h;
+  box.querySelectorAll(".q").forEach(function(qEl){ var i=+qEl.dataset.i, ans=items[i][2];
+    qEl.querySelectorAll(".opts button").forEach(function(btn){ btn.addEventListener("click",function(){
+      if(qEl.dataset.done) return; qEl.dataset.done=1;
+      qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+      if(+btn.dataset.j===ans){ btn.classList.add("correct"); } else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+      qEl.querySelector(".explain").classList.add("show");
+    }); });
+  });
+}
+function lessonCard(s, count, open){
+  var idx = SKILLS.indexOf(s);
+  var badge = count>0 ? ' <span style="color:#dc2626;font-weight:800">(ضعف: '+count+')</span>' : '';
+  var yt = 'https://www.youtube.com/results?search_query='+encodeURIComponent(s.yt);
+  return '<details '+(open?'open':'')+' style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
+    '<summary style="font-weight:800;cursor:pointer;padding:8px 0">🎬 '+s.name+badge+'</summary>'+
+    '<div style="padding:4px 0 12px">'+
+      '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9">'+s.lesson+'</div>'+
+      '<div style="margin-top:10px"><a href="'+yt+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>'+
+      '<button data-practice="'+idx+'" style="margin-top:10px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:9px 15px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit">✏️ تدرّب (3 أسئلة)</button>'+
+      '<div data-mini style="margin-top:8px"></div>'+
+    '</div></details>';
+}
+var REM_DONE=false;
+async function renderRemedial(){
+  var sec = document.getElementById("rem");
+  sec.innerHTML = '<div class="intro">⏳ نحلّل نتائجك من آخر اختبارات القدرات والتحصيلي وSTEP...</div>';
+  var wrongs=[];
+  try{
+    var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+"&order=created_at.desc&limit=30",
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
+    var rows = await r.json();
+    (Array.isArray(rows)?rows:[]).forEach(function(x){ if(x.meta && x.meta.kind==="practice" && Array.isArray(x.meta.wrong)) x.meta.wrong.forEach(function(w){ wrongs.push(w); }); });
+  }catch(e){}
+  var counts={};
+  wrongs.forEach(function(w){ for(var i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(w)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
+  var top = SKILLS.filter(function(s){ return counts[s.name]; }).sort(function(a,b){ return counts[b.name]-counts[a.name]; }).slice(0,4);
+  var html='';
+  if(top.length){
+    html += '<div class="intro">🎯 <b>نقاط ضعفك الآن</b> (من آخر اختباراتك) — لما تتقن المهارة وتجاوبها صح، تختفي تلقائيًا:</div>';
+    top.forEach(function(s){ html += lessonCard(s, counts[s.name], true); });
+  } else {
+    html += '<div class="intro">🎉 ما عندك أخطاء مسجّلة بعد! اختبر في «كمي / تحصيلي / STEP» ويرجع هنا يحلّل ضعفك تلقائيًا. وتحت هذا كل الدروس للمراجعة.</div>';
+  }
+  [["كمي","🔢 مكتبة الشرح — القدرات الكمي"],["تحصيلي","🧪 مكتبة الشرح — التحصيلي"],["STEP","🌍 مكتبة الشرح — STEP إنجليزي"]].forEach(function(g){
+    html += '<div class="intro" style="margin-top:14px"><b>'+g[1]+'</b></div>';
+    SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ html += lessonCard(s, counts[s.name]||0, false); });
+  });
+  sec.innerHTML = html;
+  sec.querySelectorAll("[data-practice]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var box = btn.parentNode.querySelector("[data-mini]");
+      renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3));
+      btn.textContent = "أسئلة أخرى 🔄";
+    });
+  });
+}
+
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.addEventListener("click", function(){
     document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
@@ -445,6 +569,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
     var pan = document.getElementById(b.dataset.tab);
     pan.classList.add("active");
+    if(b.dataset.tab==="rem"){ renderRemedial(); }
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
