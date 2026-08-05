@@ -60,6 +60,7 @@ var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
 var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي"};
 var name = NAMES[who] || "الطالب";
+var YOUNG = (who==="saud" || who==="osama"); // الصغار: لفظي + STEP فقط (بدون كمي/تحصيلي)
 
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
@@ -323,15 +324,15 @@ app.innerHTML =
   '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>'+
   '<div class="tabs" role="tablist">'+
     '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
-    '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
-    '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>'+
+    (YOUNG ? '' : '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
+    '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>')+
     '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
     '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'+
   '</div>'+
   '<section class="panel active" id="v"></section>'+
-  '<section class="panel" id="q"></section>'+
-  '<section class="panel" id="t"></section>'+
+  (YOUNG ? '' : '<section class="panel" id="q"></section>'+
+  '<section class="panel" id="t"></section>')+
   '<section class="panel" id="s"></section>'+
   '<section class="panel" id="rem"></section>'+
   '<section class="panel" id="o"></section>'+
@@ -416,8 +417,10 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
   renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال · 13 دقيقة"+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
-  renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
-  renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+  if(!YOUNG){
+    renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
+    renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+  }
   renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
 }
 document.getElementById("timedToggle").addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
@@ -555,7 +558,8 @@ async function renderRemedial(){
   }
   // مكتبة كل الدروس — مطويّة، لا تظهر تلقائيًا (اختيارية للمراجعة)
   var lib='';
-  [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]].forEach(function(g){
+  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]];
+  groups.forEach(function(g){
     lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
     SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });
   });
