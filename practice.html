@@ -527,31 +527,39 @@ function lessonCard(s, count, open){
       '<div data-mini style="margin-top:8px"></div>'+
     '</div></details>';
 }
-var REM_DONE=false;
 async function renderRemedial(){
   var sec = document.getElementById("rem");
   sec.innerHTML = '<div class="intro">⏳ نحلّل نتائجك من آخر اختبارات القدرات والتحصيلي وSTEP...</div>';
-  var wrongs=[];
+  var rows=[];
   try{
-    var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+"&order=created_at.desc&limit=30",
+    var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+"&order=created_at.desc&limit=40",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-    var rows = await r.json();
-    (Array.isArray(rows)?rows:[]).forEach(function(x){ if(x.meta && x.meta.kind==="practice" && Array.isArray(x.meta.wrong)) x.meta.wrong.forEach(function(w){ wrongs.push(w); }); });
+    rows = await r.json(); if(!Array.isArray(rows)) rows=[];
   }catch(e){}
+  // نأخذ آخر محاولتين فقط لكل اختبار (كمي/تحصيلي/STEP) — فالمهارة اللي يجاوبها صح لاحقًا تختفي تلقائيًا
+  var practice = rows.filter(function(x){ return x.meta && x.meta.kind==="practice" && Array.isArray(x.meta.wrong); });
+  var byTest={}, wrongs=[];
+  practice.forEach(function(x){ var t=x.meta.test||"?"; if(!byTest[t]) byTest[t]=0; if(byTest[t]<2){ byTest[t]++; (x.meta.wrong||[]).forEach(function(w){ wrongs.push(w); }); } });
   var counts={};
   wrongs.forEach(function(w){ for(var i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(w)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
-  var top = SKILLS.filter(function(s){ return counts[s.name]; }).sort(function(a,b){ return counts[b.name]-counts[a.name]; }).slice(0,4);
+  var weak = SKILLS.filter(function(s){ return counts[s.name]; }).sort(function(a,b){ return counts[b.name]-counts[a.name]; });
+
   var html='';
-  if(top.length){
-    html += '<div class="intro">🎯 <b>نقاط ضعفك الآن</b> (من آخر اختباراتك) — لما تتقن المهارة وتجاوبها صح، تختفي تلقائيًا:</div>';
-    top.forEach(function(s){ html += lessonCard(s, counts[s.name], true); });
+  if(weak.length){
+    html += '<div class="intro">🎯 <b>نقاط ضعفك الحالية فقط</b> (من آخر اختباراتك). <b>لما تجاوب المهارة صح في اختباراتك الجاية تختفي من هنا تلقائيًا ✅</b></div>';
+    weak.forEach(function(s){ html += lessonCard(s, counts[s.name], true); });
+  } else if(practice.length){
+    html += '<div class="intro">🎉 ما شاء الله! ما عندك ضعف حاليًا في القدرات/التحصيلي/STEP — جاوبت آخر اختباراتك صح. استمر 💪 (لو غلطت بأي مهارة لاحقًا تظهر لك هنا تلقائيًا مع الشرح والفيديو).</div>';
   } else {
-    html += '<div class="intro">🎉 ما عندك أخطاء مسجّلة بعد! اختبر في «كمي / تحصيلي / STEP» ويرجع هنا يحلّل ضعفك تلقائيًا. وتحت هذا كل الدروس للمراجعة.</div>';
+    html += '<div class="intro">لسّا ما اختبرت في «كمي / تحصيلي / STEP». اختبر فيها، ويرجع هنا يعرض لك <b>نقاط ضعفك فقط</b> مع الشرح والفيديو والتمارين.</div>';
   }
-  [["كمي","🔢 مكتبة الشرح — القدرات الكمي"],["تحصيلي","🧪 مكتبة الشرح — التحصيلي"],["STEP","🌍 مكتبة الشرح — STEP إنجليزي"]].forEach(function(g){
-    html += '<div class="intro" style="margin-top:14px"><b>'+g[1]+'</b></div>';
-    SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ html += lessonCard(s, counts[s.name]||0, false); });
+  // مكتبة كل الدروس — مطويّة، لا تظهر تلقائيًا (اختيارية للمراجعة)
+  var lib='';
+  [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]].forEach(function(g){
+    lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
+    SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });
   });
+  html += '<details style="margin-top:18px"><summary style="cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0">📚 تصفّح كل الدروس (اختياري — للمراجعة العامة)</summary><div style="margin-top:8px">'+lib+'</div></details>';
   sec.innerHTML = html;
   sec.querySelectorAll("[data-practice]").forEach(function(btn){
     btn.addEventListener("click", function(){
