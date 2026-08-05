@@ -1,5 +1,391 @@
 [
     {
+        "id": "3f311507-962e-4c70-a356-9400239dc852",
+        "created_at": "2026-08-05T02:01:31.589769+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "total": 10,
+            "correct": 10
+        }
+    },
+    {
+        "id": "e6d6ba9d-9be7-4fa3-bb2c-3db2ae9d9d16",
+        "created_at": "2026-08-04T21:21:09.998302+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "total": 5,
+            "correct": 5
+        }
+    },
+    {
+        "id": "694b490a-3d28-495c-a6fe-f5f244366962",
+        "created_at": "2026-08-04T21:18:13.645081+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
+            "total": 3,
+            "correct": 3
+        }
+    },
+    {
+        "id": "2caa0c88-ee2c-44a2-8526-23961d2ed57b",
+        "created_at": "2026-08-04T21:17:26.429871+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
+            "total": 8,
+            "correct": 8
+        }
+    },
+    {
+        "id": "9e2243c5-417e-4b01-8faa-3998e7f962c4",
+        "created_at": "2026-08-04T21:13:51.792406+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 9,
+        "en_total": 10,
+        "ma_correct": 9,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "The opposite of \"cheap\" is:",
+                "picked": "fast",
+                "correct": "expensive",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 46 + 39",
+                "picked": "75",
+                "correct": "85",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 1.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.2,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 4.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.1,
+                    "ok": false
+                }
+            ],
+            "avg_sec": 3.1,
+            "total_sec": 55
+        }
+    },
+    {
+        "id": "91ed7b43-177f-42af-914b-a614feb193bd",
+        "created_at": "2026-08-04T21:12:39.750144+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 9,
+        "en_total": 10,
+        "ma_correct": 6,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "The opposite of \"cheap\" is:",
+                "picked": "fast",
+                "correct": "expensive",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 22 \u00d7 13",
+                "picked": "276",
+                "correct": "286",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 156 \u00f7 6",
+                "picked": "24",
+                "correct": "26",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 156 \u00f7 12",
+                "picked": "12",
+                "correct": "13",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %40 \u0645\u0646 150\u061f",
+                "picked": "50",
+                "correct": "60",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 5.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.8,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.3,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 6.7,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.2,
+                    "ok": false
+                }
+            ],
+            "avg_sec": 3.6,
+            "total_sec": 64
+        }
+    },
+    {
         "id": "0851e795-345c-4fd5-8ce8-7ee44eb6997f",
         "created_at": "2026-08-04T17:04:40.676333+00:00",
         "student": "\u0631\u0641\u064a\u0641",
