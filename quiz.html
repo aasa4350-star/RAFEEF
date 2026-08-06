@@ -1182,7 +1182,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s18";
+var AUDIO_VER = "s19";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1726,13 +1726,13 @@ if(!STUDENTS[who]){
     {name:"الأعداد السالبة", rx:/−\d|احسب:\s*−/, yt:"شرح الأعداد السالبة رياضيات",
      lesson:`<p>خط الأعداد: الجمع تقدّم يمين، الطرح رجوع يسار. −6+10=4. سالب×موجب=سالب.</p>`,
      gen:function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[a+b,-(a+b),-a-b]);return ["احسب: −"+a+" + "+b,o[0],o[1],"من −"+a+" نتقدّم "+b+" → "+s+".","ma"];}},
-    {name:"الجموع الشاذة", rx:/plural/i, yt:"شرح الجموع الشاذة انجليزي",
+    {name:"الجموع الشاذة", rx:/plural/i, yt:"عرفات القزعة شرح الجموع الشاذة انجليزي",
      lesson:`<p><span class="ltr">man→men · child→children · foot→feet · leaf→leaves · woman→women</span></p>`, gen:ePluralAdv},
-    {name:"الأضداد", rx:/opposite/i, yt:"شرح الأضداد opposites انجليزي",
+    {name:"الأضداد", rx:/opposite/i, yt:"عرفات القزعة شرح الأضداد opposites انجليزي",
      lesson:`<p><span class="ltr">big↔small · hot↔cold · easy↔difficult · cheap↔expensive · ancient↔modern</span></p>`, gen:eOpp},
-    {name:"المقارنة والتفضيل", rx:/than|comparative/i, yt:"شرح المقارنة والتفضيل comparative انجليزي",
+    {name:"المقارنة والتفضيل", rx:/than|comparative/i, yt:"عرفات القزعة شرح المقارنة والتفضيل comparative انجليزي",
      lesson:`<p><span class="ltr">taller than · the tallest · more famous than · the most famous</span></p>`, gen:eComp},
-    {name:"الأزمنة", rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i, yt:"شرح الأزمنة في اللغة الانجليزية",
+    {name:"الأزمنة", rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i, yt:"عرفات القزعة شرح الأزمنة في اللغة الانجليزية",
      lesson:`<p><span class="ltr">Past: went · Present perfect: has done · Past continuous: was playing</span></p>`, gen:ePast}
   ];
 
