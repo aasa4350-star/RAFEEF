@@ -1182,7 +1182,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s17";
+var AUDIO_VER = "s18";
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -1451,7 +1451,7 @@ if(!STUDENTS[who]){
       quiz = DATA[id].quiz.slice();
     }
     const d = { review: DATA[id].review, quiz: quiz };
-    RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null};
+    RESULTS[id] = {correct:0, total:d.quiz.length, wrong:[], done:0, events:[], lastTs:null, items:d.quiz, chosen:{}};
     let html = `<div class="block-title"><span class="dot"></span> المراجعة السريعة</div><div class="review">`;
     d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
     html += `</div><div class="block-title"><span class="dot"></span> الاختبار</div>`;
@@ -1473,6 +1473,7 @@ if(!STUDENTS[who]){
         btn.addEventListener("click",()=>{
           if(answered.has(i)) return; answered.add(i);
           const j = +btn.dataset.j;
+          RESULTS[id].chosen[i] = j;
           const now = Date.now();
           const dt = RESULTS[id].lastTs ? (now - RESULTS[id].lastTs)/1000 : null;
           RESULTS[id].lastTs = now;
@@ -1541,12 +1542,19 @@ if(!STUDENTS[who]){
       const dts = per.map(p=>p.dt).filter(x=>x!=null);
       const avg = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)/dts.length*10)/10 : null;
       const total = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)) : null;
+      const buildPaper = (R)=> (R.items||[]).map((q,i)=>{
+        const ch = R.chosen[i];
+        return { q:q[0], opts:q[1], chosen:(ch==null?-1:ch), correct:q[2] };
+      });
       saveResult({
         student: S.name, grade: S.grade,
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
-        meta: { per, avg_sec: avg, total_sec: total }
+        meta: { per, avg_sec: avg, total_sec: total,
+          paper: { date: new Date().toISOString(),
+            en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
+            en: buildPaper(en), ma: buildPaper(ma) } }
       });
     }
   }

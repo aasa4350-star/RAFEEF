@@ -231,6 +231,37 @@ async function main(){
       </tr>`;
     });
     html+=`</tbody></table></div>`;
+
+    // 📄 آخر نموذجين محلولين (بالأسئلة والأجوبة والدرجة) — محفوظة لا تنحذف
+    const papers = rows.filter(r=> r.meta && r.meta.paper).slice(0,2);
+    if(papers.length){
+      html+=`<div class="sec-title"><span class="dot"></span> 📄 آخر نموذجين محلولين (بالأسئلة والأجوبة)</div>`;
+      papers.forEach((r,pi)=>{
+        const P=r.meta.paper;
+        const tot=(P.en_correct+P.ma_correct), all=(P.en_total+P.ma_total), pc=pct(tot,all);
+        const secHtml=(title,arr,ltr)=>{
+          if(!arr||!arr.length) return "";
+          let h=`<div style="font-weight:800;margin:12px 0 6px">${title}</div>`;
+          arr.forEach((it,idx)=>{
+            h+=`<div style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px">
+              <div style="font-weight:700;margin-bottom:6px"${ltr?' dir="ltr"':''}>${idx+1}. ${it.q}</div>`;
+            (it.opts||[]).forEach((o,j)=>{
+              let bg="transparent",bd="var(--line)",cl="var(--ink)",tag="";
+              if(j===it.correct){ bg="var(--good-bg)";bd="var(--good)";cl="var(--good)";tag=" ✅"; }
+              if(j===it.chosen && it.chosen!==it.correct){ bg="var(--bad-bg)";bd="var(--bad)";cl="var(--bad)";tag=" ❌ (اختياره)"; }
+              h+=`<div style="border:1px solid ${bd};background:${bg};color:${cl};border-radius:8px;padding:6px 10px;margin:4px 0;font-size:.9rem"${ltr?' dir="ltr"':''}>${o}${tag}</div>`;
+            });
+            if(it.chosen===-1) h+=`<div style="color:var(--muted);font-size:.82rem;margin-top:4px">لم يُجب على هذا السؤال</div>`;
+            h+=`</div>`;
+          });
+          return h;
+        };
+        html+=`<details ${pi===0?'open':''} class="card" style="margin-bottom:12px">
+          <summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج ${saTime(r.created_at)} — النتيجة ${tot}/${all} (${pc}%) · إنجليزي ${P.en_correct}/${P.en_total} · رياضيات ${P.ma_correct}/${P.ma_total}</summary>
+          <div style="margin-top:8px">${secHtml("الإنجليزي",P.en,true)}${secHtml("الرياضيات",P.ma,false)}</div>
+        </details>`;
+      });
+    }
   }
 
   html+=`<div class="sec-title"><span class="dot"></span> توصيات المعلّم 📌</div>`;
