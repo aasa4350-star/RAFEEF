@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>لغتي — الصف الرابع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:120px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:200px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+// حفظ النتيجة في التقرير
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST",
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function opt(correct, others){ var o=[correct].concat(others); shuffle(o); return [o, o.indexOf(correct)]; }
+
+// ================= الوحدة الأولى: صحتي وبيئتي =================
+// كل مولّد يرجع [نص السؤال، الخيارات، رقم الصحيح، الشرح]
+
+// ---- النحو ----
+var WT = [ // [كلمة، نوعها]
+  ["كتاب","اسم"],["مدرسة","اسم"],["شجرة","اسم"],["بيئة","اسم"],["فراشة","اسم"],["صحّة","اسم"],["ماء","اسم"],["طالب","اسم"],["حديقة","اسم"],["هواء","اسم"],
+  ["يزرعُ","فعل"],["كتبَ","فعل"],["يحافظُ","فعل"],["نظّفَ","فعل"],["يشربُ","فعل"],["ذهبَ","فعل"],["اقرأْ","فعل"],["ينمو","فعل"],["ساعدَ","فعل"],
+  ["في","حرف"],["من","حرف"],["إلى","حرف"],["على","حرف"],["عن","حرف"],["هل","حرف"]
+];
+function gWordType(){ var p=gp(WT); var o=opt(p[1], ["اسم","فعل","حرف"].filter(function(x){return x!==p[1];})); return ["ما نوع كلمة «"+p[0]+"»؟", o[0], o[1], "«"+p[0]+"» "+p[1]+"."]; }
+
+var NS = [ // جملة اسمية [الجملة، المبتدأ، الخبر]
+  ["الحديقةُ جميلةٌ","الحديقةُ","جميلةٌ"],["البيئةُ نظيفةٌ","البيئةُ","نظيفةٌ"],["الشجرةُ مثمرةٌ","الشجرةُ","مثمرةٌ"],
+  ["الماءُ نافعٌ","الماءُ","نافعٌ"],["الطالبُ مجتهدٌ","الطالبُ","مجتهدٌ"],["الفراشةُ ملوّنةٌ","الفراشةُ","ملوّنةٌ"],
+  ["الهواءُ نقيٌّ","الهواءُ","نقيٌّ"],["الصحّةُ تاجٌ","الصحّةُ","تاجٌ"]
+];
+function gMubtada(){ var p=gp(NS); var o=opt(p[1], [p[2],"الجملة"]); return ["ما المبتدأ في: «"+p[0]+"»؟", o[0], o[1], "المبتدأ اسم في أول الجملة نتحدّث عنه: "+p[1]+"."]; }
+function gKhabar(){ var p=gp(NS); var o=opt(p[2], [p[1],"جملة"]); return ["ما الخبر في: «"+p[0]+"»؟", o[0], o[1], "الخبر يخبرنا عن المبتدأ: "+p[2]+"."]; }
+
+var JR = [ // [جملة بها فراغ، حرف الجر الصحيح، مشتت1، مشتت2]
+  ["ذهبتُ ___ المدرسةِ","إلى","من","على"],["الكتابُ ___ الحقيبةِ","في","إلى","عن"],["حافظتُ ___ البيئةِ","على","من","إلى"],
+  ["شربتُ ___ الكأسِ","من","في","على"],["الطائرُ ___ الشجرةِ","على","من","إلى"],["رجعتُ ___ الرحلةِ","من","إلى","في"],
+  ["نبتعدُ ___ التلوّثِ","عن","في","على"],["جلستُ ___ الكرسيِّ","على","من","عن"]
+];
+function gJarr(){ var p=gp(JR); var o=opt(p[1], [p[2],p[3]]); return ["اختر حرف الجرّ المناسب: «"+p[0]+"»", o[0], o[1], "الصحيح: "+p[0].replace("___","«"+p[1]+"»")+"."]; }
+
+var FV = [ // [فعل، نوعه]
+  ["كتبَ","ماضٍ"],["زرعَ","ماضٍ"],["ذهبَ","ماضٍ"],["شربَ","ماضٍ"],["حافظَ","ماضٍ"],["قرأَ","ماضٍ"],["ساعدَ","ماضٍ"],
+  ["يكتبُ","مضارع"],["يزرعُ","مضارع"],["يشربُ","مضارع"],["يحافظُ","مضارع"],["يلعبُ","مضارع"],["يقرأُ","مضارع"],["يحمي","مضارع"],
+  ["اكتبْ","أمر"],["ازرعْ","أمر"],["احفظْ","أمر"],["نظّفْ","أمر"],["اشربْ","أمر"],["ساعدْ","أمر"],["اقرأْ","أمر"]
+];
+function gFilType(){ var p=gp(FV); var o=opt(p[1], ["ماضٍ","مضارع","أمر"].filter(function(x){return x!==p[1];})); return ["ما نوع الفعل «"+p[0]+"»؟", o[0], o[1], "«"+p[0]+"» فعل "+p[1]+"."]; }
+
+var FM = [ // [جملة فعلية، الفاعل، المفعول به، الفعل]
+  ["كتبَ الطالبُ الدرسَ","الطالبُ","الدرسَ","كتبَ"],["زرعَ الفلاحُ الشجرةَ","الفلاحُ","الشجرةَ","زرعَ"],
+  ["شربَ الطفلُ الماءَ","الطفلُ","الماءَ","شربَ"],["نظّفتِ البنتُ الحديقةَ","البنتُ","الحديقةَ","نظّفتِ"],
+  ["قطفَ محمدٌ الوردةَ","محمدٌ","الوردةَ","قطفَ"],["قرأَ خالدٌ القصّةَ","خالدٌ","القصّةَ","قرأَ"]
+];
+function gFail(){ var p=gp(FM); var o=opt(p[1], [p[2],p[3]]); return ["من الفاعل في: «"+p[0]+"»؟", o[0], o[1], "الفاعل مَن قام بالفعل: "+p[1]+"."]; }
+function gMafool(){ var p=gp(FM); var o=opt(p[2], [p[1],p[3]]); return ["ما المفعول به في: «"+p[0]+"»؟", o[0], o[1], "المفعول به وقع عليه الفعل: "+p[2]+"."]; }
+
+// ---- الإملاء ----
+var HZ = [ // [كلمة، نوع الهمزة]
+  ["أكل","قطع"],["إنسان","قطع"],["أشجار","قطع"],["أمانة","قطع"],["أحمد","قطع"],["إبراهيم","قطع"],["أخذ","قطع"],
+  ["ابن","وصل"],["اسم","وصل"],["اثنان","وصل"],["استمع","وصل"],["انطلق","وصل"],["الحديقة","وصل"],["اكتب","وصل"]
+];
+function gHamza(){ var p=gp(HZ); var o=opt(p[1], [p[1]==="قطع"?"وصل":"قطع"]); return ["همزة كلمة «"+p[0]+"» همزة:", o[0], o[1], "«"+p[0]+"» همزتها همزة "+p[1]+"."]; }
+
+var MT = [ // الهمزة المتطرفة [الصحيح، خطأ1، خطأ2]
+  ["الماء","الماْ","الما"],["السماء","السماْ","السما"],["الهدوء","الهدوْ","الهدو"],
+  ["الدواء","الدواْ","الدوا"],["الغذاء","الغذاْ","الغذا"],["دفء","دفئ","دف"],["شيء","شيئ","شي"]
+];
+function gMutatarrifa(){ var p=gp(MT); var o=opt(p[0], [p[1],p[2]]); return ["اختر الكتابة الصحيحة:", o[0], o[1], "الصحيح: «"+p[0]+"»."]; }
+
+var TA = [ // [كلمة ناقصة، التاء الصحيحة، الأخرى]
+  ["شجر_","ة","ت"],["حديق_","ة","ت"],["فراش_","ة","ت"],["صحّ_","ة","ت"],["ورد_","ة","ت"],["بيئ_","ة","ت"],
+  ["بن_","ت","ة"],["أخ_","ت","ة"],["نبا_","ت","ة"],["وق_","ت","ة"],["بي_","ت","ة"]
+];
+function gTa(){ var p=gp(TA); var o=opt(p[1], [p[2]]); return ["أكمل بالتاء الصحيحة: «"+p[0]+"»", o[0], o[1], "الصحيح: «"+p[0].replace("_",p[1])+"» — "+(p[1]==="ة"?"تاء مربوطة":"تاء مفتوحة")+"."]; }
+
+var HA = [ // حذف الألف [الصحيح، الخطأ]
+  ["هذا","هاذا"],["هذه","هاذه"],["ذلك","ذالك"],["لكن","لاكن"],["الله","اللاه"],["الرحمن","الرحمان"],["هؤلاء","هاؤلاء"],["أولئك","أولائك"],["طه","طاه"]
+];
+function gHadhf(){ var p=gp(HA); var o=opt(p[0], [p[1]]); return ["اختر الكلمة المكتوبة بشكل صحيح:", o[0], o[1], "«"+p[0]+"» تُكتب بحذف الألف من وسطها."]; }
+
+// ---- الفهم والمفردات (موضوع البيئة) ----
+var FH = [
+  ["ما معنى «التصحّر»؟",["تحوّل الأرض الخصبة إلى صحراء","هطول الأمطار","زراعة الأشجار"],0,"التصحّر: تحوّل الأرض إلى صحراء بسبب قطع الأشجار والجفاف."],
+  ["ماذا نفعل للحفاظ على البيئة؟",["نزرع الأشجار","نرمي النفايات في الشارع","نقطع الغابات"],0,"زراعة الأشجار تحمي البيئة."],
+  ["ضدّ كلمة «نظيف»:",["ملوَّث","جميل","كبير"],0,"ضدّ نظيف: ملوَّث."],
+  ["الفراشة حشرة:",["جميلة الألوان","مفترسة","ضارّة"],0,"الفراشة حشرة جميلة الألوان تنقل حبوب اللقاح."],
+  ["من أسباب تلوّث البيئة:",["رمي النفايات وعوادم المصانع","زراعة الأشجار","ترشيد الماء"],0,"النفايات والعوادم تلوّث البيئة."],
+  ["من فوائد الأشجار:",["تنقّي الهواء","تلوّث الجوّ","تجفّف الماء"],0,"الأشجار تنقّي الهواء وتعطي الظلّ والثمر."],
+  ["مرادف «يحافظ»:",["يصون ويحمي","يهمل","يتلف"],0,"يحافظ = يصون ويحمي."],
+  ["الصحّة السليمة تكون بـ:",["الغذاء والرياضة والنظافة","السهر","كثرة الحلويات"],0,"الصحة بالغذاء الجيد والرياضة والنظافة."]
+];
+function gFahm(){ var p=gp(FH); var o=opt(p[1][p[2]], p[1].filter(function(_,k){return k!==p[2];})); return [p[0], o[0], o[1], p[3]]; }
+
+var NAHW = [gWordType, gMubtada, gKhabar, gJarr, gFilType, gFail, gMafool];
+var IMLA = [gHamza, gMutatarrifa, gTa, gHadhf];
+var FAHM = [gFahm];
+var ALL  = NAHW.concat(IMLA).concat(FAHM);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · لغتي الجميلة</p><h1>📗 لغتي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a><a href="index.html">📊 اللوحة</a></div>'+
+    '<div class="unit">📘 الوحدة الأولى: <b>صحتي وبيئتي</b> — نحو وإملاء وفهم (مطابقة لكتاب لغتي)</div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="all" aria-selected="true">اختبار الوحدة 📝</button>'+
+      '<button data-tab="nahw" aria-selected="false">النحو ✍️</button>'+
+      '<button data-tab="imla" aria-selected="false">الإملاء 📖</button>'+
+      '<button data-tab="fahm" aria-selected="false">فهم ومفردات 🌿</button>'+
+    '</div>'+
+    '<section class="panel active" id="all"></section>'+
+    '<section class="panel" id="nahw"></section>'+
+    '<section class="panel" id="imla"></section>'+
+    '<section class="panel" id="fahm"></section>'+
+    '<footer>لغتي الصف الرابع · الوحدة الأولى «صحتي وبيئتي» · من إعداد المعلّم بمطابقة الكتاب</footer>';
+
+  var CFG = {
+    all:  {gens:ALL,  n:15, intro:"اختبار شامل على الوحدة: نحو + إملاء + فهم — <b>أسئلة جديدة كل مرة</b>.", label:"لغتي و١ — الوحدة"},
+    nahw: {gens:NAHW, n:10, intro:"النحو: أنواع الكلمة، المبتدأ والخبر، حروف الجر، أنواع الفعل، الفاعل، المفعول به.", label:"لغتي و١ — نحو"},
+    imla: {gens:IMLA, n:10, intro:"الإملاء: همزتا القطع والوصل، الهمزة المتطرفة، التاء المربوطة والمفتوحة، حذف الألف.", label:"لغتي و١ — إملاء"},
+    fahm: {gens:FAHM, n:8,  intro:"الفهم والمفردات من موضوع البيئة (التصحّر، الأشجار، الفراشة، الصحة).", label:"لغتي و١ — فهم"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+  render("all");
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; document.getElementById(id).classList.add("active");
+      if(!document.getElementById(id).innerHTML) render(id);
+    });
+  });
+}
+</script>
+</body>
+</html>
