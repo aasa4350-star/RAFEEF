@@ -12,11 +12,12 @@
   :root{
     --accent:#059669; --accent-deep:#047857;
     --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
-    --line:#e4e9ee;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --warn:#b45309; --bad:#b91c1c; --bad-bg:#fdecec;
     --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
   }
   @media (prefers-color-scheme:dark){
     :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--warn:#fbbf24;--bad:#f87171;--bad-bg:#3a1616;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
   }
   *{box-sizing:border-box}
@@ -26,6 +27,8 @@
   header.top .eyebrow{font-size:.85rem;opacity:.92;margin:0 0 6px}
   header.top h1{margin:0;font-size:1.7rem;font-weight:800}
   header.top p.sub{margin:8px 0 0;font-size:.9rem;opacity:.9}
+  header.top .big{margin-top:12px;font-size:2.3rem;font-weight:800;font-variant-numeric:tabular-nums}
+  header.top .big small{font-size:.95rem;font-weight:600;opacity:.9}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
   a.tile{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);
     border-radius:18px;padding:22px 14px;box-shadow:var(--shadow);text-align:center;
@@ -39,11 +42,39 @@
   a.tile.wide .ico{font-size:1.8rem}
   a.tile.hero{grid-column:1 / -1;background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border:0}
   a.tile.hero .desc{color:rgba(255,255,255,.85)}
+  /* التقرير */
+  .sec-title{display:flex;align-items:center;gap:9px;margin:26px 4px 12px;font-size:1.05rem;font-weight:800}
+  .sec-title .dot{width:11px;height:11px;border-radius:50%;background:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat .lbl{color:var(--muted);font-size:.85rem;margin-bottom:4px}
+  .stat .val{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .trend{display:flex;align-items:flex-end;gap:8px;height:90px;margin-top:6px}
+  .trend .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end}
+  .trend .bxr{width:100%;max-width:42px;border-radius:8px 8px 4px 4px;background:var(--accent);min-height:6px}
+  .trend .pc{font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .behav{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:13px;font-size:.95rem}
+  .behav.ok{background:var(--good-bg);border:1px solid var(--good)}
+  .behav.no{background:#fff7ed;border:1px solid var(--warn)}
+  @media (prefers-color-scheme:dark){ .behav.no{background:#2a1c07} }
+  .behav .be{font-size:1.3rem}
+  ul.weak{margin:0;padding-inline-start:20px}
+  ul.weak li{margin-bottom:7px;font-size:.93rem}
+  ul.weak .cnt{color:var(--bad);font-weight:700}
+  .note{border-inline-start:4px solid var(--accent);background:var(--bg);border-radius:0 12px 12px 0;padding:12px 16px;margin-bottom:12px}
+  .note .nd{font-size:.75rem;color:var(--muted);margin-bottom:4px;font-weight:700}
+  .note .nt{font-weight:800;margin-bottom:5px}
+  .note .nb{font-size:.95rem}
+  .note .nb b{font-weight:800}
+  .empty{text-align:center;color:var(--muted);padding:26px 12px}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px}
+  @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:28px}
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
+<div class="wrap"><div id="app"></div><div id="report"></div><footer id="foot"></footer></div>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"saud").toLowerCase();
@@ -52,7 +83,7 @@ var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",raf
 var name = NAMES[who] || who;
 var grade = GRADES[who] || "";
 
-// روابط المواد لكل طالب. سعود عنده صفحات المنهج المطابقة لكتبه.
+// ===== روابط المواد =====
 var SUBJECTS = {
   saud: [
     {href:"quiz.html",   ico:"📝", nm:"اختبر نفسك", ds:"إنجليزي + رياضيات", hero:true},
@@ -64,39 +95,175 @@ var SUBJECTS = {
     {href:"practice.html", ico:"📖", nm:"قدرات لفظي", ds:"تدرّب على القدرات", wide:true}
   ]
 };
-// باقي الأبناء (مؤقتاً): الأقسام العامة
 var GENERIC = [
   {href:"quiz.html",   ico:"📝", nm:"اختبر نفسك", ds:"إنجليزي + رياضيات", hero:true},
   {href:"practice.html", ico:"💪", nm:"القدرات", ds:"لفظي وكمي وتحصيلي"},
   {href:"reading.html",  ico:"🔊", nm:"القراءة والاستماع", ds:"إملاء ومفردات"}
 ];
-
 var list = (SUBJECTS[who] || GENERIC).slice();
-// زر تقرير الطفل الشخصي (نسبته + تطوّره + توصياته) — خاص فيه فقط
-list.push({href:"child.html", ico:"📊", nm:"نتيجتي وتقريري", ds:"نسبتك وتطوّرك وتوصياتك", wide:true});
 
-var html = ''+
+var head = ''+
   '<header class="top">'+
-    '<p class="eyebrow">'+ (grade?grade+' · ':'') +'كل موادك في مكان واحد</p>'+
+    '<p class="eyebrow">'+ (grade?grade+' · ':'') +'كل موادك ونتيجتك في مكان واحد</p>'+
     '<h1>👋 أهلاً '+name+'</h1>'+
     '<p class="sub">اختر المادة الي تبي تتدرّب عليها</p>'+
+    '<div class="big" id="hpct"><small>… جارٍ تحميل نتيجتك</small></div>'+
   '</header>'+
   '<div class="grid">';
-
 list.forEach(function(s){
   var cls = 'tile'+(s.hero?' hero':'')+(s.wide?' wide':'');
-  html += '<a class="'+cls+'" href="'+s.href+'?who='+who+'">'+
+  head += '<a class="'+cls+'" href="'+s.href+'?who='+who+'">'+
             '<span class="ico">'+s.ico+'</span>'+
             '<span class="name">'+s.nm+'</span>'+
             (s.ds?'<span class="desc">'+s.ds+'</span>':'')+
           '</a>';
 });
-
-html += '</div>'+
-  '<footer>مسار «'+name+'» — تقدر تحفظ هذا الرابط في الشاشة الرئيسية للجوال 📱</footer>';
-
-document.getElementById("app").innerHTML = html;
+head += '</div>';
+document.getElementById("app").innerHTML = head;
+document.getElementById("foot").innerHTML = 'مسار «'+name+'» — احفظ الرابط في الشاشة الرئيسية للجوال 📱';
 document.title = "مسار "+name;
+
+// ===== التقرير (نفس منطق صفحة المتابعة) =====
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function pct(c,t){ return t?Math.round(c/t*100):0; }
+function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
+function saToday(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
+var SKILLNAMES=[
+  {name:"الجذور",rx:/√/},{name:"حل المعادلات",rx:/حل\s*:|معادلة|\dx|\dس|x\s*=|س\s*=|x²|س²/},
+  {name:"الأسس",rx:/[²³⁴⁵⁶⁷]|الأس/},{name:"الهندسة",rx:/مساحة|محيط|حجم|مثلث|زاوية|الوتر|قطر/},
+  {name:"النسبة المئوية",rx:/%|نسبة/},{name:"الكسور",rx:/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚]|\d\/\d|كسر/},
+  {name:"ترتيب العمليات",rx:/[+\-−].*×|×.*[+\-−]/},{name:"الأعداد السالبة",rx:/−\d|احسب:\s*−/},
+  {name:"الجموع الشاذة",rx:/plural/i},{name:"الأضداد",rx:/opposite/i},
+  {name:"المقارنة والتفضيل",rx:/than|comparative/i},{name:"الأزمنة",rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i}
+];
+function behavior(row){
+  var m=row.meta; if(!m||!m.per||!m.per.length) return null;
+  var dts=m.per.map(function(p){return p.dt;}).filter(function(x){return x!=null;});
+  var avg=dts.length?dts.reduce(function(a,b){return a+b;},0)/dts.length:null;
+  var acc=(row.en_correct+row.ma_correct)/((row.en_total+row.ma_total)||1);
+  var cs=m.per.map(function(p){return p.c;}),counts={}; cs.forEach(function(c){counts[c]=(counts[c]||0)+1;});
+  var sameR=cs.length?Math.max.apply(null,Object.keys(counts).map(function(k){return counts[k];}))/cs.length:0;
+  var label,emoji,good;
+  if(avg!=null&&avg<4&&acc<0.6){label="حلّ عشوائي (تخمين سريع)";emoji="🎲";good=false;}
+  else if(sameR>=0.7&&acc<0.6){label="يختار نفس الترتيب (تخمين)";emoji="🎲";good=false;}
+  else if(avg!=null&&avg<4){label="حلّ بسرعة ودقة";emoji="🏃";good=true;}
+  else if(avg!=null&&avg>20&&acc<0.6){label="يتعثّر ويحتاج مساعدة";emoji="🐢";good=false;}
+  else if(acc>=0.8){label="متأنٍّ ومركّز";emoji="🎯";good=true;}
+  else{label="أداء عادي — يحتاج تدريب";emoji="📚";good=false;}
+  return {label:label,emoji:emoji,good:good,avg:avg!=null?Math.round(avg*10)/10:null};
+}
+function autoRec(rows){
+  if(!rows.length) return null;
+  var latest=rows[0];
+  var lp=pct(latest.en_correct+latest.ma_correct,latest.en_total+latest.ma_total);
+  var trend="";
+  if(rows.length>=2){ var prev=pct(rows[1].en_correct+rows[1].ma_correct,rows[1].en_total+rows[1].ma_total);
+    trend= lp>prev+5?"📈 في تحسّن":lp<prev-5?"📉 نزل شوي":"➡️ ثابت"; }
+  var wrongs=[]; rows.slice(0,3).forEach(function(r){(r.wrong||[]).forEach(function(w){wrongs.push(w);});});
+  var counts={}; wrongs.forEach(function(w){ var t=(w.q||"")+" "+(w.subject||""); for(var i=0;i<SKILLNAMES.length;i++){ if(SKILLNAMES[i].rx.test(t)){ counts[SKILLNAMES[i].name]=(counts[SKILLNAMES[i].name]||0)+1; break; } } });
+  var top=SKILLNAMES.filter(function(s){return counts[s.name];}).sort(function(a,b){return counts[b.name]-counts[a.name];}).slice(0,3);
+  var beh=behavior(latest);
+  var h="المستوى الحالي: <b>"+lp+"%</b> "+trend+".<br>إنجليزي "+latest.en_correct+"/"+latest.en_total+" · رياضيات "+latest.ma_correct+"/"+latest.ma_total+".<br>";
+  if(top.length){ h+="<b>ركّز على:</b> "+top.map(function(s){return s.name+" ("+counts[s.name]+")";}).join(" · ")+" — روح تبويب علاجي 💪 فيه شرح وتمارين لها.<br>"; }
+  else { h+="🎉 ما فيه أخطاء متكررة — ممتاز!<br>"; }
+  if(beh && beh.avg!=null && beh.avg<4){ h+="⚠️ تروّى شوي — سرعتك عالية ("+beh.avg+"ث/سؤال) فتغلط في التفاصيل."; }
+  return {date:saToday(),title:"📊 تقرير تلقائي محدّث — المستوى "+lp+"% "+trend, html:h, auto:true};
+}
+
+async function loadReport(){
+  var box=document.getElementById("report");
+  box.innerHTML='<div class="sec-title"><span class="dot"></span> 📊 نتيجتك وتقريرك</div><p class="empty"><span class="spin"></span> جارٍ التحميل...</p>';
+  var rows=[];
+  try{
+    var r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(name)+"&order=created_at.desc",
+      {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
+    rows=await r.json(); rows=Array.isArray(rows)?rows:[];
+  }catch(e){}
+  var practice=rows.filter(function(x){ return x.meta && x.meta.kind==="practice"; });
+  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice")); });
+
+  var notes=[];
+  try{ var nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
+
+  var latest=rows[0];
+  var latPct=latest?pct(latest.en_correct+latest.ma_correct,latest.en_total+latest.ma_total):null;
+  // نحدّث النسبة في الرأس
+  var hp=document.getElementById("hpct");
+  if(hp) hp.innerHTML = latPct!=null ? (latPct+'% <small>آخر اختبار</small>') : '<small>ما فيه اختبارات بعد — ابدأ بـ «اختبر نفسك»</small>';
+
+  var enAvg=rows.length?Math.round(rows.reduce(function(s,r){return s+pct(r.en_correct,r.en_total);},0)/rows.length):0;
+  var maAvg=rows.length?Math.round(rows.reduce(function(s,r){return s+pct(r.ma_correct,r.ma_total);},0)/rows.length):0;
+  var beh=latest?behavior(latest):null;
+  var wmap={}; rows.forEach(function(r){(r.wrong||[]).forEach(function(w){var k="["+(w.subject||"")+"] "+w.q; wmap[k]=(wmap[k]||0)+1;});});
+  var weak=Object.keys(wmap).map(function(k){return [k,wmap[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+  var tr=rows.slice(0,6).reverse().map(function(r){return pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total);});
+
+  var html='<div class="sec-title"><span class="dot"></span> 📊 نتيجتك وتقريرك</div>';
+
+  if(practice.length){
+    var byTest={}; practice.forEach(function(p){ if(!byTest[p.meta.test]) byTest[p.meta.test]=p; });
+    html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
+      Object.keys(byTest).map(function(t){ var p=byTest[t]; var pc=pct(p.meta.correct,p.meta.total);
+        return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+      '</ul></div>';
+  }
+
+  if(rows.length){
+    html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">المستوى (متوسط '+rows.length+' محاولة)</div><div class="grid2">'+
+      '<div class="stat"><div class="lbl">الإنجليزي</div><div class="val">'+enAvg+'%</div></div>'+
+      '<div class="stat"><div class="lbl">الرياضيات</div><div class="val">'+maAvg+'%</div></div></div>'+
+      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+'</span></div>':'')+
+      (tr.length>1?'<div style="font-weight:800;margin:16px 4px 6px">التطوّر</div><div class="trend">'+tr.map(function(p){return '<div class="col"><div class="pc">'+p+'%</div><div class="bxr" style="height:'+Math.max(6,p*0.8)+'px"></div></div>';}).join("")+'</div>':'')+
+      '</div>';
+
+    html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">نقاط تحتاج مراجعة</div>'+
+      (weak.length? '<ul class="weak">'+weak.map(function(w){return '<li>'+w[0]+(w[1]>1?' <span class="cnt">(×'+w[1]+')</span>':'')+'</li>';}).join("")+'</ul>' : '<p class="empty">ما فيه أخطاء متكررة 🎉</p>')+
+      '</div>';
+
+    // آخر نموذجين محلولين
+    var papers=rows.filter(function(r){return r.meta && r.meta.paper;}).slice(0,2);
+    if(papers.length){
+      html+='<div class="sec-title"><span class="dot"></span> 📄 آخر نموذجين محلولين</div>';
+      papers.forEach(function(r,pi){
+        var P=r.meta.paper;
+        var tot=(P.en_correct+P.ma_correct), all=(P.en_total+P.ma_total), pc=pct(tot,all);
+        var secHtml=function(title,arr,ltr){
+          if(!arr||!arr.length) return "";
+          var h='<div style="font-weight:800;margin:12px 0 6px">'+title+'</div>';
+          arr.forEach(function(it,idx){
+            h+='<div style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px"><div style="font-weight:700;margin-bottom:6px"'+(ltr?' dir="ltr"':'')+'>'+(idx+1)+'. '+it.q+'</div>';
+            (it.opts||[]).forEach(function(o,j){
+              var bg="transparent",bd="var(--line)",cl="var(--ink)",tag="";
+              if(j===it.correct){ bg="var(--good-bg)";bd="var(--good)";cl="var(--good)";tag=" ✅"; }
+              if(j===it.chosen && it.chosen!==it.correct){ bg="var(--bad-bg)";bd="var(--bad)";cl="var(--bad)";tag=" ❌ (اختياره)"; }
+              h+='<div style="border:1px solid '+bd+';background:'+bg+';color:'+cl+';border-radius:8px;padding:6px 10px;margin:4px 0;font-size:.9rem"'+(ltr?' dir="ltr"':'')+'>'+o+tag+'</div>';
+            });
+            if(it.chosen===-1) h+='<div style="color:var(--muted);font-size:.82rem;margin-top:4px">لم يُجب على هذا السؤال</div>';
+            h+='</div>';
+          });
+          return h;
+        };
+        html+='<details '+(pi===0?'open':'')+' class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج '+saTime(r.created_at)+' — النتيجة '+tot+'/'+all+' ('+pc+'%) · إنجليزي '+P.en_correct+'/'+P.en_total+' · رياضيات '+P.ma_correct+'/'+P.ma_total+'</summary><div style="margin-top:8px">'+secHtml("الإنجليزي",P.en,true)+secHtml("الرياضيات",P.ma,false)+'</div></details>';
+      });
+    }
+  } else {
+    html+='<div class="card empty">لسه ما فيه اختبارات. حل «اختبر نفسك» وبتظهر نتيجتك وتقريرك هنا تلقائيًا.</div>';
+  }
+
+  // التوصيات
+  html+='<div class="sec-title"><span class="dot"></span> توصيات المعلّم 📌</div>';
+  var auto=autoRec(rows);
+  var allNotes=auto?[auto].concat(notes):notes;
+  if(allNotes.length){
+    html+=allNotes.map(function(n){return '<div class="note"'+(n.auto?' style="border-color:var(--accent)"':'')+'><div class="nd">'+(n.date||"")+(n.auto?' · يتحدّث تلقائيًا':'')+'</div><div class="nt">'+(n.title||"")+'</div><div class="nb">'+(n.html||n.body||"")+'</div></div>';}).join("");
+  }else{
+    html+='<div class="card empty">لسه ما فيه توصيات. بتظهر هنا أول ما تختبر.</div>';
+  }
+
+  box.innerHTML=html;
+}
+loadReport();
 </script>
 </body>
 </html>
