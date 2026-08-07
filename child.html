@@ -174,7 +174,7 @@ async function main(){
     </header>
     <div class="bar">
       <button onclick="location.reload()">🔄 تحديث</button>
-      <a href="index.html">📊 اللوحة</a>
+      <a href="home.html?who=${who}">🏠 الصفحة الرئيسية</a>
       <a href="quiz.html?who=${who}">📝 اختبار عام + تقرير</a>
       <a href="reading.html?who=${who}">🔊 استماع وقراءة</a>
       ${who==="saud"?`<a href="practice.html?who=${who}">📖 قدرات لفظي</a>`:`<a href="quiz.html?who=${who}&set=2">🔄 مجموعة 2</a><a href="practice.html?who=${who}">📊 قدرات وتحصيلي</a>`}

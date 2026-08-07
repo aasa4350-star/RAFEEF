@@ -71,7 +71,9 @@ var GENERIC = [
   {href:"reading.html",  ico:"🔊", nm:"القراءة والاستماع", ds:"إملاء ومفردات"}
 ];
 
-var list = SUBJECTS[who] || GENERIC;
+var list = (SUBJECTS[who] || GENERIC).slice();
+// زر تقرير الطفل الشخصي (نسبته + تطوّره + توصياته) — خاص فيه فقط
+list.push({href:"child.html", ico:"📊", nm:"نتيجتي وتقريري", ds:"نسبتك وتطوّرك وتوصياتك", wide:true});
 
 var html = ''+
   '<header class="top">'+
