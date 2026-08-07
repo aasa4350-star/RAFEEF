@@ -124,12 +124,86 @@ var NATURE = [["Earth","الأرض / الكوكب"],["mountain","جبل"],["land
 function gNature(){ var p=gp(NATURE); var o=opt(p[1], dist(NATURE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
 function gNatureAr(){ var p=gp(NATURE); var o=opt(p[0], dist(NATURE,p,0)); return ["أيّ كلمة تعني «"+p[1]+"»؟", o[0], o[1], p[1]+" = "+en(p[0])+"."]; }
 
+// Unit 5 grammar
+var VBING = [
+  ["I enjoy ___ in the lake.","swimming","to swim","swim","بعد enjoy: الفعل + ing."],
+  ["We went ___ around the lake.","walking","to walk","walk","مع الأنشطة: go + verb-ing."],
+  ["I decided ___ to the countryside.","to go","going","go","بعد decide: to + الفعل."],
+  ["I want ___ football.","to play","playing","play","بعد want: to + الفعل."],
+  ["I finished ___ my homework.","doing","to do","do","بعد finish: الفعل + ing."]
+];
+function gVing(){ var p=gp(VBING); var o=opt(p[1],[p[2],p[3]]); return ["أكمل: "+en(p[0]), o[0], o[1], p[4]]; }
+var COULD = [
+  ["___ you swim when you were five? — Yes, I could.","Could","Can","Do","«Could» للقدرة في الماضي."],
+  ["I ___ ride a horse when I was young.","couldn't","can't","didn't","«couldn't» = لم أستطع (ماضٍ)."],
+  ["She ___ read at the age of four.","could","can","will","«could» للقدرة في الماضي."]
+];
+function gCould(){ var p=gp(COULD); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (القدرة في الماضي): "+en(p[0]), o[0], o[1], p[4]]; }
+
+/* ============ Unit 6 — House Accidents ============ */
+var AIL = [["cough","سُعال"],["headache","صُداع"],["stomachache","ألم في المعدة"],["toothache","ألم في الأسنان"],["earache","ألم في الأذن"],["cut","جُرح / قطع"],["sick","مريض"],["hurt","يؤلم / أذى"],["medicine","دواء"],["X-ray","أشعّة"],["band aid","لاصق جروح"],["ill","مريض / معتلّ"]];
+function gAil(){ var p=gp(AIL); var o=opt(p[1], dist(AIL,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+var MODAL = [
+  ["You ___ take this medicine.","should","mustn't","doesn't","نصيحة → should."],
+  ["You are very sick. You ___ stay in bed.","must","shouldn't","mustn't","وجوب → must / have to."],
+  ["You ___ look at screens now.","mustn't","should","have to","منع → mustn't."],
+  ["You ___ wash your hands before eating.","have to","mustn't","shouldn't","وجوب → have to."],
+  ["You ___ play outside today.","shouldn't","must","have to","نصيحة بعدم الفعل → shouldn't."]
+];
+function gModal(){ var p=gp(MODAL); var o=opt(p[1],[p[2],p[3]]); return ["أكمل: "+en(p[0]), o[0], o[1], p[4]]; }
+var INDEF = [
+  ["I have ___ in my eye.","something","anything","nothing","«something» = شيء ما (إثبات)."],
+  ["I don't see ___.","anything","something","everything","«anything» = أيّ شيء (نفي)."],
+  ["___ hurts! It hurts all over.","Everything","Anything","Nothing","«Everything» = كل شيء."],
+  ["The box is empty. There is ___ in it.","nothing","something","anything","«nothing» = لا شيء."]
+];
+function gIndef(){ var p=gp(INDEF); var o=opt(p[1],[p[2],p[3]]); return ["أكمل بالضمير المناسب: "+en(p[0]), o[0], o[1], p[4]]; }
+
+/* ============ Unit 7 — Wildlife ============ */
+var WILD = [["lion","أسد"],["panda","باندا"],["parrot","ببّغاء"],["kangaroo","كنغر"],["polar bear","دبّ قطبي"],["jungle","غابة استوائية"],["cage","قفص"],["danger","خطر"],["frightened","خائف / مذعور"],["brave","شجاع"],["friendly","ودود"],["smart","ذكيّ"],["giraffe","زرافة"],["elephant","فيل"],["tiger","نمر"],["turtle","سلحفاة"]];
+function gWild(){ var p=gp(WILD); var o=opt(p[1], dist(WILD,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+var REL = [
+  ["That's the vet ___ works in the zoo.","who","which","where","«who» للعاقل (الأشخاص)."],
+  ["This is the tiger ___ makes me frightened.","that","who","where","«that/which» لغير العاقل."],
+  ["This is the zoo ___ the pandas live.","where","who","which","«where» للمكان."],
+  ["She is the girl ___ bag is red.","whose","which","where","«whose» للملكية."]
+];
+function gRel(){ var p=gp(REL); var o=opt(p[1],[p[2],p[3]]); return ["أكمل بأداة الوصل: "+en(p[0]), o[0], o[1], p[4]]; }
+var COMP = [
+  ["Cats walk ___ than horses.","more quietly","quietly","most quietly","الظرف الطويل: more + adverb + than."],
+  ["A cheetah runs ___ than a cat.","faster","fast","fastest","المقارنة: fast → faster."],
+  ["The lion is ___ animal in the group.","the strongest","stronger","strong","التفضيل: the + adj-est."],
+  ["Pandas are ___ than tigers.","friendlier","friendly","friendliest","المقارنة: friendly → friendlier."]
+];
+function gComp(){ var p=gp(COMP); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (مقارنة/تفضيل): "+en(p[0]), o[0], o[1], p[4]]; }
+
+/* ============ Unit 8 — Weather ============ */
+var WEATHER = [["weather","الطقس"],["cloud","سحابة"],["cloudy","غائم"],["rain","مطر"],["rainy","ماطر"],["snow","ثلج"],["snowy","مثلج"],["sunny","مشمس"],["windy","عاصف"],["hot","حارّ"],["cold","بارد"],["warm","دافئ"],["cool","معتدل البرودة"],["summer","الصيف"],["winter","الشتاء"],["spring","الربيع"],["rainbow","قوس قزح"],["temperature","درجة الحرارة"],["season","فصل من السنة"]];
+function gWeatherV(){ var p=gp(WEATHER); var o=opt(p[1], dist(WEATHER,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+var GOINGTO = [
+  ["It ___ going to rain tomorrow.","is","are","be","المستقبل: is/are + going to."],
+  ["What's the weather ___ to be like?","going","go","goes","التركيب: be going to."],
+  ["It's going ___ be cold today.","to","for","of","going to + الفعل."],
+  ["They ___ going to travel in summer.","are","is","am","they + are."]
+];
+function gGoing(){ var p=gp(GOINGTO); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (المستقبل be going to): "+en(p[0]), o[0], o[1], p[4]]; }
+var TOBEW = [
+  ["What ___ the weather like today? — It is sunny.","is","was","are","المضارع: is (اليوم)."],
+  ["What ___ the weather like yesterday? — It was cloudy.","was","is","were","الماضي: was (أمس)."],
+  ["It ___ snowy now.","is","was","were","الآن → is."],
+  ["It ___ rainy yesterday.","was","is","are","أمس → was."]
+];
+function gToBeW(){ var p=gp(TOBEW); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (verb to be): "+en(p[0]), o[0], o[1], p[4]]; }
+
 var U1 = [gFam, gAdj1, gOpp, gFreqM, gFreqFill, gPoss, gWhose];
 var U2 = [gChoreV, gChoreO, gTool, gProg, gCan];
 var U3 = [gVerb3, gPastReg, gPastNeg, gPastQ];
 var U4 = [gVerb4, gIrr, gAdv, gConj];
-var U5 = [gNature, gNatureAr];
-var ALL = U1.concat(U2).concat(U3).concat(U4).concat(U5);
+var U5 = [gNature, gNatureAr, gVing, gCould];
+var U6 = [gAil, gModal, gIndef];
+var U7 = [gWild, gRel, gComp];
+var U8 = [gWeatherV, gGoing, gToBeW];
+var ALL = U1.concat(U2).concat(U3).concat(U4).concat(U5).concat(U6).concat(U7).concat(U8);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -140,7 +214,7 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a><a href="index.html">📊 اللوحة</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الإنجليزي (Part 1) — 4 وحدات</div>'+
+    '<div class="unit">📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)</div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
       '<button data-tab="u1" aria-selected="false">1) Family</button>'+
@@ -148,6 +222,9 @@ if(!NAMES[who]){
       '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
       '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
       '<button data-tab="u5" aria-selected="false">5) Outdoor</button>'+
+      '<button data-tab="u6" aria-selected="false">6) Accidents</button>'+
+      '<button data-tab="u7" aria-selected="false">7) Wildlife</button>'+
+      '<button data-tab="u8" aria-selected="false">8) Weather</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="u1"></section>'+
@@ -155,6 +232,9 @@ if(!NAMES[who]){
     '<section class="panel" id="u3"></section>'+
     '<section class="panel" id="u4"></section>'+
     '<section class="panel" id="u5"></section>'+
+    '<section class="panel" id="u6"></section>'+
+    '<section class="panel" id="u7"></section>'+
+    '<section class="panel" id="u8"></section>'+
     '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
 
   var CFG = {
@@ -163,7 +243,10 @@ if(!NAMES[who]){
     u2:  {gens:U2,  n:10, intro:"<b>Unit 2 — Chores:</b> الأعمال المنزلية، المضارع المستمر (am/is/are)، الطلب بـ Can.", label:"إنجليزي و2 — Chores"},
     u3:  {gens:U3,  n:10, intro:"<b>Unit 3 — Stories:</b> أفعال، الماضي البسيط (إثبات/نفي) والأسئلة والإجابات القصيرة.", label:"إنجليزي و3 — Stories"},
     u4:  {gens:U4,  n:10, intro:"<b>Unit 4 — After-School Fun:</b> أنشطة، الماضي الشاذّ، الظروف (-ly)، أدوات الربط.", label:"إنجليزي و4 — After-School"},
-    u5:  {gens:U5,  n:10, intro:"<b>Unit 5 — Outdoor Fun:</b> أماكن الطبيعة (mountain, island, waterfall, forest, desert, cave…).", label:"إنجليزي و5 — Outdoor"}
+    u5:  {gens:U5,  n:10, intro:"<b>Unit 5 — Outdoor Fun:</b> أماكن الطبيعة، verb+to/verb+ing، could للقدرة في الماضي.", label:"إنجليزي و5 — Outdoor"},
+    u6:  {gens:U6,  n:10, intro:"<b>Unit 6 — House Accidents:</b> الأمراض والإصابات، must/have to/should + mustn't، الضمائر (something/anything).", label:"إنجليزي و6 — Accidents"},
+    u7:  {gens:U7,  n:10, intro:"<b>Unit 7 — Wildlife:</b> الحيوانات، العبارات الوصلية (who/which/where/whose)، المقارنة والتفضيل.", label:"إنجليزي و7 — Wildlife"},
+    u8:  {gens:U8,  n:10, intro:"<b>Unit 8 — Weather:</b> الطقس، المستقبل (be going to)، الفعل to be (is/was).", label:"إنجليزي و8 — Weather"}
   };
 
   function render(id){
