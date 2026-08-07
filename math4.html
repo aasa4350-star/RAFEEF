@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الرياضيات — الصف الرابع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#059669; --accent-deep:#047857;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .stem .en,.explain .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.1rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST",
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function fmt(n){ return Number(n).toLocaleString('en-US'); } // فاصلة آلاف
+function mn(s){ return '<span class="en">'+s+'</span>'; }
+// خيارات رقمية مميّزة: الصحيح + مشتّتات
+function numOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  for(var i=0;i<cands.length && others.length<2;i++){ var v=cands[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+
+/* ===== الفصل 1: القيمة المنزلية ===== */
+var PLACES = [[1,"الآحاد"],[10,"العشرات"],[100,"المئات"],[1000,"الألوف"],[10000,"عشرات الألوف"],[100000,"مئات الألوف"]];
+function distinctDigits(k){ var d=shuffle([1,2,3,4,5,6,7,8,9]).slice(0,k); return d; }
+function gPlaceValue(){
+  var k=ri(4,6), dg=distinctDigits(k), num=Number(dg.join("")), idx=ri(0,k-1), d=dg[idx], place=Math.pow(10,k-1-idx);
+  var val=d*place, o=numOpts(val,[d*place*10, Math.floor(d*place/10), d, val+place]);
+  return ["ما القيمة المنزلية للرقم "+mn(d)+" في العدد "+mn(fmt(num))+"؟", o[0], o[1], "الرقم "+mn(d)+" في منزلة "+PLACES[k-1-idx][1]+" ⇐ قيمته "+mn(fmt(val))+"."];
+}
+function gPlaceName(){
+  var k=ri(4,6), dg=distinctDigits(k), num=Number(dg.join("")), idx=ri(0,k-1), d=dg[idx], pn=PLACES[k-1-idx][1];
+  var pool=PLACES.map(function(x){return x[1];}).filter(function(x){return x!==pn;}); shuffle(pool);
+  var arr=[pn,pool[0],pool[1]]; shuffle(arr);
+  return ["ما منزلة الرقم "+mn(d)+" في العدد "+mn(fmt(num))+"؟", arr, arr.indexOf(pn), "الرقم "+mn(d)+" يقع في منزلة "+pn+"."];
+}
+function gCompare(){
+  var a=ri(1000,999999), b; do{ b=ri(1000,999999); }while(b===a);
+  var sign=a>b?">":"<", o=[">","<","="]; shuffle(o);
+  return ["أيّ الإشارة الصحيحة: "+mn(fmt(a)+" ⬚ "+fmt(b))+"؟", o, o.indexOf(sign), mn(fmt(a)+" "+sign+" "+fmt(b))+"."];
+}
+function gOrder(){
+  var s={}, arr=[]; while(arr.length<3){ var x=ri(1000,99999); if(!s[x]){ s[x]=1; arr.push(x); } }
+  var big=Math.random()<0.5;
+  var ans=big?Math.max.apply(null,arr):Math.min.apply(null,arr);
+  var o=arr.slice().map(fmt); shuffle(o);
+  return ["أيّ الأعداد "+(big?"الأكبر":"الأصغر")+"؟ "+mn(arr.map(fmt).join(" ، ")), o, o.indexOf(fmt(ans)), (big?"الأكبر":"الأصغر")+" هو "+mn(fmt(ans))+"."];
+}
+function gRound(){
+  var toThousand=Math.random()<0.5, place=toThousand?1000:10000, n=ri(place,place*90);
+  var r=Math.round(n/place)*place, o=numOpts(r,[r+place, r-place, n]);
+  return ["قرّب العدد "+mn(fmt(n))+" لأقرب "+(toThousand?"ألف":"عشرة آلاف")+":", o[0], o[1], "أقرب "+(toThousand?"ألف":"عشرة آلاف")+" لـ "+mn(fmt(n))+" هو "+mn(fmt(r))+"."];
+}
+
+/* ===== الفصل 2: الجمع والطرح ===== */
+function gComm(){ var a=ri(2,20), b=ri(2,20); var o=numOpts(a,[b,a+b,a+1]); return ["أكمل بخاصية الإبدال: "+mn(a+" + "+b+" = "+b+" + ⬚"), o[0], o[1], "خاصية الإبدال: ترتيب الجمع لا يغيّر الناتج ⇐ "+mn(a)+"."]; }
+function gPropName(){
+  var t=gp([["إبدالية","(3 + 5 = 5 + 3)"],["تجميعية","((2 + 4) + 6 = 2 + (4 + 6))"],["العنصر المحايد","(7 + 0 = 7)"]]);
+  var o=["الإبدالية","التجميعية","العنصر المحايد"]; shuffle(o);
+  var key=t[0]==="إبدالية"?"الإبدالية":(t[0]==="تجميعية"?"التجميعية":"العنصر المحايد");
+  return ["ما الخاصية في: "+mn(t[1])+"؟", o, o.indexOf(key), "هذه خاصية "+key+" في الجمع."];
+}
+function gEstimate(){
+  var a=ri(1200,8800), b=ri(1200,8800), ra=Math.round(a/1000)*1000, rb=Math.round(b/1000)*1000, est=ra+rb;
+  var o=numOpts(est,[est+1000, est-1000, a+b]);
+  return ["قدّر ناتج "+mn(fmt(a)+" + "+fmt(b))+" بتقريب كل عدد لأقرب ألف:", o[0], o[1], mn(fmt(a)+"≈"+fmt(ra))+" و "+mn(fmt(b)+"≈"+fmt(rb))+" ⇐ "+mn(fmt(est))+"."];
+}
+function gAdd(){ var a=ri(1200,8900), b=ri(1200,8900), s=a+b, o=numOpts(s,[s+100,s-1000,s+10]); return ["احسب: "+mn(fmt(a)+" + "+fmt(b)), o[0], o[1], mn(fmt(a)+" + "+fmt(b)+" = "+fmt(s))+"."]; }
+function gSub(){ var a=ri(5000,9900), b=ri(1200,a-100), d=a-b, o=numOpts(d,[d+100,d-100,d+1000]); return ["احسب: "+mn(fmt(a)+" − "+fmt(b)), o[0], o[1], mn(fmt(a)+" − "+fmt(b)+" = "+fmt(d))+"."]; }
+
+/* ===== الفصل 5: الضرب في عدد من رقم واحد ===== */
+function gMult10(){ var d=ri(2,9), p=gp([10,100,1000]), r=d*p, o=numOpts(r,[d*p*10, Math.floor(d*p/10), r+p]); return ["احسب: "+mn(d+" × "+fmt(p)), o[0], o[1], mn(d+" × "+fmt(p)+" = "+fmt(r))+"."]; }
+function gMultEst(){ var d=ri(3,9), n=ri(21,89), rn=Math.round(n/10)*10, est=d*rn, o=numOpts(est,[est+d*10, est-d*10, d*n]); return ["قدّر ناتج "+mn(d+" × "+n)+" بتقريب "+mn(n)+" لأقرب عشرة:", o[0], o[1], mn(n+"≈"+rn)+" ⇐ "+mn(d+" × "+rn+" = "+est)+"."]; }
+function gMult1(){ var d=ri(3,9), n=ri(23,199), r=d*n, o=numOpts(r,[r+d, r-d, r+10]); return ["احسب: "+mn(d+" × "+n), o[0], o[1], mn(d+" × "+n+" = "+fmt(r))+"."]; }
+function gMultiples(){
+  var k=ri(3,9), m=ri(3,9), correct=k*m;
+  var d1; do{ d1=correct+ri(1,3); }while(d1%k===0);
+  var d2; do{ d2=correct-ri(1,3); }while(d2%k===0 || d2===d1 || d2<=0);
+  var o=[correct,d1,d2].map(fmt); shuffle(o);
+  return ["أيّ الأعداد التالية من مضاعفات "+mn(k)+"؟", o, o.indexOf(fmt(correct)), mn(fmt(correct)+" = "+k+" × "+m)+" فهو من مضاعفات "+mn(k)+"."];
+}
+
+var F1 = [gPlaceValue, gPlaceName, gCompare, gOrder, gRound];
+var F2 = [gComm, gPropName, gEstimate, gAdd, gSub];
+var F5 = [gMult10, gMultEst, gMult1, gMultiples];
+var ALL = F1.concat(F2).concat(F5);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="lughati.html?who='+who+'">📗 لغتي</a><a href="index.html">📊 اللوحة</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب الرياضيات (الفصل الدراسي الأول)</div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
+      '<button data-tab="f1" aria-selected="false">1) القيمة المنزلية</button>'+
+      '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
+      '<button data-tab="f5" aria-selected="false">5) الضرب</button>'+
+    '</div>'+
+    '<section class="panel active" id="all"></section>'+
+    '<section class="panel" id="f1"></section>'+
+    '<section class="panel" id="f2"></section>'+
+    '<section class="panel" id="f5"></section>'+
+    '<footer>الرياضيات · الصف الرابع · الفصل الأول · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
+
+  var CFG = {
+    all: {gens:ALL, n:15, intro:"اختبار شامل: القيمة المنزلية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
+    f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> القيمة والمنزلة، المقارنة، الترتيب، التقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
+    f2:  {gens:F2,  n:10, intro:"<b>الفصل 2 — الجمع والطرح:</b> خصائص الجمع، التقدير، الجمع، الطرح.", label:"رياضيات ف2 — الجمع والطرح"},
+    f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — الضرب:</b> الضرب في مضاعفات 10/100/1000، التقدير، الضرب، المضاعفات.", label:"رياضيات ف5 — الضرب"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+  render("all");
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; document.getElementById(id).classList.add("active");
+      if(!document.getElementById(id).innerHTML) render(id);
+    });
+  });
+}
+</script>
+</body>
+</html>
