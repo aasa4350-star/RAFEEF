@@ -143,10 +143,30 @@ function gMultiples(){
   return ["أيّ الأعداد التالية من مضاعفات "+mn(k)+"؟", o, o.indexOf(fmt(correct)), mn(fmt(correct)+" = "+k+" × "+m)+" فهو من مضاعفات "+mn(k)+"."];
 }
 
+/* ===== الفصل 3: تنظيم البيانات والاحتمال ===== */
+var PROB = [["الحدث الذي سيحدث بالتأكيد يُوصف بأنه:",["مؤكّد","مستحيل","ممكن"]],["الحدث الذي لن يحدث أبدًا يُوصف بأنه:",["مستحيل","مؤكّد","ممكن"]],["عند رمي حجر النرد، الحصول على الرقم 3 حدثٌ:",["ممكن","مستحيل","مؤكّد"]],["شروق الشمس من جهة الشرق غدًا حدثٌ:",["مؤكّد","مستحيل","ممكن"]]];
+var DATAR = [["أنسب تمثيل لإظهار التغيّر عبر الزمن:",["التمثيل بالخطوط","الجدول فقط","لا يوجد"]],["إشارات العدّ (Tally) تُستخدم لـ:",["عدّ البيانات وتنظيمها","الرسم فقط","القسمة"]],["الجدول يُستخدم لـ:",["تنظيم البيانات وترتيبها","حساب الضرب","تلوين الأشكال"]],["التمثيل بالقطاعات الدائرية يُظهر:",["أجزاءً من الكل","الزمن فقط","الطول"]]];
+function gProb(){ var p=gp(PROB); var o=p[1].slice(); shuffle(o); return [p[0], o, o.indexOf(p[1][0]), "الإجابة الصحيحة: "+p[1][0]+"."]; }
+function gDataR(){ var p=gp(DATAR); var o=p[1].slice(); shuffle(o); return [p[0], o, o.indexOf(p[1][0]), "الإجابة الصحيحة: "+p[1][0]+"."]; }
+
+/* ===== الفصل 4: الأنماط والجبر ===== */
+function gPattern(){ var st=ri(1,6), step=gp([2,3,4,5]), seq=[st,st+step,st+2*step,st+3*step], nx=st+4*step, o=numOpts(nx,[nx+step,nx-1,nx+1]); return ["أكمل النمط: "+mn(seq.join(" ، ")+" ، ؟"), o[0], o[1], "القاعدة: نزيد "+mn(step)+" كل مرة ⇐ "+mn(nx)+"."]; }
+function gMissing(){ var t=gp([1,2,3,4]), a,r,ans,stem; if(t===1){ a=ri(3,9); r=ri(12,20); ans=r-a; stem=a+" + ⬚ = "+r; } else if(t===2){ a=ri(3,9); ans=ri(4,12); r=a+ans; stem="⬚ + "+a+" = "+r; } else if(t===3){ ans=ri(11,20); a=ri(2,9); r=ans-a; stem="⬚ − "+a+" = "+r; } else { a=ri(11,20); ans=ri(2,9); r=a-ans; stem=a+" − ⬚ = "+r; } var o=numOpts(ans,[ans+1,ans-1,ans+2]); return ["أوجد العدد المجهول: "+mn(stem), o[0], o[1], "العدد المجهول = "+mn(ans)+"."]; }
+function gMissingMult(){ var b=ri(2,9), ans=ri(2,9), r=b*ans, t=Math.random()<0.5, stem=t?(b+" × ⬚ = "+r):("⬚ × "+b+" = "+r); var o=numOpts(ans,[ans+1,ans-1,r]); return ["أوجد العدد المجهول: "+mn(stem), o[0], o[1], mn(b+" × "+ans+" = "+r)+" ⇐ المجهول = "+mn(ans)+"."]; }
+function gRule(){ var op=gp([["اضرب في","×"],["اجمع","+"]]), k=ri(2,9), inp=ri(2,9), out=op[1]==="×"?k*inp:k+inp; var o=numOpts(out,[out+k,out-1,out+2]); return ["القاعدة: "+op[0]+" "+mn(k)+". إذا كان المُدخل "+mn(inp)+" فالمُخرج = ؟", o[0], o[1], mn(inp+" "+op[1]+" "+k+" = "+out)+"."]; }
+
+/* ===== الفصل 6: الضرب في عدد من رقمين ===== */
+function gMultTens(){ var a=ri(2,9)*10, b=ri(2,9)*10, r=a*b, o=numOpts(r,[r*10,Math.floor(r/10),r+100]); return ["احسب: "+mn(a+" × "+b), o[0], o[1], mn(a+" × "+b+" = "+fmt(r))+" (اضرب الرقمين ثم أضف الأصفار)."]; }
+function gMult2Est(){ var a=ri(21,89), b=ri(21,89), ra=Math.round(a/10)*10, rb=Math.round(b/10)*10, est=ra*rb, o=numOpts(est,[est+ra*10, Math.max(0,est-rb*10), a*b]); return ["قدّر ناتج "+mn(a+" × "+b)+" بتقريب كل عدد لأقرب عشرة:", o[0], o[1], mn(a+"≈"+ra)+" و "+mn(b+"≈"+rb)+" ⇐ "+mn(fmt(est))+"."]; }
+function gMult2(){ var a=ri(11,29), b=ri(11,19), r=a*b, o=numOpts(r,[r+a, r-b, r+10]); return ["احسب: "+mn(a+" × "+b), o[0], o[1], mn(a+" × "+b+" = "+fmt(r))+"."]; }
+
 var F1 = [gPlaceValue, gPlaceName, gCompare, gOrder, gRound];
 var F2 = [gComm, gPropName, gEstimate, gAdd, gSub];
+var F3 = [gProb, gDataR];
+var F4 = [gPattern, gMissing, gMissingMult, gRule];
 var F5 = [gMult10, gMultEst, gMult1, gMultiples];
-var ALL = F1.concat(F2).concat(F5);
+var F6 = [gMultTens, gMult2Est, gMult2];
+var ALL = F1.concat(F2).concat(F3).concat(F4).concat(F5).concat(F6);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -162,19 +182,28 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
       '<button data-tab="f1" aria-selected="false">1) القيمة المنزلية</button>'+
       '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
-      '<button data-tab="f5" aria-selected="false">5) الضرب</button>'+
+      '<button data-tab="f3" aria-selected="false">3) البيانات</button>'+
+      '<button data-tab="f4" aria-selected="false">4) الأنماط والجبر</button>'+
+      '<button data-tab="f5" aria-selected="false">5) الضرب × رقم</button>'+
+      '<button data-tab="f6" aria-selected="false">6) الضرب × رقمين</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="f1"></section>'+
     '<section class="panel" id="f2"></section>'+
+    '<section class="panel" id="f3"></section>'+
+    '<section class="panel" id="f4"></section>'+
     '<section class="panel" id="f5"></section>'+
+    '<section class="panel" id="f6"></section>'+
     '<footer>الرياضيات · الصف الرابع · الفصل الأول · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
 
   var CFG = {
     all: {gens:ALL, n:15, intro:"اختبار شامل: القيمة المنزلية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
     f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> القيمة والمنزلة، المقارنة، الترتيب، التقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
     f2:  {gens:F2,  n:10, intro:"<b>الفصل 2 — الجمع والطرح:</b> خصائص الجمع، التقدير، الجمع، الطرح.", label:"رياضيات ف2 — الجمع والطرح"},
-    f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — الضرب:</b> الضرب في مضاعفات 10/100/1000، التقدير، الضرب، المضاعفات.", label:"رياضيات ف5 — الضرب"}
+    f3:  {gens:F3,  n:8,  intro:"<b>الفصل 3 — تنظيم البيانات:</b> الجداول والتمثيل، والاحتمال (مؤكّد/ممكن/مستحيل).", label:"رياضيات ف3 — البيانات"},
+    f4:  {gens:F4,  n:10, intro:"<b>الفصل 4 — الأنماط والجبر:</b> إكمال الأنماط، إيجاد العدد المجهول، قاعدة الدالة.", label:"رياضيات ف4 — الأنماط والجبر"},
+    f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — الضرب في رقم:</b> الضرب في مضاعفات 10/100/1000، التقدير، الضرب، المضاعفات.", label:"رياضيات ف5 — الضرب × رقم"},
+    f6:  {gens:F6,  n:9,  intro:"<b>الفصل 6 — الضرب في رقمين:</b> الضرب في مضاعفات العشرة، تقدير حاصل الضرب، الضرب في عدد من رقمين.", label:"رياضيات ف6 — الضرب × رقمين"}
   };
 
   function render(id){
