@@ -321,7 +321,7 @@ var app = document.getElementById("app");
 var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (مناسبة لعمره)
 app.innerHTML =
   '<header class="top"><p class="eyebrow">'+(VERBAL_ONLY?'تدريب لفظي':'اختبارات تجريبية · بأسلوب قياس')+'</p><h1>'+(VERBAL_ONLY?'📖 قدرات لفظي — ':'📊 قدرات وتحصيلي — ')+name+'</h1></header>'+
-  '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a></div>'+
+  '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>'+
   (VERBAL_ONLY ? '' : '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>')+
   '<div class="tabs" role="tablist">'+
     '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
