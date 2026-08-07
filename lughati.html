@@ -206,12 +206,14 @@ if(!NAMES[who]){
       '<button data-tab="imla" aria-selected="false">الإملاء 📖</button>'+
       '<button data-tab="fahm" aria-selected="false">فهم النص 🌿</button>'+
       '<button data-tab="shir" aria-selected="false">النص الشعري 🦋</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="nahw"></section>'+
     '<section class="panel" id="imla"></section>'+
     '<section class="panel" id="fahm"></section>'+
     '<section class="panel" id="shir"></section>'+
+    '<section class="panel" id="rem"></section>'+
     '<footer>لغتي الصف الرابع · الوحدة الأولى «صحتي وبيئتي» · من إعداد المعلّم بمطابقة الكتاب</footer>';
 
   var CFG = {
@@ -246,11 +248,39 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
         });
       });
     });
     sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+
+  // ===== علاجي: يرتّب الأقسام من الأضعف ويعطي نصيحة =====
+  var REM_PAGE="lughati", REM_LABEL="لغتي";
+  var REMTOPICS=[
+    {id:"nahw", name:"النحو ✍️", tip:"المبتدأ والخبر مرفوعان بالضمة، والفاعل مرفوع، والمفعول به منصوب بالفتحة. راجع أمثلة تبويب النحو."},
+    {id:"imla", name:"الإملاء 📖", tip:"همزة القطع تُنطق دائمًا (أ/إ)، والوصل تسقط في الوصل. التاء المربوطة (ة) والمفتوحة (ت)، وكلمات مثل هذا/ذلك/الله تُحذف ألفها."},
+    {id:"fahm", name:"فهم النص 🌿", tip:"أعد قراءة نص «التصحّر»: الأسباب (قطع الأشجار، قلة الأمطار) والعلاج (الأحزمة الخضراء، حفر الآبار)."},
+    {id:"shir", name:"النص الشعري 🦋", tip:"راجع «لِمَ تأتِ الفراشة» — الشاعر محمد الفاضل سليمان، وموضوعه الفراشة والأزهار."}
+  ];
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب أقسامك من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل قسم.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الأقسام. جرّب أقسام '+REM_LABEL+' ويرجع هنا يعرض أضعف قسم مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?'<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div>':'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 أقسام ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
   render("all");
 
@@ -260,7 +290,7 @@ if(!NAMES[who]){
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; document.getElementById(id).classList.add("active");
-      if(!document.getElementById(id).innerHTML) render(id);
+      if(id==="rem"){ renderRem(); } else if(!document.getElementById(id).innerHTML) render(id);
     });
   });
 }

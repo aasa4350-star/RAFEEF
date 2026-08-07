@@ -225,6 +225,7 @@ if(!NAMES[who]){
       '<button data-tab="u6" aria-selected="false">6) Accidents</button>'+
       '<button data-tab="u7" aria-selected="false">7) Wildlife</button>'+
       '<button data-tab="u8" aria-selected="false">8) Weather</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="u1"></section>'+
@@ -235,6 +236,7 @@ if(!NAMES[who]){
     '<section class="panel" id="u6"></section>'+
     '<section class="panel" id="u7"></section>'+
     '<section class="panel" id="u8"></section>'+
+    '<section class="panel" id="rem"></section>'+
     '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
 
   var CFG = {
@@ -273,11 +275,43 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
         });
       });
     });
     sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="english", REM_LABEL="الإنجليزي";
+  var REMTOPICS=[
+    {id:"u1", name:"1) Family", tip:"راجع مفردات العائلة، ظروف التكرار (always/never)، والضمائر الملكية (mine/yours/hers)."},
+    {id:"u2", name:"2) Chores", tip:"الأعمال المنزلية (wash the dishes…)، المضارع المستمر (am/is/are + verb-ing)، والطلب بـ Can."},
+    {id:"u3", name:"3) Stories", tip:"الماضي البسيط: أضف ed للأفعال المنتظمة، والنفي didn't، والسؤال Did you…? Yes I did / No I didn't."},
+    {id:"u4", name:"4) After-School", tip:"الأفعال الشاذّة (go→went, see→saw)، الظروف (quick→quickly)، وأدوات الربط (and/but/because/so/when)."},
+    {id:"u5", name:"5) Outdoor", tip:"أماكن الطبيعة، verb+to مقابل verb+ing، وcould للقدرة في الماضي."},
+    {id:"u6", name:"6) Accidents", tip:"الأمراض والإصابات، must/have to/should + mustn't، والضمائر (something/anything/everything/nothing)."},
+    {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل."},
+    {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was)."}
+  ];
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الوحدات من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل وحدة.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الوحدات. جرّب وحدات '+REM_LABEL+' ويرجع هنا يعرض أضعف وحدة مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?'<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div>':'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 وحدات ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
   render("all");
 
@@ -287,7 +321,7 @@ if(!NAMES[who]){
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; document.getElementById(id).classList.add("active");
-      if(!document.getElementById(id).innerHTML) render(id);
+      if(id==="rem"){ renderRem(); } else if(!document.getElementById(id).innerHTML) render(id);
     });
   });
 }
