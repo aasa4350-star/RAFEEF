@@ -119,11 +119,17 @@ function gIrr(){ var p=gp(IRR); var o=opt(p[1], [p[2], p[0]]); return ["الما
 function gAdv(){ var p=gp(ADV); var o=opt(p[1], [p[0], p[0]+"er"]); return ["حوّل "+en("«"+p[0]+"»")+" إلى ظرف (adverb):", o[0], o[1], en(p[0]+" → "+p[1])+" (نضيف ly)."]; }
 function gConj(){ var p=gp(CONJ); var o=opt(p[1], [p[2],p[3]]); return ["أكمل بأداة الربط: "+en(p[0]), o[0], o[1], p[4]]; }
 
+/* ============ Unit 5 — Outdoor Fun (أماكن الطبيعة) ============ */
+var NATURE = [["Earth","الأرض / الكوكب"],["mountain","جبل"],["land","يابسة"],["island","جزيرة"],["waterfall","شلال"],["lake","بحيرة"],["field","حقل"],["forest","غابة"],["countryside","الرِّيف"],["desert","صحراء"],["hill","تلّة"],["cave","كهف"]];
+function gNature(){ var p=gp(NATURE); var o=opt(p[1], dist(NATURE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gNatureAr(){ var p=gp(NATURE); var o=opt(p[0], dist(NATURE,p,0)); return ["أيّ كلمة تعني «"+p[1]+"»؟", o[0], o[1], p[1]+" = "+en(p[0])+"."]; }
+
 var U1 = [gFam, gAdj1, gOpp, gFreqM, gFreqFill, gPoss, gWhose];
 var U2 = [gChoreV, gChoreO, gTool, gProg, gCan];
 var U3 = [gVerb3, gPastReg, gPastNeg, gPastQ];
 var U4 = [gVerb4, gIrr, gAdv, gConj];
-var ALL = U1.concat(U2).concat(U3).concat(U4);
+var U5 = [gNature, gNatureAr];
+var ALL = U1.concat(U2).concat(U3).concat(U4).concat(U5);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -141,12 +147,14 @@ if(!NAMES[who]){
       '<button data-tab="u2" aria-selected="false">2) Chores</button>'+
       '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
       '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
+      '<button data-tab="u5" aria-selected="false">5) Outdoor</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="u1"></section>'+
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
     '<section class="panel" id="u4"></section>'+
+    '<section class="panel" id="u5"></section>'+
     '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
 
   var CFG = {
@@ -154,7 +162,8 @@ if(!NAMES[who]){
     u1:  {gens:U1,  n:10, intro:"<b>Unit 1 — Family Events:</b> مفردات العائلة والصفات، ظروف التكرار (always/never)، الضمائر الملكية (whose).", label:"إنجليزي و1 — Family"},
     u2:  {gens:U2,  n:10, intro:"<b>Unit 2 — Chores:</b> الأعمال المنزلية، المضارع المستمر (am/is/are)، الطلب بـ Can.", label:"إنجليزي و2 — Chores"},
     u3:  {gens:U3,  n:10, intro:"<b>Unit 3 — Stories:</b> أفعال، الماضي البسيط (إثبات/نفي) والأسئلة والإجابات القصيرة.", label:"إنجليزي و3 — Stories"},
-    u4:  {gens:U4,  n:10, intro:"<b>Unit 4 — After-School Fun:</b> أنشطة، الماضي الشاذّ، الظروف (-ly)، أدوات الربط.", label:"إنجليزي و4 — After-School"}
+    u4:  {gens:U4,  n:10, intro:"<b>Unit 4 — After-School Fun:</b> أنشطة، الماضي الشاذّ، الظروف (-ly)، أدوات الربط.", label:"إنجليزي و4 — After-School"},
+    u5:  {gens:U5,  n:10, intro:"<b>Unit 5 — Outdoor Fun:</b> أماكن الطبيعة (mountain, island, waterfall, forest, desert, cave…).", label:"إنجليزي و5 — Outdoor"}
   };
 
   function render(id){
