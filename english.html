@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الإنجليزي — الصف الرابع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#2563eb; --accent-deep:#1d4ed8;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .stem .en{direction:ltr;unicode-bidi:isolate}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:left}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .explain .en{direction:ltr;unicode-bidi:isolate}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST",
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function opt(correct, others){ var o=[correct].concat(others); shuffle(o); return [o, o.indexOf(correct)]; }
+function en(s){ return '<span class="en">'+s+'</span>'; }
+// مشتّتات مميّزة من نفس القائمة (تستبعد القيمة الصحيحة وتحذف المكرّر)
+function dist(pool, item, idx, n){ var correct=item[idx], seen={}, o=[]; pool.forEach(function(x){ var v=x[idx]; if(v!==correct && !seen[v]){ seen[v]=1; o.push(v); } }); shuffle(o); return o.slice(0, n||2); }
+
+/* ============ Unit 1 — Family Events ============ */
+var FAM = [["aunt","العمّة أو الخالة"],["uncle","العمّ أو الخال"],["cousin","ابن العمّ/الخال"],["son","الابن"],["daughter","الابنة"],["grandson","الحفيد"],["granddaughter","الحفيدة"],["parent","أحد الوالدين"],["grandparent","الجدّ أو الجدّة"],["husband","الزوج"],["wife","الزوجة"]];
+var ADJ1 = [["kind","لطيف"],["helpful","متعاون"],["chatty","كثير الكلام"],["lazy","كسول"],["strong","قويّ"],["weak","ضعيف"],["tired","متعب"]];
+var FREQ = [["always","دائمًا (100%)"],["usually","عادةً"],["often","غالبًا"],["sometimes","أحيانًا"],["never","أبدًا (0%)"]];
+var POSS = [["I","mine"],["you","yours"],["he","his"],["she","hers"],["we","ours"],["they","theirs"]];
+function gFam(){ var p=gp(FAM); var o=opt(p[1], dist(FAM,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gAdj1(){ var p=gp(ADJ1); var o=opt(p[1], dist(ADJ1,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gOpp(){ var o=opt("weak",["kind","tired"]); return ["ضدّ كلمة "+en("«strong»")+":", o[0], o[1], en("strong ↔ weak")+" (قويّ ↔ ضعيف)."]; }
+function gFreqM(){ var p=gp(FREQ); var o=opt(p[1], dist(FREQ,p,1)); return ["معنى "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gFreqFill(){ var items=[["I ___ brush my teeth every day. (كل يوم)","always"],["I ___ tell lies. (أبدًا)","never"],["We ___ visit grandma on Fridays. (أحيانًا)","sometimes"]]; var p=gp(items); var o=opt(p[1], ["never","always","sometimes"].filter(function(x){return x!==p[1];}).slice(0,2)); return ["أكمل: "+en(p[0]), o[0], o[1], "الظرف المناسب: "+en(p[1])+"."]; }
+function gPoss(){ var p=gp(POSS); var o=opt(p[1], dist(POSS,p,1)); return ["الضمير الملكي لـ "+en("«"+p[0]+"»")+" (mine/yours/…):", o[0], o[1], en(p[0]+" → "+p[1])+"."]; }
+function gWhose(){ var items=[["It's her bag. = It's ___.","hers"],["It's my pen. = It's ___.","mine"],["It's your book. = It's ___.","yours"],["It's their car. = It's ___.","theirs"]]; var p=gp(items); var o=opt(p[1], dist(POSS,["x",p[1]],1)); return ["أكمل: "+en(p[0]), o[0], o[1], en(p[1])+" هو الضمير الملكي الصحيح."]; }
+
+/* ============ Unit 2 — Chores ============ */
+var CHORE = [["wash","the dishes"],["make","the bed"],["sweep","the floor"],["take out","the trash"],["set","the table"],["cut","the grass"],["feed","the animals"],["clear","the table"]];
+var TOOLS = [["broom","المكنسة"],["bucket","الدلو"],["dustpan","جاروف القمامة"]];
+function gChoreV(){ var p=gp(CHORE); var o=opt(p[0], dist(CHORE,p,0)); return ["أكمل: "+en("___ "+p[1]), o[0], o[1], en(p[0]+" "+p[1])+"."]; }
+function gChoreO(){ var p=gp(CHORE); var o=opt(p[1], dist(CHORE,p,1)); return ["أكمل: "+en(p[0]+" ___"), o[0], o[1], en(p[0]+" "+p[1])+"."]; }
+function gTool(){ var p=gp(TOOLS); var o=opt(p[1], dist(TOOLS,p,1)); return ["معنى "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gProg(){ var items=[["I ___ reading now.","am"],["She ___ cooking dinner.","is"],["They ___ playing football.","are"],["What ___ you doing?","are"],["He ___ sleeping.","is"]]; var p=gp(items); var o=opt(p[1], ["am","is","are"].filter(function(x){return x!==p[1];})); return ["أكمل (المضارع المستمر): "+en(p[0]), o[0], o[1], "الصحيح: "+en(p[1])+" (be + verb-ing)."]; }
+function gCan(){ var items=["___ you help me, please?","___ I take out the trash for you?","___ you open the window, please?"]; var p=gp(items); var o=opt("Can", ["Am","Did"]); return ["أكمل (طلب/عرض): "+en(p), o[0], o[1], en("Can")+" تُستخدم للطلب والعرض بأدب."]; }
+
+/* ============ Unit 3 — Stories ============ */
+var VERB3 = [["call","يتّصل/ينادي"],["carry","يحمل"],["climb","يتسلّق"],["cry","يبكي"],["laugh","يضحك"],["shout","يصرخ"],["invite","يدعو"],["plant","يزرع"],["water","يسقي"],["wait","ينتظر"],["prefer","يفضّل"],["score","يسجّل هدفًا"]];
+var REG = [["play","played"],["walk","walked"],["jump","jumped"],["wait","waited"],["plant","planted"],["call","called"],["climb","climbed"],["laugh","laughed"],["shout","shouted"],["water","watered"],["open","opened"],["clean","cleaned"]];
+function gVerb3(){ var p=gp(VERB3); var o=opt(p[1], dist(VERB3,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gPastReg(){ var p=gp(REG); var o=opt(p[1], [p[0], p[0]+"ing"]); return ["الماضي (Simple Past) من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+" (نضيف ed)."]; }
+function gPastNeg(){ var items=[["She ___ (not/play) yesterday.","didn't play","doesn't play"],["He ___ (not/laugh).","didn't laugh","don't laugh"],["They ___ (not/win).","didn't win","aren't win"]]; var p=gp(items); var o=opt(p[1], [p[2],"not play"]); return ["أكمل بالنفي (Simple Past): "+en(p[0]), o[0], o[1], "النفي في الماضي: "+en("didn't + verb")+"."]; }
+function gPastQ(){ var items=[["Did you win the game? — Yes, I ___.","did","didn't"],["Did she laugh? — No, she ___.","didn't","did"],["Did they play? — Yes, they ___.","did","didn't"]]; var p=gp(items); var o=opt(p[1], [p[2],"do"]); return ["أكمل الإجابة القصيرة: "+en(p[0]), o[0], o[1], "الإجابة القصيرة: "+en(p[1])+"."]; }
+
+/* ============ Unit 4 — After-School Fun ============ */
+var VERB4 = [["go shopping","يتسوّق"],["take photos","يلتقط صورًا"],["play board games","يلعب ألعاب الطاولة"],["hide","يختبئ"],["dress up","يتأنّق/يتنكّر"],["make a model","يصنع مجسّمًا"]];
+var IRR = [["go","went","goed"],["see","saw","seed"],["have","had","haved"],["run","ran","runned"],["write","wrote","writed"],["eat","ate","eated"],["take","took","taked"]];
+var ADV = [["quick","quickly"],["happy","happily"],["slow","slowly"],["loud","loudly"],["careful","carefully"],["bad","badly"],["lucky","luckily"]];
+var CONJ = [["I was tired, ___ I went to bed.","so","but","and","«so» = لذلك (نتيجة)."],["I like apples ___ bananas.","and","so","because","«and» = و (إضافة)."],["I stayed home ___ it rained.","because","and","but","«because» = لأنّ (سبب)."],["He is small ___ strong.","but","so","because","«but» = لكن (تضادّ)."],["Call me ___ you arrive.","when","but","so","«when» = عندما (زمن)."]];
+function gVerb4(){ var p=gp(VERB4); var o=opt(p[1], dist(VERB4,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gIrr(){ var p=gp(IRR); var o=opt(p[1], [p[2], p[0]]); return ["الماضي الشاذّ من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+" (فعل شاذّ)."]; }
+function gAdv(){ var p=gp(ADV); var o=opt(p[1], [p[0], p[0]+"er"]); return ["حوّل "+en("«"+p[0]+"»")+" إلى ظرف (adverb):", o[0], o[1], en(p[0]+" → "+p[1])+" (نضيف ly)."]; }
+function gConj(){ var p=gp(CONJ); var o=opt(p[1], [p[2],p[3]]); return ["أكمل بأداة الربط: "+en(p[0]), o[0], o[1], p[4]]; }
+
+var U1 = [gFam, gAdj1, gOpp, gFreqM, gFreqFill, gPoss, gWhose];
+var U2 = [gChoreV, gChoreO, gTool, gProg, gCan];
+var U3 = [gVerb3, gPastReg, gPastNeg, gPastQ];
+var U4 = [gVerb4, gIrr, gAdv, gConj];
+var ALL = U1.concat(U2).concat(U3).concat(U4);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a><a href="index.html">📊 اللوحة</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب الإنجليزي (Part 1) — 4 وحدات</div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
+      '<button data-tab="u1" aria-selected="false">1) Family</button>'+
+      '<button data-tab="u2" aria-selected="false">2) Chores</button>'+
+      '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
+      '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
+    '</div>'+
+    '<section class="panel active" id="all"></section>'+
+    '<section class="panel" id="u1"></section>'+
+    '<section class="panel" id="u2"></section>'+
+    '<section class="panel" id="u3"></section>'+
+    '<section class="panel" id="u4"></section>'+
+    '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
+
+  var CFG = {
+    all: {gens:ALL, n:15, intro:"اختبار شامل على الوحدات 1–4: مفردات وقواعد — <b>أسئلة جديدة كل مرة</b>.", label:"إنجليزي — شامل"},
+    u1:  {gens:U1,  n:10, intro:"<b>Unit 1 — Family Events:</b> مفردات العائلة والصفات، ظروف التكرار (always/never)، الضمائر الملكية (whose).", label:"إنجليزي و1 — Family"},
+    u2:  {gens:U2,  n:10, intro:"<b>Unit 2 — Chores:</b> الأعمال المنزلية، المضارع المستمر (am/is/are)، الطلب بـ Can.", label:"إنجليزي و2 — Chores"},
+    u3:  {gens:U3,  n:10, intro:"<b>Unit 3 — Stories:</b> أفعال، الماضي البسيط (إثبات/نفي) والأسئلة والإجابات القصيرة.", label:"إنجليزي و3 — Stories"},
+    u4:  {gens:U4,  n:10, intro:"<b>Unit 4 — After-School Fun:</b> أنشطة، الماضي الشاذّ، الظروف (-ly)، أدوات الربط.", label:"إنجليزي و4 — After-School"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">Q'+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+  render("all");
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; document.getElementById(id).classList.add("active");
+      if(!document.getElementById(id).innerHTML) render(id);
+    });
+  });
+}
+</script>
+</body>
+</html>
