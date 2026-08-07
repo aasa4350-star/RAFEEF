@@ -318,24 +318,27 @@ var TAHSILI = [
 ];
 
 var app = document.getElementById("app");
+var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (مناسبة لعمره)
 app.innerHTML =
-  '<header class="top"><p class="eyebrow">اختبارات تجريبية · بأسلوب قياس</p><h1>📊 قدرات وتحصيلي — '+name+'</h1></header>'+
+  '<header class="top"><p class="eyebrow">'+(VERBAL_ONLY?'تدريب لفظي':'اختبارات تجريبية · بأسلوب قياس')+'</p><h1>'+(VERBAL_ONLY?'📖 قدرات لفظي — ':'📊 قدرات وتحصيلي — ')+name+'</h1></header>'+
   '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="index.html">📊 اللوحة</a></div>'+
-  '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>'+
+  (VERBAL_ONLY ? '' : '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>')+
   '<div class="tabs" role="tablist">'+
     '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
-    (YOUNG ? '' : '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
-    '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>')+
-    '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
-    '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
-    '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'+
+    (VERBAL_ONLY ? '' : (
+      (YOUNG ? '' : '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
+      '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>')+
+      '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
+      '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'))+
   '</div>'+
   '<section class="panel active" id="v"></section>'+
-  (YOUNG ? '' : '<section class="panel" id="q"></section>'+
-  '<section class="panel" id="t"></section>')+
-  '<section class="panel" id="s"></section>'+
-  '<section class="panel" id="rem"></section>'+
-  '<section class="panel" id="o"></section>'+
+  (VERBAL_ONLY ? '' : (
+    (YOUNG ? '' : '<section class="panel" id="q"></section>'+
+    '<section class="panel" id="t"></section>')+
+    '<section class="panel" id="s"></section>'+
+    '<section class="panel" id="rem"></section>'+
+    '<section class="panel" id="o"></section>'))+
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
 function shuffleQ(q){
@@ -416,18 +419,20 @@ function renderSet(id, items, intro, regen, label){
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
-  renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال · 13 دقيقة"+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
-  if(!YOUNG){
-    renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
-    renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+  renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
+  if(!VERBAL_ONLY){
+    if(!YOUNG){
+      renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
+      renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+    }
+    renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
   }
-  renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
 }
-document.getElementById("timedToggle").addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
+var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
 buildAll();
 
 // نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
-(function(){
+if(document.getElementById("o")) (function(){
   var link = function(href,title,desc){
     return '<a href="'+href+'" target="_blank" rel="noopener" style="display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);color:var(--ink)">'+
       '<div style="font-weight:800;color:var(--accent)">'+title+' ↗</div>'+
