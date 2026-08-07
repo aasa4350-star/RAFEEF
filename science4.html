@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>العلوم — الصف الرابع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#0891b2; --accent-deep:#0e7490;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:105px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:240px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST",
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+/* بنوك أسئلة الوحدة الأولى: المخلوقات الحية — [السؤال، [الصحيح، مشتت، مشتت]، الشرح] */
+var CELLS = [
+  ["الوحدة الأساسية لبناء جسم المخلوق الحي هي:",["الخلية","النسيج","العضو"],"الخلية هي الوحدة الأساسية لبناء أجسام المخلوقات الحية."],
+  ["الجزء الذي يتحكم في نشاط الخلية ويحمل الصفات الوراثية:",["النواة","الغشاء الخلوي","السيتوبلازم"],"النواة تتحكم في الخلية وتحمل المادة الوراثية."],
+  ["الجزء الذي يحيط بالخلية ويتحكم في دخول المواد وخروجها:",["الغشاء الخلوي","النواة","الجدار الخلوي"],"الغشاء الخلوي يحيط بالخلية وينظّم دخول المواد وخروجها."],
+  ["الجزء الموجود في الخلية النباتية فقط ويصنع الغذاء:",["البلاستيدات الخضراء","النواة","الغشاء الخلوي"],"البلاستيدات الخضراء تصنع الغذاء بالبناء الضوئي، وتوجد في الخلية النباتية."],
+  ["الجدار الخلوي يوجد في:",["الخلية النباتية","الخلية الحيوانية","لا يوجد في أي خلية"],"الجدار الخلوي يوجد في الخلية النباتية ويعطيها شكلًا ثابتًا."],
+  ["السيتوبلازم هو:",["سائل تسبح فيه مكوّنات الخلية","غطاء صلب للخلية","نواة الخلية"],"السيتوبلازم سائل هلامي تسبح فيه أجزاء الخلية."],
+  ["تصنع البلاستيدات الخضراء الغذاء بعملية:",["البناء الضوئي","التنفّس","الهضم"],"البناء الضوئي: صنع الغذاء بمساعدة ضوء الشمس."],
+  ["تختلف الخلية الحيوانية عن النباتية بأنها:",["ليس لها جدار خلوي","لها جدار خلوي","لها بلاستيدات خضراء"],"الخلية الحيوانية ليس لها جدار خلوي ولا بلاستيدات خضراء."]
+];
+var CLASSIFY = [
+  ["أيٌّ ممّا يلي من صفات المخلوق الحي؟",["ينمو ويتكاثر","لا يتغذّى","لا يتنفّس"],"من صفات المخلوق الحي: ينمو، يتكاثر، يتغذّى، يتنفّس، يستجيب."],
+  ["مجموعة الخلايا المتشابهة التي تعمل معًا تكوّن:",["نسيجًا","عضوًا","جهازًا"],"الخلايا المتشابهة تكوّن نسيجًا، والأنسجة تكوّن عضوًا."],
+  ["ترتيب مستويات البناء من الأصغر إلى الأكبر:",["خلية ← نسيج ← عضو","عضو ← نسيج ← خلية","نسيج ← خلية ← عضو"],"الترتيب: خلية ← نسيج ← عضو ← جهاز."],
+  ["يحتاج المخلوق الحي لكي يعيش إلى:",["الغذاء والماء والهواء","الغذاء فقط","الماء فقط"],"يحتاج المخلوق الحي إلى الغذاء والماء والهواء."],
+  ["المخلوق الحي يستجيب لـ:",["المؤثّرات من حوله","لا شيء","الأعداد"],"من صفات الحي الاستجابة للمؤثّرات (كالضوء والحرارة)."],
+  ["تُصنّف المخلوقات الحية إلى مجموعات كبيرة تُسمّى:",["ممالك","أعداد","ألوان"],"تُصنّف المخلوقات الحية إلى ممالك."],
+  ["عملية إنتاج مخلوقات جديدة من النوع نفسه تُسمّى:",["التكاثر","التنفّس","التغذية"],"التكاثر: إنتاج أفراد جدد من النوع نفسه."]
+];
+var INVERT = [
+  ["الحيوانات اللافقارية هي التي:",["ليس لها عمود فقري","لها عمود فقري","تطير فقط"],"اللافقاريات: حيوانات ليس لها عمود فقري."],
+  ["أيٌّ ممّا يلي حيوان لافقاري؟",["النملة","السمكة","الطائر"],"النملة (حشرة) لافقارية، بينما السمكة والطائر فقاريان."],
+  ["أيٌّ ممّا يلي حيوان لافقاري؟",["الدودة","الأسد","الحمامة"],"الدودة لافقارية، والأسد والحمامة فقاريان."],
+  ["العنكبوت حيوان:",["لافقاري","فقاري","من الثدييات"],"العنكبوت لافقاري (ليس له عمود فقري)."],
+  ["قنديل البحر والإسفنج من الحيوانات:",["اللافقارية","الفقارية","الطيور"],"قنديل البحر والإسفنج لافقاريان."],
+  ["القوقع (الحلزون) حيوان:",["لافقاري","فقاري","برمائي"],"القوقع من الرخويات وهي لافقارية."]
+];
+var VERT = [
+  ["الحيوانات الفقارية تتميّز بأن لها:",["عمودًا فقريًا","ريشًا فقط","حراشف فقط"],"الفقاريات لها عمود فقري."],
+  ["الأسماك تتنفّس بواسطة:",["الخياشيم","الرئتين","الجلد"],"الأسماك تتنفّس بالخياشيم وتعيش في الماء."],
+  ["جسم الطيور مغطّى بـ:",["الريش","الفرو","الحراشف"],"جسم الطيور مغطّى بالريش ولها منقار وتضع البيض."],
+  ["الحيوان الذي يلد صغاره ويُرضعها الحليب من:",["الثدييات","الطيور","الأسماك"],"الثدييات تلد صغارها وترضعها الحليب."],
+  ["الضفدع من مجموعة:",["البرمائيات","الزواحف","الأسماك"],"الضفدع من البرمائيات التي تعيش في الماء واليابسة."],
+  ["الثعبان والسلحفاة من:",["الزواحف","الطيور","الثدييات"],"الثعبان والسلحفاة من الزواحف، جلدها جافّ مغطّى بالحراشف."],
+  ["أيٌّ ممّا يلي من الثدييات؟",["الجمل","السمكة","الحمامة"],"الجمل من الثدييات (يلد ويرضع)."],
+  ["تتكاثر معظم الطيور والزواحف بـ:",["وضع البيض","الولادة","الانقسام"],"معظم الطيور والزواحف تتكاثر بوضع البيض."],
+  ["البرمائيات تعيش:",["في الماء واليابسة","في الماء فقط","في الهواء فقط"],"البرمائيات تعيش في الماء واليابسة."],
+  ["جسم الثدييات مغطّى غالبًا بـ:",["الشعر أو الفرو","الريش","الحراشف"],"جسم الثدييات مغطّى غالبًا بالشعر أو الفرو."]
+];
+function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
+var CELLSG=[bankGen(CELLS)], CLASG=[bankGen(CLASSIFY)], INVG=[bankGen(INVERT)], VERTG=[bankGen(VERT)];
+var ALLG=[bankGen(CELLS), bankGen(CLASSIFY), bankGen(INVERT), bankGen(VERT)];
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · العلوم</p><h1>🧪 العلوم — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 الاختبار المدرسي</a><a href="math4.html?who='+who+'">🔢 الرياضيات</a><a href="index.html">📊 اللوحة</a></div>'+
+    '<div class="unit">📘 الوحدة الأولى: <b>المخلوقات الحية</b> — الخلايا، التصنيف، اللافقاريات، الفقاريات</div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="all" aria-selected="true">اختبار الوحدة 📝</button>'+
+      '<button data-tab="cells" aria-selected="false">الخلية 🔬</button>'+
+      '<button data-tab="clas" aria-selected="false">التصنيف 🌿</button>'+
+      '<button data-tab="inv" aria-selected="false">اللافقاريات 🐛</button>'+
+      '<button data-tab="vert" aria-selected="false">الفقاريات 🐟</button>'+
+    '</div>'+
+    '<section class="panel active" id="all"></section>'+
+    '<section class="panel" id="cells"></section>'+
+    '<section class="panel" id="clas"></section>'+
+    '<section class="panel" id="inv"></section>'+
+    '<section class="panel" id="vert"></section>'+
+    '<footer>العلوم · الصف الرابع · الوحدة الأولى «المخلوقات الحية» · مطابق للكتاب — من إعداد المعلّم</footer>';
+
+  var CFG = {
+    all:  {gens:ALLG,  n:12, intro:"اختبار شامل على الوحدة: الخلية، التصنيف، اللافقاريات، الفقاريات — <b>أسئلة جديدة كل مرة</b>.", label:"علوم و1 — الوحدة"},
+    cells:{gens:CELLSG,n:8,  intro:"<b>الخلية:</b> الوحدة الأساسية للبناء، أجزاؤها، والفرق بين الخلية النباتية والحيوانية.", label:"علوم و1 — الخلية"},
+    clas: {gens:CLASG, n:7,  intro:"<b>تصنيف المخلوقات:</b> صفات المخلوق الحي، مستويات البناء (خلية ← نسيج ← عضو)، الممالك.", label:"علوم و1 — التصنيف"},
+    inv:  {gens:INVG,  n:6,  intro:"<b>الحيوانات اللافقارية:</b> التي ليس لها عمود فقري (الحشرات، الديدان، الرخويات…).", label:"علوم و1 — اللافقاريات"},
+    vert: {gens:VERTG, n:10, intro:"<b>الحيوانات الفقارية:</b> الأسماك، البرمائيات، الزواحف، الطيور، الثدييات.", label:"علوم و1 — الفقاريات"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+  }
+  render("all");
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; document.getElementById(id).classList.add("active");
+      if(!document.getElementById(id).innerHTML) render(id);
+    });
+  });
+}
+</script>
+</body>
+</html>
