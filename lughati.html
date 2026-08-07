@@ -167,10 +167,22 @@ var FH = [
 ];
 function gFahm(){ var p=gp(FH); var o=opt(p[1][p[2]], p[1].filter(function(_,k){return k!==p[2];})); return [p[0], o[0], o[1], p[3]]; }
 
+// ---- النص الشعري: «لِمَ تأتِ الفراشةُ؟» — محمد الفاضل سليمان ----
+var SHIR = [
+  ["مَن شاعر النص الشعري «لِمَ تأتِ الفراشةُ؟»",["محمد الفاضل سليمان","أحمد شوقي","حافظ إبراهيم"],0,"شاعر النص: محمد الفاضل سليمان."],
+  ["ما الكائن الذي يتحدّث عنه النص الشعري؟",["الفراشة","النملة","العصفور"],0,"النص الشعري يتحدّث عن الفراشة."],
+  ["بمَ تتميّز الفراشة في النص؟",["بألوانها الجميلة","بصوتها العالي","بحجمها الكبير"],0,"تتميّز الفراشة بجمال ألوانها."],
+  ["على ماذا تحطّ الفراشة؟",["على الزهر والورد","على الحجر","على السيارة"],0,"تحطّ الفراشة على الأزهار والورد."],
+  ["نوع النص «لِمَ تأتِ الفراشةُ؟»:",["نصّ شعري","نصّ علمي","خبر صحفي"],0,"هو نصّ شعري (قصيدة)."],
+  ["ماذا تنقل الفراشة بين الأزهار؟",["حبوب اللقاح","الحجارة","الماء"],0,"تنقل الفراشة حبوب اللقاح بين الأزهار فتساعد على تكاثر النبات."]
+];
+function gPoem(){ var p=gp(SHIR); var o=opt(p[1][p[2]], p[1].filter(function(_,k){return k!==p[2];})); return [p[0], o[0], o[1], p[3]]; }
+
 var NAHW = [gWordType, gMubtada, gKhabar, gRaf3, gJarr, gFilType, gFail, gMafool, gDefMaf, gNasbMaf];
 var IMLA = [gHamza, gMutatarrifa, gTa, gHadhf];
 var FAHM = [gFahm];
-var ALL  = NAHW.concat(IMLA).concat(FAHM);
+var SHER = [gPoem];
+var ALL  = NAHW.concat(IMLA).concat(FAHM).concat(SHER);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -187,18 +199,21 @@ if(!NAMES[who]){
       '<button data-tab="nahw" aria-selected="false">النحو ✍️</button>'+
       '<button data-tab="imla" aria-selected="false">الإملاء 📖</button>'+
       '<button data-tab="fahm" aria-selected="false">فهم النص 🌿</button>'+
+      '<button data-tab="shir" aria-selected="false">النص الشعري 🦋</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="nahw"></section>'+
     '<section class="panel" id="imla"></section>'+
     '<section class="panel" id="fahm"></section>'+
+    '<section class="panel" id="shir"></section>'+
     '<footer>لغتي الصف الرابع · الوحدة الأولى «صحتي وبيئتي» · من إعداد المعلّم بمطابقة الكتاب</footer>';
 
   var CFG = {
     all:  {gens:ALL,  n:15, intro:"اختبار شامل على الوحدة: نحو + إملاء + فهم — <b>أسئلة جديدة كل مرة</b>.", label:"لغتي و١ — الوحدة"},
     nahw: {gens:NAHW, n:10, intro:"النحو: أنواع الكلمة، المبتدأ والخبر، حروف الجر، أنواع الفعل، الفاعل، المفعول به.", label:"لغتي و١ — نحو"},
     imla: {gens:IMLA, n:10, intro:"الإملاء: همزتا القطع والوصل، الهمزة المتطرفة، التاء المربوطة والمفتوحة، حذف الألف.", label:"لغتي و١ — إملاء"},
-    fahm: {gens:FAHM, n:10, intro:"الفهم القرائي من نصّ الكتاب: <b>«التصحّر وأثره في البيئة»</b> — الأسباب والآثار والحلول والمفردات.", label:"لغتي و١ — فهم"}
+    fahm: {gens:FAHM, n:10, intro:"الفهم القرائي من نصّ الكتاب: <b>«التصحّر وأثره في البيئة»</b> — الأسباب والآثار والحلول والمفردات.", label:"لغتي و١ — فهم"},
+    shir: {gens:SHER, n:6,  intro:"النص الشعري: <b>«لِمَ تأتِ الفراشةُ؟»</b> — محمد الفاضل سليمان (الفراشة وألوانها والأزهار).", label:"لغتي و١ — النص الشعري"}
   };
 
   function render(id){
