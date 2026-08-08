@@ -451,6 +451,10 @@ if(!META[who] || !DATA[who]){
   function getWeak(){ try{ return JSON.parse(localStorage.getItem(vKey("weak"))||"{}")||{}; }catch(e){ return {}; } }
   function setWeak(o){ try{ localStorage.setItem(vKey("weak"), JSON.stringify(o)); }catch(e){} }
   function markWeak(word, wrong){ var wk=getWeak(); if(wrong){ wk[word]=(wk[word]||0)+1; } else { if(wk[word]){ delete wk[word]; } } setWeak(wk); }
+  // الكلمات الي راجعها صح — ما ترجع في المراجعة (إلا لو تصفير)
+  function getReviewed(){ try{ return JSON.parse(localStorage.getItem(vKey("reviewed"))||"{}")||{}; }catch(e){ return {}; } }
+  function setReviewed(o){ try{ localStorage.setItem(vKey("reviewed"), JSON.stringify(o)); }catch(e){} }
+  function markReviewed(word, ok){ var rv=getReviewed(); if(ok){ rv[word]=1; } else { if(rv[word]){ delete rv[word]; } } setReviewed(rv); }
 
   function renderVocab(){
     var sec = document.getElementById("vocab");
@@ -464,11 +468,12 @@ if(!META[who] || !DATA[who]){
       headTitle = "🔁 مراجعة المحفوظ";
       var pool = VOCAB300.slice(0, learned);
       if(pool.length){
-        var wk = getWeak();
+        var wk = getWeak(), rv = getReviewed();
+        // الكلمات الي غلط فيها سابقاً ترجع أولاً، ثم كلمات جديدة لم تُراجع بعد
         var weakList = shuffle(pool.filter(function(w){ return wk[w[0]]; }));
-        var rest = shuffle(pool.slice());
+        var freshList = shuffle(pool.filter(function(w){ return !wk[w[0]] && !rv[w[0]]; }));
         var seen={}; V=[];
-        weakList.concat(rest).forEach(function(w){ if(V.length<VOC_STEP && !seen[w[0]]){ seen[w[0]]=1; V.push(w); } });
+        weakList.concat(freshList).forEach(function(w){ if(V.length<VOC_STEP && !seen[w[0]]){ seen[w[0]]=1; V.push(w); } });
       } else { V=[]; }
     } else {
       isNew=true; headTitle = "📚 تعلّم كلمات جديدة";
@@ -487,19 +492,25 @@ if(!META[who] || !DATA[who]){
 
     if(!V.length){
       if(vocMode==="review"){
-        html += '<div class="q" style="text-align:center">لسّا ما حفظت كلمات. اضغط «تعلّم ١٠ جديدة» أول 📚</div>';
+        if(learned===0){
+          html += '<div class="q" style="text-align:center">لسّا ما حفظت كلمات. اضغط «تعلّم '+VOC_STEP_AR+' جديدة» أول 📚</div>';
+        } else {
+          html += '<div class="q" style="text-align:center">🎉 راجعت كل كلماتك المحفوظة بنجاح! ما بقى شي للمراجعة.<br>تعلّم كلمات جديدة، أو أعد مراجعة الكل من جديد.</div>'+
+            '<div style="text-align:center;margin-top:10px"><button data-rereview class="chk" style="width:auto;padding:10px 18px">🔁 أعد مراجعة الكل من جديد</button></div>';
+        }
       } else {
         html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+VOC_TOTAL+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
       }
       html += '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
       sec.innerHTML = html;
       sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocMode=b.dataset.mode; renderVocab(); }); });
-      var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); renderVocab(); } });
+      var rr=sec.querySelector("[data-rereview]"); if(rr) rr.addEventListener("click",function(){ setReviewed({}); renderVocab(); });
+      var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); setReviewed({}); renderVocab(); } });
       return;
     }
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+VOC_TOTAL+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
-                          : '<p class="hint">🔁 مراجعة من كلماتك المحفوظة (نركّز على اللي غلطت فيها). اكتب الإنجليزي ثم «تحقّق».</p>';
+                          : '<p class="hint">🔁 كل مراجعة كلمات جديدة من محفوظك — الكلمة الي تغلط فيها بس ترجع لك في المراجعة الجاية. اكتب الإنجليزي ثم «تحقّق».</p>';
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote;
     V.forEach(function(item,i){
       var arWord = item[1][0];
@@ -540,7 +551,7 @@ if(!META[who] || !DATA[who]){
         var enOk = norm(ein.value,false)===norm(word,false);
         if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
         else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
-        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); }
+        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); if(vocMode==="review"){ markReviewed(word, enOk); } }
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         onComplete();
       });
