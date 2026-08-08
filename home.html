@@ -203,6 +203,7 @@ async function loadReport(){
 
   if(practice.length){
     var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    var durTxt=function(p){ var d=p.meta.dur; if(d==null) return ''; var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2)?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; return ' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; };
     var currMap={}, otherMap={};
     var vocabAll=[];
     practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
@@ -217,7 +218,6 @@ async function loadReport(){
       var rW=rev.reduce(function(s,p){return s+(p.meta.total||0);},0), rC=rev.reduce(function(s,p){return s+(p.meta.correct||0);},0);
       var allW=vocabAll.reduce(function(s,p){return s+(p.meta.total||0);},0), allC=vocabAll.reduce(function(s,p){return s+(p.meta.correct||0);},0);
       var lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      var durTxt=function(p){ var d=p.meta.dur; if(d==null) return ' · ⏱️ —'; var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2)?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; return ' · ⏱️ '+d+'ث ('+spw+'ث/كلمة)'+warn; };
       var revList=rev.slice(0,6).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>🔁 '+saTime(p.created_at)+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+'</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
         (vLearned>0?'<li>📚 حفظ: <b>'+vLearned+' / '+vTotal+' كلمة</b> ('+lpct+'%)</li>':'')+
@@ -246,7 +246,7 @@ async function loadReport(){
     if(Object.keys(otherMap).length){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
         Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
-          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span>'+durTxt(p)+'</li>'; }).join("")+
         '</ul></div>';
     }
   }
@@ -255,7 +255,7 @@ async function loadReport(){
     html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">المستوى (متوسط '+rows.length+' محاولة)</div><div class="grid2">'+
       '<div class="stat"><div class="lbl">الإنجليزي</div><div class="val">'+enAvg+'%</div></div>'+
       '<div class="stat"><div class="lbl">الرياضيات</div><div class="val">'+maAvg+'%</div></div></div>'+
-      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+'</span></div>':'')+
+      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+((latest.meta&&latest.meta.total_sec)?' · المدة الكلية '+latest.meta.total_sec+'ث':'')+'</span></div>':'')+
       (tr.length>1?'<div style="font-weight:800;margin:16px 4px 6px">التطوّر</div><div class="trend">'+tr.map(function(p){return '<div class="col"><div class="pc">'+p+'%</div><div class="bxr" style="height:'+Math.max(6,p*0.8)+'px"></div></div>';}).join("")+'</div>':'')+
       '</div>';
 

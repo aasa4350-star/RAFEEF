@@ -189,6 +189,7 @@ async function main(){
 
   if(practice.length){
     const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    const durTxt=p=>{ const d=p.meta.dur; if(d==null) return ``; const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; return ` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; };
     const currMap={}, otherMap={};
     const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
@@ -203,8 +204,7 @@ async function main(){
       const rW=rev.reduce((s,p)=>s+(p.meta.total||0),0), rC=rev.reduce((s,p)=>s+(p.meta.correct||0),0);
       const allW=vocabAll.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabAll.reduce((s,p)=>s+(p.meta.correct||0),0);
       const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      const durTxt=p=>{ const d=p.meta.dur; if(d==null) return ` · ⏱️ —`; const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; return ` · ⏱️ ${d}ث (${spw}ث/كلمة)${warn}`; };
-      const revList=rev.slice(0,6).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>🔁 ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${durTxt(p)}</li>`; }).join("");
+      const revList=rev.slice(0,6).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); return `<li>🔁 ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
         (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
         (rW?`<li>🔁 راجع: <b>${rW} كلمة</b> — درجته ${rC}/${rW} (${rpct}%)</li>`:`<li>🔁 المراجعة: لسّا ما بدأ</li>`)+
@@ -233,7 +233,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
         <div class="card"><ul class="weak">`+
         Object.keys(otherMap).map(t=>{ const p=otherMap[t]; const pc=pct(p.meta.correct,p.meta.total);
-          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
+          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}</li>`; }).join("")+
         `</ul></div>`;
     }
   }
@@ -246,7 +246,7 @@ async function main(){
       <div class="stat"><div class="lbl">الرياضيات</div><div class="val">${maAvg}%</div></div>
     </div>
     ${beh?`<div style="margin-top:12px" class="behav ${beh.good?'ok':'no'}"><span class="be">${beh.emoji}</span>
-      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}</span></div>`:''}
+      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}${(latest.meta&&latest.meta.total_sec)?` · المدة الكلية ${latest.meta.total_sec}ث`:''}</span></div>`:''}
     ${tr.length>1?`<div class="sec-title" style="margin:16px 4px 6px"><span class="dot"></span> التطوّر</div>
       <div class="trend">${tr.map(p=>`<div class="col"><div class="pc">${p}%</div><div class="bxr" style="height:${Math.max(6,p*0.8)}px"></div></div>`).join("")}</div>`:''}
     </div>`;
