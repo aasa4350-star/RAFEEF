@@ -188,12 +188,33 @@ async function main(){
     </div>`:""}`;
 
   if(practice.length){
-    const byTest={}; practice.forEach(p=>{ if(!byTest[p.meta.test]) byTest[p.meta.test]=p; });
-    html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
-      <div class="card"><ul class="weak">`+
-      Object.keys(byTest).map(t=>{ const p=byTest[t]; const pc=pct(p.meta.correct,p.meta.total);
-        return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
-      `</ul></div>`;
+    const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    const currMap={}, otherMap={};
+    practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
+      if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; } else { if(!otherMap[t]) otherMap[t]=p; } });
+    // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
+    const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
+    if(Object.keys(bySubj).length){
+      html+=`<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>`;
+      ["لغتي","إنجليزي","رياضيات","علوم"].forEach(subj=>{
+        const arr=bySubj[subj]; if(!arr||!arr.length) return;
+        arr.sort((a,b)=> (a.meta.test<b.meta.test)?-1:1);
+        const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
+        const acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
+        html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg}%</span></div><ul class="weak">`+
+          arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=(p.meta.test||"").replace(subj+" ",""); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(p.created_at)}</span></li>`; }).join("")+
+          `</ul></div>`;
+      });
+    }
+    // الاختبارات التجريبية (قدرات/تحصيلي/STEP)
+    if(Object.keys(otherMap).length){
+      html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
+        <div class="card"><ul class="weak">`+
+        Object.keys(otherMap).map(t=>{ const p=otherMap[t]; const pc=pct(p.meta.correct,p.meta.total);
+          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
+        `</ul></div>`;
+    }
   }
 
   if(rows.length){

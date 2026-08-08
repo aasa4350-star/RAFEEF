@@ -202,11 +202,32 @@ async function loadReport(){
   var html='<div class="sec-title"><span class="dot"></span> 📊 نتيجتك وتقريرك</div>';
 
   if(practice.length){
-    var byTest={}; practice.forEach(function(p){ if(!byTest[p.meta.test]) byTest[p.meta.test]=p; });
-    html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
-      Object.keys(byTest).map(function(t){ var p=byTest[t]; var pc=pct(p.meta.correct,p.meta.total);
-        return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
-      '</ul></div>';
+    var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    var currMap={}, otherMap={};
+    practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
+      if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; } else { if(!otherMap[t]) otherMap[t]=p; } });
+    // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
+    var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
+    if(Object.keys(bySubj).length){
+      html+='<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>';
+      ["لغتي","إنجليزي","رياضيات","علوم"].forEach(function(subj){
+        var arr=bySubj[subj]; if(!arr||!arr.length) return;
+        arr.sort(function(a,b){ return (a.meta.test<b.meta.test)?-1:1; });
+        var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
+        var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
+        html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+avg+'%</span></div><ul class="weak">'+
+          arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=(p.meta.test||"").replace(subj+" ",""); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+          '</ul></div>';
+      });
+    }
+    // الاختبارات التجريبية (قدرات/تحصيلي/STEP)
+    if(Object.keys(otherMap).length){
+      html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
+        Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
+          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+        '</ul></div>';
+    }
   }
 
   if(rows.length){
