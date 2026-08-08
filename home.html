@@ -203,7 +203,7 @@ async function loadReport(){
 
   if(practice.length){
     var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
-    var durTxt=function(p){ var d=p.meta.dur; if(d==null) return ''; var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2)?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; return ' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; };
+    var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2)?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
     var currMap={}, otherMap={};
     var vocabAll=[];
     practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
@@ -255,7 +255,7 @@ async function loadReport(){
     html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">المستوى (متوسط '+rows.length+' محاولة)</div><div class="grid2">'+
       '<div class="stat"><div class="lbl">الإنجليزي</div><div class="val">'+enAvg+'%</div></div>'+
       '<div class="stat"><div class="lbl">الرياضيات</div><div class="val">'+maAvg+'%</div></div></div>'+
-      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+((latest.meta&&latest.meta.total_sec)?' · المدة الكلية '+latest.meta.total_sec+'ث':'')+'</span></div>':'')+
+      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+((latest.meta&&latest.meta.total_sec)?' · المدة الكلية '+latest.meta.total_sec+'ث':'')+((latest.meta&&latest.meta.exits)?' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+latest.meta.exits+' مرة ⚠️</span>':'')+'</span></div>':'')+
       (tr.length>1?'<div style="font-weight:800;margin:16px 4px 6px">التطوّر</div><div class="trend">'+tr.map(function(p){return '<div class="col"><div class="pc">'+p+'%</div><div class="bxr" style="height:'+Math.max(6,p*0.8)+'px"></div></div>';}).join("")+'</div>':'')+
       '</div>';
 

@@ -186,6 +186,15 @@ function saveScore(test, correct, total, extra){
   }catch(e){}
 }
 
+// ===== كشف الخروج من الصفحة أثناء الحل (استعانة بمترجم/تطبيق ثاني) =====
+var AWAY = { total:0, exits:0, hiddenAt:null };
+function _awayOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
+function _awayIn(){ if(AWAY.hiddenAt!=null){ AWAY.total += (Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; } }
+document.addEventListener("visibilitychange", function(){ if(document.hidden) _awayOut(); else _awayIn(); });
+window.addEventListener("blur", _awayOut); window.addEventListener("focus", _awayIn);
+function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
+function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
+
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var CHOSEN = { en:null, ar:null };
 function voicesFor(isAr){
@@ -362,8 +371,8 @@ if(!META[who] || !DATA[who]){
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
-    var t0=Date.now();
-    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur}); } }
+    var t0=Date.now(), aw0=awaySnap();
+    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur, away:aw.away, exits:aw.exits}); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
@@ -424,7 +433,7 @@ if(!META[who] || !DATA[who]){
     });
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
-    var t0=Date.now();
+    var t0=Date.now(), aw0=awaySnap();
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -435,7 +444,7 @@ if(!META[who] || !DATA[who]){
           if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[right].classList.add("correct"); }
           scoreEl.textContent="الفهم: "+correct+" / "+total;
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur}); }
+          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits}); }
         });
       });
     });
@@ -537,11 +546,11 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML = html;
 
     var done={}, tried={}, correct=0, saved=false, advanced=false, total=V.length;
-    var t0=Date.now(); // بداية توقيت الجلسة — لقياس المدة (كشف الحل بسرعة غير طبيعية)
+    var t0=Date.now(); var aw0=awaySnap(); // بداية توقيت الجلسة + رصد الخروج من الصفحة
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
-      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur }); }
+      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits }); }
       if(isNew && !advanced && startIdx<VOC_TOTAL){
         advanced=true; setLearned(startIdx+total);
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";

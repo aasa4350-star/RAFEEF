@@ -189,7 +189,7 @@ async function main(){
 
   if(practice.length){
     const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
-    const durTxt=p=>{ const d=p.meta.dur; if(d==null) return ``; const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; return ` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; };
+    const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
     const currMap={}, otherMap={};
     const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
@@ -246,7 +246,7 @@ async function main(){
       <div class="stat"><div class="lbl">الرياضيات</div><div class="val">${maAvg}%</div></div>
     </div>
     ${beh?`<div style="margin-top:12px" class="behav ${beh.good?'ok':'no'}"><span class="be">${beh.emoji}</span>
-      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}${(latest.meta&&latest.meta.total_sec)?` · المدة الكلية ${latest.meta.total_sec}ث`:''}</span></div>`:''}
+      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}${(latest.meta&&latest.meta.total_sec)?` · المدة الكلية ${latest.meta.total_sec}ث`:''}${(latest.meta&&latest.meta.exits)?` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${latest.meta.exits} مرة ⚠️</span>`:''}</span></div>`:''}
     ${tr.length>1?`<div class="sec-title" style="margin:16px 4px 6px"><span class="dot"></span> التطوّر</div>
       <div class="trend">${tr.map(p=>`<div class="col"><div class="pc">${p}%</div><div class="bxr" style="height:${Math.max(6,p*0.8)}px"></div></div>`).join("")}</div>`:''}
     </div>`;

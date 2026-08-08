@@ -1365,6 +1365,13 @@ if(!STUDENTS[who]){
   document.documentElement.style.setProperty("--accent", S.accent);
   document.documentElement.style.setProperty("--accent-soft", S.soft);
   document.documentElement.style.setProperty("--accent-deep", S.deep);
+  // كشف الخروج من الصفحة أثناء الاختبار (استعانة بمترجم/تطبيق ثاني)
+  var AWAY={total:0,exits:0,hiddenAt:null};
+  function _aOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
+  function _aIn(){ if(AWAY.hiddenAt!=null){ AWAY.total+=(Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; } }
+  document.addEventListener("visibilitychange",function(){ if(document.hidden)_aOut(); else _aIn(); });
+  window.addEventListener("blur",_aOut); window.addEventListener("focus",_aIn);
+  function awayNow(){ var extra=AWAY.hiddenAt!=null?(Date.now()-AWAY.hiddenAt):0; return { away:Math.round((AWAY.total+extra)/1000), exits:AWAY.exits+(AWAY.hiddenAt!=null?1:0) }; }
   document.title = `اختبار ${S.name} — ${S.grade}`;
   app.innerHTML = `
     <header class="top">
@@ -1551,7 +1558,7 @@ if(!STUDENTS[who]){
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
-        meta: { per, avg_sec: avg, total_sec: total,
+        meta: { per, avg_sec: avg, total_sec: total, away: awayNow().away, exits: awayNow().exits,
           paper: { date: new Date().toISOString(),
             en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
             en: buildPaper(en), ma: buildPaper(ma) } }
