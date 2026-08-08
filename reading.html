@@ -196,6 +196,8 @@ function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
 var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
 function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
+// لو خرج من الصفحة أثناء المراجعة، نحفظ اللي سوّاه لين الآن (عشان لا تضيع مراجعته)
+document.addEventListener("visibilitychange", function(){ if(document.hidden && typeof renderVocab!=="undefined" && renderVocab._save) renderVocab._save(); });
 
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var CHOSEN = { en:null, ar:null };
@@ -568,6 +570,14 @@ if(!META[who] || !DATA[who]){
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ أحسنت! النتيجة "+correct+" / "+total+".";
       }
     }
+    // حفظ جزئي للمراجعة: حتى لو ما كمّل كل المجموعة، نحفظ الكلمات اللي جاوبها
+    function saveIfPartial(){
+      if(saved || isNew) return;
+      var tn=Object.keys(tried).length; if(tn<1) return;
+      saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
+      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
+    }
+    renderVocab._save = saveIfPartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
@@ -588,8 +598,8 @@ if(!META[who] || !DATA[who]){
         pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
     });
-    sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocMode=b.dataset.mode; renderVocab(); }); });
-    var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", renderVocab);
+    sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
+    var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
   }
 
   function syncVocabTab(){
