@@ -201,14 +201,17 @@ async function main(){
       let vLearned=0, vTotal=300;
       vocabAll.forEach(p=>{ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal) vTotal=p.meta.vocTotal; });
       const rev=vocabAll.filter(p=> p.meta.mode==="review");
-      const rW=rev.reduce((s,p)=>s+(p.meta.total||0),0), rC=rev.reduce((s,p)=>s+(p.meta.correct||0),0);
-      const allW=vocabAll.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabAll.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const revT=rev.filter(p=> p.meta.trusted!==false), vocabT=vocabAll.filter(p=> p.meta.trusted!==false);
+      const rW=revT.reduce((s,p)=>s+(p.meta.total||0),0), rC=revT.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const allW=vocabT.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabT.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const untrustedN=vocabAll.length-vocabT.length;
       const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      const revList=rev.slice(0,6).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); return `<li>🔁 ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}</li>`; }).join("");
+      const revList=rev.slice(0,6).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=(p.meta.trusted===false)?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``; return `<li>🔁 ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
         (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
         (rW?`<li>🔁 راجع: <b>${rW} كلمة</b> — درجته ${rC}/${rW} (${rpct}%)</li>`:`<li>🔁 المراجعة: لسّا ما بدأ</li>`)+
-        `<li>📊 إجمالي جلسات الكلمات: <b>${allC}/${allW} (${apct}%)</b> · ${vocabAll.length} جلسة</li>`+
+        `<li>📊 إجمالي جلسات الكلمات (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
+        (untrustedN?`<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>${untrustedN}</b></li>`:``)+
         `</ul>`+
         (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">🔁 آخر جلسات المراجعة (التاريخ والوقت والمدة):</div><ul class="weak">${revList}</ul>`:``)+
         `</div>`;

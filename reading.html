@@ -187,9 +187,9 @@ function saveScore(test, correct, total, extra){
 }
 
 // ===== كشف الخروج من الصفحة أثناء الحل (استعانة بمترجم/تطبيق ثاني) =====
-var AWAY = { total:0, exits:0, hiddenAt:null };
+var AWAY = { total:0, exits:0, hiddenAt:null, onReturn:null };
 function _awayOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-function _awayIn(){ if(AWAY.hiddenAt!=null){ AWAY.total += (Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; } }
+function _awayIn(){ if(AWAY.hiddenAt!=null){ AWAY.total += (Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
 document.addEventListener("visibilitychange", function(){ if(document.hidden) _awayOut(); else _awayIn(); });
 window.addEventListener("blur", _awayOut); window.addEventListener("focus", _awayIn);
 function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
@@ -525,7 +525,8 @@ if(!META[who] || !DATA[who]){
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+VOC_TOTAL+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
                           : '<p class="hint">🔁 مراجعة عشوائية متلخبطة من كل محفوظك — نلفّ على كل الكلمات ثم نعيد من جديد. الكلمة الي تغلط فيها ترجع لك أسرع.'+(passReset?' <b>🔄 بدأنا لفّة جديدة!</b>':'')+' اكتب الإنجليزي ثم «تحقّق».</p>';
-    html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote;
+    html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
+      '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
     V.forEach(function(item,i){
       var arWord = item[1][0];
       html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(i+1)+'</div>'+
@@ -548,10 +549,15 @@ if(!META[who] || !DATA[who]){
     var done={}, tried={}, correct=0, saved=false, advanced=false, total=V.length;
     var t0=Date.now(); var aw0=awaySnap(); // بداية توقيت الجلسة + رصد الخروج من الصفحة
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
+    // تحذير مباشر أول ما يخرج ويرجع للصفحة
+    AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; };
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
-      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits }); }
-      if(isNew && !advanced && startIdx<VOC_TOTAL){
+      var aw=awaySince(aw0); var trusted=(aw.exits===0);
+      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
+      if(!trusted){
+        doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
+      } else if(isNew && !advanced && startIdx<VOC_TOTAL){
         advanced=true; setLearned(startIdx+total);
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
       } else {
