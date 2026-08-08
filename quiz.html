@@ -1368,7 +1368,7 @@ if(!STUDENTS[who]){
   // كشف الخروج من الصفحة أثناء الاختبار (استعانة بمترجم/تطبيق ثاني)
   var AWAY={total:0,exits:0,hiddenAt:null};
   function _aOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-  function _aIn(){ if(AWAY.hiddenAt!=null){ AWAY.total+=(Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; } }
+  function _aIn(){ if(AWAY.hiddenAt!=null){ AWAY.total+=(Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; var wb=document.getElementById("__exitwarn"); if(wb) wb.style.display="block"; } }
   document.addEventListener("visibilitychange",function(){ if(document.hidden)_aOut(); else _aIn(); });
   window.addEventListener("blur",_aOut); window.addEventListener("focus",_aIn);
   function awayNow(){ var extra=AWAY.hiddenAt!=null?(Date.now()-AWAY.hiddenAt):0; return { away:Math.round((AWAY.total+extra)/1000), exits:AWAY.exits+(AWAY.hiddenAt!=null?1:0) }; }
@@ -1379,6 +1379,7 @@ if(!STUDENTS[who]){
       <h1>📝 اختبر نفسك · ${S.name}</h1>
       <p>راجع ثم اختبر نفسك — تُحفظ نتيجتك تلقائيًا لوالدك بعد إكمال المادتين.</p>
     </header>
+    <div id="__exitwarn" style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin:12px 0;font-weight:800;text-align:center">⚠️ خرجت من الصفحة أثناء الاختبار! هذا يُسجَّل في تقرير والدك — لا تفتح أي تطبيق ثاني أثناء الحل.</div>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
@@ -1558,7 +1559,7 @@ if(!STUDENTS[who]){
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
-        meta: { per, avg_sec: avg, total_sec: total, away: awayNow().away, exits: awayNow().exits,
+        meta: { per, avg_sec: avg, total_sec: total, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0),
           paper: { date: new Date().toISOString(),
             en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
             en: buildPaper(en), ma: buildPaper(ma) } }

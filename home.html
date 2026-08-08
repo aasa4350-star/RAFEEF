@@ -251,7 +251,7 @@ async function loadReport(){
     if(Object.keys(otherMap).length){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
         Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
-          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span>'+durTxt(p)+'</li>'; }).join("")+
+          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span>'+durTxt(p)+(p.meta.trusted===false?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':'')+'</li>'; }).join("")+
         '</ul></div>';
     }
   }

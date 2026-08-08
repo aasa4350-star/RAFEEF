@@ -238,7 +238,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
         <div class="card"><ul class="weak">`+
         Object.keys(otherMap).map(t=>{ const p=otherMap[t]; const pc=pct(p.meta.correct,p.meta.total);
-          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}</li>`; }).join("")+
+          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${p.meta.trusted===false?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``}</li>`; }).join("")+
         `</ul></div>`;
     }
   }

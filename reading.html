@@ -194,6 +194,8 @@ document.addEventListener("visibilitychange", function(){ if(document.hidden) _a
 window.addEventListener("blur", _awayOut); window.addEventListener("focus", _awayIn);
 function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
+var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
+function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
 
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var CHOSEN = { en:null, ar:null };
@@ -351,6 +353,7 @@ if(!META[who] || !DATA[who]){
     var items = shuffle(D.dictation.slice()).slice(0, Math.min(8, D.dictation.length));
     var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
       '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>'+
+      EXIT_WARN_HTML+
       PRON_TIP;
     items.forEach(function(item,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">رقم '+(i+1)+'</div>'+
@@ -371,8 +374,8 @@ if(!META[who] || !DATA[who]){
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
-    var t0=Date.now(), aw0=awaySnap();
-    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur, away:aw.away, exits:aw.exits}); } }
+    var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
+    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
@@ -411,6 +414,7 @@ if(!META[who] || !DATA[who]){
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passage+'</div>'+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
+      EXIT_WARN_HTML+
       '<div data-lock style="background:var(--bad-bg);border:1px solid var(--bad);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-weight:700;color:var(--bad);font-size:.92rem">🔒 استمع للقطعة كاملة أولًا (اضغط 🔊 استمع للنص) حتى تُفتح الأسئلة.</div>';
     questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
@@ -433,7 +437,7 @@ if(!META[who] || !DATA[who]){
     });
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
-    var t0=Date.now(), aw0=awaySnap();
+    var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -444,7 +448,7 @@ if(!META[who] || !DATA[who]){
           if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[right].classList.add("correct"); }
           scoreEl.textContent="الفهم: "+correct+" / "+total;
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits}); }
+          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
         });
       });
     });
