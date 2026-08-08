@@ -203,11 +203,15 @@ async function main(){
       const rW=rev.reduce((s,p)=>s+(p.meta.total||0),0), rC=rev.reduce((s,p)=>s+(p.meta.correct||0),0);
       const allW=vocabAll.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabAll.reduce((s,p)=>s+(p.meta.correct||0),0);
       const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
+      const durTxt=p=>{ const d=p.meta.dur; if(d==null) return ` · ⏱️ —`; const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; return ` · ⏱️ ${d}ث (${spw}ث/كلمة)${warn}`; };
+      const revList=rev.slice(0,6).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>🔁 ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${durTxt(p)}</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
         (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
         (rW?`<li>🔁 راجع: <b>${rW} كلمة</b> — درجته ${rC}/${rW} (${rpct}%)</li>`:`<li>🔁 المراجعة: لسّا ما بدأ</li>`)+
         `<li>📊 إجمالي جلسات الكلمات: <b>${allC}/${allW} (${apct}%)</b> · ${vocabAll.length} جلسة</li>`+
-        `</ul></div>`;
+        `</ul>`+
+        (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">🔁 آخر جلسات المراجعة (التاريخ والوقت والمدة):</div><ul class="weak">${revList}</ul>`:``)+
+        `</div>`;
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
     const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });

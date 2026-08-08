@@ -535,10 +535,11 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML = html;
 
     var done={}, tried={}, correct=0, saved=false, advanced=false, total=V.length;
+    var t0=Date.now(); // بداية توقيت الجلسة — لقياس المدة (كشف الحل بسرعة غير طبيعية)
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
-      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL }); }
+      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur }); }
       if(isNew && !advanced && startIdx<VOC_TOTAL){
         advanced=true; setLearned(startIdx+total);
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
