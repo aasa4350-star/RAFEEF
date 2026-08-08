@@ -172,14 +172,16 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random
 // حفظ نتيجة التمرين في التقرير (Supabase) لتظهر في لوحة المتابعة
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total){
+function saveScore(test, correct, total, extra){
   try{
     var nm = (META[who] && META[who].name) || who;
     var gr = (META[who] && META[who].grade) || "";
+    var meta = { kind:"practice", test:test, correct:correct, total:total };
+    if(extra){ for(var k in extra){ if(extra.hasOwnProperty(k)) meta[k]=extra[k]; } }
     fetch(SUPA_URL+"/rest/v1/attempts", {
       method:"POST",
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
-      body: JSON.stringify({ student:nm, grade:gr, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+      body: JSON.stringify({ student:nm, grade:gr, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:meta })
     });
   }catch(e){}
 }
@@ -536,7 +538,7 @@ if(!META[who] || !DATA[who]){
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
-      if(!saved){ saved=true; saveScore("كلمات إنجليزي 🔤", correct, total); }
+      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL }); }
       if(isNew && !advanced && startIdx<VOC_TOTAL){
         advanced=true; setLearned(startIdx+total);
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";

@@ -190,8 +190,25 @@ async function main(){
   if(practice.length){
     const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
     const currMap={}, otherMap={};
+    const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
-      if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; } else { if(!otherMap[t]) otherMap[t]=p; } });
+      if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
+      else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
+      else { if(!otherMap[t]) otherMap[t]=p; } });
+    // 📖 حفظ الكلمات (إنجليزي)
+    if(vocabAll.length){
+      let vLearned=0, vTotal=300;
+      vocabAll.forEach(p=>{ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal) vTotal=p.meta.vocTotal; });
+      const rev=vocabAll.filter(p=> p.meta.mode==="review");
+      const rW=rev.reduce((s,p)=>s+(p.meta.total||0),0), rC=rev.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const allW=vocabAll.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabAll.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
+      html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
+        (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
+        (rW?`<li>🔁 راجع: <b>${rW} كلمة</b> — درجته ${rC}/${rW} (${rpct}%)</li>`:`<li>🔁 المراجعة: لسّا ما بدأ</li>`)+
+        `<li>📊 إجمالي جلسات الكلمات: <b>${allC}/${allW} (${apct}%)</b> · ${vocabAll.length} جلسة</li>`+
+        `</ul></div>`;
+    }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
     const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
     if(Object.keys(bySubj).length){
