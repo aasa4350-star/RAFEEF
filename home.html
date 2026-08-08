@@ -220,14 +220,16 @@ async function loadReport(){
       var allW=vocabT.reduce(function(s,p){return s+(p.meta.total||0);},0), allC=vocabT.reduce(function(s,p){return s+(p.meta.correct||0);},0);
       var untrustedN=vocabAll.length-vocabT.length;
       var lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      var revList=rev.slice(0,6).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>🔁 '+saTime(p.created_at)+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
+      var isFlag=function(p){ return p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2); };
+      var revFlag=rev.filter(isFlag), revShow=rev.filter(function(p){return !isFlag(p);}).slice(0,1).concat(revFlag).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
+      var revList=revShow.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>🔁 '+saTime(p.created_at)+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
         (vLearned>0?'<li>📚 حفظ: <b>'+vLearned+' / '+vTotal+' كلمة</b> ('+lpct+'%)</li>':'')+
         (rW?'<li>🔁 راجع: <b>'+rW+' كلمة</b> — درجته '+rC+'/'+rW+' ('+rpct+'%)</li>':'<li>🔁 المراجعة: لسّا ما بدأ</li>')+
         '<li>📊 إجمالي جلسات الكلمات (المحتسبة): <b>'+allC+'/'+allW+' ('+apct+'%)</b> · '+vocabT.length+' جلسة</li>'+
         (untrustedN?'<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>'+untrustedN+'</b></li>':'')+
         '</ul>'+
-        (revList?'<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">🔁 آخر جلسات المراجعة (التاريخ والوقت والمدة):</div><ul class="weak">'+revList+'</ul>':'')+
+        (revList?'<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">🔁 آخر مراجعة + أي جلسة فيها ملاحظة:</div><ul class="weak">'+revList+'</ul>':'')+
         '</div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
