@@ -305,14 +305,16 @@ function pickIndex(len, key){
 }
 
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
-function azureConfigured(){ return !!(window.AZURE_SPEECH && window.AZURE_SPEECH.key && window.AZURE_SPEECH.region); }
+function azureCreds(){ var c = window.AZURE_SPEECH && window.AZURE_SPEECH[who]; return (c && c.key && c.region) ? c : null; }
+function azureConfigured(){ return !!azureCreds(); }
 function azureAssess(refText, isAr, statusEl, btn){
-  if(!azureConfigured()){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
+  var cr = azureCreds();
+  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure لهذا الطفل بعد."; return; }
   if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
   var SDK = window.SpeechSDK;
   var cfg, audio, rec, pa;
   try{
-    cfg = SDK.SpeechConfig.fromSubscription(window.AZURE_SPEECH.key, window.AZURE_SPEECH.region);
+    cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
     audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
     rec = new SDK.SpeechRecognizer(cfg, audio);
