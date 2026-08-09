@@ -480,8 +480,8 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML = html;
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
-    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
+    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
     sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
