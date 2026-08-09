@@ -224,9 +224,9 @@ async function loadReport(){
       var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; };
       var flagged=vocabAll.filter(isFlag), show=vocabAll.filter(function(p){return !isFlag(p);}).slice(0,1).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
       var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>'+mIco(p)+' '+saTime(p.created_at)+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
-      var byDay={}; vocabT.forEach(function(p){ var d=saTime(p.created_at).slice(0,10); if(!byDay[d]) byDay[d]={w:0,c:0}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); });
+      var byDay={}; vocabT.forEach(function(p){ var f=saTime(p.created_at); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
-      var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; return '<li>📅 '+d+': راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
+      var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
         (vLearned>0?'<li>📚 حفظ: <b>'+vLearned+' / '+vTotal+' كلمة</b> ('+lpct+'%)</li>':'')+
         dayList+

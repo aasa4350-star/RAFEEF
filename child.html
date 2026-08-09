@@ -210,9 +210,9 @@ async function main(){
       const mIco=p=> p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖";
       const flagged=vocabAll.filter(isFlag), show=vocabAll.filter(p=>!isFlag(p)).slice(0,1).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
       const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=(p.meta.trusted===false)?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``; return `<li>${mIco(p)} ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
-      const byDay={}; vocabT.forEach(p=>{ const d=saTime(p.created_at).slice(0,10); if(!byDay[d]) byDay[d]={w:0,c:0}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); });
+      const byDay={}; vocabT.forEach(p=>{ const f=saTime(p.created_at); const d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
-      const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; return `<li>📅 ${d}: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
+      const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
         (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
         dayList+
