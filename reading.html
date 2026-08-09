@@ -558,7 +558,7 @@ if(!META[who] || !DATA[who]){
     var passage = chosen[0], questions = chosen[1];
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+
-      '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button></div>'+
+      '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button>'+azBtnHtml()+'</div>'+
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passage+'</div>'+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
@@ -584,6 +584,7 @@ if(!META[who] || !DATA[who]){
       speak(passage,1,ar?"ar-SA":"en-US", unlock);
     });
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
+    var azP=sec.querySelector(".azbtn"); if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP); }); }
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
