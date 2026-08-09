@@ -8,6 +8,8 @@
 <title>القراءة والاستماع</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="azure-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
   :root{
     --accent:#0d9488; --accent-soft:#5eead4; --accent-deep:#0f766e;
@@ -302,6 +304,42 @@ function pickIndex(len, key){
   return pick;
 }
 
+// ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
+function azureConfigured(){ return !!(window.AZURE_SPEECH && window.AZURE_SPEECH.key && window.AZURE_SPEECH.region); }
+function azureAssess(refText, isAr, statusEl, btn){
+  if(!azureConfigured()){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
+  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
+  var SDK = window.SpeechSDK;
+  var cfg, audio, rec, pa;
+  try{
+    cfg = SDK.SpeechConfig.fromSubscription(window.AZURE_SPEECH.key, window.AZURE_SPEECH.region);
+    cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
+    audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
+    rec = new SDK.SpeechRecognizer(cfg, audio);
+    pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+    pa.applyTo(rec);
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); return; }
+  if(btn){ btn.disabled=true; }
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
+  rec.recognizeOnceAsync(function(result){
+    try{
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        var r = SDK.PronunciationAssessmentResult.fromResult(result);
+        var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
+        var col = pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
+        var bad=[];
+        try{ var ws=(r.detailResult&&r.detailResult.Words)||[]; ws.forEach(function(w){ var a=w.PronunciationAssessment; if(a&&a.AccuracyScore<60) bad.push(w.Word); }); }catch(e){}
+        var face = pron>=80?"🌟":pron>=60?"👍":"💪";
+        statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu + (bad.length?('<br>🔁 راجع نطق: <b>'+bad.join("، ")+'</b>'):' ✅ ممتاز!');
+      } else {
+        statusEl.style.color="var(--bad)"; statusEl.textContent="❌ ما وضح الصوت — تأكد من السماح للمايكروفون وحاول ثانية.";
+      }
+    }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
+    if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){}
+  }, function(err){ statusEl.style.color="var(--bad)"; statusEl.textContent="❌ خطأ Azure: "+err; if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){} });
+}
+function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn" style="background:#0a7cff;color:#fff;border-color:#0a7cff">🎙️ قيّم نطقي</button>' : ''; }
+
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var CHOSEN = { en:null, ar:null };
 function voicesFor(isAr){
@@ -472,7 +510,7 @@ if(!META[who] || !DATA[who]){
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
           '<span style="font-weight:700;font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px">🎤 درّب نطقك — انطقها بمايك الكيبورد:</span>'+
           '<input class="dinp pinp" placeholder="انطق هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
-          '<div class="row"><button class="say small pchk">افحص النطق</button><span class="pfb2" style="font-weight:700"></span></div>'+
+          '<div class="row"><button class="say small pchk">افحص النطق</button>'+azBtnHtml()+'<span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+items.length+'</div>'+
@@ -497,6 +535,7 @@ if(!META[who] || !DATA[who]){
         pfb2.style.color = ok?"var(--good)":"var(--bad)";
         pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
+      var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(text, ar, pfb2, azb); });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var ok = norm(inp.value,ar)===norm(text,ar);
         if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
@@ -651,7 +690,7 @@ if(!META[who] || !DATA[who]){
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
           '<span '+lab+'>🎤 درّب نطقك — اكتب نطق الكلمة (تقدر تستخدم مايك الكيبورد):</span>'+
           '<input class="pinp" placeholder="Say it..." style="direction:ltr;text-align:left">'+
-          '<div class="row"><button class="say small pchk">افحص النطق</button><span class="pfb2" style="font-weight:700"></span></div>'+
+          '<div class="row"><button class="say small pchk">افحص النطق</button>'+azBtnHtml()+'<span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>'+
@@ -704,6 +743,7 @@ if(!META[who] || !DATA[who]){
         pfb2.style.color = ok?"var(--good)":"var(--bad)";
         pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
+      var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(word, false, pfb2, azb); });
     });
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
