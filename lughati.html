@@ -253,7 +253,9 @@ if(!NAMES[who]){
         });
       });
     });
-    sec.querySelector(".reset").addEventListener("click", function(){ render(id); });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<1) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }
 
   // ===== علاجي: يرتّب الأقسام من الأضعف ويعطي نصيحة =====
@@ -286,13 +288,15 @@ if(!NAMES[who]){
 
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
       document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
-      var id=b.dataset.tab; document.getElementById(id).classList.add("active");
-      if(id==="rem"){ renderRem(); } else if(!document.getElementById(id).innerHTML) render(id);
+      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
+      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 }
 </script>
 </body>
