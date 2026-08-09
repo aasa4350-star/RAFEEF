@@ -196,8 +196,8 @@ function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
 var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
 function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
-// لو خرج من الصفحة أثناء المراجعة، نحفظ اللي سوّاه لين الآن (عشان لا تضيع مراجعته)
-document.addEventListener("visibilitychange", function(){ if(document.hidden && typeof renderVocab!=="undefined" && renderVocab._save) renderVocab._save(); });
+// لو خرج من الصفحة أثناء أي قسم، نحفظ اللي سوّاه لين الآن (عشان لا يضيع تعبه)
+document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var CHOSEN = { en:null, ar:null };
@@ -378,6 +378,8 @@ if(!META[who] || !DATA[who]){
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
+    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"استماع عربي 🎧":"استماع إنجليزي 🎧", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
@@ -401,7 +403,7 @@ if(!META[who] || !DATA[who]){
         maybeSave();
       });
     });
-    sec.querySelector("[data-regen]").addEventListener("click", renderDict);
+    sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); renderDict(); });
   }
 
   function renderRead(){
@@ -440,6 +442,8 @@ if(!META[who] || !DATA[who]){
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
+    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -454,7 +458,7 @@ if(!META[who] || !DATA[who]){
         });
       });
     });
-    sec.querySelector("[data-regen]").addEventListener("click", renderRead);
+    sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); renderRead(); });
   }
 
   // 300 كلمة (نفس ملف الطباعة PDF) — قسم الكلمات يختبر منها
@@ -577,7 +581,7 @@ if(!META[who] || !DATA[who]){
       saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
       saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
     }
-    renderVocab._save = saveIfPartial;
+    renderVocab._save = saveIfPartial; sec._leave = saveIfPartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
@@ -644,6 +648,7 @@ if(!META[who] || !DATA[who]){
 
   document.querySelectorAll(".langtabs button").forEach(function(b){
     b.addEventListener("click",function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
       document.querySelectorAll(".langtabs button").forEach(function(x){x.setAttribute("aria-selected","false");});
       b.setAttribute("aria-selected","true");
       curLang = b.dataset.lang; renderAll();
@@ -651,6 +656,7 @@ if(!META[who] || !DATA[who]){
   });
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click",function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
       document.querySelectorAll(".tabs button").forEach(function(x){x.setAttribute("aria-selected","false");});
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});

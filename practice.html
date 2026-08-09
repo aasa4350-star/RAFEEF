@@ -403,6 +403,16 @@ function renderSet(id, items, intro, regen, label){
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
     if(label) saveScore(label, correct, total, wrongs);
   }
+  // حفظ جزئي: لو بدّل القسم أو طلع قبل ما يكمّل، نحفظ اللي جاوبه (عشان لا يضيع تعبه)
+  function savePartial(){
+    if(ended) return;
+    var n = Object.keys(answered).length;
+    if(n<1 || !label) return;
+    ended = true; if(tId){ clearInterval(tId); tId=null; }
+    saveScore(label, correct, n, wrongs);
+  }
+  sec._leave = savePartial;
+  sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };
   sec._start = function(){
     if(started || !secsAll || ended) return; started = true;
     tId = setInterval(function(){
@@ -412,7 +422,7 @@ function renderSet(id, items, intro, regen, label){
     }, 1000);
   };
 
-  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ renderSet(id, regen(), intro, regen, label); }); }
+  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderSet(id, regen(), intro, regen, label); }); }
   if(sec.classList.contains("active")) sec._start();
 }
 
@@ -581,15 +591,20 @@ async function renderRemedial(){
 
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.addEventListener("click", function(){
+    var cur = document.querySelector(".panel.active");
+    if(cur && typeof cur._leave === "function") cur._leave(); // احفظ الجزئي للقسم اللي نطلع منه
     document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
     b.setAttribute("aria-selected","true");
     document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
     var pan = document.getElementById(b.dataset.tab);
     pan.classList.add("active");
+    if(typeof pan._reopen === "function") pan._reopen(); // لو كان محفوظ جزئيًا، ابدأه من جديد
     if(b.dataset.tab==="rem"){ renderRemedial(); }
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
+// لو طلع من الصفحة (أو صغّر التطبيق) وهو في نص قسم، نحفظ اللي جاوبه
+document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 </script>
 </body>
 </html>
