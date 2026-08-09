@@ -259,7 +259,7 @@ function saveScore(test, correct, total, extra){
     var meta = { kind:"practice", test:test, correct:correct, total:total };
     if(extra){ for(var k in extra){ if(extra.hasOwnProperty(k)) meta[k]=extra[k]; } }
     fetch(SUPA_URL+"/rest/v1/attempts", {
-      method:"POST",
+      method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
       body: JSON.stringify({ student:nm, grade:gr, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:meta })
     });

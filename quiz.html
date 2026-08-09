@@ -1415,7 +1415,7 @@ if(!STUDENTS[who]){
     saveState = "pending"; paintStatus();
     try{
       const r = await fetch(SUPA_URL+"/rest/v1/attempts", {
-        method:"POST",
+        method:"POST", keepalive:true,
         headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY,
           "Content-Type":"application/json", "Prefer":"return=minimal" },
         body: JSON.stringify(payload)
@@ -1433,7 +1433,7 @@ if(!STUDENTS[who]){
   function logEvent(event, label){
     try{
       fetch(SUPA_URL+"/rest/v1/attempts", {
-        method:"POST",
+        method:"POST", keepalive:true,
         headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
         body: JSON.stringify({ student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"activity", event:event, label:label } })
       });
