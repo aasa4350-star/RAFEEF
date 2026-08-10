@@ -305,7 +305,7 @@ function pickIndex(len, key){
 }
 
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
-function azureCreds(){ var c = window.AZURE_SPEECH && window.AZURE_SPEECH[who]; return (c && c.key && c.region) ? c : null; }
+function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && c.key && c.region) return c; var d = A["default"]; return (d && d.key && d.region) ? d : null; }
 function azureConfigured(){ return !!azureCreds(); }
 function azureAssess(refText, isAr, statusEl, btn){
   var cr = azureCreds();
