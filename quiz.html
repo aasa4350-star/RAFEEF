@@ -8,16 +8,18 @@
 <title>اختبارات ومراجعات الأبناء</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="azure-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
   :root{
     --accent:#0d9488; --accent-soft:#5eead4; --accent-deep:#0f766e;
     --bg:#f6f8fa; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
-    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec; --warn:#b45309;
     --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
   }
   @media (prefers-color-scheme:dark){
     :root{--bg:#0b1216;--card:#121e25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c50;
-      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
   }
   *{box-sizing:border-box}
@@ -62,6 +64,12 @@
   .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
   .explain{margin-top:10px;font-size:.9rem;color:var(--muted);padding:8px 12px;background:var(--bg);border-radius:10px;display:none}
   .explain.show{display:block}
+  .say{background:var(--accent);color:#fff;border:0;padding:9px 13px;border-radius:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .say.small{padding:8px 12px;font-size:.88rem}
+  .prow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px}
+  .prow .azbtn{background:#0a7cff}
+  .prow .ltr{direction:ltr;unicode-bidi:isolate;font-weight:700}
+  .prow .pfb{font-weight:700;font-size:.9rem}
   .scorebar{position:sticky;bottom:12px;margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:12px}
   .scorebar .track{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
   .scorebar .fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
@@ -1215,6 +1223,65 @@ function normAr(s){
   return s.replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي");
 }
 
+/* ===== النطق الإنجليزي: استماع (متصفح) + تقييم عبر Azure ===== */
+function azureCreds(){ var A=window.AZURE_SPEECH||{}; var w=(new URLSearchParams(location.search).get("who")||"").toLowerCase(); var c=A[w]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
+function azureConfigured(){ return !!azureCreds(); }
+function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn">🎙️ قيّم نطقي</button>' : ''; }
+function speakEN(text){
+  try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9; var v=pickVoice("en-US"); if(v) u.voice=v; speechSynthesis.speak(u); }
+  catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+}
+function azureAssess(refText, statusEl, btn){
+  var cr=azureCreds();
+  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
+  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
+  var SDK=window.SpeechSDK, cfg, audio, rec, pa;
+  try{
+    cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    cfg.speechRecognitionLanguage="en-US";
+    audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
+    rec=new SDK.SpeechRecognizer(cfg, audio);
+    pa=new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+    pa.applyTo(rec);
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); return; }
+  if(btn) btn.disabled=true;
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
+  rec.recognizeOnceAsync(function(result){
+    try{
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        var r=SDK.PronunciationAssessmentResult.fromResult(result);
+        var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
+        var col=pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
+        var bad=[];
+        try{ var ws=(r.detailResult&&r.detailResult.Words)||[]; ws.forEach(function(w){ var a=w.PronunciationAssessment; if(a&&a.AccuracyScore<60) bad.push(w.Word); }); }catch(e){}
+        var face=pron>=80?"🌟":pron>=60?"👍":"💪";
+        statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+(bad.length?('<br>🔁 راجع نطق: <b>'+bad.join("، ")+'</b>'):' ✅ ممتاز!');
+      } else { statusEl.style.color="var(--bad)"; statusEl.textContent="❌ ما وضح الصوت — تأكد من السماح للمايكروفون وحاول ثانية."; }
+    }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
+    if(btn) btn.disabled=false; try{ rec.close(); }catch(e){}
+  }, function(err){ statusEl.style.color="var(--bad)"; statusEl.textContent="❌ خطأ Azure: "+err; if(btn) btn.disabled=false; try{ rec.close(); }catch(e){} });
+}
+// الجملة الإنجليزية للنطق: لو فيه فراغ نملؤه بالإجابة، وإلا نتدرّب على الإجابة نفسها
+function enTargetQuiz(stemText, ansText){
+  var t=String(stemText||"");
+  if(/_{2,}|_/.test(t)){ t=t.replace(/_{2,}|_/g, ansText); }
+  else { t=String(ansText||""); }
+  t=t.replace(/[«»"?؟]/g,"").replace(/\s+/g," ").trim();
+  return /[A-Za-z]/.test(t) ? t : "";
+}
+function injectProw(qEl, stemText, ansText){
+  if(qEl.querySelector(".prow")) return;
+  var tgt=enTargetQuiz(stemText, ansText);
+  if(!tgt) return;
+  var row=document.createElement("div"); row.className="prow";
+  row.innerHTML='🗣️ <span class="ltr"></span> <button class="say small listen">🔊 استمع</button>'+azBtnHtml()+'<span class="pfb"></span>';
+  row.querySelector(".ltr").textContent=tgt;
+  qEl.appendChild(row);
+  var fb=row.querySelector(".pfb");
+  row.querySelector(".listen").addEventListener("click",function(){ speakEN(tgt); });
+  var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
+}
+
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 let who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
@@ -1495,6 +1562,7 @@ if(!STUDENTS[who]){
           }
           RESULTS[id].events.push({ok:(j===ans), dt: dt!=null? Math.round(dt*10)/10 : null, c:j});
           qEl.querySelector(".explain").classList.add("show");
+          if(isEn) injectProw(qEl, d.quiz[i][0], d.quiz[i][1][ans]);
           RESULTS[id].done = answered.size;
           scoreEl.textContent = `${RESULTS[id].correct} / ${total}`;
           fillEl.style.width = (answered.size/total*100)+"%";
@@ -1817,6 +1885,7 @@ if(!STUDENTS[who]){
           if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
+          if(items[i][4]==="en") injectProw(qEl, items[i][0], items[i][1][ans]);
           scoreEl.textContent = `${correct} / ${total}`;
           fillEl.style.width = (answered.size/total*100)+"%";
         });
