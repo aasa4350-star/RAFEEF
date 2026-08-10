@@ -8,16 +8,18 @@
 <title>الإنجليزي — الصف الرابع</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="azure-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
   :root{
     --accent:#2563eb; --accent-deep:#1d4ed8;
     --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
-    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec; --warn:#b45309;
     --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
   }
   @media (prefers-color-scheme:dark){
     :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
-      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
   }
   *{box-sizing:border-box}
@@ -50,6 +52,13 @@
   .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
   .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+  .say{background:var(--accent);color:#fff;border:0;padding:9px 13px;border-radius:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .say.small{padding:8px 12px;font-size:.88rem}
+  .prow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px}
+  .prow .say{background:#0a7cff;border-color:#0a7cff}
+  .prow .listen{background:var(--accent)}
+  .prow .en{direction:ltr;unicode-bidi:isolate;font-weight:700}
+  .prow .pfb{font-weight:700;font-size:.9rem}
 </style>
 </head>
 <body>
@@ -78,6 +87,63 @@ function opt(correct, others){ var o=[correct].concat(others); shuffle(o); retur
 function en(s){ return '<span class="en">'+s+'</span>'; }
 // مشتّتات مميّزة من نفس القائمة (تستبعد القيمة الصحيحة وتحذف المكرّر)
 function dist(pool, item, idx, n){ var correct=item[idx], seen={}, o=[]; pool.forEach(function(x){ var v=x[idx]; if(v!==correct && !seen[v]){ seen[v]=1; o.push(v); } }); shuffle(o); return o.slice(0, n||2); }
+
+/* ===== النطق: استماع (متصفح) + تقييم عبر Azure ===== */
+function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
+function azureConfigured(){ return !!azureCreds(); }
+function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn">🎙️ قيّم نطقي</button>' : ''; }
+function speakEN(text){
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9;
+    var cands=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);});
+    var good=cands.filter(function(x){return /(natural|neural|enhanced|premium|samantha|daniel|karen|serena|aria|guy|jenny)/i.test(x.name);});
+    var v=good[0]||cands[0]; if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+}
+try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+function azureAssess(refText, statusEl, btn){
+  var cr=azureCreds();
+  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
+  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
+  var SDK=window.SpeechSDK, cfg, audio, rec, pa;
+  try{
+    cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    cfg.speechRecognitionLanguage="en-US";
+    audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
+    rec=new SDK.SpeechRecognizer(cfg, audio);
+    pa=new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+    pa.applyTo(rec);
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); return; }
+  if(btn) btn.disabled=true;
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
+  rec.recognizeOnceAsync(function(result){
+    try{
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        var r=SDK.PronunciationAssessmentResult.fromResult(result);
+        var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
+        var col=pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
+        var bad=[];
+        try{ var ws=(r.detailResult&&r.detailResult.Words)||[]; ws.forEach(function(w){ var a=w.PronunciationAssessment; if(a&&a.AccuracyScore<60) bad.push(w.Word); }); }catch(e){}
+        var face=pron>=80?"🌟":pron>=60?"👍":"💪";
+        statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+(bad.length?('<br>🔁 راجع نطق: <b>'+bad.join("، ")+'</b>'):' ✅ ممتاز!');
+      } else { statusEl.style.color="var(--bad)"; statusEl.textContent="❌ ما وضح الصوت — تأكد من السماح للمايكروفون وحاول ثانية."; }
+    }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
+    if(btn) btn.disabled=false; try{ rec.close(); }catch(e){}
+  }, function(err){ statusEl.style.color="var(--bad)"; statusEl.textContent="❌ خطأ Azure: "+err; if(btn) btn.disabled=false; try{ rec.close(); }catch(e){} });
+}
+// استخراج الجملة/الكلمة الإنجليزية من السؤال، مع تعبئة الفراغ بالإجابة الصحيحة
+function enTarget(stemEl, ansText){
+  var parts=[]; try{ stemEl.querySelectorAll(".en").forEach(function(e){ parts.push(e.textContent); }); }catch(e){}
+  var t=parts.join(" ").trim();
+  var ansEn=/[A-Za-z]/.test(ansText||"");
+  if(!t){ return ansEn ? clean(ansText) : ""; }
+  if(/_{2,}|_/.test(t) && ansEn){ t=t.replace(/_{2,}|_/g, ansText); }
+  t=clean(t);
+  return /[A-Za-z]/.test(t) ? t : (ansEn ? clean(ansText) : "");
+  function clean(s){ return String(s).replace(/[«»"?؟]/g,"").replace(/\s+/g," ").trim(); }
+}
 
 /* ============ Unit 1 — Family Events ============ */
 var FAM = [["aunt","العمّة أو الخالة"],["uncle","العمّ أو الخال"],["cousin","ابن العمّ/الخال"],["son","الابن"],["daughter","الابنة"],["grandson","الحفيد"],["granddaughter","الحفيدة"],["parent","أحد الوالدين"],["grandparent","الجدّ أو الجدّة"],["husband","الزوج"],["wife","الزوجة"]];
@@ -274,6 +340,20 @@ if(!NAMES[who]){
           if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
+          // صف القراءة: استمع + قيّم نطقي (يظهر بعد الإجابة كي لا يُكشف الجواب)
+          if(!qEl.querySelector(".prow")){
+            var ansText=items[i][1][ans];
+            var tgt=enTarget(qEl.querySelector(".stem"), ansText);
+            if(tgt){
+              var row=document.createElement("div"); row.className="prow";
+              row.innerHTML='🗣️ <span class="en"></span> <button class="say small listen">🔊 استمع</button>'+azBtnHtml()+'<span class="pfb"></span>';
+              row.querySelector(".en").textContent=tgt;
+              qEl.appendChild(row);
+              var fb=row.querySelector(".pfb");
+              row.querySelector(".listen").addEventListener("click",function(){ speakEN(tgt); });
+              var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
+            }
+          }
           scoreEl.textContent = correct+" / "+total;
           if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
             if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
