@@ -622,6 +622,23 @@ if(!META[who] || !DATA[who]){
   // تتبّع اللفّة الحالية — الكلمات الي ظهرت في هاللفّة (ما تتكرر لين تخلص كل الكلمات ثم تلفّ من جديد)
   function getReviewSeen(){ try{ return JSON.parse(localStorage.getItem(vKey("rseen"))||"{}")||{}; }catch(e){ return {}; } }
   function setReviewSeen(o){ try{ localStorage.setItem(vKey("rseen"), JSON.stringify(o)); }catch(e){} }
+  // ===== عدّاد الكلمات اليومي + تحفيز =====
+  function saDate(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
+  function getDay(){ try{ var o=JSON.parse(localStorage.getItem(vKey("day"))||"{}"); if(o.date!==saDate()) return {date:saDate(),count:0,best:(o.best||0)}; return {date:o.date,count:o.count||0,best:(o.best||0)}; }catch(e){ return {date:saDate(),count:0,best:0}; } }
+  function setDay(o){ try{ localStorage.setItem(vKey("day"), JSON.stringify(o)); }catch(e){} }
+  function bumpDay(){ var o=getDay(); o.count++; if(o.count>o.best) o.best=o.count; setDay(o); return o.count; }
+  function vocMotiv(n,best){
+    var msg;
+    if(n<=0) msg="ابدأ مراجعتك 💪 كل كلمة تقرّبك للهدف!";
+    else if(n<10) msg="🔥 راجعت اليوم <b>"+n+"</b> كلمة — كمّل، تقدر أكثر!";
+    else if(n<25) msg="🌟 <b>"+n+"</b> كلمة اليوم! ممتاز، استمر!";
+    else if(n<50) msg="🚀 <b>"+n+"</b> كلمة اليوم! ما شاء الله، أنت بطل!";
+    else if(n<100) msg="🏆 <b>"+n+"</b> كلمة اليوم! رقم رهيب!";
+    else msg="👑 <b>"+n+"</b> كلمة اليوم! أسطورة! 🎉";
+    if(best>n && best>0) msg+='<br><span style="font-size:.82rem;opacity:.9">أفضل يوم لك: '+best+' كلمة — حطّمه! 💥</span>';
+    else if(n>0 && n===best) msg+='<br><span style="font-size:.82rem;opacity:.9">🎯 هذا أفضل يوم لك حتى الآن!</span>';
+    return msg;
+  }
 
   function renderVocab(){
     var sec = document.getElementById("vocab");
@@ -663,7 +680,8 @@ if(!META[who] || !DATA[who]){
         '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت '+learned+' / '+VOC_TOTAL+'</span></div>'+
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
-      '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>';
+      '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
+      '<div data-daybanner style="background:linear-gradient(135deg,var(--accent-deep,#047857),var(--accent));color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:800;text-align:center;line-height:1.6">'+vocMotiv(getDay().count,getDay().best)+'</div>';
 
     if(!V.length){
       if(vocMode==="review"){
@@ -682,9 +700,10 @@ if(!META[who] || !DATA[who]){
                           : '<p class="hint">🔁 مراجعة عشوائية متلخبطة من كل محفوظك — نلفّ على كل الكلمات ثم نعيد من جديد. الكلمة الي تغلط فيها ترجع لك أسرع.'+(passReset?' <b>🔄 بدأنا لفّة جديدة!</b>':'')+' اكتب الإنجليزي ثم «تحقّق».</p>';
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
       '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
+    var dayBase = getDay().count;
     V.forEach(function(item,i){
       var arWord = item[1][0];
-      html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(i+1)+'</div>'+
+      html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(dayBase+i+1)+' اليوم</div>'+
         '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
         '<span '+lab+'>اكتب معناها بالإنجليزي:</span>'+
         '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
@@ -735,7 +754,7 @@ if(!META[who] || !DATA[who]){
         var enOk = norm(ein.value,false)===norm(word,false);
         if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
         else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
-        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); }
+        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best); }
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         onComplete();
       });
