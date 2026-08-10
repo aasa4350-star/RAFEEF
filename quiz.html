@@ -1791,37 +1791,37 @@ if(!STUDENTS[who]){
 
   // كتالوج المهارات — يكتشف الضعف من أخطاء الطالب الفعلية
   const SKILLS = [
-    {name:"الجذور", rx:/√/, yt:"شرح الجذر التربيعي رياضيات",
+    {name:"الجذور", rx:/√/, yt:"شرح الجذر التربيعي رياضيات", vid:"ZCqUScj68io",
      lesson:`<p>√ العدد = ما نضربه بنفسه فيعطيه. √144 = 12 لأن 12×12 = 144.</p>`,
      gen:function(){var r=ri(2,15),v=r*r,o=opt3(r,[r+1,r-1,v]);return ["احسب: √"+v,o[0],o[1],r+"×"+r+"="+v+" → √"+v+"="+r+".","ma"];}},
-    {name:"حل المعادلات", rx:/حل\s*:|معادلة|\dx|\dس|x\s*=|س\s*=|x²|س²/, yt:"شرح حل المعادلات",
+    {name:"حل المعادلات", rx:/حل\s*:|معادلة|\dx|\dس|x\s*=|س\s*=|x²|س²/, yt:"شرح حل المعادلات من الدرجة الأولى", vid:"DOvRWNhHNfw",
      lesson:`<p>نعزل x: ننقل الأرقام ثم نقسم على معامل x. 3x+2=11 → 3x=9 → x=3.</p>`,
      gen:function(){var x=ri(2,9),a=ri(2,6),b=ri(1,9),c=a*x+b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x + "+b+" = "+c,o[0],o[1],a+"x="+(c-b)+" → x="+x+".","ma"];}},
-    {name:"الأسس", rx:/[²³⁴⁵⁶⁷]|الأس/, yt:"شرح الأسس والقوى رياضيات",
+    {name:"الأسس", rx:/[²³⁴⁵⁶⁷]|الأس/, yt:"شرح الأسس والقوى رياضيات", vid:"Fe7wwArseKs",
      lesson:`<p>الأس = نضرب العدد بنفسه. 7² = 7×7 = 49 (وليس 7×2). 2⁴ = 16.</p>`,
      gen:function(){var b=ri(2,7),e=gpick([2,3]),v=Math.pow(b,e),o=opt3(v,[b*e,v+b,v-b]);return ["احسب: "+b+sup(e),o[0],o[1],b+" مضروب بنفسه "+e+" مرات = "+v+".","ma"];}},
-    {name:"الهندسة", rx:/مساحة|محيط|حجم|مثلث|زاوية|الوتر|قطر/, yt:"شرح المساحة والمحيط رياضيات",
+    {name:"الهندسة", rx:/مساحة|محيط|حجم|مثلث|زاوية|الوتر|قطر/, yt:"شرح المساحة والمحيط للمستطيل والمربع رياضيات", vid:"YdfAeX3oztU",
      lesson:`<p>مساحة المستطيل = الطول×العرض. المحيط = (الطول+العرض)×2. مساحة المربع = الضلع².</p>`,
      gen:function(){var L=ri(4,12),W=ri(3,9),o=opt3(L*W,[2*(L+W),L+W,L*W-W]);return ["مساحة مستطيل طوله "+L+" وعرضه "+W+"؟",o[0],o[1],L+"×"+W+"="+(L*W)+".","ma"];}},
-    {name:"النسبة المئوية", rx:/%|النسبة|نسبة/, yt:"شرح النسبة المئوية رياضيات",
+    {name:"النسبة المئوية", rx:/%|النسبة|نسبة/, yt:"شرح النسبة المئوية رياضيات", vid:"-l_eKKlqVYA",
      lesson:`<p>p% من N = (p÷100)×N. مثال: 20% من 150 = 30.</p>`,
      gen:function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي "+p+"% من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+"="+v+".","ma"];}},
-    {name:"الكسور", rx:/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚]|\d\/\d|كسر/, yt:"شرح جمع الكسور رياضيات",
+    {name:"الكسور", rx:/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚]|\d\/\d|كسر/, yt:"شرح جمع الكسور المتشابهة رياضيات", vid:"NZWbiTZCyLw",
      lesson:`<p>عند تساوي المقام: نجمع البسط فقط والمقام يبقى. ⅓ + ⅓ = ⅔.</p>`,
      gen:function(){var d=ri(3,8),a=ri(1,d-2),b=ri(1,d-a-1),n=a+b,o=opt3(n+"/"+d,[a+"/"+d,n+"/"+(2*d),(n+1)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d,o[0],o[1],"نجمع البسط: "+n+"/"+d+".","ma"];}},
-    {name:"ترتيب العمليات", rx:/[+\-−].*×|×.*[+\-−]/, yt:"شرح ترتيب العمليات الحسابية",
+    {name:"ترتيب العمليات", rx:/[+\-−].*×|×.*[+\-−]/, yt:"شرح ترتيب العمليات الحسابية أولويات", vid:"SmhDFKL6HD0",
      lesson:`<p>نبدأ بالضرب والقسمة قبل الجمع والطرح. 6+4×3 = 6+12 = 18.</p>`,
      gen:function(){var a=ri(2,9),b=ri(2,9),c=ri(2,5),s=a+b*c,o=opt3(s,[(a+b)*c,s+c,a+b+c]);return ["احسب: "+a+" + "+b+" × "+c,o[0],o[1],b+"×"+c+"="+(b*c)+" ثم +"+a+"="+s+".","ma"];}},
-    {name:"الأعداد السالبة", rx:/−\d|احسب:\s*−/, yt:"شرح الأعداد السالبة رياضيات",
+    {name:"الأعداد السالبة", rx:/−\d|احسب:\s*−/, yt:"شرح جمع وطرح الأعداد الصحيحة السالبة", vid:"MUHOqZBDqtY",
      lesson:`<p>خط الأعداد: الجمع تقدّم يمين، الطرح رجوع يسار. −6+10=4. سالب×موجب=سالب.</p>`,
      gen:function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[a+b,-(a+b),-a-b]);return ["احسب: −"+a+" + "+b,o[0],o[1],"من −"+a+" نتقدّم "+b+" → "+s+".","ma"];}},
-    {name:"الجموع الشاذة", rx:/plural/i, yt:"عرفات القزعة شرح الجموع الشاذة انجليزي",
+    {name:"الجموع الشاذة", rx:/plural/i, yt:"شرح الجمع الشاذ irregular plural انجليزي", vid:"ft5TVez5wRA",
      lesson:`<p><span class="ltr">man→men · child→children · foot→feet · leaf→leaves · woman→women</span></p>`, gen:ePluralAdv},
-    {name:"الأضداد", rx:/opposite/i, yt:"عرفات القزعة شرح الأضداد opposites انجليزي",
+    {name:"الأضداد", rx:/opposite/i, yt:"شرح الأضداد opposites في اللغة الانجليزية بالعربي",
      lesson:`<p><span class="ltr">big↔small · hot↔cold · easy↔difficult · cheap↔expensive · ancient↔modern</span></p>`, gen:eOpp},
-    {name:"المقارنة والتفضيل", rx:/than|comparative/i, yt:"عرفات القزعة شرح المقارنة والتفضيل comparative انجليزي",
+    {name:"المقارنة والتفضيل", rx:/than|comparative/i, yt:"شرح المقارنة والتفضيل comparative superlative انجليزي", vid:"NSZaT2_W8zo",
      lesson:`<p><span class="ltr">taller than · the tallest · more famous than · the most famous</span></p>`, gen:eComp},
-    {name:"الأزمنة", rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i, yt:"عرفات القزعة شرح الأزمنة في اللغة الانجليزية",
+    {name:"الأزمنة", rx:/\bhad\b|\bhas\b|\bhave\b|\bwas\b|\bwere\b|\bwill\b|since|yet|already/i, yt:"شرح جميع الأزمنة في اللغة الانجليزية tenses", vid:"ObdBVilW8r0",
      lesson:`<p><span class="ltr">Past: went · Present perfect: has done · Past continuous: was playing</span></p>`, gen:ePast}
   ];
 
@@ -1849,7 +1849,9 @@ if(!STUDENTS[who]){
       html += `<div class="block-title"><span class="dot"></span> دروس الشرح 🎬 (لنقاط ضعفك)</div><div class="review">`;
       top.forEach(s=>{
         const q = encodeURIComponent(s.yt);
-        const vid = `<div style="margin-top:12px"><a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" data-vid="${s.name}" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>`;
+        let vid = `<div style="margin-top:12px">`;
+        if(s.vid){ vid += `<a href="https://www.youtube.com/watch?v=${s.vid}" target="_blank" rel="noopener" data-vid="${s.name}" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:10px 16px;border-radius:12px;font-weight:800">🎬 شاهد فيديو الشرح</a> `; }
+        vid += `<a href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener" data-vid="${s.name}" style="display:inline-block;text-decoration:none;color:var(--muted);font-size:.85rem;padding:10px 6px;font-weight:700">🔎 دروس أكثر</a></div>`;
         html += `<details data-lesson="${s.name}"><summary>🎬 ${s.name}</summary><div class="body">${s.lesson}${vid}</div></details>`;
       });
       html += `</div>`;
