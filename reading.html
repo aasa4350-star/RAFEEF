@@ -315,7 +315,7 @@ function pickIndex(len, key){
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
 function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && c.key && c.region) return c; var d = A["default"]; return (d && d.key && d.region) ? d : null; }
 function azureConfigured(){ return !!azureCreds(); }
-function azureAssess(refText, isAr, statusEl, btn){
+function azureAssess(refText, isAr, statusEl, btn, onDone){
   var cr = azureCreds();
   if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure لهذا الطفل بعد."; return; }
   if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
@@ -341,6 +341,7 @@ function azureAssess(refText, isAr, statusEl, btn){
         try{ var ws=(r.detailResult&&r.detailResult.Words)||[]; ws.forEach(function(w){ var a=w.PronunciationAssessment; if(a&&a.AccuracyScore<60) bad.push(w.Word); }); }catch(e){}
         var face = pron>=80?"🌟":pron>=60?"👍":"💪";
         statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu + (bad.length?('<br>🔁 راجع نطق: <b>'+bad.join("، ")+'</b>'):' ✅ ممتاز!');
+        if(onDone){ try{ onDone(pron, acc); }catch(e){} }
       } else {
         statusEl.style.color="var(--bad)"; statusEl.textContent="❌ ما وضح الصوت — تأكد من السماح للمايكروفون وحاول ثانية.";
       }
@@ -418,14 +419,14 @@ function speechMatch(alts, target, ar){
   });
   return { ok: best >= 0.6, heard: heard, score: best };
 }
-function wireMic(qEl, text, ar){
+function wireMic(qEl, text, ar, onOk){
   var mic = qEl.querySelector("[data-mic]"), pfb = qEl.querySelector(".pfb");
   if(!mic || !pfb) return;
   mic.addEventListener("click", function(){
     pfb.style.color = "var(--muted)"; pfb.textContent = "🎤 تكلّم الآن...";
     startRecognition(ar?"ar-SA":"en-US", function(alts){
       var m = speechMatch(alts, text, ar);
-      if(m.ok){ pfb.style.color = "var(--good)"; pfb.textContent = "✅ نطق صحيح! ("+m.heard+")"; }
+      if(m.ok){ pfb.style.color = "var(--good)"; pfb.textContent = "✅ نطق صحيح! ("+m.heard+")"; if(onOk){ try{ onOk(); }catch(e){} } }
       else{ pfb.style.color = "var(--bad)"; pfb.textContent = '❌ سمعتك: "'+m.heard+'" · انطقها: '+text; }
     }, function(err){
       pfb.style.color = "var(--bad)";
@@ -564,6 +565,12 @@ if(!META[who] || !DATA[who]){
     var list = D.pass || [[D.passage, D.questions]];
     var chosen = list[pickIndex(list.length, "read_"+curLang)];
     var passage = chosen[0], questions = chosen[1];
+    // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
+    // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
+    var canRead = azureConfigured() || (SR && !IS_IOS);
+    var lockMsg = canRead
+      ? '🔒 اقرأ القطعة بصوتك أولًا (اضغط 🎙️ قيّم نطقي'+((SR&&!IS_IOS)?' أو 🎤 اقرأ بصوتك':'')+') حتى تُفتح الأسئلة.'
+      : '🔒 استمع للقطعة كاملة أولًا (اضغط 🔊 استمع للنص) حتى تُفتح الأسئلة.';
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+
       '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button>'+azBtnHtml()+'</div>'+
@@ -571,7 +578,7 @@ if(!META[who] || !DATA[who]){
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
       EXIT_WARN_HTML+
-      '<div data-lock style="background:var(--bad-bg);border:1px solid var(--bad);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-weight:700;color:var(--bad);font-size:.92rem">🔒 استمع للقطعة كاملة أولًا (اضغط 🔊 استمع للنص) حتى تُفتح الأسئلة.</div>';
+      '<div data-lock style="background:var(--bad-bg);border:1px solid var(--bad);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-weight:700;color:var(--bad);font-size:.92rem">'+lockMsg+'</div>';
     questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+o+'</button>'; });
@@ -585,14 +592,14 @@ if(!META[who] || !DATA[who]){
     function unlock(){
       if(unlocked) return; unlocked=true;
       qButtons.forEach(function(b){ b.disabled=false; });
-      if(lockEl){ lockEl.style.background="var(--good-bg)"; lockEl.style.borderColor="var(--good)"; lockEl.style.color="var(--good)"; lockEl.textContent="✅ تمّ الاستماع — تقدر تحلّ الأسئلة الآن."; }
+      if(lockEl){ lockEl.style.background="var(--good-bg)"; lockEl.style.borderColor="var(--good)"; lockEl.style.color="var(--good)"; lockEl.textContent = canRead ? "✅ قرأت القطعة — تقدر تحلّ الأسئلة الآن." : "✅ تمّ الاستماع — تقدر تحلّ الأسئلة الآن."; }
     }
     readBtn.addEventListener("click",function(){
-      if(lockEl && !unlocked){ lockEl.textContent="🔊 يستمع الآن... الأسئلة تُفتح بعد نهاية القطعة."; }
-      speak(passage,1,ar?"ar-SA":"en-US", unlock);
+      if(lockEl && !unlocked){ lockEl.textContent = canRead ? "🔊 استمع للنص... ثم اقرأها بنفسك (🎙️ قيّم نطقي) عشان تُفتح الأسئلة." : "🔊 يستمع الآن... الأسئلة تُفتح بعد نهاية القطعة."; }
+      speak(passage,1,ar?"ar-SA":"en-US", canRead ? null : unlock);
     });
-    wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar);
-    var azP=sec.querySelector(".azbtn"); if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP); }); }
+    wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar, unlock);
+    var azP=sec.querySelector(".azbtn"); if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, unlock); }); }
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
