@@ -271,7 +271,7 @@ function saveScore(test, correct, total, extra){
 // ===== كشف الخروج من الصفحة أثناء الحل (استعانة بمترجم/تطبيق ثاني) =====
 var AWAY = { total:0, exits:0, hiddenAt:null, onReturn:null };
 function _awayOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-function _awayIn(){ if(AWAY.hiddenAt!=null){ AWAY.total += (Date.now()-AWAY.hiddenAt); AWAY.exits++; AWAY.hiddenAt=null; if(AWAY.exits>=2){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
+function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير (ثانيتين أو أقل) */ AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
 function ejectSession(){
   if(document.getElementById("__eject")) return;
   var ov=document.createElement("div");
