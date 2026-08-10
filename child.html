@@ -194,8 +194,8 @@ async function main(){
     const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
-      else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
-      else { if(!otherMap[t]) otherMap[t]=p; } });
+      else if(SUBJ_EMOJI[subj]){ if(!currMap[t] || (p.meta.total||0)>(currMap[t].meta.total||0)) currMap[t]=p; }
+      else { if(!otherMap[t] || (p.meta.total||0)>(otherMap[t].meta.total||0)) otherMap[t]=p; } });
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
       let vLearned=0, vTotal=300;

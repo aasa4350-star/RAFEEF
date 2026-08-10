@@ -469,7 +469,7 @@ function renderSet(id, items, intro, regen, label){
   function savePartial(){
     if(ended) return;
     var n = Object.keys(answered).length;
-    if(n<1 || !label) return;
+    if(n<3 || !label) return;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
     saveScore(label, correct, n, wrongs);
   }

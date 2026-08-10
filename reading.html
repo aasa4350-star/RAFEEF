@@ -521,7 +521,7 @@ if(!META[who] || !DATA[who]){
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
-    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
     sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
@@ -587,7 +587,7 @@ if(!META[who] || !DATA[who]){
     var azP=sec.querySelector(".azbtn"); if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP); }); }
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<1) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
     sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
@@ -722,7 +722,7 @@ if(!META[who] || !DATA[who]){
     // حفظ جزئي للمراجعة: حتى لو ما كمّل كل المجموعة، نحفظ الكلمات اللي جاوبها
     function saveIfPartial(){
       if(saved || isNew) return;
-      var tn=Object.keys(tried).length; if(tn<1) return;
+      var tn=Object.keys(tried).length; if(tn<3) return;
       saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
       saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
     }
