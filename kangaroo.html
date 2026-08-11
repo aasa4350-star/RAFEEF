@@ -92,7 +92,7 @@ function gPattern(lvl){
   else if(type==="addinc"){var cur=ri(1,3+lvl),inc=ri(1,2+lvl);seq.push(cur);for(var i=1;i<n;i++){cur+=inc;inc++;seq.push(cur);}next=cur+inc;}
   else {var cur=ri(1,3),k=gp([2,3]),add=ri(1,2);seq.push(cur);for(var i=1;i<n;i++){cur=cur*k+add;seq.push(cur);}next=cur*k+add;}
   var o=opt3(next,[next+ri(1,3),next-ri(1,3),seq[n-1]+seq[n-2]]);
-  return ["ما العدد التالي في النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"القاعدة تُكمِل النمط ليعطي "+next+".","num"];
+  return ["ما العدد التالي في النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"القاعدة تُكمِل النمط ليعطي "+next+"."];
 }
 function gOdd(lvl){
   var type=gp(["parity","mult"]);var nums=[],correct,expl;
@@ -107,17 +107,17 @@ function gOdd(lvl){
     var mn;do{mn=ri(2,k*8);}while(mn%k===0||maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
     expl=mn+" ليس من مضاعفات "+k+"، والبقية من مضاعفاته.";
   }
-  shuffle(nums);return ["أيّ عدد مختلف عن البقية: "+nums.join("، ")+"؟",nums.slice(),nums.indexOf(correct),expl,"num"];
+  shuffle(nums);return ["أيّ عدد مختلف عن البقية: "+nums.join("، ")+"؟",nums.slice(),nums.indexOf(correct),expl];
 }
 function gDist(lvl){var per=gp([2,3,4,5]),plates=ri(2,4+lvl),total=per*plates,fruit=gp(["تفاحة","موزة","برتقالة","حبة"]);
-  var o=opt3(plates,[plates+1,plates-1,per]);return ["توزّع سارة كل "+per+" "+fruit+" في طبق واحد. عندها "+total+" "+fruit+". كم طبقًا تحتاج؟",o[0],o[1],total+" ÷ "+per+" = "+plates+" أطباق.","num"];}
+  var o=opt3(plates,[plates+1,plates-1,per]);return ["توزّع سارة كل "+per+" "+fruit+" في طبق واحد. عندها "+total+" "+fruit+". كم طبقًا تحتاج؟",o[0],o[1],total+" ÷ "+per+" = "+plates+" أطباق."];}
 function gSave(lvl){var per=ri(2,5+lvl),days=ri(3,5+lvl),total=per*days;
-  var o=opt3(total,[total+per,total-per,per+days]);return ["يوفّر أحمد "+per+" ريالات كل يوم. بعد "+days+" أيام، كم ريالًا معه؟",o[0],o[1],per+" × "+days+" = "+total+" ريال.","num"];}
+  var o=opt3(total,[total+per,total-per,per+days]);return ["يوفّر أحمد "+per+" ريالات كل يوم. بعد "+days+" أيام، كم ريالًا معه؟",o[0],o[1],per+" × "+days+" = "+total+" ريال."];}
 function gShare(lvl){var k=gp([2,3,4,5]),each=ri(2,4+lvl),total=k*each;
-  var o=opt3(each,[each+1,each-1,total-each]);return ["قُسِّمت "+total+" قطعة حلوى على "+k+" أطفال بالتساوي. كم لكل طفل؟",o[0],o[1],total+" ÷ "+k+" = "+each+".","num"];}
+  var o=opt3(each,[each+1,each-1,total-each]);return ["قُسِّمت "+total+" قطعة حلوى على "+k+" أطفال بالتساوي. كم لكل طفل؟",o[0],o[1],total+" ÷ "+k+" = "+each+"."];}
 function gPuzzle(lvl){
-  if(lvl>=3){var n=ri(2,6)*4,res=n+n/2+n/4;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه وربعه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" + "+(n/4)+" = "+res+".","num"];}
-  var n=ri(2,8)*2,res=n+n/2;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" = "+res+".","num"];
+  if(lvl>=3){var n=ri(2,6)*4,res=n+n/2+n/4;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه وربعه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" + "+(n/4)+" = "+res+"."];}
+  var n=ri(2,8)*2,res=n+n/2;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" = "+res+"."];
 }
 /* ===== مولّدات الاستدلال اللغوي (مطابقة لأسلوب الكتاب) ===== */
 function optS(correct,cand){
@@ -139,7 +139,7 @@ function gAnalogy(){
   var cand=[];REL[g].forEach(function(p){if(p[1]!==correct)cand.push(p[1]);});
   keys.forEach(function(k){if(k!==g)REL[k].forEach(function(p){cand.push(p[1]);});});
   var o=optS(correct,cand);
-  return ["أكمل التناظر: "+p1[0]+" : "+p1[1]+"  مثل  "+p2[0]+" : ؟",o[0],o[1],p1[0]+" ← "+p1[1]+" وكذلك "+p2[0]+" ← "+p2[1]+"."];
+  return ["أكمل التناظر: "+p1[0]+" : "+p1[1]+"  مثل  "+p2[0]+" : ؟",o[0],o[1],p1[0]+" ← "+p1[1]+" وكذلك "+p2[0]+" ← "+p2[1]+".","an:"+g];
 }
 var SENT=[
  ["يحيط بـ",[["الإطار","الصورة"],["السور","البيت"],["الغلاف","الكتاب"],["القشرة","الموزة"]]],
@@ -151,7 +151,7 @@ function gComplete(){
   var cand=[];s[1].forEach(function(p){if(p[1]!==correct)cand.push(p[1]);});
   SENT.forEach(function(ss){if(ss[0]!==verb)ss[1].forEach(function(p){cand.push(p[1]);});});
   var o=optS(correct,cand);
-  return [p1[0]+" "+verb+" "+p1[1]+"، و"+p2[0]+" "+verb+" ؟",o[0],o[1],p2[0]+" "+verb+" "+p2[1]+"."];
+  return [p1[0]+" "+verb+" "+p1[1]+"، و"+p2[0]+" "+verb+" ؟",o[0],o[1],p2[0]+" "+verb+" "+p2[1]+".","sc:"+verb];
 }
 var CATS={
  "فاكهة":["تفاح","موز","عنب","برتقال","تمر","رمان","تين"],
@@ -164,7 +164,7 @@ var CATS={
 function gCategory(){
   var keys=Object.keys(CATS),c=gp(keys),items=shuffle(CATS[c].slice()).slice(0,3);
   var o=optS(c,keys.filter(function(k){return k!==c;}));
-  return ["إلى أيّ مجموعة تنتمي: "+items.join("، ")+"؟",o[0],o[1],"كلها من «"+c+"»."];
+  return ["إلى أيّ مجموعة تنتمي: "+items.join("، ")+"؟",o[0],o[1],"كلها من «"+c+"».","cat:"+c];
 }
 var SEQ=[
  ["مراحل عمر الإنسان",["جنين","رضيع","طفل","صبي","شاب","كهل","شيخ"]],
@@ -176,18 +176,18 @@ function gSequence(){
   var cand=arr.filter(function(x){return x!==correct&&shown.indexOf(x)<0;});
   SEQ.forEach(function(ss){if(ss[0]!==s[0])cand=cand.concat(ss[1]);});
   var o=optS(correct,cand);
-  return ["ما الكلمة التالية في الترتيب: "+shown.join("، ")+"، ...؟",o[0],o[1],"الترتيب: "+arr.join(" ← ")+"."];
+  return ["ما الكلمة التالية في الترتيب: "+shown.join("، ")+"، ...؟",o[0],o[1],"الترتيب: "+arr.join(" ← ")+".","seq:"+s[0]];
 }
 var COLL=[["الطيور","سرب"],["الغنم","قطيع"],["النحل","خلية"],["السفن","أسطول"],["الجنود","جيش"],["الإبل","قافلة"]];
 function gCollective(){
   var c=gp(COLL),correct=c[1],cand=COLL.filter(function(x){return x[1]!==correct;}).map(function(x){return x[1];});
   var o=optS(correct,cand);
-  return ["ماذا نسمّي جماعة "+c[0]+"؟",o[0],o[1],"جماعة "+c[0]+" = "+correct+"."];
+  return ["ماذا نسمّي جماعة "+c[0]+"؟",o[0],o[1],"جماعة "+c[0]+" = "+correct+".","coll"];
 }
 
 var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
-function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; var _k=(q&&q[4])||(q&&q[0]); if(!q||seen[_k]) continue; seen[_k]=1; out.push(q); } return out; }
 var CFG={
   math:{gens:MATH_GENS, mode:"input", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>اكتب الإجابة بنفسك</b> (بدون خيارات)."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."}
