@@ -103,6 +103,21 @@ function speakEN(text){
   }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+// استماع بصوت Azure العصبي البشري (مبطّأ للأطفال)، ويرجع لصوت المتصفح فقط إذا تعذّر
+var _ttsSynth=null;
+function azureSpeak(text){
+  var cr=azureCreds();
+  if(!cr || !window.SpeechSDK){ speakEN(text); return; }
+  try{
+    var SDK=window.SpeechSDK;
+    if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
+    var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
+    var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-AvaMultilingualNeural"><prosody rate="-15%">'+esc+'</prosody></voice></speak>';
+    synth.speakSsmlAsync(ssml, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; }, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speakEN(text); });
+  }catch(e){ speakEN(text); }
+}
 function _paRun(refText, statusEl, btn){
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
@@ -374,7 +389,7 @@ if(!NAMES[who]){
               row.querySelector(".en").textContent=tgt;
               qEl.appendChild(row);
               var fb=row.querySelector(".pfb");
-              row.querySelector(".listen").addEventListener("click",function(){ speakEN(tgt); });
+              row.querySelector(".listen").addEventListener("click",function(){ azureSpeak(tgt); });
               var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
             }
           }
