@@ -315,12 +315,13 @@ function pickIndex(len, key){
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
 function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && c.key && c.region) return c; var d = A["default"]; return (d && d.key && d.region) ? d : null; }
 function azureConfigured(){ return !!azureCreds(); }
-function _paRun(refText, isAr, statusEl, btn, onDone){
+function _paRun(refText, isAr, statusEl, btn, onDone, longText){
   var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
+    // القطعة الطويلة: نسمح بوقفات أطول بين الجمل (٤ث) ومهلة بدء أطول حتى لا يتقطّع
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, longText?"15000":"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, longText?"4000":"1500"); }catch(e){}
     audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
     rec = new SDK.SpeechRecognizer(cfg, audio);
     pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
@@ -329,7 +330,7 @@ function _paRun(refText, isAr, statusEl, btn, onDone){
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
   var _fin=false;
   function _end(){ if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){} }
-  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, 15000);
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, longText?40000:15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
     try{
@@ -349,14 +350,14 @@ function _paRun(refText, isAr, statusEl, btn, onDone){
     _end();
   }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من متصفح <b>Safari</b> مباشرة."; _end(); });
 }
-function azureAssess(refText, isAr, statusEl, btn, onDone){
+function azureAssess(refText, isAr, statusEl, btn, onDone, longText){
   var cr = azureCreds();
   if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure لهذا الطفل بعد."; return; }
   if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
   if(btn){ btn.disabled=true; }
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
   try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){} // تنشيط الصوت على iOS
-  _paRun(refText, isAr, statusEl, btn, onDone); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
+  _paRun(refText, isAr, statusEl, btn, onDone, longText); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
 }
 function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn" style="background:#0a7cff;color:#fff;border-color:#0a7cff">🎙️ قيّم نطقي</button>' : ''; }
 
@@ -622,7 +623,7 @@ if(!META[who] || !DATA[who]){
       speak(passage,1,ar?"ar-SA":"en-US", onListened);
     });
     wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar, onRead);
-    var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead); }); }
+    var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true); }); }
     // قراءة القطعة عبر مايك لوحة المفاتيح (يشتغل على الآيفون من سفاري والشاشة الرئيسية) — يفتح الأسئلة
     var kin=sec.querySelector("[data-kmwrap] .kmic"), kchk=sec.querySelector("[data-kmwrap] .kchk"), kpfb=sec.querySelector("[data-mic-wrap] .pfb");
     if(kchk){ kchk.addEventListener("click",function(){
