@@ -1305,13 +1305,19 @@ function injectProw(qEl, stemText, ansText){
   var tgt=enTargetQuiz(stemText, ansText);
   if(!tgt) return;
   var row=document.createElement("div"); row.className="prow";
-  row.innerHTML='🗣️ <span class="ltr"></span> <button class="say small listen">🔊 استمع</button>'+azBtnHtml()+'<span class="pfb"></span>';
+  row.innerHTML='🗣️ <span class="ltr"></span> <button class="say small listen">🔊 استمع</button>'+
+    '<input class="kmic" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
+    '<button class="say small kchk" style="background:#16a34a;border-color:#16a34a">✅ افحص النطق</button>'+
+    azBtnHtml()+'<span class="pfb"></span>';
   row.querySelector(".ltr").textContent=tgt;
   qEl.appendChild(row);
   var fb=row.querySelector(".pfb");
   row.querySelector(".listen").addEventListener("click",function(){ azureSpeak(tgt); });
+  var kin=row.querySelector(".kmic"), kchk=row.querySelector(".kchk");
+  if(kchk) kchk.addEventListener("click",function(){ var said=normEN2(kin.value), t=normEN2(tgt); var ok=said && (said===t || t.indexOf(said)>=0 || said.indexOf(t)>=0); fb.style.color=ok?"var(--good)":"var(--bad)"; fb.textContent=ok?" ✅ نطق صحيح!":" ❌ غير واضح، جرّب ثانية"; });
   var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
 }
+function normEN2(s){ return String(s||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); }
 
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 let who = (qs("who")||"").toLowerCase();

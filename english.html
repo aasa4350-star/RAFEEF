@@ -87,6 +87,7 @@ function opt(correct, others){ var o=[correct].concat(others); shuffle(o); retur
 function en(s){ return '<span class="en">'+s+'</span>'; }
 // مشتّتات مميّزة من نفس القائمة (تستبعد القيمة الصحيحة وتحذف المكرّر)
 function dist(pool, item, idx, n){ var correct=item[idx], seen={}, o=[]; pool.forEach(function(x){ var v=x[idx]; if(v!==correct && !seen[v]){ seen[v]=1; o.push(v); } }); shuffle(o); return o.slice(0, n||2); }
+function normEN(s){ return String(s||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); }
 
 /* ===== النطق: استماع (متصفح) + تقييم عبر Azure ===== */
 function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
@@ -385,11 +386,16 @@ if(!NAMES[who]){
             var tgt=enTarget(qEl.querySelector(".stem"), ansText);
             if(tgt){
               var row=document.createElement("div"); row.className="prow";
-              row.innerHTML='🗣️ <span class="en"></span> <button class="say small listen">🔊 استمع</button>'+azBtnHtml()+'<span class="pfb"></span>';
+              row.innerHTML='🗣️ <span class="en"></span> <button class="say small listen">🔊 استمع</button>'+
+                '<input class="kmic" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
+                '<button class="say small kchk" style="background:#16a34a;border-color:#16a34a">✅ افحص النطق</button>'+
+                azBtnHtml()+'<span class="pfb"></span>';
               row.querySelector(".en").textContent=tgt;
               qEl.appendChild(row);
               var fb=row.querySelector(".pfb");
               row.querySelector(".listen").addEventListener("click",function(){ azureSpeak(tgt); });
+              var kin=row.querySelector(".kmic"), kchk=row.querySelector(".kchk");
+              if(kchk) kchk.addEventListener("click",function(){ var said=normEN(kin.value), t=normEN(tgt); var ok=said && (said===t || t.indexOf(said)>=0 || said.indexOf(t)>=0); fb.style.color=ok?"var(--good)":"var(--bad)"; fb.textContent=ok?" ✅ نطق صحيح!":" ❌ غير واضح، جرّب ثانية"; });
               var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
             }
           }
