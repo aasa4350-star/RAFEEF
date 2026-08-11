@@ -1573,7 +1573,7 @@ if(!STUDENTS[who]){
     d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
     html += `</div><div class="block-title"><span class="dot"></span> الاختبار</div>`;
     d.quiz.forEach((q,i)=>{
-      var useInput = (id==="ma") && /^-?\d+$/.test(String(q[1][q[2]])); // رياضيات بإجابة عدد صحيح → كتابة (بلا تخمين)
+      var useInput = false; // خيارات للجميع (٤ في كانجرو، ٣ هنا) + كشف الإجابة السريعة يكفي للتخمين
       html += `<div class="q" data-i="${i}" ${useInput?'data-input="1"':''}><div class="num">سؤال ${i+1}</div>
         <div class="stem ${isEn?'ltr':''}">${q[0]}</div>`;
       if(useInput){

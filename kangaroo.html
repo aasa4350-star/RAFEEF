@@ -81,8 +81,8 @@ function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()
 function opt3(correct,cand){
   var seen={};seen[String(correct)]=1;var ds=[];
   (cand||[]).forEach(function(d){d=Math.round(d);var k=String(d);if(!seen[k]&&d>=0){seen[k]=1;ds.push(d);}});
-  var k=1;while(ds.length<2){var up=correct+k,dn=correct-k;if(!seen[String(up)]){seen[String(up)]=1;ds.push(up);}else if(dn>=0&&!seen[String(dn)]){seen[String(dn)]=1;ds.push(dn);}k++;if(k>80)break;}
-  var o=[correct].concat(ds.slice(0,2));shuffle(o);return [o,o.indexOf(correct)];
+  var k=1;while(ds.length<3){var up=correct+k,dn=correct-k;if(!seen[String(up)]){seen[String(up)]=1;ds.push(up);}else if(dn>=0&&!seen[String(dn)]){seen[String(dn)]=1;ds.push(dn);}k++;if(k>80)break;}
+  var o=[correct].concat(ds.slice(0,3));shuffle(o);return [o,o.indexOf(correct)];
 }
 /* ===== مولّدات الاستدلال الرياضي (مطابقة لأسلوب كتاب كانجرو) ===== */
 function gPattern(lvl){
@@ -99,11 +99,11 @@ function gOdd(lvl){
   if(type==="parity"){
     var isEven=Math.random()<0.5;
     var E=function(){return ri(1,8+lvl*3)*2;},O=function(){return ri(0,8+lvl*3)*2+1;};
-    var majFn=isEven?E:O,minFn=isEven?O:E;var s={},maj=[];while(maj.length<2){var v=majFn();if(!s[v]){s[v]=1;maj.push(v);}}
+    var majFn=isEven?E:O,minFn=isEven?O:E;var s={},maj=[];while(maj.length<3){var v=majFn();if(!s[v]){s[v]=1;maj.push(v);}}
     var mn;do{mn=minFn();}while(maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
     expl=isEven?(mn+" عدد فردي والبقية زوجية."):(mn+" عدد زوجي والبقية فردية.");
   } else {
-    var k=gp([3,4,5]);var s={},maj=[];while(maj.length<2){var v=k*ri(2,6+lvl*2);if(!s[v]){s[v]=1;maj.push(v);}}
+    var k=gp([3,4,5]);var s={},maj=[];while(maj.length<3){var v=k*ri(2,6+lvl*2);if(!s[v]){s[v]=1;maj.push(v);}}
     var mn;do{mn=ri(2,k*8);}while(mn%k===0||maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
     expl=mn+" ليس من مضاعفات "+k+"، والبقية من مضاعفاته.";
   }
@@ -189,7 +189,7 @@ var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
 function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; var _k=(q&&q[4])||(q&&q[0]); if(!q||seen[_k]) continue; seen[_k]=1; out.push(q); } return out; }
 var CFG={
-  math:{gens:MATH_GENS, mode:"input", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>اكتب الإجابة بنفسك</b> (بدون خيارات)."},
+  math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>أسئلة جديدة كل مرة</b>."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."}
 };
 
