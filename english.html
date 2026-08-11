@@ -368,14 +368,14 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="english", REM_LABEL="الإنجليزي";
   var REMTOPICS=[
-    {id:"u1", name:"1) Family", tip:"راجع مفردات العائلة، ظروف التكرار (always/never)، والضمائر الملكية (mine/yours/hers)."},
-    {id:"u2", name:"2) Chores", tip:"الأعمال المنزلية (wash the dishes…)، المضارع المستمر (am/is/are + verb-ing)، والطلب بـ Can."},
-    {id:"u3", name:"3) Stories", tip:"الماضي البسيط: أضف ed للأفعال المنتظمة، والنفي didn't، والسؤال Did you…? Yes I did / No I didn't."},
-    {id:"u4", name:"4) After-School", tip:"الأفعال الشاذّة (go→went, see→saw)، الظروف (quick→quickly)، وأدوات الربط (and/but/because/so/when)."},
-    {id:"u5", name:"5) Outdoor", tip:"أماكن الطبيعة، verb+to مقابل verb+ing، وcould للقدرة في الماضي."},
-    {id:"u6", name:"6) Accidents", tip:"الأمراض والإصابات، must/have to/should + mustn't، والضمائر (something/anything/everything/nothing)."},
-    {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل."},
-    {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was)."}
+    {id:"u1", name:"1) Family", tip:"راجع مفردات العائلة، ظروف التكرار (always/never)، والضمائر الملكية (mine/yours/hers).", yt:"شرح ظروف التكرار always usually never والضمائر الملكية انجليزي"},
+    {id:"u2", name:"2) Chores", tip:"الأعمال المنزلية (wash the dishes…)، المضارع المستمر (am/is/are + verb-ing)، والطلب بـ Can.", yt:"شرح المضارع المستمر present continuous am is are انجليزي"},
+    {id:"u3", name:"3) Stories", tip:"الماضي البسيط: أضف ed للأفعال المنتظمة، والنفي didn't، والسؤال Did you…? Yes I did / No I didn't.", yt:"شرح الماضي البسيط past simple did didn't انجليزي"},
+    {id:"u4", name:"4) After-School", tip:"الأفعال الشاذّة (go→went, see→saw)، الظروف (quick→quickly)، وأدوات الربط (and/but/because/so/when).", yt:"شرح الأفعال الشاذة في الماضي والظروف وأدوات الربط انجليزي"},
+    {id:"u5", name:"5) Outdoor", tip:"أماكن الطبيعة، verb+to مقابل verb+ing، وcould للقدرة في الماضي.", yt:"شرح verb to infinitive و verb ing و could انجليزي"},
+    {id:"u6", name:"6) Accidents", tip:"الأمراض والإصابات، must/have to/should + mustn't، والضمائر (something/anything/everything/nothing).", yt:"شرح must have to should mustn't انجليزي"},
+    {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل.", yt:"شرح العبارات الوصلية who which where whose relative clauses انجليزي"},
+    {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was).", yt:"شرح المستقبل be going to والفعل to be انجليزي"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
@@ -386,7 +386,7 @@ if(!NAMES[who]){
     if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الوحدات. جرّب وحدات '+REM_LABEL+' ويرجع هنا يعرض أضعف وحدة مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
       html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
-        (weak?'<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div>':'')+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(x.t.yt||x.t.name)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
         '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 وحدات ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
