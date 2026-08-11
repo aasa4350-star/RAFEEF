@@ -155,6 +155,7 @@ function azureAssess(refText, statusEl, btn){
   if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
   if(btn) btn.disabled=true;
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
+  try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){} // تنشيط الصوت على iOS
   _paRun(refText, statusEl, btn); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
 }
 // استخراج الجملة/الكلمة الإنجليزية من السؤال، مع تعبئة الفراغ بالإجابة الصحيحة
