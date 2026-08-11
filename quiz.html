@@ -1321,6 +1321,7 @@ function injectProw(qEl, stemText, ansText){
   var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
 }
 function normEN2(s){ return String(s||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); }
+function normNum(s){ return String(s==null?"":s).replace(/[٠-٩]/g,function(d){return "٠١٢٣٤٥٦٧٨٩".indexOf(d);}).replace(/[^\d\-]/g,"").trim(); }
 
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 let who = (qs("who")||"").toLowerCase();
@@ -1572,10 +1573,17 @@ if(!STUDENTS[who]){
     d.review.forEach(r=>{ html += `<details><summary>${r[0]}</summary><div class="body">${r[1]}</div></details>`; });
     html += `</div><div class="block-title"><span class="dot"></span> الاختبار</div>`;
     d.quiz.forEach((q,i)=>{
-      html += `<div class="q" data-i="${i}"><div class="num">سؤال ${i+1}</div>
-        <div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
-      q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
-      html += `</div><div class="explain" ${(id==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
+      var useInput = (id==="ma") && /^-?\d+$/.test(String(q[1][q[2]])); // رياضيات بإجابة عدد صحيح → كتابة (بلا تخمين)
+      html += `<div class="q" data-i="${i}" ${useInput?'data-input="1"':''}><div class="num">سؤال ${i+1}</div>
+        <div class="stem ${isEn?'ltr':''}">${q[0]}</div>`;
+      if(useInput){
+        html += `<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="nans" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;font-weight:700;font-family:inherit;text-align:center;background:transparent;color:var(--ink)"><button class="nchk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>`;
+      } else {
+        html += `<div class="opts">`;
+        q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
+        html += `</div>`;
+      }
+      html += `<div class="explain" ${(id==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score>0 / ${d.quiz.length}</span>
       <div class="track"><div class="fill" data-fill></div></div></div>
@@ -1583,8 +1591,30 @@ if(!STUDENTS[who]){
     sec.innerHTML = html;
     const answered = new Set(); const total = d.quiz.length;
     const scoreEl = sec.querySelector("[data-score]"), fillEl = sec.querySelector("[data-fill]");
+    function commit(i, ok, dt){
+      RESULTS[id].events.push({ok:ok, dt: dt!=null? Math.round(dt*10)/10 : null, c:(RESULTS[id].chosen[i]==null?-1:RESULTS[id].chosen[i])});
+      RESULTS[id].done = answered.size;
+      scoreEl.textContent = `${RESULTS[id].correct} / ${total}`;
+      fillEl.style.width = (answered.size/total*100)+"%";
+      renderResults();
+    }
     sec.querySelectorAll(".q").forEach(qEl=>{
       const i = +qEl.dataset.i, ans = d.quiz[i][2];
+      if(qEl.dataset.input){
+        const inp=qEl.querySelector(".nans"), chk=qEl.querySelector(".nchk"), exp=qEl.querySelector(".explain");
+        const correctVal=d.quiz[i][1][ans];
+        const submit=()=>{
+          if(answered.has(i)) return; if(normNum(inp.value)==="") return; answered.add(i);
+          const now=Date.now(); const dt=RESULTS[id].lastTs?(now-RESULTS[id].lastTs)/1000:null; RESULTS[id].lastTs=now;
+          inp.disabled=true; chk.disabled=true;
+          const ok = normNum(inp.value)===normNum(correctVal);
+          if(ok){ RESULTS[id].chosen[i]=ans; RESULTS[id].correct++; inp.style.borderColor="var(--good)"; inp.style.color="var(--good)"; }
+          else{ RESULTS[id].chosen[i]=-1; inp.style.borderColor="var(--bad)"; inp.style.color="var(--bad)"; exp.innerHTML=`<b>الإجابة: ${correctVal}</b> · ${d.quiz[i][3]}`; RESULTS[id].wrong.push({q:d.quiz[i][0], picked:inp.value, correct:correctVal}); }
+          exp.classList.add("show"); commit(i, ok, dt);
+        };
+        chk.addEventListener("click", submit);
+        inp.addEventListener("keydown", e=>{ if(e.key==="Enter") submit(); });
+      } else {
       qEl.querySelectorAll(".opts button").forEach(btn=>{
         btn.addEventListener("click",()=>{
           if(answered.has(i)) return; answered.add(i);
@@ -1600,15 +1630,12 @@ if(!STUDENTS[who]){
             qEl.querySelectorAll(".opts button")[ans].classList.add("correct");
             RESULTS[id].wrong.push({q:d.quiz[i][0], picked:d.quiz[i][1][j], correct:d.quiz[i][1][ans]});
           }
-          RESULTS[id].events.push({ok:(j===ans), dt: dt!=null? Math.round(dt*10)/10 : null, c:j});
           qEl.querySelector(".explain").classList.add("show");
           if(isEn) injectProw(qEl, d.quiz[i][0], d.quiz[i][1][ans]);
-          RESULTS[id].done = answered.size;
-          scoreEl.textContent = `${RESULTS[id].correct} / ${total}`;
-          fillEl.style.width = (answered.size/total*100)+"%";
-          renderResults();
+          commit(i, (j===ans), dt);
         });
       });
+      }
     });
     sec.querySelector(".reset").addEventListener("click",()=>{ build(id); renderResults(); });
   }
@@ -1659,6 +1686,7 @@ if(!STUDENTS[who]){
       const dts = per.map(p=>p.dt).filter(x=>x!=null);
       const avg = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)/dts.length*10)/10 : null;
       const total = dts.length ? Math.round(dts.reduce((a,b)=>a+b,0)) : null;
+      const fast = dts.filter(x=>x<1.5).length; // إجابات سريعة جدًا (غالبًا تخمين)
       const buildPaper = (R)=> (R.items||[]).map((q,i)=>{
         const ch = R.chosen[i];
         return { q:q[0], opts:q[1], chosen:(ch==null?-1:ch), correct:q[2] };
@@ -1668,7 +1696,7 @@ if(!STUDENTS[who]){
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
-        meta: { per, avg_sec: avg, total_sec: total, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0),
+        meta: { per, avg_sec: avg, total_sec: total, fast: fast, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0 && fast < Math.ceil(dts.length/2)),
           paper: { date: new Date().toISOString(),
             en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
             en: buildPaper(en), ma: buildPaper(ma) } }

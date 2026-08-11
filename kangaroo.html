@@ -229,10 +229,11 @@ if(!NAMES[who]){
     sec.innerHTML = html;
     var answered={}, correct=0, total=items.length, saved=false;
     var scoreEl = sec.querySelector("[data-score]");
-    var t0=Date.now();
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, n, {dur:dur}); }
+    var t0=Date.now(), lastTs=t0, fast=0;
+    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2))}; }
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
-    function afterAnswer(){ scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, total, {dur:dur}); } }
+    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total, meta(total)); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2], correctVal=items[i][1][ans];
       if(input){
