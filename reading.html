@@ -315,12 +315,8 @@ function pickIndex(len, key){
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
 function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && c.key && c.region) return c; var d = A["default"]; return (d && d.key && d.region) ? d : null; }
 function azureConfigured(){ return !!azureCreds(); }
-function azureAssess(refText, isAr, statusEl, btn, onDone){
-  var cr = azureCreds();
-  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure لهذا الطفل بعد."; return; }
-  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
-  var SDK = window.SpeechSDK;
-  var cfg, audio, rec, pa;
+function _paRun(refText, isAr, statusEl, btn, onDone){
+  var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
@@ -328,10 +324,13 @@ function azureAssess(refText, isAr, statusEl, btn, onDone){
     rec = new SDK.SpeechRecognizer(cfg, audio);
     pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
     pa.applyTo(rec);
-  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); return; }
-  if(btn){ btn.disabled=true; }
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
+  var _fin=false;
+  function _end(){ if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){} }
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. اقرأ بصوت أعلى، وإذا التطبيق مفتوح من أيقونة الشاشة الرئيسية افتحه من متصفح <b>Safari</b>."; _end(); }, 12000);
   rec.recognizeOnceAsync(function(result){
+    if(_fin) return; _fin=true; clearTimeout(_to);
     try{
       if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
         var r = SDK.PronunciationAssessmentResult.fromResult(result);
@@ -343,11 +342,27 @@ function azureAssess(refText, isAr, statusEl, btn, onDone){
         statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu + (bad.length?('<br>🔁 راجع نطق: <b>'+bad.join("، ")+'</b>'):' ✅ ممتاز!');
         if(onDone){ try{ onDone(pron, acc); }catch(e){} }
       } else {
-        statusEl.style.color="var(--bad)"; statusEl.textContent="❌ ما وضح الصوت — تأكد من السماح للمايكروفون وحاول ثانية.";
+        statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ ما وضح الصوت — اقرأ أعلى وأوضح وحاول ثانية.";
       }
     }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
-    if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){}
-  }, function(err){ statusEl.style.color="var(--bad)"; statusEl.textContent="❌ خطأ Azure: "+err; if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){} });
+    _end();
+  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من متصفح <b>Safari</b> مباشرة."; _end(); });
+}
+function azureAssess(refText, isAr, statusEl, btn, onDone){
+  var cr = azureCreds();
+  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure لهذا الطفل بعد."; return; }
+  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
+  if(btn){ btn.disabled=true; }
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      try{ stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+      _paRun(refText, isAr, statusEl, btn, onDone);
+    }).catch(function(e){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 لازم تسمح للمايكروفون. وإذا التطبيق مفتوح من أيقونة الشاشة الرئيسية، افتحه من متصفح <b>Safari</b> — المايكروفون لا يعمل من الشاشة الرئيسية على الآيفون."; if(btn){ btn.disabled=false; } });
+  } else {
+    statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 المايكروفون غير متاح هنا. افتح الموقع من متصفح <b>Safari</b> (مب من أيقونة الشاشة الرئيسية).";
+    if(btn){ btn.disabled=false; }
+  }
 }
 function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn" style="background:#0a7cff;color:#fff;border-color:#0a7cff">🎙️ قيّم نطقي</button>' : ''; }
 
