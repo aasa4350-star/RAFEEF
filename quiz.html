@@ -1259,7 +1259,7 @@ function _paRun(refText, statusEl, btn){
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
   var _fin=false;
   function _end(){ if(btn) btn.disabled=false; try{ rec.close(); }catch(e){} }
-  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. اقرأ بصوت أعلى، وإذا التطبيق مفتوح من أيقونة الشاشة الرئيسية افتحه من متصفح <b>Safari</b>."; _end(); }, 12000);
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, 12000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
     try{
@@ -1286,9 +1286,9 @@ function azureAssess(refText, statusEl, btn){
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
       try{ stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
       _paRun(refText, statusEl, btn);
-    }).catch(function(e){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 لازم تسمح للمايكروفون. وإذا التطبيق مفتوح من أيقونة الشاشة الرئيسية، افتحه من متصفح <b>Safari</b> — المايكروفون لا يعمل من الشاشة الرئيسية على الآيفون."; if(btn) btn.disabled=false; });
+    }).catch(function(e){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 على الآيفون، مايك النطق يعمل فقط في متصفح <b>Safari</b> — مب في <b>Chrome</b> ولا من الشاشة الرئيسية. افتح الرابط في Safari واسمح للمايكروفون."; if(btn) btn.disabled=false; });
   } else {
-    statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 المايكروفون غير متاح هنا. افتح الموقع من متصفح <b>Safari</b> (مب من أيقونة الشاشة الرئيسية).";
+    statusEl.style.color="var(--bad)"; statusEl.innerHTML="🎤 المايكروفون غير متاح هنا. افتح الرابط في متصفح <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية) على الآيفون.";
     if(btn) btn.disabled=false;
   }
 }
