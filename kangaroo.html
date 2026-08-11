@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>مهارات التفكير 🦘</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec; --warn:#b45309;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 10px;font-size:1.1rem}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:13px 15px;border-radius:12px;font-size:1.15rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:200px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var LVL = {saud:1,osama:2,rafeef:3,hasan:4};
+var name = NAMES[who] || "الطالب";
+var lvl = LVL[who] || 2;
+var QN = (who==="hasan"||who==="rafeef") ? 10 : 8;
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total, extra){
+  try{
+    var meta = { kind:"practice", test:test, correct:correct, total:total };
+    if(extra){ for(var k in extra){ if(extra.hasOwnProperty(k)) meta[k]=extra[k]; } }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta })
+    });
+  }catch(e){}
+}
+
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function gp(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function opt3(correct,cand){
+  var seen={};seen[String(correct)]=1;var ds=[];
+  (cand||[]).forEach(function(d){d=Math.round(d);var k=String(d);if(!seen[k]&&d>=0){seen[k]=1;ds.push(d);}});
+  var k=1;while(ds.length<2){var up=correct+k,dn=correct-k;if(!seen[String(up)]){seen[String(up)]=1;ds.push(up);}else if(dn>=0&&!seen[String(dn)]){seen[String(dn)]=1;ds.push(dn);}k++;if(k>80)break;}
+  var o=[correct].concat(ds.slice(0,2));shuffle(o);return [o,o.indexOf(correct)];
+}
+/* ===== مولّدات الاستدلال الرياضي (مطابقة لأسلوب كتاب كانجرو) ===== */
+function gPattern(lvl){
+  var type=gp(["arith","geom","addinc","muladd"]);var n=4,seq=[],next,a;
+  if(type==="arith"){a=ri(1,3+lvl*2);var d=ri(2,3+lvl*2);for(var i=0;i<n;i++)seq.push(a+i*d);next=a+n*d;}
+  else if(type==="geom"){a=ri(1,3);var r=gp([2,3]);for(var i=0;i<n;i++)seq.push(a*Math.pow(r,i));next=a*Math.pow(r,n);}
+  else if(type==="addinc"){var cur=ri(1,3+lvl),inc=ri(1,2+lvl);seq.push(cur);for(var i=1;i<n;i++){cur+=inc;inc++;seq.push(cur);}next=cur+inc;}
+  else {var cur=ri(1,3),k=gp([2,3]),add=ri(1,2);seq.push(cur);for(var i=1;i<n;i++){cur=cur*k+add;seq.push(cur);}next=cur*k+add;}
+  var o=opt3(next,[next+ri(1,3),next-ri(1,3),seq[n-1]+seq[n-2]]);
+  return ["ما العدد التالي في النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"القاعدة تُكمِل النمط ليعطي "+next+".","num"];
+}
+function gOdd(lvl){
+  var type=gp(["parity","mult"]);var nums=[],correct,expl;
+  if(type==="parity"){
+    var isEven=Math.random()<0.5;
+    var E=function(){return ri(1,8+lvl*3)*2;},O=function(){return ri(0,8+lvl*3)*2+1;};
+    var majFn=isEven?E:O,minFn=isEven?O:E;var s={},maj=[];while(maj.length<2){var v=majFn();if(!s[v]){s[v]=1;maj.push(v);}}
+    var mn;do{mn=minFn();}while(maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
+    expl=isEven?(mn+" عدد فردي والبقية زوجية."):(mn+" عدد زوجي والبقية فردية.");
+  } else {
+    var k=gp([3,4,5]);var s={},maj=[];while(maj.length<2){var v=k*ri(2,6+lvl*2);if(!s[v]){s[v]=1;maj.push(v);}}
+    var mn;do{mn=ri(2,k*8);}while(mn%k===0||maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
+    expl=mn+" ليس من مضاعفات "+k+"، والبقية من مضاعفاته.";
+  }
+  shuffle(nums);return ["أيّ عدد مختلف عن البقية: "+nums.join("، ")+"؟",nums.slice(),nums.indexOf(correct),expl,"num"];
+}
+function gDist(lvl){var per=gp([2,3,4,5]),plates=ri(2,4+lvl),total=per*plates,fruit=gp(["تفاحة","موزة","برتقالة","حبة"]);
+  var o=opt3(plates,[plates+1,plates-1,per]);return ["توزّع سارة كل "+per+" "+fruit+" في طبق واحد. عندها "+total+" "+fruit+". كم طبقًا تحتاج؟",o[0],o[1],total+" ÷ "+per+" = "+plates+" أطباق.","num"];}
+function gSave(lvl){var per=ri(2,5+lvl),days=ri(3,5+lvl),total=per*days;
+  var o=opt3(total,[total+per,total-per,per+days]);return ["يوفّر أحمد "+per+" ريالات كل يوم. بعد "+days+" أيام، كم ريالًا معه؟",o[0],o[1],per+" × "+days+" = "+total+" ريال.","num"];}
+function gShare(lvl){var k=gp([2,3,4,5]),each=ri(2,4+lvl),total=k*each;
+  var o=opt3(each,[each+1,each-1,total-each]);return ["قُسِّمت "+total+" قطعة حلوى على "+k+" أطفال بالتساوي. كم لكل طفل؟",o[0],o[1],total+" ÷ "+k+" = "+each+".","num"];}
+function gPuzzle(lvl){
+  if(lvl>=3){var n=ri(2,6)*4,res=n+n/2+n/4;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه وربعه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" + "+(n/4)+" = "+res+".","num"];}
+  var n=ri(2,8)*2,res=n+n/2;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" = "+res+".","num"];
+}
+var GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
+function genN(n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(GENS)(lvl); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · مهارات التفكير</p><h1>🦘 مهارات التفكير — '+name+'</h1></header>'+
+    '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
+    '<div class="unit">🔢 الاستدلال الرياضي — أنماط · العدد المختلف · مسائل · ألغاز أعداد (مطابق لأسلوب كانجرو)</div>'+
+    '<section id="quiz"></section>';
+
+  function render(){
+    var sec = document.getElementById("quiz");
+    var items = genN(QN);
+    var html = '<div class="intro">حلّ المسائل — تنمّي الاستدلال والتفكير. <b>أسئلة جديدة كل مرة</b>.</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    var t0=Date.now();
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كانجرو — استدلال رياضي 🦘", correct, n, {dur:dur}); }
+    sec._leave = savePartial;
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كانجرو — استدلال رياضي 🦘", correct, total, {dur:dur}); }
+        });
+      });
+    });
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(); });
+  }
+  render();
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var s=document.getElementById("quiz"); if(s && typeof s._leave==="function") s._leave(); } });
+}
+</script>
+</body>
+</html>
