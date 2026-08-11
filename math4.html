@@ -245,12 +245,12 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="math4", REM_LABEL="الرياضيات";
   var REMTOPICS=[
-    {id:"f1", name:"1) القيمة المنزلية", tip:"القيمة المنزلية = الرقم × قيمة منزلته. تذكّر ترتيب المنازل: آحاد، عشرات، مئات، ألوف… وقارن الأعداد من أعلى منزلة."},
-    {id:"f2", name:"2) الجمع والطرح", tip:"في التقدير قرّب كل عدد لأقرب ألف ثم اجمع/اطرح. وخصائص الجمع: الإبدال، التجميع، والعنصر المحايد (0)."},
-    {id:"f3", name:"3) البيانات", tip:"الحدث المؤكّد يحدث دائمًا، والمستحيل لا يحدث، والممكن قد يحدث. والتمثيل بالخطوط للتغيّر عبر الزمن."},
-    {id:"f4", name:"4) الأنماط والجبر", tip:"اكتشف قاعدة النمط (نزيد/نضرب بمقدار ثابت). ولإيجاد المجهول اعكس العملية (⬚+7=17 ← 17−7)."},
-    {id:"f5", name:"5) الضرب × رقم", tip:"للضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار. وللتقدير قرّب لأقرب عشرة."},
-    {id:"f6", name:"6) الضرب × رقمين", tip:"قدّر بتقريب كل عدد لأقرب عشرة. ثم اضرب خطوة خطوة (الآحاد ثم العشرات)."}
+    {id:"f1", name:"1) القيمة المنزلية", tip:"القيمة المنزلية = الرقم × قيمة منزلته. تذكّر ترتيب المنازل: آحاد، عشرات، مئات، ألوف… وقارن الأعداد من أعلى منزلة.", yt:"شرح القيمة المنزلية رابع ابتدائي رياضيات"},
+    {id:"f2", name:"2) الجمع والطرح", tip:"في التقدير قرّب كل عدد لأقرب ألف ثم اجمع/اطرح. وخصائص الجمع: الإبدال، التجميع، والعنصر المحايد (0).", yt:"شرح الجمع والطرح رابع ابتدائي رياضيات"},
+    {id:"f3", name:"3) البيانات", tip:"الحدث المؤكّد يحدث دائمًا، والمستحيل لا يحدث، والممكن قد يحدث. والتمثيل بالخطوط للتغيّر عبر الزمن.", yt:"شرح تمثيل البيانات رابع ابتدائي رياضيات"},
+    {id:"f4", name:"4) الأنماط والجبر", tip:"اكتشف قاعدة النمط (نزيد/نضرب بمقدار ثابت). ولإيجاد المجهول اعكس العملية (⬚+7=17 ← 17−7).", yt:"شرح الأنماط والجبر رابع ابتدائي رياضيات"},
+    {id:"f5", name:"5) الضرب × رقم", tip:"للضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار. وللتقدير قرّب لأقرب عشرة.", yt:"شرح الضرب في عدد من رقم واحد رابع ابتدائي"},
+    {id:"f6", name:"6) الضرب × رقمين", tip:"قدّر بتقريب كل عدد لأقرب عشرة. ثم اضرب خطوة خطوة (الآحاد ثم العشرات).", yt:"شرح الضرب في عدد من رقمين رابع ابتدائي"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
@@ -261,7 +261,7 @@ if(!NAMES[who]){
     if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الفصول. جرّب فصول '+REM_LABEL+' ويرجع هنا يعرض أضعف فصل مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
       html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
-        (weak?'<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div>':'')+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(x.t.yt||x.t.name)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
         '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 فصول ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }

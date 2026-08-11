@@ -261,10 +261,10 @@ if(!NAMES[who]){
   // ===== علاجي: يرتّب الأقسام من الأضعف ويعطي نصيحة =====
   var REM_PAGE="lughati", REM_LABEL="لغتي";
   var REMTOPICS=[
-    {id:"nahw", name:"النحو ✍️", tip:"المبتدأ والخبر مرفوعان بالضمة، والفاعل مرفوع، والمفعول به منصوب بالفتحة. راجع أمثلة تبويب النحو."},
-    {id:"imla", name:"الإملاء 📖", tip:"همزة القطع تُنطق دائمًا (أ/إ)، والوصل تسقط في الوصل. التاء المربوطة (ة) والمفتوحة (ت)، وكلمات مثل هذا/ذلك/الله تُحذف ألفها."},
-    {id:"fahm", name:"فهم النص 🌿", tip:"أعد قراءة نص «التصحّر»: الأسباب (قطع الأشجار، قلة الأمطار) والعلاج (الأحزمة الخضراء، حفر الآبار)."},
-    {id:"shir", name:"النص الشعري 🦋", tip:"راجع «لِمَ تأتِ الفراشة» — الشاعر محمد الفاضل سليمان، وموضوعه الفراشة والأزهار."}
+    {id:"nahw", name:"النحو ✍️", tip:"المبتدأ والخبر مرفوعان بالضمة، والفاعل مرفوع، والمفعول به منصوب بالفتحة. راجع أمثلة تبويب النحو.", yt:"شرح المبتدأ والخبر والفاعل والمفعول به رابع ابتدائي"},
+    {id:"imla", name:"الإملاء 📖", tip:"همزة القطع تُنطق دائمًا (أ/إ)، والوصل تسقط في الوصل. التاء المربوطة (ة) والمفتوحة (ت)، وكلمات مثل هذا/ذلك/الله تُحذف ألفها.", yt:"شرح همزة القطع والوصل والتاء المربوطة رابع ابتدائي"},
+    {id:"fahm", name:"فهم النص 🌿", tip:"أعد قراءة نص «التصحّر»: الأسباب (قطع الأشجار، قلة الأمطار) والعلاج (الأحزمة الخضراء، حفر الآبار).", yt:"شرح درس التصحر لغتي رابع ابتدائي"},
+    {id:"shir", name:"النص الشعري 🦋", tip:"راجع «لِمَ تأتِ الفراشة» — الشاعر محمد الفاضل سليمان، وموضوعه الفراشة والأزهار.", yt:"شرح نص لم تأت الفراشة لغتي رابع ابتدائي"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
@@ -275,7 +275,7 @@ if(!NAMES[who]){
     if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الأقسام. جرّب أقسام '+REM_LABEL+' ويرجع هنا يعرض أضعف قسم مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
       html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
-        (weak?'<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div>':'')+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(x.t.yt||x.t.name)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
         '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 أقسام ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
