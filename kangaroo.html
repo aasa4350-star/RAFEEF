@@ -29,6 +29,11 @@
   .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
   .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
   .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 8px;border-radius:13px;font-size:.98rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
   .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
   .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
@@ -114,8 +119,77 @@ function gPuzzle(lvl){
   if(lvl>=3){var n=ri(2,6)*4,res=n+n/2+n/4;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه وربعه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" + "+(n/4)+" = "+res+".","num"];}
   var n=ri(2,8)*2,res=n+n/2;var o=opt3(n,[n+2,n-2,res-n]);return ["عدد إذا أُضيف إليه نصفه صار "+res+". ما هذا العدد؟",o[0],o[1],n+" + "+(n/2)+" = "+res+".","num"];
 }
-var GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
-function genN(n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(GENS)(lvl); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+/* ===== مولّدات الاستدلال اللغوي (مطابقة لأسلوب الكتاب) ===== */
+function optS(correct,cand){
+  var seen={};seen[correct]=1;var ds=[];
+  shuffle((cand||[]).slice()).forEach(function(d){if(d&&!seen[d]){seen[d]=1;ds.push(d);}});
+  var o=[correct].concat(ds.slice(0,2));shuffle(o);return [o,o.indexOf(correct)];
+}
+var REL={
+ "صغير الحيوان":[["قطة","هريرة"],["كلبة","جرو"],["بقرة","عجل"],["فرس","مهر"],["دجاجة","كتكوت"],["نعجة","حمل"]],
+ "صوت الحيوان":[["أسد","زئير"],["كلب","نباح"],["قط","مواء"],["حصان","صهيل"],["حمار","نهيق"],["طائر","تغريد"]],
+ "أداة المهنة":[["نجار","منشار"],["طبيب","سماعة"],["رسام","فرشاة"],["خياط","إبرة"],["فلاح","محراث"]],
+ "وظيفة الأداة":[["مقص","قص"],["قلم","كتابة"],["ممحاة","مسح"],["مفتاح","فتح"],["مكنسة","كنس"]],
+ "الكل والجزء":[["يد","إصبع"],["شجرة","غصن"],["كتاب","صفحة"],["بيت","غرفة"],["وجه","عين"],["سيارة","عجلة"]]
+};
+function gAnalogy(){
+  var keys=Object.keys(REL),g=gp(keys),pairs=shuffle(REL[g].slice()),p1=pairs[0],p2=pairs[1],correct=p2[1];
+  var cand=[];REL[g].forEach(function(p){if(p[1]!==correct)cand.push(p[1]);});
+  keys.forEach(function(k){if(k!==g)REL[k].forEach(function(p){cand.push(p[1]);});});
+  var o=optS(correct,cand);
+  return ["أكمل التناظر: "+p1[0]+" : "+p1[1]+"  مثل  "+p2[0]+" : ؟",o[0],o[1],p1[0]+" ← "+p1[1]+" وكذلك "+p2[0]+" ← "+p2[1]+"."];
+}
+var SENT=[
+ ["يحيط بـ",[["الإطار","الصورة"],["السور","البيت"],["الغلاف","الكتاب"],["القشرة","الموزة"]]],
+ ["يعيش في",[["السمكة","الماء"],["الأسد","الغابة"],["الجمل","الصحراء"],["الدب القطبي","الجليد"]]],
+ ["يعمل في",[["الطبيب","المستشفى"],["المعلم","المدرسة"],["الطباخ","المطعم"],["المزارع","المزرعة"]]]
+];
+function gComplete(){
+  var s=gp(SENT),verb=s[0],pairs=shuffle(s[1].slice()),p1=pairs[0],p2=pairs[1],correct=p2[1];
+  var cand=[];s[1].forEach(function(p){if(p[1]!==correct)cand.push(p[1]);});
+  SENT.forEach(function(ss){if(ss[0]!==verb)ss[1].forEach(function(p){cand.push(p[1]);});});
+  var o=optS(correct,cand);
+  return [p1[0]+" "+verb+" "+p1[1]+"، و"+p2[0]+" "+verb+" ؟",o[0],o[1],p2[0]+" "+verb+" "+p2[1]+"."];
+}
+var CATS={
+ "فاكهة":["تفاح","موز","عنب","برتقال","تمر","رمان","تين"],
+ "خُضار":["جزر","خيار","طماطم","بصل","بطاطس","خس"],
+ "حيوانات":["أسد","قط","فيل","حصان","أرنب","نمر"],
+ "طيور":["عصفور","حمامة","صقر","ببغاء","بطة"],
+ "ألوان":["أحمر","أزرق","أخضر","أصفر","أسود"],
+ "وسائل نقل":["سيارة","طائرة","قطار","سفينة","دراجة"]
+};
+function gCategory(){
+  var keys=Object.keys(CATS),c=gp(keys),items=shuffle(CATS[c].slice()).slice(0,3);
+  var o=optS(c,keys.filter(function(k){return k!==c;}));
+  return ["إلى أيّ مجموعة تنتمي: "+items.join("، ")+"؟",o[0],o[1],"كلها من «"+c+"»."];
+}
+var SEQ=[
+ ["مراحل عمر الإنسان",["جنين","رضيع","طفل","صبي","شاب","كهل","شيخ"]],
+ ["أيام الأسبوع",["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"]],
+ ["مراحل النبات",["بذرة","برعم","نبتة","شجرة"]]
+];
+function gSequence(){
+  var s=gp(SEQ),arr=s[1],k=ri(2,Math.min(arr.length-1,4)),shown=arr.slice(0,k),correct=arr[k];
+  var cand=arr.filter(function(x){return x!==correct&&shown.indexOf(x)<0;});
+  SEQ.forEach(function(ss){if(ss[0]!==s[0])cand=cand.concat(ss[1]);});
+  var o=optS(correct,cand);
+  return ["ما الكلمة التالية في الترتيب: "+shown.join("، ")+"، ...؟",o[0],o[1],"الترتيب: "+arr.join(" ← ")+"."];
+}
+var COLL=[["الطيور","سرب"],["الغنم","قطيع"],["النحل","خلية"],["السفن","أسطول"],["الجنود","جيش"],["الإبل","قافلة"]];
+function gCollective(){
+  var c=gp(COLL),correct=c[1],cand=COLL.filter(function(x){return x[1]!==correct;}).map(function(x){return x[1];});
+  var o=optS(correct,cand);
+  return ["ماذا نسمّي جماعة "+c[0]+"؟",o[0],o[1],"جماعة "+c[0]+" = "+correct+"."];
+}
+
+var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
+var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
+function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+var CFG={
+  math:{gens:MATH_GENS, label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>أسئلة جديدة كل مرة</b>."},
+  verb:{gens:VERB_GENS, label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."}
+};
 
 var app = document.getElementById("app");
 if(!NAMES[who]){
@@ -124,13 +198,18 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · مهارات التفكير</p><h1>🦘 مهارات التفكير — '+name+'</h1></header>'+
     '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
-    '<div class="unit">🔢 الاستدلال الرياضي — أنماط · العدد المختلف · مسائل · ألغاز أعداد (مطابق لأسلوب كانجرو)</div>'+
-    '<section id="quiz"></section>';
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="math" aria-selected="true">🔢 استدلال رياضي</button>'+
+      '<button data-tab="verb" aria-selected="false">🧩 استدلال لغوي</button>'+
+    '</div>'+
+    '<section class="panel active" id="math"></section>'+
+    '<section class="panel" id="verb"></section>'+
+    '<footer>مهارات التفكير · مطابق لأسلوب كانجرو · من إعداد المعلّم</footer>';
 
-  function render(){
-    var sec = document.getElementById("quiz");
-    var items = genN(QN);
-    var html = '<div class="intro">حلّ المسائل — تنمّي الاستدلال والتفكير. <b>أسئلة جديدة كل مرة</b>.</div>';
+  function render(kind){
+    var c = CFG[kind], sec = document.getElementById(kind);
+    var items = genN(c.gens, QN);
+    var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
@@ -142,8 +221,8 @@ if(!NAMES[who]){
     var answered={}, correct=0, total=items.length, saved=false;
     var scoreEl = sec.querySelector("[data-score]");
     var t0=Date.now();
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كانجرو — استدلال رياضي 🦘", correct, n, {dur:dur}); }
-    sec._leave = savePartial;
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, n, {dur:dur}); }
+    sec._leave = savePartial; sec._done=function(){ return saved; };
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -154,14 +233,24 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كانجرو — استدلال رياضي 🦘", correct, total, {dur:dur}); }
+          if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, total, {dur:dur}); }
         });
       });
     });
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(); });
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(kind); });
   }
-  render();
-  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var s=document.getElementById("quiz"); if(s && typeof s._leave==="function") s._leave(); } });
+  render("math");
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab, pan=document.getElementById(id); pan.classList.add("active");
+      if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+    });
+  });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 }
 </script>
 </body>
