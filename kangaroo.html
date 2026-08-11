@@ -123,8 +123,10 @@ function gPuzzle(lvl){
 function optS(correct,cand){
   var seen={};seen[correct]=1;var ds=[];
   shuffle((cand||[]).slice()).forEach(function(d){if(d&&!seen[d]){seen[d]=1;ds.push(d);}});
-  var o=[correct].concat(ds.slice(0,2));shuffle(o);return [o,o.indexOf(correct)];
+  var o=[correct].concat(ds.slice(0,3));shuffle(o);return [o,o.indexOf(correct)];
 }
+// تحويل الأرقام العربية إلى إنجليزية وتجريدها للمقارنة (يمنع فروق التنسيق)
+function normNum(s){ return String(s==null?"":s).replace(/[٠-٩]/g,function(d){return "٠١٢٣٤٥٦٧٨٩".indexOf(d);}).replace(/[^\d\-]/g,"").trim(); }
 var REL={
  "صغير الحيوان":[["قطة","هريرة"],["كلبة","جرو"],["بقرة","عجل"],["فرس","مهر"],["دجاجة","كتكوت"],["نعجة","حمل"]],
  "صوت الحيوان":[["أسد","زئير"],["كلب","نباح"],["قط","مواء"],["حصان","صهيل"],["حمار","نهيق"],["طائر","تغريد"]],
@@ -187,8 +189,8 @@ var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
 function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 var CFG={
-  math:{gens:MATH_GENS, label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>أسئلة جديدة كل مرة</b>."},
-  verb:{gens:VERB_GENS, label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."}
+  math:{gens:MATH_GENS, mode:"input", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>اكتب الإجابة بنفسك</b> (بدون خيارات)."},
+  verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."}
 };
 
 var app = document.getElementById("app");
@@ -207,13 +209,20 @@ if(!NAMES[who]){
     '<footer>مهارات التفكير · مطابق لأسلوب كانجرو · من إعداد المعلّم</footer>';
 
   function render(kind){
-    var c = CFG[kind], sec = document.getElementById(kind);
+    var c = CFG[kind], sec = document.getElementById(kind), input=(c.mode==="input");
     var items = genN(c.gens, QN);
     var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
-      html += '</div><div class="explain">'+q[3]+'</div></div>';
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
+      if(input){
+        html += '<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="ans" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.15rem;font-weight:700;font-family:inherit;text-align:center">'+
+          '<button class="chk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>';
+      } else {
+        html += '<div class="opts">';
+        q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+        html += '</div>';
+      }
+      html += '<div class="explain">'+q[3]+'</div></div>';
     });
     html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
@@ -223,19 +232,33 @@ if(!NAMES[who]){
     var t0=Date.now();
     function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, n, {dur:dur}); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
+    function afterAnswer(){ scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, total, {dur:dur}); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
-      var i=+qEl.dataset.i, ans=items[i][2];
-      qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click",function(){
-          if(answered[i]) return; answered[i]=1;
-          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
-          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          qEl.querySelector(".explain").classList.add("show");
-          scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore(c.label, correct, total, {dur:dur}); }
+      var i=+qEl.dataset.i, ans=items[i][2], correctVal=items[i][1][ans];
+      if(input){
+        var inp=qEl.querySelector(".ans"), chk=qEl.querySelector(".chk"), exp=qEl.querySelector(".explain");
+        function submit(){
+          if(answered[i]) return; if(normNum(inp.value)==="") return; answered[i]=1;
+          inp.disabled=true; chk.disabled=true;
+          var ok = normNum(inp.value)===normNum(correctVal);
+          if(ok){ correct++; inp.style.borderColor="var(--good)"; inp.style.color="var(--good)"; }
+          else{ inp.style.borderColor="var(--bad)"; inp.style.color="var(--bad)"; exp.innerHTML='<b style="color:var(--good)">الإجابة: '+correctVal+'</b> — '+items[i][3]; }
+          exp.classList.add("show"); afterAnswer();
+        }
+        chk.addEventListener("click", submit);
+        inp.addEventListener("keydown", function(e){ if(e.key==="Enter") submit(); });
+      } else {
+        qEl.querySelectorAll(".opts button").forEach(function(btn){
+          btn.addEventListener("click",function(){
+            if(answered[i]) return; answered[i]=1;
+            qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+            if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+            else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+            qEl.querySelector(".explain").classList.add("show");
+            afterAnswer();
+          });
         });
-      });
+      }
     });
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(kind); });
   }
