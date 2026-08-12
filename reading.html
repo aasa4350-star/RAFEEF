@@ -344,13 +344,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone){
     var wordsHtml = allWords.map(function(w){
       var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var et=a.ErrorType||"None";
       var wc=(et==="Omission")?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)");
-      return '<span style="color:'+wc+'">'+w.Word+'</span>';
+      return '<span class="rword" data-w="'+encodeURIComponent(w.Word)+'" style="color:'+wc+';cursor:pointer;border-bottom:1px dotted '+wc+'">'+w.Word+'</span>';
     }).join(' ');
     var face = pron>=80?"🌟":pron>=60?"👍":"💪";
     statusEl.style.color="";
     statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b>'+
       '<div style="direction:'+(isAr?"rtl":"ltr")+';text-align:'+(isAr?"right":"left")+';margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+
-      '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 نطق صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
+      '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
+    // نطق الكلمة لحدها عند الضغط عليها — عشان يتعلّم الكلمات الغلط
+    statusEl.querySelectorAll(".rword").forEach(function(sp){ sp.addEventListener("click", function(){ var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
     if(onDone){ try{ onDone(pron, pron); }catch(e){} }
     _closeRec();
   }
@@ -498,6 +500,25 @@ function speak(text, rate, lang, onEnd){
     if(onEnd){ u.onend = onEnd; }
     speechSynthesis.speak(u);
   }catch(e){ if(onEnd){ onEnd(); } alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+}
+// نطق عصبي بشري من Azure (مبطّأ للأطفال) للكلمة المفردة أو القطعة — يرجع لصوت المتصفح فقط إذا تعذّر Azure
+var _ttsSynth=null;
+function azureTTS(text, isAr, ratePct, onEnd){
+  var cr=azureCreds(), lang=isAr?"ar-SA":"en-US";
+  if(!cr || !window.SpeechSDK){ speak(text, 0.8, lang, onEnd); return; }
+  try{
+    var SDK=window.SpeechSDK;
+    try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
+    if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
+    var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
+    var voice=isAr?"ar-SA-ZariyahNeural":"en-US-AvaMultilingualNeural";
+    var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="'+lang+'"><voice name="'+voice+'"><prosody rate="'+(ratePct||"-15%")+'">'+esc+'</prosody></voice></speak>';
+    synth.speakSsmlAsync(ssml,
+      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; if(onEnd){ try{onEnd();}catch(e){} } },
+      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speak(text, 0.8, lang, onEnd); });
+  }catch(e){ speak(text, 0.8, lang, onEnd); }
 }
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // التعرّف على الكلام غير موثوق على آيفون/آيباد (قيد من آبل) — نخفي زر النطق هناك
@@ -716,7 +737,7 @@ if(!META[who] || !DATA[who]){
     }
     readBtn.addEventListener("click",function(){
       if(lockEl && !unlocked){ lockEl.textContent = canRead ? "🔊 يستمع الآن... بعد ما يخلص اقرأها بصوتك." : "🔊 يستمع الآن... الأسئلة تُفتح بعد نهاية القطعة."; }
-      speak(passage,1,ar?"ar-SA":"en-US", onListened);
+      azureTTS(passage, ar, "-22%", onListened); // صوت بشري عصبي مبطّأ شوي للأطفال (يرجع لصوت المتصفح لو تعذّر Azure)
     });
     // قراءة القطعة عبر Azure فقط (🎙️ قيّم نطقي) — التسجيل المستمر يفتح الأسئلة بعد القراءة
     var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true); }); }
