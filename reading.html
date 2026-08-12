@@ -722,7 +722,8 @@ if(!META[who] || !DATA[who]){
       '<div data-lock style="background:var(--bad-bg);border:1px solid var(--bad);border-radius:12px;padding:11px 14px;margin-bottom:12px;font-weight:700;color:var(--bad);font-size:.92rem">'+lockMsg+'</div>';
     questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+o+'</button>'; });
+      // نخلط ترتيب الخيارات حتى لا تكون الإجابة الصحيحة دائمًا الأولى (data-j يبقى الفهرس الأصلي)
+      shuffle(q[1].map(function(_,j){ return j; })).forEach(function(j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+q[1][j]+'</button>'; });
       html += '</div></div>';
     });
     html += '<div class="score" data-score>الفهم: 0 / '+questions.length+'</div>'+
@@ -767,7 +768,7 @@ if(!META[who] || !DATA[who]){
           if(ans[i]!=null) return; ans[i]=+btn.dataset.j;
           qEl.querySelectorAll(".opts button").forEach(function(b){b.disabled=true;});
           if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
-          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[right].classList.add("correct"); }
+          else{ btn.classList.add("wrong"); var rb=qEl.querySelector('.opts button[data-j="'+right+'"]'); if(rb) rb.classList.add("correct"); }
           scoreEl.textContent="الفهم: "+correct+" / "+total;
           // صف اختبار نطق السؤال (يظهر بعد الإجابة): استمع + قيّم نطقي
           if(!qEl.querySelector(".qprow")){
