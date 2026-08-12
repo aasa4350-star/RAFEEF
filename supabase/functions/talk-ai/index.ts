@@ -16,6 +16,15 @@ const cors = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// اللصق من الجوال كثير يجيب مسافة أو سطر جديد أو علامات تنصيص حول المفتاح،
+// وقوقل ترفض المفتاح وقتها بـ 401. ننظّفه قبل الاستعمال.
+function cleanKey(raw: string | undefined): string {
+  let k = String(raw || "").trim();
+  k = k.replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+  k = k.replace(/\s+/g, "");
+  return k;
+}
+
 function sys(child: string, topic: string): string {
   return [
     `You are a warm, patient English conversation partner for ${child || "a student"}, an Arabic-speaking school child.`,
@@ -44,7 +53,12 @@ async function callGemini(key: string, system: string, messages: any[]): Promise
       generationConfig: { maxOutputTokens: 800, temperature: 0.85, topP: 0.9 },
     }),
   });
-  if (!res.ok) throw new Error("gemini " + res.status + " " + (await res.text()).slice(0, 200));
+  if (!res.ok) {
+    // نضيف طول المفتاح فقط (بدون كشفه) لأن 401 غالبًا سببه مفتاح ناقص أو ملصوق غلط.
+    throw new Error(
+      "gemini " + res.status + " (keyLen=" + key.length + ") " + (await res.text()).slice(0, 200),
+    );
+  }
   const data = await res.json();
   const parts = data?.candidates?.[0]?.content?.parts || [];
   return parts.map((p: any) => p.text || "").join(" ").trim();
@@ -79,8 +93,8 @@ Deno.serve(async (req: Request) => {
     }
     const system = sys(body.child || "", body.topic || "");
 
-    const gk = Deno.env.get("GEMINI_API_KEY");
-    const ok = Deno.env.get("OPENAI_API_KEY");
+    const gk = cleanKey(Deno.env.get("GEMINI_API_KEY"));
+    const ok = cleanKey(Deno.env.get("OPENAI_API_KEY"));
     let reply = "";
     if (gk) reply = await callGemini(gk, system, messages);
     else if (ok) reply = await callOpenAI(ok, system, messages);
