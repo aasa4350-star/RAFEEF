@@ -337,7 +337,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone){
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
     if(btn){ btn.disabled=false; }
-    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك بعد محاولتين. جرّب زر <b>«✅ تحقّق من قراءتي»</b> (مايك لوحة المفاتيح) — يشتغل دايم ويفتح الأسئلة."; _closeRec(); return; }
+    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك بعد محاولتين. اضغط <b>«🎙️ قيّم نطقي»</b> وحاول ثانية بصوت أوضح، وتأكد إنك تفتح الموقع في <b>Safari</b> واسمحت بالمايكروفون."; _closeRec(); return; }
     var sum=0,n=0; allWords.forEach(function(w){ var a=w.PronunciationAssessment||{}; if(typeof a.AccuracyScore==="number" && (a.ErrorType||"None")!=="Insertion"){ sum+=a.AccuracyScore; n++; } });
     var pron = n?Math.round(sum/n):0;
     var col = pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
@@ -394,7 +394,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone){
     rec.startContinuousRecognitionAsync(function(){}, function(err){
       if(_fin || _userStopped) return;
       if(_retryOrFail()) return;
-      _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون. جرّب زر <b>«✅ تحقّق من قراءتي»</b> — يشتغل دايم."; if(btn){ btn.disabled=false; } _closeRec();
+      _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون. افتح الموقع في <b>Safari</b> واسمح بالمايكروفون، ثم اضغط <b>«🎙️ قيّم نطقي»</b> مرة ثانية."; if(btn){ btn.disabled=false; } _closeRec();
     });
   }
   _to = setTimeout(finish, 150000); // أمان عام: يوقف تلقائيًا بعد دقيقتين ونصف (يشمل الإعادات)
@@ -675,12 +675,12 @@ if(!META[who] || !DATA[who]){
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
-    var lockMsg = '🔒 الخطوة ١: استمع للنص (🔊). الخطوة ٢: اقرأ القطعة بصوتك عبر 🎤 <b>مايك لوحة المفاتيح</b> في الخانة ثم «✅ تحقّق من قراءتي»'+(azureConfigured()?' (أو 🎙️ قيّم نطقي)':'')+'. بعدها تُفتح الأسئلة.';
+    var lockMsg = azureConfigured()
+      ? '🔒 الخطوة ١: استمع للنص (🔊 استمع للنص). الخطوة ٢: اقرأ القطعة كاملة بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة.'
+      : '🔒 استمع للنص كاملًا (🔊 استمع للنص) وبعدها تُفتح الأسئلة.';
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
-      '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+
-      '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 اقرأ بصوتك</button>'+azBtnHtml()+'</div>'+
+      '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+azBtnHtml()+'</div>'+
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passage+'</div>'+
-      '<div data-kmwrap style="margin-top:8px"><input class="kmic" placeholder="🎤 اقرأ القطعة بمايك لوحة المفاتيح هنا..." style="width:100%;direction:'+dir+';text-align:'+ta+';padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;box-sizing:border-box"><button class="say small kchk" style="margin-top:6px;background:#16a34a;border-color:#16a34a">✅ تحقّق من قراءتي</button></div>'+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
       EXIT_WARN_HTML+
@@ -696,8 +696,6 @@ if(!META[who] || !DATA[who]){
     var unlocked=false, listened=false, lockEl=sec.querySelector("[data-lock]"), qButtons=sec.querySelectorAll(".q .opts button");
     var readBtn=sec.querySelector("[data-read]");
     var azBtnEl=sec.querySelector(".azbtn"), micBtnEl=sec.querySelector("[data-mic]");
-    // زر «اقرأ بصوتك» يعتمد على مايك المتصفح ولا يعمل على آيفون — نخفيه هناك حتى لا يلخبط الطفل (يبقى مايك لوحة المفاتيح + قيّم نطقي)
-    if(IS_IOS && micBtnEl){ micBtnEl.style.display="none"; }
     // الخطوة ٢ (القراءة) مقفلة حتى يستمع أولًا
     function setReadEnabled(on){ [azBtnEl,micBtnEl].forEach(function(b){ if(b){ b.disabled=!on; b.style.opacity=on?"":"0.45"; b.style.cursor=on?"":"not-allowed"; } }); }
     if(canRead) setReadEnabled(false);
@@ -720,26 +718,8 @@ if(!META[who] || !DATA[who]){
       if(lockEl && !unlocked){ lockEl.textContent = canRead ? "🔊 يستمع الآن... بعد ما يخلص اقرأها بصوتك." : "🔊 يستمع الآن... الأسئلة تُفتح بعد نهاية القطعة."; }
       speak(passage,1,ar?"ar-SA":"en-US", onListened);
     });
-    wireMic(sec.querySelector("[data-mic-wrap]"), passage, ar, onRead);
+    // قراءة القطعة عبر Azure فقط (🎙️ قيّم نطقي) — التسجيل المستمر يفتح الأسئلة بعد القراءة
     var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true); }); }
-    // قراءة القطعة عبر مايك لوحة المفاتيح (يشتغل على الآيفون من سفاري والشاشة الرئيسية) — يفتح الأسئلة
-    var kin=sec.querySelector("[data-kmwrap] .kmic"), kchk=sec.querySelector("[data-kmwrap] .kchk"), kpfb=sec.querySelector("[data-mic-wrap] .pfb");
-    if(kchk){ kchk.addEventListener("click",function(){
-      if(!listened){ if(lockEl && !unlocked){ lockEl.textContent="⚠️ استمع للنص أولًا (🔊 استمع للنص) قبل ما تقرأها."; } return; }
-      var raw=(kin.value||"").trim();
-      // الخانة فاضية: الطفل قرأ بصوته بس ما انكتب شي — نوضّح الخطوات ونفتح لوحة المفاتيح
-      if(!raw){ if(kpfb){ kpfb.style.color="var(--bad)"; kpfb.innerHTML="🎤 الخانة فاضية! المس الخانة تحت 👇 ثم اضغط زر المايك 🎤 في لوحة المفاتيح واقرأ القطعة — بيظهر كلامك <b>مكتوب</b> في الخانة، بعدها اضغط «تحقّق»."; } try{ kin.focus(); }catch(e){} return; }
-      // قطعة إنجليزية والطفل أملى بالعربي: لوحة المفاتيح على العربي — نرشده يبدّلها
-      if(!ar && /[ء-ي]/.test(raw)){ if(kpfb){ kpfb.style.color="var(--bad)"; kpfb.innerHTML="🌐 القطعة إنجليزية بس كتب بالعربي! بدّل لوحة المفاتيح للإنجليزية (زر 🌐) ثم اضغط المايك 🎤 واقرأ."; } return; }
-      var saidArr=normX(raw, ar).split(" ").filter(Boolean);
-      var pwords=normX(passage, ar).split(" ").filter(Boolean);
-      var pset={}; pwords.forEach(function(w){ pset[w]=1; });
-      var hit=0; saidArr.forEach(function(w){ if(pset[w]) hit++; });
-      var need=Math.min(pwords.length, Math.max(5, Math.ceil(pwords.length*0.3))); // 30% من القطعة (أو الكل لو قصيرة) بحدّ أدنى ٥ كلمات
-      var ok = hit>=need;
-      if(ok){ if(kpfb){ kpfb.style.color="var(--good)"; kpfb.textContent="✅ قرأت القطعة!"; } onRead(); }
-      else { if(kpfb){ kpfb.style.color="var(--bad)"; kpfb.innerHTML="❌ لسه — طابقت <b>"+hit+"</b> كلمة وتحتاج <b>"+need+"</b>. اقرأ القطعة كاملة وأوضح بمايك لوحة المفاتيح ثم تحقّق."; } }
-    }); }
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
