@@ -326,7 +326,69 @@ function pickIndex(len, key){
 // ===== تقييم النطق عبر Azure Speech (يعمل فقط إذا وُضع المفتاح في azure-config.js) =====
 function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && c.key && c.region) return c; var d = A["default"]; return (d && d.key && d.region) ? d : null; }
 function azureConfigured(){ return !!azureCreds(); }
+// القطعة الطويلة: تسجيل مستمر يقرأ الطفل القطعة كاملة على راحته ثم يضغط «⏹️ خلّصت» — بلا مهلة تقطعه ولا توقّف بين الجمل يقصّه
+function _paRunLong(refText, isAr, statusEl, btn, onDone){
+  var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
+  try{
+    cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"25000"); }catch(e){}
+    audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
+    rec = new SDK.SpeechRecognizer(cfg, audio);
+    pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+    pa.applyTo(rec);
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
+  var allWords=[], _fin=false, _to;
+  window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
+  function _closeRec(){ try{ rec.stopContinuousRecognitionAsync(function(){ try{rec.close();}catch(e){} }, function(){ try{rec.close();}catch(e){} }); }catch(e){ try{rec.close();}catch(e2){} } }
+  function finish(){
+    if(_fin) return; _fin=true; clearTimeout(_to);
+    if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000;
+    if(btn){ btn.disabled=false; }
+    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. اقرأ بصوت أعلى وبمكان هادئ، وتأكد إنك تفتح الموقع في <b>Safari</b>."; _closeRec(); return; }
+    var sum=0,n=0; allWords.forEach(function(w){ var a=w.PronunciationAssessment||{}; if(typeof a.AccuracyScore==="number" && (a.ErrorType||"None")!=="Insertion"){ sum+=a.AccuracyScore; n++; } });
+    var pron = n?Math.round(sum/n):0;
+    var col = pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
+    var wordsHtml = allWords.map(function(w){
+      var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var et=a.ErrorType||"None";
+      var wc=(et==="Omission")?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)");
+      return '<span style="color:'+wc+'">'+w.Word+'</span>';
+    }).join(' ');
+    var face = pron>=80?"🌟":pron>=60?"👍":"💪";
+    statusEl.style.color="";
+    statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b>'+
+      '<div style="direction:'+(isAr?"rtl":"ltr")+';text-align:'+(isAr?"right":"left")+';margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+
+      '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 نطق صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
+    if(onDone){ try{ onDone(pron, pron); }catch(e){} }
+    _closeRec();
+  }
+  rec.recognized = function(s, e){
+    try{
+      if(e && e.result && e.result.reason===SDK.ResultReason.RecognizedSpeech){
+        var r = SDK.PronunciationAssessmentResult.fromResult(e.result);
+        var ws = (r.detailResult && r.detailResult.Words) || [];
+        allWords = allWords.concat(ws);
+        window.__micGrace=Date.now()+9000;
+        var cn = statusEl.querySelector("[data-readcnt]"); if(cn) cn.textContent = allWords.length;
+      }
+    }catch(err){}
+  };
+  rec.canceled = function(s, e){ finish(); };
+  statusEl.style.color="var(--muted)";
+  statusEl.innerHTML = '🎙️ اقرأ القطعة كاملة بصوت واضح على راحتك... (<b data-readcnt>0</b> كلمة) '+
+    '<button data-stopread class="say small" style="background:#dc2626;border-color:#dc2626;color:#fff;margin-top:6px">⏹️ خلّصت القراءة</button>';
+  var sb = statusEl.querySelector("[data-stopread]"); if(sb) sb.addEventListener("click", finish);
+  _to = setTimeout(finish, 120000); // أمان: يوقف تلقائيًا بعد دقيقتين
+  rec.startContinuousRecognitionAsync(function(){}, function(err){
+    if(_fin) return; _fin=true; clearTimeout(_to);
+    if(window.__paBusy>0) window.__paBusy--;
+    statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من متصفح <b>Safari</b> مباشرة.";
+    if(btn){ btn.disabled=false; }
+    try{ rec.close(); }catch(e){}
+  });
+}
 function _paRun(refText, isAr, statusEl, btn, onDone, longText){
+  if(longText){ return _paRunLong(refText, isAr, statusEl, btn, onDone); }
   var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
