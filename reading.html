@@ -68,6 +68,7 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="reading-bank.js"></script>
+<script src="vocab-bank.js"></script>
 <script>
 const META = {
   hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e",rate:0.95},
@@ -255,6 +256,14 @@ const VOCAB = {
   rafeef:[["weather",["طقس","جو"]],["student",["طالب","تلميذ"]],["beautiful",["جميل","جميلة"]],["difficult",["صعب","صعبة"]],["important",["مهم","مهمة"]],["answer",["إجابة","جواب"]],["question",["سؤال"]],["country",["دولة","بلد"]],["travel",["يسافر","سفر"]],["hospital",["مستشفى"]],["nature",["طبيعة"]],["prize",["جائزة"]],["dream",["حلم","يحلم"]],["ocean",["محيط"]]],
   hasan:[["knowledge",["معرفة","علم"]],["success",["نجاح"]],["experience",["خبرة","تجربة"]],["environment",["بيئة"]],["technology",["تقنية","تكنولوجيا"]],["future",["مستقبل"]],["health",["صحة"]],["develop",["يطور","تطوير","يطوّر"]],["challenge",["تحدي","تحدٍّ","تحدّي"]],["energy",["طاقة"]],["planet",["كوكب"]],["discover",["يكتشف","اكتشاف"]],["protect",["يحمي","حماية"]],["reduce",["يقلل","تقليل","يقلّل"]]]
 };
+// دمج بنك المفردات الإضافي (vocab-bank.js) في VOCAB — بلا تكرار
+try{
+  var _VX = window.VOCAB_EXTRA;
+  if(_VX){ for(var _vw in _VX){ if(Array.isArray(VOCAB[_vw]) && Array.isArray(_VX[_vw])){
+    var _seen={}; VOCAB[_vw].forEach(function(p){ _seen[String(p[0]).toLowerCase()]=1; });
+    _VX[_vw].forEach(function(p){ var k=String(p[0]).toLowerCase(); if(!_seen[k]){ VOCAB[_vw].push(p); _seen[k]=1; } });
+  } } }
+}catch(e){}
 
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 const who = (qs("who")||"").toLowerCase();
