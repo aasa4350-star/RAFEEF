@@ -1426,7 +1426,7 @@ if(!STUDENTS[who]){
     return ["We meet ___ "+t[1]+".",["in","on","at"],["in","on","at"].indexOf(t[0]),"مع «"+t[1]+"» نستخدم "+t[0]+".","en"];
   }
   function eOpp(){
-    var ps=[["big","small"],["hot","cold"],["fast","slow"],["happy","sad"],["old","new"],["open","closed"],["day","night"],["up","down"],["easy","difficult"],["cheap","expensive"],["clean","dirty"],["strong","weak"]];
+    var ps=[["big","small"],["hot","cold"],["fast","slow"],["happy","sad"],["old","new"],["open","closed"],["day","night"],["up","down"],["easy","difficult"],["cheap","expensive"],["clean","dirty"],["strong","weak"],["full","empty"],["high","low"],["long","short"],["rich","poor"],["light","dark"],["wet","dry"],["near","far"],["right","wrong"],["early","late"],["first","last"],["true","false"],["loud","quiet"]];
     var p=gpick(ps), others=[]; ps.forEach(function(x){ if(x!==p){ others.push(x[0],x[1]); } });
     others=shuffle(others).filter(function(w){return w!==p[0]&&w!==p[1];});
     var o=opt3(p[1],others.slice(0,2));
@@ -1438,7 +1438,7 @@ if(!STUDENTS[who]){
     return ["I have ___ "+n[0]+".",["a","an","the"],["a","an","the"].indexOf(n[1]),(n[1]==="an"?("«"+n[0]+"» تبدأ بحرف متحرك → an"):("«"+n[0]+"» تبدأ بحرف ساكن → a"))+".","en"];
   }
   function ePast(){
-    var v=gpick(["play","work","walk","talk","cook","clean","help","wait","call","watch","rain","start","jump","open","visit"]);
+    var v=gpick(["play","work","walk","talk","cook","clean","help","wait","call","watch","rain","start","jump","open","visit","want","need","love","live","move","close","learn","answer","finish","follow","paint","plant","push","pull","rest","smile","travel","use"]);
     var correct=v+"ed", o=opt3(correct,[v,v+"ing",v+"s"]);
     return ["Yesterday, they ___ a lot.",o[0],o[1],"yesterday تدل على الماضي: "+correct+".","en"];
   }
@@ -1464,11 +1464,42 @@ if(!STUDENTS[who]){
     var n=gpick(ns), o=opt3(n[1],[n[0]+"s",n[0]+"es",n[0]+"ies"]);
     return ['The plural of "'+n[0]+'" is:',o[0],o[1],"جمع شاذ: "+n[0]+" = "+n[1]+".","en"];
   }
+  // ===== مولّدات إضافية لزيادة التنوّع =====
+  function eIrregPast(){
+    var v=gpick([["go","went"],["eat","ate"],["see","saw"],["buy","bought"],["take","took"],["come","came"],["give","gave"],["make","made"],["find","found"],["write","wrote"],["drink","drank"],["run","ran"],["swim","swam"],["sing","sang"],["teach","taught"],["think","thought"],["bring","brought"],["catch","caught"],["know","knew"],["drive","drove"],["fly","flew"],["speak","spoke"],["break","broke"],["choose","chose"],["get","got"],["leave","left"],["meet","met"],["pay","paid"],["sell","sold"],["tell","told"]]);
+    var o=opt3(v[1],[v[0]+"ed",v[0],v[0]+"d"]);
+    return ["Yesterday, I ___ (to "+v[0]+").",o[0],o[1],"فعل شاذ: "+v[0]+" ← "+v[1]+" في الماضي.","en"];
+  }
+  function eSuper(){
+    var a=gpick(["tall","short","fast","old","young","strong","big","small","cheap","cold","warm","long","clean","rich","high","low","new"]);
+    var correct="the "+a+"est", o=opt3(correct,[a+"er","the most "+a,"the "+a]);
+    return ["This is ___ of all.",o[0],o[1],"صيغة التفضيل للقصيرة: the + "+a+"est.","en"];
+  }
+  function eWh(){
+    var q=gpick([["Where","in the park"],["When","at 5 o'clock"],["Who","my brother"],["What","a new book"],["Why","because I was tired"],["How","by bus"]]);
+    var wrong=["Where","When","Who","What","Why","How"].filter(function(x){return x!==q[0];});
+    var o=opt3(q[0],shuffle(wrong).slice(0,2));
+    return ["___ ? — "+q[1]+".",o[0],o[1],"«"+q[1]+"» جواب يدل على أداة الاستفهام «"+q[0]+"».","en"];
+  }
+  function ePresPerfect(){
+    var subs=[["I","have"],["We","have"],["They","have"],["You","have"],["He","has"],["She","has"],["It","has"]];
+    var s=gpick(subs), v=gpick([["finish","finished"],["visit","visited"],["eat","eaten"],["see","seen"],["do","done"],["go","gone"],["write","written"],["take","taken"],["give","given"],["read","read"],["break","broken"],["speak","spoken"]]);
+    var correct=s[1]+" "+v[1], o=opt3(correct,[s[1]+" "+v[0],(s[1]==="has"?"have":"has")+" "+v[1],v[1]]);
+    return [s[0]+" ___ it already.",o[0],o[1],"المضارع التام: "+s[1]+" + التصريف الثالث ("+v[1]+").","en"];
+  }
+  function eThereIs(){
+    var t=gpick([["is","a book"],["is","some water"],["is","a cat"],["is","milk"],["are","three cats"],["are","many books"],["are","two apples"],["are","some pens"]]);
+    return ["There ___ "+t[1]+" on the table.",["is","are","am"],["is","are","am"].indexOf(t[0]),(t[0]==="is"?"مفرد/غير معدود ← there is":"جمع ← there are")+".","en"];
+  }
+  function eMuchMany(){
+    var t=gpick([["many","books"],["many","cars"],["many","apples"],["many","students"],["much","water"],["much","money"],["much","time"],["much","sugar"]]);
+    return ["How ___ "+t[1]+"?",["many","much","more"],["many","much","more"].indexOf(t[0]),(t[0]==="many"?"«"+t[1]+"» معدود ← many":"«"+t[1]+"» غير معدود ← much")+".","en"];
+  }
   const EGEN = {
-    saud:[eSv,ePlural,ePrep,eOpp,eAan],
-    osama:[eSv,ePlural,ePrep,eOpp,eAan],
-    rafeef:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp],
-    hasan:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp]
+    saud:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh],
+    osama:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh,eMuchMany,ePast],
+    rafeef:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,eWh,eMuchMany],
+    hasan:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,ePresPerfect,eWh]
   };
 
   document.documentElement.style.setProperty("--accent", S.accent);
