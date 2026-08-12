@@ -22,7 +22,7 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
-  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 64px}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 40px}
   header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:20px 22px;box-shadow:var(--shadow)}
   header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
   header.top h1{margin:0;font-size:1.42rem;font-weight:800}
@@ -30,265 +30,221 @@
   .bar a,.bar button{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow);cursor:pointer;font-family:inherit}
   .en{direction:ltr;unicode-bidi:isolate}
 
-  /* Scenario picker */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:6px}
   .scn{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 14px;box-shadow:var(--shadow);cursor:pointer;text-align:right;font-family:inherit;color:var(--ink)}
   .scn:hover{border-color:var(--accent)}
   .scn .e{font-size:1.7rem;flex:none}
   .scn .t{font-weight:800;font-size:1.02rem;line-height:1.3}
-  .scn .s{font-size:.8rem;color:var(--muted);font-weight:600}
   .scn.free{grid-column:1 / -1;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;border:0}
-  .scn.free .s{color:rgba(255,255,255,.85)}
   .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin:6px 0 14px;box-shadow:var(--shadow);font-size:.94rem}
 
-  /* Conversation */
-  .prog{font-size:.85rem;color:var(--muted);font-weight:700;margin:2px 0 12px;text-align:center}
-  .trans{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-  .msg{display:flex;gap:9px;align-items:flex-start;opacity:.72;font-size:.92rem}
-  .msg.me{flex-direction:row-reverse;text-align:left}
-  .msg .av{flex:none;font-size:1.1rem}
-  .msg .bb{background:var(--npc);border:1px solid var(--line);border-radius:13px;padding:7px 12px;max-width:80%}
-  .msg.me .bb{background:var(--good-bg);border-color:var(--good)}
-  .msg .en{font-weight:600}
+  /* Chat */
+  .chat{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+  .b{display:flex;gap:9px;align-items:flex-start;max-width:100%}
+  .b.me{flex-direction:row-reverse}
+  .b .av{flex:none;font-size:1.5rem;margin-top:2px}
+  .b .bub{border-radius:16px;padding:10px 14px;max-width:82%;box-shadow:var(--shadow)}
+  .b.ai .bub{background:var(--npc);border:1px solid var(--line);border-bottom-right-radius:5px}
+  .b.me .bub{background:var(--good-bg);border:1px solid var(--good);border-bottom-left-radius:5px}
+  .b .bub .en{font-size:1.12rem;font-weight:700}
+  .b .bub .sc{font-size:.78rem;color:var(--muted);margin-top:5px;font-weight:600}
+  .b .bub .rep{background:transparent;border:0;color:var(--accent);font-weight:800;cursor:pointer;font-size:.85rem;padding:4px 0 0;font-family:inherit}
+  .thinking{color:var(--muted);font-style:normal}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:var(--shadow)}
-  .npcline{display:flex;gap:11px;align-items:flex-start;margin-bottom:6px}
-  .npcline .av{flex:none;font-size:1.9rem}
-  .npcline .bub{flex:1;background:var(--npc);border:1px solid var(--line);border-radius:15px;padding:11px 14px}
-  .npcline .bub .en{font-size:1.12rem;font-weight:700}
-  .npcline .bub .ar{font-size:.86rem;color:var(--muted);margin-top:3px}
-  .yourturn{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
-  .yourturn .lbl{font-size:.85rem;font-weight:800;color:var(--accent);margin-bottom:6px}
-  .target{direction:ltr;text-align:left;font-size:1.28rem;font-weight:800;line-height:1.7;margin-bottom:4px}
-  .target .w{cursor:pointer}
-  .tar-ar{direction:rtl;text-align:right;font-size:.86rem;color:var(--muted);margin-bottom:10px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .say{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:12px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:inherit}
-  .say.small{padding:9px 12px;font-size:.88rem}
-  .say.listen{background:#0ea5a5;border-color:#0ea5a5}
-  .say.azbtn{background:#0a7cff}
-  .say.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
-  .pfb{font-weight:700;font-size:.92rem;flex-basis:100%;margin-top:6px;min-height:18px}
-  .nav{display:flex;gap:9px;margin-top:16px}
-  .nav button{flex:1;padding:12px;border-radius:13px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;border:0}
-  .nav .next{background:var(--accent);color:#fff}
-  .nav .prev{background:transparent;border:1.5px solid var(--line);color:var(--ink);flex:0 0 auto;padding:12px 16px}
-  .done{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 18px;text-align:center;box-shadow:var(--shadow)}
-  .done .big{font-size:2.6rem}
-  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:26px}
+  /* Mic dock */
+  .dock{position:sticky;bottom:0;padding:14px 0 6px;background:linear-gradient(to top,var(--bg) 70%,transparent)}
+  .status{text-align:center;font-weight:700;font-size:.92rem;min-height:22px;margin-bottom:10px}
+  .micbtn{display:block;width:100%;background:var(--accent);color:#fff;border:0;border-radius:16px;padding:16px;font-size:1.12rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .micbtn:disabled{opacity:.55}
+  .micbtn.rec{background:var(--bad);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.98)}}
+  .row2{display:flex;gap:9px;margin-top:9px}
+  .row2 button{flex:1;background:transparent;border:1.5px solid var(--line);color:var(--ink);border-radius:13px;padding:11px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.9rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:16px}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
-var who = (qs("who")||"saud").toLowerCase();
+var who=(qs("who")||"saud").toLowerCase();
 var NAMES={saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
-var name = NAMES[who]||"الطالب";
+var name=NAMES[who]||"الطالب";
 
-/* ===== Azure: نطق عصبي (استماع) + تقييم النطق ===== */
 function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
 function azureConfigured(){ return !!azureCreds(); }
-function speakEN(text, rate){
-  try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=rate||0.9;
-    var cands=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);});
-    var good=cands.filter(function(x){return /(natural|neural|enhanced|premium|samantha|daniel|karen|serena|aria|guy|jenny)/i.test(x.name);});
-    var v=good[0]||cands[0]; if(v) u.voice=v; speechSynthesis.speak(u);
-  }catch(e){}
-}
+
+/* ===== المعلّم يتكلم (نطق عصبي) ===== */
+function speakEN(text){ try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.92; var v=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);})[0]; if(v)u.voice=v; speechSynthesis.speak(u);}catch(e){} }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var _ttsSynth=null;
-function azureSpeak(text, ratePct){
+var _tts=null;
+function tutorSpeak(text){
   var cr=azureCreds();
-  if(!cr || !window.SpeechSDK){ speakEN(text); return; }
+  if(!cr||!window.SpeechSDK){ speakEN(text); return; }
   try{
     var SDK=window.SpeechSDK;
     try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
-    if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
+    if(_tts){ try{_tts.close();}catch(e){} _tts=null; }
     var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
-    var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
+    var synth=new SDK.SpeechSynthesizer(sc); _tts=synth;
     var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-AvaMultilingualNeural"><prosody rate="'+(ratePct||"-8%")+'">'+esc+'</prosody></voice></speak>';
-    synth.speakSsmlAsync(ssml, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; }, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speakEN(text); });
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-AvaMultilingualNeural"><prosody rate="-8%">'+esc+'</prosody></voice></speak>';
+    synth.speakSsmlAsync(ssml, function(){ try{synth.close();}catch(e){} if(_tts===synth)_tts=null; }, function(){ try{synth.close();}catch(e){} if(_tts===synth)_tts=null; speakEN(text); });
   }catch(e){ speakEN(text); }
 }
-function _paRun(refText, statusEl, btn){
-  var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
+
+/* ===== يسمع الطفل بحرية: تفريغ + تقييم نطق غير مقيّد ===== */
+function listen(statusEl, btn, onDone){
+  var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
+  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure."; return; }
+  if(!SDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق..."; return; }
+  try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
   try{
     cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage="en-US";
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1800"); }catch(e){}
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"2200"); }catch(e){}
     audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
     rec=new SDK.SpeechRecognizer(cfg, audio);
-    pa=new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
-    pa.applyTo(rec);
-  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn) btn.disabled=false; return; }
-  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ قل الجملة الآن بصوت واضح...";
-  var _fin=false;
-  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> واقرأ بصوت أعلى."; if(btn) btn.disabled=false; try{rec.close();}catch(e){} }, 15000);
+    try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}
+  }catch(e){ statusEl.textContent="خطأ: "+(e.message||e); if(btn){btn.disabled=false;btn.classList.remove("rec");} return; }
+  if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
+  statusEl.style.color="var(--muted)"; statusEl.textContent="🎙️ تكلّم الآن بالإنجليزي...";
+  var fin=false;
+  var to=setTimeout(function(){ if(fin)return; fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما سمعتك — على الآيفون افتح من <b>Safari</b>، واضغط وتكلّم أعلى."; if(btn){btn.disabled=false;btn.classList.remove("rec");btn.textContent="🎤 اضغط وتكلّم";} try{rec.close();}catch(e){} }, 14000);
   rec.recognizeOnceAsync(function(result){
-    if(_fin) return; _fin=true; clearTimeout(_to);
+    if(fin)return; fin=true; clearTimeout(to);
+    var out={text:"",wordsHtml:"",pron:null};
     try{
-      if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
-        var r=SDK.PronunciationAssessmentResult.fromResult(result);
-        var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
-        var col=pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
-        var wordsHtml="";
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
+        out.text=result.text.trim();
         try{
+          var r=SDK.PronunciationAssessmentResult.fromResult(result);
+          if(typeof r.pronunciationScore==="number" && !isNaN(r.pronunciationScore)) out.pron=Math.round(r.pronunciationScore);
           var ws=(r.detailResult&&r.detailResult.Words)||[];
-          wordsHtml=ws.map(function(w){ var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var et=a.ErrorType||"None"; var wc=(et==="Omission")?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)"); return '<span style="color:'+wc+'">'+w.Word+'</span>'; }).join(' ');
+          if(ws.length){ out.wordsHtml=ws.map(function(w){ var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var wc=(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)"); return '<span style="color:'+wc+'">'+w.Word+'</span>'; }).join(' '); }
         }catch(e){}
-        var face=pron>=80?"🌟":pron>=60?"👍":"💪";
-        statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+
-          (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:6px;line-height:2;font-weight:700">'+wordsHtml+'</div><div style="font-size:.76rem;color:var(--muted);margin-top:3px;font-weight:400">🟢 صحيح · 🟡 وسط · 🔴 راجعه</div>'):' ✅ ممتاز!');
-      } else { statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ ما وضح الصوت — قلها أعلى وأوضح وحاول ثانية."; }
-    }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
-    if(btn) btn.disabled=false; try{ rec.close(); }catch(e){}
-  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من <b>Safari</b> مباشرة."; if(btn) btn.disabled=false; try{rec.close();}catch(e){} });
-}
-function azureAssess(refText, statusEl, btn){
-  var cr=azureCreds();
-  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
-  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
-  if(btn) btn.disabled=true;
-  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
-  try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
-  _paRun(refText, statusEl, btn);
+      }
+    }catch(e){}
+    if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; }
+    statusEl.textContent="";
+    try{rec.close();}catch(e){}
+    onDone(out);
+  }, function(err){ if(fin)return; fin=true; clearTimeout(to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح من <b>Safari</b> مباشرة."; if(btn){btn.disabled=false;btn.classList.remove("rec");btn.textContent="🎤 اضغط وتكلّم";} try{rec.close();}catch(e){} });
 }
 
-/* ===== سيناريوهات المحادثة ===== */
-// كل جولة: [كلام الطرف الثاني EN, ترجمته, ردّك EN, ترجمة ردّك]
-var SC = {
-  restaurant:{ ico:"🍽️", t:"في المطعم", npc:"👩‍🍳", turns:[
-    ["Welcome! How many people?","أهلًا! كم شخص؟","Table for two, please.","طاولة لشخصين، من فضلك."],
-    ["Here is the menu. What would you like?","هذي القائمة. ماذا تحب؟","I would like a chicken sandwich.","أريد ساندويتش دجاج."],
-    ["Would you like anything to drink?","هل تريد مشروبًا؟","Yes, an orange juice, please.","نعم، عصير برتقال من فضلك."],
-    ["Anything else?","أي شيء آخر؟","No, thank you. That's all.","لا شكرًا، هذا كل شيء."],
-    ["Enjoy your meal!","بالهناء والشفاء!","Thank you very much.","شكرًا جزيلًا."]
-  ]},
-  cafe:{ ico:"☕", t:"في المقهى", npc:"🧑‍🍳", turns:[
-    ["Hi! What can I get you?","مرحبًا! ماذا أحضر لك؟","A cup of coffee, please.","كوب قهوة من فضلك."],
-    ["Small, medium, or large?","صغير، وسط، أم كبير؟","Medium, please.","وسط من فضلك."],
-    ["Milk or sugar?","حليب أم سكر؟","Milk, no sugar, please.","حليب بدون سكر من فضلك."],
-    ["Anything to eat?","شيء للأكل؟","A piece of cake, please.","قطعة كيك من فضلك."],
-    ["That will be ten riyals.","المبلغ عشرة ريال.","Here you are. Thank you.","تفضّل. شكرًا."]
-  ]},
-  shopping:{ ico:"🛍️", t:"التسوّق", npc:"🧑‍💼", turns:[
-    ["Hello, can I help you?","مرحبًا، أساعدك؟","I'm looking for a blue shirt.","أبحث عن قميص أزرق."],
-    ["What size do you need?","أي مقاس تريد؟","Medium, please.","وسط من فضلك."],
-    ["Do you want to try it on?","تريد تجربته؟","Yes, where is the fitting room?","نعم، أين غرفة القياس؟"],
-    ["How was it?","كيف كان؟","It fits well. I'll take it.","مناسب. سآخذه."],
-    ["That's fifty riyals.","خمسون ريالًا.","Can I pay by card?","هل أدفع بالبطاقة؟"]
-  ]},
-  introduce:{ ico:"🎓", t:"عرّف بنفسك", npc:"🧑‍🏫", turns:[
-    ["Good morning! What's your name?","صباح الخير! ما اسمك؟","My name is Ahmed.","اسمي أحمد."],
-    ["Nice to meet you. What grade are you in?","سعيد بلقائك. في أي صف أنت؟","I'm in the sixth grade.","أنا في الصف السادس."],
-    ["What's your favorite subject?","ما مادّتك المفضّلة؟","My favorite subject is science.","مادّتي المفضّلة العلوم."],
-    ["Do you have any hobbies?","هل لديك هوايات؟","Yes, I like reading and football.","نعم، أحب القراءة وكرة القدم."],
-    ["Great! Have a nice day.","رائع! يومًا سعيدًا.","Thank you. You too.","شكرًا، وأنت أيضًا."]
-  ]},
-  airport:{ ico:"✈️", t:"في المطار", npc:"👮", turns:[
-    ["Good morning. May I see your passport?","صباح الخير. أرى جواز سفرك؟","Sure, here is my passport.","بالتأكيد، هذا جوازي."],
-    ["How many bags do you have?","كم حقيبة معك؟","I have one bag.","معي حقيبة واحدة."],
-    ["Window or aisle seat?","مقعد نافذة أم ممر؟","A window seat, please.","مقعد نافذة من فضلك."],
-    ["Here is your boarding pass.","هذي بطاقة الصعود.","Thank you. Where is the gate?","شكرًا. أين البوابة؟"],
-    ["Gate five, to your right.","البوابة خمسة، على يمينك.","Thank you for your help.","شكرًا على مساعدتك."]
-  ]},
-  doctor:{ ico:"🩺", t:"عند الطبيب", npc:"🧑‍⚕️", turns:[
-    ["Hello, what seems to be the problem?","مرحبًا، ما المشكلة؟","I have a headache and a sore throat.","عندي صداع والتهاب حلق."],
-    ["How long have you felt like this?","منذ متى وأنت هكذا؟","Since yesterday morning.","منذ صباح أمس."],
-    ["Do you have a fever?","هل لديك حرارة؟","Yes, a little.","نعم، قليلًا."],
-    ["I'll give you some medicine. Rest well.","سأعطيك دواء. ارتَح جيدًا.","Thank you, doctor.","شكرًا يا دكتور."]
-  ]},
-  directions:{ ico:"🧭", t:"السؤال عن الطريق", npc:"🧑", turns:[
-    ["Excuse me, do you need help?","عذرًا، تحتاج مساعدة؟","Yes, how can I get to the station?","نعم، كيف أصل إلى المحطة؟"],
-    ["Go straight, then turn left.","امشِ مباشرة ثم انعطف يسارًا.","Is it far from here?","هل هي بعيدة من هنا؟"],
-    ["No, about five minutes on foot.","لا، حوالي خمس دقائق مشيًا.","Thank you so much.","شكرًا جزيلًا."],
-    ["You're welcome. Have a good day.","عفوًا. يومًا طيبًا.","You too. Goodbye.","وأنت أيضًا. مع السلامة."]
-  ]},
-  free:{ ico:"💬", t:"سوالف عامة", npc:"🙂", free:true, turns:[
-    ["How are you today?","كيف حالك اليوم؟","I'm fine, thank you. How about you?","بخير، شكرًا. وأنت؟"],
-    ["What did you do yesterday?","ماذا فعلت أمس؟","I studied and played with my friends.","درست ولعبت مع أصدقائي."],
-    ["What is the weather like today?","كيف الطقس اليوم؟","It's sunny and warm.","مشمس ودافئ."],
-    ["What do you want to be in the future?","ماذا تريد أن تكون مستقبلًا؟","I want to be a doctor.","أريد أن أكون طبيبًا."],
-    ["Tell me about your family.","حدّثني عن عائلتك.","I have a big family and I love them.","عندي عائلة كبيرة وأحبّهم."],
-    ["What is your favorite food?","ما طعامك المفضّل؟","My favorite food is rice and chicken.","طعامي المفضّل الرز والدجاج."],
-    ["What do you do on weekends?","ماذا تفعل في الإجازة؟","I visit my grandparents and read books.","أزور أجدادي وأقرأ الكتب."],
-    ["Describe your best friend.","صِف أعزّ أصدقائك.","My best friend is kind and funny.","صديقي المقرّب لطيف ومرح."]
-  ]}
+/* ===== مواضيع الحوار ===== */
+var TOPICS={
+  free:{ico:"💬",t:"دردشة حرة",open:"Hi! I'm your English friend. How are you today?",qs:["What is your name?","What did you do today?","What do you like to do for fun?","Tell me about your family.","What do you want to be when you grow up?"]},
+  meet:{ico:"👋",t:"تعارف",open:"Hello! Nice to meet you. What's your name?",qs:["How old are you?","Where do you live?","What grade are you in?","What is your favorite subject?"]},
+  family:{ico:"👨‍👩‍👧",t:"العائلة",open:"Let's talk about your family. How many people are in your family?",qs:["Do you have brothers or sisters?","What does your father do?","What do you like to do together?","Who do you love the most?"]},
+  hobby:{ico:"⚽",t:"الهوايات",open:"What do you like to do in your free time?",qs:["Do you play any sports?","What is your favorite game?","Do you like reading or watching TV?","What do you do on the weekend?"]},
+  school:{ico:"🏫",t:"المدرسة",open:"Let's talk about school. Do you like school?",qs:["What is your favorite subject?","Who is your favorite teacher?","What do you do at break time?","Is English easy for you?"]},
+  food:{ico:"🍕",t:"الأكل",open:"Let's talk about food. What is your favorite food?",qs:["Do you like fruit?","What do you eat for breakfast?","Can you cook anything?","Do you like sweets?"]},
+  day:{ico:"🌤️",t:"يومي",open:"Tell me about your day. What time do you wake up?",qs:["What do you do in the morning?","How do you go to school?","What do you do after school?","What time do you sleep?"]},
+  dream:{ico:"🌟",t:"أحلامي",open:"Let's dream big! What do you want to be in the future?",qs:["Why do you want that?","Where do you want to travel?","What is your biggest wish?","What makes you happy?"]}
 };
-var LIST = (who==="rafeef"||who==="hasan")
-  ? ["restaurant","cafe","shopping","introduce","airport","doctor","directions","free"]
-  : ["restaurant","cafe","shopping","introduce","free"];
+var LIST=["free","meet","family","hobby","school","food","day","dream"];
+
+// ردود المعلّم حسب كلمات الطفل
+var REACT=[
+  [/foot ?ball|soccer|messi|ronaldo/,"Football is exciting!"],
+  [/read|book/,"Reading is a wonderful habit!"],
+  [/doctor/,"A doctor helps people — a great goal!"],
+  [/teacher/,"Teaching is a noble job!"],
+  [/engineer/,"Engineering is very cool!"],
+  [/pilot|plane/,"A pilot — the sky is yours!"],
+  [/game|playstation|video|xbox/,"Games are fun in moderation!"],
+  [/mother|mom|father|dad|family|brother|sister/,"Family is precious!"],
+  [/science|math|english|art|history/,"That's a great subject!"],
+  [/pizza|burger|rice|chicken|fruit|apple|banana/,"Yummy! Good choice!"],
+  [/swim/,"Swimming is great exercise!"],
+  [/draw|paint/,"You're creative!"],
+  [/happy|good|fine|great|awesome|nice/,"I'm glad to hear that!"],
+  [/football|game|play/,"Sounds fun!"]
+];
+var GENERIC=["Nice!","That's interesting!","Great job!","Well said!","Cool!","I see!","Awesome!","Good!"];
+function reactTo(text){ var t=(" "+text+" ").toLowerCase(); for(var i=0;i<REACT.length;i++){ if(REACT[i][0].test(t)) return REACT[i][1]; } return GENERIC[Math.floor(Math.random()*GENERIC.length)]; }
 
 var app=document.getElementById("app");
-var state={ scn:null, step:0 };
-
+var state={topic:null,qi:0,chatHtml:""};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
-function wordSpans(t){ return t.split(" ").map(function(w){ return '<span class="w" data-w="'+encodeURIComponent(w)+'">'+esc(w)+'</span>'; }).join(" "); }
 
 function renderHome(){
-  state.scn=null;
-  var cards=LIST.map(function(id){ var s=SC[id];
-    return '<button class="scn'+(s.free?' free':'')+'" data-scn="'+id+'"><span class="e">'+s.ico+'</span><span><span class="t">'+s.t+'</span><br><span class="s">'+(s.free?"تكلّم بحرية":(s.turns.length+" جُمل"))+'</span></span></button>';
-  }).join("");
+  state.topic=null;
+  var cards=LIST.map(function(id){ var s=TOPICS[id]; return '<button class="scn'+(id==="free"?" free":"")+'" data-t="'+id+'"><span class="e">'+s.ico+'</span><span class="t">'+s.t+'</span></button>'; }).join("");
   app.innerHTML=
-    '<header class="top"><p class="eyebrow">محادثة إنجليزية · نطق حقيقي 🎙️</p><h1>تكلّم إنجليزي — '+name+'</h1></header>'+
+    '<header class="top"><p class="eyebrow">محادثة إنجليزية · تكلّم بحرية 🎙️</p><h1>تحدّث معي — '+name+'</h1></header>'+
     '<div class="bar"><a href="home.html?who='+who+'">⬅ الرئيسية</a></div>'+
-    '<div class="intro">اختر موقفًا وتكلّم فيه: تسمع الطرف الثاني 🔊، ثم تنطق ردّك 🎙️ ويظهر تقييم نطقك بالألوان. المس أي كلمة لتسمعها. <b>على الآيفون افتح من Safari.</b></div>'+
+    '<div class="intro">اختر موضوعًا، وأنا أبدأ أسألك بالصوت 🔊 — <b>وأنت تردّ بكلامك أنت</b> (مب تقرأ). أسمعك وأردّ عليك وأكمّل الحوار، وأقيّم نطقك بالألوان. <b>على الآيفون افتح من Safari.</b></div>'+
     '<div class="grid">'+cards+'</div>'+
-    '<footer>كل موقف جُمل واقعية · النطق يُقيَّم عبر Azure</footer>';
-  app.querySelectorAll("[data-scn]").forEach(function(b){ b.addEventListener("click", function(){ state.scn=b.getAttribute("data-scn"); state.step=0; renderTurn(); }); });
+    '<footer>كلامك يُفرَّغ ويُقيَّم عبر Azure · الردود موجّهة بالموضوع</footer>';
+  app.querySelectorAll("[data-t]").forEach(function(b){ b.addEventListener("click",function(){ startTopic(b.getAttribute("data-t")); }); });
 }
 
-function renderTurn(){
-  var s=SC[state.scn], turns=s.turns;
-  if(state.step>=turns.length){ return renderDone(); }
-  var t=turns[state.step];
-  var trans=turns.slice(0,state.step).map(function(p){
-    return '<div class="msg"><span class="av">'+s.npc+'</span><div class="bb"><span class="en">'+esc(p[0])+'</span></div></div>'+
-           '<div class="msg me"><span class="av">🗣️</span><div class="bb"><span class="en">'+esc(p[2])+'</span></div></div>';
-  }).join("");
+function startTopic(id){
+  state.topic=id; state.qi=0; state.chatHtml="";
+  var s=TOPICS[id];
+  render();
+  addAI(s.open, true);
+}
+
+function render(){
+  var s=TOPICS[state.topic];
   app.innerHTML=
-    '<header class="top"><p class="eyebrow">'+s.ico+' '+s.t+'</p><h1>'+(s.free?"سوالف عامة":"محادثة")+' — '+name+'</h1></header>'+
-    '<div class="bar"><button data-back>⬅ المواقف</button></div>'+
-    '<div class="prog">'+(state.step+1)+' / '+turns.length+'</div>'+
-    (trans?'<div class="trans">'+trans+'</div>':'')+
-    '<div class="card">'+
-      '<div class="npcline"><span class="av">'+s.npc+'</span><div class="bub"><div class="en">'+esc(t[0])+'</div><div class="ar">'+t[1]+'</div>'+
-        '<div class="row" style="margin-top:8px"><button class="say small listen" data-say="npc">🔊 استمع</button></div></div></div>'+
-      '<div class="yourturn"><div class="lbl">'+(s.free?"🗣️ جاوب بهذي الجملة:":"🗣️ دورك — قل:")+'</div>'+
-        '<div class="target en" data-target>'+wordSpans(t[2])+'</div>'+
-        '<div class="tar-ar">'+t[3]+'</div>'+
-        '<div class="row"><button class="say small listen" data-say="model">🔊 اسمع النموذج</button>'+
-          (azureConfigured()?'<button class="say small azbtn" data-assess>🎙️ قيّم نطقي</button>':'<span style="font-size:.82rem;color:var(--muted)">النطق غير مُفعّل — افتح من Safari</span>')+
-          '<span class="pfb" data-pfb></span></div>'+
-      '</div>'+
-      '<div class="nav">'+(state.step>0?'<button class="prev" data-prev>السابق</button>':'')+'<button class="next" data-next>'+(state.step===turns.length-1?"إنهاء ✅":"التالي ➡️")+'</button></div>'+
+    '<header class="top"><p class="eyebrow">'+s.ico+' '+s.t+'</p><h1>تحدّث معي — '+name+'</h1></header>'+
+    '<div class="bar"><button data-back>⬅ المواضيع</button></div>'+
+    '<div class="chat" id="chat">'+state.chatHtml+'</div>'+
+    '<div class="dock"><div class="status" id="st"></div>'+
+      '<button class="micbtn" id="mic">🎤 اضغط وتكلّم</button>'+
+      '<div class="row2"><button data-repeat>🔁 أعد سؤالي</button><button data-skip>تخطَّ ➡️</button></div>'+
     '</div>'+
-    '<footer>المس أي كلمة في جملتك لتسمع نطقها</footer>';
+    '<footer>تكلّم بجملة كاملة · اضغط 🔁 لتسمع سؤالي ثانية</footer>';
   app.querySelector("[data-back]").addEventListener("click", renderHome);
-  app.querySelector('[data-say="npc"]').addEventListener("click", function(){ azureSpeak(t[0], "-6%"); });
-  app.querySelector('[data-say="model"]').addEventListener("click", function(){ azureSpeak(t[2], "-12%"); });
-  var pfb=app.querySelector("[data-pfb]");
-  var ab=app.querySelector("[data-assess]"); if(ab) ab.addEventListener("click", function(){ azureAssess(t[2], pfb, ab); });
-  app.querySelectorAll("[data-target] .w").forEach(function(sp){ sp.addEventListener("click", function(){ azureSpeak(decodeURIComponent(sp.getAttribute("data-w")), "-28%"); }); });
-  var nx=app.querySelector("[data-next]"); if(nx) nx.addEventListener("click", function(){ state.step++; renderTurn(); });
-  var pv=app.querySelector("[data-prev]"); if(pv) pv.addEventListener("click", function(){ state.step--; renderTurn(); });
+  app.querySelector("#mic").addEventListener("click", onMic);
+  app.querySelector("[data-repeat]").addEventListener("click", function(){ if(state.lastAI) tutorSpeak(state.lastAI); });
+  app.querySelector("[data-skip]").addEventListener("click", nextTutor);
+}
+function scrollDown(){ var c=document.getElementById("chat"); if(c) window.scrollTo(0, document.body.scrollHeight); }
+
+function addAI(text, speak){
+  state.lastAI=text;
+  state.chatHtml+='<div class="b ai"><span class="av">🧑‍🏫</span><div class="bub"><div class="en">'+esc(text)+'</div><button class="rep" data-rep="'+encodeURIComponent(text)+'">🔊 استمع</button></div></div>';
+  var c=document.getElementById("chat"); if(c){ c.innerHTML=state.chatHtml; c.querySelectorAll("[data-rep]").forEach(function(b){ b.addEventListener("click",function(){ tutorSpeak(decodeURIComponent(b.getAttribute("data-rep"))); }); }); }
+  if(speak) tutorSpeak(text);
+  scrollDown();
+}
+function addMe(out){
+  var body = out.wordsHtml ? ('<div class="en">'+out.wordsHtml+'</div>') : ('<div class="en">'+esc(out.text)+'</div>');
+  var sc = (out.pron!=null) ? ('<div class="sc">🗣️ نطقك: '+out.pron+'/100 · 🟢🟡🔴</div>') : '';
+  state.chatHtml+='<div class="b me"><span class="av">🧒</span><div class="bub">'+body+sc+'</div></div>';
+  var c=document.getElementById("chat"); if(c) c.innerHTML=state.chatHtml;
+  scrollDown();
 }
 
-function renderDone(){
-  var s=SC[state.scn];
-  app.innerHTML=
-    '<header class="top"><p class="eyebrow">'+s.ico+' '+s.t+'</p><h1>أحسنت يا '+name+'! 🎉</h1></header>'+
-    '<div class="bar"><button data-back>⬅ المواقف</button></div>'+
-    '<div class="done"><div class="big">🎉</div><p style="font-weight:800;font-size:1.15rem;margin:6px 0">خلّصت المحادثة!</p>'+
-      '<p style="color:var(--muted)">تدرّبت على '+s.turns.length+' جُمل. كرّرها لين يصير نطقك أوضح، أو جرّب موقفًا ثانيًا.</p>'+
-      '<div class="nav" style="max-width:340px;margin:14px auto 0"><button class="prev" data-again>🔄 من جديد</button><button class="next" data-back2>مواقف ثانية</button></div>'+
-    '</div>';
-  app.querySelector("[data-back]").addEventListener("click", renderHome);
-  app.querySelector("[data-back2]").addEventListener("click", renderHome);
-  app.querySelector("[data-again]").addEventListener("click", function(){ state.step=0; renderTurn(); });
+function onMic(){
+  var st=document.getElementById("st"), mic=document.getElementById("mic");
+  mic.disabled=true;
+  listen(st, mic, function(out){
+    if(!out.text){ return; } // الرسالة تظهر في الحالة
+    addMe(out);
+    // ردّ المعلّم: تفاعل + السؤال التالي
+    setTimeout(function(){ replyThenAsk(out.text); }, 500);
+  });
+}
+function replyThenAsk(childText){
+  var s=TOPICS[state.topic];
+  var react=reactTo(childText);
+  if(state.qi < s.qs.length){
+    addAI(react+" "+s.qs[state.qi], true);
+    state.qi++;
+  } else {
+    addAI(react+" You did great, "+name+"! Let's talk again soon. 🎉", true);
+  }
+}
+function nextTutor(){ // تخطّي: ينتقل للسؤال التالي بلا رد
+  var s=TOPICS[state.topic];
+  if(state.qi < s.qs.length){ addAI(s.qs[state.qi], true); state.qi++; }
+  else { addAI("You did great, "+name+"! Let's talk again soon. 🎉", true); }
 }
 
 renderHome();
