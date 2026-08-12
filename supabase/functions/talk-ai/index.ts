@@ -33,14 +33,15 @@ async function callGemini(key: string, system: string, messages: any[]): Promise
     parts: [{ text: String(m.content || "") }],
   }));
   const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(key)}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    // ملاحظة: maxOutputTokens مرتفع لأن موديلات Gemini الحديثة تستهلك جزءًا في "التفكير"؛ نبقيه واسعًا وردّ النظام يبقى قصيرًا.
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
       contents,
-      generationConfig: { maxOutputTokens: 120, temperature: 0.85, topP: 0.9 },
+      generationConfig: { maxOutputTokens: 800, temperature: 0.85, topP: 0.9 },
     }),
   });
   if (!res.ok) throw new Error("gemini " + res.status + " " + (await res.text()).slice(0, 200));
