@@ -1259,7 +1259,8 @@ function _paRun(refText, statusEl, btn){
   }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn) btn.disabled=false; return; }
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
   var _fin=false;
-  function _end(){ if(btn) btn.disabled=false; try{ rec.close(); }catch(e){} }
+  window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
+  function _end(){ if(btn) btn.disabled=false; if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} }
   var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, 15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
@@ -1475,8 +1476,13 @@ if(!STUDENTS[who]){
   document.documentElement.style.setProperty("--accent-deep", S.deep);
   // كشف الخروج من الصفحة أثناء الاختبار (استعانة بمترجم/تطبيق ثاني)
   var AWAY={total:0,exits:0,hiddenAt:null};
-  function _aOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-  function _aIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total+=dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير */ AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else { var wb=document.getElementById("__exitwarn"); if(wb) wb.style.display="block"; } } }
+  // أثناء استخدام المايك (إملاء لوحة المفاتيح أو تقييم Azure) يخفي الآيفون الصفحة لحظة — لا نحسبها خروجًا
+  function _isMicEl(t){ return !!(t && /(^|\s)(kmic|dinp|pinp)(\s|$)/.test(t.className||"")); }
+  function _micActive(){ if(window.__paBusy>0) return true; if(_isMicEl(document.activeElement)) return true; if(window.__micGrace && Date.now()<window.__micGrace) return true; return false; }
+  document.addEventListener("focusin", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+  document.addEventListener("focusout", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+  function _aOut(){ if(_micActive()){ window.__micGrace=Date.now()+9000; return; } if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
+  function _aIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total+=dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير */ if(_micActive()) return; AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else { var wb=document.getElementById("__exitwarn"); if(wb) wb.style.display="block"; } } }
   function ejectSession(){ if(document.getElementById("__eject")) return; var ov=document.createElement("div"); ov.id="__eject"; ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px"); ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهى الاختبار</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. عشان تكون النتيجة عادلة، لازم تبقى داخل الصفحة أثناء الحل.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>'; (document.body||document.documentElement).appendChild(ov); }
   document.addEventListener("visibilitychange",function(){ if(document.hidden)_aOut(); else _aIn(); });
   window.addEventListener("blur",_aOut); window.addEventListener("focus",_aIn);

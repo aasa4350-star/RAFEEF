@@ -132,7 +132,8 @@ function _paRun(refText, statusEl, btn){
   }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn) btn.disabled=false; return; }
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
   var _fin=false;
-  function _end(){ if(btn) btn.disabled=false; try{ rec.close(); }catch(e){} }
+  window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
+  function _end(){ if(btn) btn.disabled=false; if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} }
   var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, 15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
@@ -458,9 +459,14 @@ if(!NAMES[who]){
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
+// أثناء استخدام المايك (إملاء لوحة المفاتيح أو تقييم Azure) يخفي الآيفون الصفحة لحظة — لا نحسبها خروجًا
+function _isMicEl(t){ return !!(t && /(^|\s)(kmic|dinp|pinp)(\s|$)/.test(t.className||"")); }
+function _micActive(){ if(window.__paBusy>0) return true; if(_isMicEl(document.activeElement)) return true; if(window.__micGrace && Date.now()<window.__micGrace) return true; return false; }
+document.addEventListener("focusin", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+document.addEventListener("focusout", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
 function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
-document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+document.addEventListener("visibilitychange",function(){if(document.hidden){if(_micActive()){window.__micGrace=Date.now()+9000;h=null;return;}h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;if(_micActive())return;ex++;if(ex>=2)ejc();else tst();}});})();
 }
 </script>
 </body>

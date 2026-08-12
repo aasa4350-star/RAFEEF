@@ -270,8 +270,19 @@ function saveScore(test, correct, total, extra){
 
 // ===== كشف الخروج من الصفحة أثناء الحل (استعانة بمترجم/تطبيق ثاني) =====
 var AWAY = { total:0, exits:0, hiddenAt:null, onReturn:null };
-function _awayOut(){ if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير (ثانيتين أو أقل) */ AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
+// أثناء استخدام المايك (إملاء لوحة المفاتيح أو تقييم Azure) يخفي الآيفون الصفحة لحظة — لا نحسبها خروجًا
+window.__paBusy = 0; window.__micGrace = 0;
+function _isMicEl(t){ return !!(t && /(^|\s)(pinp|kmic|dinp)(\s|$)/.test(t.className||"")); }
+function _micActive(){
+  if(window.__paBusy>0) return true;                 // تقييم نطق Azure يعمل الآن
+  if(_isMicEl(document.activeElement)) return true;   // مؤشر الكتابة داخل خانة نطق (إملاء المايك)
+  if(window.__micGrace && Date.now()<window.__micGrace) return true; // مهلة سماح بعد استخدام المايك
+  return false;
+}
+document.addEventListener("focusin", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+document.addEventListener("focusout", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+function _awayOut(){ if(_micActive()){ window.__micGrace=Date.now()+9000; return; } if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
+function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير (ثانيتين أو أقل) */ if(_micActive()) return; /* رجع أثناء/بعد استخدام المايك مباشرة — لا يُحسب */ AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
 function ejectSession(){
   if(document.getElementById("__eject")) return;
   var ov=document.createElement("div");
@@ -329,7 +340,8 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText){
   }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
   var _fin=false;
-  function _end(){ if(btn){ btn.disabled=false; } try{ rec.close(); }catch(e){} }
+  window.__paBusy++; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
+  function _end(){ if(btn){ btn.disabled=false; } if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} }
   var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, longText?40000:15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
