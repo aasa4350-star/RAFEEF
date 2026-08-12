@@ -233,14 +233,30 @@ var GK=[
 ];
 function gGK(){ var it=gp(GK); var o=optS(it[1],it[2]); return [it[0],o[0],o[1],"الإجابة الصحيحة: "+it[1]+".","gk:"+it[0]]; }
 
+/* ===== فهم الصور (تناظر بصري بالإيموجي) ===== */
+var VIS={
+ "العضو وأداته":[["👁️","👓"],["🦶","👟"],["✋","🧤"],["🦷","🪥"],["👂","🎧"]],
+ "الحيوان ومنتجه":[["🐄","🥛"],["🐝","🍯"],["🐔","🥚"],["🐑","🧶"]],
+ "المركبة ومكانها":[["✈️","☁️"],["🚢","🌊"],["🚗","🛣️"],["🚂","🛤️"]]
+};
+function gVisual(){
+ var keys=Object.keys(VIS),g=gp(keys),pairs=shuffle(VIS[g].slice()),p1=pairs[0],p2=pairs[1],correct=p2[1];
+ var cand=[];VIS[g].forEach(function(p){if(p[1]!==correct)cand.push(p[1]);});
+ keys.forEach(function(k){if(k!==g)VIS[k].forEach(function(p){cand.push(p[1]);});});
+ var o=optS(correct,cand);
+ return ["أكمل بالعلاقة نفسها:  "+p1[0]+" ← "+p1[1]+"   مثل   "+p2[0]+" ← ؟",o[0],o[1],p1[0]+"←"+p1[1]+" وكذلك "+p2[0]+"←"+p2[1]+".","vis:"+p2[0]];
+}
+
 var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
 var GK_GENS=[gGK];
+var VIS_GENS=[gVisual];
 function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; var _k=(q&&q[4])||(q&&q[0]); if(!q||seen[_k]) continue; seen[_k]=1; out.push(q); } return out; }
 var CFG={
   math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>أسئلة جديدة كل مرة</b>."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."},
-  gk:{gens:GK_GENS, mode:"choice", label:"كانجرو — معرفة عامة 🦘", intro:"🌍 معلومات عامة: علوم · جغرافيا · حيوانات · معلومات إسلامية بسيطة."}
+  gk:{gens:GK_GENS, mode:"choice", label:"كانجرو — معرفة عامة 🦘", intro:"🌍 معلومات عامة: علوم · جغرافيا · حيوانات · معلومات إسلامية بسيطة."},
+  vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري: اختر الأيقونة التي تكمل العلاقة نفسها."}
 };
 
 var app = document.getElementById("app");
@@ -254,10 +270,12 @@ if(!NAMES[who]){
       '<button data-tab="math" aria-selected="true">🔢 استدلال رياضي</button>'+
       '<button data-tab="verb" aria-selected="false">🧩 استدلال لغوي</button>'+
       '<button data-tab="gk" aria-selected="false">🌍 معرفة عامة</button>'+
+      '<button data-tab="vis" aria-selected="false">👁️ فهم الصور</button>'+
     '</div>'+
     '<section class="panel active" id="math"></section>'+
     '<section class="panel" id="verb"></section>'+
     '<section class="panel" id="gk"></section>'+
+    '<section class="panel" id="vis"></section>'+
     '<footer>مهارات التفكير · مطابق لأسلوب كانجرو · من إعداد المعلّم</footer>';
 
   function render(kind){
