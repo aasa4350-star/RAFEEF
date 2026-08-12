@@ -1,0 +1,157 @@
+/* بنك قطع القراءة الإضافي — يُدمج تلقائيًا في DATA[who][lang].pass داخل reading.html.
+   كل عنصر: [نص القطعة, [[سؤال,[الإجابة الصحيحة, خطأ, خطأ], 0], ...]]
+   الإجابة الصحيحة تُكتب أولًا (الفهرس 0)؛ ترتيب الخيارات يُخلط تلقائيًا عند العرض. */
+window.READING_EXTRA = {
+  saud: {
+    en: [
+      ["Ben has a blue kite. He runs in the park. The wind lifts the kite high. Ben is happy.",
+        [["What color is the kite?",["blue","red","green"],0],["Where does Ben run?",["in the park","at home","at school"],0],["How does Ben feel?",["happy","sad","tired"],0]]],
+      ["The little duck swims in the pond. It looks for food. Its mother is near. They are safe.",
+        [["Where does the duck swim?",["in the pond","in the sea","in a cup"],0],["What does the duck look for?",["food","a ball","a book"],0],["Who is near the duck?",["its mother","a dog","a cat"],0]]],
+      ["Amy likes to paint. She paints a big sun and a green tree. Her picture is beautiful.",
+        [["What does Amy like to do?",["paint","sleep","run"],0],["What does she paint?",["a sun and a tree","a car","a house"],0],["How is her picture?",["beautiful","bad","small"],0]]],
+      ["Sam wakes up early. He brushes his teeth and eats breakfast. Then he goes to school.",
+        [["When does Sam wake up?",["early","late","at night"],0],["What does he do first?",["brushes his teeth","plays","sleeps"],0],["Where does he go?",["to school","to the park","to bed"],0]]],
+      ["We have a small farm. We have cows and hens. The hens give us eggs every day.",
+        [["What do we have?",["a small farm","a big shop","a boat"],0],["What animals are on the farm?",["cows and hens","lions","fish"],0],["What do the hens give us?",["eggs","milk","wool"],0]]],
+      ["The bee flies from flower to flower. It makes sweet honey. Bees help the plants grow.",
+        [["What does the bee make?",["honey","milk","bread"],0],["Where does the bee fly?",["from flower to flower","to the sea","to school"],0],["What do bees help?",["the plants grow","cars move","rain fall"],0]]],
+      ["It is winter. The day is cold. Dad makes hot soup. We feel warm and happy.",
+        [["What season is it?",["winter","summer","spring"],0],["What does Dad make?",["hot soup","cold juice","a cake"],0],["How do we feel?",["warm and happy","cold and sad","tired"],0]]],
+      ["Lulu lost her red shoe. She looked under the bed. She found it and smiled.",
+        [["What did Lulu lose?",["her red shoe","her book","her pen"],0],["Where did she look?",["under the bed","in the car","at school"],0],["How did she feel at the end?",["happy","angry","scared"],0]]]
+    ],
+    ar: [
+      ["زرع سعد بذرة في الحديقة، وسقاها كل يوم. بعد أيام نبتت زهرة جميلة، ففرح سعد كثيرًا.",
+        [["ماذا زرع سعد؟",["بذرة","شجرة","حجرًا"],0],["ماذا فعل كل يوم؟",["سقاها","تركها","قطعها"],0],["ماذا نبت؟",["زهرة جميلة","حشيش","شوك"],0]]],
+      ["استيقظ الولد مبكرًا، وصلّى الفجر، ثم قرأ درسه. أُعجب أبوه باجتهاده.",
+        [["متى استيقظ الولد؟",["مبكرًا","متأخرًا","ظهرًا"],0],["ماذا فعل بعد الصلاة؟",["قرأ درسه","لعب","نام"],0],["بماذا أُعجب أبوه؟",["اجتهاده","كسله","نومه"],0]]],
+      ["ذهبت الأسرة إلى البحر. بنى الأطفال قلاعًا من الرمل، وجمعوا الأصداف الجميلة.",
+        [["إلى أين ذهبت الأسرة؟",["البحر","الجبل","السوق"],0],["ماذا بنى الأطفال؟",["قلاعًا من الرمل","بيتًا","سيارة"],0],["ماذا جمعوا؟",["الأصداف","الأوراق","الحجارة"],0]]],
+      ["رأى ماجد رجلًا كبيرًا يحمل أكياسًا ثقيلة، فساعده في حملها. شكره الرجل ودعا له.",
+        [["ماذا رأى ماجد؟",["رجلًا يحمل أكياسًا","طفلًا يبكي","قطة"],0],["ماذا فعل ماجد؟",["ساعده في الحمل","تركه","ضحك عليه"],0],["ماذا فعل الرجل؟",["شكره ودعا له","غضب","سكت"],0]]],
+      ["في المزرعة دجاجات تبيض كل يوم، وبقرة تعطي حليبًا طازجًا. الحيوانات مفيدة لنا.",
+        [["ماذا تفعل الدجاجات؟",["تبيض كل يوم","تطير بعيدًا","تنام"],0],["ماذا تعطي البقرة؟",["حليبًا طازجًا","بيضًا","صوفًا"],0],["كيف الحيوانات؟",["مفيدة لنا","مؤذية","بلا فائدة"],0]]],
+      ["أضاء القمر في الليل، ولمعت النجوم في السماء. نظر سعود إليها وتعجّب من جمالها.",
+        [["متى أضاء القمر؟",["في الليل","في الصباح","ظهرًا"],0],["ماذا لمع في السماء؟",["النجوم","الشمس","المطر"],0],["بماذا تعجّب سعود؟",["جمالها","صوتها","لونها"],0]]],
+      ["نظّفت سارة أسنانها بعد الطعام، ورتّبت غرفتها. النظافة تجعلنا أصحّاء وسعداء.",
+        [["ماذا نظّفت سارة؟",["أسنانها","حذاءها","سيارتها"],0],["ماذا رتّبت؟",["غرفتها","حقيبتها","كتبها"],0],["ماذا تجعلنا النظافة؟",["أصحّاء وسعداء","متعبين","مرضى"],0]]],
+      ["وجد الطفل قطة صغيرة تبكي من الجوع، فأعطاها طعامًا وماءً. أكلت القطة وشبعت.",
+        [["ماذا وجد الطفل؟",["قطة جائعة","كلبًا","عصفورًا"],0],["ماذا أعطاها؟",["طعامًا وماءً","لعبة","حجرًا"],0],["ماذا حدث للقطة؟",["أكلت وشبعت","هربت","بكت"],0]]]
+    ]
+  },
+  osama: {
+    en: [
+      ["Every Saturday, Omar and his father go to the market. They buy fresh fruit and vegetables. Omar likes to help carry the bags. Shopping together is fun.",
+        [["When do they go to the market?",["every Saturday","every night","never"],0],["What do they buy?",["fresh fruit and vegetables","toys","books"],0],["What does Omar like to do?",["help carry the bags","run away","sleep"],0]]],
+      ["The library is a quiet place. People read books and study there. You must not talk loudly. Everyone respects the rules.",
+        [["What kind of place is the library?",["a quiet place","a noisy place","a shop"],0],["What do people do there?",["read and study","play games","eat"],0],["What must you not do?",["talk loudly","read","study"],0]]],
+      ["Plants need three things to grow: water, sunlight, and good soil. Farmers take care of their plants every day. Healthy plants give us food.",
+        [["How many things do plants need to grow?",["three","one","five"],0],["Who takes care of the plants?",["farmers","doctors","drivers"],0],["What do healthy plants give us?",["food","money","toys"],0]]],
+      ["Sara joined the school football team. She practices every afternoon. At first it was hard, but now she plays very well. Practice makes perfect.",
+        [["What team did Sara join?",["the football team","the music club","the art club"],0],["When does she practice?",["every afternoon","once a year","never"],0],["How does she play now?",["very well","badly","the same"],0]]],
+      ["Recycling helps our planet. We put paper, glass, and plastic in different bins. This keeps our city clean and saves energy.",
+        [["What does recycling help?",["our planet","our games","our sleep"],0],["Where do we put paper and glass?",["in different bins","in one box","on the floor"],0],["What does recycling save?",["energy","time only","nothing"],0]]],
+      ["The camel is called the ship of the desert. It can walk for days without water. It stores fat in its hump. Camels are strong animals.",
+        [["What is the camel called?",["the ship of the desert","the king of the sea","the bird of the sky"],0],["How long can it walk without water?",["for days","for minutes","never"],0],["Where does it store fat?",["in its hump","in its legs","in its ears"],0]]],
+      ["Ali woke up late and missed the school bus. He learned an important lesson: he must sleep early. Now he is never late.",
+        [["Why did Ali miss the bus?",["he woke up late","it was raining","the bus was full"],0],["What lesson did he learn?",["to sleep early","to eat more","to run fast"],0],["How is Ali now?",["never late","always late","sad"],0]]],
+      ["Water can change into three forms. It can be a solid like ice, a liquid like rain, or a gas like steam. This is part of the water cycle.",
+        [["How many forms can water take?",["three","two","four"],0],["What is a solid form of water?",["ice","rain","steam"],0],["What is this process called?",["the water cycle","the wind","the sun"],0]]]
+    ],
+    ar: [
+      ["يذهب عمر ووالده كل جمعة إلى السوق ليشتريا الفاكهة والخضار الطازجة. يساعد عمر في حمل الأكياس، ويستمتع بالتسوّق مع أبيه.",
+        [["متى يذهبان إلى السوق؟",["كل جمعة","كل ليلة","نادرًا"],0],["ماذا يشتريان؟",["الفاكهة والخضار","الألعاب","الكتب"],0],["بماذا يستمتع عمر؟",["التسوّق مع أبيه","النوم","اللعب وحده"],0]]],
+      ["المكتبة مكان هادئ، يقرأ فيه الناس الكتب ويدرسون. لا يجوز رفع الصوت فيها، فالجميع يحترم النظام.",
+        [["كيف المكتبة؟",["مكان هادئ","مكان صاخب","دكان"],0],["ماذا يفعل الناس فيها؟",["يقرؤون ويدرسون","يلعبون","يأكلون"],0],["ما الذي لا يجوز؟",["رفع الصوت","القراءة","الدراسة"],0]]],
+      ["تحتاج النباتات إلى الماء والضوء والتربة الجيدة كي تنمو. يعتني المزارع بنباتاته كل يوم، والنبات السليم يعطينا غذاءً مفيدًا.",
+        [["كم شيئًا تحتاجه النباتات لتنمو؟",["ثلاثة","واحد","خمسة"],0],["من يعتني بالنباتات؟",["المزارع","الطبيب","السائق"],0],["ماذا يعطينا النبات السليم؟",["غذاءً مفيدًا","مالًا","لعبًا"],0]]],
+      ["انضمّت سارة إلى فريق المدرسة، وتدرّبت كل يوم. كان الأمر صعبًا في البداية، لكنها أتقنته بالممارسة. التدريب طريق النجاح.",
+        [["إلى أي فريق انضمّت سارة؟",["فريق المدرسة","فريق الحي","نادي الرسم"],0],["متى كانت تتدرّب؟",["كل يوم","مرة بالسنة","أبدًا"],0],["ما طريق النجاح؟",["التدريب","الحظ","النوم"],0]]],
+      ["إعادة التدوير تحمي كوكبنا. نضع الورق والزجاج والبلاستيك في حاويات مختلفة، فتبقى مدينتنا نظيفة ونوفّر الطاقة.",
+        [["ماذا تحمي إعادة التدوير؟",["كوكبنا","ألعابنا","نومنا"],0],["أين نضع الورق والزجاج؟",["في حاويات مختلفة","في صندوق واحد","على الأرض"],0],["ماذا نوفّر بإعادة التدوير؟",["الطاقة","الوقت فقط","لا شيء"],0]]],
+      ["يُسمّى الجمل سفينة الصحراء؛ لأنه يسير أيامًا دون ماء، ويخزّن الدهون في سنامه. الجمل حيوان صبور وقوي.",
+        [["بماذا يُسمّى الجمل؟",["سفينة الصحراء","ملك البحر","طائر السماء"],0],["كم يسير دون ماء؟",["أيامًا","دقائق","أبدًا"],0],["أين يخزّن الدهون؟",["في سنامه","في رجليه","في أذنيه"],0]]],
+      ["استيقظ علي متأخرًا وفاته الباص، فتعلّم درسًا مهمًا: أن ينام مبكرًا. ومنذ ذلك اليوم لم يتأخّر أبدًا.",
+        [["لماذا فات علي الباص؟",["استيقظ متأخرًا","كان مطر","الباص ممتلئ"],0],["ما الدرس الذي تعلّمه؟",["أن ينام مبكرًا","أن يأكل أكثر","أن يركض"],0],["كيف صار علي بعدها؟",["لم يتأخّر أبدًا","دائم التأخّر","حزينًا"],0]]],
+      ["للماء ثلاث حالات: صلبة كالجليد، وسائلة كالمطر، وغازية كالبخار. وتتحوّل بينها فيما يُعرف بدورة الماء.",
+        [["كم حالة للماء؟",["ثلاث","اثنتان","أربع"],0],["ما الحالة الصلبة للماء؟",["الجليد","المطر","البخار"],0],["ماذا تُسمّى هذه العملية؟",["دورة الماء","الريح","الشمس"],0]]]
+    ]
+  },
+  rafeef: {
+    en: [
+      ["Time management is a valuable skill. Students who plan their day finish their work on time and feel less stress. Making a simple schedule can improve both grades and happiness.",
+        [["What kind of skill is time management?",["a valuable skill","a useless skill","a hobby"],0],["What do students who plan their day feel?",["less stress","more stress","nothing"],0],["What can a simple schedule improve?",["grades and happiness","only sleep","only games"],0]]],
+      ["Deserts are among the driest places on Earth, yet they are full of life. Many animals are active at night to avoid the heat. Plants like the cactus store water to survive dry periods.",
+        [["What are deserts among?",["the driest places","the wettest places","the coldest places"],0],["When are many desert animals active?",["at night","at noon","never"],0],["How does the cactus survive?",["it stores water","it eats sand","it sleeps"],0]]],
+      ["Reading regularly builds a strong vocabulary and improves writing. It also opens the mind to new ideas and cultures. A person who reads never feels alone.",
+        [["What does regular reading build?",["a strong vocabulary","weak muscles","bad habits"],0],["What does reading open the mind to?",["new ideas and cultures","noise","fear"],0],["How does a reader feel?",["never alone","always tired","bored"],0]]],
+      ["Exercise is essential for a healthy body and mind. It strengthens the heart, improves mood, and increases energy. Even a short daily walk can make a big difference.",
+        [["What is exercise essential for?",["a healthy body and mind","losing friends","wasting time"],0],["What does exercise strengthen?",["the heart","the phone","the car"],0],["What can even a short daily walk do?",["make a big difference","do nothing","cause harm"],0]]],
+      ["The invention of the printing press changed the world. Before it, books were copied by hand and were very expensive. Printing made knowledge available to ordinary people.",
+        [["What changed the world?",["the printing press","the wheel","the phone"],0],["How were books made before it?",["copied by hand","printed fast","not made"],0],["Who could get knowledge after printing?",["ordinary people","only kings","no one"],0]]],
+      ["Teamwork allows people to achieve more than they could alone. Each member brings different skills and ideas. Respect and clear communication are the keys to a successful team.",
+        [["What does teamwork allow?",["achieving more together","working alone","doing less"],0],["What does each member bring?",["different skills and ideas","the same idea","nothing"],0],["What are the keys to a successful team?",["respect and communication","luck","money"],0]]],
+      ["Honesty is the foundation of trust. When people tell the truth, others rely on them. A single lie can damage a relationship that took years to build.",
+        [["What is honesty the foundation of?",["trust","fear","money"],0],["What happens when people tell the truth?",["others rely on them","others avoid them","nothing"],0],["What can a single lie do?",["damage a relationship","build trust","help others"],0]]],
+      ["Pollution threatens the oceans. Plastic waste harms fish and birds that mistake it for food. Reducing our use of plastic can protect sea life for future generations.",
+        [["What threatens the oceans?",["pollution","music","reading"],0],["Why is plastic harmful to animals?",["they mistake it for food","it is heavy","it is loud"],0],["What can reducing plastic protect?",["sea life","cars","buildings"],0]]]
+    ],
+    ar: [
+      ["تنظيم الوقت مهارة ثمينة؛ فالطالب الذي يخطّط ليومه يُنجز أعماله في وقتها ويشعر براحة أكبر. ووضعُ جدول بسيط يرفع المستوى الدراسي ويقلّل التوتر.",
+        [["كيف يوصف تنظيم الوقت؟",["مهارة ثمينة","مضيعة للوقت","هواية"],0],["بماذا يشعر من يخطّط ليومه؟",["راحة أكبر","توتر أكبر","بلا فرق"],0],["ماذا يرفع الجدول البسيط؟",["المستوى الدراسي","الطعام","اللعب"],0]]],
+      ["الصحراء من أكثر البقاع جفافًا، لكنها مليئة بالحياة. تنشط كثير من حيواناتها ليلًا هربًا من الحرّ، وتخزّن نباتاتها كالصبّار الماءَ لتصمد في الجفاف.",
+        [["كيف الصحراء رغم جفافها؟",["مليئة بالحياة","خالية تمامًا","باردة"],0],["متى تنشط حيوانات الصحراء؟",["ليلًا","ظهرًا","أبدًا"],0],["كيف يصمد الصبّار؟",["يخزّن الماء","يأكل الرمل","ينام"],0]]],
+      ["القراءة المنتظمة تبني ثروة لغوية وتحسّن الكتابة، وتفتح العقل على أفكار وثقافات جديدة. ومن يقرأ لا يشعر بالوحدة.",
+        [["ماذا تبني القراءة المنتظمة؟",["ثروة لغوية","عضلات","عادات سيئة"],0],["على ماذا تفتح القراءة العقل؟",["أفكار وثقافات جديدة","الضجيج","الخوف"],0],["كيف يشعر القارئ؟",["لا يشعر بالوحدة","متعب دائمًا","ملول"],0]]],
+      ["الرياضة ضرورية لصحة الجسم والعقل؛ فهي تقوّي القلب وتحسّن المزاج وتزيد النشاط. وحتى المشي القصير يوميًا يُحدث فرقًا كبيرًا.",
+        [["لماذا الرياضة ضرورية؟",["لصحة الجسم والعقل","لإضاعة الوقت","لا فائدة"],0],["ماذا تقوّي الرياضة؟",["القلب","الهاتف","السيارة"],0],["ماذا يفعل المشي القصير يوميًا؟",["يُحدث فرقًا كبيرًا","لا شيء","يضرّ"],0]]],
+      ["غيّر اختراع المطبعة وجه العالم؛ فقد كانت الكتب تُنسخ باليد وثمنها باهظ، فأتاحت الطباعة المعرفة لعامة الناس.",
+        [["ما الذي غيّر وجه العالم؟",["المطبعة","العجلة","الهاتف"],0],["كيف كانت الكتب قبلها؟",["تُنسخ باليد","تُطبع بسرعة","لا تُصنع"],0],["لمن أتاحت الطباعة المعرفة؟",["عامة الناس","الملوك فقط","لا أحد"],0]]],
+      ["العمل الجماعي يمكّن الناس من إنجاز ما يعجزون عنه منفردين؛ إذ يقدّم كل فرد مهاراته وأفكاره. والاحترام ووضوح التواصل مفتاح نجاح الفريق.",
+        [["ماذا يمكّن العمل الجماعي؟",["إنجاز أكثر معًا","العمل منفردًا","إنجاز أقل"],0],["ماذا يقدّم كل فرد؟",["مهاراته وأفكاره","الفكرة نفسها","لا شيء"],0],["ما مفتاح نجاح الفريق؟",["الاحترام والتواصل","الحظ","المال"],0]]],
+      ["الصدق أساس الثقة؛ فإذا صدق الناس اعتمد بعضهم على بعض. وكذبة واحدة قد تهدم علاقة بُنيت في سنوات.",
+        [["الصدق أساس ماذا؟",["الثقة","الخوف","المال"],0],["ماذا يحدث إذا صدق الناس؟",["اعتمد بعضهم على بعض","تجنّبوا بعضهم","لا شيء"],0],["ماذا قد تفعل الكذبة الواحدة؟",["تهدم علاقة","تبني ثقة","تنفع"],0]]],
+      ["التلوّث يهدّد المحيطات؛ إذ تؤذي المخلّفات البلاستيكية الأسماك والطيور التي تحسبها طعامًا. وتقليل استخدام البلاستيك يحمي الحياة البحرية للأجيال القادمة.",
+        [["ما الذي يهدّد المحيطات؟",["التلوّث","الموسيقى","القراءة"],0],["لماذا يؤذي البلاستيك الحيوانات؟",["تحسبه طعامًا","لأنه ثقيل","لأنه مضيء"],0],["ماذا يحمي تقليل البلاستيك؟",["الحياة البحرية","السيارات","المباني"],0]]]
+    ]
+  },
+  hasan: {
+    en: [
+      ["Artificial intelligence is transforming the way we live and work. It can analyze huge amounts of data in seconds and help doctors diagnose diseases. However, experts warn that it must be used responsibly.",
+        [["What is artificial intelligence transforming?",["the way we live and work","the weather","the oceans"],0],["What can it help doctors do?",["diagnose diseases","cook food","drive cars"],0],["What do experts warn about?",["using it responsibly","using it more","ignoring it"],0]]],
+      ["Volunteering benefits both the individual and society. It develops new skills, builds friendships, and gives a sense of purpose. Communities grow stronger when people give their time to help others.",
+        [["Who benefits from volunteering?",["the individual and society","only the rich","no one"],0],["What does volunteering develop?",["new skills","bad habits","laziness"],0],["When do communities grow stronger?",["when people help others","when people stay home","when people argue"],0]]],
+      ["The human brain is an extraordinary organ. It contains billions of nerve cells that communicate constantly. Sleep, healthy food, and exercise all help the brain work at its best.",
+        [["What kind of organ is the brain?",["extraordinary","ordinary","useless"],0],["What do the brain's nerve cells do?",["communicate constantly","stay silent","sleep"],0],["What helps the brain work best?",["sleep, food, and exercise","noise","stress"],0]]],
+      ["Renewable energy comes from natural sources that never run out, such as the sun and wind. Unlike fossil fuels, it produces little pollution. Many countries are investing in solar and wind power.",
+        [["Where does renewable energy come from?",["natural sources that never run out","deep mines","factories only"],0],["How much pollution does it produce?",["little pollution","a lot of pollution","poison"],0],["What are many countries investing in?",["solar and wind power","coal","plastic"],0]]],
+      ["Critical thinking is the ability to analyze information and form reasoned judgments. It helps people avoid being misled by false claims. In a world full of information, this skill is essential.",
+        [["What is critical thinking?",["analyzing information and judging","memorizing only","guessing"],0],["What does it help people avoid?",["being misled","reading","learning"],0],["Why is it essential today?",["the world is full of information","there is no information","people never read"],0]]],
+      ["Ancient civilizations made remarkable achievements in science and art. The Egyptians built the pyramids, while the Greeks laid the foundations of philosophy. Their ideas still influence us today.",
+        [["What did ancient civilizations achieve?",["remarkable achievements","nothing","only wars"],0],["What did the Egyptians build?",["the pyramids","the internet","cars"],0],["What did the Greeks lay the foundations of?",["philosophy","electricity","football"],0]]],
+      ["Financial literacy means understanding how to manage money wisely. Saving a small amount regularly can grow into a large sum over time. Learning to budget early leads to a secure future.",
+        [["What does financial literacy mean?",["managing money wisely","spending fast","borrowing more"],0],["What can saving a small amount regularly do?",["grow into a large sum","disappear","stay the same"],0],["What does budgeting early lead to?",["a secure future","debt","poverty"],0]]],
+      ["The ocean plays a vital role in regulating the Earth's climate. It absorbs heat and carbon dioxide and produces much of the oxygen we breathe. Protecting the ocean is essential for all life.",
+        [["What role does the ocean play?",["regulating the climate","causing storms only","nothing"],0],["What does the ocean produce?",["much of our oxygen","plastic","coal"],0],["Why must we protect the ocean?",["it is essential for all life","it is useless","it is small"],0]]]
+    ],
+    ar: [
+      ["يُحدث الذكاء الاصطناعي تحوّلًا في طريقة حياتنا وعملنا؛ فهو يحلّل كمّيات هائلة من البيانات في ثوانٍ، ويساعد الأطباء في التشخيص. غير أن الخبراء يحذّرون من ضرورة استخدامه بمسؤولية.",
+        [["فيمَ يُحدث الذكاء الاصطناعي تحوّلًا؟",["طريقة حياتنا وعملنا","الطقس","المحيطات"],0],["بماذا يساعد الأطباء؟",["في التشخيص","في الطبخ","في القيادة"],0],["ممّ يحذّر الخبراء؟",["ضرورة استخدامه بمسؤولية","استخدامه أكثر","تجاهله"],0]]],
+      ["العمل التطوّعي يعود بالنفع على الفرد والمجتمع معًا؛ إذ يكسب مهارات جديدة ويبني صداقات ويمنح إحساسًا بالمعنى. وتقوى المجتمعات حين يبذل أفرادها أوقاتهم لخدمة غيرهم.",
+        [["على من يعود نفع التطوّع؟",["الفرد والمجتمع","الأغنياء فقط","لا أحد"],0],["ماذا يكسب المتطوّع؟",["مهارات جديدة","عادات سيئة","الكسل"],0],["متى تقوى المجتمعات؟",["حين يخدم أفرادها غيرهم","حين يبقون في بيوتهم","حين يتنازعون"],0]]],
+      ["الدماغ البشري عضو مذهل يضمّ مليارات الخلايا العصبية التي تتواصل باستمرار. والنوم الكافي والغذاء الصحي والرياضة تساعده على أداء عمله بأفضل صورة.",
+        [["كيف يوصف الدماغ البشري؟",["عضو مذهل","عضو عادي","بلا فائدة"],0],["ماذا تفعل الخلايا العصبية؟",["تتواصل باستمرار","تسكن","تنام"],0],["ما الذي يساعد الدماغ؟",["النوم والغذاء والرياضة","الضجيج","التوتر"],0]]],
+      ["الطاقة المتجدّدة تأتي من مصادر طبيعية لا تنضب كالشمس والرياح، وهي على خلاف الوقود الأحفوري قليلة التلوّث. ولذلك تستثمر دول كثيرة في الطاقة الشمسية وطاقة الرياح.",
+        [["من أين تأتي الطاقة المتجدّدة؟",["مصادر لا تنضب","مناجم عميقة","مصانع فقط"],0],["كيف تلوّثها مقارنة بالوقود؟",["قليلة التلوّث","كثيرة التلوّث","سامة"],0],["فيمَ تستثمر الدول؟",["الطاقة الشمسية والرياح","الفحم","البلاستيك"],0]]],
+      ["التفكير الناقد قدرة على تحليل المعلومات وبناء أحكام معلّلة، تقي صاحبها من الانخداع بالادّعاءات الباطلة. وفي عالم يفيض بالمعلومات صارت هذه المهارة أهمّ من أيّ وقت مضى.",
+        [["ما التفكير الناقد؟",["تحليل المعلومات وبناء أحكام","الحفظ فقط","التخمين"],0],["ممّ يقي صاحبه؟",["الانخداع بالباطل","القراءة","التعلّم"],0],["لماذا صار أهمّ اليوم؟",["العالم يفيض بالمعلومات","لا معلومات","لا أحد يقرأ"],0]]],
+      ["قدّمت الحضارات القديمة إنجازات عظيمة في العلم والفن؛ فبنى المصريون الأهرامات، وأرسى الإغريق أسس الفلسفة، ولا تزال أفكارهم تؤثّر فينا إلى اليوم.",
+        [["ماذا قدّمت الحضارات القديمة؟",["إنجازات عظيمة","لا شيء","حروبًا فقط"],0],["ماذا بنى المصريون؟",["الأهرامات","الإنترنت","السيارات"],0],["ماذا أرسى الإغريق؟",["أسس الفلسفة","الكهرباء","كرة القدم"],0]]],
+      ["الثقافة المالية تعني إدارة المال بحكمة؛ فادّخار مبلغ صغير بانتظام قد ينمو إلى ثروة مع الوقت. وتعلّم وضع الميزانية مبكرًا يقود إلى مستقبل آمن.",
+        [["ماذا تعني الثقافة المالية؟",["إدارة المال بحكمة","الإنفاق بسرعة","الاقتراض أكثر"],0],["ماذا يفعل ادّخار مبلغ صغير بانتظام؟",["ينمو إلى ثروة","يختفي","يبقى كما هو"],0],["إلامَ يقود وضع الميزانية مبكرًا؟",["مستقبل آمن","الديون","الفقر"],0]]],
+      ["يؤدّي المحيط دورًا حيويًا في تنظيم مناخ الأرض؛ فهو يمتصّ الحرارة وثاني أكسيد الكربون، وينتج جزءًا كبيرًا من الأكسجين الذي نتنفّسه. وحمايته ضرورية للحياة كلها.",
+        [["ما دور المحيط؟",["تنظيم مناخ الأرض","إثارة العواصف فقط","لا شيء"],0],["ماذا ينتج المحيط؟",["جزءًا كبيرًا من الأكسجين","البلاستيك","الفحم"],0],["لماذا نحميه؟",["ضروري للحياة كلها","بلا فائدة","صغير"],0]]]
+    ]
+  }
+};

@@ -67,6 +67,7 @@
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<script src="reading-bank.js"></script>
 <script>
 const META = {
   hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e",rate:0.95},
@@ -236,6 +237,16 @@ const DATA = {
       ] }
   }
 };
+
+// دمج بنك القطع الإضافي (reading-bank.js) في DATA — يزيد التنوّع بلا تكرار
+try{
+  var _EX = window.READING_EXTRA;
+  if(_EX){ for(var _w in _EX){ for(var _lg in _EX[_w]){
+    if(DATA[_w] && DATA[_w][_lg] && Array.isArray(DATA[_w][_lg].pass) && Array.isArray(_EX[_w][_lg])){
+      DATA[_w][_lg].pass = DATA[_w][_lg].pass.concat(_EX[_w][_lg]);
+    }
+  } } }
+}catch(e){}
 
 // معاني الكلمات الإنجليزية بالعربي (يُقبل أكثر من إجابة)
 const VOCAB = {
