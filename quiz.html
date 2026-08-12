@@ -1576,12 +1576,12 @@ if(!STUDENTS[who]){
   }
 
   // تسجيل نشاط (فتح درس شرح أو فتح فيديو يوتيوب) — يظهر في تقرير ولي الأمر
-  function logEvent(event, label){
+  function logEvent(event, label, secs){
     try{
       fetch(SUPA_URL+"/rest/v1/attempts", {
         method:"POST", keepalive:true,
         headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
-        body: JSON.stringify({ student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"activity", event:event, label:label } })
+        body: JSON.stringify({ student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"activity", event:event, label:label, secs:(secs||0) } })
       });
     }catch(e){}
   }
@@ -2001,7 +2001,14 @@ if(!STUDENTS[who]){
     sec.querySelector(".reset").addEventListener("click", renderRemedial);
     // تتبّع فتح الدروس والفيديوهات
     sec.querySelectorAll("[data-vid]").forEach(function(a){ a.addEventListener("click", function(){ logEvent("video", a.getAttribute("data-vid")); }); });
-    sec.querySelectorAll("details[data-lesson]").forEach(function(d){ d.addEventListener("toggle", function(){ if(d.open && !d._logged){ d._logged=true; logEvent("lesson", d.getAttribute("data-lesson")); } }); });
+    // نسجّل الدرس فقط إذا بقي مفتوحًا ٦ ثوانٍ فأكثر (دراسة فعلية مب نقرة خاطفة)، ونخزّن مدة البقاء
+    sec.querySelectorAll("details[data-lesson]").forEach(function(d){
+      var openedAt=null;
+      function commit(){ if(d._logged || openedAt==null) return; var secs=Math.round((Date.now()-openedAt)/1000); if(secs<6) return; d._logged=true; logEvent("lesson", d.getAttribute("data-lesson"), secs); }
+      d.addEventListener("toggle", function(){ if(d.open){ openedAt=Date.now(); } else { commit(); } });
+      document.addEventListener("visibilitychange", function(){ if(document.hidden && d.open) commit(); });
+      window.addEventListener("pagehide", function(){ if(d.open) commit(); });
+    });
   }
 
   ["en","ma"].forEach(build);
