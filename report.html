@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>تقرير المستوى 📊</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#0f766e; --accent-deep:#115e59;
+    --bg:#f6f7fb; --card:#fff; --ink:#14202b; --muted:#5b6b78; --line:#e4e9ee;
+    --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec; --warn:#b45309; --warn-bg:#fdf3e3;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;--warn-bg:#3a2f14;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a,.bar button{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow);cursor:pointer;font-family:inherit}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px 8px;border-radius:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 10px;font-size:1.08rem}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:13px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+  .stat .v{font-size:1.35rem;font-weight:800}
+  .stat .l{font-size:.78rem;color:var(--muted)}
+  ul.sk{list-style:none;margin:0;padding:0}
+  ul.sk li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  ul.sk li:last-child{border-bottom:0}
+  .nm{flex:1;font-weight:700;font-size:.96rem}
+  .frac{font-size:.82rem;color:var(--muted);white-space:nowrap}
+  .pill{min-width:52px;text-align:center;border-radius:9px;padding:3px 8px;font-weight:800;font-size:.86rem}
+  .lo{background:var(--bad-bg);color:var(--bad)} .mid{background:var(--warn-bg);color:var(--warn)} .hi{background:var(--good-bg);color:var(--good)}
+  .trend{font-size:.8rem;white-space:nowrap}
+  .note{color:var(--muted);font-size:.87rem;margin:6px 0 0}
+  .empty{text-align:center;color:var(--muted);padding:26px 14px}
+  #copyBox{width:100%;min-height:150px;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem;line-height:1.7;display:none}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">لوحة الوالد</p>
+    <h1>📊 تقرير المستوى — مهارة مهارة</h1>
+  </header>
+  <div class="bar">
+    <a href="index.html">🏠 لوحة المتابعة</a>
+    <button id="reload">🔄 تحديث</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="status" class="card empty">جارٍ التحميل...</div>
+  <div id="out"></div>
+  <footer>يُبنى التقرير من تفصيل كل سؤال حسب مهارته · الجلسات المشكوك فيها مستبعدة</footer>
+</div>
+<script>
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var KIDS = [["حسن","ثالث متوسط"],["رفيف","ثاني متوسط"],["أسامة","خامس ابتدائي"],["سعود","رابع ابتدائي"]];
+var MIN_N = 4;              // أقلّ عدد أسئلة حتى تُعتبر المهارة قابلة للحكم
+var RECENT_DAYS = 7;        // نافذة «الأخير» عند حساب الاتجاه
+
+function pct(c,t){ return t ? Math.round(c/t*100) : 0; }
+function cls(p){ return p<60 ? "lo" : (p<80 ? "mid" : "hi"); }
+function saDate(iso){
+  var d = new Date(iso); if(isNaN(d)) return "";
+  d = new Date(d.getTime() + 3*3600*1000);
+  var p = function(n){ return String(n).padStart(2,"0"); };
+  return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate());
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+var ALL = [], current = KIDS[0][0];
+
+/* يجمع تفصيل المهارات لطالب واحد. يستبعد الجلسات غير الموثوقة (خروج/سرعة مريبة). */
+function build(student){
+  var rows = ALL.filter(function(r){ return r.student === student && r.meta && r.meta.skills; });
+  var skipped = rows.filter(function(r){ return r.meta.trusted === false; }).length;
+  rows = rows.filter(function(r){ return r.meta.trusted !== false; });
+  var cutoff = Date.now() - RECENT_DAYS*86400000;
+  var sk = {}, dates = [];
+  rows.forEach(function(r){
+    dates.push(r.created_at);
+    var isRecent = new Date(r.created_at).getTime() >= cutoff;
+    Object.keys(r.meta.skills).forEach(function(name){
+      var v = r.meta.skills[name];
+      if(!v || typeof v.t !== "number" || v.t <= 0) return;
+      var s = sk[name] || (sk[name] = {c:0,t:0,rc:0,rt:0,oc:0,ot:0});
+      s.c += (v.c||0); s.t += v.t;
+      if(isRecent){ s.rc += (v.c||0); s.rt += v.t; } else { s.oc += (v.c||0); s.ot += v.t; }
+    });
+  });
+  dates.sort();
+  return { rows:rows.length, skipped:skipped, sk:sk,
+           from:dates.length?saDate(dates[0]):"", to:dates.length?saDate(dates[dates.length-1]):"" };
+}
+
+function trendOf(s){
+  if(s.rt < 3 || s.ot < 3) return "";
+  var d = pct(s.rc,s.rt) - pct(s.oc,s.ot);
+  /* بالكلمات لا بإشارة: داخل نصّ عربي قد تُقرأ «11-» بالمقلوب */
+  if(d >= 8)  return '<span class="trend" style="color:var(--good)">📈 تحسّن '+d+'</span>';
+  if(d <= -8) return '<span class="trend" style="color:var(--bad)">📉 تراجع '+Math.abs(d)+'</span>';
+  return '<span class="trend" style="color:var(--muted)">➡️ ثابت</span>';
+}
+
+function listHtml(items, neutral){
+  if(!items.length) return '<p class="note">لا توجد بيانات كافية بعد.</p>';
+  return '<ul class="sk">' + items.map(function(it){
+    var p = pct(it.s.c, it.s.t);
+    /* المهارات قليلة البيانات تُعرض بلون محايد حتى لا تُقرأ نسبتها كحكم */
+    return '<li><span class="pill '+(neutral?"":cls(p))+'"'+(neutral?' style="background:var(--bg);color:var(--muted)"':'')+'>'+p+'%</span>'+
+           '<span class="nm">'+esc(it.name)+'</span>'+
+           trendOf(it.s)+
+           '<span class="frac">'+it.s.c+'/'+it.s.t+'</span></li>';
+  }).join("") + '</ul>';
+}
+
+function render(){
+  var d = build(current), names = Object.keys(d.sk);
+  var out = document.getElementById("out");
+  if(!names.length){
+    out.innerHTML = '<div class="card empty">ما فيه تفصيل مهارات لـ'+esc(current)+' بعد.<br>'+
+      'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.'+
+      (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>';
+    return;
+  }
+  var ready  = names.filter(function(n){ return d.sk[n].t >= MIN_N; }).map(function(n){ return {name:n, s:d.sk[n]}; });
+  var thin   = names.filter(function(n){ return d.sk[n].t <  MIN_N; }).map(function(n){ return {name:n, s:d.sk[n]}; });
+  ready.sort(function(a,b){ return pct(a.s.c,a.s.t) - pct(b.s.c,b.s.t); });
+  /* لو المهارات قليلة نعرضها قائمة واحدة مرتّبة؛ تقسيمها لقائمتين يكرّر نفس البنود
+     في «الأضعف» و«الأقوى» معًا فيبدو التقرير متناقضًا. */
+  var single = ready.length <= 6;
+  var half   = Math.min(6, Math.floor(ready.length/2));
+  var weak   = single ? ready : ready.slice(0, half);
+  var strong = single ? []    : ready.slice(ready.length-half).reverse();
+  var totC = 0, totT = 0;
+  names.forEach(function(n){ totC += d.sk[n].c; totT += d.sk[n].t; });
+
+  out.innerHTML =
+    '<div class="stats">'+
+      '<div class="stat"><div class="v">'+d.rows+'</div><div class="l">جلسة محتسبة</div></div>'+
+      '<div class="stat"><div class="v">'+names.length+'</div><div class="l">مهارة مُقاسة</div></div>'+
+      '<div class="stat"><div class="v">'+totT+'</div><div class="l">سؤال</div></div>'+
+      '<div class="stat"><div class="v">'+pct(totC,totT)+'%</div><div class="l">المعدّل العام</div></div>'+
+    '</div>'+
+    (d.from ? '<p class="note">الفترة: '+d.from+' ← '+d.to+
+       (d.skipped ? ' · ⚠️ '+d.skipped+' جلسة مستبعدة (خروج أو سرعة مريبة)' : '')+'</p>' : '')+
+    '<div class="card"><h2>'+(single?'📊 كل المهارات — مرتّبة من الأضعف':'🎯 أضعف المهارات — ابدأ من هنا')+'</h2>'+listHtml(weak)+'</div>'+
+    (strong.length ? '<div class="card"><h2>💪 أقوى المهارات</h2>'+listHtml(strong)+'</div>' : '')+
+    (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
+       '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
+    '<div class="card"><h2>📋 نسخ التقرير</h2>'+
+      '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+
+      '<button id="mk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">📋 جهّز النصّ وانسخه</button>'+
+      '<textarea id="copyBox" readonly></textarea></div>';
+
+  document.getElementById("mk").addEventListener("click", function(){
+    var L = [];
+    L.push("تقرير "+current+" — "+(KIDS.filter(function(k){return k[0]===current;})[0]||["",""])[1]);
+    L.push("الفترة: "+d.from+" ← "+d.to+" · "+d.rows+" جلسة · "+totT+" سؤال · المعدّل "+pct(totC,totT)+"%");
+    if(d.skipped) L.push("جلسات مستبعدة (خروج/سرعة): "+d.skipped);
+    L.push("");
+    L.push(single ? "كل المهارات (من الأضعف):" : "الأضعف:");
+    weak.forEach(function(it){ L.push("  - "+it.name+": "+it.s.c+"/"+it.s.t+" ("+pct(it.s.c,it.s.t)+"%)"); });
+    if(strong.length){
+      L.push("الأقوى:");
+      strong.forEach(function(it){ L.push("  - "+it.name+": "+it.s.c+"/"+it.s.t+" ("+pct(it.s.c,it.s.t)+"%)"); });
+    }
+    var moved = ready.filter(function(it){ return it.s.rt>=3 && it.s.ot>=3 && Math.abs(pct(it.s.rc,it.s.rt)-pct(it.s.oc,it.s.ot))>=8; });
+    if(moved.length){
+      L.push("تغيّر خلال آخر "+RECENT_DAYS+" أيام:");
+      moved.forEach(function(it){
+        var dd = pct(it.s.rc,it.s.rt) - pct(it.s.oc,it.s.ot);
+        L.push("  - "+it.name+": "+(dd>0?"+":"")+dd+" نقطة ("+pct(it.s.oc,it.s.ot)+"% ← "+pct(it.s.rc,it.s.rt)+"%)");
+      });
+    }
+    if(thin.length) L.push("بيانات قليلة: "+thin.map(function(it){ return it.name+" ("+it.s.t+")"; }).join("، "));
+    var box = document.getElementById("copyBox");
+    box.value = L.join("\n"); box.style.display = "block"; box.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    if(navigator.clipboard){ navigator.clipboard.writeText(box.value).catch(function(){}); }
+    this.textContent = "✅ انتُسخ — الصقه في المحادثة";
+  });
+}
+
+function tabs(){
+  document.getElementById("tabs").innerHTML = KIDS.map(function(k){
+    return '<button data-n="'+k[0]+'" aria-selected="'+(k[0]===current)+'">'+k[0]+'</button>';
+  }).join("");
+  document.querySelectorAll("#tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      current = b.dataset.n;
+      document.querySelectorAll("#tabs button").forEach(function(x){ x.setAttribute("aria-selected", String(x.dataset.n===current)); });
+      render();
+    });
+  });
+}
+
+function load(){
+  var st = document.getElementById("status");
+  st.style.display = "block"; st.textContent = "جارٍ التحميل...";
+  fetch(SUPA_URL+"/rest/v1/attempts?select=student,created_at,meta&order=created_at.desc&limit=2000",
+        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(function(data){
+    ALL = Array.isArray(data) ? data : [];
+    var withSkills = ALL.filter(function(r){ return r.meta && r.meta.skills; }).length;
+    st.style.display = "none";
+    if(!withSkills){
+      st.style.display = "block";
+      st.innerHTML = "ما وصلت أي نتيجة فيها تفصيل مهارات بعد.<br>التسجيل التفصيلي جديد — النتائج القديمة ما فيها تفصيل.";
+    }
+    tabs(); render();
+  })
+  .catch(function(e){
+    st.style.display = "block";
+    st.textContent = "تعذّر التحميل: " + e.message;
+  });
+}
+
+document.getElementById("reload").addEventListener("click", load);
+load();
+</script>
+</body>
+</html>
