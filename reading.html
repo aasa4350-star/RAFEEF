@@ -733,12 +733,68 @@ if(!META[who] || !DATA[who]){
     sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); renderDict(); });
   }
 
+  /* ===== توليد أسئلة استيعاب من الأنواع الناقصة =====
+     بنك القطع كلّه من نوع «معلومة صريحة»، وكتاب موهبة يسأل أنواعًا أخرى.
+     هنا نولّد سؤال «معنى كلمة من السياق» لكل قطعة تحتوي كلمة معروفة المعنى. */
+  var AR_GLOSS = [
+    ["استيقظ","قام من نومه"], ["مبكرًا","في أوّل الوقت"], ["مبكر","في أوّل الوقت"],
+    ["باجتهاده","بذله الجهد والتعب"], ["اجتهاده","بذله الجهد والتعب"],
+    ["بذرة","حبّة تُزرع فيخرج منها النبات"], ["وسقاها","أعطاها الماء"], ["نبتت","خرجت من الأرض"],
+    ["الأصداف","أغطية صلبة لحيوانات البحر"], ["قلاع","حصون وأبنية عالية"],
+    ["ثقيلة","وزنها كبير"], ["فساعده","أعانه على حملها"], ["شكره","أثنى عليه ودعا له"],
+    ["ودعا","طلب من الله"], ["يحمل","يرفع الشيء وينقله"],
+    ["تبيض","تضع البيض"], ["طازج","جديد لم يمضِ عليه وقت"], ["الطازجة","الجديدة التي لم يمضِ عليها وقت"],
+    ["وتعج","تمتلئ وتزدحم"], ["ولمعت","أضاءت وبرقت"], ["أضاء","نشر النور"], ["جمالها","حُسنها ومنظرها"],
+    ["الجوع","الحاجة إلى الطعام"], ["وشبعت","امتلأت من الطعام"],
+    ["النظافة","إزالة الوسخ"], ["تجعلنا","تصيّرنا"], ["ويستمتع","يجد لذّة وسرورًا"],
+    ["الفاكهة","ثمار حلوة كالتفّاح والموز"], ["والخضار","نبات يؤكل كالجزر والخيار"],
+    ["يحترم","يقدّر ويوقّر"], ["هادئ","ساكن لا صوت فيه"], ["المكتبة","مكان فيه كتب للقراءة"],
+    ["النظام","ترتيب الأمور وضبطها"], ["تنظيم","ترتيب وضبط"], ["ثروة","مال كثير أو شيء ثمين"],
+    ["ضرورية","لا يُستغنى عنها"], ["الطاقة","القوّة التي تحرّك الأشياء"],
+    ["الصحراء","أرض واسعة رمليّة قليلة الماء"], ["مفيدة","تنفع صاحبها"], ["الأسرة","الأب والأمّ والأولاد"]
+  ];
+  function xqMeaning(passage, ar){
+    var p = String(passage||"");
+    if(ar){
+      var hits = AR_GLOSS.filter(function(g){ return p.indexOf(g[0])>=0; });
+      if(!hits.length) return [];
+      var g = hits[Math.floor(Math.random()*hits.length)];
+      var others = shuffle(AR_GLOSS.filter(function(x){ return x[1]!==g[1]; }).slice());
+      if(others.length<2) return [];
+      return [["ما معنى كلمة «"+g[0]+"» كما وردت في النصّ؟", [g[1], others[0][1], others[1][1]], 0]];
+    }
+    if(typeof VOCAB300 === "undefined") return [];
+    var seen={}, hits2=[];
+    (p.toLowerCase().match(/[a-z]+/g)||[]).forEach(function(w){
+      if(w.length<4 || seen[w]) return; seen[w]=1;
+      for(var i=0;i<VOCAB300.length;i++){ if(VOCAB300[i][0]===w){ hits2.push(i); return; } }
+    });
+    if(!hits2.length) return [];
+    /* القائمة مرتّبة من الأساسي إلى المتقدّم، فنختار الأبعد فيها = الكلمة الأصعب */
+    var gi = hits2.reduce(function(a,b){ return b>a?b:a; }, -1), g2 = VOCAB300[gi];
+    /* المشتّتات من جوار الكلمة في القائمة — نفس المجال الدلالي، فتكون معقولة لا عشوائية */
+    var pool=[], used={};
+    used[g2[1][0]]=1;
+    for(var d=1; d<=22 && pool.length<10; d++){
+      [gi-d, gi+d].forEach(function(j){
+        if(j<0 || j>=VOCAB300.length) return;
+        var mn=VOCAB300[j][1][0];
+        if(used[mn]) return; used[mn]=1; pool.push(VOCAB300[j]);
+      });
+    }
+    if(pool.length<2) pool = VOCAB300.filter(function(x){ return x[1][0]!==g2[1][0]; }).slice();
+    shuffle(pool);
+    if(pool.length<2) return [];
+    return [['What does the word "'+g2[0]+'" mean in the text?', [g2[1][0], pool[0][1][0], pool[1][1][0]], 0]];
+  }
+
   function renderRead(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("read");
     var list = D.pass || [[D.passage, D.questions]];
     var chosen = list[pickIndex(list.length, "read_"+curLang)];
     var passage = chosen[0], questions = chosen[1];
+    questions = questions.concat(xqMeaning(passage, ar));  /* نضيف سؤال معنى كلمة من السياق */
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
