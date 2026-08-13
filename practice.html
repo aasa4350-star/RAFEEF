@@ -66,12 +66,12 @@ var YOUNG = (who==="saud" || who==="osama"); // الصغار: لفظي + STEP ف
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total, wrongs){
+function saveScore(test, correct, total, wrongs, skills){
   try{
     fetch(SUPA_URL+"/rest/v1/attempts", {
       method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
-      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]) } })
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}) } })
     });
   }catch(e){}
 }
@@ -124,7 +124,27 @@ var QUANT = [
   function(){var st=gp([2,4,6,8]),seq=[st,st+2,st+4,st+6],nx=st+8,o=opt3(nx,[nx+2,nx-2,nx+1]);return ["أكمل نمط الأعداد الزوجية: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد 2 → "+nx+"."];},
   function(){var n=gp([12,16,20,24,30,40]),o=opt3(n/2,[n/4,n*2,n-2]);return ["نصف العدد "+n+" يساوي؟",o[0],o[1],n+" ÷ 2 = "+(n/2)+"."];}
 ];
-function genQuant(n){ var out=[],seen={},t=0; while(out.length<n && t<n*10){ var q=gp(QUANT)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
+/* اسم كل مولّد كمّي — بالترتيب نفسه لعناصر QUANT أعلاه.
+   ⚠️ لو أضفت أو حذفت مولّدًا في QUANT، عدّل هذي القائمة في الموضع نفسه. */
+var QUANT_AR=[
+ "النسبة المئوية","معادلة بسيطة","التناسب","المتوسط الحسابي","مساحة المستطيل","محيط المستطيل",
+ "نظرية فيثاغورس","أنماط عددية","نسبة الزيادة","معدّل العمل","السرعة والزمن","مسائل الأعمار",
+ "الاحتمالات","الزوايا المتكاملة","الزوايا المتتامة","مساحة الدائرة","الوسيط","أعداد متتالية",
+ "نسبة النقص","كسر من عدد","القسمة التناسبية","الربح والخسارة","الخصم","تحويل الأطوال",
+ "المضاعف المشترك الأصغر","القسمة بالتساوي","محيط المربّع","مساحة المربّع","مساحة المثلّث",
+ "حجم الصندوق","تحويل الزمن","تحويل الكتلة","القاسم المشترك الأكبر","جمع الكسور",
+ "أنماط الأعداد الزوجية","نصف العدد"
+];
+function genQuant(n){
+  var out=[],seen={},t=0;
+  while(out.length<n && t<n*10){
+    var k=Math.floor(Math.random()*QUANT.length), q=QUANT[k]();
+    t++; if(seen[q[0]])continue; seen[q[0]]=1;
+    q.gen = QUANT_AR[k] || ("كمّي "+k);
+    out.push(q);
+  }
+  return out;
+}
 
 // ===== لفظي (قدرات) — تدريبي =====
 var VERBAL = [
@@ -423,7 +443,15 @@ function shuffleQ(q){
   var pairs = q[1].map(function(o,i){ return [o,i]; });
   for(var i=pairs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pairs[i]; pairs[i]=pairs[j]; pairs[j]=t; }
   var idx=0, newOpts=pairs.map(function(p,ni){ if(p[1]===q[2]) idx=ni; return p[0]; });
-  return [q[0], newOpts, idx, q[3]];
+  var r=[q[0], newOpts, idx, q[3]];
+  if(q.gen) r.gen = q.gen;   /* نحافظ على اسم المهارة بعد خلط الخيارات */
+  return r;
+}
+/* اسم المهارة: من وسم المولّد إن وُجد، وإلا من العنوان <b>…:</b> في بداية السؤال */
+function skillOf(q){
+  if(q && q.gen) return q.gen;
+  var m=/^<b>(.*?)<\/b>/.exec((q && q[0]) || "");
+  return m ? m[1].replace(/[:：]\s*$/,"").trim() : "غير محدّد";
 }
 var SECS = { v:780, q:720, t:900, s:720 }; // ثواني كل قسم (مثل الاختبار الحقيقي)
 var TIMED = false; // الوضع المؤقّت اختياري
@@ -444,6 +472,12 @@ function renderSet(id, items, intro, regen, label){
   if(regen) html += '<button class="reset">أسئلة جديدة 🔄</button>';
   sec.innerHTML = html;
   var answered = {}, correct = 0, total = items.length, wrongs = [];
+  var skills = {};   /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة */
+  function mark(i, ok){
+    var g = skillOf(items[i]);
+    var s = skills[g] || (skills[g]={c:0,t:0});
+    s.t++; if(ok) s.c++;
+  }
   var scoreEl = sec.querySelector("[data-score]");
   sec.querySelectorAll(".q").forEach(function(qEl){
     var i = +qEl.dataset.i, ans = items[i][2];
@@ -451,7 +485,9 @@ function renderSet(id, items, intro, regen, label){
       btn.addEventListener("click", function(){
         if(answered[i]) return; answered[i]=1;
         qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-        if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+        var ok = (+btn.dataset.j===ans);
+        mark(i, ok);
+        if(ok){ btn.classList.add("correct"); correct++; }
         else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); wrongs.push(items[i][0]); }
         qEl.querySelector(".explain").classList.add("show");
         scoreEl.textContent = correct+" / "+total;
@@ -479,7 +515,7 @@ function renderSet(id, items, intro, regen, label){
       scoreEl.textContent = correct+" / "+total;
     }
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
-    if(label) saveScore(label, correct, total, wrongs);
+    if(label) saveScore(label, correct, total, wrongs, skills);
   }
   // حفظ جزئي: لو بدّل القسم أو طلع قبل ما يكمّل، نحفظ اللي جاوبه (عشان لا يضيع تعبه)
   function savePartial(){
@@ -487,7 +523,7 @@ function renderSet(id, items, intro, regen, label){
     var n = Object.keys(answered).length;
     if(n<3 || !label) return;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
-    saveScore(label, correct, n, wrongs);
+    saveScore(label, correct, n, wrongs, skills);
   }
   sec._leave = savePartial;
   sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };

@@ -553,7 +553,34 @@ var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
                gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
 var VIS_GENS=[gVisual];
-function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; var _k=(q&&q[4])||(q&&q[0]); if(!q||seen[_k]) continue; seen[_k]=1; out.push(q); } return out; }
+/* اسم عربي لكل مولّد — يُخزَّن مع النتيجة ليصير التقرير على مستوى المهارة لا القسم */
+var SKILL_AR={
+  gPattern:"أنماط عددية", gOdd:"العدد المختلف", gDist:"توزيع بالقسمة", gSave:"ضرب متكرر",
+  gShare:"قسمة بالتساوي", gPuzzle:"لغز العدد ونصفه", gRatio:"تناسب", gRate:"معدّل وزمن",
+  gLineOrder:"الترتيب في صفّ", gRound:"تقريب الأعداد", gCompareOps:"مقارنة نواتج العمليات",
+  gBalance:"موازين متّزنة", gPrimeOdd:"الأعداد الأوّلية", gCountTri:"عدّ المثلّثات",
+  gFraction:"الكسر من شكل مظلّل", gCompareAges:"ترتيب ومقارنة", gTableRow:"طاولات في صفّ",
+  gBarChart:"قراءة رسم بيانيّ", gDigitCount:"عدّ رقم داخل مدى", gBiggestNumber:"تكوين أكبر عدد",
+  gCountSquares:"عدّ المربّعات",
+  gAnalogy:"التناظر اللفظي", gComplete:"إكمال الجملة", gCategory:"التصنيف", gSequence:"التسلسل",
+  gCollective:"أسماء الجموع", gCounterfactual:"مقدّمات خيالية", gInduction:"الاستقراء",
+  gPurpose:"استقراء الغرض", gTrueStat:"العبارة الصحيحة",
+  gGK:"معرفة عامة", gVisual:"تناظر بصري"
+};
+function genN(gens,n){
+  var out=[],seen={},t=0;
+  while(out.length<n && t<n*30){
+    var f=gp(gens), q;
+    try{ q=f(lvl); }catch(e){ t++; continue; }
+    t++;
+    var _k=(q&&q[4])||(q&&q[0]);
+    if(!q||seen[_k]) continue;
+    seen[_k]=1;
+    q.gen = SKILL_AR[f.name] || f.name || "غير محدّد";
+    out.push(q);
+  }
+  return out;
+}
 var CFG={
   math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · عدّ مثلّثات · كسور · تقريب · أعداد أوّلية · ترتيب في صفّ. <b>أسئلة جديدة كل مرة</b>."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · تصنيف · تسلسل · استقراء · استدلال بمقدّمات خيالية · اختيار العبارة الصحيحة. <b>أسئلة جديدة كل مرة</b>."},
@@ -602,7 +629,14 @@ if(!NAMES[who]){
     var answered={}, correct=0, total=items.length, saved=false;
     var scoreEl = sec.querySelector("[data-score]");
     var t0=Date.now(), lastTs=t0, fast=0;
-    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2))}; }
+    /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة، ليعرف التقرير أين الضعف بالضبط */
+    var skills={};
+    function mark(i, ok){
+      var g=(items[i] && items[i].gen) || "غير محدّد";
+      var s=skills[g] || (skills[g]={c:0,t:0});
+      s.t++; if(ok) s.c++;
+    }
+    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills}; }
     function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
     function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total, meta(total)); } }
@@ -614,6 +648,7 @@ if(!NAMES[who]){
           if(answered[i]) return; if(normNum(inp.value)==="") return; answered[i]=1;
           inp.disabled=true; chk.disabled=true;
           var ok = normNum(inp.value)===normNum(correctVal);
+          mark(i, ok);
           if(ok){ correct++; inp.style.borderColor="var(--good)"; inp.style.color="var(--good)"; }
           else{ inp.style.borderColor="var(--bad)"; inp.style.color="var(--bad)"; exp.innerHTML='<b style="color:var(--good)">الإجابة: '+correctVal+'</b> — '+items[i][3]; }
           exp.classList.add("show"); afterAnswer();
@@ -625,7 +660,9 @@ if(!NAMES[who]){
           btn.addEventListener("click",function(){
             if(answered[i]) return; answered[i]=1;
             qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-            if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+            var ok=(+btn.dataset.j===ans);
+            mark(i, ok);
+            if(ok){ btn.classList.add("correct"); correct++; }
             else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
             qEl.querySelector(".explain").classList.add("show");
             afterAnswer();
