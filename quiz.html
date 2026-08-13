@@ -1407,7 +1407,32 @@ if(!STUDENTS[who]){
       function(){var a=ri(2,7),o=opt3("x²+"+(2*a)+"x+"+(a*a),["x²+"+(a*a),"x²+"+a+"x+"+(a*a),"x²+"+(2*a)+"x+"+(2*a)]);return ["بسّط: (x + "+a+")²",o[0],o[1],"(x+"+a+")² = x²+"+(2*a)+"x+"+(a*a)+".","ma"];}
     ]
   };
-  function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var q=gpick(gens)(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
+  /* اسم المهارة لكل مولّد إنجليزي — يُحفظ مع النتيجة ليصير التقرير على مستوى المهارة */
+  const QSKILL_AR = {
+    eSv:"مطابقة الفاعل والفعل", ePlural:"الجمع", ePrep:"حروف الجرّ", eOpp:"الأضداد",
+    eAan:"a / an", eThereIs:"There is / are", eWh:"أدوات الاستفهام", eMuchMany:"much / many",
+    ePast:"الماضي البسيط", ePresCont:"المضارع المستمر", eComp:"المقارنة", ePluralAdv:"الجموع الشاذّة",
+    eColl:"المتلازمات اللفظية", eIrregPast:"الأفعال الشاذّة", eSuper:"التفضيل", ePresPerfect:"المضارع التامّ"
+  };
+  /* مولّدات الرياضيات دوالّ بلا أسماء، فنستنتج المهارة من نصّ السؤال */
+  function skillOfQ(q, id){
+    if(q && q.gen) return q.gen;
+    var s = String((q && q[0]) || "");
+    if(id === "ma"){
+      if(/باقي القسمة/.test(s)) return "باقي القسمة";
+      if(/%|نسبة/.test(s)) return "النسبة المئوية";
+      if(/محيط/.test(s)) return "المحيط";
+      if(/مساحة/.test(s)) return "المساحة";
+      if(/كسر|\//.test(s) && /احسب/.test(s)) return "الكسور";
+      if(/ ÷ /.test(s)) return "القسمة";
+      if(/ × /.test(s)) return "الضرب";
+      if(/ − | - /.test(s)) return "الطرح";
+      if(/ \+ /.test(s)) return "الجمع";
+      return "رياضيات (منوّع)";
+    }
+    return "إنجليزي (منسّق)";
+  }
+  function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var f=gpick(gens), q=f(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name]; out.push(q); } return out; }
 
   // ===== مولّد جمل إنجليزية (الأسماء والأفعال تتغيّر كل مرة) =====
   function eSv(){
@@ -1728,12 +1753,28 @@ if(!STUDENTS[who]){
         const ch = R.chosen[i];
         return { q:q[0], opts:q[1], chosen:(ch==null?-1:ch), correct:q[2] };
       });
+      /* تسجيل تفصيلي: صح/خطأ لكل مهارة، للأسئلة المُجابة فقط */
+      const buildSkills = ()=>{
+        const sk = {};
+        [["en", en], ["ma", ma]].forEach(pair=>{
+          const id = pair[0], R = pair[1];
+          (R.items||[]).forEach((q,i)=>{
+            const ch = R.chosen[i];
+            if(ch == null) return;
+            const g = skillOfQ(q, id);
+            const s = sk[g] || (sk[g] = {c:0, t:0});
+            s.t++; if(ch === q[2]) s.c++;
+          });
+        });
+        return sk;
+      };
       saveResult({
         student: S.name, grade: S.grade,
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
         meta: { per, avg_sec: avg, total_sec: total, fast: fast, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0 && fast < Math.ceil(dts.length/2)),
+          skills: buildSkills(),
           paper: { date: new Date().toISOString(),
             en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
             en: buildPaper(en), ma: buildPaper(ma) } }
