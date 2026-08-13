@@ -462,8 +462,93 @@ function gCompareAges(lvl){
     "age"];
 }
 
+/* ١٥) طاولات مصفوفة في صفّ: شخصان لكلّ طاولة + شخصان في الطرفين */
+function gTableRow(lvl){
+  var n=ri(3,6), correct=2*n+2, tw=34, out="";
+  for(var i=0;i<n;i++){
+    var x=i*tw+10;
+    out+='<rect x="'+x+'" y="24" width="'+(tw-3)+'" height="18" rx="3" fill="#7dd3fc" stroke="currentColor" stroke-width="1.5"/>'+
+         '<circle cx="'+(x+(tw-3)/2)+'" cy="13" r="5" fill="#f59e0b"/>'+
+         '<circle cx="'+(x+(tw-3)/2)+'" cy="53" r="5" fill="#f59e0b"/>';
+  }
+  out+='<circle cx="4" cy="33" r="5" fill="#f59e0b"/><circle cx="'+(n*tw+15)+'" cy="33" r="5" fill="#f59e0b"/>';
+  var svg='<svg viewBox="0 0 '+(n*tw+22)+' 66" width="'+Math.min(300,n*tw+22)+'" style="display:block;margin:10px auto;color:var(--ink)">'+out+'</svg>';
+  var o=opt3(correct,[2*n,correct+2,4*n]);
+  return ["تُصفّ "+n+" طاولات في صفّ واحد كما في الشكل: يجلس شخص على كلّ جانب من كلّ طاولة، وشخص عند كلّ طرف من طرفَي الصفّ. كم شخصًا يجلس؟"+svg,
+    o[0],o[1],"(2 × "+n+") + 2 = "+correct+" شخصًا: شخصان لكلّ طاولة، وشخصان في الطرفين."];
+}
+
+/* ١٦) قراءة رسم بيانيّ بالأعمدة */
+function gBarChart(lvl){
+  var names=shuffle(["سالم","فارس","فهد","بدر","ياسر"]).slice(0,3);
+  var vals=[], seen={};
+  while(vals.length<3){ var v=ri(2,9)*5; if(seen[v]) continue; seen[v]=1; vals.push(v); }
+  var mx=Math.max.apply(null,vals), cols=["#f97316","#a78bfa","#ef4444"], bars="";
+  names.forEach(function(nm,i){
+    var w=Math.round(150*vals[i]/mx), y=i*30+10;
+    bars+='<text x="256" y="'+(y+13)+'" font-size="13" text-anchor="end" fill="currentColor">'+nm+'</text>'+
+          '<rect x="'+(200-w)+'" y="'+y+'" width="'+w+'" height="17" rx="4" fill="'+cols[i]+'"/>'+
+          '<text x="'+(194-w)+'" y="'+(y+13)+'" font-size="12" text-anchor="end" fill="currentColor">'+vals[i]+'</text>';
+  });
+  /* direction:ltr ضروري — في صفحة RTL ينقلب معنى text-anchor فتُقصّ الأسماء خارج الرسم */
+  var svg='<svg viewBox="0 0 260 100" width="290" style="display:block;margin:10px auto;color:var(--ink);direction:ltr">'+bars+'</svg>';
+  var kind=gp(["max","min","diff"]), stem, o, exp;
+  if(kind==="diff"){
+    var i1=ri(0,2), i2; do{ i2=ri(0,2); }while(i2===i1);
+    var d=Math.abs(vals[i1]-vals[i2]);
+    o=opt3(d,[d+5,d-5,vals[i1]+vals[i2]]);
+    stem="يبيّن الرسم عدد الكتب التي قرأها كلّ طالب. كم الفرق بين "+names[i1]+" و"+names[i2]+"؟";
+    exp="الفرق = "+Math.max(vals[i1],vals[i2])+" − "+Math.min(vals[i1],vals[i2])+" = "+d+".";
+  } else {
+    var want = kind==="max" ? Math.max.apply(null,vals) : Math.min.apply(null,vals);
+    var who2 = names[vals.indexOf(want)];
+    o=optS(who2, names.filter(function(x){return x!==who2;}).concat(["لا يمكن تحديده"]));
+    stem="يبيّن الرسم عدد الكتب التي قرأها كلّ طالب. من قرأ "+(kind==="max"?"أكثر":"أقلّ")+" عددًا؟";
+    exp=who2+" عمودُه "+(kind==="max"?"الأطول":"الأقصر")+" بـ"+want+" كتابًا.";
+  }
+  return [stem+svg,o[0],o[1],exp];
+}
+
+/* ١٧) عدّ الأعداد التي تحتوي رقمًا معيّنًا داخل مدى */
+function gDigitCount(lvl){
+  var d=ri(1,9), N=gp([30,40,50,55,60]), c=0;
+  for(var i=1;i<=N;i++){ if(String(i).indexOf(String(d))>=0) c++; }
+  var o=opt3(c,[c+1,c-1,c+2]);
+  return ["كم عددًا يحتوي على الرقم "+d+" من 1 إلى "+N+"؟",o[0],o[1],
+    "نعدّ الأعداد التي فيها الرقم "+d+" في الآحاد أو في العشرات، فنجدها "+c+" عددًا."];
+}
+
+/* ١٨) ترتيب أرقام لتكوين أكبر أو أصغر عدد */
+function gBiggestNumber(lvl){
+  var k=(lvl>=2)?5:4, ds=[], seen={}, t=0;
+  while(ds.length<k && t<200){ t++; var v=ri(1,9); if(seen[v]) continue; seen[v]=1; ds.push(v); }
+  if(ds.length<k) return null;
+  var big=Math.random()<0.5;
+  var sorted=ds.slice().sort(function(a,b){ return big?b-a:a-b; });
+  var rev=ds.slice().sort(function(a,b){ return big?a-b:b-a; });
+  var sw=sorted.slice(), tmp=sw[0]; sw[0]=sw[1]; sw[1]=tmp;
+  var correct=+sorted.join("");
+  var o=opt3(correct,[+rev.join(""),+sw.join(""),+ds.join("")]);
+  return ["رتّب الأرقام "+ds.join("، ")+" لتكوين "+(big?"أكبر":"أصغر")+" عدد ممكن.",o[0],o[1],
+    "نضع "+(big?"أكبر":"أصغر")+" رقم في أعلى منزلة ثمّ ننتقل إلى المنازل الأقلّ بالطريقة نفسها: "+sorted.join("")+"."];
+}
+
+/* ١٩) عدّ المربّعات بكلّ الأحجام في شبكة */
+function gCountSquares(lvl){
+  var n=ri(2,(lvl>=2)?4:3), total=n*(n+1)*(2*n+1)/6, cw=26, out="";
+  for(var r=0;r<n;r++){ for(var c=0;c<n;c++){
+    out+='<rect x="'+(c*cw+2)+'" y="'+(r*cw+2)+'" width="'+cw+'" height="'+cw+'" fill="none" stroke="currentColor" stroke-width="2"/>';
+  } }
+  var sz=n*cw+4;
+  var svg='<svg viewBox="0 0 '+sz+' '+sz+'" height="'+sz+'" style="display:block;margin:10px auto;color:var(--accent)">'+out+'</svg>';
+  var o=opt3(total,[n*n,total+1,total-2]);
+  return ["كم مربّعًا في الشكل التالي؟ (احسب المربّعات بجميع الأحجام)"+svg,o[0],o[1],
+    "مربّعات 1×1 عددها "+(n*n)+"، ثمّ نضيف المربّعات الأكبر المكوّنة منها، فيصير المجموع "+total+" مربّعًا."];
+}
+
 var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle,
-               gRatio,gRate,gLineOrder,gRound,gCompareOps,gBalance,gPrimeOdd,gCountTri,gFraction,gCompareAges];
+               gRatio,gRate,gLineOrder,gRound,gCompareOps,gBalance,gPrimeOdd,gCountTri,gFraction,gCompareAges,
+               gTableRow,gBarChart,gDigitCount,gBiggestNumber,gCountSquares];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
                gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
