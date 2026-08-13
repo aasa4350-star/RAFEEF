@@ -669,10 +669,78 @@ function gMatrix(lvl){
     "في كلّ صفّ وكلّ عمود تظهر الأشكال الثلاثة مرّة واحدة، والناقص هنا هو "+correct+"."];
 }
 
+/* ===== ألغاز الاستنتاج: تُولَّد ثم يُتحقَّق من وحدانيّة حلّها قبل عرضها ===== */
+function permsOf(arr){
+  if(arr.length<=1) return [arr.slice()];
+  var out=[];
+  for(var i=0;i<arr.length;i++){
+    var rest=arr.slice(0,i).concat(arr.slice(i+1));
+    permsOf(rest).forEach(function(p){ out.push([arr[i]].concat(p)); });
+  }
+  return out;
+}
+var PERM4 = permsOf([0,1,2,3]);
+
+/* ٢٧) الاستنتاج بالاستبعاد: أربعة أشخاص وأربع وسائل */
+var VEH=["السيارة","الطائرة","القطار","السفينة"];   /* 0 برّ · 1 جوّ · 2 برّ · 3 بحر */
+function gElimination(lvl){
+  for(var t=0;t<60;t++){
+    var names=shuffle(["محمد","عليّ","مازن","خالد","سعد","فهد"]).slice(0,4);
+    var assign=gp(PERM4);                 /* assign[i] = رقم وسيلة الشخص i */
+    var air=assign.indexOf(1), car=assign.indexOf(0);
+    var others=[0,1,2,3].filter(function(i){ return i!==air && i!==car; });
+    var k=gp(others), notV=(assign[k]===2)?3:2;
+    var preds=[
+      function(a){ return a[air]===1; },
+      function(a){ return a[car]===0; },
+      function(a){ return a[k]!==notV; }
+    ];
+    var sols=PERM4.filter(function(a){ return preds.every(function(f){ return f(a); }); });
+    if(sols.length!==1) continue;         /* لا نعرض لغزًا له أكثر من حلّ */
+    var ask=others.filter(function(i){ return i!==k; })[0];
+    var correct=VEH[assign[ask]];
+    var o=optS(correct, VEH.filter(function(v){ return v!==correct; }));
+    var clues='<div style="margin:8px 0;font-weight:600">'+
+      '– '+names[air]+' لم يسافر برًّا ولا بحرًا.<br>'+
+      '– '+names[car]+' سافر بسيارته الخاصّة.<br>'+
+      '– '+names[k]+' لم يسافر بـ'+VEH[notV]+'.</div>';
+    return ["سافر "+names.join(" و")+" بوسائل مختلفة (سيارة – طائرة – قطار – سفينة)، فإذا كان:"+clues+
+      "فبِمَ سافر "+names[ask]+"؟", o[0], o[1],
+      names[air]+" بالطائرة، و"+names[car]+" بالسيارة، و"+names[k]+" ليس بـ"+VEH[notV]+
+      "، فلم يبقَ لـ"+names[ask]+" إلّا "+correct+".", "elim"];
+  }
+  return null;
+}
+
+/* ٢٨) الترتيب من قيود */
+function gOrderConstraints(lvl){
+  for(var t=0;t<80;t++){
+    var names=shuffle(["سالم","خالد","سعيد","يوسف","بدر","ماجد"]).slice(0,4);
+    var order=gp(PERM4);                  /* order[المركز] = رقم الاسم */
+    var first=order[0], preds=[function(o){ return o[0]===first; }];
+    var texts=["كان "+names[first]+" أوّل الواصلين"];
+    shuffle([[0,1],[0,2],[1,2],[1,3],[2,3]]).slice(0,2).forEach(function(pr){
+      var a=order[pr[0]], b=order[pr[1]];
+      texts.push("ووصل "+names[a]+" قبل "+names[b]);
+      preds.push(function(o){ return o.indexOf(a) < o.indexOf(b); });
+    });
+    var sols=PERM4.filter(function(o){ return preds.every(function(f){ return f(o); }); });
+    if(sols.length!==1) continue;
+    var nm=function(o){ return o.map(function(i){ return names[i]; }).join(" ، "); };
+    var correct=nm(order);
+    var cand=shuffle(PERM4.filter(function(o){ return o.join()!==order.join(); })).slice(0,6).map(nm);
+    var o2=optS(correct,cand);
+    return ["تسابق أربعة أصدقاء ("+names.join(" ، ")+")، "+texts.join("، ")+
+      ". فما ترتيب وصولهم من الأوّل إلى الأخير؟", o2[0], o2[1],
+      "القيود لا يحقّقها إلّا ترتيب واحد: "+correct+".", "ord"];
+  }
+  return null;
+}
+
 var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle,
                gRatio,gRate,gLineOrder,gRound,gCompareOps,gBalance,gPrimeOdd,gCountTri,gFraction,gCompareAges,
                gTableRow,gBarChart,gDigitCount,gBiggestNumber,gCountSquares,
-               gPicEquation,gPaths,gTrap,gWeekday,gUnitAnalogy];
+               gPicEquation,gPaths,gTrap,gWeekday,gUnitAnalogy,gElimination,gOrderConstraints];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
                gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
@@ -692,7 +760,8 @@ var SKILL_AR={
   gGK:"معرفة عامة", gVisual:"تناظر بصري",
   gPicEquation:"معادلات بالصور", gPaths:"عدّ المسارات", gTrap:"فخّ منطقي",
   gWeekday:"أيام الأسبوع", gUnitAnalogy:"تناظر الوحدات",
-  gCubeOpposite:"طيّ المكعّب", gMatrix:"مصفوفة بصرية"
+  gCubeOpposite:"طيّ المكعّب", gMatrix:"مصفوفة بصرية",
+  gElimination:"الاستنتاج بالاستبعاد", gOrderConstraints:"الترتيب من قيود"
 };
 function genN(gens,n){
   var out=[],seen={},t=0;
