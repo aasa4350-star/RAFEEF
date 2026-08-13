@@ -247,14 +247,231 @@ function gVisual(){
  return ["أكمل بالعلاقة نفسها:  "+p1[0]+" ← "+p1[1]+"   مثل   "+p2[0]+" ← ؟",o[0],o[1],p1[0]+"←"+p1[1]+" وكذلك "+p2[0]+"←"+p2[1]+".","vis:"+p2[0]];
 }
 
-var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle];
-var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective];
+/* ===== مولّدات مستخرجة من كتاب كانجرو (مقياس مهارات المتميزين ٣-٤-٥ ابتدائي) ===== */
+
+/* ١) الاستدلال بمقدّمات خيالية — الطفل يمشي مع الافتراض لا مع الواقع */
+var CFOBJ=[
+ {n:"الخبز",   acc:"خبزًا",    use:"الأكل"},
+ {n:"الورق",   acc:"ورقًا",    use:"الكتابة"},
+ {n:"الثلج",   acc:"ثلجًا",    use:"التبريد"},
+ {n:"الفحم",   acc:"فحمًا",    use:"التدفئة"},
+ {n:"الصابون", acc:"صابونًا",  use:"التنظيف"},
+ {n:"المفتاح", acc:"مفتاحًا",  use:"فتح الباب"},
+ {n:"الحبل",   acc:"حبلًا",    use:"الربط"},
+ {n:"المطرقة", acc:"مطرقةً",   use:"دقّ المسمار", f:1},
+ {n:"المسطرة", acc:"مسطرةً",   use:"القياس",     f:1},
+ {n:"المكنسة", acc:"مكنسةً",   use:"كنس الأرض",  f:1}
+];
+var CFILL=["كان القمر يضيء ليلًا","كان القرد يأكل الموز","كانت السفينة تسير في البحر",
+           "كان الطائر يبني عشّه","كانت الشمس تشرق صباحًا","كان النحل ينتج العسل"];
+function gCounterfactual(lvl){
+  var a=gp(CFOBJ), b, t=0;
+  do{ b=gp(CFOBJ); t++; }while((b.n===a.n||b.use===a.use)&&t<40);
+  if(b.n===a.n) return null;
+  var cand=[a.use];
+  CFOBJ.forEach(function(x){ if(x.use!==b.use&&x.use!==a.use) cand.push(x.use); });
+  var o=optS(b.use,cand);
+  var kan=a.f?"كانت":"كان", ust=a.f?"تُستخدم":"يُستخدم", sar=a.f?"صارت":"صار";
+  var bUst=b.f?"تُستخدم":"يُستخدم";
+  return ["إذا "+kan+" "+a.n+" "+b.acc+"، و"+gp(CFILL)+"، فإنّ "+a.n+" "+ust+" في ......",
+    o[0],o[1],
+    "المقدّمة تقول إنّ "+a.n+" "+sar+" "+b.acc+"، و"+b.n+" "+bUst+" في "+b.use+". نمشي مع الافتراض لا مع الواقع.",
+    "cf:"+a.n+">"+b.n];
+}
+
+/* ٢) الاستقراء — يُعطى أفراد من فئة ويُسأل عن فرد جديد */
+function gInduction(lvl){
+  var keys=Object.keys(CATS), c=gp(keys), pool=shuffle(CATS[c].slice());
+  var shown=pool.slice(0,3), correct=pool[3];
+  if(!correct) return null;
+  var cand=[]; keys.forEach(function(k){ if(k!==c) cand=cand.concat(CATS[k]); });
+  var o=optS(correct,cand);
+  return ["جمع سعد في سلّته: "+shown.join("، ")+". وعليه فإنّ ممّا يمكن أن يضيفه ......",
+    o[0],o[1],shown.join("، ")+" و"+correct+" كلّها من «"+c+"».","ind:"+c];
+}
+
+/* ٣) الاستقراء — أدوات تدلّ على غرض */
+var PURP=[
+ {it:["قِدر","ملعقة","سكين"],        p:"طهي الطعام"},
+ {it:["قلم","دفتر","ممحاة"],          p:"الكتابة"},
+ {it:["منشار","مطرقة","مسمار"],       p:"النجارة"},
+ {it:["صابون","ماء","إسفنجة"],        p:"التنظيف"},
+ {it:["إبرة","خيط","قماش"],           p:"الخياطة"},
+ {it:["كرة","حذاء رياضي","ملعب"],     p:"ممارسة الرياضة"},
+ {it:["بذور","تربة","مِرَشّة"],        p:"الزراعة"},
+ {it:["فرشاة","ألوان","لوحة"],        p:"الرسم"}
+];
+function gPurpose(lvl){
+  var s=gp(PURP), cand=PURP.filter(function(x){return x.p!==s.p;}).map(function(x){return x.p;});
+  var o=optS(s.p,cand);
+  return ["أحضر خالد إلى بيته: "+shuffle(s.it.slice()).join("، ")+". وعليه فإنّه يريد ......",
+    o[0],o[1],"هذه الأدوات كلّها تُستخدم في "+s.p+".","pur:"+s.p];
+}
+
+/* ٤) اختيار العبارة الصحيحة منطقيًا */
+var MADE=[["العطر","الزهور"],["العصير","البرتقال"],["الخبز","القمح"],["الجبن","الحليب"],
+          ["الورق","الشجر"],["الزيت","الزيتون"],["السكّر","القصب"],["الحرير","دودة القز"]];
+var USED=[["الغسّالة","غسل الملابس"],["الثلّاجة","حفظ الطعام"],["السبّورة","الكتابة في الفصل"],
+          ["النظّارة","تقوية النظر"],["السمّاعة","سماع الصوت"],["المروحة","تبريد الجوّ"],
+          ["الساعة","معرفة الوقت"],["المِمحاة","مسح الكتابة"]];
+function gTrueStat(lvl){
+  /* MADE كلّها مذكّرة و USED كلّها مؤنّثة، فيستقيم الفعل مع الفاعل */
+  var isMade=Math.random()<0.5, T=isMade?MADE:USED, verb=isMade?"يُصنع من":"تُستخدم في";
+  var map={}; T.forEach(function(p){ map[p[0]]=p[1]; });
+  var pairs=shuffle(T.slice()).slice(0,4), right=pairs[0];
+  if(pairs.length<4) return null;
+  var correct=right[0]+" "+verb+" "+right[1], cand=[];
+  /* إزاحة دائرية: كل مشتّت يأخذ خبر عبارة أخرى، فتتنوّع الأخبار ولا يتكرّر خبر الإجابة */
+  for(var i=1;i<4;i++){
+    var j = (i===3)?1:(i+1);
+    if(map[pairs[i][0]]!==pairs[j][1]) cand.push(pairs[i][0]+" "+verb+" "+pairs[j][1]);
+  }
+  if(cand.length<3) return null;
+  var o=optS(correct,cand);
+  return ["أيّ العبارات التالية صحيحة؟",o[0],o[1],"الصحيح: "+correct+".","ts:"+right[0]];
+}
+
+/* ٥) تناسب */
+function gRatio(lvl){
+  var per=gp([2,3]), t1=gp([2,3]), t2=t1+ri(2,4), a=per*t1, correct=per*t2;
+  var o=opt3(correct,[correct+per,correct-per,a+t2]);
+  return ["يجلس "+a+" أشخاص على "+(t1===2?"طاولتين":(t1+" طاولات"))+" بالتساوي. كم شخصًا يجلس على "+t2+" طاولات؟",
+    o[0],o[1],a+" ÷ "+t1+" = "+per+" لكلّ طاولة، و"+per+" × "+t2+" = "+correct+"."];
+}
+
+/* ٦) معدّل وزمن */
+function gRate(lvl){
+  var n=ri(3,5), t1=gp([10,12,15,20]), k=gp([2,3,4]), t2=t1*k, correct=n*k;
+  var o=opt3(correct,[correct+n,correct-n,n+k]);
+  return ["يمرّ قطار بـ"+n+" محطات كلّ "+t1+" دقيقة. كم محطة يمرّ بها خلال "+t2+" دقيقة؟",
+    o[0],o[1],t2+" ÷ "+t1+" = "+k+"، و"+n+" × "+k+" = "+correct+" محطة."];
+}
+
+/* ٧) الترتيب في صفّ */
+var ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع","الثامن","التاسع","العاشر"];
+function gLineOrder(lvl){
+  var a=ri(3,8), b=ri(3,8), correct=a+b-1, nm=gp(["سالم","خالد","فهد","ياسر","بدر"]);
+  var o=opt3(correct,[a+b,correct-1,a*b]);
+  return ["يقف "+nm+" في صفّ، ترتيبه "+ORD[a-1]+" من الأمام و"+ORD[b-1]+" من الخلف. كم عدد الطلاب في الصفّ؟",
+    o[0],o[1],a+" + "+b+" − 1 = "+correct+"، ونطرح 1 لأنّ "+nm+" حُسِب مرّتين."];
+}
+
+/* ٨) تقريب الأعداد */
+function gRound(lvl){
+  var unit = (lvl>=2 && Math.random()<0.5) ? 1000 : 100, h=unit/2;
+  var base = ri(2,9)*unit;
+  var correct = base + ri(1,h-1);
+  var d1 = base + unit + ri(1,h-1);
+  var d2 = base - unit - ri(1,h-1);
+  var d3 = base + h + ri(1,h-1);
+  var o=opt3(correct,[d1,d2,d3]);
+  return ["أيّ الأعداد التالية يصبح "+base+" عند تقريبه لأقرب "+(unit===100?"مئة":"ألف")+"؟",
+    o[0],o[1],correct+" أقرب إلى "+base+" من غيره، لأنّ باقيه أقلّ من "+h+"."];
+}
+
+/* ٩) مقارنة نواتج العمليات */
+function gCompareOps(lvl){
+  var m = lvl>=3?200:60, ops=[], seen={}, t=0;
+  while(ops.length<4 && t<300){
+    t++;
+    var a=ri(10,m), b=ri(2,Math.floor(m/2)), plus=Math.random()<0.5, v=plus?a+b:a-b;
+    if(v<=0||seen[v]) continue; seen[v]=1;
+    ops.push({t:a+(plus?" + ":" − ")+b, v:v});
+  }
+  if(ops.length<4) return null;
+  var vals=ops.map(function(x){return x.v;}), texts=ops.map(function(x){return x.t;});
+  var want = Math.random()<0.5?"أكبر":"أصغر";
+  var target = want==="أكبر"?Math.max.apply(null,vals):Math.min.apply(null,vals);
+  var idx=vals.indexOf(target);
+  return ["أيّ العمليات التالية ناتجها "+want+"؟",texts,idx,"ناتجها "+target+"، وهو ال"+want+".","ops:"+texts.join("|")];
+}
+
+/* ١٠) الموازين المتزنة */
+function gBalance(lvl){
+  var tw=gp([2,3,4,5,6,8,10]), nTri=ri(1,3), total=nTri*tw, divs=[];
+  for(var d=1;d<=6;d++){ if(total%d===0 && total/d<=20) divs.push(d); }
+  if(!divs.length) return null;
+  var nSq=gp(divs), sw=total/nSq;
+  var o=opt3(tw,[tw+1,tw-1,sw]);
+  var left=new Array(nTri+1).join("🔺"), right=new Array(nSq+1).join("🟦");
+  return ["الميزان متّزن ⚖️<br><span style=\"font-size:1.45rem;letter-spacing:2px\">"+left+" &nbsp;⚖️&nbsp; "+right+"</span><br>إذا كان وزن 🟦 يساوي "+sw+" جرامًا، فما وزن 🔺؟",
+    o[0],o[1],nSq+" × "+sw+" = "+total+" جرام في الكفّة، و"+total+" ÷ "+nTri+" = "+tw+" جرامًا لكلّ مثلّث."];
+}
+
+/* ١١) العدد المختلف: أوّلي بين غير أوّلية */
+function isPrime(n){ if(n<2) return false; for(var d=2;d*d<=n;d++){ if(n%d===0) return false; } return true; }
+function gPrimeOdd(lvl){
+  var comp=[], seen={}, t=0;
+  while(comp.length<3 && t<300){ t++; var v=ri(4,60); if(isPrime(v)||seen[v]) continue; seen[v]=1; comp.push(v); }
+  if(comp.length<3) return null;
+  var p=0, t2=0; do{ p=ri(5,59); t2++; }while((!isPrime(p)||seen[p])&&t2<300);
+  if(!isPrime(p)||seen[p]) return null;
+  var nums=shuffle(comp.concat([p]));
+  return ["ما العدد المختلف عن البقيّة: "+nums.join("، ")+"؟",nums.slice(),nums.indexOf(p),
+    p+" عدد أوّلي، لا يقبل القسمة إلّا على 1 وعلى نفسه. والبقيّة أعداد غير أوّلية."];
+}
+
+/* ١٢) عدّ المثلّثات في شكل مرسوم */
+function gCountTri(lvl){
+  var k=ri(1, lvl>=2?4:3), total=(k+1)*(k+2)/2, lines="";
+  for(var i=1;i<=k;i++){
+    var x=(10+180*i/(k+1)).toFixed(1);
+    lines+='<line x1="100" y1="12" x2="'+x+'" y2="112" stroke="currentColor" stroke-width="2"/>';
+  }
+  var svg='<svg viewBox="0 0 200 124" width="190" height="118" style="display:block;margin:10px auto;color:var(--accent)">'+
+    '<polygon points="100,12 10,112 190,112" fill="none" stroke="currentColor" stroke-width="2.5"/>'+lines+'</svg>';
+  var o=opt3(total,[total+1,total-1,k+1]);
+  return ["كم مثلّثًا في الشكل التالي؟"+svg,o[0],o[1],
+    "الأجزاء الصغيرة "+(k+1)+"، ونضيف المثلّثات الناتجة من دمج الأجزاء المتجاورة، فيصير المجموع "+total+" مثلّثًا."];
+}
+
+/* ١٣) الكسر من شكل مظلّل */
+function gFraction(lvl){
+  function gcd(a,b){ return b?gcd(b,a%b):a; }
+  var n=gp([6,8,9]), kC=ri(1,n-1), g=gcd(kC,n), num=kC/g, den=n/g;
+  var used={}, alts=[], t=0; used[kC]=1;
+  while(alts.length<3 && t<200){ t++; var v=ri(1,n-1); if(used[v]) continue; used[v]=1; alts.push(v); }
+  if(alts.length<3) return null;
+  var cols = n===9?3:(n===6?3:(n===4?2:4)), rows=n/cols, cw=20;
+  function grid(sh){
+    var out="";
+    for(var i=0;i<n;i++){
+      var r=Math.floor(i/cols), c=i%cols;
+      out+='<rect x="'+(c*cw+1)+'" y="'+(r*cw+1)+'" width="'+(cw-2)+'" height="'+(cw-2)+
+           '" fill="'+(i<sh?"currentColor":"none")+'" stroke="currentColor" stroke-width="1.5"/>';
+    }
+    return '<svg viewBox="0 0 '+(cols*cw+2)+' '+(rows*cw+2)+'" height="'+(rows*cw+2)+
+           '" style="color:var(--accent);vertical-align:middle">'+out+'</svg>';
+  }
+  var o=optS(grid(kC), alts.map(grid));
+  return ["أيّ الأشكال التالية الجزء المظلّل فيه يساوي "+num+"/"+den+"؟",o[0],o[1],
+    "الشكل الصحيح فيه "+kC+" من "+n+" مظلّلة، و"+kC+"/"+n+" = "+num+"/"+den+".","frac:"+n+":"+kC];
+}
+
+/* ١٤) ترتيب ومقارنة */
+function gCompareAges(lvl){
+  var names=shuffle(["سالم","فارس","فهد","بدر","ياسر"]).slice(0,3);
+  var A=names[0],B=names[1],C=names[2], d=ri(2,4), askBig=Math.random()<0.5;
+  var correct=askBig?A:C;
+  var cand=[A,B,C].filter(function(x){return x!==correct;}).concat(["لا يمكن تحديده"]);
+  var o=optS(correct,cand);
+  return [A+" أكبر من "+B+" بـ"+d+" سنوات، و"+C+" أصغر من الجميع. فمن "+(askBig?"أكبرهم":"أصغرهم")+"؟",
+    o[0],o[1],
+    askBig ? (A+" أكبر من "+B+"، و"+C+" أصغر من الجميع، فيكون "+A+" هو الأكبر.")
+           : (C+" أصغر من الجميع كما نصّت المقدّمة."),
+    "age"];
+}
+
+var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle,
+               gRatio,gRate,gLineOrder,gRound,gCompareOps,gBalance,gPrimeOdd,gCountTri,gFraction,gCompareAges];
+var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
+               gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
 var VIS_GENS=[gVisual];
 function genN(gens,n){ var out=[],seen={},t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(lvl); }catch(e){ t++; continue; } t++; var _k=(q&&q[4])||(q&&q[0]); if(!q||seen[_k]) continue; seen[_k]=1; out.push(q); } return out; }
 var CFG={
-  math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · العدد المختلف · مسائل · ألغاز أعداد. <b>أسئلة جديدة كل مرة</b>."},
-  verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · إكمال جملة · تصنيف · تسلسل · أسماء الجموع. <b>أسئلة جديدة كل مرة</b>."},
+  math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · عدّ مثلّثات · كسور · تقريب · أعداد أوّلية · ترتيب في صفّ. <b>أسئلة جديدة كل مرة</b>."},
+  verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · تصنيف · تسلسل · استقراء · استدلال بمقدّمات خيالية · اختيار العبارة الصحيحة. <b>أسئلة جديدة كل مرة</b>."},
   gk:{gens:GK_GENS, mode:"choice", label:"كانجرو — معرفة عامة 🦘", intro:"🌍 معلومات عامة: علوم · جغرافيا · حيوانات · معلومات إسلامية بسيطة."},
   vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري: اختر الأيقونة التي تكمل العلاقة نفسها."}
 };
