@@ -669,6 +669,78 @@ function gMatrix(lvl){
     "في كلّ صفّ وكلّ عمود تظهر الأشكال الثلاثة مرّة واحدة، والناقص هنا هو "+correct+"."];
 }
 
+/* ===== المرايا وطيّ الورق ===== */
+function _grid(cells, cols, rows, cell, holes){
+  var c=cell||18, s="";
+  for(var r=0;r<rows;r++){ for(var k=0;k<cols;k++){
+    var on = cells.some(function(x){ return x[0]===r && x[1]===k; });
+    s+='<rect x="'+(k*c+1)+'" y="'+(r*c+1)+'" width="'+(c-2)+'" height="'+(c-2)+
+       '" fill="'+(on&&!holes?"currentColor":"none")+'" stroke="currentColor" stroke-width="1.2"/>';
+    if(on&&holes) s+='<circle cx="'+(k*c+c/2)+'" cy="'+(r*c+c/2)+'" r="'+(c*0.26)+'" fill="currentColor"/>';
+  } }
+  return s;
+}
+function _svg(inner, cols, rows, cell, h){
+  var c=cell||18;
+  return '<svg viewBox="0 0 '+(cols*c+2)+' '+(rows*c+2)+'" height="'+(h||60)+
+         '" style="color:var(--accent);vertical-align:middle;direction:ltr">'+inner+'</svg>';
+}
+function _key(cells){ return cells.map(function(x){ return x[0]*10+x[1]; }).sort(function(a,b){ return a-b; }).join(","); }
+
+/* ٢٩) صورة المرآة — يُتحقَّق أن الشكل لا يطابق صورته بأيّ دوران (وإلا فلا إجابة مميّزة) */
+function gMirror(lvl){
+  var rot=function(cs){ return cs.map(function(x){ return [x[1], 2-x[0]]; }); };
+  var mir=function(cs){ return cs.map(function(x){ return [x[0], 2-x[1]]; }); };
+  for(var t=0;t<80;t++){
+    var all=[]; for(var r=0;r<3;r++) for(var k=0;k<3;k++) all.push([r,k]);
+    var cells=shuffle(all).slice(0, ri(3,4));
+    var r1=rot(cells), r2=rot(r1), r3=rot(r2), m=mir(cells);
+    var rots=[_key(cells),_key(r1),_key(r2),_key(r3)];
+    if(rots.indexOf(_key(m))>=0) continue;              /* الشكل غير أصيل الانعكاس */
+    var opts=[m, cells, r1, r2];
+    var keys=opts.map(_key);
+    if(new Set(keys).size!==4) continue;
+    var svgs=opts.map(function(cs){ return _svg(_grid(cs,3,3),3,3); });
+    var o=optS(svgs[0], svgs.slice(1));
+    return ["أيّ الأشكال هو صورة هذا الشكل في مرآة رأسية؟<div style=\"margin:8px 0\">"+
+      _svg(_grid(cells,3,3),3,3,18,74)+"</div>", o[0], o[1],
+      "صورة المرآة تقلب اليمين واليسار ولا تُدير الشكل؛ فما كان في العمود الأيمن ينتقل إلى الأيسر.", "mir"];
+  }
+  return null;
+}
+
+/* ٣٠) طيّ الورق والثقب: تُطوى الورقة نصفين رأسيًّا ثم تُثقب، فما شكلها مفرودة؟ */
+function gPaperFold(lvl){
+  for(var t=0;t<60;t++){
+    var n=4, nh=(lvl>=2)?ri(1,2):1, half=[], seen={};
+    while(half.length<nh){
+      var r=ri(0,n-1), c=ri(0,1), k=r*10+c;
+      if(seen[k]) continue; seen[k]=1; half.push([r,c]);
+    }
+    var full=[];                                   /* الثقب وانعكاسه حول خطّ الطيّ */
+    half.forEach(function(h){ full.push([h[0],h[1]]); full.push([h[0], n-1-h[1]]); });
+    var wrong=[
+      half.slice(),                                /* بلا انعكاس */
+      full.map(function(h){ return [n-1-h[0], h[1]]; }),   /* انعكاس أفقيّ خاطئ */
+      half.map(function(h){ return [h[0], h[1]+2]; }).concat(half)   /* إزاحة بدل الانعكاس */
+    ];
+    var keys=[_key(full)].concat(wrong.map(_key));
+    if(new Set(keys).size!==4) continue;
+    var mk=function(cs){ return _svg(_grid(cs,n,n,16,true),n,n,16,66); };
+    var o=optS(mk(full), wrong.map(mk));
+    /* خطّ الطيّ يُرسم داخل الشكل على حافّته لا كنصّ بجانبه: في صفحة RTL ينقلب
+       ترتيب العنصرين فيصير السهم مشيرًا إلى الجهة الخطأ. */
+    var foldLine='<line x1="'+(2*16+1)+'" y1="0" x2="'+(2*16+1)+'" y2="'+(n*16+2)+
+      '" stroke="currentColor" stroke-width="2.5" stroke-dasharray="4 3"/>';
+    var fold=_svg(_grid(half,2,n,16,true)+foldLine,2,n,16,70);
+    return ["طُويت ورقة مربّعة نصفين حول الخطّ المنقّط، ثمّ ثُقبت كما في الشكل. فما شكلها بعد فردها؟"+
+      '<div style="margin:8px 0;text-align:center">'+fold+'</div>',
+      o[0], o[1],
+      "عند الفرد يظهر لكلّ ثقب ثقبٌ مقابل على الجهة الأخرى من خطّ الطيّ، فيصير العدد "+full.length+" ثقوب.", "fold"];
+  }
+  return null;
+}
+
 /* ===== ألغاز الاستنتاج: تُولَّد ثم يُتحقَّق من وحدانيّة حلّها قبل عرضها ===== */
 function permsOf(arr){
   if(arr.length<=1) return [arr.slice()];
@@ -744,7 +816,7 @@ var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle,
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
                gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
-var VIS_GENS=[gVisual,gCubeOpposite,gMatrix];
+var VIS_GENS=[gVisual,gCubeOpposite,gMatrix,gMirror,gPaperFold];
 /* اسم عربي لكل مولّد — يُخزَّن مع النتيجة ليصير التقرير على مستوى المهارة لا القسم */
 var SKILL_AR={
   gPattern:"أنماط عددية", gOdd:"العدد المختلف", gDist:"توزيع بالقسمة", gSave:"ضرب متكرر",
@@ -761,7 +833,8 @@ var SKILL_AR={
   gPicEquation:"معادلات بالصور", gPaths:"عدّ المسارات", gTrap:"فخّ منطقي",
   gWeekday:"أيام الأسبوع", gUnitAnalogy:"تناظر الوحدات",
   gCubeOpposite:"طيّ المكعّب", gMatrix:"مصفوفة بصرية",
-  gElimination:"الاستنتاج بالاستبعاد", gOrderConstraints:"الترتيب من قيود"
+  gElimination:"الاستنتاج بالاستبعاد", gOrderConstraints:"الترتيب من قيود",
+  gMirror:"صورة المرآة", gPaperFold:"طيّ الورق"
 };
 function genN(gens,n){
   var out=[],seen={},t=0;
@@ -781,7 +854,7 @@ var CFG={
   math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · معادلات بالصور · عدّ مسارات · فخّ منطقي · كسور · أعداد أوّلية. <b>أسئلة جديدة كل مرة</b>."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · تصنيف · تسلسل · استقراء · استدلال بمقدّمات خيالية · اختيار العبارة الصحيحة. <b>أسئلة جديدة كل مرة</b>."},
   gk:{gens:GK_GENS, mode:"choice", label:"كانجرو — معرفة عامة 🦘", intro:"🌍 معلومات عامة: علوم · جغرافيا · حيوانات · معلومات إسلامية بسيطة."},
-  vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري · مصفوفات · طيّ المكعّب. <b>أسئلة جديدة كل مرة</b>."}
+  vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري · مصفوفات · طيّ المكعّب · صورة المرآة · طيّ الورق والثقب. <b>أسئلة جديدة كل مرة</b>."}
 };
 
 var app = document.getElementById("app");
