@@ -546,13 +546,137 @@ function gCountSquares(lvl){
     "مربّعات 1×1 عددها "+(n*n)+"، ثمّ نضيف المربّعات الأكبر المكوّنة منها، فيصير المجموع "+total+" مربّعًا."];
 }
 
+/* ===== دفعة الاختبارات التجريبية ١١+ من الكتاب (كمّي ومكاني) ===== */
+
+/* ٢٠) معادلات بالصور: رمزان بقيمتين ومعادلتان */
+function gPicEquation(lvl){
+  var pair=gp([["🏀","⚽"],["🍎","🍌"],["⭐","🔷"],["🐢","🐇"],["🔴","🟡"]]);
+  var A=pair[0], B=pair[1], a=ri(2,9), b=ri(2,9);
+  if(a===b) b = (b%9)+1;
+  var askA = Math.random()<0.5, correct = askA?a:b;
+  var o=opt3(correct,[correct+1,correct-1,askA?b:a]);
+  var eq='<div style="direction:ltr;font-size:1.25rem;line-height:2.1;margin:8px 0">'+
+    A+' + '+B+' + '+B+' = '+(a+2*b)+'<br>'+A+' + '+B+' = '+(a+b)+'</div>';
+  return ["إذا كان:"+eq+"فما قيمة "+(askA?A:B)+"؟",o[0],o[1],
+    "بطرح المعادلة الثانية من الأولى: "+B+" = "+(a+2*b)+" − "+(a+b)+" = "+b+"، ومنها "+A+" = "+a+"."];
+}
+
+/* ٢١) عدّ المسارات — مبدأ الضرب */
+function gPaths(lvl){
+  var n1=ri(2,4), n2=ri(2,4), correct=n1*n2;
+  var arcs=function(x1,x2,n,base){
+    var s="";
+    for(var i=0;i<n;i++){
+      var dy=(i-(n-1)/2)*13;
+      s+='<path d="M'+x1+',40 Q'+((x1+x2)/2)+','+(40+dy*1.8)+' '+x2+',40" fill="none" stroke="'+base+'" stroke-width="2"/>';
+    }
+    return s;
+  };
+  var svg='<svg viewBox="0 0 260 80" width="270" style="display:block;margin:10px auto;direction:ltr">'+
+    arcs(40,130,n1,"#f97316")+arcs(130,220,n2,"#7c3aed")+
+    '<circle cx="40" cy="40" r="16" fill="#0ea5e9"/><circle cx="130" cy="40" r="16" fill="#f472b6"/><circle cx="220" cy="40" r="16" fill="#22c55e"/>'+
+    '<text x="40" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">أ</text>'+
+    '<text x="130" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">ب</text>'+
+    '<text x="220" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">ج</text></svg>';
+  var o=opt3(correct,[n1+n2,correct+1,correct-1]);
+  return ["من (أ) إلى (ب) "+n1+" طرق، ومن (ب) إلى (ج) "+n2+" طرق. فكم طريقًا من (أ) إلى (ج)؟"+svg,
+    o[0],o[1],"لكلّ طريق من الأولى نختار أيًّا من طرق الثانية: "+n1+" × "+n2+" = "+correct+" طريقًا."];
+}
+
+/* ٢٢) فخّ منطقي: التزامن لا يضاعف الزمن */
+function gTrap(lvl){
+  var t=gp([
+    {q:function(n){ return "فترة حمل الفأر الواحد "+n+" يومًا. فكم تكون فترة حمل توأم من الفئران؟"; },
+     e:function(n){ return "التوأم يحملان في الوقت نفسه، فالمدّة تبقى "+n+" يومًا ولا تتضاعف."; }, lo:14, hi:22},
+    {q:function(n){ return "تُطبخ البيضة الواحدة في "+n+" دقائق. فكم تحتاج ثلاث بيضات تُطبخ معًا في القِدر نفسه؟"; },
+     e:function(n){ return "تُطبخ الثلاث في وقت واحد، فالزمن يبقى "+n+" دقائق."; }, lo:4, hi:9},
+    {q:function(n){ return "تحترق الشمعة في "+n+" دقيقة. فكم تستغرق شمعتان تُشعلان معًا؟"; },
+     e:function(n){ return "الشمعتان تحترقان في الوقت نفسه، فالزمن يبقى "+n+" دقيقة."; }, lo:20, hi:60}
+  ]);
+  var n=ri(t.lo,t.hi);
+  var o=opt3(n,[n*2,n*3,Math.round(n/2)]);
+  return [t.q(n),o[0],o[1],t.e(n)];
+}
+
+/* ٢٣) أيام الأسبوع بعد عدد من الأيام */
+var WDAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+function gWeekday(lvl){
+  var i=ri(0,6), n=ri(9,60), j=(i+n)%7, correct=WDAYS[j];
+  var o=optS(correct, WDAYS.filter(function(d){ return d!==correct; }));
+  return ["إذا كان اليوم هو "+WDAYS[i]+"، فبعد "+n+" يومًا سيكون يوم:",o[0],o[1],
+    n+" ÷ 7 باقيها "+(n%7)+"، فنعدّ "+(n%7)+" يومًا بعد "+WDAYS[i]+" فنصل إلى "+correct+"."];
+}
+
+/* ٢٤) تناظر الوحدات */
+var UNITS=[[12,"شهر","سنة"],[7,"يوم","أسبوع"],[60,"دقيقة","ساعة"],[24,"ساعة","يوم"],
+           [100,"سنة","قرن"],[10,"سنوات","عقد"],[1000,"غرام","كيلوغرام"],[100,"سنتيمتر","متر"]];
+function gUnitAnalogy(lvl){
+  var u=gp(UNITS), correct=u[2];
+  var o=optS(correct, UNITS.filter(function(x){ return x[2]!==correct; }).map(function(x){ return x[2]; }));
+  return ["أكمل بالعلاقة نفسها:  1 : "+u[0]+"   مثل   "+u[1]+" : ؟",o[0],o[1],
+    "في الـ"+u[2]+" الواحد "+u[0]+" "+u[1]+"."];
+}
+
+/* ٢٥) طيّ المكعب: أيّ وجهين متقابلان في المخطط الصليبي */
+function gCubeOpposite(lvl){
+  var S=shuffle(["🔺","🔵","⭐","🟩","🟣","🔶"]).slice(0,6);
+  /* المخطط:      S0
+                S1 S2 S3
+                  S4
+                  S5        المتقابلات: S0–S4 · S1–S3 · S2–S5 */
+  var pairs=[[0,4],[1,3],[2,5]];
+  var right=gp(pairs), correct=S[right[0]]+" و "+S[right[1]];
+  var wrong=[], t=0;
+  while(wrong.length<3 && t<200){
+    t++;
+    var a=ri(0,5), b=ri(0,5);
+    if(a===b) continue;
+    var isPair=pairs.some(function(p){ return (p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a); });
+    if(isPair) continue;
+    var s=S[a]+" و "+S[b];
+    if(wrong.indexOf(s)<0) wrong.push(s);
+  }
+  if(wrong.length<3) return null;
+  var o=optS(correct,wrong);
+  var c=34, cell=function(col,row,sym){
+    return '<rect x="'+(col*c+2)+'" y="'+(row*c+2)+'" width="'+(c-4)+'" height="'+(c-4)+'" fill="none" stroke="currentColor" stroke-width="2"/>'+
+           '<text x="'+(col*c+c/2)+'" y="'+(row*c+c/2+7)+'" text-anchor="middle" font-size="17">'+sym+'</text>';
+  };
+  var svg='<svg viewBox="0 0 '+(3*c+4)+' '+(4*c+4)+'" height="'+(4*c+4)+'" style="display:block;margin:10px auto;color:var(--accent);direction:ltr">'+
+    cell(1,0,S[0])+cell(0,1,S[1])+cell(1,1,S[2])+cell(2,1,S[3])+cell(1,2,S[4])+cell(1,3,S[5])+'</svg>';
+  return ["عند طيّ هذا المخطّط ليصير مكعّبًا، أيّ شكلين يقعان على وجهين متقابلين؟"+svg,
+    o[0],o[1],"في المخطّط الصليبي يتقابل الوجهان اللذان يفصل بينهما وجه واحد: "+correct+"."];
+}
+
+/* ٢٦) مصفوفة بصرية ٣×٣ — كل صفّ وكل عمود فيه الأشكال الثلاثة */
+function gMatrix(lvl){
+  var E=shuffle(["🔴","🟡","🔵","🟢","🟣","🟠"]).slice(0,3);
+  var extra=gp(["⬛","⭐","🔺","💠"]);
+  var hr=ri(0,2), hc=ri(0,2), correct=E[(hr+hc)%3];
+  var rows="";
+  for(var r=0;r<3;r++){
+    var cells="";
+    for(var c2=0;c2<3;c2++){
+      var isHole=(r===hr&&c2===hc);
+      cells+='<td style="border:1.5px solid var(--line);width:44px;height:44px;text-align:center;font-size:1.35rem">'+
+             (isHole?'<span style="color:var(--accent);font-weight:800">؟</span>':E[(r+c2)%3])+'</td>';
+    }
+    rows+='<tr>'+cells+'</tr>';
+  }
+  var tbl='<table style="border-collapse:collapse;margin:10px auto;direction:ltr">'+rows+'</table>';
+  var o=optS(correct, E.filter(function(x){ return x!==correct; }).concat([extra]));
+  return ["ما الشكل الذي يكمل المجموعة؟"+tbl,o[0],o[1],
+    "في كلّ صفّ وكلّ عمود تظهر الأشكال الثلاثة مرّة واحدة، والناقص هنا هو "+correct+"."];
+}
+
 var MATH_GENS=[gPattern,gOdd,gDist,gSave,gShare,gPuzzle,
                gRatio,gRate,gLineOrder,gRound,gCompareOps,gBalance,gPrimeOdd,gCountTri,gFraction,gCompareAges,
-               gTableRow,gBarChart,gDigitCount,gBiggestNumber,gCountSquares];
+               gTableRow,gBarChart,gDigitCount,gBiggestNumber,gCountSquares,
+               gPicEquation,gPaths,gTrap,gWeekday,gUnitAnalogy];
 var VERB_GENS=[gAnalogy,gComplete,gCategory,gSequence,gCollective,
                gCounterfactual,gInduction,gPurpose,gTrueStat];
 var GK_GENS=[gGK];
-var VIS_GENS=[gVisual];
+var VIS_GENS=[gVisual,gCubeOpposite,gMatrix];
 /* اسم عربي لكل مولّد — يُخزَّن مع النتيجة ليصير التقرير على مستوى المهارة لا القسم */
 var SKILL_AR={
   gPattern:"أنماط عددية", gOdd:"العدد المختلف", gDist:"توزيع بالقسمة", gSave:"ضرب متكرر",
@@ -565,7 +689,10 @@ var SKILL_AR={
   gAnalogy:"التناظر اللفظي", gComplete:"إكمال الجملة", gCategory:"التصنيف", gSequence:"التسلسل",
   gCollective:"أسماء الجموع", gCounterfactual:"مقدّمات خيالية", gInduction:"الاستقراء",
   gPurpose:"استقراء الغرض", gTrueStat:"العبارة الصحيحة",
-  gGK:"معرفة عامة", gVisual:"تناظر بصري"
+  gGK:"معرفة عامة", gVisual:"تناظر بصري",
+  gPicEquation:"معادلات بالصور", gPaths:"عدّ المسارات", gTrap:"فخّ منطقي",
+  gWeekday:"أيام الأسبوع", gUnitAnalogy:"تناظر الوحدات",
+  gCubeOpposite:"طيّ المكعّب", gMatrix:"مصفوفة بصرية"
 };
 function genN(gens,n){
   var out=[],seen={},t=0;
@@ -582,10 +709,10 @@ function genN(gens,n){
   return out;
 }
 var CFG={
-  math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · عدّ مثلّثات · كسور · تقريب · أعداد أوّلية · ترتيب في صفّ. <b>أسئلة جديدة كل مرة</b>."},
+  math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · معادلات بالصور · عدّ مسارات · فخّ منطقي · كسور · أعداد أوّلية. <b>أسئلة جديدة كل مرة</b>."},
   verb:{gens:VERB_GENS, mode:"choice", label:"كانجرو — استدلال لغوي 🦘", intro:"🧩 تناظر · تصنيف · تسلسل · استقراء · استدلال بمقدّمات خيالية · اختيار العبارة الصحيحة. <b>أسئلة جديدة كل مرة</b>."},
   gk:{gens:GK_GENS, mode:"choice", label:"كانجرو — معرفة عامة 🦘", intro:"🌍 معلومات عامة: علوم · جغرافيا · حيوانات · معلومات إسلامية بسيطة."},
-  vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري: اختر الأيقونة التي تكمل العلاقة نفسها."}
+  vis:{gens:VIS_GENS, mode:"choice", label:"كانجرو — فهم الصور 🦘", intro:"👁️ تناظر بصري · مصفوفات · طيّ المكعّب. <b>أسئلة جديدة كل مرة</b>."}
 };
 
 var app = document.getElementById("app");
