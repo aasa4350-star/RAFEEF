@@ -68,6 +68,7 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="reading-bank.js"></script>
+<script src="reading-xq.js"></script>
 <script src="vocab-bank.js"></script>
 <script>
 const META = {
@@ -753,6 +754,14 @@ if(!META[who] || !DATA[who]){
     ["ضرورية","لا يُستغنى عنها"], ["الطاقة","القوّة التي تحرّك الأشياء"],
     ["الصحراء","أرض واسعة رمليّة قليلة الماء"], ["مفيدة","تنفع صاحبها"], ["الأسرة","الأب والأمّ والأولاد"]
   ];
+  /* أسئلة مؤلّفة يدويًا (الفكرة الرئيسة / الاستنتاج / المثل) — من reading-xq.js */
+  function xqAuthored(passage){
+    var X = window.READING_XQ;
+    if(!X) return [];
+    var list = X[String(passage||"").slice(0,30)];
+    if(!list || !list.length) return [];
+    return shuffle(list.slice()).slice(0,2);   /* اثنان كحدّ أقصى حتى لا يطول الاختبار */
+  }
   function xqMeaning(passage, ar){
     var p = String(passage||"");
     if(ar){
@@ -794,7 +803,7 @@ if(!META[who] || !DATA[who]){
     var list = D.pass || [[D.passage, D.questions]];
     var chosen = list[pickIndex(list.length, "read_"+curLang)];
     var passage = chosen[0], questions = chosen[1];
-    questions = questions.concat(xqMeaning(passage, ar));  /* نضيف سؤال معنى كلمة من السياق */
+    questions = questions.concat(xqAuthored(passage)).concat(xqMeaning(passage, ar));
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
