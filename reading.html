@@ -758,7 +758,7 @@ if(!META[who] || !DATA[who]){
   function xqAuthored(passage){
     var X = window.READING_XQ;
     if(!X) return [];
-    var list = X[String(passage||"").slice(0,30)];
+    var list = X[String(passage||"")];   /* المفتاح النصّ الكامل — البادئة تلتبس بين قطع متشابهة */
     if(!list || !list.length) return [];
     return shuffle(list.slice()).slice(0,2);   /* اثنان كحدّ أقصى حتى لا يطول الاختبار */
   }
