@@ -288,6 +288,18 @@ function saveScore(test, correct, total, extra){
   }catch(e){}
 }
 
+/* نوع سؤال الاستيعاب — مستخرج من تصنيف كتاب موهبة نفسه، ليصير التقرير
+   على مستوى المهارة: هل ضعفه في فهم المعنى أم في الاستنتاج أم في التقاط المعلومة. */
+function compSkill(qt){
+  var s = String(qt || "");
+  if(/ما معنى|معنى كلمة|مرادف|mean(s|ing)?\b|synonym|closest to/i.test(s)) return "معنى كلمة من السياق";
+  if(/الفكرة الرئيس|العنوان المناسب|main idea|best title/i.test(s)) return "الفكرة الرئيسة";
+  if(/المثل|مثل يناسب|proverb/i.test(s)) return "المثل المناسب";
+  if(/نستنتج|نفهم من|يمكن أن|infer|probably|most likely/i.test(s)) return "الاستنتاج";
+  if(/تدلّ|تدل على|يدلّ على|refers to|indicates?/i.test(s)) return "دلالة كلمة";
+  return "معلومة صريحة من النصّ";
+}
+
 // ===== كشف الخروج من الصفحة أثناء الحل (استعانة بمترجم/تطبيق ثاني) =====
 var AWAY = { total:0, exits:0, hiddenAt:null, onReturn:null };
 // أثناء استخدام المايك (إملاء لوحة المفاتيح أو تقييم Azure) يخفي الآيفون الصفحة لحظة — لا نحسبها خروجًا
@@ -777,8 +789,10 @@ if(!META[who] || !DATA[who]){
     // قراءة القطعة عبر Azure فقط (🎙️ قيّم نطقي) — التسجيل المستمر يفتح الأسئلة بعد القراءة
     var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true); }); }
     var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
+    var skills={};   /* تسجيل تفصيلي حسب نوع سؤال الاستيعاب */
+    function markComp(i, ok){ var g=compSkill(questions[i][0]); var s2=skills[g]||(skills[g]={c:0,t:0}); s2.t++; if(ok) s2.c++; }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills}); }
     sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
@@ -787,7 +801,8 @@ if(!META[who] || !DATA[who]){
           if(!unlocked) return;
           if(ans[i]!=null) return; ans[i]=+btn.dataset.j;
           qEl.querySelectorAll(".opts button").forEach(function(b){b.disabled=true;});
-          if(+btn.dataset.j===right){ btn.classList.add("correct"); correct++; }
+          var okC=(+btn.dataset.j===right); markComp(i, okC);
+          if(okC){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); var rb=qEl.querySelector('.opts button[data-j="'+right+'"]'); if(rb) rb.classList.add("correct"); }
           scoreEl.textContent="الفهم: "+correct+" / "+total;
           // صف اختبار نطق السؤال (يظهر بعد الإجابة): استمع + قيّم نطقي
@@ -801,7 +816,7 @@ if(!META[who] || !DATA[who]){
             var qlb=qrow.querySelector("[data-qlisten]"); if(qlb) qlb.addEventListener("click",function(){ speak(qtext,1,ar?"ar-SA":"en-US"); });
             var qaz=qrow.querySelector(".azbtn"), qfb=qrow.querySelector(".pfb2"); if(qaz) qaz.addEventListener("click",function(){ azureAssess(qtext, ar, qfb, qaz); });
           }
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills}); }
         });
       });
     });
