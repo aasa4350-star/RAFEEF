@@ -864,6 +864,7 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · مهارات التفكير</p><h1>🦘 مهارات التفكير — '+name+'</h1></header>'+
     '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
+    '<div id="plan" style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:10px;box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between"></div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="math" aria-selected="true">🔢 استدلال رياضي</button>'+
       '<button data-tab="verb" aria-selected="false">🧩 استدلال لغوي</button>'+
@@ -951,7 +952,39 @@ if(!NAMES[who]){
       savePartial(); render(kind);
     });
   }
-  render("math");
+  // ===== البند ١: خطة اليوم — قسمان بالتناوب (ثابتان خلال اليوم، يدوران كل يوم) =====
+  var LABELS={math:"🔢 استدلال رياضي",verb:"🧩 استدلال لغوي",gk:"🌍 معرفة عامة",vis:"👁️ فهم الصور"};
+  var PLAN=[["math","verb"],["verb","vis"],["vis","math"],["math","gk"],["verb","gk"],["vis","gk"]];
+  var dayNum=Math.floor((Date.now()+3*3600000)/86400000);        // يوم السعودية
+  var todays=PLAN[dayNum % PLAN.length];
+  // نبرز قسمَي اليوم في التبويبات
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    if(todays.indexOf(b.dataset.tab)>=0){ b.textContent="⭐ "+b.textContent; b.style.outline="2px solid var(--accent)"; }
+  });
+
+  // ===== البند ٢: ميزانية وقت الجلسة (سعود/أسامة ١٠-١٢ د · رفيف/حسن ١٥-٢٠ د) =====
+  var YOUNG=(who==="saud"||who==="osama");
+  var softMin=YOUNG?10:15, hardMin=YOUNG?12:20;
+  var t0=Date.now(), doseDone=false;
+  var planEl=document.getElementById("plan");
+  function renderPlan(){
+    var el=Math.floor((Date.now()-t0)/60000), sec=Math.floor(((Date.now()-t0)%60000)/1000);
+    var clock=el+":"+String(sec).padStart(2,"0");
+    var col=el>=hardMin?"var(--bad)":(el>=softMin?"#d97706":"var(--muted)");
+    var timeHtml='<span style="font-weight:800;color:'+col+'">⏱️ '+clock+' / '+hardMin+' د</span>';
+    if(el>=hardMin && !doseDone){ doseDone=true; }
+    var note = doseDone ? '<span style="color:var(--bad);font-weight:800">🎉 كفاية اليوم — خلّصت جرعتك، ارتاح وباجر نكمّل</span>'
+             : (el>=softMin ? '<span style="color:#d97706;font-weight:700">قربت تخلّص — أنهِ جولتك الحالية</span>' : '');
+    planEl.innerHTML='<span style="font-weight:800">📅 خطة اليوم: <span style="color:var(--accent)">'+LABELS[todays[0]]+'</span> + <span style="color:var(--accent)">'+LABELS[todays[1]]+'</span></span>'+
+      '<span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+note+timeHtml+'</span>';
+  }
+  renderPlan(); setInterval(renderPlan, 1000);
+
+  // نبدأ بأول قسم في خطة اليوم بدل «رياضي» دائمًا
+  document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+  document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected", String(x.dataset.tab===todays[0])); });
+  document.getElementById(todays[0]).classList.add("active");
+  render(todays[0]);
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
       var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();

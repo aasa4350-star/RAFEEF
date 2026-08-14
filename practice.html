@@ -589,59 +589,78 @@ if(document.getElementById("o")) (function(){
 
 // ===== قسم علاجي — يشرح نقاط ضعف القدرات الكمي والتحصيلي وSTEP + فيديو + تدريب =====
 function pickBank(arr, rx){ var f = arr.filter(function(x){ return rx.test(x[0]+" "+(x[3]||"")); }); return (f.length?gp(f):gp(arr)).slice(); }
+// keys: أسماء المهارات في meta.skills التي يغطّيها هذا الدرس — بها نقيس نسبة إتقانه
+// (البند ٤ من الجرعة: الفيديو يظهر فقط للمهارة تحت ٥٠٪).
 var SKILLS = [
   // ---- كمي ----
   {group:"كمي", name:"النسبة المئوية والخصم والربح", rx:/%|مئوي|خصم|ربح|زاد سعر|نقص سعر|السعر/, yt:"شرح النسبة المئوية قدرات كمي",
+   keys:["النسبة المئوية","نسبة الزيادة","نسبة النقص","الربح والخسارة","الخصم"],
    lesson:"النسبة المئوية = (الجزء ÷ الكل) × 100. لإيجاد نسبة من عدد: (النسبة ÷ 100) × العدد. مثال: 20% من 50 = 10. الخصم: اطرح قيمة الخصم من السعر. الربح = سعر البيع − سعر الشراء.",
    gen:function(){ return QUANT[gp([0,8,18,21,22])](); }},
   {group:"كمي", name:"حل المعادلات", rx:/س \+|س −|قيمة س|معادلة/, yt:"حل المعادلات من الدرجة الأولى قدرات",
+   keys:["معادلة بسيطة"],
    lesson:"لعزل «س» انقل الأعداد للطرف الآخر بعكس العملية. مثال: 3س + 5 = 20 ← 3س = 15 ← س = 5.",
    gen:function(){ return QUANT[1](); }},
   {group:"كمي", name:"النسب والتناسب والتقسيم", rx:/النسبة|تناسب|نصيب/, yt:"النسبة والتناسب قدرات كمي",
+   keys:["التناسب","القسمة التناسبية","القسمة بالتساوي"],
    lesson:"النسبة أ:ب تعني لكل «أ» يقابلها «ب». أوجد قيمة الوحدة بقسمة الكل على مجموع الأجزاء. مثال: قسّم 30 بنسبة 2:3 ← الوحدة = 30÷5 = 6 ← 12 و18.",
    gen:function(){ return QUANT[gp([2,20])](); }},
   {group:"كمي", name:"الهندسة (مساحات ومحيطات وزوايا)", rx:/مساحة|محيط|مستطيل|مثلث|الوتر|دائرة|زاوية|قطر/, yt:"المساحات والمحيطات والزوايا قدرات",
+   keys:["مساحة المستطيل","محيط المستطيل","نظرية فيثاغورس","الزوايا المتكاملة","الزوايا المتتامة","مساحة الدائرة","محيط المربّع","مساحة المربّع","مساحة المثلّث","حجم الصندوق"],
    lesson:"مساحة المستطيل = الطول × العرض، ومحيطه = 2×(الطول+العرض). مساحة المثلث = ½ × القاعدة × الارتفاع. فيثاغورس: الوتر² = الضلع1² + الضلع2². المتكاملتان مجموعهما 180°، المتتامتان 90°.",
    gen:function(){ return QUANT[gp([4,5,6,13,14,15])](); }},
   {group:"كمي", name:"المتوسط والوسيط", rx:/متوسط|الوسيط/, yt:"المتوسط الحسابي والوسيط قدرات",
+   keys:["المتوسط الحسابي","الوسيط"],
    lesson:"المتوسط = مجموع القيم ÷ عددها. الوسيط = القيمة الوسطى بعد ترتيب الأعداد.",
    gen:function(){ return QUANT[gp([3,16])](); }},
   {group:"كمي", name:"المتتابعات والأنماط", rx:/النمط|متتالية|أكمل|متتابع/, yt:"المتتابعات والأنماط العددية قدرات",
+   keys:["أنماط عددية","أعداد متتالية","أنماط الأعداد الزوجية"],
    lesson:"اكتشف القاعدة (نجمع أو نضرب بمقدار ثابت) ثم طبّقها. مثال: 3، 6، 9، 12 ← نزيد 3 ← التالي 15.",
    gen:function(){ return QUANT[gp([7,17])](); }},
   {group:"كمي", name:"السرعة والزمن والأعمار", rx:/سرعة|كم\/ساعة|قطع|ينجز|عمر|أكبر من ابنه/, yt:"مسائل السرعة والزمن قدرات كمي",
+   keys:["السرعة والزمن","معدّل العمل","مسائل الأعمار"],
    lesson:"السرعة = المسافة ÷ الزمن. المعدل = المقدار ÷ الزمن. مسائل الأعمار: عبّر بالعلاقة بينهم ثم كوّن معادلة.",
    gen:function(){ return QUANT[gp([9,10,11])](); }},
   {group:"كمي", name:"الكسور من كمية والاحتمال", rx:/يساوي.*\/|احتمال|كسر/, yt:"الكسور والاحتمال قدرات كمي",
+   keys:["كسر من عدد","الاحتمالات","جمع الكسور"],
    lesson:"كسر من كمية: (الكمية ÷ المقام) × البسط. مثال: 3/4 من 20 = 15. الاحتمال = عدد الحالات المطلوبة ÷ العدد الكلي.",
    gen:function(){ return QUANT[gp([19,12])](); }},
-  // ---- تحصيلي ----
+  // ---- تحصيلي ---- (كل أسئلة الرياضيات في بنك التحصيلي تُسجَّل باسم واحد «رياضيات»)
   {group:"تحصيلي", name:"التحليل وفرق المربعين", rx:/حلّل|فرق مربعين/, yt:"تحليل فرق مربعين تحصيلي",
+   keys:["رياضيات"],
    lesson:"فرق مربعين: أ² − ب² = (أ−ب)(أ+ب). مثال: س² − 9 = (س−3)(س+3).",
    gen:function(){ return pickBank(TAHSILI,/حلّل/); }},
   {group:"تحصيلي", name:"ميل المستقيم", rx:/ميل|المستقيم/, yt:"ميل المستقيم تحصيلي",
+   keys:["رياضيات"],
    lesson:"ميل المستقيم y = mx + c هو m (معامل x). بين نقطتين: الميل = (فرق y) ÷ (فرق x).",
    gen:function(){ return pickBank(TAHSILI,/ميل/); }},
   {group:"تحصيلي", name:"الأسس والجذور", rx:/أس|²|³|√|قوة/, yt:"قوانين الأسس والجذور تحصيلي",
+   keys:["رياضيات"],
    lesson:"عند الضرب نجمع الأسس: أ^م × أ^ن = أ^(م+ن). أي عدد (عدا الصفر) أُس صفر = 1. الجذر √ عكس التربيع.",
    gen:function(){ return pickBank(TAHSILI,/أس|²|³|√/); }},
   {group:"تحصيلي", name:"الفيزياء (تحضيري)", rx:/فيزياء|القوة|الطاقة|الضغط|السرعة/, yt:"أساسيات الفيزياء تحصيلي",
+   keys:["فيزياء"],
    lesson:"السرعة = المسافة ÷ الزمن. القوة تُقاس بالنيوتن، والطاقة بالجول. الضغط = القوة ÷ المساحة.",
    gen:function(){ return pickBank(TAHSILI,/فيزياء/); }},
   {group:"تحصيلي", name:"الكيمياء (تحضيري)", rx:/كيمياء|عنصر|pH|ذرّة|الذرة|صيغة|أكسجين/, yt:"أساسيات الكيمياء تحصيلي",
+   keys:["كيمياء"],
    lesson:"الذرة أصغر وحدة في العنصر. الماء H₂O، وملح الطعام NaCl. الرقم الهيدروجيني pH=7 متعادل، أقل منه حمضي، أكثر قاعدي.",
    gen:function(){ return pickBank(TAHSILI,/كيمياء/); }},
   {group:"تحصيلي", name:"الأحياء (تحضيري)", rx:/أحياء|خلية|DNA|الجهاز|البناء الضوئي|الثغور/, yt:"أساسيات الأحياء تحصيلي",
+   keys:["أحياء"],
    lesson:"الخلية وحدة بناء الكائن الحي. البناء الضوئي هو صنع الغذاء في النبات. الحمض النووي DNA يحمل الصفات الوراثية.",
    gen:function(){ return pickBank(TAHSILI,/أحياء/); }},
   // ---- STEP ----
   {group:"STEP", name:"القواعد والأزمنة (Grammar)", rx:/Grammar/, yt:"عرفات القزعة شرح قواعد وأزمنة الانجليزي grammar",
+   keys:["Grammar"],
    lesson:"راجع الأزمنة: المضارع/الماضي/التام. «since» مع نقطة زمنية و«for» مع مدة. الماضي التام had + p.p. المبني للمجهول be + p.p.",
    gen:function(){ return pickBank(STEP,/Grammar/); }},
   {group:"STEP", name:"المفردات (Vocabulary)", rx:/Vocabulary|synonym|opposite/, yt:"عرفات القزعة مفردات وكلمات انجليزي مرادفات وأضداد",
+   keys:["Vocabulary"],
    lesson:"احفظ المرادفات والأضداد الشائعة. synonym = مرادف، وopposite/antonym = ضدّ. اقرأ كثيرًا لتوسيع حصيلتك.",
    gen:function(){ return pickBank(STEP,/Vocabulary/); }},
   {group:"STEP", name:"الأخطاء والاستيعاب (Error & Reading)", rx:/Error|Reading/, yt:"عرفات القزعة فهم المقروء والقواعد انجليزي reading",
+   keys:["Error","Reading"],
    lesson:"في الاستيعاب: اقرأ السؤال أولًا ثم ابحث عن الفكرة الرئيسة. في الخطأ النحوي: تأكّد من تطابق الفعل مع الفاعل والزمن.",
    gen:function(){ return pickBank(STEP,/Error|Reading/); }}
 ];
@@ -661,13 +680,15 @@ function renderMini(box, items){
     }); });
   });
 }
-function lessonCard(s, count, open){
+function lessonCard(s, stat, open){
   var idx = SKILLS.indexOf(s);
-  var badge = count>0 ? ' <span style="color:#dc2626;font-weight:800">(ضعف: '+count+')</span>' : '';
+  var badge = (stat && stat.t) ? ' <span style="color:#dc2626;font-weight:800">('+Math.round(stat.c/stat.t*100)+'% — '+stat.c+'/'+stat.t+')</span>' : '';
   var yt = 'https://www.youtube.com/results?search_query='+encodeURIComponent(s.yt);
+  /* البند ٤ من الجرعة: شاهد الفيديو (≈ ربع ساعة) ثم جولة فورًا في نفس المهارة. */
+  var guide = open ? '<div style="background:var(--bg);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:.9rem;font-weight:700;color:#dc2626">📺 شاهد الفيديو (≈ ربع ساعة)، وبعده مباشرة حُلّ الجولة تحت — في نفس المهارة.</div>' : '';
   return '<details '+(open?'open':'')+' style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
     '<summary style="font-weight:800;cursor:pointer;padding:8px 0">🎬 '+s.name+badge+'</summary>'+
-    '<div style="padding:4px 0 12px">'+
+    '<div style="padding:4px 0 12px">'+guide+
       '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9">'+s.lesson+'</div>'+
       '<div style="margin-top:10px"><a href="'+yt+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>'+
       '<button data-practice="'+idx+'" style="margin-top:10px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:9px 15px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit">✏️ تدرّب (3 أسئلة)</button>'+
@@ -683,22 +704,30 @@ async function renderRemedial(){
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
     rows = await r.json(); if(!Array.isArray(rows)) rows=[];
   }catch(e){}
-  // نأخذ آخر محاولتين فقط لكل اختبار (كمي/تحصيلي/STEP) — فالمهارة اللي يجاوبها صح لاحقًا تختفي تلقائيًا
-  var practice = rows.filter(function(x){ return x.meta && x.meta.kind==="practice" && Array.isArray(x.meta.wrong); });
-  var byTest={}, wrongs=[];
-  practice.forEach(function(x){ var t=x.meta.test||"?"; if(!byTest[t]) byTest[t]=0; if(byTest[t]<2){ byTest[t]++; (x.meta.wrong||[]).forEach(function(w){ wrongs.push(w); }); } });
-  var counts={};
-  wrongs.forEach(function(w){ for(var i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(w)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
-  var weak = SKILLS.filter(function(s){ return counts[s.name]; }).sort(function(a,b){ return counts[b.name]-counts[a.name]; });
+  // البند ٤: نقيس نسبة إتقان كل مهارة من meta.skills (آخر ٤ جلسات لكل اختبار)،
+  // والفيديو يظهر فقط للمهارة تحت ٥٠٪ (بحدّ أدنى ٣ أسئلة حتى يكون الرقم موثوقًا).
+  var practice = rows.filter(function(x){ return x.meta && x.meta.kind==="practice" && x.meta.skills && x.meta.trusted!==false && !/كلمات/.test(x.meta.test||""); });
+  var byTest={}, agg={};
+  practice.forEach(function(x){
+    var t=x.meta.test||"?"; byTest[t]=(byTest[t]||0)+1; if(byTest[t]>4) return;
+    Object.keys(x.meta.skills).forEach(function(nm){ var v=x.meta.skills[nm]; if(!v||!v.t) return;
+      var a=agg[nm]||(agg[nm]={c:0,t:0}); a.c+=(v.c||0); a.t+=v.t; });
+  });
+  function topicStat(s){ var c=0,t=0; (s.keys||[]).forEach(function(k){ if(agg[k]){ c+=agg[k].c; t+=agg[k].t; } }); return {c:c,t:t}; }
+  var WEAK=0.5, MINQ=3;
+  var weak = SKILLS.map(function(s){ return {s:s, st:topicStat(s)}; })
+    .filter(function(o){ return o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
+    .sort(function(a,b){ return (a.st.c/a.st.t)-(b.st.c/b.st.t); });
+  var measured = Object.keys(agg).length>0;
 
   var html='';
   if(weak.length){
-    html += '<div class="intro">🎯 <b>نقاط ضعفك الحالية فقط</b> (من آخر اختباراتك). <b>لما تجاوب المهارة صح في اختباراتك الجاية تختفي من هنا تلقائيًا ✅</b></div>';
-    weak.forEach(function(s){ html += lessonCard(s, counts[s.name], true); });
-  } else if(practice.length){
-    html += '<div class="intro">🎉 ما شاء الله! ما عندك ضعف حاليًا في القدرات/التحصيلي/STEP — جاوبت آخر اختباراتك صح. استمر 💪 (لو غلطت بأي مهارة لاحقًا تظهر لك هنا تلقائيًا مع الشرح والفيديو).</div>';
+    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> (من آخر اختباراتك). شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
+    weak.forEach(function(o){ html += lessonCard(o.s, o.st, true); });
+  } else if(measured){
+    html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪ حاليًا في القدرات/التحصيلي/STEP. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).</div>';
   } else {
-    html += '<div class="intro">لسّا ما اختبرت في «كمي / تحصيلي / STEP». اختبر فيها، ويرجع هنا يعرض لك <b>نقاط ضعفك فقط</b> مع الشرح والفيديو والتمارين.</div>';
+    html += '<div class="intro">لسّا ما فيه بيانات كافية في «كمي / تحصيلي / STEP». اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
   }
   // مكتبة كل الدروس — مطويّة، لا تظهر تلقائيًا (اختيارية للمراجعة)
   var lib='';
@@ -715,6 +744,12 @@ async function renderRemedial(){
       renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3));
       btn.textContent = "أسئلة أخرى 🔄";
     });
+  });
+  // البند ٤: البطاقات المفتوحة (مهارات تحت ٥٠٪) تبدأ جولتها فورًا في نفس المهارة
+  sec.querySelectorAll("details[open] [data-practice]").forEach(function(btn){
+    var box = btn.parentNode.querySelector("[data-mini]");
+    renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3));
+    btn.textContent = "أسئلة أخرى 🔄";
   });
 }
 
