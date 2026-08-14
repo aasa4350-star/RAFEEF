@@ -449,8 +449,9 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone){
   _to = setTimeout(finish, 150000); // أمان عام: يوقف تلقائيًا بعد دقيقتين ونصف (يشمل الإعادات)
   startRec(false);
 }
-function _paRun(refText, isAr, statusEl, btn, onDone, longText){
+function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries){
   if(longText){ return _paRunLong(refText, isAr, statusEl, btn, onDone); }
+  tries = tries || 0;
   var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
@@ -462,15 +463,25 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText){
     pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
     pa.applyTo(rec);
   }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
-  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎙️ اقرأ الآن بصوت واضح...";
+  if(btn){ btn.disabled=true; }
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML=(tries>0?"🔁 مرة ثانية — ":"🎙️ ")+"اقرأ الآن بصوت واضح...";
   var _fin=false;
   window.__paBusy++; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
   function _end(){ if(btn){ btn.disabled=false; } if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} }
-  var _to=setTimeout(function(){ if(_fin) return; _fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك. على الآيفون افتح الرابط في <b>Safari</b> (مب Chrome ولا الشاشة الرئيسية)، واقرأ بصوت أعلى."; _end(); }, longText?40000:15000);
+  // إعادة محاولة تلقائية واحدة عند عدم وضوح الصوت (الكلمات القصيرة تحتاج محاولتين أحيانًا)
+  function _retryOrFail(finalMsg){
+    if(tries<1){
+      statusEl.style.color="var(--muted)"; statusEl.innerHTML="🔁 ما وضح — نعيد المحاولة تلقائيًا، قُل الكلمة مرة ثانية بصوت واضح...";
+      setTimeout(function(){ _paRun(refText, isAr, statusEl, btn, onDone, longText, tries+1); }, 700);
+    } else { statusEl.style.color="var(--bad)"; statusEl.innerHTML=finalMsg; }
+  }
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; _end(); _retryOrFail("⚠️ ما التقطتُ صوتك. اقرأ بصوت أعلى وأوضح، وتأكّد إنك تفتح من <b>Safari</b> مباشرة."); }, longText?40000:15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
+    var outcome="nomatch";
     try{
       if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        outcome="ok";
         var r = SDK.PronunciationAssessmentResult.fromResult(result);
         var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
         var col = pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
@@ -488,11 +499,10 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText){
           (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+
             '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 نطق صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>'):' ✅ ممتاز!');
         if(onDone){ try{ onDone(pron, acc); }catch(e){} }
-      } else {
-        statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ ما وضح الصوت — اقرأ أعلى وأوضح وحاول ثانية.";
       }
-    }catch(e){ statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
+    }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();
+    if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
   }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من متصفح <b>Safari</b> مباشرة."; _end(); });
 }
 function azureAssess(refText, isAr, statusEl, btn, onDone, longText){
