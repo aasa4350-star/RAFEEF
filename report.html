@@ -83,26 +83,37 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, function(c){ retu
 
 var ALL = [], current = KIDS[0][0];
 
+/* التحصيلي (SAAT) وSTEP اختباران للثانوي — فوق مستوى أبنائنا (ابتدائي/متوسط).
+   نفصل جلساتهما فلا تُحسب في تقييم المستوى، بل تُعرض كتهيئة مبكرة.
+   نتحقّق من الوسم الجديد stretch، ومن اسم الاختبار للبيانات القديمة قبل الوسم. */
+function isStretch(r){
+  var m = r.meta || {};
+  return m.stretch === true || /تحصيلي|STEP/i.test(m.test || "");
+}
+
 /* يجمع تفصيل المهارات لطالب واحد. يستبعد الجلسات غير الموثوقة (خروج/سرعة مريبة). */
 function build(student){
   var rows = ALL.filter(function(r){ return r.student === student && r.meta && r.meta.skills; });
   var skipped = rows.filter(function(r){ return r.meta.trusted === false; }).length;
   rows = rows.filter(function(r){ return r.meta.trusted !== false; });
   var cutoff = Date.now() - RECENT_DAYS*86400000;
-  var sk = {}, dates = [];
+  var sk = {}, stretchSk = {}, dates = [], stretchRows = 0;
   rows.forEach(function(r){
-    dates.push(r.created_at);
+    var stretch = isStretch(r);
+    var bucket = stretch ? stretchSk : sk;
+    if(stretch){ stretchRows++; } else { dates.push(r.created_at); }
     var isRecent = new Date(r.created_at).getTime() >= cutoff;
     Object.keys(r.meta.skills).forEach(function(name){
       var v = r.meta.skills[name];
       if(!v || typeof v.t !== "number" || v.t <= 0) return;
-      var s = sk[name] || (sk[name] = {c:0,t:0,rc:0,rt:0,oc:0,ot:0});
+      var s = bucket[name] || (bucket[name] = {c:0,t:0,rc:0,rt:0,oc:0,ot:0});
       s.c += (v.c||0); s.t += v.t;
       if(isRecent){ s.rc += (v.c||0); s.rt += v.t; } else { s.oc += (v.c||0); s.ot += v.t; }
     });
   });
   dates.sort();
-  return { rows:rows.length, skipped:skipped, sk:sk,
+  return { rows:rows.length-stretchRows, skipped:skipped, sk:sk,
+           stretchSk:stretchSk, stretchRows:stretchRows,
            from:dates.length?saDate(dates[0]):"", to:dates.length?saDate(dates[dates.length-1]):"" };
 }
 
@@ -127,13 +138,26 @@ function listHtml(items, neutral){
   }).join("") + '</ul>';
 }
 
+/* قسم «فوق المستوى»: تحصيلي وSTEP — يُعرض محايدًا ولا يُحسب في التقييم. */
+function stretchCardHtml(d){
+  var items = Object.keys(d.stretchSk).map(function(n){ return {name:n, s:d.stretchSk[n]}; });
+  if(!items.length) return "";
+  items.sort(function(a,b){ return pct(a.s.c,a.s.t) - pct(b.s.c,b.s.t); });
+  return '<div class="card"><h2>🚀 فوق المستوى — تهيئة مبكرة</h2>'+
+         '<p class="note">تحصيلي وSTEP اختباران لمرحلة الثانوي، أعلى من صفّه. '+
+         'نعرضها للتعوّد المبكر فقط — <b>لا تُحسب في تقييم مستواه</b> ('+d.stretchRows+' جلسة).</p>'+
+         listHtml(items, true)+'</div>';
+}
+
 function render(){
   var d = build(current), names = Object.keys(d.sk);
   var out = document.getElementById("out");
+  var stretchCard = stretchCardHtml(d);
   if(!names.length){
-    out.innerHTML = '<div class="card empty">ما فيه تفصيل مهارات لـ'+esc(current)+' بعد.<br>'+
+    out.innerHTML = '<div class="card empty">ما فيه تفصيل مهارات (في مستوى صفّه) لـ'+esc(current)+' بعد.<br>'+
       'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.'+
-      (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>';
+      (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
+      stretchCard;
     return;
   }
   var ready  = names.filter(function(n){ return d.sk[n].t >= MIN_N; }).map(function(n){ return {name:n, s:d.sk[n]}; });
@@ -161,6 +185,7 @@ function render(){
     (strong.length ? '<div class="card"><h2>💪 أقوى المهارات</h2>'+listHtml(strong)+'</div>' : '')+
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
+    stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+
       '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+
       '<button id="mk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">📋 جهّز النصّ وانسخه</button>'+
@@ -187,6 +212,14 @@ function render(){
       });
     }
     if(thin.length) L.push("بيانات قليلة: "+thin.map(function(it){ return it.name+" ("+it.s.t+")"; }).join("، "));
+    var stretchNames = Object.keys(d.stretchSk);
+    if(stretchNames.length){
+      L.push("");
+      L.push("فوق المستوى (تحصيلي/STEP — للثانوي، لا تُحسب في التقييم):");
+      stretchNames.map(function(n){ return {name:n, s:d.stretchSk[n]}; })
+        .sort(function(a,b){ return pct(a.s.c,a.s.t) - pct(b.s.c,b.s.t); })
+        .forEach(function(it){ L.push("  - "+it.name+": "+it.s.c+"/"+it.s.t+" ("+pct(it.s.c,it.s.t)+"%)"); });
+    }
     var box = document.getElementById("copyBox");
     box.value = L.join("\n"); box.style.display = "block"; box.select();
     try{ document.execCommand("copy"); }catch(e){}
