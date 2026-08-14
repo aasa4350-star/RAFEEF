@@ -714,24 +714,27 @@ async function renderRemedial(){
       var a=agg[nm]||(agg[nm]={c:0,t:0}); a.c+=(v.c||0); a.t+=v.t; });
   });
   function topicStat(s){ var c=0,t=0; (s.keys||[]).forEach(function(k){ if(agg[k]){ c+=agg[k].c; t+=agg[k].t; } }); return {c:c,t:t}; }
+  // التحصيلي وSTEP فوق المستوى (ثانوي) ولا تدخل تقييم الأبناء — فلا نطلقها كـ«ضعف»،
+  // نبقيها في المكتبة الاختيارية فقط. كشف الضعف يقتصر على المهارات في مستوى الصفّ (كمي).
+  var STRETCH_GROUPS = {"تحصيلي":1,"STEP":1};
   var WEAK=0.5, MINQ=3;
   var weak = SKILLS.map(function(s){ return {s:s, st:topicStat(s)}; })
-    .filter(function(o){ return o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
+    .filter(function(o){ return !STRETCH_GROUPS[o.s.group] && o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
     .sort(function(a,b){ return (a.st.c/a.st.t)-(b.st.c/b.st.t); });
-  var measured = Object.keys(agg).length>0;
+  var inLevelData = SKILLS.some(function(s){ return !STRETCH_GROUPS[s.group] && topicStat(s).t>0; });
 
   var html='';
   if(weak.length){
-    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> (من آخر اختباراتك). شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
+    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> (في مستوى صفّك — القدرات الكمي). شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
     weak.forEach(function(o){ html += lessonCard(o.s, o.st, true); });
-  } else if(measured){
-    html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪ حاليًا في القدرات/التحصيلي/STEP. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).</div>';
+  } else if(inLevelData){
+    html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪ في مستوى صفّك. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span></div>';
   } else {
-    html += '<div class="intro">لسّا ما فيه بيانات كافية في «كمي / تحصيلي / STEP». اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
+    html += '<div class="intro">لسّا ما فيه بيانات كافية في القدرات الكمي. اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
   }
-  // مكتبة كل الدروس — مطويّة، لا تظهر تلقائيًا (اختيارية للمراجعة)
+  // مكتبة كل الدروس — مطويّة، اختيارية (والتحصيلي/STEP فوق المستوى، للتعوّد فقط)
   var lib='';
-  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]];
+  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي (فوق المستوى — اختياري)"]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي (فوق المستوى — اختياري)"],["STEP","🌍 STEP إنجليزي (فوق المستوى — اختياري)"]];
   groups.forEach(function(g){
     lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
     SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });
