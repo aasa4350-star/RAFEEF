@@ -68,10 +68,13 @@ var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 function saveScore(test, correct, total, wrongs, skills){
   try{
+    // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
+    // نوسمهما stretch حتى يفصلهما تقرير المستوى ولا يحسبهما ضدّ الطالب.
+    var stretch = /تحصيلي|STEP/i.test(test);
     fetch(SUPA_URL+"/rest/v1/attempts", {
       method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
-      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}) } })
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch } })
     });
   }catch(e){}
 }
