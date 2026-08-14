@@ -691,6 +691,14 @@ if(!META[who] || !DATA[who]){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
     var items = pickFresh(D.dictation, "dict_"+curLang, 8);
+    // خريطة المعنى العربي للكلمة الإنجليزية (للإملاء الإنجليزي فقط) — من VOCAB300 + تكملة
+    var MEAN = {};
+    if(!ar){
+      if(typeof VOCAB300 !== "undefined"){ VOCAB300.forEach(function(p){ MEAN[String(p[0]).toLowerCase()] = (p[1] && p[1][0]) || ""; }); }
+      // كلمات إملائية غير موجودة في VOCAB300
+      var MEAN_EXTRA = {ball:"كرة",hat:"قبّعة",box:"صندوق",car:"سيّارة",cake:"كعكة",cup:"كوب",kite:"طائرة ورقية",nest:"عُشّ",bear:"دبّ",ship:"سفينة",flag:"علَم",ring:"خاتم",shoe:"حذاء",gift:"هديّة",leaf:"ورقة شجر",toy:"لعبة",hen:"دجاجة",fox:"ثعلب",seven:"سبعة",animal:"حيوان",picture:"صورة",summer:"صيف",winter:"شتاء",holiday:"عطلة",bedroom:"غرفة نوم",bottle:"زجاجة",purple:"بنفسجي"};
+      for(var _k in MEAN_EXTRA){ if(!MEAN[_k]) MEAN[_k]=MEAN_EXTRA[_k]; }
+    }
     var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
       '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>'+
       EXIT_WARN_HTML+
@@ -721,9 +729,12 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
+      // المعنى العربي يظهر جنب الكلمة الإنجليزية في نفس مربّع الإجابة (إملاء إنجليزي فقط)
+      var mn = MEAN[String(text).toLowerCase()] || "";
+      var mnHtml = mn ? ' <span style="color:var(--accent);font-weight:700">— '+mn+'</span>' : "";
       qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,1,ar?"ar-SA":"en-US"); });
       qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.7,ar?"ar-SA":"en-US"); });
-      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
+      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'+mnHtml; });
       wireMic(qEl, text, ar);
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
       qEl.querySelector(".pchk").addEventListener("click",function(){
@@ -735,8 +746,8 @@ if(!META[who] || !DATA[who]){
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(text, ar, pfb2, azb); });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var ok = norm(inp.value,ar)===norm(text,ar);
-        if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
-        else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
+        if(ok){ fb.className="fb ok"; fb.innerHTML="✅ صحيح!"+mnHtml; if(!done[i]){done[i]=1;correct++;} }
+        else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'+mnHtml; }
         tried[i]=1;
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         maybeSave();
