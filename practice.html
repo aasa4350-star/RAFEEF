@@ -539,7 +539,19 @@ function renderSet(id, items, intro, regen, label){
     }, 1000);
   };
 
-  if(regen){ sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderSet(id, regen(), intro, regen, label); }); }
+  if(regen){
+    var resetBtn = sec.querySelector(".reset");
+    resetBtn.addEventListener("click", function(){
+      /* منع تكديس جولات جديدة بلا حلّ — الضغط المتتالي على «أسئلة جديدة» يضيّع أثر التباعد. */
+      var done = Object.keys(answered).length, need = Math.ceil(total*0.6);
+      if(!ended && done < need){
+        resetBtn.textContent = "✍️ خلّص جولتك أول ("+done+"/"+total+")";
+        setTimeout(function(){ resetBtn.textContent = "أسئلة جديدة 🔄"; }, 2200);
+        return;
+      }
+      savePartial(); renderSet(id, regen(), intro, regen, label);
+    });
+  }
   if(sec.classList.contains("active")) sec._start();
 }
 

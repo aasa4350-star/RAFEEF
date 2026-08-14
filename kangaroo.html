@@ -939,7 +939,17 @@ if(!NAMES[who]){
         });
       }
     });
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(kind); });
+    var resetBtn = sec.querySelector(".reset");
+    resetBtn.addEventListener("click", function(){
+      /* منع تكديس جولات جديدة بلا حلّ — الضغط المتتالي على «أسئلة جديدة» يضيّع أثر التباعد. */
+      var done = Object.keys(answered).length, need = Math.ceil(total*0.6);
+      if(done < need){
+        resetBtn.textContent = "✍️ خلّص جولتك أول ("+done+"/"+total+")";
+        setTimeout(function(){ resetBtn.textContent = "أسئلة جديدة 🔄"; }, 2200);
+        return;
+      }
+      savePartial(); render(kind);
+    });
   }
   render("math");
   document.querySelectorAll(".tabs button").forEach(function(b){
