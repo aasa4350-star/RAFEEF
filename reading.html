@@ -819,32 +819,6 @@ if(!META[who] || !DATA[who]){
     return [['What does the word "'+g2[0]+'" mean in the text?', [g2[1][0], pool[0][1][0], pool[1][1][0]], 0]];
   }
 
-  // ===== معنى خيار الفهم بالعربي — للخيارات ذات الكلمة الواحدة فقط =====
-  // (الجُمل لا تُترجَم آليًّا: ترتيب الصفة/الموصوف بالعربي معكوس فتطلع ترجمة غلط).
-  var _EN_MEAN=null;
-  function enMeanMap(){
-    if(_EN_MEAN) return _EN_MEAN;
-    var M={};
-    if(typeof VOCAB300!=="undefined"){ VOCAB300.forEach(function(p){ M[String(p[0]).toLowerCase()]=(p[1]&&p[1][0])||""; }); }
-    var EX={paint:"يرسم",draw:"يرسم",swim:"يسبح",jump:"يقفز",climb:"يتسلّق",cook:"يطبخ",clean:"ينظّف",brown:"بنّي",pink:"ورديّ",gray:"رماديّ",sunny:"مشمس",rainy:"ممطر",cloudy:"غائم",windy:"عاصف",noisy:"مزعج",loud:"عالي الصوت",silent:"صامت",dark:"مظلم",bright:"مضيء",music:"موسيقى",art:"فنّ",sport:"رياضة",soup:"حساء",save:"يوفّر",waste:"يهدر",tap:"صنبور",spring:"ربيع",autumn:"خريف",shell:"صدفة",stone:"حجر",coin:"عملة",plant:"نبات",valuable:"ثمين",useless:"عديم الفائدة",harmful:"ضارّ",quiet:"هادئ",yes:"نعم",maybe:"ربّما",nobody:"لا أحد",nothing:"لا شيء",everyone:"الجميع",everything:"كلّ شيء",treasure:"كنز",money:"مال",success:"نجاح",failure:"فشل",stress:"توتّر",skill:"مهارة",teamwork:"عمل جماعي",communication:"تواصل",respect:"احترام",competition:"منافسة",pollution:"تلوّث",solar:"شمسيّ",coal:"فحم",oil:"نفط",gas:"غاز",factory:"مصنع",planet:"كوكب",space:"فضاء",ground:"أرض",soft:"ناعم",hard:"صلب",sweet:"حلو",sour:"حامض",angry:"غاضب",scared:"خائف",bored:"ملول",funny:"مضحك",kite:"طائرة ورقيّة",toy:"لعبة",gift:"هديّة",ball:"كرة",cake:"كعكة",cup:"كوب",box:"صندوق",hat:"قبّعة",car:"سيّارة",ship:"سفينة",flag:"علَم",ring:"خاتم",shoe:"حذاء",leaf:"ورقة شجر",hen:"دجاجة",fox:"ثعلب",bear:"دبّ",nest:"عُشّ",animal:"حيوان",picture:"صورة",summer:"صيف",winter:"شتاء",holiday:"عطلة",bedroom:"غرفة نوم",bottle:"زجاجة",purple:"بنفسجيّ",seven:"سبعة"};
-    var EX2={badly:"بشكل سيّئ",balance:"توازن",boat:"قارب",boring:"مُمِلّ",buildings:"مبانٍ",dancing:"رقص",debt:"دَيْن",disappear:"يختفي",extraordinary:"استثنائيّ",fame:"شهرة",fear:"خوف",five:"خمسة",food:"طعام",football:"كرة قدم",game:"لعبة",games:"ألعاب",guessing:"تخمين",hobby:"هواية",honey:"عسل",ice:"ثلج",laziness:"كسل",lonely:"وحيد",luck:"حظّ",lying:"كذب",mood:"مزاج",museum:"متحف",never:"أبدًا",no:"لا",noise:"ضجيج",none:"لا شيء",oceans:"محيطات",one:"واحد",ordinary:"عاديّ",philosophy:"فلسفة",phone:"هاتف",plastic:"بلاستيك",poison:"سُمّ",poverty:"فقر",pyramids:"أهرامات",radio:"راديو",same:"نفسه",shop:"متجر",silence:"صمت",singing:"غناء",steam:"بخار",sunlight:"ضوء الشمس",television:"تلفاز",three:"ثلاثة",traffic:"حركة المرور",travelling:"سفر",trust:"ثقة",twelve:"اثنا عشر",two:"اثنان",weakness:"ضعف",weather:"طقس",wheel:"عجلة",wonderful:"رائع",wool:"صوف"};
-    for(var k in EX){ if(!M[k]) M[k]=EX[k]; }
-    for(var k2 in EX2){ if(!M[k2]) M[k2]=EX2[k2]; }
-    _EN_MEAN=M; return M;
-  }
-  function _lemma(M,w){
-    if(M[w]) return M[w];
-    var forms=[w.replace(/ies$/,"y"), w.replace(/ves$/,"f"), w.replace(/es$/,""), w.replace(/s$/,""), w.replace(/ing$/,""), w.replace(/ing$/,"e"), w.replace(/ed$/,""), w.replace(/ed$/,"e"), w.replace(/(.)\1ing$/,"$1"), w.replace(/(.)\1ed$/,"$1")];
-    for(var i=0;i<forms.length;i++){ if(forms[i] && M[forms[i]]) return M[forms[i]]; }
-    return "";
-  }
-  function optArabic(opt){
-    var toks=String(opt).toLowerCase().replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean);
-    var content=toks.filter(function(t){ return !({a:1,an:1,the:1,to:1})[t]; });
-    if(content.length!==1) return "";   // كلمة واحدة فقط
-    return _lemma(enMeanMap(), content[0]);
-  }
-
   function renderRead(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("read");
@@ -868,11 +842,7 @@ if(!META[who] || !DATA[who]){
     questions.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="stem" style="direction:'+dir+';text-align:'+ta+'">'+(i+1)+'. '+q[0]+'</div><div class="opts">';
       // نخلط ترتيب الخيارات حتى لا تكون الإجابة الصحيحة دائمًا الأولى (data-j يبقى الفهرس الأصلي)
-      shuffle(q[1].map(function(_,j){ return j; })).forEach(function(j){
-        var mn = ar ? "" : optArabic(q[1][j]);   // معنى عربي للخيار المفرد (إنجليزي فقط)
-        var mnHtml = mn ? ' <span style="color:var(--accent);font-weight:700;font-size:.9rem">— '+mn+'</span>' : "";
-        html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+q[1][j]+mnHtml+'</button>';
-      });
+      shuffle(q[1].map(function(_,j){ return j; })).forEach(function(j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+q[1][j]+'</button>'; });
       html += '</div></div>';
     });
     html += '<div class="score" data-score>الفهم: 0 / '+questions.length+'</div>'+
