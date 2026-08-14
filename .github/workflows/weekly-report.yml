@@ -1,0 +1,52 @@
+name: weekly-report
+
+# يجهّز تقريرًا أسبوعيًا لمستوى الأبناء تلقائيًا:
+#   1) يسحب أحدث النتائج من Supabase (نفس مصدر snapshot).
+#   2) يشغّل scripts/weekly_report.py الذي يكتب results/weekly-report.md.
+#   3) يحفظ التقرير في الفرع فيُقرأ من غير فتح report.html أو تشغيل المتصفّح.
+# يعمل كل سبت صباحًا (توقيت السعودية)، ويمكن تشغيله يدويًا في أي وقت.
+
+on:
+  schedule:
+    - cron: '0 3 * * 6'   # السبت 06:00 بتوقيت السعودية (03:00 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/children-tests-reviews-bq40n9
+
+      - name: Fetch attempts from Supabase
+        run: |
+          mkdir -p results
+          curl -sS "https://kmopkxlhisrwxllagjbu.supabase.co/rest/v1/attempts?select=*&order=created_at.desc" \
+            -H "apikey: sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_" \
+            -H "Authorization: Bearer sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_" \
+            -o raw.json
+          python3 -m json.tool raw.json > results/attempts.json || cp raw.json results/attempts.json
+          rm -f raw.json
+
+      - name: Build weekly report
+        run: python3 scripts/weekly_report.py
+
+      - name: Commit report
+        run: |
+          git config user.name "results-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add results/weekly-report.md results/attempts.json
+          if git diff --staged --quiet; then
+            echo "no change"
+          else
+            git commit -m "weekly report"
+            git push
+          fi
