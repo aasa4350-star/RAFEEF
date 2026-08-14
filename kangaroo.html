@@ -8,6 +8,7 @@
 <title>مهارات التفكير 🦘</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="moheba-book.js"></script>
 <style>
   :root{
     --accent:#7c3aed; --accent-deep:#5b21b6;
@@ -838,6 +839,24 @@ var SKILL_AR={
   gElimination:"الاستنتاج بالاستبعاد", gOrderConstraints:"الترتيب من قيود",
   gMirror:"صورة المرآة", gPaperFold:"طيّ الورق"
 };
+/* أسئلة الكتاب تُعرض أوّلًا حسب ترتيبه، ويُحفظ موضع الطفل محليًّا حتى لا تتكرّر.
+   بعد أن يُنهي الكتاب يتولّى التوليد فيمدّه بأسئلة جديدة بلا نهاية. */
+function bookKey(kind){ return "moheba_book_"+who+"_"+kind; }
+function bookTake(kind, n){
+  var B = (window.MOHEBA_BOOK && window.MOHEBA_BOOK[kind]) || [];
+  if(!B.length || !n) return [];
+  var at = 0;
+  try{ at = parseInt(localStorage.getItem(bookKey(kind))||"0",10)||0; }catch(e){}
+  if(at >= B.length) return [];
+  var out = B.slice(at, at+n).map(function(q){
+    var c = [q[0], q[1].slice(), q[2], q[3]];
+    c.gen = "📘 " + (SKILL_BOOK[kind] || "أسئلة الكتاب");
+    return c;
+  });
+  try{ localStorage.setItem(bookKey(kind), String(at+out.length)); }catch(e){}
+  return out;
+}
+var SKILL_BOOK = { vis:"تناظر بصري (الكتاب)", verb:"لفظي (الكتاب)", math:"كمّي (الكتاب)", gk:"معرفة عامة (الكتاب)" };
 function genN(gens,n){
   var out=[],seen={},t=0;
   while(out.length<n && t<n*30){
@@ -880,7 +899,8 @@ if(!NAMES[who]){
 
   function render(kind){
     var c = CFG[kind], sec = document.getElementById(kind), input=(c.mode==="input");
-    var items = genN(c.gens, QN);
+    var fromBook = bookTake(kind, QN);
+    var items = fromBook.concat(genN(c.gens, QN - fromBook.length));
     var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
