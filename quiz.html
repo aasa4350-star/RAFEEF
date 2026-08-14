@@ -1414,6 +1414,77 @@ if(!STUDENTS[who]){
     ePast:"الماضي البسيط", ePresCont:"المضارع المستمر", eComp:"المقارنة", ePluralAdv:"الجموع الشاذّة",
     eColl:"المتلازمات اللفظية", eIrregPast:"الأفعال الشاذّة", eSuper:"التفضيل", ePresPerfect:"المضارع التامّ"
   };
+  /* بنك الإنجليزي المنسّق مكتوب يدويًا بلا وسوم، فنستنتج مهارته من نصّ السؤال
+     ومن شكل الخيارات — والخيارات أدقّ دلالة من النصّ. الترتيب مهمّ: الأخصّ أوّلًا. */
+  function enSkill(stem, opts){
+    var s = String(stem||"").toLowerCase();
+    var o = (opts||[]).map(function(x){ return String(x).toLowerCase().trim(); });
+    var any = function(re){ return o.some(function(x){ return re.test(x); }); };
+    var all = function(re){ return o.length>0 && o.every(function(x){ return re.test(x); }); };
+    /* خياران أحدهما جمع الآخر (book/books، knife/knives) */
+    /* لا نعدّها جمعًا إذا بدت الخيارات صيغ أفعال (goes/going، walked/walks) */
+    var verbish = o.some(function(x){ return /ing$|ed$/.test(x); });
+    var pluralPair = !verbish && o.some(function(a){ return o.some(function(b){ return b!==a && (b===a+"s" || b===a+"es"); }); });
+
+    /* ١) ما يصرّح به نصّ السؤال */
+    if(/opposite of|antonym of/.test(s))            return "الأضداد";
+    if(/synonym|same meaning/.test(s))              return "المرادفات";
+    if(/plural of/.test(s))                         return "الجمع";
+    if(/which one is a|which one is an|which is a|which is an/.test(s)) return "تصنيف المفردات";
+    if(/says "|says \\"|is called a|gives us/.test(s)) return "مفردات ومعلومات";
+    if(/first letter|letter of|how many letters/.test(s)) return "الحروف الأبجدية";
+    if(/asked me|told me|said that|wondered/.test(s)) return "الكلام المنقول";
+    if(/which day|the day comes/.test(s))           return "الأيام والشهور";
+    if(/has a |have a |can \w+ and/.test(s) && !/\?$/.test(s.slice(0,1))) {}
+    if(/the number (before|after)|in numbers/.test(s)) return "الأعداد";
+    if(/the day (after|before)|the month|which season/.test(s)) return "الأيام والشهور";
+    if(/spell|correct sentence/.test(s))            return "تمييز الجملة الصحيحة";
+
+    /* ٢) ما تكشفه الخيارات */
+    if(all(/^(who|which|whom|whose|that)$/))        return "ضمائر الوصل";
+    if(any(/^(after|during|while|before)$/))        return "أدوات الربط";
+    if(all(/^(he|she|it|they|we|i|you|him|her|them|his|hers)$/)) return "الضمائر";
+    if(any(/ly$/) && any(/^\w+ful$|^\w+y$/))       return "الظروف";
+    if(/look forward to|good at|instead of|denied|enjoys?\s/.test(s)) return "المصدر وصيغة ing";
+    if(/was \w+ing|were \w+ing/.test(s))            return "الماضي المستمرّ";
+    if(/a person who|has a long|a baby \w+ is/.test(s)) return "مفردات ومعلومات";
+    if(any(/^(what|where|when|why|how)$/))           return "أدوات الاستفهام";
+    if(any(/^how (many|much)$/) || any(/^(much|many|few|little)$/)) return "الكمّيات";
+    if(any(/^(although|because|so|but|however)$/))   return "أدوات الربط";
+    if(any(/n't (you|it|he|she|they)$/))            return "الأسئلة الذيلية";
+    if(any(/^(must|should|can't|mustn't|don't have to|should have|must not)$/)) return "الأفعال الناقصة";
+    if(any(/^(this|that|these|those)$/))            return "أسماء الإشارة";
+    if(any(/^(already|yet|ever|never|just)$/))      return "المضارع التامّ";
+    if(any(/^had\s/))                               return "الماضي التامّ";
+    if(any(/^have been|^has been/))                 return "المضارع التامّ المستمرّ";
+    if(any(/^(was|were|is|are|been)\s+\S+/))        return "المبني للمجهول";
+    if(/^if\b/.test(s) || any(/^would( have)?$/))   return "الجمل الشرطية";
+    if(o.filter(function(x){ return /^(since|for|during|from|ago)$/.test(x); }).length>=2) return "since / for";
+    if(all(/^(in|on|at|to|from|under|over|behind|between|near|with|by|for|of|into|above|below)$/)) return "حروف الجرّ";
+    if(all(/^(a|an|the)$/))                         return "أدوات التعريف";
+    if(any(/^(than|then|that)$/) && /\w+er\b/.test(s)) return "المقارنة";
+    if(any(/^(more|most)\s/) || any(/\w+est$/))     return "المقارنة والتفضيل";
+    if(any(/ing$/) && any(/^to\s/))                 return "المصدر وصيغة ing";
+
+    /* ٣) الأزمنة قبل قاعدة الجمع، وإلا ابتلعت صيغ الأفعال */
+    if(/\b(have|has)\s+(never|already|just|ever)\b/.test(s)) return "المضارع التامّ";
+    if(/yesterday|last \w+|\bago\b/.test(s))       return "الماضي البسيط";
+    if(/next (week|year|month|monday)|tomorrow/.test(s)) return "المستقبل";
+    if(/every (day|evening|morning|week)|usually|always|often|sometimes/.test(s)) return "المضارع البسيط";
+    if(/\bnow\b|at the moment|look!|listen!/.test(s)) return "المضارع المستمرّ";
+    if(/\b(didn't|doesn't|don't)\b/.test(s))        return "الأفعال المساعدة";
+    if(pluralPair)                                  return "الجمع";
+
+    if(any(/^(has|have|having)$/))                  return "have / has";
+    if(any(/^(do|does|did|don't|doesn't|didn't)$/)) return "الأفعال المساعدة";
+    if(any(/^(will|shall|going to)$/))              return "المستقبل";
+    if(any(/ing$/) && any(/s$/))                    return "مطابقة الفاعل والفعل";
+    if(any(/^(is|are|am|was|were|be|isn't|aren't)$/)) return "أفعال الكينونة";
+    if(/what color|what is the capital|where do/.test(s)) return "معلومات عامة";
+    if(o.some(function(x){ return x.split(" ").length>2; })) return "فهم الجملة";
+    return "إنجليزي (عامّ)";
+  }
+
   /* مولّدات الرياضيات دوالّ بلا أسماء، فنستنتج المهارة من نصّ السؤال */
   function skillOfQ(q, id){
     if(q && q.gen) return q.gen;
@@ -1430,7 +1501,7 @@ if(!STUDENTS[who]){
       if(/ \+ /.test(s)) return "الجمع";
       return "رياضيات (منوّع)";
     }
-    return "إنجليزي (منسّق)";
+    return enSkill(s, q && q[1]);
   }
   function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var f=gpick(gens), q=f(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name]; out.push(q); } return out; }
 

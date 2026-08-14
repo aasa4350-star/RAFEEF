@@ -644,7 +644,9 @@ function gCubeOpposite(lvl){
   };
   var svg='<svg viewBox="0 0 '+(3*c+4)+' '+(4*c+4)+'" height="'+(4*c+4)+'" style="display:block;margin:10px auto;color:var(--accent);direction:ltr">'+
     cell(1,0,S[0])+cell(0,1,S[1])+cell(1,1,S[2])+cell(2,1,S[3])+cell(1,2,S[4])+cell(1,3,S[5])+'</svg>';
-  return ["عند طيّ هذا المخطّط ليصير مكعّبًا، أيّ شكلين يقعان على وجهين متقابلين؟"+svg,
+  /* تلميح توجيهي لا يكشف القاعدة: يوجّه الطفل لتخيّل الطيّ، ويبقى الاستنتاج عليه */
+  var hint='<div style="font-size:.86rem;color:var(--muted);margin-top:4px">💡 تخيّل المربّعات وهي تُطوى لأعلى حول المربّع الأوسط.</div>';
+  return ["عند طيّ هذا المخطّط ليصير مكعّبًا، أيّ شكلين يقعان على وجهين متقابلين؟"+svg+hint,
     o[0],o[1],"في المخطّط الصليبي يتقابل الوجهان اللذان يفصل بينهما وجه واحد: "+correct+"."];
 }
 
