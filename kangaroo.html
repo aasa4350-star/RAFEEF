@@ -61,7 +61,9 @@ var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",raf
 var LVL = {saud:1,osama:2,rafeef:3,hasan:4};
 var name = NAMES[who] || "الطالب";
 var lvl = LVL[who] || 2;
-var QN = (who==="hasan"||who==="rafeef") ? 10 : 8;
+// عدد أسئلة القسم: رُفع ليقترب من ميزانية الوقت (سعود خلّص القسمين بسرعة).
+// الكبار أكثر من الصغار لأن جلستهم أطول (١٥-٢٠ د مقابل ١٠-١٢ د).
+var QN = (who==="hasan"||who==="rafeef") ? 14 : 12;
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
