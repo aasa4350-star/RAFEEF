@@ -857,8 +857,8 @@ function bookTake(kind, n){
   return out;
 }
 var SKILL_BOOK = { vis:"تناظر بصري (الكتاب)", verb:"لفظي (الكتاب)", math:"كمّي (الكتاب)", gk:"معرفة عامة (الكتاب)" };
-function genN(gens,n){
-  var out=[],seen={},t=0;
+function genN(gens,n,seen){
+  var out=[],t=0; seen = seen || {};
   while(out.length<n && t<n*30){
     var f=gp(gens), q;
     try{ q=f(lvl); }catch(e){ t++; continue; }
@@ -867,9 +867,30 @@ function genN(gens,n){
     if(!q||seen[_k]) continue;
     seen[_k]=1;
     q.gen = SKILL_AR[f.name] || f.name || "غير محدّد";
+    q._fn = f.name;
     out.push(q);
   }
   return out;
+}
+
+/* تركيز الجولة على مهارات قليلة بدل النطّ بين الكل:
+   جولة فيها سؤال واحد عن ثلاثين مهارة لا تُنتج تقريرًا مفيدًا،
+   بينما ثلاث مهارات × ثلاثة أسئلة تكشف الضعف فعلًا.
+   نختار الأقلّ تدريبًا حتى تُغطّى كل المهارات مع الوقت. */
+var FOCUS_N = 3;
+function focusKey(kind){ return "kang_focus_"+who+"_"+kind; }
+function focusGens(kind, gens){
+  var counts={};
+  try{ counts = JSON.parse(localStorage.getItem(focusKey(kind))||"{}") || {}; }catch(e){}
+  var arr = gens.map(function(f){ return {f:f, n:(counts[f.name]||0), r:Math.random()}; });
+  arr.sort(function(a,b){ return (a.n-b.n) || (a.r-b.r); });
+  return arr.slice(0, Math.min(FOCUS_N, arr.length)).map(function(x){ return x.f; });
+}
+function bumpFocus(kind, items){
+  var counts={};
+  try{ counts = JSON.parse(localStorage.getItem(focusKey(kind))||"{}") || {}; }catch(e){}
+  items.forEach(function(q){ if(q && q._fn) counts[q._fn] = (counts[q._fn]||0) + 1; });
+  try{ localStorage.setItem(focusKey(kind), JSON.stringify(counts)); }catch(e){}
 }
 var CFG={
   math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · معادلات بالصور · عدّ مسارات · فخّ منطقي · كسور · أعداد أوّلية. <b>أسئلة جديدة كل مرة</b>."},
@@ -900,7 +921,16 @@ if(!NAMES[who]){
   function render(kind){
     var c = CFG[kind], sec = document.getElementById(kind), input=(c.mode==="input");
     var fromBook = bookTake(kind, QN);
-    var items = fromBook.concat(genN(c.gens, QN - fromBook.length));
+    var need = QN - fromBook.length, seen = {};
+    var items = fromBook;
+    if(need > 0){
+      var gen = genN(focusGens(kind, c.gens), need, seen);
+      /* بعض المولّدات لا تنتج إلا سؤالًا واحدًا في الجولة (مفتاح تكرار ثابت)،
+         فنكمّل النقص من بقيّة المولّدات حتى لا تقصر الجولة. */
+      if(gen.length < need) gen = gen.concat(genN(c.gens, need - gen.length, seen));
+      items = items.concat(gen);
+      bumpFocus(kind, gen);
+    }
     var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
