@@ -80,7 +80,7 @@ function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&
 function azureConfigured(){ return !!azureCreds(); }
 
 /* ===== المعلّم يتكلم (نطق عصبي) ===== */
-function speakEN(text){ try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.92; var v=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);})[0]; if(v)u.voice=v; speechSynthesis.speak(u);}catch(e){} }
+function speakEN(text){ try{ speechSynthesis.cancel(); try{ speechSynthesis.resume(); }catch(e){} var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.92; var v=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);})[0]; if(v)u.voice=v; speechSynthesis.speak(u);}catch(e){} }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
 var _tts=null;
 function tutorSpeak(text){

@@ -1212,6 +1212,7 @@ function speakAr(text, rate){
   }
   try{
     speechSynthesis.cancel();
+    try{ speechSynthesis.resume(); }catch(e){} // Safari/iOS قد يعلّق المحرّك فيصير صامتًا — resume يفكّه
     var u = new SpeechSynthesisUtterance(key);
     u.lang = "ar-SA"; u.rate = rate || 0.9;
     var v = pickVoice("ar-SA"); if(v) u.voice = v;
@@ -1228,7 +1229,7 @@ function azureCreds(){ var A=window.AZURE_SPEECH||{}; var w=(new URLSearchParams
 function azureConfigured(){ return !!azureCreds(); }
 function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn">🎙️ قيّم نطقي</button>' : ''; }
 function speakEN(text){
-  try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9; var v=pickVoice("en-US"); if(v) u.voice=v; speechSynthesis.speak(u); }
+  try{ speechSynthesis.cancel(); try{ speechSynthesis.resume(); }catch(e){} var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9; var v=pickVoice("en-US"); if(v) u.voice=v; speechSynthesis.speak(u); }
   catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
 // استماع بصوت Azure العصبي البشري (مبطّأ)، ويرجع لصوت المتصفح فقط إذا تعذّر

@@ -537,6 +537,7 @@ function speak(text, rate, lang, onEnd){
   // بديل: نطق المتصفح
   try{
     speechSynthesis.cancel();
+    try{ speechSynthesis.resume(); }catch(e){} // Safari/iOS قد يعلّق المحرّك فيصير صامتًا — resume يفكّه
     var u = new SpeechSynthesisUtterance(key);
     u.lang = lang || "en-US"; u.rate = rate || 0.9;
     var cands = voicesFor(isAr);

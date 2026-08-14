@@ -96,6 +96,7 @@ function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn
 function speakEN(text){
   try{
     speechSynthesis.cancel();
+    try{ speechSynthesis.resume(); }catch(e){} // Safari/iOS قد يعلّق المحرّك فيصير صامتًا — resume يفكّه
     var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9;
     var cands=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);});
     var good=cands.filter(function(x){return /(natural|neural|enhanced|premium|samantha|daniel|karen|serena|aria|guy|jenny)/i.test(x.name);});
