@@ -873,24 +873,43 @@ function genN(gens,n,seen){
   return out;
 }
 
-/* تركيز الجولة على مهارات قليلة بدل النطّ بين الكل:
-   جولة فيها سؤال واحد عن ثلاثين مهارة لا تُنتج تقريرًا مفيدًا،
-   بينما ثلاث مهارات × ثلاثة أسئلة تكشف الضعف فعلًا.
-   نختار الأقلّ تدريبًا حتى تُغطّى كل المهارات مع الوقت. */
+/* ===== تركيز الجولة + المراجعة المتباعدة =====
+   جولة فيها سؤال واحد عن ثلاثين مهارة لا تكشف شيئًا، فنركّز على ثلاث مهارات.
+   واختيارها ليس عشوائيًا: المهارة التي يخطئ فيها ترجع بعد يوم، ثم يومين، ثم
+   أربعة، ثم أسبوع — والتي يتقنها تبتعد. هذا هو أثر التباعد في الترسيخ. */
 var FOCUS_N = 3;
-function focusKey(kind){ return "kang_focus_"+who+"_"+kind; }
+var SR_DAYS = [0, 1, 2, 4, 7];          // فترة الانتظار حسب درجة الإتقان
+function srKey(kind){ return "kang_sr_"+who+"_"+kind; }
+function srLoad(kind){ try{ return JSON.parse(localStorage.getItem(srKey(kind))||"{}") || {}; }catch(e){ return {}; } }
+function srSave(kind,o){ try{ localStorage.setItem(srKey(kind), JSON.stringify(o)); }catch(e){} }
+
 function focusGens(kind, gens){
-  var counts={};
-  try{ counts = JSON.parse(localStorage.getItem(focusKey(kind))||"{}") || {}; }catch(e){}
-  var arr = gens.map(function(f){ return {f:f, n:(counts[f.name]||0), r:Math.random()}; });
-  arr.sort(function(a,b){ return (a.n-b.n) || (a.r-b.r); });
-  return arr.slice(0, Math.min(FOCUS_N, arr.length)).map(function(x){ return x.f; });
+  var st = srLoad(kind), now = Date.now(), DAY = 86400000;
+  var scored = gens.map(function(f){
+    var s = st[f.name];
+    if(!s || !s.n) return {f:f, a:0, b:0, r:Math.random()};      // لم تُجرَّب بعد → الأولوية القصوى
+    var acc = s.c / s.n;
+    var due = (now - (s.last||0)) >= SR_DAYS[Math.min(s.box||0, SR_DAYS.length-1)] * DAY;
+    return {f:f, a:(due?1:2), b:acc, r:Math.random()};           // المستحقّة أوّلًا، والأضعف قبل الأقوى
+  });
+  scored.sort(function(x,y){ return (x.a-y.a) || (x.b-y.b) || (x.r-y.r); });
+  return scored.slice(0, Math.min(FOCUS_N, scored.length)).map(function(x){ return x.f; });
 }
-function bumpFocus(kind, items){
-  var counts={};
-  try{ counts = JSON.parse(localStorage.getItem(focusKey(kind))||"{}") || {}; }catch(e){}
-  items.forEach(function(q){ if(q && q._fn) counts[q._fn] = (counts[q._fn]||0) + 1; });
-  try{ localStorage.setItem(focusKey(kind), JSON.stringify(counts)); }catch(e){}
+
+/* يُستدعى عند حفظ الجولة: يحدّث الإتقان وموعد المراجعة القادمة */
+function srCommit(kind, round){
+  var st = srLoad(kind), now = Date.now();
+  Object.keys(round).forEach(function(fn){
+    var r = round[fn];
+    if(!r || !r.t) return;
+    var s = st[fn] || (st[fn] = {n:0, c:0, box:0, last:0});
+    s.n += r.t; s.c += r.c; s.last = now;
+    var acc = r.c / r.t;
+    if(acc >= 0.8)      s.box = Math.min(SR_DAYS.length-1, (s.box||0) + 1);
+    else if(acc < 0.5)  s.box = 0;
+    else                s.box = Math.max(0, (s.box||0) - 1);
+  });
+  srSave(kind, st);
 }
 var CFG={
   math:{gens:MATH_GENS, mode:"choice", label:"كانجرو — استدلال رياضي 🦘", intro:"🔢 أنماط · تناسب · موازين ⚖️ · معادلات بالصور · عدّ مسارات · فخّ منطقي · كسور · أعداد أوّلية. <b>أسئلة جديدة كل مرة</b>."},
@@ -929,7 +948,6 @@ if(!NAMES[who]){
          فنكمّل النقص من بقيّة المولّدات حتى لا تقصر الجولة. */
       if(gen.length < need) gen = gen.concat(genN(c.gens, need - gen.length, seen));
       items = items.concat(gen);
-      bumpFocus(kind, gen);
     }
     var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
@@ -951,16 +969,18 @@ if(!NAMES[who]){
     var scoreEl = sec.querySelector("[data-score]");
     var t0=Date.now(), lastTs=t0, fast=0;
     /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة، ليعرف التقرير أين الضعف بالضبط */
-    var skills={};
+    var skills={}, srRound={};
     function mark(i, ok){
       var g=(items[i] && items[i].gen) || "غير محدّد";
       var s=skills[g] || (skills[g]={c:0,t:0});
       s.t++; if(ok) s.c++;
+      var fn=(items[i] && items[i]._fn);
+      if(fn){ var r=srRound[fn] || (srRound[fn]={c:0,t:0}); r.t++; if(ok) r.c++; }
     }
     function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills}; }
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n, meta(n)); }
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; srCommit(kind, srRound); saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
-    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total, meta(total)); } }
+    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; srCommit(kind, srRound); saveScore(c.label, correct, total, meta(total)); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2], correctVal=items[i][1][ans];
       if(input){
