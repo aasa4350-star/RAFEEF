@@ -58,7 +58,9 @@
   <div class="bar">
     <a href="index.html">🏠 لوحة المتابعة</a>
     <button id="reload">🔄 تحديث</button>
+    <button id="weeklyBtn">📅 التقرير الأسبوعي</button>
   </div>
+  <div id="weekly" class="card" style="display:none"></div>
   <div class="tabs" id="tabs"></div>
   <div id="status" class="card empty">جارٍ التحميل...</div>
   <div id="out"></div>
@@ -265,6 +267,57 @@ function load(){
 
 document.getElementById("reload").addEventListener("click", load);
 load();
+
+/* ===== التقرير الأسبوعي: يجلب results/weekly-report.md ويعرضه داخل الصفحة =====
+   محوّل markdown صغير يكفي للشكل الذي يولّده scripts/weekly_report.py
+   (عناوين، عريض، مائل، جداول، اقتباس، فاصل، قوائم). المحتوى من ملفنا فنثق به،
+   لكن نهرب < > & أولًا احتياطًا. */
+function mdInline(s){
+  s = s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  s = s.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  return s;
+}
+function mdToHtml(md){
+  var lines = md.replace(/\r/g,"").split("\n"), out = [], i = 0;
+  function flushList(buf){ if(buf.length){ out.push("<ul style='margin:6px 0;padding-inline-start:20px'>"+buf.map(function(x){return "<li>"+mdInline(x)+"</li>";}).join("")+"</ul>"); } }
+  while(i < lines.length){
+    var ln = lines[i];
+    if(/^\s*\|/.test(ln)){                          // جدول
+      var rows = [];
+      while(i < lines.length && /^\s*\|/.test(lines[i])){ rows.push(lines[i]); i++; }
+      var cells = rows.map(function(r){ return r.trim().replace(/^\||\|$/g,"").split("|").map(function(c){return c.trim();}); });
+      var body = cells.filter(function(r){ return !r.every(function(c){ return /^:?-+:?$/.test(c); }); });
+      var html = "<div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:.9rem'>";
+      body.forEach(function(r, ri){
+        var tag = ri===0 ? "th" : "td";
+        html += "<tr>"+r.map(function(c){ return "<"+tag+" style='border:1px solid var(--line);padding:6px 9px;text-align:right'>"+mdInline(c)+"</"+tag+">"; }).join("")+"</tr>";
+      });
+      html += "</table></div>";
+      out.push(html);
+      continue;
+    }
+    if(/^#{1,6}\s+/.test(ln)){ var big = /^#\s/.test(ln); out.push("<h2 style='margin:14px 0 6px;font-size:"+(big?"1.2rem":"1.05rem")+"'>"+mdInline(ln.replace(/^#+\s+/,""))+"</h2>"); i++; continue; }
+    if(/^>\s?/.test(ln)){ out.push("<blockquote style='margin:8px 0;padding:8px 12px;background:var(--bg);border-inline-start:3px solid var(--accent);border-radius:8px'>"+mdInline(ln.replace(/^>\s?/,""))+"</blockquote>"); i++; continue; }
+    if(/^---+\s*$/.test(ln)){ out.push("<hr style='border:0;border-top:1px solid var(--line);margin:14px 0'>"); i++; continue; }
+    if(/^-\s+/.test(ln)){ var buf=[]; while(i<lines.length && /^-\s+/.test(lines[i])){ buf.push(lines[i].replace(/^-\s+/,"")); i++; } flushList(buf); continue; }
+    if(/^_.*_\s*$/.test(ln)){ out.push("<p style='color:var(--muted);font-size:.85rem'>"+mdInline(ln.replace(/^_|_$/g,""))+"</p>"); i++; continue; }
+    if(ln.trim()===""){ i++; continue; }
+    out.push("<p style='margin:6px 0'>"+mdInline(ln)+"</p>"); i++;
+  }
+  return out.join("");
+}
+(function(){
+  var btn = document.getElementById("weeklyBtn"), box = document.getElementById("weekly"), shown = false;
+  btn.addEventListener("click", function(){
+    if(shown){ box.style.display="none"; shown=false; btn.textContent="📅 التقرير الأسبوعي"; return; }
+    box.style.display="block"; shown=true; btn.textContent="✖️ إخفاء الأسبوعي";
+    box.innerHTML = "<p class='note'>جارٍ تحميل التقرير الأسبوعي...</p>";
+    fetch("results/weekly-report.md?t="+Date.now())
+      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.text(); })
+      .then(function(md){ box.innerHTML = mdToHtml(md); })
+      .catch(function(e){ box.innerHTML = "<p class='note'>ما قدرت أجيب التقرير الأسبوعي بعد ("+e.message+"). يتولّد تلقائيًا كل سبت، أو شغّله يدويًا من Actions.</p>"; });
+  });
+})();
 </script>
 </body>
 </html>
