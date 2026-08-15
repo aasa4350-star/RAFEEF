@@ -865,9 +865,11 @@ function genN(gens,n,seen){
     var f=gp(gens), q;
     try{ q=f(lvl); }catch(e){ t++; continue; }
     t++;
-    var _k=(q&&q[4])||(q&&q[0]);
-    if(!q||seen[_k]) continue;
-    seen[_k]=1;
+    // نمنع التكرار بمفتاح المولّد ونصّ السؤال معًا: بعض المولّدات تعطي نفس النصّ
+    // بمفتاح مختلف، فبدون فحص النصّ يتسرّب سؤال مكرّر.
+    var _k=(q&&q[4])||(q&&q[0]), _t=(q&&q[0]);
+    if(!q||seen[_k]||seen[_t]) continue;
+    seen[_k]=1; seen[_t]=1;
     q.gen = SKILL_AR[f.name] || f.name || "غير محدّد";
     q._fn = f.name;
     out.push(q);
@@ -944,6 +946,8 @@ if(!NAMES[who]){
     var c = CFG[kind], sec = document.getElementById(kind), input=(c.mode==="input");
     var fromBook = bookTake(kind, QN);
     var need = QN - fromBook.length, seen = {};
+    // نبذر قائمة المنع بأسئلة الكتاب حتى لا يكرّرها التوليد
+    fromBook.forEach(function(q){ if(q){ if(q[4])seen[q[4]]=1; if(q[0])seen[q[0]]=1; } });
     var items = fromBook;
     if(need > 0){
       var gen = genN(focusGens(kind, c.gens), need, seen);
