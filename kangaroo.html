@@ -64,6 +64,9 @@ var lvl = LVL[who] || 2;
 // عدد أسئلة القسم: رُفع ليقترب من ميزانية الوقت (سعود خلّص القسمين بسرعة).
 // الكبار أكثر من الصغار لأن جلستهم أطول (١٥-٢٠ د مقابل ١٠-١٢ د).
 var QN = (who==="hasan"||who==="rafeef") ? 14 : 12;
+// تركيز مؤقّت على أضعف مهارات الاستدلال الرياضي عند الأربعة (خط الأساس): العدّ وأيام الأسبوع.
+// يُحجَز لها جزء من كل جولة رياضية. للإزالة لاحقًا: فرّغ هذه القائمة.
+var MATH_BOOST = ["gCountTri","gCountSquares","gDigitCount","gWeekday"];
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
@@ -950,7 +953,13 @@ if(!NAMES[who]){
     fromBook.forEach(function(q){ if(q){ if(q[4])seen[q[4]]=1; if(q[0])seen[q[0]]=1; } });
     var items = fromBook;
     if(need > 0){
-      var gen = genN(focusGens(kind, c.gens), need, seen);
+      var gen = [];
+      // تركيز: نحجز ~٤٠٪ من جولة الاستدلال الرياضي لمهارات العدّ وأيام الأسبوع (الأضعف).
+      if(kind==="math" && MATH_BOOST.length){
+        var boostGens = c.gens.filter(function(f){ return MATH_BOOST.indexOf(f.name)>=0; });
+        if(boostGens.length) gen = genN(boostGens, Math.ceil(need*0.4), seen);
+      }
+      gen = gen.concat(genN(focusGens(kind, c.gens), need - gen.length, seen));
       /* بعض المولّدات لا تنتج إلا سؤالًا واحدًا في الجولة (مفتاح تكرار ثابت)،
          فنكمّل النقص من بقيّة المولّدات حتى لا تقصر الجولة. */
       if(gen.length < need) gen = gen.concat(genN(c.gens, need - gen.length, seen));
