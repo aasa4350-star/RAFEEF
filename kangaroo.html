@@ -67,6 +67,14 @@ var QN = (who==="hasan"||who==="rafeef") ? 14 : 12;
 // تركيز مؤقّت على أضعف مهارات الاستدلال الرياضي عند الأربعة (خط الأساس): العدّ وأيام الأسبوع.
 // يُحجَز لها جزء من كل جولة رياضية. للإزالة لاحقًا: فرّغ هذه القائمة.
 var MATH_BOOST = ["gCountTri","gCountSquares","gDigitCount","gWeekday"];
+// روابط بحث يوتيوب (لا فيديو محدّد — البحث لا ينكسر) لأصعب مهارات الاستدلال الرياضي.
+var VIDEO_Q = {
+  gCountTri:"طريقة عد المثلثات في الشكل قدرات",
+  gDigitCount:"كم مرة يتكرر الرقم من 1 الى 100",
+  gWeekday:"معرفة اليوم بعد عدد من الايام باقي القسمة",
+  gCountSquares:"عد المربعات في الشبكة كم مربع قدرات",
+  gFraction:"شرح الكسر من شكل مظلل كيف نحسب الكسر"
+};
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
@@ -965,7 +973,27 @@ if(!NAMES[who]){
       if(gen.length < need) gen = gen.concat(genN(c.gens, need - gen.length, seen));
       items = items.concat(gen);
     }
-    var html = '<div class="intro">'+c.intro+'</div>';
+    var html = '';
+    // صندوق دروس الشرح (فيديو) لأصعب مهارات الاستدلال الرياضي — يبرز الأضعف حسب بيانات الطفل.
+    if(kind==="math"){
+      var st = srLoad("math");
+      var vids = Object.keys(VIDEO_Q).map(function(fn){
+        var s = st[fn], acc = (s && s.n) ? s.c/s.n : null, n = (s && s.n) || 0;
+        return { fn:fn, name:(SKILL_AR[fn]||fn), acc:acc, n:n, weak:(acc!=null && n>=2 && acc<0.5) };
+      });
+      vids.sort(function(a,b){ return (a.weak===b.weak ? ((a.acc==null?9:a.acc)-(b.acc==null?9:b.acc)) : (a.weak?-1:1)); });
+      var rows = vids.map(function(v){
+        var pct = v.acc!=null ? Math.round(v.acc*100) : null;
+        var badge = pct==null ? '' : ' <span style="color:'+(v.weak?'var(--bad)':'var(--muted)')+';font-weight:800;font-size:.85rem">('+pct+'%)</span>';
+        var url = 'https://www.youtube.com/results?search_query='+encodeURIComponent(VIDEO_Q[v.fn]);
+        return '<a href="'+url+'" target="_blank" rel="noopener" style="display:block;text-decoration:none;padding:9px 12px;margin:6px 0;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-weight:700">🎬 '+v.name+badge+'</a>';
+      }).join('');
+      var anyWeak = vids.some(function(v){ return v.weak; });
+      html += '<details '+(anyWeak?'open':'')+' style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
+        '<summary style="font-weight:800;cursor:pointer;padding:8px 0">🎬 دروس شرح (فيديو) للمهارات الصعبة'+(anyWeak?' — عندك مهارة تحت ٥٠٪':'')+'</summary>'+
+        '<div style="padding:2px 0 8px"><p style="color:var(--muted);font-size:.82rem;margin:2px 0 6px">شاهد الشرح ثم ارجع حُلّ الأسئلة تحت.</p>'+rows+'</div></details>';
+    }
+    html += '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
       if(input){
