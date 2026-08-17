@@ -862,7 +862,10 @@ function bookTake(kind, n){
   try{ at = parseInt(localStorage.getItem(bookKey(kind))||"0",10)||0; }catch(e){}
   if(at >= B.length) return [];
   var out = B.slice(at, at+n).map(function(q){
-    var c = [q[0], q[1].slice(), q[2], q[3]];
+    /* أسئلة الكتاب مكتوبة والإجابة الصحيحة أوّلًا؛ نخلط الخيارات عند العرض
+       حتى لا يتعوّد الطفل على أن الجواب دائمًا في الخيار الأوّل. */
+    var right = q[1][q[2]], o = shuffle(q[1].slice());
+    var c = [q[0], o, o.indexOf(right), q[3]];
     c.gen = "📘 " + (SKILL_BOOK[kind] || "أسئلة الكتاب");
     return c;
   });
