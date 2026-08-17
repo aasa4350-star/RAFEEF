@@ -342,7 +342,16 @@ var VGEN = [
   function(){var a=gp(VC);return ["<b>إكمال جمل:</b> "+a[0],[a[1],a[2],a[3]],0,a[4]];},
   function(){var a=gp(VR);return ["<b>استيعاب مقروء:</b> «"+a[0]+"» الفكرة الرئيسة:",[a[1],a[2],a[3]],0,"الفكرة العامة للنصّ."];}
 ];
-function genVerbal(n){ var out=[],seen={},t=0; while(out.length<n && t<n*12){ var q=gp(VGEN)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); } return out; }
+function genVerbal(n){
+  var out=[],seen={},t=0;
+  // تركيز مرادفات لحسن (ضعفه المحدّد): نحجز ~ثلث القسم لأسئلة المرادف.
+  // مولّد المرادف = العنصر الذي نصّه يبدأ بـ«مرادف» في VGEN (بدل الاعتماد على فهرس ثابت).
+  var synGen = VGEN.filter(function(g){ try{ return /^<b>مرادف/.test(g()[0]); }catch(e){ return false; } })[0];
+  var synN = (who==="hasan" && synGen) ? Math.round(n*0.3) : 0;
+  while(out.length<synN && t<n*12){ var qs=synGen(); t++; if(seen[qs[0]])continue; seen[qs[0]]=1; out.push(qs); }
+  while(out.length<n && t<n*12){ var q=gp(VGEN)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); }
+  return out;
+}
 
 // ===== STEP — الكفايات اللغوية الإنجليزية (تدريبي) =====
 var STEP = [

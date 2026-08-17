@@ -1734,6 +1734,21 @@ if(!STUDENTS[who]){
         var generated = genN(gens, gcount);
         var curated = shuffle(pool(id).slice()).slice(0, QN); // عيّنة متنوّعة من المنسّق
         quiz = shuffle(generated.concat(curated)).slice(0, QN);
+        // تركيز مرادفات إنجليزية لحسن (ضعفه المحدّد): نضمن ~٣ أسئلة مرادف في القسم.
+        if(isEn && who==="hasan"){
+          var isSyn=function(q){ return /synonym|same meaning/i.test(q[0]||""); };
+          var have=quiz.filter(isSyn).length, want=Math.min(3, QN);
+          if(have<want){
+            var pooled=shuffle(pool(id).filter(isSyn));
+            var slots=quiz.map(function(q,i){ return isSyn(q)?-1:i; }).filter(function(i){ return i>=0; });
+            for(var _k=0; have<want && _k<pooled.length && slots.length; _k++){
+              var s=pooled[_k];
+              if(quiz.some(function(q){ return q[0]===s[0]; })) continue;
+              quiz[slots.pop()]=s; have++;
+            }
+            quiz=shuffle(quiz);
+          }
+        }
       } else {
         quiz = shuffle(pool(id).slice()).slice(0, QN);
       }
