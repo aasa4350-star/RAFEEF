@@ -1116,7 +1116,9 @@ if(!NAMES[who]){
       if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
-  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+  // لا نحفظ جزئيًا عند مجرّد اختفاء الصفحة (فتح فيديو يوتيوب ثم الرجوع لإكمال الجولة)،
+  // وإلا قُفل الحفظ على جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند
+  // تبديل القسم فعليًا (معالِج التبويبات). حالة الجولة تبقى محفوظة في الذاكرة عند الرجوع.
 }
 </script>
 </body>

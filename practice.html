@@ -780,7 +780,8 @@ document.querySelectorAll(".tabs button").forEach(function(b){
   });
 });
 // لو طلع من الصفحة (أو صغّر التطبيق) وهو في نص قسم، نحفظ اللي جاوبه
-document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// لا نحفظ جزئيًا عند اختفاء الصفحة (فتح فيديو علاجي ثم الرجوع)، وإلا قُفل الحفظ على
+// جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند تبديل القسم فعليًا.
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}

@@ -331,7 +331,8 @@ function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hidden
 var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
 function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
 // لو خرج من الصفحة أثناء أي قسم، نحفظ اللي سوّاه لين الآن (عشان لا يضيع تعبه)
-document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// لا نحفظ جزئيًا عند اختفاء الصفحة (فتح تطبيق/فيديو ثم الرجوع)، وإلا قُفل الحفظ على
+// جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند تبديل القسم فعليًا.
 // اختيار عناصر جديدة كل مرة بدون تكرار — نلفّ على كل القائمة ثم نعيد
 function pickFresh(pool, key, n){
   n = Math.min(n||8, pool.length);
