@@ -117,8 +117,14 @@ function gOdd(lvl){
     var mn;do{mn=minFn();}while(maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
     expl=isEven?(mn+" عدد فردي والبقية زوجية."):(mn+" عدد زوجي والبقية فردية.");
   } else {
-    var k=gp([3,4,5]);var s={},maj=[];while(maj.length<3){var v=k*ri(2,6+lvl*2);if(!s[v]){s[v]=1;maj.push(v);}}
-    var mn;do{mn=ri(2,k*8);}while(mn%k===0||maj.indexOf(mn)>=0);nums=maj.concat([mn]);correct=mn;
+    // كل الأعداد بنفس الزوجية حتى لا يصير «الزوجي/الفردي الوحيد» إجابة منافسة:
+    // k=4 → كلها زوجية؛ k فردي → كلها فردية.
+    var k=gp([3,4,5]), par=(k%2===0)?0:1, s={}, maj=[], t=0;
+    while(maj.length<3 && t<400){ t++; var v=k*ri(2,6+lvl*2); if(v%2!==par || s[v]) continue; s[v]=1; maj.push(v); }
+    if(maj.length<3) return null;
+    var mn, t3=0; do{ mn=ri(2,k*8); t3++; }while((mn%k===0||mn%2!==par||maj.indexOf(mn)>=0)&&t3<400);
+    if(mn%k===0||mn%2!==par||maj.indexOf(mn)>=0) return null;
+    nums=maj.concat([mn]);correct=mn;
     expl=mn+" ليس من مضاعفات "+k+"، والبقية من مضاعفاته.";
   }
   shuffle(nums);return ["أيّ عدد مختلف عن البقية: "+nums.join("، ")+"؟",nums.slice(),nums.indexOf(correct),expl];
@@ -415,8 +421,11 @@ function gBalance(lvl){
 /* ١١) العدد المختلف: أوّلي بين غير أوّلية */
 function isPrime(n){ if(n<2) return false; for(var d=2;d*d<=n;d++){ if(n%d===0) return false; } return true; }
 function gPrimeOdd(lvl){
+  // كل الأعداد فردية وغير مربّعة كاملة، حتى يبقى معيار «المختلف» هو الأوّلية وحدها
+  // (لو كان مشتّت زوجيًّا وحيدًا صار مختلفًا بالزوجية، فيصير للسؤال إجابتان).
+  function isSq(n){ var r=Math.round(Math.sqrt(n)); return r*r===n; }
   var comp=[], seen={}, t=0;
-  while(comp.length<3 && t<300){ t++; var v=ri(4,60); if(isPrime(v)||seen[v]) continue; seen[v]=1; comp.push(v); }
+  while(comp.length<3 && t<500){ t++; var v=ri(4,60); if(v%2===0||isPrime(v)||isSq(v)||seen[v]) continue; seen[v]=1; comp.push(v); }
   if(comp.length<3) return null;
   var p=0, t2=0; do{ p=ri(5,59); t2++; }while((!isPrime(p)||seen[p])&&t2<300);
   if(!isPrime(p)||seen[p]) return null;
