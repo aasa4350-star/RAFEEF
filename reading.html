@@ -908,6 +908,13 @@ if(!META[who] || !DATA[who]){
      يختلّ موضع «حفظت كذا» المحفوظ لكل ابن. ونستبعد أي تكرار احتياطًا. */
   (function(){
     var P = window.VOCAB_PLUS; if(!P || !P.length) return;
+    /* لا تُفتح الدفعة الثانية إلا لمن أنهى الثلاثمئة الأولى (أو كان قاربها).
+       سعود وأسامة محفوظهما قليل، فلو رأيا «٤٠ / ٦٩٩» أُحبِطا من رقمٍ
+       لا يبلغانه هذا العام. يبقى هدفهما ٣٠٠ وهو قريبٌ محسوس، وتُفتح
+       الدفعة الثانية تلقائيًّا يوم يُنهيانها. */
+    var raw = 0; try{ raw = parseInt(localStorage.getItem("vocab_learned_"+who)||"0",10)||0; }catch(e){}
+    var NEXT_TIER = { hasan:1, rafeef:1 };      /* الكبار — أوشكا على النهاية */
+    if(raw < VOCAB300.length && !NEXT_TIER[who]) return;
     var seenEn={}, seenAr={};
     VOCAB300.forEach(function(w){ seenEn[String(w[0]).toLowerCase()]=1; seenAr[w[1][0]]=1; });
     P.forEach(function(w){
