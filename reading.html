@@ -934,6 +934,49 @@ if(!META[who] || !DATA[who]){
   function getWeak(){ try{ return JSON.parse(localStorage.getItem(vKey("weak"))||"{}")||{}; }catch(e){ return {}; } }
   function setWeak(o){ try{ localStorage.setItem(vKey("weak"), JSON.stringify(o)); }catch(e){} }
   function markWeak(word, wrong){ var wk=getWeak(); if(wrong){ wk[word]=(wk[word]||0)+1; } else { if(wk[word]){ delete wk[word]; } } setWeak(wk); }
+
+  /* ===== مراجعة متباعدة لكل كلمة على حدة (نظام الصناديق) =====
+     المشكلة قبل: المراجعة كانت «لفّة» على كل المحفوظ — تعرض ١٠ وتشيلهم من
+     اللفّة، فلا ترجع الكلمة إلا بعد (المحفوظ ÷ ١٠) جلسة: ٣٠ جلسة عند ٣٠٠
+     كلمة، وضِعفها في أسوأ حالة. فالكلمة القديمة تغيب شهرًا أو شهرين.
+     الآن لكل كلمة صندوقٌ وموعد: أوّل ما تُحفظ ترجع بعد يوم، فيومين، فأربعة…
+     وإذا غلط فيها رجعت إلى الصندوق صفر فتعود بكرة. */
+  var SR_DAYS = [0, 1, 2, 4, 8, 16, 30, 45];
+  var SR_DAY_MS = 86400000;
+  function getSR(){ try{ return JSON.parse(localStorage.getItem(vKey("sr"))||"{}")||{}; }catch(e){ return {}; } }
+  function setSR(o){ try{ localStorage.setItem(vKey("sr"), JSON.stringify(o)); }catch(e){} }
+  /* كم بقي على موعدها بالمللي ثانية؛ السالب يعني تأخّرت، وكلّما صغر زاد التأخّر */
+  function srDueIn(st){
+    if(!st || !st.t) return -Infinity;          // ما رُوجعت قطّ → أولى الناس بالدور
+    var box = Math.min(st.b||0, SR_DAYS.length-1);
+    return (st.t + SR_DAYS[box]*SR_DAY_MS) - Date.now();
+  }
+  function srMark(word, ok){
+    var s=getSR(), st=s[word] || {b:0,t:0,n:0,c:0};
+    st.n++;
+    if(ok){ st.c++; st.b = Math.min((st.b||0)+1, SR_DAYS.length-1); }
+    else  { st.b = 0; }                          // نسيها → ترجع بكرة
+    st.t = Date.now(); s[word]=st; setSR(s);
+  }
+  /* عدد الكلمات التي حان موعدها الآن */
+  function srDue(pool){ var s=getSR(); return pool.filter(function(w){ return srDueIn(s[w[0]])<=0; }).length; }
+  /* عدد الكلمات الراسخة (وصلت الصندوق الأخير) */
+  function srMastered(pool){ var s=getSR(); return pool.filter(function(w){ var st=s[w[0]]; return st && st.b>=SR_DAYS.length-1; }).length; }
+
+  /* ===== حجم جلسة المراجعة =====
+     حقيقة حسابية لا مفرّ منها: طول اللفّة = المحفوظ ÷ حجم الجلسة. فعند ٣٠٠
+     كلمة و١٠ في الجلسة لا ترجع الكلمة إلا بعد ٣٠ يومًا مهما كان الترتيب ذكيًّا.
+     الحلّ الوحيد أن يكبر حجم الجلسة مع كِبَر المحفوظ. نستهدف لفّةً كل ١٤ يومًا،
+     ونترك للطفل أن يختار حجمًا أصغر أو أكبر ونُريه أثر اختياره بالأيام. */
+  var RV_TARGET_DAYS = 14;
+  function rvAuto(learned){ return Math.max(VOC_STEP, Math.min(30, Math.ceil(learned/RV_TARGET_DAYS))); }
+  function getRvSize(learned){
+    var n=parseInt(localStorage.getItem(vKey("rvsize"))||"0",10);
+    if(!n || isNaN(n)) return rvAuto(learned);
+    return Math.max(VOC_STEP, Math.min(40, n));
+  }
+  function setRvSize(n){ try{ localStorage.setItem(vKey("rvsize"), String(n)); }catch(e){} }
+  function rvCycle(learned, size){ return size>0 ? Math.ceil(learned/size) : 0; }
   // تتبّع اللفّة الحالية — الكلمات الي ظهرت في هاللفّة (ما تتكرر لين تخلص كل الكلمات ثم تلفّ من جديد)
   function getReviewSeen(){ try{ return JSON.parse(localStorage.getItem(vKey("rseen"))||"{}")||{}; }catch(e){ return {}; } }
   function setReviewSeen(o){ try{ localStorage.setItem(vKey("rseen"), JSON.stringify(o)); }catch(e){} }
@@ -963,25 +1006,22 @@ if(!META[who] || !DATA[who]){
     var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
 
     // بناء قائمة الكلمات حسب الوضع
-    var V, headTitle, isNew=false, startIdx=learned, passReset=false;
+    var V, headTitle, isNew=false, startIdx=learned, passReset=false, dueNow=0, masteredNow=0, rvSize=VOC_STEP;
     if(vocMode==="review"){
       headTitle = "🔁 مراجعة المحفوظ";
       var pool = VOCAB300.slice(0, learned);
       if(pool.length){
-        var wk = getWeak();
-        var seenPass = getReviewSeen();
-        // الكلمات الي ما ظهرت في هاللفّة الحالية بعد
-        var remaining = pool.filter(function(w){ return !seenPass[w[0]]; });
-        if(!remaining.length){ // خلصت اللفّة → نلفّ من جديد بترتيب جديد
-          seenPass = {}; passReset = true; remaining = pool.slice();
-        }
-        // ترتيب عشوائي متلخبط — والكلمات الي غلط فيها تجي أول
-        var weakRemain = shuffle(remaining.filter(function(w){ return wk[w[0]]; }));
-        var normRemain = shuffle(remaining.filter(function(w){ return !wk[w[0]]; }));
-        var seen={}; V=[];
-        weakRemain.concat(normRemain).forEach(function(w){ if(V.length<VOC_STEP && !seen[w[0]]){ seen[w[0]]=1; V.push(w); } });
-        // نسجّل الكلمات المعروضة كأنها ظهرت في هاللفّة
-        V.forEach(function(w){ seenPass[w[0]]=1; }); setReviewSeen(seenPass);
+        var wk = getWeak(), srs = getSR();
+        /* الترتيب: الكلمة الي غلط فيها أوّلًا، ثم الأكثر تأخّرًا عن موعدها،
+           ثم الأقدم حفظًا — فالكلمات القديمة ترجع أوّل لا آخِرًا. */
+        var scored = pool.map(function(w,i){
+          return { w:w, weak:(wk[w[0]]?1:0), due:srDueIn(srs[w[0]]), idx:i };
+        });
+        scored.sort(function(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); });
+        rvSize = getRvSize(learned);
+        V = scored.slice(0, rvSize).map(function(x){ return x.w; });
+        dueNow = scored.filter(function(x){ return x.due<=0; }).length;
+        masteredNow = srMastered(pool);
       } else { V=[]; }
     } else {
       isNew=true; headTitle = "📚 تعلّم كلمات جديدة";
@@ -990,6 +1030,20 @@ if(!META[who] || !DATA[who]){
 
     // شريط التقدّم + أزرار الوضع
     var pct = Math.round(learned/VOC_TOTAL*100);
+    function sizeBar(learned){
+      var cur=getRvSize(learned), opts=[];
+      [VOC_STEP, rvAuto(learned), 30].forEach(function(n){ n=Math.max(VOC_STEP,Math.min(30,n)); if(opts.indexOf(n)<0) opts.push(n); });
+      opts.sort(function(a,b){ return a-b; });
+      var h='<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:12px;box-shadow:var(--shadow)">'+
+        '<div style="font-weight:800;font-size:.9rem;margin-bottom:8px">⏱️ كم كلمة في جلسة المراجعة؟</div>'+
+        '<div class="row" style="gap:6px">';
+      opts.forEach(function(n){
+        var on=(n===cur);
+        h+='<button data-rv="'+n+'" style="flex:1;padding:9px 4px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit;font-size:.88rem;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+n+'</button>';
+      });
+      h+='</div><div style="font-size:.85rem;color:var(--muted);margin-top:8px;line-height:1.6">بهذا الحجم ترجع لك كل كلمة مرّةً كل <b>'+rvCycle(learned,cur)+'</b> يوم تقريبًا. كلّما كبر الحجم رجعت كلماتك القديمة أسرع، وطالت الجلسة.</div></div>';
+      return h;
+    }
     var btn = function(m,txt){ var on=(vocMode===m); return '<button data-mode="'+m+'" style="flex:1;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+txt+'</button>'; };
     var html = '<div class="block-title"><span class="dot"></span> حفظ الكلمات ✍️</div>'+
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
@@ -997,6 +1051,7 @@ if(!META[who] || !DATA[who]){
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
+      (vocMode==="review" && learned>VOC_STEP ? sizeBar(learned) : '')+
       '<div data-daybanner style="background:linear-gradient(135deg,var(--accent-deep,#047857),var(--accent));color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:800;text-align:center;line-height:1.6">'+vocMotiv(getDay().count,getDay().best)+'</div>';
 
     if(!V.length){
@@ -1008,12 +1063,16 @@ if(!META[who] || !DATA[who]){
       html += '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
       sec.innerHTML = html;
       sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocMode=b.dataset.mode; renderVocab(); }); });
-      var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); setReviewSeen({}); renderVocab(); } });
+      sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
+      var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); setReviewSeen({}); setSR({}); renderVocab(); } });
       return;
     }
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+VOC_TOTAL+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
-                          : '<p class="hint">🔁 مراجعة عشوائية متلخبطة من كل محفوظك — نلفّ على كل الكلمات ثم نعيد من جديد. الكلمة الي تغلط فيها ترجع لك أسرع.'+(passReset?' <b>🔄 بدأنا لفّة جديدة!</b>':'')+' اكتب الإنجليزي ثم «تحقّق».</p>';
+                          : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
+                            (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
+                            (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
+                            ' اكتب الإنجليزي ثم «تحقّق».</p>';
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
       '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
     var dayBase = getDay().count;
@@ -1070,7 +1129,7 @@ if(!META[who] || !DATA[who]){
         var enOk = norm(ein.value,false)===norm(word,false);
         if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
         else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
-        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best); }
+        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); srMark(word, enOk); var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best); }
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         onComplete();
       });
@@ -1084,6 +1143,7 @@ if(!META[who] || !DATA[who]){
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(word, false, pfb2, azb); });
     });
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
+    sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
   }
 
