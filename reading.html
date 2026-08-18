@@ -969,8 +969,18 @@ if(!META[who] || !DATA[who]){
      الحلّ الوحيد أن يكبر حجم الجلسة مع كِبَر المحفوظ. نستهدف لفّةً كل ١٤ يومًا،
      ونترك للطفل أن يختار حجمًا أصغر أو أكبر ونُريه أثر اختياره بالأيام. */
   var RV_TARGET_DAYS = 14;
-  function rvAuto(learned){ return Math.max(VOC_STEP, Math.min(30, Math.ceil(learned/RV_TARGET_DAYS))); }
+  /* طلب الأب صراحةً: حسن ورفيف يراجعون ٢٥ كلمة كل يوم */
+  var RV_FIXED = { hasan:25, rafeef:25 };
+  var RV_VER = "2";   /* رفعُه يُلغي اختيارًا محفوظًا قديمًا مرّةً واحدة */
+  function rvAuto(learned){
+    if(RV_FIXED[who]) return Math.max(VOC_STEP, Math.min(learned||VOC_STEP, RV_FIXED[who]));
+    return Math.max(VOC_STEP, Math.min(30, Math.ceil(learned/RV_TARGET_DAYS)));
+  }
   function getRvSize(learned){
+    /* لو كان المحفوظ اختيارًا من نسخةٍ أقدم، نتجاهله ونرجع للمطلوب */
+    if(localStorage.getItem(vKey("rvver")) !== RV_VER){
+      try{ localStorage.removeItem(vKey("rvsize")); localStorage.setItem(vKey("rvver"), RV_VER); }catch(e){}
+    }
     var n=parseInt(localStorage.getItem(vKey("rvsize"))||"0",10);
     if(!n || isNaN(n)) return rvAuto(learned);
     return Math.max(VOC_STEP, Math.min(40, n));
@@ -1032,7 +1042,7 @@ if(!META[who] || !DATA[who]){
     var pct = Math.round(learned/VOC_TOTAL*100);
     function sizeBar(learned){
       var cur=getRvSize(learned), opts=[];
-      [VOC_STEP, rvAuto(learned), 30].forEach(function(n){ n=Math.max(VOC_STEP,Math.min(30,n)); if(opts.indexOf(n)<0) opts.push(n); });
+      [VOC_STEP, rvAuto(learned), cur, 30].forEach(function(n){ n=Math.max(VOC_STEP,Math.min(40,n)); if(opts.indexOf(n)<0) opts.push(n); });
       opts.sort(function(a,b){ return a-b; });
       var h='<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:12px;box-shadow:var(--shadow)">'+
         '<div style="font-weight:800;font-size:.9rem;margin-bottom:8px">⏱️ كم كلمة في جلسة المراجعة؟</div>'+
