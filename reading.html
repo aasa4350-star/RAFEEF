@@ -913,7 +913,10 @@ if(!META[who] || !DATA[who]){
        لا يبلغانه هذا العام. يبقى هدفهما ٣٠٠ وهو قريبٌ محسوس، وتُفتح
        الدفعة الثانية تلقائيًّا يوم يُنهيانها. */
     var raw = 0; try{ raw = parseInt(localStorage.getItem("vocab_learned_"+who)||"0",10)||0; }catch(e){}
-    var NEXT_TIER = { hasan:1, rafeef:1 };      /* الكبار — أوشكا على النهاية */
+    /* رفيف وحدها أنهت الثلاثمئة فعلًا. حسن باقٍ له خمسون كلمة، ولو رأى
+       «٢٥٠ / ٦٩٩» شعر أن ما حفظه تضاءل — وهو ما اشتكى منه فعلًا. يبقى
+       على «٢٥٠ / ٣٠٠» حتى يُنهيها ثم تُفتح له الدفعة الثانية من نفسها. */
+    var NEXT_TIER = { rafeef:1 };
     if(raw < VOCAB300.length && !NEXT_TIER[who]) return;
     var seenEn={}, seenAr={};
     VOCAB300.forEach(function(w){ seenEn[String(w[0]).toLowerCase()]=1; seenAr[w[1][0]]=1; });
@@ -979,6 +982,16 @@ if(!META[who] || !DATA[who]){
     if(ok){ st.c++; st.b = Math.min((st.b||0)+1, SR_DAYS.length-1); }
     else  { st.b = 0; }                          // نسيها → ترجع بكرة
     st.t = Date.now(); s[word]=st; setSR(s);
+  }
+  /* بعد الإجابة: متى ترجع هذه الكلمة؟ — يسأل حسن «متى أراجعهم»،
+     فالجواب يُعرض على البطاقة نفسها بدل أن يبقى مخفيًّا في الكود. */
+  function srNextTxt(word){
+    var st = getSR()[word]; if(!st) return "";
+    var d = SR_DAYS[Math.min(st.b||0, SR_DAYS.length-1)];
+    if(d<=0) return "ترجع لك في الجولة الجاية";
+    if(d===1) return "ترجع لك بكرة";
+    if(d===2) return "ترجع لك بعد يومين";
+    return "ترجع لك بعد "+d+" أيام";
   }
   /* عدد الكلمات التي حان موعدها الآن */
   function srDue(pool){ var s=getSR(); return pool.filter(function(w){ return srDueIn(s[w[0]])<=0; }).length; }
@@ -1117,9 +1130,12 @@ if(!META[who] || !DATA[who]){
         '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
         '<div class="fb"></div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
-          '<span '+lab+'>🎤 درّب نطقك — اكتب نطق الكلمة (تقدر تستخدم مايك الكيبورد):</span>'+
-          '<input class="pinp" placeholder="Say it..." style="direction:ltr;text-align:left">'+
-          '<div class="row"><button class="say small pchk">افحص النطق</button>'+azBtnHtml()+'<span class="pfb2" style="font-weight:700"></span></div>'+
+          '<span '+lab+'>🎙️ درّب نطقك — اضغط «انطق» وقل الكلمة بصوتك:</span>'+
+          '<div class="row"><button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button>'+
+            '<button class="say small" data-vsay>🔊 اسمعها</button>'+azBtnHtml()+'</div>'+
+          '<div class="pfb" style="font-weight:700;margin-top:6px;font-size:.92rem"></div>'+
+          '<input class="pinp" placeholder="أو اكتبها كما تُنطق..." style="direction:ltr;text-align:left;margin-top:8px">'+
+          '<div class="row"><button class="say small pchk">افحص المكتوب</button><span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>'+
@@ -1161,7 +1177,13 @@ if(!META[who] || !DATA[who]){
         var enOk = norm(ein.value,false)===norm(word,false);
         if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
         else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
-        if(!tried[i]){ tried[i]=1; markWeak(word, !enOk); srMark(word, enOk); var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best); }
+        if(!tried[i]){
+          tried[i]=1; markWeak(word, !enOk); srMark(word, enOk);
+          /* نُري الطفل موعد رجوع الكلمة فورًا — هذا جوابُ سؤال «متى أراجعهم» */
+          var nx=srNextTxt(word);
+          if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>';
+          var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best);
+        }
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         onComplete();
       });
@@ -1173,6 +1195,9 @@ if(!META[who] || !DATA[who]){
         pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(word, false, pfb2, azb); });
+      /* تقييم نطقٍ حقيقيّ بالمايك — يقارن ما نطقه الطفل بالكلمة نفسها */
+      wireMic(qEl, word, false);
+      var vsay=qEl.querySelector("[data-vsay]"); if(vsay) vsay.addEventListener("click",function(){ speak(word,0.85,"en-US"); });
     });
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
     sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
