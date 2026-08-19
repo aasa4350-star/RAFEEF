@@ -1,5 +1,112 @@
 [
     {
+        "id": "0425b1a2-be61-4ce6-9ed2-8e55f28b2f9a",
+        "created_at": "2026-08-19T21:58:31.648014+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
+            "total": 13,
+            "wrong": [
+                "<b>\u0645\u0631\u0627\u062f\u0641:</b> \u0645\u0631\u0627\u062f\u0641 \u00ab\u062e\u0648\u0641\u00bb:",
+                "<b>\u0636\u062f\u0651:</b> \u0636\u062f\u0651 \u00ab\u0633\u0644\u0645\u00bb:",
+                "<b>\u0625\u0643\u0645\u0627\u0644 \u062c\u0645\u0644:</b> \u0627\u0644\u0643\u062a\u0627\u0628 \u062e\u064a\u0631 ______ \u0644\u0627 \u064a\u0645\u0644\u0651 \u0645\u062d\u062f\u0651\u062b\u0647.",
+                "<b>\u0625\u0643\u0645\u0627\u0644 \u062c\u0645\u0644:</b> \u0631\u0628\u0651 \u0636\u0627\u0631\u0651\u0629 ______ ."
+            ],
+            "skills": {
+                "\u0636\u062f\u0651": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0645\u0631\u0627\u062f\u0641": {
+                    "c": 7,
+                    "t": 8
+                },
+                "\u0625\u0643\u0645\u0627\u0644 \u062c\u0645\u0644": {
+                    "c": 1,
+                    "t": 3
+                },
+                "\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 9,
+            "stretch": false
+        }
+    },
+    {
+        "id": "e057488a-ae97-4156-a1a5-4290131350ea",
+        "created_at": "2026-08-19T21:56:16.315323+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "kind": "practice",
+            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
+            "total": 12,
+            "wrong": [
+                "<b>Reading:</b> \"Reading widens the mind and builds vocabulary.\" What is the main idea?",
+                "<b>Grammar:</b> It's the best film ___ I've ever seen.",
+                "<b>Vocabulary:</b> \"Diligent\" means:"
+            ],
+            "skills": {
+                "Error": {
+                    "c": 1,
+                    "t": 1
+                },
+                "Grammar": {
+                    "c": 6,
+                    "t": 7
+                },
+                "Reading": {
+                    "c": 0,
+                    "t": 1
+                },
+                "Vocabulary": {
+                    "c": 2,
+                    "t": 3
+                }
+            },
+            "correct": 9,
+            "stretch": true
+        }
+    },
+    {
+        "id": "dadfe235-9c2d-414d-ab4c-c9440bea39e4",
+        "created_at": "2026-08-19T21:54:52.208214+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "dur": 478,
+            "away": 0,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 30,
+            "correct": 30,
+            "learned": 34,
+            "trusted": true,
+            "vocTotal": 300
+        }
+    },
+    {
         "id": "86a99ab7-90a4-4f7f-bbc3-68537eb7e19c",
         "created_at": "2026-08-19T21:49:55.329102+00:00",
         "student": "\u0631\u0641\u064a\u0641",
@@ -50088,498 +50195,6 @@
             ],
             "avg_sec": 4.2,
             "total_sec": 76
-        }
-    },
-    {
-        "id": "0abd42c7-fe27-43bd-a559-a247e774c7ce",
-        "created_at": "2026-07-24T00:43:55.595312+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 10,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "The plural of \"box\" is:",
-                "picked": "boxs",
-                "correct": "boxes",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3.4,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 6.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.6,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.3,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 2.8,
-            "total_sec": 51
-        }
-    },
-    {
-        "id": "db51466b-f766-4e4d-9051-693ebdd45de4",
-        "created_at": "2026-07-24T00:43:25.286603+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 6,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "The plural of \"box\" is:",
-                "picked": "boxs",
-                "correct": "boxes",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a \u00bd \u0645\u0646 10\u061f",
-                "picked": "2",
-                "correct": "5",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 25 + 37",
-                "picked": "72",
-                "correct": "62",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0623\u064a\u0647\u0645\u0627 \u0623\u0643\u0628\u0631: 0.5 \u0623\u0645 0.05\u061f",
-                "picked": "0.05",
-                "correct": "0.5",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: \u00be + \u00bc",
-                "picked": "\u00bd",
-                "correct": "1",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3.4,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 6.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 46.3,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 25.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 8.8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 6.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 12.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 7.8,
-            "total_sec": 141
-        }
-    },
-    {
-        "id": "d04d430b-d014-417e-9863-d292f33daa38",
-        "created_at": "2026-07-24T00:35:49.104251+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 7,
-        "en_total": 10,
-        "ma_correct": 6,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "Yesterday I ___ a film.",
-                "picked": "watch",
-                "correct": "watched",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The plural of \"child\" is:",
-                "picked": "childs",
-                "correct": "children",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "We ___ TV every evening.",
-                "picked": "watching",
-                "correct": "watch",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 12 \u00d7 5",
-                "picked": "55",
-                "correct": "60",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0645\u062d\u064a\u0637 \u0645\u0631\u0628\u0639 \u0637\u0648\u0644 \u0636\u0644\u0639\u0647 5",
-                "picked": "25",
-                "correct": "20",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a \u00be \u0645\u0646 20\u061f",
-                "picked": "12",
-                "correct": "15",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0628\u0633\u0651\u0637 \u0627\u0644\u0646\u0633\u0628\u0629 2:4",
-                "picked": "2:1",
-                "correct": "1:2",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 22.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 10,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 26.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 11.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 6.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 46.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 15.3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 7.7,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 8.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 27,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 5.4,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 23.8,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 54.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 6.8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 30.6,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 17.6,
-            "total_sec": 317
         }
     }
 ]
