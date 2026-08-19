@@ -1052,6 +1052,25 @@ if(!META[who] || !DATA[who]){
     return msg;
   }
 
+  /* تصحيح رقم المحفوظ يدويًّا: خللٌ سابق كان يضخّم العدّاد عبر المزامنة،
+     فظهرت للطفل كلماتٌ لم يدرسها قطّ. هذا يُعيده إلى الرقم الحقيقيّ. */
+  function wireSetLearned(sec){
+    var b=sec.querySelector("[data-setlearned]"); if(!b) return;
+    b.addEventListener("click",function(){
+      var cur=getLearned();
+      var v=prompt("كم كلمة حفظها فعلًا؟ (الرقم الحالي "+cur+" من "+VOC_TOTAL+")", String(cur));
+      if(v===null) return;
+      var n=parseInt(String(v).replace(/[^0-9]/g,""),10);
+      if(isNaN(n)) return;
+      n=Math.max(0,Math.min(VOC_TOTAL,n));
+      setLearned(n);
+      var sr=getSR(), keep={};
+      VOCAB300.slice(0,n).forEach(function(w){ if(sr[w[0]]) keep[w[0]]=sr[w[0]]; });
+      setSR(keep);
+      _vocSynced = true;   /* حتى لا تُعيد المزامنة الرقم القديم في هذي الجلسة */
+      renderVocab();
+    });
+  }
   function renderVocab(){
     var sec = document.getElementById("vocab");
     if(curLang!=="en"){ sec.innerHTML=""; return; }
@@ -1078,7 +1097,9 @@ if(!META[who] || !DATA[who]){
       /* الأضعف أوّلًا، ثم الأكثر تأخّرًا، ثم الأحدث حفظًا (الفهرس تنازليًّا) */
       fpool.sort(function(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (b.idx-a.idx); });
       rvSize = Math.min(getRvSize(learned), FRESH_TAKE);
-      V = fpool.slice(0, rvSize).map(function(x){ return x.w; });
+      /* الاختيار بالأولويّة، ثم يُعاد الترتيب حسب رقم الكلمة — لأنهم يذاكرون
+         من ورقة الـPDF أوّلًا ثم يحلّون، فيجب أن يجدوها بالتسلسل نفسه لا مبعثرة. */
+      V = fpool.slice(0, rvSize).sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
     } else if(vocMode==="review"){
       headTitle = "🔁 مراجعة المحفوظ";
       var pool = VOCAB300.slice(0, learned);
@@ -1101,7 +1122,8 @@ if(!META[who] || !DATA[who]){
           return (b.weak-a.weak) || (a.tier-b.tier) || (a.due-b.due) || (a.idx-b.idx);
         });
         rvSize = getRvSize(learned);
-        V = scored.slice(0, rvSize).map(function(x){ return x.w; });
+        /* العرض بترتيب الملف أيضًا (انظر التعليق أعلاه) */
+        V = scored.slice(0, rvSize).sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
         dueNow = scored.filter(function(x){ return x.due<=0; }).length;
         masteredNow = srMastered(pool);
       } else { V=[]; }
@@ -1145,10 +1167,11 @@ if(!META[who] || !DATA[who]){
       } else {
         html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+VOC_TOTAL+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
       }
-      html += '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
+      html += '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
       sec.innerHTML = html;
       sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocMode=b.dataset.mode; renderVocab(); }); });
       sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
+      wireSetLearned(sec);
       var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); setReviewSeen({}); setSR({}); renderVocab(); } });
       return;
     }
@@ -1181,7 +1204,8 @@ if(!META[who] || !DATA[who]){
     });
     html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>'+
       '<div class="fb" data-donemsg style="text-align:center;min-height:20px;margin-top:8px"></div>'+
-      '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>';
+      '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
+      '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button></div>';
     sec.innerHTML = html;
 
     var done={}, tried={}, correct=0, saved=false, advanced=false, total=V.length;
@@ -1247,6 +1271,7 @@ if(!META[who] || !DATA[who]){
     });
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
     sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
+    wireSetLearned(sec);
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
   }
 
