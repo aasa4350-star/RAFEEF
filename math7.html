@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الرياضيات — ثاني متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.1rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function fmt(n){ return Number(n).toLocaleString('en-US'); } // فاصلة آلاف
+function mn(s){ return '<span class="en">'+s+'</span>'; }
+// خيارات رقمية مميّزة: الصحيح + مشتّتات
+function numOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct+10, correct*2+1]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+
+/* ============================================================
+   رياضيات ثاني متوسط — الفصل ١: الجبر والدوال
+   الدروس ١-١ و١-٢ و١-٣، مبنيّة من كتاب رفيف نفسه (ص ١٢–٢٤).
+   كل مولّد فوقه رقم الدرس والصفحة التي أُخذ منها نوع السؤال.
+   ============================================================ */
+var SUP = ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
+function sup(n){ return String(n).split("").map(function(d){ return SUP[+d]; }).join(""); }
+function pw(b,e){ return mn(b+sup(e)); }
+
+/* ===== الدرس ١-١: الخطوات الأربع لحل المسألة (ص ١٢–١٦) ===== */
+
+/* ص١٢: ترتيب الخطوات الأربع — أساس الدرس كلّه */
+var STEPS = ["افهم","خطّط","حُلّ","تحقّق"];
+function gStepOrder(){
+  var C = [
+    ["«ما المعطيات؟ وما المطلوب إيجاده؟» — هذا السؤال في خطوة:", "افهم"],
+    ["«اختر خطة لحلّ المسألة وقدّر الإجابة» — هذه خطوة:", "خطّط"],
+    ["«استعمل خطّتك، وإن لم تنجح فاختر خطّة أخرى» — هذه خطوة:", "حُلّ"],
+    ["«هل تتوافق إجابتك مع المعطيات؟ وهل هي معقولة؟» — هذا السؤال في خطوة:", "تحقّق"],
+    ["أوّل خطوة تعملها قبل أن تحسب أيّ شيء هي:", "افهم"],
+    ["بعد أن تصل إلى الجواب، الخطوة الأخيرة هي:", "تحقّق"]
+  ];
+  var c = gp(C), o = STEPS.slice(); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]), "الخطوات الأربع بالترتيب: <b>افهم ← خطّط ← حُلّ ← تحقّق</b>."];
+}
+
+/* ص١٤ مثال ٢: أقطار المضلّع — ن(ن−٣)÷٢ */
+function gDiagonals(){
+  var n = ri(6,12), r = n*(n-3)/2;
+  var o = numOpts(r, [n*(n-1)/2, n*(n-3), r+n]);
+  return ["القُطر قطعة مستقيمة تصل بين رأسين غير متجاورين في مضلَّع. للمثلث "+mn(0)+" أقطار، وللمربّع "+mn(2)+"، وللخماسي "+mn(5)+". فكم عدد أقطار مضلَّع له "+mn(n)+" أضلاع؟",
+    o[0], o[1],
+    "القاعدة: "+mn("ن × (ن − 3) ÷ 2")+" ⇐ "+mn(n+" × "+(n-3)+" ÷ 2 = "+r)+" قطرًا."];
+}
+
+/* ص١٤ تحقّق: الأعداد المثلّثية ١، ٣، ٦، ١٠، ١٥ … */
+function gTriangular(){
+  var k = ri(5,9), t=[], s=0;
+  for(var i=1;i<=k+1;i++){ s+=i; t.push(s); }
+  var r = t[k], seq = t.slice(0,k);
+  var o = numOpts(r, [r+k, r-1, r+1]);
+  return ["الأعداد المثلَّثية هي التي يمكن ترتيبها بنقطٍ على شكل مثلث: "+mn(seq.join(" ، ")+" ، ؟")+"<br>ما العدد التالي؟",
+    o[0], o[1],
+    "نزيد في كلّ مرة بمقدارٍ أكبر بواحد: آخر زيادة كانت "+mn(k)+" فالتالية "+mn(k+1)+" ⇐ "+mn(seq[k-1]+" + "+(k+1)+" = "+r)+"."];
+}
+
+/* ص١٤ تمرين ٢: نمط ضربيّ متزايد ١، ٢، ٦، ٢٤ … */
+function gFactPattern(){
+  var st = gp([1,2,3]), seq=[st], v=st;
+  for(var i=2;i<=4;i++){ v*=i; seq.push(v); }
+  var nx = v*5;
+  var o = numOpts(nx, [v+5, v*2, nx+v]);
+  return ["ما العدد التالي في النمط؟ "+mn(seq.join(" ، ")+" ، ؟"),
+    o[0], o[1],
+    "نضرب في "+mn(2)+" ثم في "+mn(3)+" ثم في "+mn(4)+" ثم في "+mn(5)+" ⇐ "+mn(v+" × 5 = "+nx)+"."];
+}
+
+/* ص١٤ تمرين ١: قراءة جدول — كم مرّة تكبر */
+var ISLANDS = [["فرسان الكبرى",369],["زفاف",30],["السقيد",156],["دمسك",12],["سلوبه",2],["قماح",14]];
+function gTableTimes(){
+  var pairs = [];
+  ISLANDS.forEach(function(x){ ISLANDS.forEach(function(y){ if(x[0]!==y[0] && x[1] >= y[1]*2) pairs.push([x,y]); }); });
+  var pr = gp(pairs), a = pr[0], b = pr[1];
+  var r = Math.round(a[1]/b[1]);
+  var o = numOpts(r, [Math.round(a[1]/b[1])+2, a[1]-b[1], Math.round(b[1]/a[1])||1]);
+  var rows = ISLANDS.map(function(x){ return '<tr><td style="border:1px solid #999;padding:3px 8px">'+x[0]+'</td><td style="border:1px solid #999;padding:3px 8px">'+x[1]+'</td></tr>'; }).join("");
+  return ['الجدول يبيّن مساحات جُزُر فرسان بالكيلومتر المربّع. كم مرّة تقريبًا تكبر مساحة جزيرة <b>'+a[0]+'</b> جزيرةَ <b>'+b[0]+'</b>؟'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem"><tr><th style="border:1px solid #999;padding:3px 8px">الجزيرة</th><th style="border:1px solid #999;padding:3px 8px">المساحة</th></tr>'+rows+'</table></div>',
+    o[0], o[1],
+    "نقسم: "+mn(a[1]+" ÷ "+b[1]+" ≈ "+r)+" مرّة."];
+}
+
+/* ص١٣: خطوة «تحقّق» — هل الإجابة معقولة؟ */
+function gReasonable(){
+  var n = ri(4,9), per = ri(12,28), r = n*per;
+  var ok = Math.random() < 0.5;
+  var est = ok ? (Math.round(r/10)*10) : gp([r*10, Math.round(r/10), r+1000]);
+  var o = ["معقولة","غير معقولة"]; shuffle(o);
+  return ["في المدرسة "+mn(n)+" فصول، في كلّ فصلٍ "+mn(per)+" طالبًا. قدّرت طالبةٌ أن عدد الطلاب "+mn(fmt(est))+" طالبًا. هل إجابتها معقولة؟",
+    o, o.indexOf(ok ? "معقولة" : "غير معقولة"),
+    "خطوة <b>تحقّق</b>: نقدّر أوّلًا "+mn(n+" × "+per+" ≈ "+fmt(r))+"، والتقدير المذكور "+mn(fmt(est))+" ⇐ "+(ok ? "قريبٌ منه فهو معقول." : "بعيدٌ عنه فهو غير معقول.")];
+}
+
+/* ===== الدرس ١-٢: القوى والأسس (ص ١٧–٢٠) ===== */
+
+/* ص١٧: القوة ← ضرب العامل في نفسه */
+function gPowerExpand(){
+  var b = ri(2,9), e = ri(2,5);
+  var right = Array(e).fill(b).join(" × ");
+  var d1 = Array(e).fill(b+1).join(" × ");
+  var d2 = Array(e+1).fill(b).join(" × ");
+  var o = [right,d1,d2].map(mn); shuffle(o);
+  return ["اكتب القوة "+pw(b,e)+" على صورة ضرب العامل في نفسه:",
+    o, o.indexOf(mn(right)),
+    "الأساس "+mn(b)+" والأُسّ "+mn(e)+"، أي نستعمل "+mn(b)+" عاملًا "+mn(e)+" مرّات."];
+}
+
+/* ص١٨ مثالان ٣ و٤: احسب قيمة القوة */
+function gPowerValue(){
+  var b = ri(2,10), e = ri(2,4);
+  if(b>=7 && e>3) e=2;
+  var r = Math.pow(b,e);
+  var o = numOpts(r, [b*e, Math.pow(b,e-1), Math.pow(b,e+1)]);
+  return ["احسب قيمة "+pw(b,e)+" :", o[0], o[1],
+    mn(Array(e).fill(b).join(" × ")+" = "+fmt(r))+" — لا تضرب الأساس في الأُسّ."];
+}
+
+/* ص١٨ مثال ٥: اكتب بالصيغة الأُسّية */
+function gPowerWrite(){
+  var b = ri(2,12), e = ri(3,6);
+  var right = b+sup(e);
+  var cands = [e+sup(b), b+sup(e+1), b+sup(e-1), (b+1)+sup(e)];
+  var o = [right];
+  for(var i=0;i<cands.length && o.length<3;i++){ if(o.indexOf(cands[i])<0) o.push(cands[i]); }
+  o = o.map(mn); shuffle(o);
+  return ["اكتب "+mn(Array(e).fill(b).join(" × "))+" بالصيغة الأُسّية:",
+    o, o.indexOf(mn(right)),
+    "العدد "+mn(b)+" هو الأساس، واستُعمل عاملًا "+mn(e)+" مرّات، فالأُسّ "+mn(e)+"."];
+}
+
+/* ص١٧: قراءة القوة بالكلمات */
+function gPowerRead(){
+  var b = ri(2,9), e = gp([2,3]);
+  var right = (e===2) ? (b+" تربيع") : (b+" تكعيب");
+  var wrong1 = (e===2) ? (b+" تكعيب") : (b+" تربيع");
+  var o = [right, wrong1, "الأساس "+e+" والأُسّ "+b]; shuffle(o);
+  return ["كيف تُقرأ القوة "+pw(b,e)+" ؟", o, o.indexOf(right),
+    "الأُسّ "+mn(2)+" يُقرأ «تربيع» والأُسّ "+mn(3)+" يُقرأ «تكعيب»."];
+}
+
+/* ص١٨ تمرين ٧: الصيغة القياسية */
+function gStandardForm(){
+  var b = ri(2,7), e = ri(3,5), r = Math.pow(b,e);
+  var o = numOpts(r, [b*e, Math.pow(b,e-1), r+b]);
+  return ["يبلغ عدد طلاب مدرسةٍ "+pw(b,e)+" طالبًا. اكتب هذا العدد بالصيغة القياسية:",
+    o[0], o[1],
+    "الصيغة القياسية تعني كتابته عددًا عاديًّا: "+mn(Array(e).fill(b).join(" × ")+" = "+fmt(r))+"."];
+}
+
+/* ===== الدرس ١-٣: ترتيب العمليات (ص ٢١–٢٤) ===== */
+
+/* ص٢١: ترتيب العمليات بالقاعدة */
+function gOrderRule(){
+  var C = [
+    ["ما أوّل ما تحسبه في العبارة العددية؟", "ما بين الأقواس", ["الضرب","الجمع","الطرح"]],
+    ["بعد الأقواس، ما الذي يُحسب قبل غيره؟", "القوى والأسس", ["الجمع","الطرح","القسمة"]],
+    ["الضرب والقسمة يُحسبان:", "من اليمين إلى اليسار حسب أيّهما أسبق", ["الضرب دائمًا قبل القسمة","القسمة دائمًا قبل الضرب","بعد الجمع"]],
+    ["الجمع والطرح يُحسبان:", "في النهاية، من اليمين إلى اليسار", ["قبل الأقواس","قبل الضرب","قبل الأسس"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "ترتيب العمليات: <b>الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح</b>."];
+}
+
+/* ص٢٢ مثال ٣: أقواس ثم ضرب ثم جمع */
+function gOrderParen(){
+  var a=ri(10,20), b=ri(2,6), c=ri(3,9), d=ri(1,c-1);
+  var r = a + b*(c-d);
+  var wrongLeft = (a+b)*(c-d);           /* من جمع قبل الضرب */
+  var wrongNoParen = a + b*c - d;        /* من تجاهل القوسين */
+  var o = numOpts(r, [wrongLeft, wrongNoParen, r+b]);
+  return ["احسب قيمة: "+mn(a+" + "+b+" ("+c+" − "+d+")"),
+    o[0], o[1],
+    "الأقواس أوّلًا: "+mn(c+" − "+d+" = "+(c-d))+"، ثم الضرب "+mn(b+" × "+(c-d)+" = "+(b*(c-d)))+"، ثم الجمع ⇐ "+mn(r)+"."];
+}
+
+/* ص٢٢ مثال ٤: أسس ثم ضرب ثم طرح */
+function gOrderPower(){
+  var a=ri(2,6), b=ri(2,3), e=ri(2,3), c=ri(2,9);
+  var p = Math.pow(b,e), r = a*p - c;
+  if(r<1){ c = ri(1, a*p-1); r = a*p - c; }
+  var wrongMul = Math.pow(a*b, e) - c;   /* من ضرب قبل الأسّ */
+  var o = numOpts(r, [wrongMul, a*b*e - c, r+c]);
+  return ["احسب قيمة: "+mn(a+" × "+b+sup(e)+" − "+c),
+    o[0], o[1],
+    "الأُسّ أوّلًا: "+mn(b+sup(e)+" = "+p)+"، ثم الضرب "+mn(a+" × "+p+" = "+(a*p))+"، ثم الطرح ⇐ "+mn(r)+"."];
+}
+
+/* ص٢٢ مثال ٥: مسألة نقود — عبارة عددية من جدول */
+var SHOPITEMS = [["ورق زينة",2],["ألعاب",7],["بالونات",5],["أقلام",3],["دفاتر",6]];
+function gMoneyExpr(){
+  var it = shuffle(SHOPITEMS.slice()).slice(0,3);
+  var q = it.map(function(){ return ri(2,6); });
+  var r = it.reduce(function(a,x,i){ return a + x[1]*q[i]; }, 0);
+  var wrongSum = it.reduce(function(a,x,i){ return a + x[1] + q[i]; }, 0);
+  var o = numOpts(r, [wrongSum, r - it[0][1]*q[0], r + 10]);
+  var rows = it.map(function(x,i){ return '<tr><td style="border:1px solid #999;padding:3px 8px">'+x[0]+'</td><td style="border:1px solid #999;padding:3px 8px">'+q[i]+'</td><td style="border:1px solid #999;padding:3px 8px">'+x[1]+' ريال</td></tr>'; }).join("");
+  return ['اشترت ليلى ما في الجدول. استعمل ترتيب العمليات لتجد مقدار ما دفعته بالريال:'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem"><tr><th style="border:1px solid #999;padding:3px 8px">المادة</th><th style="border:1px solid #999;padding:3px 8px">الكمية</th><th style="border:1px solid #999;padding:3px 8px">سعر الوحدة</th></tr>'+rows+'</table></div>',
+    o[0], o[1],
+    "العبارة: "+mn(it.map(function(x,i){ return q[i]+" × "+x[1]; }).join(" + "))+" — نضرب أوّلًا ثم نجمع ⇐ "+mn(r)+" ريالًا."];
+}
+
+/* ص٢٢ تحقّق (د): جمع وقسمة وضرب مع قوسين */
+function gOrderMixed(){
+  var a=ri(4,12), b=gp([2,3,4]), c=b*ri(2,6), d=ri(2,7), e=ri(1,d-1), f=ri(2,5);
+  var r = a + c/b + f*(d-e);
+  var o = numOpts(r, [(a+c)/b + f*(d-e), a + c/(b+f) + d - e, r+f]);
+  return ["احسب قيمة: "+mn(a+" + "+c+" ÷ "+b+" + "+f+" ("+d+" − "+e+")"),
+    o[0], o[1],
+    "الأقواس "+mn(d+" − "+e+" = "+(d-e))+"، ثم القسمة "+mn(c+" ÷ "+b+" = "+(c/b))+" والضرب "+mn(f+" × "+(d-e)+" = "+(f*(d-e)))+"، ثم الجمع ⇐ "+mn(r)+"."];
+}
+
+var D1 = [gStepOrder, gDiagonals, gTriangular, gFactPattern, gTableTimes, gReasonable];
+var D2 = [gPowerExpand, gPowerValue, gPowerWrite, gPowerRead, gStandardForm];
+var D3 = [gOrderRule, gOrderParen, gOrderPower, gMoneyExpr, gOrderMixed];
+var ALL = D1.concat(D2).concat(D3);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=rafeef</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–24</span>)</div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
+      '<button data-tab="d1" aria-selected="false">1-1 الخطوات الأربع</button>'+
+      '<button data-tab="d2" aria-selected="false">1-2 القوى والأسس</button>'+
+      '<button data-tab="d3" aria-selected="false">1-3 ترتيب العمليات</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
+    '</div>'+
+    '<section class="panel active" id="all"></section>'+
+    '<section class="panel" id="d1"></section>'+
+    '<section class="panel" id="d2"></section>'+
+    '<section class="panel" id="d3"></section>'+
+    '<section class="panel" id="rem"></section>'+
+    '<footer>الرياضيات · ثاني متوسط · الفصل الأول · أرقام جديدة كل مرة</footer>';
+
+  var CFG = {
+    all: {gens:ALL, n:12, intro:"<b>اختبار شامل</b> على الدروس الثلاثة: الخطوات الأربع · القوى والأسس · ترتيب العمليات.", label:"رياضيات م٢ — شامل ف١"},
+    d1:  {gens:D1,  n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م٢ — 1-1 الخطوات الأربع"},
+    d2:  {gens:D2,  n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م٢ — 1-2 القوى والأسس"},
+    d3:  {gens:D3,  n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"}
+  };
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="math7", REM_LABEL="الرياضيات";
+  var REMTOPICS=[
+    {id:"d1", name:"1-1 الخطوات الأربع", tip:"لا تبدأ بالحساب. اسأل أوّلًا: ما المعطيات؟ وما المطلوب؟ ثم اختر خطّة وقدّر الإجابة، ثم احسب، ثم تحقّق أن الجواب معقول مقارنةً بتقديرك.", yt:"شرح الخطوات الأربع لحل المسألة ثاني متوسط"},
+    {id:"d2", name:"1-2 القوى والأسس", tip:"الأُسّ يعني كم مرّة تستعمل الأساس عاملًا: ٢⁵ = ٢×٢×٢×٢×٢ = ٣٢، وليس ٢×٥. والصيغة الأُسّية تكتب بالأسس، والقياسية عددًا عاديًّا.", yt:"شرح القوى والأسس ثاني متوسط رياضيات"},
+    {id:"d3", name:"1-3 ترتيب العمليات", tip:"الترتيب: الأقواس ← الأسس ← الضرب والقسمة (من اليمين لليسار) ← الجمع والطرح. أكثر خطأ شائع: الجمع قبل الضرب.", yt:"شرح ترتيب العمليات ثاني متوسط رياضيات"}
+  ];
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الفصول من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل فصل.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الفصول. جرّب فصول '+REM_LABEL+' ويرجع هنا يعرض أضعف فصل مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 فصول ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+  render("all");
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
+      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+    });
+  });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
