@@ -946,7 +946,13 @@ if(!META[who] || !DATA[who]){
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
         var maxL=0;
-        (rows||[]).forEach(function(x){ var m=x.meta||{}; if(typeof m.learned==="number" && m.learned>maxL) maxL=m.learned; });
+        /* نتجاهل أيّ سجلٍّ من جلسةٍ غير موثوقة، وإلا رفع العدّادَ رقمٌ
+           نتج عن جلسةٍ خرج منها الطفل ولم تُحتسب أصلًا. */
+        (rows||[]).forEach(function(x){
+          var m=x.meta||{};
+          if(m.trusted === false) return;
+          if(typeof m.learned==="number" && m.learned>maxL) maxL=m.learned;
+        });
         if(maxL>getLearned()){
           setLearned(maxL);
           var vp=document.getElementById("vocab");
@@ -1186,11 +1192,16 @@ if(!META[who] || !DATA[who]){
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
       var aw=awaySince(aw0); var trusted=(aw.exits===0);
-      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
+      /* ⚠️ الترتيب هنا مقصود: نُقدّم العدّاد أوّلًا (إن كانت الجلسة موثوقة) ثم
+         نحفظ الرقم الحقيقيّ. كان الحفظ يسبق فحص الثقة فيُسجَّل في قاعدة
+         البيانات رقمٌ متقدّم حتى لو لم يُحتسب محلّيًّا، ثم يسحبه
+         syncLearnedFromDB (يأخذ الأعلى) متجاوزًا شرط الثقة — فتظهر للطفل
+         كلماتٌ «محفوظة» لم يدرسها قطّ، وهو ما اشتكت منه رفيف وحسن. */
+      if(trusted && isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
+      if(!saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
-      } else if(isNew && !advanced && startIdx<VOC_TOTAL){
-        advanced=true; setLearned(startIdx+total);
+      } else if(isNew && advanced){
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
       } else {
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ أحسنت! النتيجة "+correct+" / "+total+".";
