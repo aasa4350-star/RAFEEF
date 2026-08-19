@@ -1002,6 +1002,10 @@ if(!META[who] || !DATA[who]){
      كلمة و١٠ في الجلسة لا ترجع الكلمة إلا بعد ٣٠ يومًا مهما كان الترتيب ذكيًّا.
      الحلّ الوحيد أن يكبر حجم الجلسة مع كِبَر المحفوظ. نستهدف لفّةً كل ١٤ يومًا،
      ونترك للطفل أن يختار حجمًا أصغر أو أكبر ونُريه أثر اختياره بالأيام. */
+  /* نافذة «الجديد»: آخر ما حُفظ ولم يرسخ بعد */
+  var FRESH_WINDOW = 40;                 /* نبحث في آخر ٤٠ كلمة محفوظة */
+  var FRESH_TAKE   = 15;                 /* ونعرض منها ١٥ كحدٍّ أعلى */
+  var MASTERED_BOX = 4;                  /* الصندوق ٤ فأعلى = رسخت */
   var RV_TARGET_DAYS = 14;
   /* طلب الأب صراحةً: حسن ورفيف يراجعون ٢٥ كلمة كل يوم */
   var RV_FIXED = { hasan:25, rafeef:25 };
@@ -1050,18 +1054,46 @@ if(!META[who] || !DATA[who]){
     var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
 
     // بناء قائمة الكلمات حسب الوضع
-    var V, headTitle, isNew=false, startIdx=learned, passReset=false, dueNow=0, masteredNow=0, rvSize=VOC_STEP;
-    if(vocMode==="review"){
+    var V, headTitle, isNew=false, startIdx=learned, passReset=false, dueNow=0, masteredNow=0, rvSize=VOC_STEP, freshTotal=0;
+    if(vocMode==="fresh"){
+      /* خانة مراجعة الجديد — طلبها حسن نصًّا: الكلمات التي حفظها حديثًا
+         ولم ترسخ بعد، مجموعةً وحدها بعيدًا عن طابور المحفوظ القديم. */
+      headTitle = "🆕 مراجعة الكلمات الجديدة";
+      var win = VOCAB300.slice(Math.max(0, learned-FRESH_WINDOW), learned);
+      var srf = getSR(), wkf = getWeak();
+      var fpool = win.filter(function(w){
+        var st = srf[w[0]];
+        return !st || (st.b||0) < MASTERED_BOX;      /* نستبعد ما رسخ تمامًا */
+      });
+      freshTotal = fpool.length;
+      fpool = fpool.map(function(w,i){
+        return { w:w, weak:(wkf[w[0]]?1:0), due:srDueIn(srf[w[0]]), idx:i };
+      });
+      /* الأضعف أوّلًا، ثم الأكثر تأخّرًا، ثم الأحدث حفظًا (الفهرس تنازليًّا) */
+      fpool.sort(function(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (b.idx-a.idx); });
+      rvSize = Math.min(getRvSize(learned), FRESH_TAKE);
+      V = fpool.slice(0, rvSize).map(function(x){ return x.w; });
+    } else if(vocMode==="review"){
       headTitle = "🔁 مراجعة المحفوظ";
       var pool = VOCAB300.slice(0, learned);
       if(pool.length){
         var wk = getWeak(), srs = getSR();
         /* الترتيب: الكلمة الي غلط فيها أوّلًا، ثم الأكثر تأخّرًا عن موعدها،
            ثم الأقدم حفظًا — فالكلمات القديمة ترجع أوّل لا آخِرًا. */
+        /* ثلاث درجات أولويّة:
+           ٠ — كلمةٌ رُوجعت من قبل وحان موعدها الآن (ومنها الكلمة المحفوظة أمس:
+               أوّل مراجعةٍ لها هي الأهمّ، ونسيانها يعني ضياع حفظها)
+           ١ — كلمةٌ لم تُراجَع قطّ (طابور المحفوظ القديم)
+           ٢ — كلمةٌ لم يحن موعدها بعد
+           كان الترتيب قبل ذلك بالفهرس وحده، فتذهب الكلمة الجديدة إلى آخر
+           الطابور ولا تعود إلا بعد أحد عشر يومًا — وهو ما اشتكى منه حسن. */
         var scored = pool.map(function(w,i){
-          return { w:w, weak:(wk[w[0]]?1:0), due:srDueIn(srs[w[0]]), idx:i };
+          var st = srs[w[0]], d = srDueIn(st);
+          return { w:w, weak:(wk[w[0]]?1:0), tier:(st ? (d<=0 ? 0 : 2) : 1), due:d, idx:i };
         });
-        scored.sort(function(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); });
+        scored.sort(function(a,b){
+          return (b.weak-a.weak) || (a.tier-b.tier) || (a.due-b.due) || (a.idx-b.idx);
+        });
         rvSize = getRvSize(learned);
         V = scored.slice(0, rvSize).map(function(x){ return x.w; });
         dueNow = scored.filter(function(x){ return x.due<=0; }).length;
@@ -1094,12 +1126,15 @@ if(!META[who] || !DATA[who]){
         '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت '+learned+' / '+VOC_TOTAL+'</span></div>'+
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
-      '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
+      '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
+      (learned>0 ? '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("fresh","🆕 راجع الجديد")+'</div>' : '')+
       (vocMode==="review" && learned>VOC_STEP ? sizeBar(learned) : '')+
       '<div data-daybanner style="background:linear-gradient(135deg,var(--accent-deep,#047857),var(--accent));color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:800;text-align:center;line-height:1.6">'+vocMotiv(getDay().count,getDay().best)+'</div>';
 
     if(!V.length){
-      if(vocMode==="review"){
+      if(vocMode==="fresh"){
+        html += '<div class="q" style="text-align:center">✅ ما شاء الله — كل كلماتك الجديدة رسخت! انتقل لـ«راجع المحفوظ» 🔁 أو تعلّم كلماتٍ جديدة 📚</div>';
+      } else if(vocMode==="review"){
         html += '<div class="q" style="text-align:center">لسّا ما حفظت كلمات. اضغط «تعلّم '+VOC_STEP_AR+' جديدة» أول 📚</div>';
       } else {
         html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+VOC_TOTAL+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
@@ -1113,6 +1148,7 @@ if(!META[who] || !DATA[who]){
     }
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+VOC_TOTAL+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
+                : vocMode==="fresh" ? '<p class="hint">🆕 <b>الكلمات الجديدة:</b> هذي آخر كلماتٍ حفظتها ولم ترسخ بعد — وأهمّ مراجعةٍ لها هي أوّل يومين. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁</p>'
                           : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
                             (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
                             (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
@@ -1150,7 +1186,7 @@ if(!META[who] || !DATA[who]){
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
       var aw=awaySince(aw0); var trusted=(aw.exits===0);
-      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":"review"), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
+      if(!saved){ saved=true; var learnedNow = isNew ? Math.min(VOC_TOTAL, startIdx+total) : getLearned(); var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:learnedNow, vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
       } else if(isNew && !advanced && startIdx<VOC_TOTAL){
