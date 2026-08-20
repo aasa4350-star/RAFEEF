@@ -29,6 +29,9 @@
   .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
   .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
   .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
+  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
   .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -75,7 +78,7 @@ function saveScore(test, correct, total){
 function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
-function fmt(n){ return Number(n).toLocaleString('en-US'); } // فاصلة آلاف
+function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<0 ? "\u2212" : "")+s; } // فاصلة آلاف + إشارة سالب رياضية
 function mn(s){ return '<span class="en">'+s+'</span>'; }
 // خيارات رقمية مميّزة: الصحيح + مشتّتات
 function numOpts(correct, cands){
@@ -610,6 +613,449 @@ function gFuncTerms(){
     "المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، والصِّيغة التي تربط بينهما ⇐ قاعدة الدالّة."];
 }
 
+
+/* ============================================================
+   الفصل الثاني: الأعداد الصحيحة — الدروس 2-1 … 2-8 (ص 49–91)
+   ============================================================ */
+function pz(n){ return n<0 ? "("+fmt(n)+")" : fmt(n); }   /* عدد سالب بين قوسين */
+/* خيارات لأعداد صحيحة (تسمح بالسالب، بخلاف numOpts) */
+function zOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([-correct, correct+1, correct-1, correct+2, correct+10]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+
+/* ===== الدرس 2-1: الأعداد الصحيحة والقيمة المطلقة (ص 50–53) ===== */
+
+/* ص50 مثال: اكتب عددًا صحيحًا يمثّل الموقف */
+var INTCTX = [
+  [function(n){ return "ارتفاع "+mn(n)+" أمتار فوق سطح البحر"; }, 1],
+  [function(n){ return "عمق "+mn(n)+" أمتار تحت سطح البحر"; }, -1],
+  [function(n){ return "ربح "+mn(n)+" ريالات"; }, 1],
+  [function(n){ return "خسارة "+mn(n)+" ريالات"; }, -1],
+  [function(n){ return mn(n)+" درجات تحت الصفر"; }, -1],
+  [function(n){ return "ارتفاع درجة الحرارة "+mn(n)+" درجات"; }, 1],
+  [function(n){ return "صعود "+mn(n)+" أدوار في المصعد"; }, 1],
+  [function(n){ return "نزول "+mn(n)+" أدوار في المصعد"; }, -1]
+];
+function gIntWrite(){
+  var c = gp(INTCTX), n = ri(3,10), r = c[1]*n;
+  var o = zOpts(r, [-r, 0, r+1]);
+  return ["اكتب عددًا صحيحًا يمثّل: "+c[0](n), o[0], o[1],
+    "ما كان فوق المستوى أو زيادةً فهو موجب، وما كان تحته أو نقصًا فهو سالب ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص51: القيمة المطلقة */
+function gAbsValue(){
+  var n = gp([-1,1]) * ri(2,20);
+  var o = zOpts(Math.abs(n), [n, -Math.abs(n), 0]);
+  return ["أوجد القيمة المطلقة: "+mn("| "+fmt(n)+" |"), o[0], o[1],
+    "القيمة المطلقة هي بُعد العدد عن الصفر على خط الأعداد، وهي موجبة دائمًا ⇐ "+mn(Math.abs(n))+"."];
+}
+
+/* ص53 تمرين 28: |س| = عدد ⇐ قيمتان */
+function gAbsEq(){
+  var n = ri(2,15);
+  var right = fmt(n)+" و "+fmt(-n);
+  var o = [right, fmt(n)+" فقط", fmt(-n)+" فقط"]; shuffle(o);
+  return ["إذا كان "+ax("|س| = "+n)+" فما قيم "+ax("س")+" ؟",
+    o.map(ax), o.indexOf(right),
+    "يوجد عددان بُعدهما عن الصفر "+mn(n)+"، أحدهما موجب والآخر سالب ⇐ "+mn(fmt(n))+" و"+mn(fmt(-n))+"."];
+}
+
+/* ص51: مقارنة القيم المطلقة */
+function gAbsBigger(){
+  var a = -ri(2,25), b = ri(2,25); if(Math.abs(a)===Math.abs(b)) b = Math.abs(a)+3;
+  var r = (Math.abs(a) > Math.abs(b)) ? a : b;
+  var o = [fmt(a), fmt(b)]; shuffle(o);
+  return ["أيُّ العددين قيمتُه المطلقة أكبر: "+mn(fmt(a))+" أم "+mn(fmt(b))+" ؟",
+    o, o.indexOf(fmt(r)),
+    "القيمة المطلقة تتجاهل الإشارة: "+mn("| "+fmt(a)+" | = "+Math.abs(a))+" و"+mn("| "+fmt(b)+" | = "+Math.abs(b))+"."];
+}
+
+/* ص50: المصطلحات */
+function gIntTerms(){
+  var C = [
+    ["ما العدد الصحيح؟", "أيّ عددٍ من المجموعة: … ، −2 ، −1 ، 0 ، 1 ، 2 ، …", ["أيّ عددٍ موجبٍ فقط","أيّ عددٍ فيه فاصلة عشرية","أيّ كسرٍ بين عددين"]],
+    ["العدد صفر:", "ليس سالبًا ولا موجبًا", ["عددٌ موجب","عددٌ سالب","ليس عددًا صحيحًا"]],
+    ["ماذا تعني القيمة المطلقة لعدد؟", "بُعد العدد عن الصفر على خط الأعداد", ["إشارة العدد","العدد مضروبًا في نفسه","العدد ناقص واحد"]],
+    ["القيمة المطلقة لأيّ عددٍ صحيحٍ لا يساوي صفرًا تكون:", "موجبةً دائمًا", ["سالبةً دائمًا","لها إشارة العدد نفسه","صفرًا"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "الأعداد الصحيحة تشمل الموجبة والسالبة والصفر، والقيمة المطلقة بُعدٌ عن الصفر فهي لا تكون سالبة."];
+}
+
+/* ===== الدرس 2-2: مقارنة الأعداد الصحيحة وترتيبها (ص 54–57) ===== */
+
+/* ص54: أيّهما أكبر */
+function gGreater(){
+  var a = ri(-30,30), b = ri(-30,30); if(a===b) b = a+ri(1,9);
+  var r = Math.max(a,b);
+  var o = [fmt(a), fmt(b)]; shuffle(o);
+  return ["أيُّ العددين أكبر: "+mn(fmt(a))+" أم "+mn(fmt(b))+" ؟",
+    o, o.indexOf(fmt(r)),
+    "على خط الأعداد، كلّما اتّجهنا يمينًا كبر العدد ⇐ "+mn(fmt(r))+" أكبر."];
+}
+
+/* ص55: ترتيب تصاعدي */
+function gOrderAsc(){
+  var set = {}; while(Object.keys(set).length < 4){ set[ri(-25,25)] = 1; }
+  var v = Object.keys(set).map(Number);
+  var asc = v.slice().sort(function(x,y){ return x-y; });
+  var right = asc.map(fmt).join(" < ");
+  var wrong1 = asc.slice().reverse().map(fmt).join(" < ");
+  var wrong2 = v.slice().sort(function(x,y){ return Math.abs(x)-Math.abs(y); }).map(fmt).join(" < ");
+  var o = [right, wrong1, wrong2].filter(function(x,i,arr){ return arr.indexOf(x)===i; });
+  if(o.length < 3) o.push(asc.slice(1).concat(asc[0]).map(fmt).join(" < "));
+  o = o.slice(0,3); shuffle(o);
+  return ["رتّب الأعداد التالية تصاعديًّا (من الأصغر إلى الأكبر): "+mn(shuffle(v.slice()).map(fmt).join(" ، ")),
+    o.map(mn), o.indexOf(right),
+    "الترتيب الصحيح على خط الأعداد من اليسار إلى اليمين: "+mn(right)+"."];
+}
+
+/* ص54: أبرد مدينة (جدول درجات حرارة) */
+var CITIES = ["الرياض","جدة","أبها","تبوك","حائل","عرعر","الدمام","القريات"];
+function gColdest(){
+  var cs = shuffle(CITIES.slice()).slice(0,4);
+  var set = {}; while(Object.keys(set).length < 4){ set[ri(-12,20)] = 1; }
+  var t = shuffle(Object.keys(set).map(Number));
+  var ask = gp([0,1]);   /* 0 = الأبرد، 1 = الأدفأ */
+  var target = ask ? Math.max.apply(null,t) : Math.min.apply(null,t);
+  var right = cs[t.indexOf(target)];
+  var o = cs.slice(0,3).indexOf(right)>=0 ? cs.slice(0,3) : [right].concat(cs.filter(function(x){return x!==right;}).slice(0,2));
+  o = o.slice(); shuffle(o);
+  var rows = cs.map(function(c,i){ return '<tr><td style="border:1px solid #999;padding:3px 10px">'+c+'</td><td style="border:1px solid #999;padding:3px 10px">'+fmt(t[i])+'</td></tr>'; }).join("");
+  return ['يبيّن الجدول درجات الحرارة المسجَّلة في أربع مدن. أيُّ المدن كانت <b>'+(ask?"الأدفأ":"الأبرد")+'</b>؟'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem"><tr><th style="border:1px solid #999;padding:3px 10px">المدينة</th><th style="border:1px solid #999;padding:3px 10px">الحرارة</th></tr>'+rows+'</table></div>',
+    o, o.indexOf(right),
+    (ask?"الأدفأ هي صاحبة أكبر عدد: ":"الأبرد هي صاحبة أصغر عدد: ")+mn(fmt(target))+" ⇐ "+right+"."];
+}
+
+/* ===== الدرس 2-3: المستوى الإحداثي (ص 58–62) ===== */
+
+var QUAD = ["الربع الأول","الربع الثاني","الربع الثالث","الربع الرابع"];
+function quadOf(x,y){
+  if(x>0 && y>0) return 0;
+  if(x<0 && y>0) return 1;
+  if(x<0 && y<0) return 2;
+  return 3;
+}
+/* ص59 مثال 1: تحديد الربع */
+function gQuadrant(){
+  var x = gp([-1,1])*ri(1,6), y = gp([-1,1])*ri(1,6);
+  var right = QUAD[quadOf(x,y)];
+  var o = QUAD.slice(); shuffle(o);
+  return ["في أيِّ ربعٍ تقع النقطة "+mn("("+fmt(x)+", "+fmt(y)+")")+" ؟",
+    o, o.indexOf(right),
+    "الإحداثي السيني "+mn(fmt(x))+" والصادي "+mn(fmt(y))+" ⇐ "+right+". (الأول: + +، الثاني: − +، الثالث: − −، الرابع: + −)"];
+}
+
+/* ص59: نقطة على أحد المحورين */
+function gOnAxis(){
+  var k = ri(1,6), which = gp([0,1,2]);
+  var x = which===0 ? k*gp([-1,1]) : 0, y = which===1 ? k*gp([-1,1]) : 0;
+  if(which===2){ x = 0; y = 0; }
+  var right = which===2 ? "نقطة الأصل" : (which===0 ? "المحور السيني" : "المحور الصادي");
+  var o = ["المحور السيني","المحور الصادي","نقطة الأصل","الربع الأول"]; shuffle(o);
+  return ["أين تقع النقطة "+mn("("+fmt(x)+", "+fmt(y)+")")+" ؟",
+    o, o.indexOf(right),
+    "إذا كان الإحداثي الصادي صفرًا فالنقطة على المحور السيني، وإذا كان السيني صفرًا فهي على المحور الصادي، وإذا كانا صفرين فهي نقطة الأصل."];
+}
+
+/* ص58: من الحركة إلى الزوج المرتّب */
+function gMoveToPair(){
+  var hx = gp([["اليمين",1],["اليسار",-1]]), hy = gp([["أعلى",1],["أسفل",-1]]);
+  var a = ri(1,6), b = ri(1,6), x = hx[1]*a, y = hy[1]*b;
+  var right = "("+fmt(x)+", "+fmt(y)+")";
+  var o = [right, "("+fmt(y)+", "+fmt(x)+")", "("+fmt(-x)+", "+fmt(-y)+")"];
+  o = o.filter(function(v,i,arr){ return arr.indexOf(v)===i; });
+  if(o.length<3) o.push("("+fmt(x)+", "+fmt(-y)+")");
+  o = o.slice(0,3); shuffle(o);
+  return ["ابدأ من نقطة الأصل، وتحرّك "+mn(a)+" "+tmz(a,"وحدةً","وحدات")+" إلى "+hx[0]+"، ثمّ "+mn(b)+" "+tmz(b,"وحدةً","وحدات")+" إلى "+hy[0]+". ما الزوج المرتّب للنقطة؟",
+    o.map(mn), o.indexOf(right),
+    "اليمين وأعلى موجب، واليسار وأسفل سالب، والإحداثي السيني يُكتب أوّلًا ⇐ "+mn(right)+"."];
+}
+
+/* ص58: المصطلحات */
+function gCoordTerms(){
+  var C = [
+    ["النقطة "+"(0, 0)"+" على المستوى الإحداثي تُسمّى:", "نقطة الأصل", ["الربع الأول","المحور السيني","المدى"]],
+    ["في الزوج المرتّب، أيُّ الإحداثيين يُكتب أوّلًا؟", "الإحداثي السيني", ["الإحداثي الصادي","الأكبر منهما","الموجب منهما"]],
+    ["التحرّك إلى اليسار على المستوى الإحداثي يعبّر عن:", "الاتجاه السالب", ["الاتجاه الموجب","نقطة الأصل","المحور الصادي"]],
+    ["كم عدد الأرباع في المستوى الإحداثي؟", "أربعة", ["اثنان","ثلاثة","ستة"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "المستوى الإحداثي محوران يتقاطعان في نقطة الأصل ويقسمانه إلى أربعة أرباع، والزوج المرتّب يبدأ بالإحداثي السيني."];
+}
+
+/* ===== الدرس 2-4: جمع الأعداد الصحيحة (ص 65–69) ===== */
+
+/* ص66 مثال 1: عددان لهما الإشارة نفسها */
+function gAddSame(){
+  var s = gp([-1,1]), a = s*ri(3,40), b = s*ri(3,40), r = a+b;
+  var o = zOpts(r, [a-b, Math.abs(a)+Math.abs(b), -r]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" + "+pz(b)),
+    o[0], o[1],
+    "العددان لهما الإشارة نفسها: نجمع القيمتين المطلقتين ونُبقي الإشارة ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص67 مثال 2: عددان مختلفا الإشارة */
+function gAddDiff(){
+  var a = ri(3,40), b = -ri(3,40); if(a === -b) b -= 3;
+  if(gp([0,1])){ var t=a; a=b; b=-t; }
+  var r = a+b;
+  var o = zOpts(r, [-r, a-b, Math.abs(a)+Math.abs(b)]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" + "+pz(b)),
+    o[0], o[1],
+    "الإشارتان مختلفتان: نطرح القيمتين المطلقتين "+mn(Math.abs(Math.abs(a)-Math.abs(b)))+" ونأخذ إشارة العدد الأكبر قيمةً مطلقة ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص68 تمرين 5: ثلاثة أعداد */
+function gAddThree(){
+  var a = gp([-1,1])*ri(3,25), b = gp([-1,1])*ri(3,25), c = gp([-1,1])*ri(3,25), r = a+b+c;
+  var o = zOpts(r, [-r, a+b-c, Math.abs(a)+Math.abs(b)+Math.abs(c)]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" + "+pz(b)+" + "+pz(c)),
+    o[0], o[1],
+    "نجمع بالترتيب: "+mn(fmt(a)+" + "+pz(b)+" = "+fmt(a+b))+"، ثمّ "+mn(fmt(a+b)+" + "+pz(c)+" = "+fmt(r))+"."];
+}
+
+/* ص65: النظير الجمعي */
+function gAddInverse(){
+  var n = gp([-1,1])*ri(2,30);
+  var o = zOpts(-n, [n, 0, Math.abs(n)+1]);
+  return ["ما النظير الجمعي (المعكوس) للعدد "+mn(fmt(n))+" ؟",
+    o[0], o[1],
+    "النظير الجمعي هو العدد الذي مجموعه مع العدد يساوي صفرًا ⇐ "+mn(fmt(n)+" + "+pz(-n)+" = 0")+"."];
+}
+
+/* ص66–67: قاعدة الجمع */
+function gAddRule(){
+  var C = [
+    ["عند جمع عددين صحيحين لهما الإشارة نفسها:", "نجمع القيمتين المطلقتين ونُبقي الإشارة", ["نطرح القيمتين المطلقتين","يكون الناتج موجبًا دائمًا","يكون الناتج صفرًا"]],
+    ["عند جمع عددين صحيحين مختلفَي الإشارة:", "نطرح القيمتين المطلقتين ونأخذ إشارة الأكبر قيمةً مطلقة", ["نجمع القيمتين المطلقتين","يكون الناتج سالبًا دائمًا","نأخذ إشارة العدد الأول"]],
+    ["مجموع عددٍ صحيحٍ ونظيره الجمعي يساوي:", "صفرًا", ["العدد نفسه","ضعف العدد","واحدًا"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "إشارتان متشابهتان ⇐ اجمع وأبقِ الإشارة. إشارتان مختلفتان ⇐ اطرح وخذ إشارة الأكبر قيمةً مطلقة."];
+}
+
+/* ===== الدرس 2-5: طرح الأعداد الصحيحة (ص 71–75) ===== */
+
+/* ص72 مثالان: الطرح */
+function gSubInt(){
+  var a = gp([-1,1])*ri(2,40), b = gp([-1,1])*ri(2,40), r = a-b;
+  var o = zOpts(r, [a+b, -r, b-a]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" − "+pz(b)),
+    o[0], o[1],
+    "لطرح عددٍ نجمع نظيره: "+mn(fmt(a)+" + "+pz(-b)+" = "+fmt(r))+"."];
+}
+
+/* ص72: تحويل الطرح إلى جمع */
+function gSubAsAdd(){
+  var a = gp([-1,1])*ri(2,30), b = gp([-1,1])*ri(2,30);
+  var right = fmt(a)+" + "+pz(-b);
+  var o = [right, fmt(a)+" + "+pz(b), fmt(-a)+" + "+pz(b)];
+  o = o.filter(function(v,i,arr){ return arr.indexOf(v)===i; });
+  if(o.length<3) o.push(fmt(-a)+" + "+pz(-b));
+  o = o.slice(0,3); shuffle(o);
+  return ["أيُّ جملة جمعٍ تكافئ: "+mn(fmt(a)+" − "+pz(b)),
+    o.map(mn), o.indexOf(right),
+    "طرح عددٍ = جمع نظيره الجمعي ⇐ "+mn(right+" = "+fmt(a-b))+"."];
+}
+
+/* ص73: فرق درجات الحرارة */
+function gSubTemp(){
+  var hi = ri(1,25), lo = -ri(1,20), r = hi-lo;
+  var o = zOpts(r, [hi+lo, -r, Math.abs(hi)-Math.abs(lo)]);
+  return ["بلغت درجة الحرارة العظمى في أحد الأيام "+mn(fmt(hi))+" والصغرى "+mn(fmt(lo))+". كم مقدار الفرق بينهما؟",
+    o[0], o[1],
+    "الفرق = العظمى − الصغرى ⇐ "+mn(fmt(hi)+" − "+pz(lo)+" = "+fmt(hi)+" + "+fmt(-lo)+" = "+fmt(r))+"."];
+}
+
+/* ص71: مصطلحات الطرح */
+function gSubRule(){
+  var C = [
+    ["لطرح عددٍ صحيحٍ من آخر:", "نجمع النظير الجمعي للمطروح", ["نطرح النظير الجمعي","نضرب العددين","نعكس إشارة المطروح منه"]],
+    ["في جملة الطرح "+"، العدد الذي نطرح منه يُسمّى:", "المطروح منه", ["المطروح","الفرق","النظير"]],
+    ["ناتج طرح عددٍ من نفسه يساوي:", "صفرًا", ["العدد نفسه","ضعف العدد","واحدًا"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "الطرح يتحوّل دائمًا إلى جمعٍ بالنظير: "+mn("أ − ب = أ + (−ب)")+"."];
+}
+
+/* ===== الدرس 2-6: ضرب الأعداد الصحيحة (ص 76–79) ===== */
+
+/* ص77: إشارتان مختلفتان ⇐ سالب */
+function gMulDiff(){
+  var a = ri(2,12), b = -ri(2,12);
+  if(gp([0,1])){ var t=a; a=b; b=Math.abs(t); }
+  var r = a*b;
+  var o = zOpts(r, [-r, a+b, Math.abs(a*b)+Math.abs(a)]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" × "+pz(b)),
+    o[0], o[1],
+    "الإشارتان مختلفتان فالناتج سالب: "+mn(Math.abs(a)+" × "+Math.abs(b)+" = "+Math.abs(r))+" ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص78: إشارتان متشابهتان ⇐ موجب */
+function gMulSame(){
+  var s = gp([-1,1]), a = s*ri(2,12), b = s*ri(2,12), r = a*b;
+  var o = zOpts(r, [-r, a+b, r+Math.abs(a)]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" × "+pz(b)),
+    o[0], o[1],
+    "الإشارتان متشابهتان فالناتج موجب ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص78 مثال 4: مربّع عددٍ سالب */
+function gMulSquare(){
+  var a = -ri(2,12), r = a*a;
+  var o = zOpts(r, [-r, 2*a, a]);
+  return ["أوجد الناتج: "+mn("("+fmt(a)+")"+sup(2)),
+    o[0], o[1],
+    mn("("+fmt(a)+") × ("+fmt(a)+")")+" — العددان لهما الإشارة نفسها فالناتج موجب ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص78 مثال 5: ثلاثة أعداد */
+function gMulThree(){
+  var a = gp([-1,1])*ri(2,8), b = gp([-1,1])*ri(2,8), c = gp([-1,1])*ri(2,6), r = a*b*c;
+  var o = zOpts(r, [-r, a*b+c, a+b+c]);
+  return ["أوجد الناتج: "+mn(fmt(a)+" × "+pz(b)+" × "+pz(c)),
+    o[0], o[1],
+    "نضرب اثنين أوّلًا: "+mn(fmt(a)+" × "+pz(b)+" = "+fmt(a*b))+"، ثمّ "+mn(fmt(a*b)+" × "+pz(c)+" = "+fmt(r))+"."];
+}
+
+/* ص79: غوّاصة تنزل بمعدّل ثابت */
+function gMulWord(){
+  var per = ri(2,9), mins = ri(3,12), r = -per*mins;
+  var o = zOpts(r, [-r, -(per+mins), r-per]);
+  return ["تبدأ غوّاصةٌ الغطس من سطح الماء بسرعة "+mn(per)+" "+tmz(per,"مترًا","أمتار")+" في الدقيقة. ما العمق الذي تصل إليه بعد "+mn(mins)+" "+tmz(mins,"دقيقةً","دقائق")+"؟",
+    o[0], o[1],
+    "النزول يمثَّل بعددٍ سالب: "+mn(fmt(-per)+" × "+mins+" = "+fmt(r))+" مترًا."];
+}
+
+/* ص77–78: قاعدة الضرب */
+function gMulRule(){
+  var C = [
+    ["ناتج ضرب عددين صحيحين لهما الإشارة نفسها يكون:", "موجبًا", ["سالبًا","صفرًا","له إشارة الأكبر"]],
+    ["ناتج ضرب عددين صحيحين مختلفَي الإشارة يكون:", "سالبًا", ["موجبًا","صفرًا","له إشارة الأول"]],
+    ["ناتج ضرب أيّ عددٍ صحيحٍ في صفر يساوي:", "صفرًا", ["العدد نفسه","واحدًا","نظير العدد"]],
+    ["ناتج ضرب ثلاثة أعدادٍ سالبة يكون:", "سالبًا", ["موجبًا","صفرًا","لا يمكن تحديده"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب. وعدد الإشارات السالبة إن كان زوجيًّا فالناتج موجب، وإن كان فرديًّا فسالب."];
+}
+
+/* ===== الدرس 2-7: استراتيجية البحث عن نمط (ص 82–83) ===== */
+
+/* ص82: جدول نسبة ثابتة */
+function gPatternRatio(){
+  var per = gp([4,5,6,8]), out = ri(3, per-1), k = ri(4,9);   /* الأهداف أقلّ من الركلات دائمًا */
+  var kicks = per*k, goals = out*k;
+  var head = ["الأهداف","الركلات"], name = gp(["طلال","سعود","ماجد","خالد","فيصل"]);
+  var o = zOpts(goals, [kicks-goals, goals+out, Math.round(kicks/2)]);
+  var r1 = [1,2,3].map(function(i){ return '<td style="border:1px solid #999;padding:3px 10px">'+(out*i)+'</td>'; }).join("");
+  var r2 = [1,2,3].map(function(i){ return '<td style="border:1px solid #999;padding:3px 10px">'+(per*i)+'</td>'; }).join("");
+  return ['يسجّل '+name+' <b>'+out+'</b> أهدافٍ من كلّ <b>'+per+'</b> ركلاتٍ، كما في الجدول. كم هدفًا يسجّل من '+mn(kicks)+' ركلة؟'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem">'+
+    '<tr><td style="border:1px solid #999;padding:3px 10px">'+head[0]+'</td>'+r1+'</tr>'+
+    '<tr><td style="border:1px solid #999;padding:3px 10px">'+head[1]+'</td>'+r2+'</tr></table></div>',
+    o[0], o[1],
+    "النمط: كلّ "+mn(per)+" ركلاتٍ تعطي "+mn(out)+" أهداف. و"+mn(kicks)+" ركلة = "+mn(k)+" مجموعات ⇐ "+mn(k+" × "+out+" = "+goals)+" هدفًا."];
+}
+
+/* ص83: متتابعة بفرق ثابت */
+function gPatternStep(){
+  var a0 = ri(2,15), d = gp([-1,1])*ri(2,9), k = ri(6,10);
+  var seq = [0,1,2,3].map(function(i){ return a0 + i*d; });
+  var r = a0 + (k-1)*d;
+  var o = zOpts(r, [a0 + k*d, r-d, a0*k]);
+  return ["ابحث عن النمط: "+mn(seq.map(fmt).join(" ، ")+" ، …")+"<br>ما الحدّ رقم "+mn(k)+" ؟",
+    o[0], o[1],
+    "النمط يزيد بمقدار "+mn(fmt(d))+" في كلّ خطوة ⇐ "+mn(fmt(a0)+" + "+(k-1)+" × "+pz(d)+" = "+fmt(r))+"."];
+}
+
+/* ص83: الاستراتيجية نفسها */
+function gPatternHow(){
+  var C = [
+    ["متى تكون استراتيجية «البحث عن نمط» مناسبة؟", "عندما تتكرّر العلاقة نفسها بانتظام بين المعطيات", ["عندما تكون المسألة جمعًا لعددين فقط","عندما لا توجد أعداد في المسألة","عندما يكون المطلوب رسمًا"]],
+    ["ما أوّل ما تفعله في استراتيجية «البحث عن نمط»؟", "أرتّب المعطيات في جدول لأرى العلاقة بينها", ["أخمّن الجواب مباشرةً","أضرب كلّ الأعداد","أتجاهل الأعداد الصغيرة"]],
+    ["بعد أن تكتشف النمط، ماذا تفعل؟", "أوسّعه حتى أصل إلى المطلوب ثمّ أتحقّق", ["أتوقّف وأكتب أوّل عدد","أعيد كتابة المعطيات","أبدّل النمط بنمطٍ آخر"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "رتّب المعطيات في جدول ← اكتشف العلاقة المتكرّرة ← وسّعها حتى المطلوب ← تحقّق أنّ الجواب معقول."];
+}
+
+/* ===== الدرس 2-8: قسمة الأعداد الصحيحة (ص 84–87) ===== */
+
+/* ص85 مثال 1: إشارتان مختلفتان */
+function gDivDiff(){
+  var q = ri(2,12), b = ri(2,12), a = q*b;
+  if(gp([0,1])){ b = -b; } else { a = -a; }
+  var r = a/b;
+  var o = zOpts(r, [-r, a-b, r+1]);
+  return ["أوجد ناتج القسمة: "+mn(fmt(a)+" ÷ "+pz(b)),
+    o[0], o[1],
+    "الإشارتان مختلفتان فالناتج سالب: "+mn(Math.abs(a)+" ÷ "+Math.abs(b)+" = "+Math.abs(r))+" ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص86 مثال 3: إشارتان متشابهتان */
+function gDivSame(){
+  var q = ri(2,12), b = ri(2,12), a = q*b;
+  if(gp([0,1])){ a = -a; b = -b; }
+  var r = a/b;
+  var o = zOpts(r, [-r, a+b, r+2]);
+  return ["أوجد ناتج القسمة: "+mn(fmt(a)+" ÷ "+pz(b)),
+    o[0], o[1],
+    "الإشارتان متشابهتان فالناتج موجب ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص85 مثال 2: صورة الكسر */
+function gDivFrac(){
+  var q = ri(2,11), b = ri(2,11), a = q*b;
+  if(gp([0,1])) a = -a; else b = -b;
+  var r = a/b;
+  var o = zOpts(r, [-r, a+b, r-1]);
+  return ["أوجد ناتج القسمة: "+mn(fmt(a)+" / "+fmt(b)),
+    o[0], o[1],
+    "الخطّ الكسري يعني القسمة، والإشارتان مختلفتان فالناتج سالب ⇐ "+mn(fmt(r))+"."];
+}
+
+/* ص85 مثال 4: قسمة فيها متغيّر */
+function gDivAlg(){
+  var q = gp([-1,1])*ri(2,10), b = gp([-1,1])*ri(2,10), a = q*b;
+  var o = zOpts(q, [-q, a+b, a-b]);
+  return ["إذا كانت "+ax("س = "+fmt(b))+" فاحسب قيمة العبارة: "+ax(fmt(a)+" ÷ س"),
+    o[0], o[1],
+    "نعوّض عن "+ax("س")+" بـ"+mn(fmt(b))+": "+mn(fmt(a)+" ÷ "+pz(b)+" = "+fmt(q))+"."];
+}
+
+/* ص86: معدّل التغيّر */
+function gDivWord(){
+  var per = ri(2,9), n = ri(3,9), total = -per*n;
+  var o = zOpts(-per, [per, total/2, total]);
+  return ["انخفضت درجة الحرارة "+mn(fmt(total))+" درجات خلال "+mn(n)+" "+tmz(n,"ساعةً","ساعات")+" بانتظام. ما مقدار التغيّر في كلّ ساعة؟",
+    o[0], o[1],
+    mn(fmt(total)+" ÷ "+n+" = "+fmt(-per))+" — أي أنّها تنخفض "+mn(per)+" "+tmz(per,"درجةً","درجات")+" كلّ ساعة."];
+}
+
+/* ص86: قاعدة القسمة */
+function gDivRule(){
+  var C = [
+    ["ناتج قسمة عددين صحيحين لهما الإشارة نفسها يكون:", "موجبًا", ["سالبًا","صفرًا","له إشارة المقسوم"]],
+    ["ناتج قسمة عددين صحيحين مختلفَي الإشارة يكون:", "سالبًا", ["موجبًا","صفرًا","له إشارة المقسوم عليه"]],
+    ["قواعد إشارة القسمة في الأعداد الصحيحة:", "هي نفسها قواعد إشارة الضرب", ["عكس قواعد الضرب تمامًا","تختلف حسب حجم العددين","لا توجد لها قاعدة"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "القسمة تتبع قواعد الضرب نفسها: إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب."];
+}
+
 var D1 = [gStepOrder, gDiagonals, gTriangular, gFactPattern, gTableTimes, gReasonable];
 var D2 = [gPowerExpand, gPowerValue, gPowerWrite, gPowerRead, gStandardForm];
 var D3 = [gOrderRule, gOrderParen, gOrderPower, gMoneyExpr, gOrderMixed];
@@ -618,7 +1064,16 @@ var D5 = [gEvalOne, gEvalTwo, gEvalDiv, gCoefficient, gPatternExpr, gAlgTerms];
 var D6 = [gSolveAdd, gSolveSub, gSolveMul, gEqFromWord, gEqWordSolve, gEqMeaning];
 var D7 = [gPropName, gDistRewrite, gDistValue, gMentalMul, gDistBack];
 var D8 = [gFuncOut, gFuncRule, gFuncRange, gFuncPrice, gFuncTerms];
-var ALL = D1.concat(D2).concat(D3).concat(D4).concat(D5).concat(D6).concat(D7).concat(D8);
+var ALL1 = D1.concat(D2).concat(D3).concat(D4).concat(D5).concat(D6).concat(D7).concat(D8);
+var E1 = [gIntWrite, gAbsValue, gAbsEq, gAbsBigger, gIntTerms];
+var E2 = [gGreater, gOrderAsc, gColdest];
+var E3 = [gQuadrant, gOnAxis, gMoveToPair, gCoordTerms];
+var E4 = [gAddSame, gAddDiff, gAddThree, gAddInverse, gAddRule];
+var E5 = [gSubInt, gSubAsAdd, gSubTemp, gSubRule];
+var E6 = [gMulDiff, gMulSame, gMulSquare, gMulThree, gMulWord, gMulRule];
+var E7 = [gPatternRatio, gPatternStep, gPatternHow];
+var E8 = [gDivDiff, gDivSame, gDivFrac, gDivAlg, gDivWord, gDivRule];
+var ALL2 = E1.concat(E2).concat(E3).concat(E4).concat(E5).concat(E6).concat(E7).concat(E8);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -629,44 +1084,52 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–44</span>)</div>'+
-    '<div class="tabs" role="tablist">'+
-      '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
-      '<button data-tab="d1" aria-selected="false">1-1 الخطوات الأربع</button>'+
-      '<button data-tab="d2" aria-selected="false">1-2 القوى والأسس</button>'+
-      '<button data-tab="d3" aria-selected="false">1-3 ترتيب العمليات</button>'+
-      '<button data-tab="d4" aria-selected="false">1-4 التخمين والتحقّق</button>'+
-      '<button data-tab="d5" aria-selected="false">1-5 العبارات الجبرية</button>'+
-      '<button data-tab="d6" aria-selected="false">1-6 المعادلات</button>'+
-      '<button data-tab="d7" aria-selected="false">1-7 الخصائص</button>'+
-      '<button data-tab="d8" aria-selected="false">1-8 الدوال</button>'+
-      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
-    '</div>'+
-    '<section class="panel active" id="all"></section>'+
-    '<section class="panel" id="d1"></section>'+
-    '<section class="panel" id="d2"></section>'+
-    '<section class="panel" id="d3"></section>'+
-    '<section class="panel" id="d4"></section>'+
-    '<section class="panel" id="d5"></section>'+
-    '<section class="panel" id="d6"></section>'+
-    '<section class="panel" id="d7"></section>'+
-    '<section class="panel" id="d8"></section>'+
-    '<section class="panel" id="rem"></section>'+
-    '<footer>الرياضيات · ثاني متوسط · الفصل الأول · أرقام جديدة كل مرة</footer>';
+    '<div class="chapsel" id="chapsel"></div>'+
+    '<div class="unit" id="unit"></div>'+
+    '<div class="tabs" role="tablist" id="tabs"></div>'+
+    '<div id="panels"></div>'+
+    '<footer>الرياضيات · ثاني متوسط · مطابق للكتاب · أرقام جديدة كل مرة</footer>';
 
   var CFG = {
-    all: {gens:ALL, n:12, intro:"<b>اختبار شامل</b> على الدروس الثلاثة: الخطوات الأربع · القوى والأسس · ترتيب العمليات.", label:"رياضيات م٢ — شامل ف١"},
-    d1:  {gens:D1,  n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م٢ — 1-1 الخطوات الأربع"},
-    d2:  {gens:D2,  n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م٢ — 1-2 القوى والأسس"},
-    d3:  {gens:D3,  n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"},
-    d4:  {gens:D4,  n:10, intro:"<b>الدرس <span class=en>1-4</span> — استراتيجية التخمين والتحقّق:</b> خمّن ← تحقّق ← عدّل التخمين حتى تتوافق النتيجة مع كلّ المعطيات.", label:"رياضيات م٢ — 1-4 التخمين والتحقّق"},
-    d5:  {gens:D5,  n:10, intro:"<b>الدرس <span class=en>1-5</span> — المتغيّرات والعبارات الجبرية:</b> المتغيّر رمزٌ لكميّةٍ غير معلومة، والمُعامِل هو العدد المضروب فيه. نحسب قيمة العبارة بالتعويض.", label:"رياضيات م٢ — 1-5 العبارات الجبرية"},
-    d6:  {gens:D6,  n:10, intro:"<b>الدرس <span class=en>1-6</span> — المعادلات:</b> حلّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين.", label:"رياضيات م٢ — 1-6 المعادلات"},
-    d7:  {gens:D7,  n:10, intro:"<b>الدرس <span class=en>1-7</span> — الخصائص:</b> الإبدال · التجميع · التوزيع · العنصر المحايد — واستعمالها في الحساب الذهني.", label:"رياضيات م٢ — 1-7 الخصائص"},
-    d8:  {gens:D8,  n:10, intro:"<b>الدرس <span class=en>1-8</span> — المعادلات والدوال:</b> المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، وقاعدة الدالّة تربط بينهما.", label:"رياضيات م٢ — 1-8 الدوال"}
+    all1:{tab:"اختبار شامل 📝", gens:ALL1, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الأول الثمانية.", label:"رياضيات م٢ — شامل ف١"},
+    d1:  {tab:"1-1 الخطوات الأربع", gens:D1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م٢ — 1-1 الخطوات الأربع"},
+    d2:  {tab:"1-2 القوى والأسس", gens:D2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م٢ — 1-2 القوى والأسس"},
+    d3:  {tab:"1-3 ترتيب العمليات", gens:D3, n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"},
+    d4:  {tab:"1-4 التخمين والتحقّق", gens:D4, n:10, intro:"<b>الدرس <span class=en>1-4</span> — استراتيجية التخمين والتحقّق:</b> خمّن ← تحقّق ← عدّل التخمين حتى تتوافق النتيجة مع كلّ المعطيات.", label:"رياضيات م٢ — 1-4 التخمين والتحقّق"},
+    d5:  {tab:"1-5 العبارات الجبرية", gens:D5, n:10, intro:"<b>الدرس <span class=en>1-5</span> — المتغيّرات والعبارات الجبرية:</b> المتغيّر رمزٌ لكميّةٍ غير معلومة، والمُعامِل هو العدد المضروب فيه. نحسب قيمة العبارة بالتعويض.", label:"رياضيات م٢ — 1-5 العبارات الجبرية"},
+    d6:  {tab:"1-6 المعادلات", gens:D6, n:10, intro:"<b>الدرس <span class=en>1-6</span> — المعادلات:</b> حلّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين.", label:"رياضيات م٢ — 1-6 المعادلات"},
+    d7:  {tab:"1-7 الخصائص", gens:D7, n:10, intro:"<b>الدرس <span class=en>1-7</span> — الخصائص:</b> الإبدال · التجميع · التوزيع · العنصر المحايد — واستعمالها في الحساب الذهني.", label:"رياضيات م٢ — 1-7 الخصائص"},
+    d8:  {tab:"1-8 الدوال", gens:D8, n:10, intro:"<b>الدرس <span class=en>1-8</span> — المعادلات والدوال:</b> المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، وقاعدة الدالّة تربط بينهما.", label:"رياضيات م٢ — 1-8 الدوال"},
+
+    all2:{tab:"اختبار شامل 📝", gens:ALL2, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الثاني الثمانية.", label:"رياضيات م٢ — شامل ف٢"},
+    e1:  {tab:"2-1 القيمة المطلقة", gens:E1, n:10, intro:"<b>الدرس <span class=en>2-1</span> — الأعداد الصحيحة والقيمة المطلقة:</b> ما فوق المستوى موجب وما تحته سالب، والقيمة المطلقة بُعدٌ عن الصفر فهي موجبة دائمًا.", label:"رياضيات م٢ — 2-1 القيمة المطلقة"},
+    e2:  {tab:"2-2 المقارنة والترتيب", gens:E2, n:10, intro:"<b>الدرس <span class=en>2-2</span> — مقارنة الأعداد الصحيحة وترتيبها:</b> على خط الأعداد كلّما اتّجهت يمينًا كبر العدد — فـ<span class=en>−12</span> أصغر من <span class=en>−3</span>.", label:"رياضيات م٢ — 2-2 المقارنة والترتيب"},
+    e3:  {tab:"2-3 المستوى الإحداثي", gens:E3, n:10, intro:"<b>الدرس <span class=en>2-3</span> — المستوى الإحداثي:</b> الزوج المرتّب يبدأ بالإحداثي السيني، والأرباع أربعة تبدأ من أعلى اليمين وتدور عكس عقارب الساعة.", label:"رياضيات م٢ — 2-3 المستوى الإحداثي"},
+    e4:  {tab:"2-4 جمع الصحيحة", gens:E4, n:10, intro:"<b>الدرس <span class=en>2-4</span> — جمع الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ اجمع وأبقِ الإشارة. مختلفتان ⇐ اطرح وخذ إشارة الأكبر قيمةً مطلقة.", label:"رياضيات م٢ — 2-4 جمع الأعداد الصحيحة"},
+    e5:  {tab:"2-5 طرح الصحيحة", gens:E5, n:10, intro:"<b>الدرس <span class=en>2-5</span> — طرح الأعداد الصحيحة:</b> لطرح عددٍ اجمع نظيره ⇐ <span class=en>أ − ب = أ + (−ب)</span>.", label:"رياضيات م٢ — 2-5 طرح الأعداد الصحيحة"},
+    e6:  {tab:"2-6 ضرب الصحيحة", gens:E6, n:10, intro:"<b>الدرس <span class=en>2-6</span> — ضرب الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب.", label:"رياضيات م٢ — 2-6 ضرب الأعداد الصحيحة"},
+    e7:  {tab:"2-7 البحث عن نمط", gens:E7, n:10, intro:"<b>الدرس <span class=en>2-7</span> — استراتيجية البحث عن نمط:</b> رتّب المعطيات في جدول ← اكتشف العلاقة المتكرّرة ← وسّعها حتى المطلوب ← تحقّق.", label:"رياضيات م٢ — 2-7 البحث عن نمط"},
+    e8:  {tab:"2-8 قسمة الصحيحة", gens:E8, n:10, intro:"<b>الدرس <span class=en>2-8</span> — قسمة الأعداد الصحيحة:</b> القسمة تتبع قواعد إشارة الضرب نفسها.", label:"رياضيات م٢ — 2-8 قسمة الأعداد الصحيحة"}
   };
+
+  var CHAPS = {
+    c1: {name:"الفصل الأول", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–44</span>)',
+         ids:["all1","d1","d2","d3","d4","d5","d6","d7","d8"]},
+    c2: {name:"الفصل الثاني", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الثاني: الأعداد الصحيحة (ص <span class="en">49–91</span>)',
+         ids:["all2","e1","e2","e3","e4","e5","e6","e7","e8"]}
+  };
+
+  var curCh = "c1", curId = "all1";
+
+  function panelOf(id){
+    var pan = document.getElementById("p_"+id);
+    if(!pan){ pan = document.createElement("section"); pan.className="panel"; pan.id="p_"+id; document.getElementById("panels").appendChild(pan); }
+    return pan;
+  }
+  function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
+
   function render(id){
-    var c = CFG[id], sec = document.getElementById(id);
+    var c = CFG[id], sec = panelOf(id);
     var items = genN(c.gens, c.n);
     var html = '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
@@ -690,11 +1153,11 @@ if(!NAMES[who]){
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
           if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
-            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
+            if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }
@@ -709,39 +1172,79 @@ if(!NAMES[who]){
     {id:"d5", name:"1-5 العبارات الجبرية", tip:"المتغيّر رمز لكميّة غير معلومة، و«3س» تعني 3 × س. لحساب قيمة العبارة: عوّض عن كل متغيّر بقيمته، ثم اتبع ترتيب العمليات.", yt:"شرح المتغيرات والعبارات الجبرية ثاني متوسط"},
     {id:"d6", name:"1-6 المعادلات", tip:"حلّ المعادلة يعني إيجاد قيمة المتغيّر التي تجعل الطرفين متساويين. اسأل نفسك: أيّ عدد إذا فعلتُ به هذا صار ذاك؟ ثم تحقّق بالتعويض.", yt:"شرح حل المعادلات ذهنيا ثاني متوسط"},
     {id:"d7", name:"1-7 الخصائص", tip:"الإبدال = تغيير الترتيب، والتجميع = تغيير مواضع الأقواس، والتوزيع = ضرب العدد في كل حدّ داخل القوسين، والعنصر المحايد = الصفر في الجمع والواحد في الضرب.", yt:"شرح خصائص العمليات الإبدال التجميع التوزيع ثاني متوسط"},
-    {id:"d8", name:"1-8 الدوال", tip:"الدالّة تعطي لكل مُدخَل مُخرَجًا واحدًا فقط. المُدخلات = المجال، والمُخرجات = المدى. لتجد القاعدة من جدول: اسأل ماذا فُعِل بـ س ليعطي ص في كلّ صف؟", yt:"شرح المعادلات والدوال المجال والمدى ثاني متوسط"}
+    {id:"d8", name:"1-8 الدوال", tip:"الدالّة تعطي لكل مُدخَل مُخرَجًا واحدًا فقط. المُدخلات = المجال، والمُخرجات = المدى. لتجد القاعدة من جدول: اسأل ماذا فُعِل بـ س ليعطي ص في كلّ صف؟", yt:"شرح المعادلات والدوال المجال والمدى ثاني متوسط"},
+    {id:"e1", name:"2-1 القيمة المطلقة", tip:"ما فوق المستوى أو الزيادة موجب، وما تحته أو النقص سالب. والقيمة المطلقة هي بُعد العدد عن الصفر — فهي لا تكون سالبة أبدًا، ولذلك |س| = 5 لها حلّان: 5 و −5.", yt:"شرح الأعداد الصحيحة والقيمة المطلقة ثاني متوسط"},
+    {id:"e2", name:"2-2 المقارنة والترتيب", tip:"ارسم خط الأعداد في ذهنك: كلّما اتّجهت يمينًا كبر العدد. أكثر خطأ شائع: الظنّ أن −12 أكبر من −3 لأن 12 أكبر من 3 — العكس هو الصحيح.", yt:"شرح مقارنة الأعداد الصحيحة وترتيبها ثاني متوسط"},
+    {id:"e3", name:"2-3 المستوى الإحداثي", tip:"الزوج المرتّب (س، ص) يبدأ بالسيني دائمًا. اليمين وأعلى موجب، واليسار وأسفل سالب. الأرباع: الأول (+،+)، الثاني (−،+)، الثالث (−،−)، الرابع (+،−).", yt:"شرح المستوى الإحداثي والأزواج المرتبة ثاني متوسط"},
+    {id:"e4", name:"2-4 جمع الصحيحة", tip:"إشارتان متشابهتان: اجمع القيمتين المطلقتين وأبقِ الإشارة. إشارتان مختلفتان: اطرح القيمتين المطلقتين وخذ إشارة العدد الأكبر قيمةً مطلقة.", yt:"شرح جمع الأعداد الصحيحة ثاني متوسط"},
+    {id:"e5", name:"2-5 طرح الصحيحة", tip:"لا تطرح — حوّل الطرح إلى جمع بالنظير: أ − ب = أ + (−ب). فمثلًا 5 − (−3) تصير 5 + 3 = 8.", yt:"شرح طرح الأعداد الصحيحة ثاني متوسط"},
+    {id:"e6", name:"2-6 ضرب الصحيحة", tip:"إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب. وفي أكثر من عددين: عُدّ الإشارات السالبة — زوجي ⇐ موجب، فردي ⇐ سالب. وانتبه: (−4)² = 16 موجبة.", yt:"شرح ضرب الأعداد الصحيحة ثاني متوسط"},
+    {id:"e7", name:"2-7 البحث عن نمط", tip:"رتّب المعطيات في جدول أوّلًا، وابحث: كم يزيد أو ينقص في كل خطوة؟ أو في كم يُضرب؟ ثم وسّع النمط حتى تصل إلى المطلوب، ثم تحقّق أن الجواب معقول.", yt:"شرح استراتيجية البحث عن نمط ثاني متوسط"},
+    {id:"e8", name:"2-8 قسمة الصحيحة", tip:"قواعد إشارة القسمة هي نفسها قواعد الضرب: متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب. والخطّ الكسري يعني قسمة.", yt:"شرح قسمة الأعداد الصحيحة ثاني متوسط"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
-    var sec=document.getElementById("rem");
+    var sec=panelOf("rem");
     var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
     var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
-    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الفصول من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل فصل.)</div>';
-    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الفصول. جرّب فصول '+REM_LABEL+' ويرجع هنا يعرض أضعف فصل مع نصيحة وزر مراجعة.</div>'; }
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
       html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
         (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
         '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
-    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 فصول ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
     html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
     sec.innerHTML=html;
-    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
-  render("all");
 
-  document.querySelectorAll(".tabs button").forEach(function(b){
-    b.addEventListener("click", function(){
-      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
-      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
-      b.setAttribute("aria-selected","true");
-      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
-      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
-      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  function showPanel(id){
+    leaveCur();
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var pan = panelOf(id);
+    pan.classList.add("active");
+    curId = id;
+    if(id==="rem"){ renderRem(); }
+    else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  }
+  function drawTabs(){
+    var ch = CHAPS[curCh], t = document.getElementById("tabs");
+    t.innerHTML = ch.ids.map(function(id){
+      return '<button data-tab="'+id+'" aria-selected="'+(id===curId?"true":"false")+'">'+CFG[id].tab+'</button>';
+    }).join("") + '<button data-tab="rem" aria-selected="'+(curId==="rem"?"true":"false")+'">علاجي 💪</button>';
+    t.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        t.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+        b.setAttribute("aria-selected","true");
+        showPanel(b.dataset.tab);
+      });
     });
-  });
-  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+    document.getElementById("unit").innerHTML = ch.unit;
+  }
+  function drawChap(){
+    var e = document.getElementById("chapsel");
+    e.innerHTML = Object.keys(CHAPS).map(function(c){
+      return '<button data-ch="'+c+'" aria-selected="'+(c===curCh?"true":"false")+'">'+CHAPS[c].name+'</button>';
+    }).join("");
+    e.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        if(curCh===b.dataset.ch) return;
+        leaveCur(); curCh=b.dataset.ch; curId=CHAPS[curCh].ids[0];
+        drawChap(); drawTabs(); showPanel(curId);
+      });
+    });
+  }
+  function goTo(id){
+    curCh = (CHAPS.c1.ids.indexOf(id) >= 0) ? "c1" : "c2";
+    curId = id; drawChap(); drawTabs(); showPanel(id);
+  }
+
+  drawChap(); drawTabs(); showPanel("all1");
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
+
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
