@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الرياضيات — ثالث متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#0d9488; --accent-deep:#115e59;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
+  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .ax{direction:rtl;unicode-bidi:isolate;display:inline-block;font-weight:inherit}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.1rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify({ student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } })
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<0 ? "\u2212" : "")+s; } // فاصلة آلاف + إشارة سالب رياضية
+function mn(s){ return '<span class="en">'+s+'</span>'; }
+// خيارات رقمية مميّزة: الصحيح + مشتّتات
+function numOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct+10, correct*2+1]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+
+/* ============================================================
+   رياضيات ثاني متوسط — الفصل ١: الجبر والدوال
+   الدروس ١-١ و١-٢ و١-٣، مبنيّة من كتاب رفيف نفسه (ص ١٢–٢٤).
+   كل مولّد فوقه رقم الدرس والصفحة التي أُخذ منها نوع السؤال.
+   ============================================================ */
+/* ===== دوالّ مساعدة ===== */
+var SUP = ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
+function sup(n){ return String(n).split("").map(function(d){ return SUP[+d]; }).join(""); }
+function pw(b,e){ return mn(b+sup(e)); }
+function tmz(n, sing, plur){ return (n>=3 && n<=10) ? plur : sing; }
+function ryl(n){ return tmz(n,"ريالًا","ريالات"); }
+function ax(s){ return '<span class="ax">'+s+'</span>'; }   /* عبارة جبرية بحروف عربية: عزل RTL */
+function pz(n){ return n<0 ? "("+fmt(n)+")" : fmt(n); }
+/* خيارات لأعداد صحيحة (تسمح بالسالب) */
+function zOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([-correct, correct+1, correct-1, correct+2, correct+10]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+/* خيارات نصّية متمايزة */
+function sOpts(right, cands){
+  var o=[right];
+  for(var i=0;i<cands.length && o.length<3;i++){ if(o.indexOf(cands[i])<0) o.push(cands[i]); }
+  shuffle(o); return [o, o.indexOf(right)];
+}
+
+/* ============================================================
+   رياضيات ثالث متوسط — الفصل الأول: المعادلات الخطية (ص 10–29)
+   ============================================================ */
+
+var VARS9 = ["س","ص","ن","م","ق","ك","ل"];
+
+/* ===== الدرس 1-1: المعادلات (ص 12–17) ===== */
+
+/* ص13 مثال 2: حلّ معادلة بترتيب العمليات */
+function gEqOrderOps(){
+  var b = ri(2,6), e = 2, c = ri(2,9), dv = gp([2,4,5]);
+  var inner = Math.pow(b,e) - c;
+  if(inner <= 0 || inner % dv !== 0){ b = 5; c = 5; dv = 2; inner = 20; }
+  var add = ri(2,15), r = add + inner/dv;
+  var o = numOpts(r, [add + inner, inner/dv, add + Math.pow(b,e)]);
+  return ["ما حلّ المعادلة: "+ax("ب = "+add+" + ("+b+sup(e)+" − "+c+") ÷ "+dv)+" ؟",
+    o[0], o[1],
+    "بترتيب العمليات: "+mn(b+sup(e)+" = "+Math.pow(b,e))+"، ثمّ "+mn(Math.pow(b,e)+" − "+c+" = "+inner)+"، ثمّ "+mn(inner+" ÷ "+dv+" = "+(inner/dv))+"، ثمّ الجمع ⇐ "+mn(r)+"."];
+}
+
+/* ص15: مجموعة الحلّ من مجموعة تعويض */
+function gSolutionSet(){
+  var a = ri(2,15), x = ri(10,20), b = x+a;
+  var setv = [x-2,x-1,x,x+1,x+2];
+  var right = "{ "+x+" }";
+  var o = sOpts(right, ["{ "+(x+1)+" }", "{ "+(x-1)+" }", "{ "+b+" }"]);
+  return ["أوجد مجموعة الحلّ للمعادلة "+ax("س + "+a+" = "+b)+" إذا كانت مجموعة التعويض "+ax("{ "+setv.join(" ، ")+" }")+" :",
+    o[0].map(ax), o[1],
+    "نعوّض كلّ عنصر: العنصر الوحيد الذي يجعل الجملة صحيحة هو "+mn(x)+" لأنّ "+mn(x+" + "+a+" = "+b)+" ⇐ مجموعة الحلّ "+ax(right)+"."];
+}
+
+/* ص14 مثال 4: متطابقة أم بلا حلّ */
+function gIdentityOrNone(){
+  var a = ri(2,6), b = ri(1,9), c = ri(1,9);
+  var kind = gp([0,1]);   /* 0 = متطابقة، 1 = لا حلّ */
+  var left, rightSide;
+  if(kind===0){ left = a+"(س + "+b+")"; rightSide = a+"س + "+(a*b); }
+  else { left = "س + "+b; rightSide = "س + "+(b+c); }
+  var right = kind===0 ? "متطابقة، وحلّها مجموعة الأعداد الحقيقية" : "لا حلّ لها، ومجموعة حلّها Ø";
+  var o = ["متطابقة، وحلّها مجموعة الأعداد الحقيقية", "لا حلّ لها، ومجموعة حلّها Ø", "لها حلٌّ واحدٌ فقط"]; shuffle(o);
+  return ["صنّف المعادلة: "+ax(left+" = "+rightSide),
+    o, o.indexOf(right),
+    kind===0 ? ("بخاصيّة التوزيع: "+ax(left+" = "+a+"س + "+(a*b))+" — الطرفان متطابقان فهي صحيحة لأيّ قيمةٍ لـ"+ax("س")+".")
+             : ("الطرفان لا يتساويان لأيّ قيمةٍ لـ"+ax("س")+": الأيمن أكبر من الأيسر بمقدار "+mn(c)+" دائمًا ⇐ لا حلّ.")];
+}
+
+/* ص14 مثال 5: معادلة بمتغيّرين — التعويض */
+function gEqTwoVars(){
+  var base = gp([20,25,30,35,40]), per = gp([3,4,5,6]), m = ri(4,12);
+  var r = base + per*m;
+  var o = numOpts(r, [base+per+m, per*m, base*per]);
+  return ["يدفع مشترِكٌ "+mn(base)+" "+ryl(base)+" شهريًّا، بالإضافة إلى "+mn(per)+" "+ryl(per)+" عن كلّ رسالة. المعادلة "+ax("ك = "+base+" + "+per+"م")+" تُعطي الكلفة "+ax("ك")+" عند إرسال "+ax("م")+" رسالة. كم يدفع إذا أرسل "+mn(m)+" "+tmz(m,"رسالةً","رسائل")+"؟",
+    o[0], o[1],
+    "نعوّض عن "+ax("م")+" بـ"+mn(m)+": "+mn(base+" + "+per+" × "+m+" = "+base+" + "+(per*m)+" = "+r)+" "+ryl(r)+"."];
+}
+
+/* ص12–15: المصطلحات */
+function gEqTerms9(){
+  var C = [
+    ["ما مجموعة التعويض؟", "مجموعة الأعداد التي نعوّض بها عن المتغيّر لإيجاد الحلّ", ["مجموعة الحلول الصحيحة فقط","مجموعة الأعداد الحقيقية دائمًا","مجموعة معاملات المعادلة"]],
+    ["ما مجموعة الحلّ؟", "مجموعة عناصر مجموعة التعويض التي تجعل المعادلة صحيحة", ["كلّ عناصر مجموعة التعويض","مجموعة الأعداد الصحيحة","المتغيّرات في المعادلة"]],
+    ["ما المتطابقة؟", "معادلةٌ صحيحةٌ لجميع قيم المتغيّر", ["معادلةٌ لا حلّ لها","معادلةٌ لها حلٌّ واحد","عبارةٌ جبريةٌ بلا يساوي"]],
+    ["إذا لم يكن للمعادلة حلٌّ، فمجموعة حلّها:", "المجموعة الخالية Ø", ["مجموعة الأعداد الحقيقية","{ 0 }","لا تُكتب"]],
+    ["ما الفرق بين المعادلة والعبارة الجبرية؟", "المعادلة فيها إشارة «يساوي» أمّا العبارة فلا", ["العبارة فيها متغيّر والمعادلة بلا متغيّر","المعادلة لا تُحلّ","لا فرق بينهما"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "مجموعة التعويض ما نجرّبه، ومجموعة الحلّ ما نجح منه. والمتطابقة صحيحةٌ لكلّ القيم، وما لا حلّ له مجموعة حلّه Ø."];
+}
+
+/* ===== الدرس 1-2: حلّ المعادلات ذات الخطوة الواحدة (ص 20–25) ===== */
+
+/* ص21 مثال 1: خاصيّة الجمع في المساواة */
+function gOneStepAdd(){
+  var v = gp(VARS9), a = ri(3,60), x = ri(-20,80), b = x+a;
+  var o = zOpts(x, [b+a, a-b, b]);
+  return ["حُلَّ المعادلة: "+ax(v+" + "+a+" = "+fmt(b)),
+    o[0], o[1],
+    "بخاصيّة الطرح في المساواة نطرح "+mn(a)+" من الطرفين ⇐ "+mn(fmt(b)+" − "+a+" = "+fmt(x))+"."];
+}
+/* ص21 مثال 2 */
+function gOneStepSub(){
+  var v = gp(VARS9), a = ri(3,60), b = ri(-20,80), x = b+a;
+  var o = zOpts(x, [b-a, a-b, b]);
+  return ["حُلَّ المعادلة: "+ax(v+" − "+a+" = "+fmt(b)),
+    o[0], o[1],
+    "بخاصيّة الجمع في المساواة نضيف "+mn(a)+" إلى الطرفين ⇐ "+mn(fmt(b)+" + "+a+" = "+fmt(x))+"."];
+}
+/* ص21: خاصيّة القسمة في المساواة */
+function gOneStepMul(){
+  var v = gp(VARS9), a = ri(2,15), x = gp([-1,1])*ri(2,20), b = a*x;
+  var o = zOpts(x, [b, b-a, -x]);
+  return ["حُلَّ المعادلة: "+ax(a+v+" = "+fmt(b)),
+    o[0], o[1],
+    "بخاصيّة القسمة في المساواة نقسم الطرفين على "+mn(a)+" ⇐ "+mn(fmt(b)+" ÷ "+a+" = "+fmt(x))+"."];
+}
+/* ص21: خاصيّة الضرب في المساواة */
+function gOneStepDiv(){
+  var v = gp(VARS9), a = ri(2,12), b = gp([-1,1])*ri(2,20), x = a*b;
+  var o = zOpts(x, [b, b+a, -x]);
+  return ["حُلَّ المعادلة: "+ax(v+" ÷ "+a+" = "+fmt(b)),
+    o[0], o[1],
+    "بخاصيّة الضرب في المساواة نضرب الطرفين في "+mn(a)+" ⇐ "+mn(fmt(b)+" × "+a+" = "+fmt(x))+"."];
+}
+/* ص24: من جملةٍ كلامية إلى معادلة ثمّ حلّها */
+function gOneStepWord(){
+  var k = gp([3,4,5,6,7,8]), x = ri(6,40), total = k*x;
+  var o = numOpts(x, [total, total-k, k+x]);
+  var NAMEK = ["ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية"][k-3];
+  return [NAMEK+" أمثال عددٍ تساوي "+mn(total)+". ما ذلك العدد؟",
+    o[0], o[1],
+    "المعادلة "+ax(k+"س = "+total)+"، ونقسم الطرفين على "+mn(k)+" ⇐ "+mn(total+" ÷ "+k+" = "+x)+"."];
+}
+/* ص21: تسمية الخاصيّة المستعملة */
+function gPropEquality(){
+  var a = ri(3,20), b = ri(5,60);
+  var C = [
+    ["أيّ خاصيّةٍ تستعملها لحلّ "+ax("س + "+a+" = "+b)+" ؟", "خاصيّة الطرح في المساواة", ["خاصيّة الجمع في المساواة","خاصيّة الضرب في المساواة","خاصيّة القسمة في المساواة"]],
+    ["أيّ خاصيّةٍ تستعملها لحلّ "+ax("س − "+a+" = "+b)+" ؟", "خاصيّة الجمع في المساواة", ["خاصيّة الطرح في المساواة","خاصيّة الضرب في المساواة","خاصيّة القسمة في المساواة"]],
+    ["أيّ خاصيّةٍ تستعملها لحلّ "+ax(a+"س = "+b)+" ؟", "خاصيّة القسمة في المساواة", ["خاصيّة الضرب في المساواة","خاصيّة الجمع في المساواة","خاصيّة الطرح في المساواة"]],
+    ["أيّ خاصيّةٍ تستعملها لحلّ "+ax("س ÷ "+a+" = "+b)+" ؟", "خاصيّة الضرب في المساواة", ["خاصيّة القسمة في المساواة","خاصيّة الجمع في المساواة","خاصيّة الطرح في المساواة"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "نستعمل العملية العكسية على الطرفين معًا: عكس الجمع طرحٌ، وعكس الطرح جمعٌ، وعكس الضرب قسمةٌ، وعكس القسمة ضربٌ."];
+}
+/* ص22 مثال 3: مسألة من واقع الحياة */
+function gOneStepReal(){
+  var per = gp([6,8,9,12,15]), k = ri(4,14), total = per*k;
+  var o = numOpts(k, [total, total-per, per+k]);
+  return ["قُسِمت "+mn(total)+" "+tmz(total,"قطعةً","قطع")+" من الحلوى بالتساوي على عددٍ من الأطفال، فأخذ كلُّ طفلٍ "+mn(per)+" "+tmz(per,"قطعةً","قطع")+". كم عدد الأطفال؟",
+    o[0], o[1],
+    "المعادلة "+ax(per+"س = "+total)+" ⇐ "+mn(total+" ÷ "+per+" = "+k)+" أطفال."];
+}
+
+var H1 = [gEqOrderOps, gSolutionSet, gIdentityOrNone, gEqTwoVars, gEqTerms9];
+var H2 = [gOneStepAdd, gOneStepSub, gOneStepMul, gOneStepDiv, gOneStepWord, gPropEquality, gOneStepReal];
+var ALLH1 = H1.concat(H2);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
+    '<div class="chapsel" id="chapsel"></div>'+
+    '<div class="unit" id="unit"></div>'+
+    '<div class="tabs" role="tablist" id="tabs"></div>'+
+    '<div id="panels"></div>'+
+    '<footer>الرياضيات · ثالث متوسط · مطابق للكتاب · أرقام جديدة كل مرة</footer>';
+
+  var CFG = {
+    allh1:{tab:"اختبار شامل 📝", gens:ALLH1, n:12, intro:"<b>اختبار شامل</b> على درسَي الفصل الأول المتاحين.", label:"رياضيات م٣ — شامل ف١"},
+    h1:  {tab:"1-1 المعادلات", gens:H1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — المعادلات:</b> مجموعة التعويض ما نجرّبه، ومجموعة الحلّ ما نجح منه. والمتطابقة صحيحةٌ لكلّ القيم، وما لا حلّ له مجموعة حلّه <span class=en>\u00d8</span>.", label:"رياضيات م٣ — 1-1 المعادلات"},
+    h2:  {tab:"1-2 ذات الخطوة الواحدة", gens:H2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — حلّ المعادلات ذات الخطوة الواحدة:</b> اعزل المتغيّر بالعملية العكسية، وطبّقها على الطرفين معًا.", label:"رياضيات م٣ — 1-2 ذات الخطوة الواحدة"}
+  };
+
+  var CHAPS = {
+    c1: {name:"الفصل الأول", unit:'\ud83d\udcd8 مطابق لكتاب الرياضيات — ثالث متوسط · الفصل الأول: المعادلات الخطية (ص <span class="en">10\u201329</span>)',
+         ids:["allh1","h1","h2"]}
+  };
+
+  var curCh = "c1", curId = "allh1";
+
+  function panelOf(id){
+    var pan = document.getElementById("p_"+id);
+    if(!pan){ pan = document.createElement("section"); pan.className="panel"; pan.id="p_"+id; document.getElementById("panels").appendChild(pan); }
+    return pan;
+  }
+  function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
+
+  function render(id){
+    var c = CFG[id], sec = panelOf(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="math9", REM_LABEL="الرياضيات";
+  var REMTOPICS=[
+    {id:"h1", name:"1-1 المعادلات", tip:"فرّق بين ثلاثة أشياء: مجموعة التعويض هي ما تجرّبه، ومجموعة الحلّ ما نجح منه، والمتطابقة معادلة صحيحة لكلّ قيمة فحلّها كل الأعداد الحقيقية. وإذا لم يصحّ أيّ عدد فمجموعة الحلّ خالية \u00d8. وفي المعادلات ذات الأقواس والأسس اتّبع ترتيب العمليات.", yt:"شرح المعادلات ومجموعة الحل ثالث متوسط"},
+    {id:"h2", name:"1-2 ذات الخطوة الواحدة", tip:"اعزل المتغيّر بالعملية العكسية وطبّقها على الطرفين معًا: عكس الجمع طرح، وعكس الطرح جمع، وعكس الضرب قسمة، وعكس القسمة ضرب. ثم تحقّق بالتعويض في المعادلة الأصلية.", yt:"شرح حل المعادلات ذات الخطوة الواحدة ثالث متوسط"}
+  ];
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=panelOf("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+
+  function showPanel(id){
+    leaveCur();
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var pan = panelOf(id);
+    pan.classList.add("active");
+    curId = id;
+    if(id==="rem"){ renderRem(); }
+    else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  }
+  function drawTabs(){
+    var ch = CHAPS[curCh], t = document.getElementById("tabs");
+    t.innerHTML = ch.ids.map(function(id){
+      return '<button data-tab="'+id+'" aria-selected="'+(id===curId?"true":"false")+'">'+CFG[id].tab+'</button>';
+    }).join("") + '<button data-tab="rem" aria-selected="'+(curId==="rem"?"true":"false")+'">علاجي 💪</button>';
+    t.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        t.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+        b.setAttribute("aria-selected","true");
+        showPanel(b.dataset.tab);
+      });
+    });
+    document.getElementById("unit").innerHTML = ch.unit;
+  }
+  function drawChap(){
+    var e = document.getElementById("chapsel");
+    e.innerHTML = Object.keys(CHAPS).map(function(c){
+      return '<button data-ch="'+c+'" aria-selected="'+(c===curCh?"true":"false")+'">'+CHAPS[c].name+'</button>';
+    }).join("");
+    e.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        if(curCh===b.dataset.ch) return;
+        leaveCur(); curCh=b.dataset.ch; curId=CHAPS[curCh].ids[0];
+        drawChap(); drawTabs(); showPanel(curId);
+      });
+    });
+  }
+  function chapOf(id){
+    var found = null;
+    Object.keys(CHAPS).forEach(function(c){ if(CHAPS[c].ids.indexOf(id) >= 0) found = c; });
+    return found;
+  }
+  function goTo(id){
+    var c = chapOf(id); if(c) curCh = c;
+    curId = id; drawChap(); drawTabs(); showPanel(id);
+  }
+
+  drawChap(); drawTabs(); showPanel("allh1");
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
+
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
