@@ -30,7 +30,7 @@
   .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
   .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
-  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -39,6 +39,7 @@
   .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
   .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
   .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .ax{direction:rtl;unicode-bidi:isolate;display:inline-block;font-weight:inherit}
   .opts{display:grid;gap:8px}
   .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.1rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
   .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
@@ -187,7 +188,7 @@ function gPowerValue(){
   if(b>=7 && e>3) e=2;
   var r = Math.pow(b,e);
   var o = numOpts(r, [b*e, Math.pow(b,e-1), Math.pow(b,e+1)]);
-  return ["احسب قيمة "+pw(b,e)+" :", o[0], o[1],
+  return ["احسب قيمة القوة: "+pw(b,e), o[0], o[1],
     mn(Array(e).fill(b).join(" × ")+" = "+fmt(r))+" — لا تضرب الأساس في الأُسّ."];
 }
 
@@ -210,7 +211,7 @@ function gPowerRead(){
   var right = (e===2) ? (b+" تربيع") : (b+" تكعيب");
   var wrong1 = (e===2) ? (b+" تكعيب") : (b+" تربيع");
   var o = [right, wrong1, "الأساس "+e+" والأُسّ "+b]; shuffle(o);
-  return ["كيف تُقرأ القوة "+pw(b,e)+" ؟", o, o.indexOf(right),
+  return ["كيف تُقرأ القوة التالية؟ "+pw(b,e), o, o.indexOf(right),
     "الأُسّ "+mn(2)+" يُقرأ «تربيع» والأُسّ "+mn(3)+" يُقرأ «تكعيب»."];
 }
 
@@ -287,10 +288,337 @@ function gOrderMixed(){
     "الأقواس "+mn(d+" − "+e+" = "+(d-e))+"، ثم القسمة "+mn(c+" ÷ "+b+" = "+(c/b))+" والضرب "+mn(f+" × "+(d-e)+" = "+(f*(d-e)))+"، ثم الجمع ⇐ "+mn(r)+"."];
 }
 
+
+/* ============================================================
+   الدروس 1-4 … 1-8 من الفصل الأول (ص 25–44)
+   ============================================================ */
+function tmz(n, sing, plur){ return (n>=3 && n<=10) ? plur : sing; }
+function ax(s){ return '<span class="ax">'+s+'</span>'; }   /* عبارة جبرية بحروف عربية: عزل RTL */
+function ryl(n){ return tmz(n,"ريالًا","ريالات"); }
+
+/* ===== الدرس 1-4: استراتيجية حلّ المسألة — التخمين والتحقّق (ص 25–26) ===== */
+
+/* ص25 مثال: نوعان بسعرين مختلفين ومجموع معلوم */
+function gGuessWash(){
+  var pS = gp([8,10,12]), pL = pS + gp([8,10,15]);
+  var nS = ri(2,8), nL = ri(2,8), n = nS+nL, T = nS*pS + nL*pL;
+  var o = numOpts(nS, [nL, nS+1, nS+2]);
+  return ["يتقاضى محلٌّ لغسيل السيارات "+mn(pS)+" "+ryl(pS)+" على غسيل السيارة الصغيرة، و"+mn(pL)+" "+ryl(pL)+" على الكبيرة. في أحد الأيام غُسِلت "+mn(n)+" "+tmz(n,"سيارةً","سيارات")+" بمبلغ "+mn(T)+" "+ryl(T)+". كم سيارةً صغيرةً غُسِلت؟",
+    o[0], o[1],
+    "خمّن ثمّ تحقّق: لو كانت الصغيرة "+mn(nS)+" فالكبيرة "+mn(nL)+" ⇐ "+mn(nS+" × "+pS+" + "+nL+" × "+pL+" = "+T)+" — وهو المطلوب."];
+}
+
+/* ص26 تمرين 3: تذاكر صغار وكبار */
+function gGuessTickets(){
+  var pS = gp([3,4,5]), pL = pS + gp([2,3,4]);
+  var nS = ri(3,12), nL = ri(3,12), n = nS+nL, T = nS*pS + nL*pL;
+  var o = numOpts(nL, [nS, nL+1, nL+3]);
+  return ["سعر تذكرة المهرجان الرياضي "+mn(pS)+" "+ryl(pS)+" للصِّغار و"+mn(pL)+" "+ryl(pL)+" للكبار. حضر "+mn(n)+" "+tmz(n,"شخصًا","أشخاص")+" ودفعوا "+mn(T)+" "+ryl(T)+". كم عدد الكبار؟",
+    o[0], o[1],
+    "خمّن ثمّ تحقّق: الكبار "+mn(nL)+" والصِّغار "+mn(nS)+" ⇐ "+mn(nL+" × "+pL+" + "+nS+" × "+pS+" = "+T)+"."];
+}
+
+/* ص26: عددان مجموعهما وفرقهما معلومان */
+function gGuessSumDiff(){
+  var big = ri(12,40), small = ri(3, big-2), S = big+small, D = big-small;
+  var o = numOpts(big, [small, (S+D)/2+1, S-big+2]);
+  return ["عددان مجموعهما "+mn(S)+" والفرق بينهما "+mn(D)+". ما العدد الأكبر؟",
+    o[0], o[1],
+    "خمّن ثمّ تحقّق: "+mn(big)+" و"+mn(small)+" ⇐ مجموعهما "+mn(S)+" وفرقهما "+mn(D)+"."];
+}
+
+/* ص26: عددان مجموعهما وحاصل ضربهما معلومان */
+function gGuessSumProd(){
+  var a = ri(2,9), b = ri(2,9); if(a===b) b = a+1;
+  var big = Math.max(a,b), small = Math.min(a,b), S = a+b, P = a*b;
+  var o = numOpts(big, [small, S-1, big+2]);
+  return ["عددان مجموعهما "+mn(S)+" وحاصل ضربهما "+mn(P)+". ما العدد الأكبر؟",
+    o[0], o[1],
+    "خمّن ثمّ تحقّق: "+mn(small)+" و"+mn(big)+" ⇐ "+mn(small+" + "+big+" = "+S)+" و"+mn(small+" × "+big+" = "+P)+"."];
+}
+
+/* ص25: أعمار — مضاعفات ومجموع */
+function gGuessAges(){
+  var k = gp([2,3,4]), son = ri(6,15), dad = k*son, S = son+dad;
+  var o = numOpts(son, [dad, son+k, S-son+1]);
+  return ["عمر الأب يساوي "+mn(k)+" أمثال عمر ابنه، ومجموع عمريهما "+mn(S)+" سنة. كم عمر الابن؟",
+    o[0], o[1],
+    "خمّن ثمّ تحقّق: لو كان عمر الابن "+mn(son)+" فعمر الأب "+mn(dad)+" ⇐ "+mn(son+" + "+dad+" = "+S)+"."];
+}
+
+/* ص25: الاستراتيجية نفسها */
+function gGuessHow(){
+  var C = [
+    ["في استراتيجية «التخمين والتحقّق»، ماذا تفعل إذا كان تخمينك أكبر من المطلوب؟", "أُقلِّل التخمين ثمّ أتحقّق مرّة أخرى", ["أتوقف وأكتب هذا الجواب","أزيد التخمين","أبدأ المسألة من جديد بأرقام غير المعطاة"]],
+    ["ما الخطوة التي تأتي مباشرةً بعد التخمين؟", "التحقّق من صحّة التخمين بالمعطيات", ["كتابة الجواب النهائي","تخمين ثانٍ دون حساب","رسم شكل"]],
+    ["متى تكون استراتيجية «التخمين والتحقّق» مناسبة؟", "عندما تكون الاحتمالات محدودة ويمكن اختبارها", ["عندما تكون المسألة جمعًا بسيطًا","عندما لا توجد معطيات","عندما يكون المطلوب رسمًا فقط"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "خمّن ← تحقّق ← عدّل التخمين، وكرّر حتى تتوافق النتيجة مع كلّ المعطيات."];
+}
+
+/* ===== الدرس 1-5: الجبر — المتغيّرات والعبارات الجبرية (ص 27–29) ===== */
+
+var VARS = ["س","ص","ن","م","ك","د"];
+
+/* ص27 مثال 1: تعويض في عبارة من متغيّر واحد */
+function gEvalOne(){
+  var v = gp(VARS), a = ri(2,9), b = ri(2,15), x = ri(2,9), r = a*x + b;
+  var o = numOpts(r, [a+x+b, a*(x+b), a*x]);
+  return ["إذا كانت "+ax(v+" = "+x)+" فاحسب قيمة العبارة: "+ax(a+v+" + "+b),
+    o[0], o[1],
+    "نعوّض عن "+ax(v)+" بـ"+mn(x)+": "+mn(a+" × "+x+" + "+b+" = "+r)+"."];
+}
+
+/* ص28 مثال 2: عبارة بمتغيّرين */
+function gEvalTwo(){
+  var v1 = "م", v2 = "ن", a = ri(4,9), x = ri(4,9);
+  var b = ri(2,5), y = ri(2, Math.min(6, Math.floor((a*x-2)/b)));
+  var r = a*x - b*y;
+  var o = numOpts(r, [a*x*b*y, (a-b)*(x-y), a+x-b-y]);
+  return ["إذا كانت "+ax(v1+" = "+x)+" و"+ax(v2+" = "+y)+" فاحسب قيمة العبارة: "+ax(a+v1+" − "+b+v2),
+    o[0], o[1],
+    "نعوّض ثمّ نضرب أوّلًا: "+mn(a+" × "+x+" = "+(a*x))+" و"+mn(b+" × "+y+" = "+(b*y))+"، ثمّ نطرح ⇐ "+mn(r)+"."];
+}
+
+/* ص28: قسمة في عبارة جبرية */
+function gEvalDiv(){
+  var a = ri(2,9)*2, b = ri(1,9), x = ri(2,8);
+  var top = a*x + b*2, r = top/2;
+  var o = numOpts(r, [top, a*x+b, r+2]);
+  return ["إذا كانت "+ax("أ = "+(a*x))+" و"+ax("ب = "+(b*2))+" فاحسب قيمة العبارة: "+ax("(أ + ب) ÷ 2"),
+    o[0], o[1],
+    "نعوّض: "+mn("("+(a*x)+" + "+(b*2)+") ÷ 2 = "+top+" ÷ 2 = "+r)+"."];
+}
+
+/* ص28: المُعامِل */
+function gCoefficient(){
+  var v = gp(VARS), a = ri(3,12);
+  var o = numOpts(a, [1, a+1, a*2]);
+  return ["ما المُعامِل في العبارة الجبرية التالية؟ "+ax(a+v),
+    o[0], o[1],
+    "المُعامِل هو العدد المضروب في المتغيّر، وهو "+mn(a)+" — و"+ax(a+v)+" تعني "+ax(a+" × "+v)+"."];
+}
+
+/* ص27 نشاط: نمط ← قاعدة جبرية */
+function gPatternExpr(){
+  var a = gp([2,3,4]), b = ri(1,5);
+  var rows = [1,2,3,4].map(function(i){ return [i, a*i+b]; });
+  var right = "ن × "+a+" + "+b;
+  var opts = [right, "ن + "+(a+b), a+" × ("+"ن + "+b+")", "ن × "+b+" + "+a];
+  var o = [opts[0], opts[1], opts[2]]; shuffle(o);
+  var tr = '<tr><td style="border:1px solid #999;padding:3px 10px">رقم الشكل (ن)</td>'+rows.map(function(r){ return '<td style="border:1px solid #999;padding:3px 10px">'+r[0]+'</td>'; }).join("")+'</tr>'+
+           '<tr><td style="border:1px solid #999;padding:3px 10px">عدد المربّعات</td>'+rows.map(function(r){ return '<td style="border:1px solid #999;padding:3px 10px">'+r[1]+'</td>'; }).join("")+'</tr>';
+  return ['يبيّن الجدول نمطًا من المربّعات. ما العبارة الجبرية التي تعطي عدد المربّعات في الشكل رقم '+ax("ن")+' ؟'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem">'+tr+'</table></div>',
+    o.map(ax), o.indexOf(right),
+    "في كلّ خطوة يزيد العدد "+mn(a)+"، وعند "+ax("ن = 1")+" العدد "+mn(a+b)+" ⇐ القاعدة "+ax("ن × "+a+" + "+b)+"."];
+}
+
+/* ص27: المصطلحات */
+function gAlgTerms(){
+  var C = [
+    ["ما المتغيّر؟", "رمزٌ يمثِّل كميّةً غير معلومة", ["عددٌ معلومٌ ثابت","إشارة الجمع","ناتج الضرب"]],
+    ["ما العبارة الجبرية؟", "عبارة تحوي رموزًا وأعدادًا وعمليةً حسابيّةً واحدةً على الأقل", ["جملة فيها إشارة يساوي فقط","عددٌ مفردٌ بلا رموز","شكلٌ هندسيّ"]],
+    ["فرع الرياضيات الذي يتعامل مع عبارات تحوي متغيّرات يُسمّى:", "الجبر", ["الهندسة","الإحصاء","الحساب الذهني"]],
+    ["العدد المضروب في رمز المتغيّر يُسمّى:", "المُعامِل", ["المتغيّر","الحدّ الثابت","المجال"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "المتغيّر رمزٌ لكميّة غير معلومة، والعبارة الجبرية تجمع رموزًا وأعدادًا وعمليّات، والعدد المضروب في المتغيّر هو المُعامِل."];
+}
+
+/* ===== الدرس 1-6: الجبر — المعادلات (ص 33–35) ===== */
+
+/* ص34 تمرين 1: معادلة جمع تُحلّ ذهنيًّا */
+function gSolveAdd(){
+  var v = gp(VARS), a = ri(5,40), x = ri(3,50), b = x+a;
+  var o = numOpts(x, [b+a, a, b]);
+  return ["حُلَّ المعادلة ذهنيًّا: "+ax(v+" + "+a+" = "+b),
+    o[0], o[1],
+    "نسأل: أيّ عددٍ إذا أضفنا إليه "+mn(a)+" كان الناتج "+mn(b)+"؟ ⇐ "+mn(b+" − "+a+" = "+x)+"."];
+}
+
+/* ص34 تمرين 2: معادلة طرح */
+function gSolveSub(){
+  var v = gp(VARS), a = ri(5,30), b = ri(5,40), x = a+b;
+  var o = numOpts(x, [b-a>0?b-a:b+1, b, a]);
+  return ["حُلَّ المعادلة ذهنيًّا: "+ax(v+" − "+a+" = "+b),
+    o[0], o[1],
+    "نسأل: أيّ عددٍ إذا طرحنا منه "+mn(a)+" بقي "+mn(b)+"؟ ⇐ "+mn(b+" + "+a+" = "+x)+"."];
+}
+
+/* ص33 مثال 2: معادلة ضرب */
+function gSolveMul(){
+  var v = gp(VARS), a = ri(2,12), x = ri(2,15), b = a*x;
+  var o = numOpts(x, [b, b-a, a]);
+  return ["حُلَّ المعادلة: "+ax(a+v+" = "+b),
+    o[0], o[1],
+    "نسأل: "+mn(a)+" في أيّ عددٍ يساوي "+mn(b)+"؟ ⇐ "+mn(b+" ÷ "+a+" = "+x)+"."];
+}
+
+/* ص33 مثال 3: من الكلمات إلى معادلة */
+function gEqFromWord(){
+  var usual = ri(20,60)*10, extra = ri(10,40)*10, total = usual+extra;
+  var right = "ك + "+usual+" = "+total;
+  var o = [right, "ك − "+usual+" = "+total, "ك = "+usual+" + "+total]; shuffle(o);
+  return ["تهاجر الحيتان كلَّ شتاءٍ حوالي "+mn(usual)+" كيلومتر. قطع أحد الحيتان "+mn(total)+" كيلومتر. أيّ معادلةٍ تجد بها "+ax("ك")+"، وهي عدد الكيلومترات الزائدة عن المسافة الاعتيادية؟",
+    o.map(ax), o.indexOf(right),
+    "المسافة الاعتيادية + الزيادة = المسافة المقطوعة ⇐ "+ax(usual+" + ك = "+total)+"، وحلُّها "+ax("ك = "+extra)+"."];
+}
+
+/* ص33 مثال 3 (الجزء العددي) */
+function gEqWordSolve(){
+  var per = ri(3,9), days = ri(4,15), total = per*days;
+  var o = numOpts(days, [total, total-per, per]);
+  return ["يقود محمود دراجته "+mn(per)+" "+tmz(per,"كيلومترًا","كيلومترات")+" يوميًّا، وتُستعمل المعادلة "+ax(per+"ي = "+total)+" لإيجاد عدد الأيام اللازمة ليقطع "+mn(total)+" كيلومترًا. فكم يومًا يحتاج؟",
+    o[0], o[1],
+    mn(per+" × "+days+" = "+total)+" ⇐ "+ax("ي = "+days)+" يومًا."];
+}
+
+/* ص35: مفهوم حلّ المعادلة */
+function gEqMeaning(){
+  var C = [
+    ["ماذا يعني «حُلَّ المعادلة»؟", "أجد قيمة المتغيّر التي تجعل المعادلة صحيحة", ["أكتب المعادلة مرّةً أخرى","أجمع كلّ الأعداد في المعادلة","أحذف المتغيّر من المعادلة"]],
+    ["عمليّة اختيار متغيّر ليمثّل كميّةً غير معلومة تُسمّى:", "تحديد المتغيّر", ["ترتيب العمليات","خاصيّة التوزيع","تحديد المجال"]],
+    ["ما الفرق بين العبارة الجبرية والمعادلة؟", "المعادلة فيها إشارة «يساوي» أمّا العبارة فلا", ["العبارة فيها متغيّر والمعادلة بلا متغيّر","لا فرق بينهما","المعادلة لا تُحلّ"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "حلُّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين، والمعادلة تتميّز عن العبارة الجبرية بوجود إشارة «=»."];
+}
+
+/* ===== الدرس 1-7: الجبر — الخصائص (ص 36–39) ===== */
+
+/* ص37: تسمية الخاصيّة من مثال */
+function gPropName(){
+  var pk = shuffle([2,3,4,5,6,7,8,9]), a = pk[0], b = pk[1], c = pk[2];
+  var C = [
+    [mn(a+" + "+b+" = "+b+" + "+a), "خاصيّة الإبدال في الجمع"],
+    [mn(a+" × "+b+" = "+b+" × "+a), "خاصيّة الإبدال في الضرب"],
+    [mn("("+a+" + "+b+") + "+c+" = "+a+" + ("+b+" + "+c+")"), "خاصيّة التجميع في الجمع"],
+    [mn("("+a+" × "+b+") × "+c+" = "+a+" × ("+b+" × "+c+")"), "خاصيّة التجميع في الضرب"],
+    [mn(a+" + 0 = "+a), "خاصيّة العنصر المحايد في الجمع"],
+    [mn(a+" × 1 = "+a), "خاصيّة العنصر المحايد في الضرب"],
+    [mn(a+" ("+b+" + "+c+") = "+a+" × "+b+" + "+a+" × "+c), "خاصيّة التوزيع"]
+  ];
+  var c0 = gp(C);
+  var all = ["خاصيّة الإبدال في الجمع","خاصيّة الإبدال في الضرب","خاصيّة التجميع في الجمع","خاصيّة التجميع في الضرب","خاصيّة العنصر المحايد في الجمع","خاصيّة العنصر المحايد في الضرب","خاصيّة التوزيع"];
+  var o = [c0[1]];
+  var rest = shuffle(all.filter(function(x){ return x!==c0[1]; }));
+  o = o.concat(rest.slice(0,3)); shuffle(o);
+  return ["أيّ خاصيّةٍ توضّحها الجملة التالية؟ "+c0[0], o, o.indexOf(c0[1]),
+    "الإبدال: تغيير الترتيب. التجميع: تغيير التجميع بالأقواس. العنصر المحايد: الصفر في الجمع والواحد في الضرب. التوزيع: ضرب العدد في كلّ حدٍّ داخل القوسين."];
+}
+
+/* ص36 مثال 1: إعادة كتابة بخاصيّة التوزيع */
+function gDistRewrite(){
+  var a = ri(2,9), b = ri(2,9), c = ri(2,9);
+  var right = a+" × "+b+" + "+a+" × "+c;
+  var o = [right, a+" × "+b+" + "+c, (a+b)+" × "+(a+c)]; shuffle(o);
+  return ["استعمل خاصيّة التوزيع لإعادة كتابة العبارة: "+mn(a+" ("+b+" + "+c+")"),
+    o.map(mn), o.indexOf(right),
+    "نضرب "+mn(a)+" في كلٍّ من "+mn(b)+" و"+mn(c)+" ⇐ "+mn(right+" = "+(a*(b+c)))+"."];
+}
+
+/* ص36 مثال 2: قيمة العبارة بعد التوزيع */
+function gDistValue(){
+  var a = ri(2,9), b = ri(2,9), c = ri(2,9), r = a*(b+c);
+  var o = numOpts(r, [a*b+c, a+b+c, a*b*c]);
+  return ["احسب قيمة "+mn(a+" ("+b+" + "+c+")")+" مستعملًا خاصيّة التوزيع:",
+    o[0], o[1],
+    mn(a+" × "+b+" + "+a+" × "+c+" = "+(a*b)+" + "+(a*c)+" = "+r)+"."];
+}
+
+/* ص37 مثال 3: ضرب ذهني بتفكيك العدد */
+function gMentalMul(){
+  var a = ri(3,9), hundreds = ri(2,9)*100, tens = ri(1,9)*10, big = hundreds+tens, r = a*big;
+  var o = numOpts(r, [a*hundreds, a*tens, r+a*10]);
+  return ["استعمل خاصيّة التوزيع لتحسب ذهنيًّا: "+mn(a+" × "+big),
+    o[0], o[1],
+    mn(a+" ("+hundreds+" + "+tens+") = "+a+" × "+hundreds+" + "+a+" × "+tens+" = "+(a*hundreds)+" + "+(a*tens)+" = "+r)+"."];
+}
+
+/* ص38 تمرين 3: تجميع الحدود المتشابهة بالتوزيع العكسي */
+function gDistBack(){
+  var a = ri(2,9), b = ri(2,9), c = ri(2,9), r = a*(b+c);
+  var right = a+" ("+b+" + "+c+")";
+  var o = [right, (a+b)+" × "+c, a+" + "+b+" × "+c]; shuffle(o);
+  return ["أيّ عبارةٍ تكافئ العبارة التالية؟ "+mn(a+" ("+b+") + "+a+" ("+c+")"),
+    o.map(mn), o.indexOf(right),
+    "العدد "+mn(a)+" مشترك في الحدَّين، فنُخرِجه: "+mn(right+" = "+r)+"."];
+}
+
+/* ===== الدرس 1-8: الجبر — المعادلات والدَّوال (ص 40–44) ===== */
+
+/* ص40 مثال 1: إكمال جدول دالّة */
+function gFuncOut(){
+  var a = ri(2,12), x = ri(2,9), r = a*x;
+  var o = numOpts(r, [a+x, a*(x+1), r-a]);
+  return ["قاعدة الدالّة هي "+ax("ص = "+a+"س")+". جد قيمة "+ax("ص")+" عندما: "+ax("س = "+x),
+    o[0], o[1],
+    "نعوّض عن "+ax("س")+" بـ"+mn(x)+": "+mn(a+" × "+x+" = "+r)+"."];
+}
+
+/* ص44 تمرين 22: من الجدول إلى قاعدة الدالّة */
+function gFuncRule(){
+  var a = ri(2,12);
+  var xs = [1,2,3,4], ys = xs.map(function(x){ return a*x; });
+  var right = "ص = "+a+"س";
+  var o = [right, "ص = س + "+a, "ص = "+(a+1)+"س"]; shuffle(o);
+  var tr = '<tr><td style="border:1px solid #999;padding:3px 10px">س</td>'+xs.map(function(x){ return '<td style="border:1px solid #999;padding:3px 10px">'+x+'</td>'; }).join("")+'</tr>'+
+           '<tr><td style="border:1px solid #999;padding:3px 10px">ص</td>'+ys.map(function(y){ return '<td style="border:1px solid #999;padding:3px 10px">'+y+'</td>'; }).join("")+'</tr>';
+  return ['أيُّ دالّةٍ ممّا يأتي تمثِّل الجدول؟'+
+    '<div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;margin:0 auto;font-size:.92rem">'+tr+'</table></div>',
+    o.map(ax), o.indexOf(right),
+    "كلّ مُخرَجٍ يساوي المُدخَل مضروبًا في "+mn(a)+" ⇐ "+ax(right)+"."];
+}
+
+/* ص42: المدى من المجال والقاعدة */
+function gFuncRange(){
+  var a = ri(2,6), b = ri(1,9);
+  var dom = [1,2,3,4], ran = dom.map(function(x){ return a*x+b; });
+  var right = "{ "+ran.join(" ، ")+" }";
+  var w1 = "{ "+dom.map(function(x){ return a*x; }).join(" ، ")+" }";
+  var w2 = "{ "+dom.map(function(x){ return x+b; }).join(" ، ")+" }";
+  var o = [right, w1, w2]; shuffle(o);
+  return ["قاعدة الدالّة "+ax("ص = "+a+"س + "+b)+" ومجالها "+ax("{ 1 ، 2 ، 3 ، 4 }")+". ما مداها؟",
+    o.map(ax), o.indexOf(right),
+    "نعوّض كلّ مُدخَل: "+mn(dom.map(function(x){ return a+"×"+x+"+"+b+"="+(a*x+b); }).join(" ، "))+"."];
+}
+
+/* ص40 استعدّ: ثمن عددٍ من المجلّات */
+function gFuncPrice(){
+  var p = ri(3,15), k = ri(2,9), r = p*k;
+  var o = numOpts(r, [p+k, r-p, p*(k+1)]);
+  return ["ثمن النسخة الواحدة من مجلّةٍ "+mn(p)+" "+ryl(p)+". قاعدة الدالّة "+ax("ص = "+p+"س")+" حيث "+ax("س")+" عدد المجلّات. كم ثمن "+mn(k)+" "+tmz(k,"مجلّةً","مجلّات")+"؟",
+    o[0], o[1],
+    mn(p+" × "+k+" = "+r)+" "+ryl(r)+"."];
+}
+
+/* ص40–41: مصطلحات الدوال */
+function gFuncTerms(){
+  var C = [
+    ["مجموعة قيم المُدخلات في الدالّة تُسمّى:", "المجال", ["المدى","قاعدة الدالّة","المُعامِل"]],
+    ["مجموعة قيم المُخرجات في الدالّة تُسمّى:", "المدى", ["المجال","المتغيّر","العبارة الجبرية"]],
+    ["ما الدالّة؟", "علاقةٌ تعيّن لكلِّ قيمةٍ من المُدخلات قيمةً واحدةً فقط من المُخرجات", ["أيّ معادلةٍ فيها متغيّران","جدولٌ من عمودين فقط","عبارةٌ بلا إشارة يساوي"]],
+    ["الصِّيغة التي نعوّض فيها قيمة المُدخَل لنحصل على المُخرَج تُسمّى:", "قاعدة الدالّة", ["المدى","المجال","المُعامِل"]]
+  ];
+  var c = gp(C), o = [c[1]].concat(c[2]); shuffle(o);
+  return [c[0], o, o.indexOf(c[1]),
+    "المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، والصِّيغة التي تربط بينهما ⇐ قاعدة الدالّة."];
+}
+
 var D1 = [gStepOrder, gDiagonals, gTriangular, gFactPattern, gTableTimes, gReasonable];
 var D2 = [gPowerExpand, gPowerValue, gPowerWrite, gPowerRead, gStandardForm];
 var D3 = [gOrderRule, gOrderParen, gOrderPower, gMoneyExpr, gOrderMixed];
-var ALL = D1.concat(D2).concat(D3);
+var D4 = [gGuessWash, gGuessTickets, gGuessSumDiff, gGuessSumProd, gGuessAges, gGuessHow];
+var D5 = [gEvalOne, gEvalTwo, gEvalDiv, gCoefficient, gPatternExpr, gAlgTerms];
+var D6 = [gSolveAdd, gSolveSub, gSolveMul, gEqFromWord, gEqWordSolve, gEqMeaning];
+var D7 = [gPropName, gDistRewrite, gDistValue, gMentalMul, gDistBack];
+var D8 = [gFuncOut, gFuncRule, gFuncRange, gFuncPrice, gFuncTerms];
+var ALL = D1.concat(D2).concat(D3).concat(D4).concat(D5).concat(D6).concat(D7).concat(D8);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -301,18 +629,28 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–24</span>)</div>'+
+    '<div class="unit">📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–44</span>)</div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
       '<button data-tab="d1" aria-selected="false">1-1 الخطوات الأربع</button>'+
       '<button data-tab="d2" aria-selected="false">1-2 القوى والأسس</button>'+
       '<button data-tab="d3" aria-selected="false">1-3 ترتيب العمليات</button>'+
+      '<button data-tab="d4" aria-selected="false">1-4 التخمين والتحقّق</button>'+
+      '<button data-tab="d5" aria-selected="false">1-5 العبارات الجبرية</button>'+
+      '<button data-tab="d6" aria-selected="false">1-6 المعادلات</button>'+
+      '<button data-tab="d7" aria-selected="false">1-7 الخصائص</button>'+
+      '<button data-tab="d8" aria-selected="false">1-8 الدوال</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="d1"></section>'+
     '<section class="panel" id="d2"></section>'+
     '<section class="panel" id="d3"></section>'+
+    '<section class="panel" id="d4"></section>'+
+    '<section class="panel" id="d5"></section>'+
+    '<section class="panel" id="d6"></section>'+
+    '<section class="panel" id="d7"></section>'+
+    '<section class="panel" id="d8"></section>'+
     '<section class="panel" id="rem"></section>'+
     '<footer>الرياضيات · ثاني متوسط · الفصل الأول · أرقام جديدة كل مرة</footer>';
 
@@ -320,7 +658,12 @@ if(!NAMES[who]){
     all: {gens:ALL, n:12, intro:"<b>اختبار شامل</b> على الدروس الثلاثة: الخطوات الأربع · القوى والأسس · ترتيب العمليات.", label:"رياضيات م٢ — شامل ف١"},
     d1:  {gens:D1,  n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م٢ — 1-1 الخطوات الأربع"},
     d2:  {gens:D2,  n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م٢ — 1-2 القوى والأسس"},
-    d3:  {gens:D3,  n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"}
+    d3:  {gens:D3,  n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"},
+    d4:  {gens:D4,  n:10, intro:"<b>الدرس <span class=en>1-4</span> — استراتيجية التخمين والتحقّق:</b> خمّن ← تحقّق ← عدّل التخمين حتى تتوافق النتيجة مع كلّ المعطيات.", label:"رياضيات م٢ — 1-4 التخمين والتحقّق"},
+    d5:  {gens:D5,  n:10, intro:"<b>الدرس <span class=en>1-5</span> — المتغيّرات والعبارات الجبرية:</b> المتغيّر رمزٌ لكميّةٍ غير معلومة، والمُعامِل هو العدد المضروب فيه. نحسب قيمة العبارة بالتعويض.", label:"رياضيات م٢ — 1-5 العبارات الجبرية"},
+    d6:  {gens:D6,  n:10, intro:"<b>الدرس <span class=en>1-6</span> — المعادلات:</b> حلّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين.", label:"رياضيات م٢ — 1-6 المعادلات"},
+    d7:  {gens:D7,  n:10, intro:"<b>الدرس <span class=en>1-7</span> — الخصائص:</b> الإبدال · التجميع · التوزيع · العنصر المحايد — واستعمالها في الحساب الذهني.", label:"رياضيات م٢ — 1-7 الخصائص"},
+    d8:  {gens:D8,  n:10, intro:"<b>الدرس <span class=en>1-8</span> — المعادلات والدوال:</b> المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، وقاعدة الدالّة تربط بينهما.", label:"رياضيات م٢ — 1-8 الدوال"}
   };
   function render(id){
     var c = CFG[id], sec = document.getElementById(id);
@@ -361,7 +704,12 @@ if(!NAMES[who]){
   var REMTOPICS=[
     {id:"d1", name:"1-1 الخطوات الأربع", tip:"لا تبدأ بالحساب. اسأل أوّلًا: ما المعطيات؟ وما المطلوب؟ ثم اختر خطّة وقدّر الإجابة، ثم احسب، ثم تحقّق أن الجواب معقول مقارنةً بتقديرك.", yt:"شرح الخطوات الأربع لحل المسألة ثاني متوسط"},
     {id:"d2", name:"1-2 القوى والأسس", tip:"الأُسّ يعني كم مرّة تستعمل الأساس عاملًا: ٢⁵ = ٢×٢×٢×٢×٢ = ٣٢، وليس ٢×٥. والصيغة الأُسّية تكتب بالأسس، والقياسية عددًا عاديًّا.", yt:"شرح القوى والأسس ثاني متوسط رياضيات"},
-    {id:"d3", name:"1-3 ترتيب العمليات", tip:"الترتيب: الأقواس ← الأسس ← الضرب والقسمة (من اليمين لليسار) ← الجمع والطرح. أكثر خطأ شائع: الجمع قبل الضرب.", yt:"شرح ترتيب العمليات ثاني متوسط رياضيات"}
+    {id:"d3", name:"1-3 ترتيب العمليات", tip:"الترتيب: الأقواس ← الأسس ← الضرب والقسمة (من اليمين لليسار) ← الجمع والطرح. أكثر خطأ شائع: الجمع قبل الضرب.", yt:"شرح ترتيب العمليات ثاني متوسط رياضيات"},
+    {id:"d4", name:"1-4 التخمين والتحقّق", tip:"التخمين ليس عشوائيًّا: خمّن، ثم احسب وتحقّق، فإن كانت النتيجة أكبر من المطلوب قلّل، وإن كانت أقلّ زِد. سجّل كل محاولة في جدول حتى لا تكرّرها.", yt:"شرح استراتيجية التخمين والتحقق ثاني متوسط"},
+    {id:"d5", name:"1-5 العبارات الجبرية", tip:"المتغيّر رمز لكميّة غير معلومة، و«3س» تعني 3 × س. لحساب قيمة العبارة: عوّض عن كل متغيّر بقيمته، ثم اتبع ترتيب العمليات.", yt:"شرح المتغيرات والعبارات الجبرية ثاني متوسط"},
+    {id:"d6", name:"1-6 المعادلات", tip:"حلّ المعادلة يعني إيجاد قيمة المتغيّر التي تجعل الطرفين متساويين. اسأل نفسك: أيّ عدد إذا فعلتُ به هذا صار ذاك؟ ثم تحقّق بالتعويض.", yt:"شرح حل المعادلات ذهنيا ثاني متوسط"},
+    {id:"d7", name:"1-7 الخصائص", tip:"الإبدال = تغيير الترتيب، والتجميع = تغيير مواضع الأقواس، والتوزيع = ضرب العدد في كل حدّ داخل القوسين، والعنصر المحايد = الصفر في الجمع والواحد في الضرب.", yt:"شرح خصائص العمليات الإبدال التجميع التوزيع ثاني متوسط"},
+    {id:"d8", name:"1-8 الدوال", tip:"الدالّة تعطي لكل مُدخَل مُخرَجًا واحدًا فقط. المُدخلات = المجال، والمُخرجات = المدى. لتجد القاعدة من جدول: اسأل ماذا فُعِل بـ س ليعطي ص في كلّ صف؟", yt:"شرح المعادلات والدوال المجال والمدى ثاني متوسط"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
