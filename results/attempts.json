@@ -1,5 +1,590 @@
 [
     {
+        "id": "6ff6cad7-6f38-48ee-8154-4bd7f95e6d2f",
+        "created_at": "2026-08-23T16:32:06.136387+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "dur": 189,
+            "away": 0,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 25,
+            "correct": 25,
+            "learned": 340,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "65710148-52d7-4896-9824-6275f2127a7d",
+        "created_at": "2026-08-23T16:28:44.885548+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 8,
+        "en_total": 12,
+        "ma_correct": 7,
+        "ma_total": 12,
+        "wrong": [
+            {
+                "q": "The plural of \"foot\" is:",
+                "picked": "foots",
+                "correct": "feet",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "They ___ it already.",
+                "picked": "have give",
+                "correct": "have given",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "The opposite of \"early\" is:",
+                "picked": "empty",
+                "correct": "late",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "This one is ___ than that one.",
+                "picked": "cheap",
+                "correct": "cheaper",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0625\u0630\u0627 2x + y = 15 \u0648 x \u2212 y = -3\u060c \u0641\u0645\u0627 x\u061f",
+                "picked": "x=3",
+                "correct": "x=4",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u062d\u0644: 7x \u2212 9 = 5",
+                "picked": "x=1",
+                "correct": "x=2",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %40 \u0645\u0646 200\u061f",
+                "picked": "60",
+                "correct": "80",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0645\u062d\u064a\u0637 \u0645\u0631\u0628\u0639 \u0637\u0648\u0644 \u0636\u0644\u0639\u0647 9",
+                "picked": "81",
+                "correct": "36",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0625\u0630\u0627 2x + y = 13 \u0648 x \u2212 y = -1\u060c \u0641\u0645\u0627 x\u061f",
+                "picked": "x=5",
+                "correct": "x=4",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "per": [
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": null,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5.2,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.5,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 7.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.4,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 18.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 1.5,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 25.3,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 5.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 9.9,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 28.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4.4,
+                    "ok": false
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 7.1,
+                    "ok": false
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.3,
+                    "ok": false
+                }
+            ],
+            "away": 0,
+            "fast": 0,
+            "exits": 0,
+            "paper": {
+                "en": [
+                    {
+                        "q": "The plural of \"foot\" is:",
+                        "opts": [
+                            "feet",
+                            "footes",
+                            "foots"
+                        ],
+                        "chosen": 2,
+                        "correct": 0
+                    },
+                    {
+                        "q": "They ___ it already.",
+                        "opts": [
+                            "has given",
+                            "have give",
+                            "have given"
+                        ],
+                        "chosen": 1,
+                        "correct": 2
+                    },
+                    {
+                        "q": "We ___ a great time yesterday.",
+                        "opts": [
+                            "have",
+                            "had",
+                            "having"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The opposite of \"early\" is:",
+                        "opts": [
+                            "late",
+                            "empty",
+                            "closed"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "Choose the synonym of \"happy\":",
+                        "opts": [
+                            "sad",
+                            "glad",
+                            "angry"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "You are coming, ___?",
+                        "opts": [
+                            "aren't you",
+                            "don't you",
+                            "isn't it"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "This is the ___ book I have ever read.",
+                        "opts": [
+                            "more interesting",
+                            "most interesting",
+                            "interesting"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "We ___ dinner when you called.",
+                        "opts": [
+                            "have",
+                            "were having",
+                            "had"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "This one is ___ than that one.",
+                        "opts": [
+                            "cheap",
+                            "cheaper",
+                            "more cheap"
+                        ],
+                        "chosen": 0,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Choose the synonym of \"big\":",
+                        "opts": [
+                            "huge",
+                            "tiny",
+                            "short"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "The book, ___ cover is torn, is mine.",
+                        "opts": [
+                            "whose",
+                            "which",
+                            "who"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "Choose the synonym of \"important\":",
+                        "opts": [
+                            "tiny",
+                            "significant",
+                            "weak"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    }
+                ],
+                "ma": [
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 7 \u00d7 8 \u2212 6",
+                        "opts": [
+                            "50",
+                            "56",
+                            "44"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0625\u0630\u0627 2x + y = 15 \u0648 x \u2212 y = -3\u060c \u0641\u0645\u0627 x\u061f",
+                        "opts": [
+                            "x=4",
+                            "x=3",
+                            "x=5"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0642\u064a\u0645\u0629 x \u0641\u064a: x/3 + 2 = 5",
+                        "opts": [
+                            "9",
+                            "3",
+                            "1"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 9 \u00d7 6 \u2212 4",
+                        "opts": [
+                            "50",
+                            "54",
+                            "46"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u062d\u0644: 7x \u2212 9 = 5",
+                        "opts": [
+                            "x=1",
+                            "x=2",
+                            "x=3"
+                        ],
+                        "chosen": 0,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u062d\u0644: x\u00b2 \u2212 7x + 12 = 0",
+                        "opts": [
+                            "3 \u0648 5",
+                            "3 \u0648 4",
+                            "\u22123 \u0648 \u22124"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0628\u0633\u0651\u0637: 3\u00b2 \u00d7 3",
+                        "opts": [
+                            "18",
+                            "27",
+                            "9"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %40 \u0645\u0646 200\u061f",
+                        "opts": [
+                            "80",
+                            "60",
+                            "40"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0645\u062d\u064a\u0637 \u0645\u0631\u0628\u0639 \u0637\u0648\u0644 \u0636\u0644\u0639\u0647 9",
+                        "opts": [
+                            "36",
+                            "18",
+                            "81"
+                        ],
+                        "chosen": 2,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0628\u0633\u0651\u0637: (x + 3)\u00b2",
+                        "opts": [
+                            "x\u00b2+9",
+                            "x\u00b2+3x+9",
+                            "x\u00b2+6x+9"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "\u062d\u0644: 2x\u00b2 = 32",
+                        "opts": [
+                            "x=4 \u0641\u0642\u0637",
+                            "x=\u00b14",
+                            "x=16"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0625\u0630\u0627 2x + y = 13 \u0648 x \u2212 y = -1\u060c \u0641\u0645\u0627 x\u061f",
+                        "opts": [
+                            "x=5",
+                            "x=4",
+                            "x=3"
+                        ],
+                        "chosen": 0,
+                        "correct": 1
+                    }
+                ],
+                "date": "2026-08-23T16:28:43.870Z",
+                "en_total": 12,
+                "ma_total": 12,
+                "en_correct": 8,
+                "ma_correct": 7
+            },
+            "skills": {
+                "\u0627\u0644\u0623\u0633\u0633": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u062c\u0645\u0639": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u062d\u064a\u0637": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0636\u062f\u0627\u062f": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0631\u0627\u062f\u0641\u0627\u062a": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0636\u0645\u0627\u0626\u0631 \u0627\u0644\u0648\u0635\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0628\u0633\u064a\u0637": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062d\u0644\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a": {
+                    "c": 2,
+                    "t": 5
+                },
+                "\u0627\u0644\u062c\u0645\u0648\u0639 \u0627\u0644\u0634\u0627\u0630\u0651\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0628\u0646\u064a \u0644\u0644\u0645\u062c\u0647\u0648\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u062a\u0627\u0645\u0651": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0646\u0633\u0628\u0629 \u0627\u0644\u0645\u0626\u0648\u064a\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0623\u0633\u0626\u0644\u0629 \u0627\u0644\u0630\u064a\u0644\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629 \u0648\u0627\u0644\u062a\u0641\u0636\u064a\u0644": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "avg_sec": 6.8,
+            "trusted": true,
+            "total_sec": 150
+        }
+    },
+    {
+        "id": "7a37773a-8aa4-4240-9bc4-ffc99a8843f9",
+        "created_at": "2026-08-23T16:24:19.353175+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "dur": 148,
+            "away": 0,
+            "kind": "practice",
+            "mode": "new",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 10,
+            "correct": 10,
+            "learned": 340,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
         "id": "3976a2dd-bd7b-47d4-9247-40a5b018869d",
         "created_at": "2026-08-23T09:04:51.161789+00:00",
         "student": "\u0623\u0633\u0627\u0645\u0629",
@@ -48065,57 +48650,6 @@
             ],
             "avg_sec": 5.7,
             "total_sec": 102
-        }
-    },
-    {
-        "id": "56045cc4-50c2-4863-b784-19046d0bd693",
-        "created_at": "2026-07-27T22:41:31.454062+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u062a\u062d\u0635\u064a\u0644\u064a",
-            "total": 12,
-            "correct": 8
-        }
-    },
-    {
-        "id": "e5398092-60e2-45b0-96f5-18e99d6f4c91",
-        "created_at": "2026-07-27T22:39:25.627855+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "total": 12,
-            "correct": 4
-        }
-    },
-    {
-        "id": "769e4867-a614-4062-9705-60690460180a",
-        "created_at": "2026-07-27T22:36:58.453789+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0643\u0645\u064a",
-            "total": 10,
-            "correct": 6
         }
     }
 ]
