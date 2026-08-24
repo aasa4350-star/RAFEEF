@@ -976,8 +976,11 @@ if(!NAMES[who]){
       var gen = [];
       // تركيز: نحجز ~٤٠٪ من جولة الاستدلال الرياضي لمهارات العدّ وأيام الأسبوع (الأضعف).
       if(kind==="math" && MATH_BOOST.length){
+        // أولوية إضافية لأيام الأسبوع (أعند نقطة): نضمن سؤالين على الأقل في كل جولة.
+        var prio = c.gens.filter(function(f){ return f.name==="gWeekday"; });
+        if(prio.length) gen = genN(prio, 2, seen);
         var boostGens = c.gens.filter(function(f){ return MATH_BOOST.indexOf(f.name)>=0; });
-        if(boostGens.length) gen = genN(boostGens, Math.ceil(need*0.4), seen);
+        if(boostGens.length) gen = gen.concat(genN(boostGens, Math.ceil(need*0.4)-gen.length, seen));
       }
       gen = gen.concat(genN(focusGens(kind, c.gens), need - gen.length, seen));
       /* بعض المولّدات لا تنتج إلا سؤالًا واحدًا في الجولة (مفتاح تكرار ثابت)،
