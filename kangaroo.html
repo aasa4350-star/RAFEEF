@@ -971,6 +971,11 @@ if(!NAMES[who]){
     var need = QN - fromBook.length, seen = {};
     // نبذر قائمة المنع بأسئلة الكتاب حتى لا يكرّرها التوليد
     fromBook.forEach(function(q){ if(q){ if(q[4])seen[q[4]]=1; if(q[0])seen[q[0]]=1; } });
+    // ذاكرة عبر الجلسات: نتفادى نصّ آخر الأسئلة المطروحة حتى لا تتكرّر كل جولة.
+    // نستعمل نصّ السؤال (q[0]) لا مفتاح المولّد، لأن بعض المفاتيح ثابتة («fold»/«mir») فتُلغي المولّد بأكمله.
+    var recentKey="kang_recent_"+who+"_"+kind, recent=[];
+    try{ recent=JSON.parse(localStorage.getItem(recentKey)||"[]")||[]; }catch(e){}
+    recent.forEach(function(k){ if(k) seen[k]=1; });
     var items = fromBook;
     if(need > 0){
       var gen = [];
@@ -988,6 +993,15 @@ if(!NAMES[who]){
       if(gen.length < need) gen = gen.concat(genN(c.gens, need - gen.length, seen));
       items = items.concat(gen);
     }
+    // لو قصرت الجولة بسبب تفادي المكرّر (بنك صغير)، نكمّلها بالسماح بتكرار قديم حتى لا تنقص.
+    if(items.length < QN){
+      var s2={}; items.forEach(function(q){ if(q){ if(q[4])s2[q[4]]=1; if(q[0])s2[q[0]]=1; } });
+      items = items.concat(genN(c.gens, QN - items.length, s2));
+    }
+    // نحدّث الذاكرة: نصوص هذه الجولة أوّلًا ثم القديم، بلا تكرار، حدّ ٢٠.
+    var _mem=[], _ms={};
+    items.map(function(q){ return (q&&q[0])||""; }).concat(recent).forEach(function(k){ if(k && !_ms[k]){ _ms[k]=1; _mem.push(k); } });
+    try{ localStorage.setItem(recentKey, JSON.stringify(_mem.slice(0,20))); }catch(e){}
     var html = '';
     // صندوق دروس الشرح (فيديو) لأصعب مهارات الاستدلال الرياضي — يبرز الأضعف حسب بيانات الطفل.
     if(kind==="math"){
