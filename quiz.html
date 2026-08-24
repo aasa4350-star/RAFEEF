@@ -8,6 +8,7 @@
 <title>اختبارات ومراجعات الأبناء</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
 <script src="azure-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
@@ -1688,12 +1689,22 @@ if(!STUDENTS[who]){
 
   function statusText(){
     return saveState==="ok" ? "✅ تم حفظ النتيجة تلقائيًا لوالدك"
+      : saveState==="queued" ? "📥 النتيجة محفوظة على جهازك — الإنترنت متعثّر، وسترسل تلقائيًّا أول ما يرجع. لا تعيد الاختبار."
       : saveState==="fail" ? "⚠️ تعذّر الحفظ — تأكد من الإنترنت وأعد فتح «النتيجة»"
       : "⏳ جارٍ حفظ النتيجة...";
   }
   function paintStatus(){ const el=document.getElementById("saveStatus"); if(el) el.textContent = statusText(); }
 
   async function saveResult(payload){
+    /* عبر الطابور: إن تعثّرت الشبكة تُحفظ النتيجة على الجهاز وتُرسل تلقائيًّا
+       في أوّل فتحةٍ تالية — كانت تضيع نهائيًّا. */
+    if(window.AQ){
+      await AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, payload, function(st){
+        saveState = (st==="ok") ? "ok" : (st==="queued") ? "queued" : "pending";
+        paintStatus();
+      });
+      return;
+    }
     saveState = "pending"; paintStatus();
     try{
       const r = await fetch(SUPA_URL+"/rest/v1/attempts", {

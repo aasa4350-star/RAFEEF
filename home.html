@@ -8,6 +8,7 @@
 <title>صفحة البداية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
 <style>
   :root{
     --accent:#059669; --accent-deep:#047857;
@@ -147,6 +148,9 @@ document.title = "مسار "+name;
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 function pct(c,t){ return t?Math.round(c/t*100):0; }
+/* نُفضّل ختم وقت الجهاز (meta.at) على created_at، لأن نتيجةً أُعيد إرسالها
+   بعد انقطاعٍ تأخذ created_at الجديد فتظهر بتاريخٍ خاطئ. */
+function rowTime(r){ return (r && r.meta && r.meta.at) || (r && r.created_at) || ""; }
 function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
 function saToday(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
 var SKILLNAMES=[
@@ -243,8 +247,8 @@ async function loadReport(){
       var isFlag=function(p){ return p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2); };
       var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; };
       var flagged=vocabAll.filter(isFlag), show=vocabAll.filter(function(p){return !isFlag(p);}).slice(0,1).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
-      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>'+mIco(p)+' '+saTime(p.created_at)+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
-      var byDay={}; vocabT.forEach(function(p){ var f=saTime(p.created_at); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
+      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>'+mIco(p)+' '+saTime(rowTime(p))+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
+      var byDay={}; vocabT.forEach(function(p){ var f=saTime(rowTime(p)); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
       var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
@@ -267,7 +271,7 @@ async function loadReport(){
         var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+avg+'%</span></div><ul class="weak">'+
           arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=(p.meta.test||"").replace(subj+" ",""); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
-            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span></li>'; }).join("")+
           '</ul></div>';
       });
     }
@@ -275,7 +279,7 @@ async function loadReport(){
     if(Object.keys(otherMap).length){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
         Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
-          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(p.created_at)+'</span>'+durTxt(p)+(p.meta.trusted===false?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':'')+'</li>'; }).join("")+
+          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+(p.meta.trusted===false?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':'')+'</li>'; }).join("")+
         '</ul></div>';
     }
   }
@@ -315,7 +319,7 @@ async function loadReport(){
           });
           return h;
         };
-        html+='<details '+(pi===0?'open':'')+' class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج '+saTime(r.created_at)+' — النتيجة '+tot+'/'+all+' ('+pc+'%) · إنجليزي '+P.en_correct+'/'+P.en_total+' · رياضيات '+P.ma_correct+'/'+P.ma_total+'</summary><div style="margin-top:8px">'+secHtml("الإنجليزي",P.en,true)+secHtml("الرياضيات",P.ma,false)+'</div></details>';
+        html+='<details '+(pi===0?'open':'')+' class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج '+saTime(rowTime(r))+' — النتيجة '+tot+'/'+all+' ('+pc+'%) · إنجليزي '+P.en_correct+'/'+P.en_total+' · رياضيات '+P.ma_correct+'/'+P.ma_total+'</summary><div style="margin-top:8px">'+secHtml("الإنجليزي",P.en,true)+secHtml("الرياضيات",P.ma,false)+'</div></details>';
       });
     }
   } else {
