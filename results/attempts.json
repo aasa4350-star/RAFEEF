@@ -1,5 +1,421 @@
 [
     {
+        "id": "c91ec1c0-538d-46bc-9cd2-005adee13854",
+        "created_at": "2026-08-24T16:44:18.6095+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 8,
+        "en_total": 10,
+        "ma_correct": 10,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "I ___ every day.",
+                "picked": "helps",
+                "correct": "help",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "We ___ every day.",
+                "picked": "loveing",
+                "correct": "love",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "at": "2026-08-24T16:44:18.027Z",
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 5.9,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.9,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 8.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 6.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 21.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 21.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.5,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 38,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 16.3,
+                    "ok": true
+                }
+            ],
+            "away": 3,
+            "fast": 0,
+            "exits": 1,
+            "paper": {
+                "en": [
+                    {
+                        "q": "We meet ___ Monday.",
+                        "opts": [
+                            "in",
+                            "on",
+                            "at"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The opposite of \"up\" is:",
+                        "opts": [
+                            "down",
+                            "in",
+                            "hot"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "We ___ every day.",
+                        "opts": [
+                            "loveing",
+                            "loves",
+                            "love"
+                        ],
+                        "chosen": 0,
+                        "correct": 2
+                    },
+                    {
+                        "q": "___ do you live?",
+                        "opts": [
+                            "What",
+                            "Where",
+                            "Who"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "I ___ every day.",
+                        "opts": [
+                            "help",
+                            "helps",
+                            "helping"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "What is \"thirty\" in numbers?",
+                        "opts": [
+                            "13",
+                            "30",
+                            "3"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The number after 7 is:",
+                        "opts": [
+                            "6",
+                            "8",
+                            "9"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "I have ten ___ .",
+                        "opts": [
+                            "finger",
+                            "fingers",
+                            "fingeres"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "She ___ to school every day.",
+                        "opts": [
+                            "go",
+                            "goes",
+                            "going"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "___ ? \u2014 in the park.",
+                        "opts": [
+                            "How",
+                            "Where",
+                            "When"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    }
+                ],
+                "ma": [
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 8 \u00d7 7",
+                        "opts": [
+                            "54",
+                            "56",
+                            "58"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 5 \u00d7 2",
+                        "opts": [
+                            "8",
+                            "10",
+                            "12"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 6 + 3",
+                        "opts": [
+                            "8",
+                            "9",
+                            "10"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 7 + 8",
+                        "opts": [
+                            "14",
+                            "15",
+                            "16"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u0634\u062a\u0631\u0649 3 \u062f\u0641\u0627\u062a\u0631 \u0628\u0640 4 \u0631\u064a\u0627\u0644 \u0644\u0644\u0648\u0627\u062d\u062f\u060c \u0643\u0645 \u062f\u0641\u0639\u061f",
+                        "opts": [
+                            "10",
+                            "12",
+                            "14"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 24 \u00d7 3",
+                        "opts": [
+                            "62",
+                            "72",
+                            "82"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 2/4 + 1/4",
+                        "opts": [
+                            "3/4",
+                            "3/8",
+                            "2/4"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0646\u0635\u0641 \u0627\u0644\u0639\u062f\u062f 44\u061f",
+                        "opts": [
+                            "20",
+                            "24",
+                            "22"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 5000 \u2212 2675",
+                        "opts": [
+                            "2325",
+                            "2425",
+                            "2335"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 9 \u00d7 6",
+                        "opts": [
+                            "48",
+                            "54",
+                            "56"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    }
+                ],
+                "date": "2026-08-24T16:44:18.027Z",
+                "en_total": 10,
+                "ma_total": 10,
+                "en_correct": 8,
+                "ma_correct": 10
+            },
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0627\u0644\u0636\u0631\u0628": {
+                    "c": 4,
+                    "t": 4
+                },
+                "\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0643\u0633\u0648\u0631": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0636\u062f\u0627\u062f": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u062d\u0631\u0648\u0641 \u0627\u0644\u062c\u0631\u0651": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0633\u0627\u0626\u0644 \u0643\u0644\u0627\u0645\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0628\u0633\u064a\u0637": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0641\u0647\u0627\u0645": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0645\u0636\u0627\u0639\u0641\u0629 \u0648\u0627\u0644\u062a\u0646\u0635\u064a\u0641": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0637\u0627\u0628\u0642\u0629 \u0627\u0644\u0641\u0627\u0639\u0644 \u0648\u0627\u0644\u0641\u0639\u0644": {
+                    "c": 0,
+                    "t": 2
+                }
+            },
+            "avg_sec": 8.1,
+            "trusted": false,
+            "total_sec": 146
+        }
+    },
+    {
         "id": "d3a22716-0932-42fe-a32e-204f91eb30a8",
         "created_at": "2026-08-24T16:29:23.915336+00:00",
         "student": "\u062d\u0633\u0646",
@@ -48121,22 +48537,6 @@
             "kind": "activity",
             "event": "lesson",
             "label": "\u0627\u0644\u062c\u0645\u0648\u0639 \u0627\u0644\u0634\u0627\u0630\u0629"
-        }
-    },
-    {
-        "id": "b6db35d1-b884-426a-9ffc-b24d32226f8d",
-        "created_at": "2026-07-29T13:30:30.509967+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062d\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a"
         }
     }
 ]
