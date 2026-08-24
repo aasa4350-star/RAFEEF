@@ -912,11 +912,13 @@ if(!META[who] || !DATA[who]){
        سعود وأسامة محفوظهما قليل، فلو رأيا «٤٠ / ٦٩٩» أُحبِطا من رقمٍ
        لا يبلغانه هذا العام. يبقى هدفهما ٣٠٠ وهو قريبٌ محسوس، وتُفتح
        الدفعة الثانية تلقائيًّا يوم يُنهيانها. */
-    var raw = 0; try{ raw = parseInt(localStorage.getItem("vocab_learned_"+who)||"0",10)||0; }catch(e){}
-    /* الأب طلب صراحةً إرجاع البنك الكامل لحسن، فأُعيد. وسعود وأسامة
-       يبقيان على الثلاثمئة (رقمٌ يبلغانه) وتُفتح لهما تلقائيًّا يوم يُنهيانها. */
-    var NEXT_TIER = { hasan:1, rafeef:1 };
-    if(raw < VOCAB300.length && !NEXT_TIER[who]) return;
+    /* ⚠️ كان هنا بابٌ يمنع إلحاق الدفعة الثانية حتى يُنهي الابن الثلاثمئة،
+       ويقرّر ذلك من localStorage عند التحميل. فإذا أنهى أسامة الثلاثمئة
+       ولم يكن الرقم قد وصل التخزين المحلّي بعد (فُتحت الصفحة من جهازٍ آخر
+       أو من الشاشة الرئيسية، فيصل الرقم لاحقًا من قاعدة البيانات) وقف عند
+       «حفظت كل الـ٣٠٠» ولم تظهر له كلمةٌ جديدة أبدًا — وهو بلاغ الأب.
+       الحلّ: نُلحق البنك كاملًا دائمًا (فلا طريق مسدود)، ونكتفي بتقييد
+       الرقم *المعروض* حتى لا يُحبَط الصغير من هدفٍ بعيد — انظر vocGoal. */
     var seenEn={}, seenAr={};
     VOCAB300.forEach(function(w){ seenEn[String(w[0]).toLowerCase()]=1; seenAr[w[1][0]]=1; });
     P.forEach(function(w){
@@ -928,6 +930,13 @@ if(!META[who] || !DATA[who]){
 
   // ===== تتبّع تقدّم الحفظ (لكل ابن على جهازه) =====
   var VOC_TOTAL = VOCAB300.length;
+  /* الهدف المعروض للطفل: سعود وأسامة يرَيان ٣٠٠ حتى يبلغاها ثم يُفتح الباقي،
+     فيبقى الرقم قريبًا محسوسًا بلا أن يسدّ الطريق أمام كلماتٍ جديدة. */
+  var GOAL_STEP = { saud:300, osama:300 };
+  function vocGoal(learned){
+    var g = GOAL_STEP[who];
+    return (g && learned < g) ? g : VOC_TOTAL;
+  }
   var VOC_STEP = (who==="saud") ? 3 : (who==="osama") ? 5 : 10; // سعود ٣، أسامة ٥، الكبار ١٠
   var VOC_STEP_AR = (VOC_STEP===3) ? "٣" : (VOC_STEP===5) ? "٥" : "١٠";
   var vocMode = "new"; // "new" = تعلّم جديد · "review" = مراجعة
@@ -1015,6 +1024,7 @@ if(!META[who] || !DATA[who]){
   var RV_TARGET_DAYS = 14;
   /* طلب الأب صراحةً: حسن ورفيف يراجعون ٢٥ كلمة كل يوم */
   var RV_FIXED = { hasan:25, rafeef:25 };
+  var NEW_SHARE = 0.30;   /* نصيب الكلمات التي لم تُراجَع قطّ من كل جلسة مراجعة */
   var RV_VER = "2";   /* رفعُه يُلغي اختيارًا محفوظًا قديمًا مرّةً واحدة */
   function rvAuto(learned){
     if(RV_FIXED[who]) return Math.max(VOC_STEP, Math.min(learned||VOC_STEP, RV_FIXED[who]));
@@ -1114,17 +1124,31 @@ if(!META[who] || !DATA[who]){
            ٢ — كلمةٌ لم يحن موعدها بعد
            كان الترتيب قبل ذلك بالفهرس وحده، فتذهب الكلمة الجديدة إلى آخر
            الطابور ولا تعود إلا بعد أحد عشر يومًا — وهو ما اشتكى منه حسن. */
-        var scored = pool.map(function(w,i){
-          var st = srs[w[0]], d = srDueIn(st);
-          return { w:w, weak:(wk[w[0]]?1:0), tier:(st ? (d<=0 ? 0 : 2) : 1), due:d, idx:i };
+        /* ⚠️ كان الترتيب: المتأخّرة (٠) ثم التي لم تُراجَع قطّ (١) ثم غير الحالّة (٢).
+           والنتيجة أن الكلمة ما إن تدخل دورة المراجعة حتى يحين موعدها كل يومٍ
+           أو يومين فتحتكر الجلسة، فلا يصل الطابور القديم أبدًا. محاكاةٌ لـ٦٠٠
+           كلمة و٢٥ في الجلسة أظهرت أن حسنًا يرى ١١٧ كلمة فقط في ثلاثين يومًا،
+           وبعضها خمس عشرة مرّة — وهو بلاغه «نفس الكلمات».
+           الحلّ: نحجز ٣٠٪ من كل جلسة للكلمات التي لم تُراجَع قطّ، فيُغطّى
+           البنك كاملًا في نحو خمسة وسبعين يومًا مع بقاء الأولويّة للمتأخّرات. */
+        var dueL=[], newL=[], restL=[];
+        pool.forEach(function(w,i){
+          var st = srs[w[0]], d = srDueIn(st), o = { w:w, weak:(wk[w[0]]?1:0), due:d, idx:i };
+          if(!st) newL.push(o); else if(d<=0) dueL.push(o); else restL.push(o);
         });
-        scored.sort(function(a,b){
-          return (b.weak-a.weak) || (a.tier-b.tier) || (a.due-b.due) || (a.idx-b.idx);
-        });
+        function byPri(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); }
+        dueL.sort(byPri); restL.sort(byPri);
+        newL.sort(function(a,b){ return (b.weak-a.weak) || (a.idx-b.idx); });
         rvSize = getRvSize(learned);
+        var wantNew = Math.min(newL.length, Math.round(rvSize * NEW_SHARE));
+        var wantDue = Math.min(dueL.length, rvSize - wantNew);
+        var sel = dueL.slice(0, wantDue).concat(newL.slice(0, wantNew));
+        if(sel.length < rvSize) sel = sel.concat(dueL.slice(wantDue, wantDue + (rvSize - sel.length)));
+        if(sel.length < rvSize) sel = sel.concat(newL.slice(wantNew, wantNew + (rvSize - sel.length)));
+        if(sel.length < rvSize) sel = sel.concat(restL.slice(0, rvSize - sel.length));
         /* العرض بترتيب الملف أيضًا (انظر التعليق أعلاه) */
-        V = scored.slice(0, rvSize).sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
-        dueNow = scored.filter(function(x){ return x.due<=0; }).length;
+        V = sel.sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
+        dueNow = dueL.length + newL.length;
         masteredNow = srMastered(pool);
       } else { V=[]; }
     } else {
@@ -1133,7 +1157,8 @@ if(!META[who] || !DATA[who]){
     }
 
     // شريط التقدّم + أزرار الوضع
-    var pct = Math.round(learned/VOC_TOTAL*100);
+    var goal = vocGoal(learned);            /* الرقم المعروض للطفل */
+    var pct = Math.round(learned/goal*100);
     function sizeBar(learned){
       var cur=getRvSize(learned), opts=[];
       [VOC_STEP, rvAuto(learned), cur, 30].forEach(function(n){ n=Math.max(VOC_STEP,Math.min(40,n)); if(opts.indexOf(n)<0) opts.push(n); });
@@ -1151,7 +1176,7 @@ if(!META[who] || !DATA[who]){
     var btn = function(m,txt){ var on=(vocMode===m); return '<button data-mode="'+m+'" style="flex:1;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+txt+'</button>'; };
     var html = '<div class="block-title"><span class="dot"></span> حفظ الكلمات ✍️</div>'+
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
-        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت '+learned+' / '+VOC_TOTAL+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت '+learned+' / '+goal+'</span></div>'+
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
@@ -1165,7 +1190,7 @@ if(!META[who] || !DATA[who]){
       } else if(vocMode==="review"){
         html += '<div class="q" style="text-align:center">لسّا ما حفظت كلمات. اضغط «تعلّم '+VOC_STEP_AR+' جديدة» أول 📚</div>';
       } else {
-        html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+VOC_TOTAL+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
+        html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+goal+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
       }
       html += '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
       sec.innerHTML = html;
@@ -1176,7 +1201,7 @@ if(!META[who] || !DATA[who]){
       return;
     }
 
-    var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+VOC_TOTAL+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
+    var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+goal+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
                 : vocMode==="fresh" ? '<p class="hint">🆕 <b>الكلمات الجديدة:</b> هذي آخر كلماتٍ حفظتها ولم ترسخ بعد — وأهمّ مراجعةٍ لها هي أوّل يومين. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁</p>'
                           : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
                             (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
@@ -1215,7 +1240,11 @@ if(!META[who] || !DATA[who]){
     AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; };
     function onComplete(){
       if(Object.keys(tried).length!==total) return;
-      var aw=awaySince(aw0); var trusted=(aw.exits===0);
+      /* كان خروجٌ واحد يُلغي الجلسة كلّها فلا يتقدّم العدّاد، فيرى الطفل
+         الكلمات الخمس نفسها في اليوم التالي. وخروجٌ واحد على الجوال قد يكون
+         إشعارًا عابرًا. فصارت القاعدة كقاعدة صفحات الرياضيات: الأولى إنذار،
+         والثانية تُلغي الجلسة. */
+      var aw=awaySince(aw0); var trusted=(aw.exits<=1);
       /* ⚠️ الترتيب هنا مقصود: نُقدّم العدّاد أوّلًا (إن كانت الجلسة موثوقة) ثم
          نحفظ الرقم الحقيقيّ. كان الحفظ يسبق فحص الثقة فيُسجَّل في قاعدة
          البيانات رقمٌ متقدّم حتى لو لم يُحتسب محلّيًّا، ثم يسحبه
@@ -1226,7 +1255,7 @@ if(!META[who] || !DATA[who]){
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
       } else if(isNew && advanced){
-        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+VOC_TOTAL+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
+        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+vocGoal(getLearned())+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
       } else {
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ أحسنت! النتيجة "+correct+" / "+total+".";
       }
