@@ -41,11 +41,13 @@ async function callGemini(key: string, system: string, messages: any[]): Promise
     role: m.role === "model" ? "model" : "user",
     parts: [{ text: String(m.content || "") }],
   }));
+  // مفاتيح Google الجديدة تبدأ بـ«AQ.» ولا تُقبل في ?key= بل في ترويسة x-goog-api-key،
+  // والقديمة «AIza» تُقبل في الاثنين — فنرسلها في الترويسة دائمًا.
   const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(key)}`;
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
     // ملاحظة: maxOutputTokens مرتفع لأن موديلات Gemini الحديثة تستهلك جزءًا في "التفكير"؛ نبقيه واسعًا وردّ النظام يبقى قصيرًا.
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
