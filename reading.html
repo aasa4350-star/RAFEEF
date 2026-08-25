@@ -269,6 +269,14 @@ try{
   } } }
 }catch(e){}
 
+/* بصمة قصيرة ومستقرّة لنصّ القطعة (لا نحفظ النصّ كاملًا في كل محاولة).
+   تُستعمل في التقرير لقياس كم مرّة تكرّرت القطعة على الطفل. */
+function passageId(txt){
+  var s=String(txt||""), h=5381;
+  for(var i=0;i<s.length;i++){ h=((h*33) ^ s.charCodeAt(i)) >>> 0; }
+  return "p"+h.toString(36);
+}
+
 // معاني الكلمات الإنجليزية بالعربي (يُقبل أكثر من إجابة)
 const VOCAB = {
   saud:[["cat",["قطة","قط"]],["dog",["كلب"]],["red",["أحمر"]],["book",["كتاب"]],["sun",["شمس"]],["apple",["تفاحة","تفاح"]],["fish",["سمكة","سمك"]],["milk",["حليب","لبن"]],["ball",["كرة"]],["star",["نجمة","نجم"]],["bird",["عصفور","طائر"]],["door",["باب"]],["hand",["يد"]],["moon",["قمر"]]],
@@ -891,7 +899,10 @@ if(!META[who] || !DATA[who]){
     var skills={};   /* تسجيل تفصيلي حسب نوع سؤال الاستيعاب */
     function markComp(i, ok){ var g=compSkill(questions[i][0]); var s2=skills[g]||(skills[g]={c:0,t:0}); s2.t++; if(ok) s2.c++; }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills}); }
+    /* بصمة القطعة: بها يعرف التقرير كم مرّة تكرّرت هذه القطعة على الطفل،
+       فلا تُقرأ نسبةٌ عاليةٌ ناتجةٌ عن الحفظ على أنّها فهم. */
+    var _pid = passageId(passage);
+    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid}); }
     sec._leave = savePartial;
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
@@ -915,7 +926,7 @@ if(!META[who] || !DATA[who]){
             var qlb=qrow.querySelector("[data-qlisten]"); if(qlb) qlb.addEventListener("click",function(){ speak(qtext,1,ar?"ar-SA":"en-US"); });
             var qaz=qrow.querySelector(".azbtn"), qfb=qrow.querySelector(".pfb2"); if(qaz) qaz.addEventListener("click",function(){ azureAssess(qtext, ar, qfb, qaz); });
           }
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills}); }
+          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid}); }
         });
       });
     });

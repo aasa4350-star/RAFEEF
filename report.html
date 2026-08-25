@@ -114,7 +114,23 @@ function build(student){
     });
   });
   dates.sort();
+  /* تكرار المادة المكتوبة: نعدّ كم مرّة تكرّرت القطعة نفسها (meta.item) على الطفل.
+     مع المراجعة اليومية ينفد بنك القطع فتتكرّر، فترتفع النسبة بالحفظ لا بالفهم —
+     وهذا المؤشّر يمنع قراءة تلك النسبة على أنّها إتقان. */
+  var repeats = {}, repTests = {};
+  ALL.filter(function(r){ return r.student===student && r.meta && r.meta.item && r.meta.trusted!==false; })
+     .forEach(function(r){
+       var k = r.meta.item;
+       repeats[k] = (repeats[k]||0) + 1;
+       repTests[k] = r.meta.test || "";
+     });
+  var repVals = Object.keys(repeats).map(function(k){ return repeats[k]; });
+  var repSeen = repVals.length;
+  var repTotal = repVals.reduce(function(a,b){ return a+b; }, 0);
+  var repMax = repVals.length ? Math.max.apply(null, repVals) : 0;
+  var repAvg = repSeen ? (repTotal/repSeen) : 0;
   return { rows:rows.length-stretchRows, skipped:skipped, sk:sk,
+           rep:{seen:repSeen, total:repTotal, max:repMax, avg:repAvg},
            stretchSk:stretchSk, stretchRows:stretchRows,
            from:dates.length?saDate(dates[0]):"", to:dates.length?saDate(dates[dates.length-1]):"" };
 }
@@ -138,6 +154,23 @@ function listHtml(items, neutral){
            trendOf(it.s)+
            '<span class="frac">'+it.s.c+'/'+it.s.t+'</span></li>';
   }).join("") + '</ul>';
+}
+
+/* مؤشّر تكرار المادة المكتوبة (القطع): يوضّح أن نسبة القراءة قد تعكس الحفظ
+   لا الفهم حين تتكرّر القطعة نفسها كثيرًا. */
+function repeatCardHtml(d){
+  var r = d.rep || {};
+  if(!r.seen) return "";
+  var avg = Math.round(r.avg*10)/10;
+  var heavy = (avg >= 2) || (r.max >= 3);
+  var col = heavy ? "var(--bad)" : "var(--muted)";
+  return '<div class="card"><h2>🔁 تكرار مادة القراءة</h2>'+
+    '<p class="note">قرأ <b>'+r.seen+'</b> قطعة مختلفة في <b>'+r.total+'</b> جلسة · '+
+    'متوسّط التكرار <b style="color:'+col+'">'+avg+'</b> مرّة للقطعة · أكثر قطعة تكرّرت <b style="color:'+col+'">'+r.max+'</b> مرّات.</p>'+
+    (heavy
+      ? '<p class="note" style="color:var(--bad);font-weight:700">⚠️ التكرار مرتفع — نسبة القراءة هنا قد تعكس حفظ الإجابات لا الفهم. قارنها بالأقسام المولّدة (كانجرو/القدرات) فهي أدقّ في قياس المستوى.</p>'
+      : '<p class="note">التكرار منخفض — نسبة القراءة تعكس الفهم بشكل معقول.</p>')+
+    '</div>';
 }
 
 /* قسم «فوق المستوى»: تحصيلي وSTEP — يُعرض محايدًا ولا يُحسب في التقييم. */
@@ -187,6 +220,7 @@ function render(){
     (strong.length ? '<div class="card"><h2>💪 أقوى المهارات</h2>'+listHtml(strong)+'</div>' : '')+
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
+    repeatCardHtml(d)+
     stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+
       '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+
