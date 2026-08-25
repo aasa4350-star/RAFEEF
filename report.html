@@ -187,18 +187,51 @@ function writingCardHtml(student){
   var dc=0, dt=0;
   drills.forEach(function(r){ dc += (r.meta.correct||0); dt += (r.meta.total||0); });
 
+  /* أسماء مقاييس كامبردج الأربعة كما تُحفظ في meta.bands */
+  var SUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],
+            ["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
+  /* متوسّط كل مقياس عبر كل الفقرات — يكشف الضعف المتكرّر لا نتيجة يومٍ واحد */
+  var agg={}, aggN=0;
+  rows.forEach(function(r){ if(r.meta.bands){ aggN++;
+    SUBS.forEach(function(s){ agg[s[0]]=(agg[s[0]]||0)+(r.meta.bands[s[0]]||0); }); } });
+
   var html = '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
     '<p class="note">كتب <b>'+rows.length+'</b> فقرة'+
-    (dt ? ' · تدريب بناء الجملة: <b>'+dc+'/'+dt+'</b> ('+pct(dc,dt)+'%)' : '')+'</p>';
+    (dt ? ' · تدريب بناء الجملة: <b>'+dc+'/'+dt+'</b> ('+pct(dc,dt)+'%)' : '')+
+    '<br>التقييم بمقاييس <b>كامبردج</b> الأربعة (كلٌّ من 5، والنجاح 3 فأكثر)، '+
+    'والطول وأدوات الربط المطلوبة من هدف <b>CEFR</b> لصفّه.</p>';
+
+  if(aggN){
+    html += '<ul class="sk">'+SUBS.map(function(s){
+      var avg=agg[s[0]]/aggN, p=Math.round(avg/5*100);
+      return '<li><span class="pill '+cls(p)+'">'+(Math.round(avg*10)/10)+' / 5</span>'+
+             '<span class="nm">'+s[1]+'</span>'+
+             '<span class="frac">'+s[0]+'</span></li>';
+    }).join("")+'</ul>'+
+    '<p class="note">متوسّط '+aggN+' فقرة — أضعف مقياس هو الذي يستحقّ التدريب.</p>';
+  }
 
   rows.slice(0,5).forEach(function(r){
-    var m=r.meta, p=pct(m.correct||0, m.total||8);
+    var m=r.meta, p=pct(m.correct||0, m.total||20);
+    var bandsHtml="";
+    if(m.bands){
+      bandsHtml = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px">'+
+        SUBS.map(function(s){
+          var b=m.bands[s[0]];
+          if(typeof b!=="number") return "";
+          return '<span class="pill '+cls(Math.round(b/5*100))+'" style="min-width:auto;font-size:.78rem">'+
+                 s[1]+' '+b+'</span>';
+        }).join("")+'</div>';
+    }
     html += '<div style="border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:10px">'+
       '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800">'+
         '<span>'+esc(m.topic||"—")+'</span>'+
-        '<span class="pill '+cls(p)+'">'+p+'%</span>'+
+        '<span class="pill '+cls(p)+'">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+
       '</div>'+
-      '<p class="note" style="margin:4px 0 8px">'+saDate(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة</p>'+
+      '<p class="note" style="margin:4px 0 6px">'+saDate(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+
+        (m.cefr? ' · هدف '+esc(m.cefr) : '')+
+        (typeof m.pass==="boolean" ? (m.pass?' · ✅ اجتاز':' · ⚠️ لم يجتز') : '')+'</p>'+
+      bandsHtml+
       '<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:10px;padding:10px 12px;'+
         'font-size:.95rem;line-height:1.75;white-space:pre-wrap">'+esc(m.text)+'</div></div>';
   });

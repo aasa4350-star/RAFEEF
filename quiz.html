@@ -2393,8 +2393,11 @@ if(!STUDENTS[who]){
     writingBuilt = true;
     /* المستوى: متوسط (فقرة) لرفيف وحسن، ابتدائي (جملة) لسعود وأسامة */
     const level = (who==="hasan"||who==="rafeef") ? 2 : 1;
+    /* هدف CEFR حسب الصفّ — المنهج السعودي مبنيّ على CEFR:
+       نهاية السادس الابتدائي A1، ونهاية الثاني عشر B2+. */
+    const CEFR_BY_CHILD = { saud:"A1", osama:"A1", rafeef:"A2", hasan:"B1" };
     WritingEN.render(sec, {
-      who: who, name: S.name, level: level,
+      who: who, name: S.name, level: level, cefr: CEFR_BY_CHILD[who] || "A1",
       save: function(m){
         const payload = { student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0,
                           wrong:[], meta:Object.assign({ at:new Date().toISOString() }, m) };

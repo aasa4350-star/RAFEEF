@@ -218,29 +218,110 @@ var CONN2 = [
   ["Our library has thousands of books.","___ , it has a quiet room for studying.","In addition","However","Finally"]
 ];
 
-/* مواضيع الكتابة الحرّة */
+/* مواضيع الكتابة الحرّة.
+   points = نقاط المهمّة (Content في مقياس كامبردج): لكلّ نقطة سؤالٌ موجِّه
+   ومجموعةُ كلماتٍ نستدلّ بها على أنّ الطفل تناولها فعلًا. */
 var PROMPTS = {
   1: [
-    {t:"My family", h:"Who is in your family? What does each person like to do?", w:35},
-    {t:"My school day", h:"What do you do from the morning until you go home?", w:35},
-    {t:"My favourite food", h:"What is it? Who cooks it? Why do you like it?", w:30},
-    {t:"How I help at home", h:"What jobs do you do? When do you do them?", w:30},
-    {t:"My best friend", h:"What is his name? What do you do together?", w:30},
-    {t:"A day I enjoyed", h:"Where were you? What did you do? How did you feel?", w:35},
-    {t:"My favourite animal", h:"What does it look like? Where does it live? Why do you like it?", w:30},
-    {t:"My room", h:"What is in your room? What do you do there?", w:30}
+    {t:"My family", h:"Who is in your family? What do they like to do? How do you feel about them?", points:[
+      {q:"Name the people in your family", k:["father","dad","mother","mum","mom","brother","sister","parents","grandfather","grandmother","uncle","aunt","cousin","family"]},
+      {q:"Say what they like or do", k:["like","likes","love","loves","enjoy","enjoys","work","works","play","plays","read","reads","cook","cooks","teach","teaches","study","studies"]},
+      {q:"Say how you feel about them", k:["happy","proud","kind","best","lucky","love","great","because","favourite","favorite"]}
+    ]},
+    {t:"My school day", h:"When does your day start? What do you study? What do you do at break?", points:[
+      {q:"Say when your day starts or ends", k:["morning","clock","start","starts","begin","begins","wake","early","finish","finishes","end","ends","afternoon","seven","eight"]},
+      {q:"Name subjects or lessons", k:["english","maths","math","science","arabic","lesson","lessons","class","classes","subject","subjects","teacher","study","studies"]},
+      {q:"Say what you do at break or after school", k:["break","lunch","friends","play","playground","football","home","after","eat","talk"]}
+    ]},
+    {t:"My favourite food", h:"What is it? Who makes it? Why do you like it?", points:[
+      {q:"Name the food", k:["rice","chicken","kabsa","pizza","bread","dates","fish","meat","soup","salad","food","dish","burger","pasta","sandwich"]},
+      {q:"Say who cooks it and when", k:["mother","mum","mom","father","grandmother","cook","cooks","make","makes","friday","dinner","lunch","weekend"]},
+      {q:"Say why you like it", k:["because","delicious","tasty","sweet","favourite","favorite","love","like","best","good"]}
+    ]},
+    {t:"How I help at home", h:"What jobs do you do? When? How does your family feel?", points:[
+      {q:"Name the jobs you do", k:["clean","cleans","tidy","wash","washes","dishes","room","help","helps","water","cook","cooks","carry","sweep","table"]},
+      {q:"Say when you do them", k:["every","day","morning","evening","after","before","weekend","friday","always","sometimes","usually"]},
+      {q:"Say how your family feels", k:["happy","proud","thank","thanks","glad","pleased","because","smile"]}
+    ]},
+    {t:"My best friend", h:"What is his or her name? What do you do together? Why is he or she a good friend?", points:[
+      {q:"Give the name and something about them", k:["name","friend","he","she","his","her","old","years","class","school","neighbour","neighbor"]},
+      {q:"Say what you do together", k:["play","plays","together","football","study","studies","talk","walk","game","games","visit","ride"]},
+      {q:"Say why he or she is a good friend", k:["because","kind","funny","helps","help","honest","good","best","always","share","shares"]}
+    ]},
+    {t:"A day I enjoyed", h:"Where were you? What did you do? How did you feel?", points:[
+      {q:"Say where and when you were", k:["went","was","were","park","farm","beach","sea","house","home","yesterday","friday","weekend","last","holiday"]},
+      {q:"Say what you did", k:["played","ate","saw","visited","swam","ran","rode","watched","helped","walked","bought","took"]},
+      {q:"Say how you felt", k:["happy","fun","enjoyed","great","excited","tired","because","best","good"]}
+    ]},
+    {t:"My favourite animal", h:"What is it? Where does it live? Why do you like it?", points:[
+      {q:"Name the animal and describe it", k:["cat","dog","horse","camel","bird","lion","fish","rabbit","sheep","animal","big","small","brown","white","black","fast","strong"]},
+      {q:"Say where it lives or what it eats", k:["live","lives","desert","farm","house","water","sea","tree","eat","eats","grass","meat","food"]},
+      {q:"Say why you like it", k:["because","like","love","beautiful","friendly","kind","useful","favourite","favorite","best"]}
+    ]},
+    {t:"My room", h:"What is in your room? What do you do there? Why do you like it?", points:[
+      {q:"Say what is in the room", k:["bed","desk","chair","window","door","book","books","shelf","lamp","carpet","wall","picture","cupboard"]},
+      {q:"Say what you do there", k:["sleep","study","read","play","write","rest","listen","draw","homework"]},
+      {q:"Say why you like it", k:["because","quiet","clean","big","comfortable","like","love","favourite","favorite","best"]}
+    ]}
   ],
   2: [
-    {t:"The benefits of reading", h:"Give two benefits and an example for each.", w:70},
-    {t:"Should students use phones at school?", h:"Give your opinion, then two reasons, then a conclusion.", w:80},
-    {t:"A person I admire", h:"Who is it? Describe two qualities and give an example of each.", w:75},
-    {t:"How to stay healthy", h:"Explain three habits and why each one matters.", w:75},
-    {t:"A trip I will never forget", h:"Where, when, what happened, and how you felt at the end.", w:80},
-    {t:"The advantages and disadvantages of the internet", h:"Two advantages, one disadvantage, then your opinion.", w:85},
-    {t:"My plans for the future", h:"What do you want to study or become, and why?", w:70},
-    {t:"A problem in my city and how to solve it", h:"Describe the problem, its effect, and one solution.", w:80}
+    {t:"The benefits of reading", h:"Give two benefits, an example for each, and a short conclusion.", points:[
+      {q:"State the first benefit", k:["vocabulary","words","knowledge","learn","learns","imagination","concentration","focus","relax","understand"]},
+      {q:"Give an example or a second benefit", k:["for example","such as","like","story","stories","novel","book","books","history","science","also","another"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","so","think","believe","opinion","should","every","important"]}
+    ]},
+    {t:"Should students use phones at school?", h:"Give your opinion, two reasons, and a conclusion.", points:[
+      {q:"State your opinion clearly", k:["think","believe","opinion","should","should not","shouldn't","agree","disagree","view"]},
+      {q:"Give reasons or examples", k:["because","for example","reason","first","secondly","also","distract","distracts","learn","search","emergency","call","cheat"]},
+      {q:"Finish with a conclusion", k:["in conclusion","finally","therefore","so","overall","to sum up"]}
+    ]},
+    {t:"A person I admire", h:"Who is it? Describe two qualities with an example of each.", points:[
+      {q:"Say who the person is", k:["father","mother","teacher","brother","sister","grandfather","grandmother","friend","doctor","admire","person"]},
+      {q:"Describe qualities with examples", k:["kind","patient","honest","hard","working","generous","brave","clever","because","for example","always","helps","helped"]},
+      {q:"Say what you learned from them", k:["learn","learned","taught","teaches","lesson","want","try","follow","example","therefore","so"]}
+    ]},
+    {t:"How to stay healthy", h:"Explain three habits and why each one matters.", points:[
+      {q:"Mention food or diet", k:["food","eat","eats","vegetables","fruit","fruits","water","drink","sugar","healthy","diet","breakfast"]},
+      {q:"Mention exercise or sleep", k:["exercise","sport","walk","run","running","football","sleep","hours","rest","gym","active"]},
+      {q:"Explain why each habit matters", k:["because","therefore","so","helps","help","strong","energy","heart","mind","concentrate","illness","health"]}
+    ]},
+    {t:"A trip I will never forget", h:"Where and when, what happened, and how you felt at the end.", points:[
+      {q:"Say where and when you went", k:["went","travelled","traveled","last","summer","holiday","visited","city","farm","sea","mountain","desert","riyadh","jeddah","makkah"]},
+      {q:"Describe what happened, in order", k:["first","then","after","later","finally","next","we","arrived","saw","stayed","walked","ate","took"]},
+      {q:"Say how you felt at the end", k:["felt","feel","happy","tired","excited","unforgettable","never forget","memory","best","because"]}
+    ]},
+    {t:"The advantages and disadvantages of the internet", h:"Two advantages, one disadvantage, then your opinion.", points:[
+      {q:"Give advantages", k:["advantage","advantages","useful","learn","information","fast","communicate","search","study","helps","for example"]},
+      {q:"Give a disadvantage", k:["however","but","disadvantage","waste","time","dangerous","addicted","health","eyes","false","fake","bully"]},
+      {q:"Give your own opinion", k:["think","believe","opinion","should","in conclusion","overall","therefore","so","balance","careful"]}
+    ]},
+    {t:"My plans for the future", h:"What do you want to study or become, why, and what you are doing now.", points:[
+      {q:"Say what you want to become", k:["want","hope","plan","become","engineer","doctor","teacher","pilot","programmer","study","university","future","dream"]},
+      {q:"Explain your reason", k:["because","reason","help","people","interested","love","enjoy","important","country","therefore"]},
+      {q:"Say what you are doing now to prepare", k:["now","study","studying","practise","practice","read","reading","learn","learning","working","every day","improve"]}
+    ]},
+    {t:"A problem in my city and how to solve it", h:"Describe the problem, its effect, and one solution.", points:[
+      {q:"Describe the problem", k:["problem","traffic","crowded","litter","rubbish","noise","pollution","water","parking","roads","dust"]},
+      {q:"Explain its effect on people", k:["because","effect","affects","people","health","late","dangerous","difficult","hard","time","accident"]},
+      {q:"Suggest a solution", k:["solution","solve","should","could","government","build","more","recycle","fine","fines","bus","metro","plant","clean"]}
+    ]}
   ]
 };
+
+/* أهداف CEFR لكلّ طفل — المنهج السعودي مبنيّ على CEFR (نهاية السادس = A1).
+   يحدّد الطول المتوقّع وأدوات الربط المطلوبة في مقياس Organisation. */
+var CEFR = {
+  A1: {name:"A1", minWords:30, minSent:3, minConn:1, needSeq:false,
+       conn:["and","but","because","also"],
+       say:"جُمل بسيطة عن نفسك، مربوطة بـ and / but"},
+  A2: {name:"A2", minWords:60, minSent:5, minConn:2, needSeq:false,
+       conn:["and","but","because","so","then","after","before","also"],
+       say:"سلسلة جُمل مربوطة بأدوات بسيطة: and / but / because — وهو نصّ وصف CEFR للمستوى A2"},
+  B1: {name:"A2+ نحو B1", minWords:100, minSent:6, minConn:3, needSeq:true,
+       conn:["and","but","because","so","however","therefore","for example","in addition","first","then","finally","although","also"],
+       say:"نصّ مترابط: مقدّمة ثم أفكار مرتّبة ثم خاتمة، بأدوات ربط متنوّعة"}
+};
+
 
 /* ===================== مولّدات التدريب ===================== */
 
@@ -361,62 +442,137 @@ function genN(gens,n){
   return out;
 }
 
-/* ===================== مصحّح الكتابة الحرّة ===================== */
-
-var CONNECTORS_1 = ["and","but","because","so","then","also"];
-var CONNECTORS_2 = ["however","therefore","because","although","in addition","for example","finally","moreover","as a result","first","then"];
+/* ===================== مصحّح الكتابة الحرّة =====================
+   مبنيّ على مقاييس كامبردج الأربعة لتقييم الكتابة، كلٌّ منها من ٥ ووزنه ٢٥٪،
+   والدرجة ٣ هي حدّ النجاح — وهي المقاييس نفسها المستعملة في
+   A2 Key for Schools و B1 Preliminary for Schools:
+     Content                 هل غطّى نقاط المهمّة؟
+     Communicative Achievement  هل الأسلوب مناسب للقارئ والمهمّة؟
+     Organisation            هل النصّ مرتّب ومربوط؟
+     Language                الإملاء والترقيم والثروة اللغوية.
+   ومستوى التوقّع (الطول وأدوات الربط) يأتي من هدف CEFR للطفل. */
 
 function splitSentences(text){
   return String(text).split(/[.!?]+/).map(function(s){ return s.trim(); }).filter(function(s){ return s.length>0; });
 }
+function hasWord(t, w){
+  return new RegExp("(^|[^A-Za-z])"+w.replace(/ /g,"\\s+")+"([^A-Za-z]|$)","i").test(t);
+}
+/* من نسبة الفحوص المتحقّقة إلى نطاق كامبردج ٠–٥ */
+function band(passed, total){
+  if(!total) return 0;
+  return Math.max(0, Math.min(5, Math.round(passed/total*5)));
+}
 
-/* يُرجع {score, max, checks:[{ok,label,hint}]} — معايير واضحة لا رأي غامض */
-function gradeWriting(text, level, target){
+/* لغة الدردشة والاختصارات — تُخِلّ بـ«مناسبة الأسلوب للمهمّة» (Register) */
+var CHATSPEAK = ["u","ur","r","plz","pls","thx","gonna","wanna","gotta","lol","omg","bcz","bcoz","cuz","idk","btw","asap","4u","2u"];
+var SEQ_WORDS = ["first","firstly","then","next","after that","finally","lastly","in conclusion","to sum up"];
+
+function gradeWriting(text, level, targetOrCefr, prompt){
+  var cef = (typeof targetOrCefr==="object" && targetOrCefr) ? targetOrCefr
+          : (CEFR[targetOrCefr] || (level>=2 ? CEFR.A2 : CEFR.A1));
   var t=String(text||"").replace(/\s+/g," ").trim();
   var words=t? t.split(/\s+/).filter(function(w){ return /[A-Za-z]/.test(w); }) : [];
   var sents=splitSentences(t);
-  var low=t.toLowerCase();
-  var conns=(level>=2?CONNECTORS_2:CONNECTORS_1).filter(function(c){
-    return new RegExp("(^|[^a-z])"+c.replace(/ /g,"\\s+")+"([^a-z]|$)","i").test(t);
-  });
-  var minSent = level>=2 ? 5 : 3;
-  var minConn = level>=2 ? 2 : 1;
+  var any = words.length>0;
 
-  /* كلّ جملة تبدأ بحرفٍ كبير؟ */
+  /* ---------- 1) Content: نقاط المهمّة ---------- */
+  var pts = (prompt && prompt.points) || [];
+  var covered = pts.map(function(p){
+    return { q:p.q, ok: any && p.k.some(function(k){ return hasWord(t,k); }) };
+  });
+  var contentChecks = covered.map(function(c){
+    return {ok:c.ok, label:"غطّيت: "+c.q, hint:"أضف جملةً تجيب عن: "+c.q};
+  });
+  contentChecks.push({ok: words.length>=cef.minWords,
+    label:"الطول المطلوب لمستوى "+cef.name+": "+words.length+" من "+cef.minWords+" كلمة",
+    hint:"اكتب "+Math.max(0,cef.minWords-words.length)+" كلمة إضافية."});
+  contentChecks.push({ok: any && !/[؀-ۿ]/.test(t), label:"الفقرة كلّها بالإنجليزية",
+    hint:"فيها حروف عربية — اكتبها كاملة بالإنجليزية."});
+
+  /* ---------- 2) Organisation: الترتيب والربط ---------- */
+  var conns = cef.conn.filter(function(c){ return hasWord(t,c); });
+  var seq   = SEQ_WORDS.filter(function(c){ return hasWord(t,c); });
+  var orgChecks=[
+    {ok: sents.length>=cef.minSent, label:"عدد الجمل: "+sents.length+" من "+cef.minSent,
+     hint:"قسّم أفكارك: كلّ جملةٍ فكرةٌ واحدة."},
+    {ok: conns.length>=cef.minConn,
+     label:"أدوات الربط: "+conns.length+" من "+cef.minConn+(conns.length?" ("+conns.join(", ")+")":""),
+     hint:"اربط جُملك بـ "+cef.conn.slice(0,5).join(" / ")+"."},
+    {ok: any && sents.length>=2 && sents[0].split(/\s+/).length>=4,
+     label:"جملة أولى واضحة تُقدّم الموضوع", hint:"ابدأ بجملةٍ تُعرّف القارئ بموضوعك."}
+  ];
+  if(cef.needSeq){
+    orgChecks.push({ok: seq.length>=1, label:"ترتيب زمنيّ/منطقيّ ظاهر"+(seq.length?" ("+seq.join(", ")+")":""),
+      hint:"استعمل First / Then / Finally أو In conclusion لترتيب أفكارك."});
+    orgChecks.push({ok: sents.length>=3 && /(?:conclusion|to sum up|overall|finally|in short|think|believe|opinion)/i.test(sents[sents.length-1]||""),
+      label:"خاتمة أو رأي في آخر جملة",
+      hint:"أنهِ الفقرة برأيك أو خلاصتك (In conclusion… / I think…)."});
+  }
+
+  /* ---------- 3) Language: الصحّة والثروة ---------- */
   var badCap=[], i;
   for(i=0;i<sents.length;i++){
     var m=sents[i].match(/[A-Za-z]/);
     if(m && m[0]!==m[0].toUpperCase()) badCap.push(sents[i].slice(0,24));
   }
-  /* ضمير المتكلّم صغير؟ */
   var lowerI = /(^|[^A-Za-z])i([^A-Za-z]|$)/.test(t);
-  /* حروف عربية داخل النصّ الإنجليزي؟ */
-  var arabic = /[؀-ۿ]/.test(t);
-  /* تكرار كلمة واحدة بإفراط (خارج الكلمات الوظيفية) */
-  var STOP={the:1,a:1,an:1,and:1,to:1,of:1,in:1,is:1,are:1,was:1,were:1,i:1,my:1,it:1,he:1,she:1,we:1,they:1,you:1,that:1,this:1,for:1,on:1,at:1,with:1,but:1,so:1,because:1};
-  var freq={}, top="", topN=0;
-  words.forEach(function(w){ var k=w.toLowerCase().replace(/[^a-z]/g,""); if(!k||STOP[k]) return;
+  var STOP={the:1,a:1,an:1,and:1,to:1,of:1,in:1,is:1,are:1,was:1,were:1,i:1,my:1,it:1,he:1,she:1,we:1,they:1,you:1,that:1,this:1,for:1,on:1,at:1,with:1,but:1,so:1,because:1,have:1,has:1,do:1,does:1,very:1};
+  var freq={}, top="", topN=0, uniq={};
+  words.forEach(function(w){ var k=w.toLowerCase().replace(/[^a-z]/g,""); if(!k) return;
+    uniq[k]=1; if(STOP[k]) return;
     freq[k]=(freq[k]||0)+1; if(freq[k]>topN){ topN=freq[k]; top=k; } });
   var overused = words.length>=20 && topN>=Math.max(4, Math.round(words.length*0.12));
+  /* تنوّع المفردات: نسبة الكلمات المختلفة إلى مجموع الكلمات */
+  var ttr = words.length ? Object.keys(uniq).length/words.length : 0;
+  /* تنوّع أطوال الجمل: ألّا تكون كلّ الجمل بالطول نفسه تقريبًا */
+  var lens = sents.map(function(s){ return s.split(/\s+/).length; });
+  var avgLen = lens.length ? lens.reduce(function(a,b){return a+b;},0)/lens.length : 0;
+  var varied = lens.length<3 ? false : lens.some(function(L){ return Math.abs(L-avgLen)>=3; });
 
-  var checks=[
-    {ok: words.length>=target, label:"الطول: "+words.length+" كلمة من "+target,
-     hint:"اكتب "+(target-words.length>0?(target-words.length):0)+" كلمة إضافية على الأقل."},
-    {ok: sents.length>=minSent, label:"عدد الجمل: "+sents.length+" من "+minSent,
-     hint:"قسّم أفكارك إلى جملٍ أقصر، كلّ جملةٍ فكرة."},
-    /* الفحوص التالية لا تُحتسب ناجحةً على نصٍّ فارغ — لا معنى لنجاحٍ بلا كتابة */
-    {ok: words.length>0 && !arabic, label:"النصّ كلّه بالإنجليزية", hint:"فيه حروف عربية — اكتب الفقرة كاملة بالإنجليزية."},
+  var langChecks=[
     {ok: sents.length>0 && badCap.length===0, label:"كلّ جملة تبدأ بحرفٍ كبير",
      hint: badCap.length? ("ابدأ بحرفٍ كبير: «"+badCap[0]+"…»") : ""},
     {ok: !!t && /[.!?]$/.test(t), label:"النصّ ينتهي بعلامة ترقيم", hint:"أنهِ آخر جملة بنقطة."},
-    {ok: words.length>0 && !lowerI, label:"الضمير I مكتوب كبيرًا", hint:"اكتب I كبيرة دائمًا، لا i."},
-    {ok: conns.length>=minConn, label:"أدوات الربط: "+conns.length+" من "+minConn,
-     hint:"اربط أفكارك بـ "+(level>=2?"however / therefore / for example":"and / but / because / so")+"."},
-    {ok: words.length>0 && !overused, label:"لا تكرار مفرط لكلمة واحدة",
-     hint: overused? ("كرّرت «"+top+"» "+topN+" مرّات — نوّع كلماتك.") : ""}
+    {ok: any && !lowerI, label:"الضمير I مكتوب كبيرًا", hint:"اكتب I كبيرة دائمًا، لا i."},
+    {ok: any && !overused, label:"لا تكرار مفرط لكلمة واحدة",
+     hint: overused? ("كرّرت «"+top+"» "+topN+" مرّات — نوّع كلماتك.") : ""},
+    {ok: words.length>=15 && ttr>=0.55, label:"تنوّع المفردات: "+Math.round(ttr*100)+"%",
+     hint:"استعمل مرادفاتٍ وكلماتٍ أوسع بدل تكرار نفس الكلمة."},
+    {ok: varied, label:"تنوّع أطوال الجمل",
+     hint:"نوّع: جملة قصيرة ثمّ أطول — لا تجعلها كلّها بالطول نفسه."}
   ];
-  var got=checks.filter(function(c){ return c.ok; }).length;
-  return {score:got, max:checks.length, checks:checks, words:words.length, sents:sents.length, conns:conns};
+
+  /* ---------- 4) Communicative Achievement: مناسبة الأسلوب ---------- */
+  var chat = CHATSPEAK.filter(function(c){ return hasWord(t,c); });
+  var shouty = (t.match(/\b[A-Z]{4,}\b/g)||[]).length>0;
+  var comChecks=[
+    {ok: any && chat.length===0, label:"أسلوب كتابيّ لا لغة دردشة",
+     hint: chat.length? ("تجنّب: "+chat.join(", ")+" — اكتبها كاملة.") : ""},
+    {ok: any && !shouty, label:"بلا كلماتٍ بحروفٍ كبيرة كلّها", hint:"الحروف الكبيرة كلّها تُقرأ صياحًا."},
+    {ok: any && avgLen>=5, label:"جُملٌ كاملة لا كلماتٌ مبعثرة",
+     hint:"اكتب جُملًا كاملة فيها فاعلٌ وفعل."},
+    {ok: any && sents.length>0 && /[.!?]/.test(t), label:"الترقيم يفصل الأفكار",
+     hint:"استعمل النقاط لتفصل بين أفكارك."}
+  ];
+
+  function sub(nameAr, nameEn, checks){
+    var p=checks.filter(function(c){ return c.ok; }).length;
+    return {ar:nameAr, en:nameEn, passed:p, total:checks.length, band:band(p,checks.length), checks:checks};
+  }
+  var subs=[
+    sub("المحتوى","Content",contentChecks),
+    sub("الترتيب والربط","Organisation",orgChecks),
+    sub("اللغة","Language",langChecks),
+    sub("مناسبة الأسلوب","Communicative Achievement",comChecks)
+  ];
+  var totalBand = subs.reduce(function(a,s){ return a+s.band; },0);   /* من ٢٠ كنظام كامبردج */
+  var pass = subs.every(function(s){ return s.band>=3; });
+
+  return { subs:subs, total:totalBand, max:20, pass:pass, cefr:cef.name,
+           words:words.length, sents:sents.length, conns:conns,
+           /* توافق مع النداءات القديمة */
+           score:totalBand, checks:subs.reduce(function(a,s){ return a.concat(s.checks); },[]) };
 }
 
 /* ===================== الواجهة ===================== */
@@ -440,7 +596,14 @@ var CSS = ''+
 '.wbtn{width:100%;margin-top:10px;background:var(--accent);border:0;color:#fff;padding:13px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;font-size:1rem}'+
 '.wbtn.ghost{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}'+
 '.wmeter{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0}'+
-'.wmeter>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}';
+'.wmeter>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}'+
+'.wsub{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}'+
+'.wsub>summary{cursor:pointer;font-weight:800;display:flex;justify-content:space-between;gap:8px;align-items:center;list-style:none}'+
+'.wsub>summary::-webkit-details-marker{display:none}'+
+'.wband{min-width:64px;text-align:center;border-radius:9px;padding:2px 8px;font-weight:800;font-size:.86rem}'+
+'.wb-lo{background:var(--bad-bg);color:var(--bad)} .wb-ok{background:#fdf3e3;color:#b45309} .wb-hi{background:var(--good-bg);color:var(--good)}'+
+'@media (prefers-color-scheme:dark){.wb-ok{background:#3a2f14;color:#fbbf24}}'+
+'.wtag{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:.8rem;color:var(--muted);font-weight:700}';
 
 function injectCss(){
   if(document.getElementById("wen-css")) return;
@@ -451,6 +614,7 @@ function injectCss(){
 function render(el, ctx){
   injectCss();
   var level = ctx.level || 1;
+  var cef = CEFR[ctx.cefr] || (level>=2 ? CEFR.A2 : CEFR.A1);
   var prompts = PROMPTS[level] || PROMPTS[1];
   /* موضوع اليوم يتغيّر يوميًّا ولا يتغيّر بإعادة التحميل في اليوم نفسه */
   var dayIdx = Math.floor((Date.now()+3*3600*1000)/86400000);
@@ -461,14 +625,19 @@ function render(el, ctx){
     '<div class="wsec"><b>✍️ التعبير</b> — '+
       (level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'
                 : 'بناء الجملة: الترتيب، الحرف الكبير، النقطة، وأدوات الربط.')+
-      '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح، ثمّ اكتب فقرتك — وتُحفظ لوالدك ليقرأها.</span></div>'+
+      '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح، ثمّ اكتب فقرتك — وتُحفظ لوالدك ليقرأها.</span>'+
+      '<div style="margin-top:8px"><span class="wtag">📐 التقييم بمقاييس كامبردج الأربعة</span> '+
+      '<span class="wtag">🎯 مستواك المستهدف: '+cef.name+'</span></div></div>'+
     '<div class="wsec"><b>الجزء الأول — تدريب</b><div id="wquiz"></div>'+
       '<div style="text-align:center;font-weight:800;margin-top:10px"><span id="wscore">0 / '+items.length+'</span></div>'+
       '<button class="wbtn ghost" id="wnew">تدريب جديد 🔄</button></div>'+
     '<div class="wsec"><b>الجزء الثاني — اكتب فقرتك</b>'+
       '<div style="margin:8px 0 4px;font-size:1.05rem"><b>'+en(prompts[pIdx].t)+'</b></div>'+
-      '<div style="color:var(--muted);font-size:.92rem;margin-bottom:8px">'+en(prompts[pIdx].h)+
-        ' — المطلوب '+prompts[pIdx].w+' كلمة على الأقل.</div>'+
+      '<div style="color:var(--muted);font-size:.92rem;margin-bottom:6px">'+en(prompts[pIdx].h)+'</div>'+
+      '<div style="background:var(--bg);border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:.9rem">'+
+        '<b>نقاط المهمّة</b> — غطِّها كلّها لترفع درجة <i>Content</i>:<ol style="margin:5px 0 0;padding-inline-start:18px">'+
+        (prompts[pIdx].points||[]).map(function(pp){ return '<li>'+en(pp.q)+'</li>'; }).join('')+
+        '</ol><div style="color:var(--muted);margin-top:6px">الطول المطلوب لمستوى '+cef.name+': <b>'+cef.minWords+'</b> كلمة على الأقل — '+cef.say+'.</div></div>'+
       '<textarea id="wtext" dir="ltr" placeholder="Write your paragraph here..." spellcheck="true"></textarea>'+
       '<div class="wmeter"><i id="wbar"></i></div>'+
       '<div id="wlive" style="font-size:.9rem;color:var(--muted)">0 كلمة · 0 جملة</div>'+
@@ -520,28 +689,52 @@ function render(el, ctx){
     var w=t? t.split(/\s+/).filter(function(x){ return /[A-Za-z]/.test(x); }).length : 0;
     var s=splitSentences(t).length;
     live.textContent=w+" كلمة · "+s+" جملة";
-    bar.style.width=Math.min(100, Math.round(w/prompts[pIdx].w*100))+"%";
+    bar.style.width=Math.min(100, Math.round(w/cef.minWords*100))+"%";
     try{ localStorage.setItem(draftKey, ta.value); }catch(e){}
   }
   ta.addEventListener("input", refresh); refresh();
 
   el.querySelector("#wcheck").addEventListener("click", function(){
-    var g=gradeWriting(ta.value, level, prompts[pIdx].w);
+    var g=gradeWriting(ta.value, level, cef, prompts[pIdx]);
     var feed=el.querySelector("#wfeed");
     if(g.words===0){ feed.innerHTML='<div style="color:var(--bad);font-weight:700;margin-top:10px">اكتب فقرتك أولًا ✍️</div>'; return; }
-    var pct=Math.round(g.score/g.max*100);
-    var h='<div style="margin-top:12px;font-weight:800">النتيجة: '+g.score+' / '+g.max+' ('+pct+'%)</div><ul class="wchk">';
-    g.checks.forEach(function(c){
-      h+='<li>'+(c.ok?'✅':'⚠️')+' '+c.label+(!c.ok&&c.hint?'<span class="h">'+c.hint+'</span>':'')+'</li>';
+
+    var bcls=function(b){ return b>=4?"wb-hi":(b>=3?"wb-ok":"wb-lo"); };
+    var h='<div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">'+
+            '<b style="font-size:1.05rem">النتيجة: '+g.total+' / 20</b>'+
+            '<span class="wband '+(g.pass?"wb-hi":"wb-lo")+'">'+(g.pass?"✅ اجتزت":"⚠️ لم تجتز")+'</span>'+
+          '</div>'+
+          '<p style="color:var(--muted);font-size:.86rem;margin:4px 0 0">'+
+            'أربعة مقاييس، كلٌّ من 5 ووزنه 25٪ — والنجاح أن تبلغ <b>3</b> في كلٍّ منها (نظام كامبردج).</p>';
+
+    g.subs.forEach(function(s){
+      var open = s.band<3 ? " open" : "";
+      h+='<details class="wsub"'+open+'><summary><span>'+s.ar+' <span style="color:var(--muted);font-weight:600;font-size:.85rem">'+s.en+'</span></span>'+
+         '<span class="wband '+bcls(s.band)+'">'+s.band+' / 5</span></summary><ul class="wchk">';
+      s.checks.forEach(function(c){
+        h+='<li>'+(c.ok?'✅':'⚠️')+' '+c.label+(!c.ok&&c.hint?'<span class="h">'+c.hint+'</span>':'')+'</li>';
+      });
+      h+='</ul></details>';
     });
-    h+='</ul>';
-    if(g.score===g.max) h+='<div style="margin-top:8px;color:var(--good);font-weight:800">ممتاز! فقرتك مستوفية كلّ المعايير 🎉</div>';
-    else h+='<div style="margin-top:8px;color:var(--muted);font-size:.9rem">صحّح الملاحظات أعلاه ثمّ اضغط «قيّم كتابتي» مرّة ثانية.</div>';
+
+    /* أضعف مقياس أوّلًا — نقطة واحدة يشتغل عليها الآن */
+    var weakest=g.subs.slice().sort(function(a,b){ return a.band-b.band; })[0];
+    if(weakest.band<5){
+      var firstMiss=weakest.checks.filter(function(c){ return !c.ok; })[0];
+      h+='<div style="margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">'+
+         '👈 <b>ابدأ من هنا:</b> أضعف مقياس عندك هو <b>'+weakest.ar+'</b>'+
+         (firstMiss? ' — '+(firstMiss.hint||firstMiss.label) : '')+'</div>';
+    } else {
+      h+='<div style="margin-top:10px;color:var(--good);font-weight:800">ممتاز! خمسة من خمسة في المقاييس الأربعة 🎉</div>';
+    }
     feed.innerHTML=h;
-    ctx.save({ kind:"writing", correct:g.score, total:g.max, level:level,
-               topic:prompts[pIdx].t, words:g.words, sents:g.sents, text:ta.value.slice(0,1500) });
+
+    var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
+    ctx.save({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
+               bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
+               text:ta.value.slice(0,1500) });
   });
 }
 
-window.WritingEN = { render:render, grade:gradeWriting, _gens:GENS, _genN:genN };
+window.WritingEN = { render:render, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN };
 })();
