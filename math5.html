@@ -86,6 +86,8 @@ function numOpts(correct, cands){
   for(var i=0;i<cands.length && others.length<2;i++){ var v=cands[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
   var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
 }
+// يولّد n سؤالًا بلا تكرار (يتجاهل المولّد الذي يرمي استثناء ويعيد المحاولة)
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
 
 /* ===== منهج الصف الخامس — الكسور العشرية (من فهرس الكتاب) =====
@@ -266,10 +268,209 @@ function gMulWord(){
           o[0],o[1],"«في كلّ» تدلّ على الضرب: "+box+" × "+per+" = "+fmt(res)+"."];
 }
 
+/* ---------- الفصل ٤: القسمة ---------- */
+
+// أنماط القسمة على مضاعفات العشرة (ذهنيًّا)
+function gDivPattern(){
+  var a=ri(2,9), z=gp([10,100,1000]), dividend=a*z;
+  var o=numOpts(a,[a*10, a*100, a+1]);
+  return ["احسب ذهنيًّا: "+mn(fmt(dividend)+" ÷ "+z),o[0],o[1],
+          "نحذف أصفار "+z+" من "+fmt(dividend)+" ← "+fmt(dividend)+" ÷ "+z+" = "+a+"."];
+}
+
+// تقدير ناتج القسمة (أعداد متوافقة)
+function gDivEstimate(){
+  var b=ri(3,9), q=ri(20,90);
+  var r=ri(1, Math.floor((b-1)/2));      // الباقي أقل من نصف المقسوم عليه ← b×q هو الأقرب دائمًا
+  var a=b*q+r, est=q;
+  var o=numOpts(est,[est+10,est-10,est+2]);
+  return ["قدّر ناتج: "+mn(fmt(a)+" ÷ "+b)+" باستعمال أقرب عددين متوافقين:",
+          o[0],o[1],"أقرب عدد لـ"+fmt(a)+" يقبل القسمة على "+b+" هو "+fmt(b*q)+"، و"+fmt(b*q)+" ÷ "+b+" = "+est+"."];
+}
+
+// القسمة على عدد من رقم واحد (بلا باقٍ)
+function gDiv1(){
+  var b=ri(3,9), q=ri(21,199), a=b*q;
+  var o=numOpts(q,[q+1,q-1,q+10]);
+  return ["احسب: "+mn(fmt(a)+" ÷ "+b),o[0],o[1],fmt(a)+" ÷ "+b+" = "+fmt(q)+"."];
+}
+
+// باقي القسمة
+function gDivRemainder(){
+  var b=ri(3,9), q=ri(11,99), r=ri(1,b-1), a=b*q+r;
+  var o=numOpts(r,[r+1,r-1,b]);
+  return ["ما باقي القسمة في: "+mn(fmt(a)+" ÷ "+b)+"؟",o[0],o[1],
+          fmt(a)+" = ("+b+" × "+fmt(q)+") + "+r+"، فالباقي "+r+"."];
+}
+
+// القسمة على عدد من رقمين
+function gDiv2(){
+  var b=ri(12,39), q=ri(6,40), a=b*q;
+  var o=numOpts(q,[q+1,q-1,q+10]);
+  return ["احسب: "+mn(fmt(a)+" ÷ "+b),o[0],o[1],fmt(a)+" ÷ "+b+" = "+fmt(q)+"."];
+}
+
+// مسألة قسمة كلامية (التوزيع بالتساوي)
+function gDivWord(){
+  var b=ri(4,12), q=ri(5,25), a=b*q;
+  var item=gp(["حبّة","قطعة","كتابًا","قلمًا","بطاقة"]);
+  var o=numOpts(q,[a-b, q+1, b]);
+  return ["وُزِّعت "+mn(fmt(a))+" "+item+" بالتساوي على "+mn(String(b))+" طلاب. كم نصيب كلّ طالب؟",
+          o[0],o[1],"«بالتساوي على» تدلّ على القسمة: "+fmt(a)+" ÷ "+b+" = "+fmt(q)+"."];
+}
+
+/* ---------- الفصل ٥: العبارات الجبرية والمعادلات ---------- */
+
+// كتابة عبارة جبرية (جمع/طرح)
+function gExprAddSub(){
+  var n=ri(2,15), op=gp(["زاد","نقص"]);
+  var correct = op==="زاد" ? ("س + "+n) : ("س − "+n);
+  var w1 = op==="زاد" ? ("س − "+n) : ("س + "+n);
+  var w2 = op==="زاد" ? (n+" − س") : (n+" + س");
+  var arr=[correct,w1,w2]; shuffle(arr);
+  var txt = op==="زاد" ? ("عدد زاد بمقدار "+n) : ("عدد نقص بمقدار "+n);
+  return ["اكتب عبارة جبرية تُعبّر عن: "+txt,arr,arr.indexOf(correct),
+          "نرمز للعدد المجهول بـ«س»، و«"+op+"» تعني "+(op==="زاد"?"الجمع":"الطرح")+"."];
+}
+
+// كتابة عبارة جبرية (ضرب/قسمة)
+function gExprMulDiv(){
+  var n=ri(2,9), op=gp(["أضعاف","قُسِّم"]);
+  var correct = op==="أضعاف" ? (n+" × س") : ("س ÷ "+n);
+  var w1 = op==="أضعاف" ? ("س ÷ "+n) : (n+" × س");
+  var w2 = op==="أضعاف" ? ("س + "+n) : ("س − "+n);
+  var arr=[correct,w1,w2]; shuffle(arr);
+  var txt = op==="أضعاف" ? (n+" أضعاف عدد") : ("عدد قُسِّم على "+n);
+  return ["اكتب عبارة جبرية تُعبّر عن: "+txt,arr,arr.indexOf(correct),
+          op==="أضعاف" ? ("«أضعاف» تعني الضرب: "+n+" × س.") : ("«قُسِّم على» تعني القسمة: س ÷ "+n+".")];
+}
+
+// حلّ معادلة جمع/طرح
+function gEqAddSub(){
+  var n=ri(2,25), plus=Math.random()<0.5;
+  var x = plus ? ri(3,40) : ri(n+1, n+40);      // في الطرح نضمن ناتجًا موجبًا
+  var rhs = plus ? x+n : x-n;
+  var eq = plus ? ("س + "+n+" = "+rhs) : ("س − "+n+" = "+rhs);
+  var o=numOpts(x,[rhs+n,Math.abs(rhs-n),x+1]);
+  return ["حُلّ المعادلة: "+mn(eq),o[0],o[1],
+          plus ? ("نطرح "+n+" من الطرفين: س = "+rhs+" − "+n+" = "+x+".")
+               : ("نجمع "+n+" للطرفين: س = "+rhs+" + "+n+" = "+x+".")];
+}
+
+// حلّ معادلة ضرب/قسمة
+function gEqMulDiv(){
+  var n=ri(2,9), mul=Math.random()<0.5, x, rhs, eq, expl;
+  if(mul){
+    x=ri(2,20); rhs=x*n; eq=n+" × س = "+rhs;
+    expl="نقسم الطرفين على "+n+": س = "+rhs+" ÷ "+n+" = "+x+".";
+  } else {
+    rhs=ri(2,20); x=rhs*n; eq="س ÷ "+n+" = "+rhs;
+    expl="نضرب الطرفين في "+n+": س = "+rhs+" × "+n+" = "+x+".";
+  }
+  var o=numOpts(x,[rhs,x+n,x*n]);
+  return ["حُلّ المعادلة: "+mn(eq),o[0],o[1],expl];
+}
+
+// ترتيب العمليات
+function gOrderOps(){
+  var a=ri(2,9), b=ri(2,9), c=ri(2,9);
+  var mode=gp(["mulAdd","addMul","paren"]);
+  var expr, val, trap;
+  if(mode==="mulAdd"){ expr=a+" × "+b+" + "+c; val=a*b+c; trap=a*(b+c); }
+  else if(mode==="addMul"){ expr=a+" + "+b+" × "+c; val=a+b*c; trap=(a+b)*c; }
+  else { expr="("+a+" + "+b+") × "+c; val=(a+b)*c; trap=a+b*c; }
+  var o=numOpts(val,[trap, val+c, val+a]);
+  return ["احسب مع مراعاة ترتيب العمليات: "+mn(expr),o[0],o[1],
+          "نبدأ بالأقواس، ثم الضرب والقسمة، ثم الجمع والطرح ← "+mn(expr)+" = "+val+"."];
+}
+
+// جدول دالة: إيجاد القاعدة
+function gFuncTable(){
+  var m=ri(2,6), b=ri(0,9);
+  var xs=[1,2,3];
+  var ys=xs.map(function(x){ return m*x+b; });
+  var correct = b===0 ? ("س × "+m) : ("(س × "+m+") + "+b);
+  var w1 = b===0 ? ("س + "+m) : ("(س × "+m+") − "+b);
+  var w2 = b===0 ? ("س − "+m) : ("س + "+(m+b));
+  var arr=[correct,w1,w2]; shuffle(arr);
+  return ["في جدول الدالة: عندما "+mn("س = "+xs.join(" ، "))+" تكون "+mn("ص = "+ys.join(" ، "))+". ما القاعدة؟",
+          arr,arr.indexOf(correct),
+          "كلّما زادت س واحدًا زادت ص "+m+"، وعند س = 1 تكون ص = "+ys[0]+" ← "+correct+"."];
+}
+
+/* ---------- الفصل ٦: الكسور الاعتيادية ---------- */
+
+function gcd(a,b){ while(b){ var t=b; b=a%b; a=t; } return a; }
+
+// القسمة والكسور: تبسيط الكسر
+function gFracSimplify(){
+  var k=ri(2,6), n=ri(1,8), d=n+ri(1,7);
+  var N=n*k, D=d*k;
+  var g=gcd(N,D), sn=N/g, sd=D/g;
+  var correct=sn+"/"+sd;
+  var arr=[correct, N+"/"+D, (sn+1)+"/"+sd];
+  shuffle(arr);
+  return ["بسّط الكسر "+mn(N+"/"+D)+" إلى أبسط صورة:",arr,arr.indexOf(correct),
+          "القاسم المشترك الأكبر لـ"+N+" و"+D+" هو "+g+"، فنقسم الطرفين عليه ← "+correct+"."];
+}
+
+// تحويل كسر غير عادي إلى عدد كسري
+function gImproperToMixed(){
+  var d=ri(2,9), w=ri(1,6), r=ri(1,d-1), N=w*d+r;
+  var correct=w+" و "+r+"/"+d;
+  var w1=(w+1)+" و "+r+"/"+d;
+  var w2=w+" و "+(r+1)+"/"+d;
+  var arr=[correct,w1,w2]; shuffle(arr);
+  return ["حوّل الكسر غير العادي "+mn(N+"/"+d)+" إلى عدد كسري:",arr,arr.indexOf(correct),
+          N+" ÷ "+d+" = "+w+" والباقي "+r+"، فالناتج "+correct+"."];
+}
+
+// تحويل عدد كسري إلى كسر غير عادي
+function gMixedToImproper(){
+  var d=ri(2,9), w=ri(1,6), r=ri(1,d-1), N=w*d+r;
+  var correct=N+"/"+d;
+  var arr=[correct,(N+1)+"/"+d,(w+r)+"/"+d]; shuffle(arr);
+  return ["حوّل العدد الكسري "+mn(w+" و "+r+"/"+d)+" إلى كسر غير عادي:",arr,arr.indexOf(correct),
+          "("+w+" × "+d+") + "+r+" = "+N+"، والمقام لا يتغيّر ← "+correct+"."];
+}
+
+// مقارنة كسرين
+function gFracCompare(){
+  var d=gp([4,6,8,10,12]);
+  if(Math.random()<0.25){                        // حالة التساوي: كسران متكافئان
+    var k=gp([2,3]), a0=ri(1,d-1);
+    return ["قارن: "+mn(a0+"/"+d)+" ___ "+mn((a0*k)+"/"+(d*k)),
+            ["<",">","="],2,
+            "بضرب طرفَي "+a0+"/"+d+" في "+k+" نحصل على "+(a0*k)+"/"+(d*k)+"، فهما متكافئان."];
+  }
+  var a=ri(1,d-1), b=ri(1,d-1);
+  if(a===b) b=(b%(d-1))+1;
+  var correct = a>b ? ">" : "<";
+  var arr=[">","<","="];
+  return ["قارن: "+mn(a+"/"+d)+" ___ "+mn(b+"/"+d),arr,arr.indexOf(correct),
+          "المقامان متساويان، فنقارن البسطين: "+a+(a>b?" > ":" < ")+b+"."];
+}
+
+// تقريب الكسر إلى ٠ أو ½ أو ١
+function gFracRound(){
+  var d,n,v,t=0;
+  do{ d=gp([4,6,8,10,12]); n=ri(1,d-1); v=n/d; t++; }
+  while((v===0.25||v===0.75) && t<40);            // نتجنّب الحالتين المتساويتَي البُعد
+  if(v===0.25||v===0.75) throw 0;
+  var correct = v<0.25 ? "0" : (v<0.75 ? "1/2" : "1");
+  var arr=["0","1/2","1"];
+  return ["قرّب الكسر "+mn(n+"/"+d)+" إلى أقرب: "+mn("0")+" أو "+mn("1/2")+" أو "+mn("1"),
+          arr,arr.indexOf(correct),
+          n+"/"+d+" ≈ "+(Math.round(v*100)/100)+"، فأقرب قيمة هي "+correct+"."];
+}
+
 var F1 = [gDecPlace,gDecPlaceName,gDecCompare,gDecOrder,gFracToDec,gDecWords];
 var F2 = [gDecAdd,gDecSub,gDecRoundWhole,gDecRoundTenth,gDecEstimate];
 var F3 = [gDistProp,gMulPattern,gMulEstimate,gMul1,gMul2,gMulWord];
-var ALL = F1.concat(F2).concat(F3);
+var F4 = [gDivPattern,gDivEstimate,gDiv1,gDivRemainder,gDiv2,gDivWord];
+var F5 = [gExprAddSub,gExprMulDiv,gEqAddSub,gEqMulDiv,gOrderOps,gFuncTable];
+var F6 = [gFracSimplify,gImproperToMixed,gMixedToImproper,gFracCompare,gFracRound];
+var ALL = F1.concat(F2).concat(F3).concat(F4).concat(F5).concat(F6);
 
 var app = document.getElementById("app");
 if(!NAMES[who]){
@@ -278,26 +479,35 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="lughati.html?who='+who+'">📗 لغتي</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الرياضيات — الخامس الابتدائي (الفصل الأول)</div>'+
+    '<div class="unit">📘 مطابق لكتاب الرياضيات — الخامس الابتدائي</div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
       '<button data-tab="f1" aria-selected="false">1) الكسور العشرية</button>'+
       '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
       '<button data-tab="f3" aria-selected="false">3) الضرب</button>'+
+      '<button data-tab="f4" aria-selected="false">4) القسمة</button>'+
+      '<button data-tab="f5" aria-selected="false">5) العبارات والمعادلات</button>'+
+      '<button data-tab="f6" aria-selected="false">6) الكسور الاعتيادية</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel active" id="all"></section>'+
     '<section class="panel" id="f1"></section>'+
     '<section class="panel" id="f2"></section>'+
     '<section class="panel" id="f3"></section>'+
+    '<section class="panel" id="f4"></section>'+
+    '<section class="panel" id="f5"></section>'+
+    '<section class="panel" id="f6"></section>'+
     '<section class="panel" id="rem"></section>'+
-    '<footer>الرياضيات · الصف الرابع · الفصل الأول · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
+    '<footer>الرياضيات · الصف الخامس الابتدائي · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
 
   var CFG = {
-    all: {gens:ALL, n:15, intro:"اختبار شامل: الكسور العشرية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
+    all: {gens:ALL, n:15, intro:"اختبار شامل على الفصول الستة — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
     f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — الكسور العشرية:</b> منازل الكسر العشري، القراءة، المقارنة والترتيب، وتحويل الكسر الاعتيادي إلى عشري.", label:"رياضيات ف1 — الكسور العشرية"},
     f2:  {gens:F2,  n:10, intro:"<b>الفصل 2 — الجمع والطرح:</b> جمع وطرح الكسور العشرية، والتقريب، وتقدير النواتج.", label:"رياضيات ف2 — جمع وطرح عشري"},
-    f3:  {gens:F3,  n:10, intro:"<b>الفصل 3 — الضرب:</b> أنماط الضرب، خاصية التوزيع، تقدير النواتج، والضرب في رقم ورقمين.", label:"رياضيات ف3 — الضرب"}
+    f3:  {gens:F3,  n:10, intro:"<b>الفصل 3 — الضرب:</b> أنماط الضرب، خاصية التوزيع، تقدير النواتج، والضرب في رقم ورقمين.", label:"رياضيات ف3 — الضرب"},
+    f4:  {gens:F4,  n:10, intro:"<b>الفصل 4 — القسمة:</b> أنماط القسمة، التقدير بالأعداد المتوافقة، القسمة على رقم ورقمين، وباقي القسمة.", label:"رياضيات ف4 — القسمة"},
+    f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — العبارات الجبرية والمعادلات:</b> كتابة العبارات، حلّ المعادلات، ترتيب العمليات، وجداول الدوال.", label:"رياضيات ف5 — العبارات والمعادلات"},
+    f6:  {gens:F6,  n:10, intro:"<b>الفصل 6 — الكسور الاعتيادية:</b> التبسيط، الأعداد الكسرية، الكسور غير العادية، المقارنة والتقريب.", label:"رياضيات ف6 — الكسور الاعتيادية"}
   };
 
   function render(id){
@@ -337,13 +547,13 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="math5", REM_LABEL="الرياضيات";
   var REMTOPICS=[
-    {id:"f1", name:"1) القيمة المنزلية", tip:"القيمة المنزلية = الرقم × قيمة منزلته. تذكّر ترتيب المنازل: آحاد، عشرات، مئات، ألوف… وقارن الأعداد من أعلى منزلة.", yt:"شرح القيمة المنزلية رابع ابتدائي رياضيات"},
-    {id:"f2", name:"2) الجمع والطرح", tip:"في التقدير قرّب كل عدد لأقرب ألف ثم اجمع/اطرح. وخصائص الجمع: الإبدال، التجميع، والعنصر المحايد (0).", yt:"شرح الجمع والطرح رابع ابتدائي رياضيات"},
-    {id:"f3", name:"3) البيانات", tip:"الحدث المؤكّد يحدث دائمًا، والمستحيل لا يحدث، والممكن قد يحدث. والتمثيل بالخطوط للتغيّر عبر الزمن.", yt:"شرح تمثيل البيانات رابع ابتدائي رياضيات"},
-    {id:"f4", name:"4) الأنماط والجبر", tip:"اكتشف قاعدة النمط (نزيد/نضرب بمقدار ثابت). ولإيجاد المجهول اعكس العملية (⬚+7=17 ← 17−7).", yt:"شرح الأنماط والجبر رابع ابتدائي رياضيات"},
-    {id:"f5", name:"5) الضرب × رقم", tip:"للضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار. وللتقدير قرّب لأقرب عشرة.", yt:"شرح الضرب في عدد من رقم واحد رابع ابتدائي"},
-    {id:"f6", name:"6) الضرب × رقمين", tip:"قدّر بتقريب كل عدد لأقرب عشرة. ثم اضرب خطوة خطوة (الآحاد ثم العشرات).", yt:"شرح الضرب في عدد من رقمين رابع ابتدائي"},
-    {id:"fw", name:"مسائل كلامية 🧠", tip:"لا تبدأ بالحساب — ابدأ بالسؤال: أيّ عمليّة؟ ابحث عن الكلمة الدالّة: «في كلّ» ⟵ ضرب · «بالتساوي على» ⟵ قسمة · «بقي / بكم يزيد» ⟵ طرح · «أُضيف / صار» ⟵ جمع. ثم احسب.", yt:"شرح حل المسائل الكلامية رابع ابتدائي رياضيات"}
+    {id:"f1", name:"1) الكسور العشرية", tip:"بعد الفاصلة: أول منزلة «أجزاء من عشرة» (0.1)، والثانية «أجزاء من مئة» (0.01). وللمقارنة قارن المنازل من اليسار: الآحاد ثم الأعشار ثم الأجزاء من مئة.", yt:"شرح القيمة المنزلية للكسور العشرية خامس ابتدائي"},
+    {id:"f2", name:"2) الجمع والطرح", tip:"رتّب الفاصلة تحت الفاصلة قبل ما تجمع أو تطرح، وأكمل الفراغات بأصفار. وللتقريب انظر للمنزلة التي بعد المطلوبة: 5 فأكثر ⟵ زِد واحدًا، أقل من 5 ⟵ اترك العدد.", yt:"شرح جمع وطرح الكسور العشرية خامس ابتدائي"},
+    {id:"f3", name:"3) الضرب", tip:"خاصية التوزيع: فكّك العدد لعشرات وآحاد ثم اضرب كلًّا على حدة واجمع، مثل 7×24 = (7×20)+(7×4). وللضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار.", yt:"شرح خاصية التوزيع والضرب خامس ابتدائي رياضيات"},
+    {id:"f4", name:"4) القسمة", tip:"للتقدير استعمل «الأعداد المتوافقة»: غيّر المقسوم لأقرب عدد يقبل القسمة بسهولة، مثل 187 ÷ 9 ← 180 ÷ 9 = 20. وباقي القسمة دائمًا أصغر من المقسوم عليه.", yt:"شرح القسمة وتقدير ناتج القسمة خامس ابتدائي"},
+    {id:"f5", name:"5) العبارات والمعادلات", tip:"ترتيب العمليات: الأقواس ⟵ الضرب والقسمة ⟵ الجمع والطرح. ولحلّ المعادلة اعكس العملية على الطرفين: س + 7 = 19 ← س = 19 − 7.", yt:"شرح العبارات الجبرية والمعادلات خامس ابتدائي"},
+    {id:"f6", name:"6) الكسور الاعتيادية", tip:"للتبسيط اقسم البسط والمقام على القاسم المشترك الأكبر. ولتحويل عدد كسري لكسر غير عادي: (العدد الصحيح × المقام) + البسط، والمقام ما يتغيّر.", yt:"شرح تبسيط الكسور والأعداد الكسرية خامس ابتدائي"},
+    {id:"fw", name:"مسائل كلامية 🧠", tip:"لا تبدأ بالحساب — ابدأ بالسؤال: أيّ عمليّة؟ ابحث عن الكلمة الدالّة: «في كلّ» ⟵ ضرب · «بالتساوي على» ⟵ قسمة · «بقي / بكم يزيد» ⟵ طرح · «أُضيف / صار» ⟵ جمع. ثم احسب.", yt:"شرح حل المسائل الكلامية خامس ابتدائي رياضيات"}
   ];
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
