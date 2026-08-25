@@ -1378,7 +1378,15 @@ if(!STUDENTS[who]){
      الحلّ: نحفظ السؤال الذي أخطأ فيه كاملًا، ونحجز له مقعدين في الجلسة
      التالية. وإذا أصابه مرّتين متتاليتين خرج من القائمة.
      ونُعيد ترتيب الخيارات في كلّ عودة كي يحفظ المعنى لا موضع الزرّ. */
-  var MISS_K = "misses_v1_" + who, MISS_MAX = 120, MISS_AGE = 120*864e5, MISS_SEATS = 2, MISS_RETIRE = 2;
+  /* مقعدان لكل قسم لم يكونا يكفيان: قياسٌ على بيانات حسن الحقيقية أظهر أنّه
+     يُدخل الصندوق ~10.5 سؤالًا في اليوم بينما يتقاعد منه ~2 — فينمو ولا يفرغ،
+     وبقي «احسب 2⁵ ÷ 2²» شهرًا كاملًا لم يُعَد عليه ولو مرّة.
+     الحلّ: مقاعد ساخنة مضمونة للأسئلة التي أخطأ فيها مرّتين فأكثر، لا تنتظر
+     دورها خلف الطابور أبدًا، ومقاعد عادية تتّسع بحسب حجم المتراكم. */
+  var MISS_K = "misses_v1_" + who, MISS_MAX = 120, MISS_AGE = 120*864e5, MISS_RETIRE = 2;
+  var MISS_HOT = 2;        // مقاعد مضمونة للمتكرّر (n ≥ 2)
+  var MISS_SEATS_MIN = 3;  // أدنى عدد مقاعد في الجولة
+  var MISS_SEATS_MAX = 5;  // أقصى عدد، حتى يبقى في الجولة أسئلةٌ جديدة
   function missRead(){
     try{ var o = JSON.parse(localStorage.getItem(MISS_K) || "{}"); return (o && typeof o === "object" && !Array.isArray(o)) ? o : {}; }
     catch(e){ return {}; }
@@ -1419,11 +1427,35 @@ if(!STUDENTS[who]){
     out.rev = 1;                       /* علامة: سبق أن أخطأ فيه */
     return out;
   }
+  /* كل أخطاء قسمٍ ما، مقسومةً إلى «ساخن» (تكرّر الخطأ فيه) و«بارد» (مرّة واحدة) */
+  function missSplit(id){
+    var o = missRead(), hot = [], cold = [];
+    Object.keys(o).forEach(function(k){
+      var e = o[k]; if(!(e && e.sub === id && e.q && e.q[1])) return;
+      ((e.n||0) >= 2 ? hot : cold).push(e);
+    });
+    var urgent = function(a,b){ return (b.n - a.n) || ((a.at||0) - (b.at||0)); }; /* الأكثر خطأً ثمّ الأقدم */
+    hot.sort(urgent); cold.sort(urgent);
+    return { hot:hot, cold:cold };
+  }
+  /* عدد مقاعد هذه الجولة: يتّسع كلّما كبر المتراكم، ضمن حدٍّ أعلى */
+  function missSeats(id){
+    var s = missSplit(id), total = s.hot.length + s.cold.length;
+    if(!total) return 0;
+    return Math.max(MISS_SEATS_MIN, Math.min(MISS_SEATS_MAX, MISS_SEATS_MIN + Math.floor(s.hot.length/8)));
+  }
   function missDue(id, n){
-    var o = missRead(), arr = [];
-    Object.keys(o).forEach(function(k){ var e = o[k]; if(e && e.sub === id && e.q && e.q[1]) arr.push(e); });
-    arr.sort(function(a,b){ return (b.n - a.n) || ((a.at||0) - (b.at||0)); }); /* الأكثر خطأً أوّلًا، ثم الأقدم */
-    return arr.slice(0, n).map(function(e){ return missReshuffle(e.q); });
+    if(n <= 0) return [];
+    var s = missSplit(id);
+    /* المقاعد الساخنة تتّسع كلّما كبر المتراكم المتكرّر — لكن نُبقي مقعدًا
+       واحدًا على الأقلّ للأخطاء الجديدة كي لا تُهمَل. */
+    var hotSeats = Math.min(n - 1, Math.max(MISS_HOT, Math.ceil(s.hot.length/12)));
+    if(!s.cold.length) hotSeats = n;
+    /* الساخن أوّلًا بمقاعده المضمونة، ثمّ البارد، ثمّ نكمّل من الساخن إن بقي مقعد */
+    var take = s.hot.slice(0, Math.max(0, Math.min(hotSeats, n)));
+    take = take.concat(s.cold.slice(0, n - take.length));
+    if(take.length < n) take = take.concat(s.hot.slice(take.length));
+    return take.slice(0, n).map(function(e){ return missReshuffle(e.q); });
   }
 
   // ===== مولّد أسئلة رياضية عشوائي (الأرقام تتغيّر كل مرة) =====
@@ -1932,8 +1964,8 @@ if(!STUDENTS[who]){
       } else {
         quiz = shuffle(pool(id).slice()).slice(0, QN);
       }
-      /* مقعدان محجوزان لأسئلةٍ سبق أن أخطأ فيها — بعد الاختيار كي لا يُزاحمها شيء */
-      var revive = missDue(id, MISS_SEATS);
+      /* مقاعد محجوزة لأسئلةٍ سبق أن أخطأ فيها — بعد الاختيار كي لا يُزاحمها شيء */
+      var revive = missDue(id, missSeats(id));
       if(revive.length){
         quiz = quiz.filter(function(q){ return !revive.some(function(r){ return r[0]===q[0]; }); });
         quiz = shuffle(revive.concat(quiz).slice(0, QN));
@@ -2284,6 +2316,37 @@ if(!STUDENTS[who]){
      lesson:`<p><span class="ltr">Past: went · Present perfect: has done · Past continuous: was playing</span></p>`, gen:ePast}
   ];
 
+  /* 🔁 صندوق أخطائي المتكرّرة — يعرض ما أخطأ فيه مرّتين فأكثر ولم يتقاعد بعد،
+     مع عدد المرّات وكم بقي عليه من إجابةٍ صحيحةٍ متتالية. الغرض أن يرى الطفل
+     (ووالده) القائمة بعينها بدل أن تبقى مخبّأةً في الجهاز. */
+  function missBoxHtml(){
+    var all = [];
+    ["en","ma"].forEach(function(id){
+      var s = missSplit(id);
+      s.hot.forEach(function(e){ all.push({e:e, id:id}); });
+    });
+    if(!all.length) return "";
+    all.sort(function(a,b){ return (b.e.n - a.e.n) || ((a.e.at||0) - (b.e.at||0)); });
+    var lbl = {en:"إنجليزي", ma:"رياضيات"};
+    var rows = all.slice(0, 12).map(function(x){
+      var e = x.e, left = Math.max(0, MISS_RETIRE - (e.ok||0));
+      var txt = String(e.q[0]).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+      if(txt.length > 70) txt = txt.slice(0, 70) + "…";
+      return `<li style="padding:8px 0;border-bottom:1px dashed var(--line);font-size:.93rem">`+
+        `<span style="background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:1px 7px;font-weight:800;font-size:.8rem">${e.n}×</span> `+
+        `<span style="color:var(--muted);font-size:.78rem">${lbl[x.id]}</span><br>`+
+        `<span style="font-weight:600">${txt}</span>`+
+        `<span style="display:block;color:var(--muted);font-size:.82rem;margin-top:2px">باقي عليك <b>${left}</b> ${left===1?"إجابة صحيحة":"إجابتان صحيحتان"} متتالية ليخرج</span>`+
+      `</li>`;
+    }).join("");
+    return `<div class="block-title"><span class="dot"></span> صندوق أخطائي المتكرّرة 🔁</div>`+
+      `<div class="review"><details open><summary>${all.length} سؤالًا أخطأت فيه أكثر من مرّة</summary><div class="body">`+
+      `هذي الأسئلة <b>تجيك إجباريًّا في كل جولة</b> حتى تجاوبها صح <b>مرّتين متتاليتين</b>، وبعدها تخرج من الصندوق.`+
+      `<ul style="list-style:none;padding:0;margin:10px 0 0">${rows}</ul>`+
+      (all.length > 12 ? `<p class="hint" style="margin-top:8px">وأقلّ إلحاحًا منها ${all.length-12} سؤالًا.</p>` : ``)+
+      `</div></details></div>`;
+  }
+
   async function renderRemedial(){
     const sec = document.getElementById("rem");
     sec.innerHTML = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div><div class="review"><p class="hint" style="padding:14px">⏳ نحلّل نقاط ضعفك من آخر اختباراتك...</p></div>`;
@@ -2301,7 +2364,8 @@ if(!STUDENTS[who]){
     wrongs.forEach(w=>{ const t=(w.q||"")+" "+(w.subject||""); for(let i=0;i<SKILLS.length;i++){ if(SKILLS[i].rx.test(t)){ counts[SKILLS[i].name]=(counts[SKILLS[i].name]||0)+1; break; } } });
     const top = SKILLS.filter(s=>counts[s.name]).sort((a,b)=>counts[b.name]-counts[a.name]).slice(0,4);
 
-    let html = `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`;
+    let html = missBoxHtml();
+    html += `<div class="block-title"><span class="dot"></span> تمارين علاجية 💪</div>`;
     if(top.length){
       html += `<div class="review"><details open><summary>🎯 نقاط ضعفك الآن (من آخر ٣ اختبارات)</summary><div class="body">هذي نقاط ضعفك الحالية — <b>لما تتقن أي مهارة وتجاوبها صح، تختفي تلقائيًا ✅</b>:<br>`+
         top.map(s=>`• <b>${s.name}</b> <span style="color:var(--accent)">(${counts[s.name]} مرة)</span>`).join("<br>")+`</div></details></div>`;
