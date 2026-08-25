@@ -1394,9 +1394,14 @@ if(!STUDENTS[who]){
   function missWrite(o){ try{ localStorage.setItem(MISS_K, JSON.stringify(o)); }catch(e){} }
   function missAdd(id, q){
     if(!q || !q[0] || !q[1] || q[2] == null) return;
-    var o = missRead(), k = String(q[0]);
+    /* السؤال المُعاد بكلماتٍ جديدة يحمل مفتاح خطئه الأصلي، فيُحتسب عليه
+       لا كخطأٍ جديد — وإلّا انقسمت المهارة الواحدة إلى عشرات المداخل. */
+    var o = missRead(), k = String(q.missKey || q[0]);
     var e = o[k] || { n:0, ok:0 };
-    e.q = [q[0], q[1].slice(), q[2], q[3], q[4]];
+    if(!q.missKey) e.q = [q[0], q[1].slice(), q[2], q[3], q[4]];
+    /* نحفظ اسم المولّد إن وُجد، لنعيد عليه السؤال بكلماتٍ جديدة لا بالكلمات
+       نفسها — وإلّا حفظ «generous ← mean» بدل أن يتعلّم معنى opposite. */
+    e.gf = q.genFn || missGenName(q, id) || e.gf || "";
     e.n = (e.n||0) + 1; e.ok = 0; e.sub = id; e.at = Date.now();
     o[k] = e;
     /* خطأٌ لم يعُد منذ أربعة أشهر لم يعُد يمثّل مستواه */
@@ -1414,17 +1419,80 @@ if(!STUDENTS[who]){
     missWrite(o);
   }
   function missHit(id, q){
-    var o = missRead(), k = String(q && q[0]), e = o[k];
+    var o = missRead(), k = String((q && (q.missKey || q[0])) || ""), e = o[k];
     if(!e) return;
     e.ok = (e.ok||0) + 1; e.at = Date.now();   /* التدريب الحديث يحميه من الإخراج */
     if(e.ok >= MISS_RETIRE) delete o[k]; else o[k] = e;
     missWrite(o);
+  }
+  /* أسئلة البنوك المنسّقة لا تحمل اسم مولّد، فنستدلّ عليه من صيغة السؤال.
+     الغرض: أن يعود عليه <b>نوع</b> السؤال بكلماتٍ جديدة، لا السؤال بعينه. */
+  var MISS_GEN_RX = [
+    [/\bopposite of\b|\bantonym of\b/i, "eOpp"],
+    [/\bsynonym of\b|same meaning\b/i,  "eSyn"],
+    [/\bplural of\b/i,                  "ePlural"],
+    [/^I have ___|___ (apple|orange|egg|umbrella|book|car|hat|dog|pen)\b/i, "eAan"],
+    [/\bThere ___|\bThere is\b|\bThere are\b/i, "eThereIs"],
+    [/\bmuch\b.*\bmany\b|___ (water|sugar|books|apples)\b/i, "eMuchMany"],
+    [/\bYesterday\b|\blast (night|week|year)\b/i, "ePast"],
+    [/\bright now\b|\bat the moment\b|\bLook!/i,  "ePresCont"],
+    [/\b(than|the ___est|more ___)\b/i,           "eComp"]
+  ];
+  function missGenName(q, id){
+    var s = String((q && q[0]) || "").replace(/<[^>]+>/g, " ");
+    if(id === "en"){
+      for(var i=0;i<MISS_GEN_RX.length;i++){ if(MISS_GEN_RX[i][0].test(s)) return MISS_GEN_RX[i][1]; }
+      return "";
+    }
+    /* الرياضيات: مولّداتها بلا أسماء، فنستعمل SKILLS — وهي مصنّفةٌ أصلًا
+       بأنماطٍ لكلّ مهارة ولكلٍّ منها مولّدها.
+       ملاحظة: SKILLS معرّفة بـconst لاحقًا في الملف، و«typeof» لا يعصم من
+       منطقة الموت الزمنيّة (TDZ) بل يرمي — فنحرسها بـtry. */
+    var SK = missSkills();
+    for(var k=0;k<SK.length;k++){
+      if(SK[k].gen && SK[k].rx && SK[k].rx.test(s)) return "sk:" + SK[k].name;
+    }
+    return "";
+  }
+  function missSkills(){ try{ return SKILLS || []; }catch(e){ return []; } }
+  /* يبحث عن المولّد باسمه: إمّا مهارةٌ من SKILLS، أو مولّدٌ مسمّى في قوائم الطفل */
+  function missGenFn(name, id){
+    if(!name) return null;
+    if(name.indexOf("sk:") === 0){
+      var SK = missSkills(), want = name.slice(3);
+      for(var s=0;s<SK.length;s++){ if(SK[s].name === want && SK[s].gen) return SK[s].gen; }
+      return null;
+    }
+    var lists = (id === "ma") ? [MGEN[who]] : [EGEN[who]];
+    for(var i=0;i<lists.length;i++){
+      var L = lists[i]; if(!L) continue;
+      for(var j=0;j<L.length;j++){ if(L[j] && L[j].name === name) return L[j]; }
+    }
+    return null;
+  }
+  /* سؤالٌ جديد من مهارة الخطأ نفسها؛ فإن تعذّر عاد السؤال الأصلي بخياراتٍ مخلوطة */
+  function missFresh(e){
+    var f = missGenFn(e.gf, e.sub);
+    if(f){
+      for(var t=0;t<12;t++){
+        var q;
+        try{ q = f(); }catch(err){ continue; }
+        if(!q || !q[1] || q[2] == null) continue;
+        if(String(q[0]) === String(e.q[0])) continue;   /* لا نعيد الكلمات نفسها */
+        var out = [q[0], q[1].slice(), q[2], q[3], q[4]];
+        out.rev = 1; out.missKey = String(e.q[0]);      /* مفتاح الخطأ الأصلي للتقاعد */
+        out.fresh = 1;
+        return out;
+      }
+    }
+    return missReshuffle(e.q);
   }
   function missReshuffle(q){
     var opts = q[1].slice(), correct = opts[q[2]];
     for(var i=opts.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
     var out = [q[0], opts, opts.indexOf(correct), q[3], q[4]];
     out.rev = 1;                       /* علامة: سبق أن أخطأ فيه */
+    out.missKey = String(q[0]);
     return out;
   }
   /* كل أخطاء قسمٍ ما، مقسومةً إلى «ساخن» (تكرّر الخطأ فيه) و«بارد» (مرّة واحدة) */
@@ -1455,7 +1523,7 @@ if(!STUDENTS[who]){
     var take = s.hot.slice(0, Math.max(0, Math.min(hotSeats, n)));
     take = take.concat(s.cold.slice(0, n - take.length));
     if(take.length < n) take = take.concat(s.hot.slice(take.length));
-    return take.slice(0, n).map(function(e){ return missReshuffle(e.q); });
+    return take.slice(0, n).map(function(e){ return missFresh(e); });
   }
 
   // ===== مولّد أسئلة رياضية عشوائي (الأرقام تتغيّر كل مرة) =====
@@ -1640,7 +1708,7 @@ if(!STUDENTS[who]){
     }
     return enSkill(s, q && q[1]);
   }
-  function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var f=gpick(gens), q=f(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name]; out.push(q); } return out; }
+  function genN(gens, n){ var out=[], seen={}, tries=0; while(out.length<n && tries<n*10){ var f=gpick(gens), q=f(); tries++; if(seen[q[0]])continue; seen[q[0]]=1; if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name]; if(f.name) q.genFn = f.name; out.push(q); } return out; }
 
   // ===== مولّد جمل إنجليزية (الأسماء والأفعال تتغيّر كل مرة) =====
   function eSv(){
@@ -2332,11 +2400,15 @@ if(!STUDENTS[who]){
       var e = x.e, left = Math.max(0, MISS_RETIRE - (e.ok||0));
       var txt = String(e.q[0]).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
       if(txt.length > 70) txt = txt.slice(0, 70) + "…";
+      var skill = !e.gf ? "" : (e.gf.indexOf("sk:")===0 ? e.gf.slice(3) : (QSKILL_AR[e.gf] || ""));
+      var willVary = !!missGenFn(e.gf, x.id);
       return `<li style="padding:8px 0;border-bottom:1px dashed var(--line);font-size:.93rem">`+
         `<span style="background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:1px 7px;font-weight:800;font-size:.8rem">${e.n}×</span> `+
-        `<span style="color:var(--muted);font-size:.78rem">${lbl[x.id]}</span><br>`+
+        `<span style="color:var(--muted);font-size:.78rem">${lbl[x.id]}${skill?" · "+skill:""}</span><br>`+
         `<span style="font-weight:600">${txt}</span>`+
-        `<span style="display:block;color:var(--muted);font-size:.82rem;margin-top:2px">باقي عليك <b>${left}</b> ${left===1?"إجابة صحيحة":"إجابتان صحيحتان"} متتالية ليخرج</span>`+
+        `<span style="display:block;color:var(--muted);font-size:.82rem;margin-top:2px">`+
+          (willVary ? `🔄 يرجع لك <b>بكلماتٍ جديدة</b> من المهارة نفسها · ` : ``)+
+          `باقي عليك <b>${left}</b> ${left===1?"إجابة صحيحة":"إجابتان صحيحتان"} متتالية ليخرج</span>`+
       `</li>`;
     }).join("");
     return `<div class="block-title"><span class="dot"></span> صندوق أخطائي المتكرّرة 🔁</div>`+
