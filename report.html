@@ -173,6 +173,39 @@ function repeatCardHtml(d){
     '</div>';
 }
 
+/* ✍️ التعبير الإنجليزي: نعرض نصّ ما كتبه الطفل بنفسه — أهمّ من أيّ نسبة،
+   لأنّه الشيء الوحيد في الموقع الذي يُنتجه الطفل بلغته لا باختيارٍ من ثلاثة. */
+function writingCardHtml(student){
+  var rows = ALL.filter(function(r){
+    return r.student===student && r.meta && r.meta.kind==="writing" && r.meta.text;
+  });
+  if(!rows.length) return "";
+  /* meta.at وقت الجهاز الحقيقي، وcreated_at احتياطي لو غاب */
+  var rowT=function(r){ return (r.meta && r.meta.at) || r.created_at; };
+  rows.sort(function(a,b){ return String(rowT(b)).localeCompare(String(rowT(a))); });
+  var drills = ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="writing-drill"; });
+  var dc=0, dt=0;
+  drills.forEach(function(r){ dc += (r.meta.correct||0); dt += (r.meta.total||0); });
+
+  var html = '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
+    '<p class="note">كتب <b>'+rows.length+'</b> فقرة'+
+    (dt ? ' · تدريب بناء الجملة: <b>'+dc+'/'+dt+'</b> ('+pct(dc,dt)+'%)' : '')+'</p>';
+
+  rows.slice(0,5).forEach(function(r){
+    var m=r.meta, p=pct(m.correct||0, m.total||8);
+    html += '<div style="border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:10px">'+
+      '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800">'+
+        '<span>'+esc(m.topic||"—")+'</span>'+
+        '<span class="pill '+cls(p)+'">'+p+'%</span>'+
+      '</div>'+
+      '<p class="note" style="margin:4px 0 8px">'+saDate(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة</p>'+
+      '<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:10px;padding:10px 12px;'+
+        'font-size:.95rem;line-height:1.75;white-space:pre-wrap">'+esc(m.text)+'</div></div>';
+  });
+  if(rows.length>5) html += '<p class="note" style="margin-top:8px">وأقدم منها '+(rows.length-5)+' فقرة.</p>';
+  return html+'</div>';
+}
+
 /* قسم «فوق المستوى»: تحصيلي وSTEP — يُعرض محايدًا ولا يُحسب في التقييم. */
 function stretchCardHtml(d){
   var items = Object.keys(d.stretchSk).map(function(n){ return {name:n, s:d.stretchSk[n]}; });
@@ -192,6 +225,7 @@ function render(){
     out.innerHTML = '<div class="card empty">ما فيه تفصيل مهارات (في مستوى صفّه) لـ'+esc(current)+' بعد.<br>'+
       'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.'+
       (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
+      writingCardHtml(current)+
       stretchCard;
     return;
   }
@@ -221,6 +255,7 @@ function render(){
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
     repeatCardHtml(d)+
+    writingCardHtml(current)+
     stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+
       '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+

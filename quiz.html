@@ -10,6 +10,7 @@
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <script src="azure-config.js"></script>
+<script src="writing-en.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
   :root{
@@ -1827,6 +1828,7 @@ if(!STUDENTS[who]){
     <div id="__exitwarn" style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin:12px 0;font-weight:800;text-align:center">⚠️ خرجت من الصفحة أثناء الاختبار! هذا يُسجَّل في تقرير والدك — لا تفتح أي تطبيق ثاني أثناء الحل.</div>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="en">الإنجليزي</button>
+      <button role="tab" aria-selected="false" data-tab="wr">التعبير ✍️</button>
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
       <button role="tab" aria-selected="false" data-tab="arb">العربية 🕌</button>
       <button role="tab" aria-selected="false" data-tab="rem">علاجي 💪</button>
@@ -1834,6 +1836,7 @@ if(!STUDENTS[who]){
       <button role="tab" aria-selected="false" data-tab="log">محاولاتي 📚</button>
     </div>
     <section class="panel active" id="en" role="tabpanel"></section>
+    <section class="panel" id="wr" role="tabpanel"></section>
     <section class="panel" id="ma" role="tabpanel"></section>
     <section class="panel" id="arb" role="tabpanel"></section>
     <section class="panel" id="rem" role="tabpanel"></section>
@@ -2374,8 +2377,37 @@ if(!STUDENTS[who]){
       if(b.dataset.tab==="log") renderLog();
       if(b.dataset.tab==="arb") renderArb();
       if(b.dataset.tab==="rem") renderRemedial();
+      if(b.dataset.tab==="wr") renderWriting();
     });
   });
+
+  /* ===== التعبير ✍️ — تُبنى مرّة واحدة عند أوّل فتح (writing-en.js) ===== */
+  let writingBuilt = false;
+  function renderWriting(){
+    const sec = document.getElementById("wr");
+    if(!window.WritingEN){
+      sec.innerHTML = '<div class="card" style="text-align:center;padding:24px;color:var(--muted)">تعذّر تحميل قسم التعبير. حدّث الصفحة.</div>';
+      return;
+    }
+    if(writingBuilt) return;
+    writingBuilt = true;
+    /* المستوى: متوسط (فقرة) لرفيف وحسن، ابتدائي (جملة) لسعود وأسامة */
+    const level = (who==="hasan"||who==="rafeef") ? 2 : 1;
+    WritingEN.render(sec, {
+      who: who, name: S.name, level: level,
+      save: function(m){
+        const payload = { student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0,
+                          wrong:[], meta:Object.assign({ at:new Date().toISOString() }, m) };
+        try{
+          if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, payload); return; }
+          fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+            headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY,
+                      "Content-Type":"application/json", "Prefer":"return=minimal" },
+            body: JSON.stringify(payload) });
+        }catch(e){}
+      }
+    });
+  }
 }
 </script>
 </body>
