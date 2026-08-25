@@ -1485,7 +1485,11 @@ if(!STUDENTS[who]){
     eAan:"a / an", eThereIs:"There is / are", eWh:"أدوات الاستفهام", eMuchMany:"much / many",
     ePast:"الماضي البسيط", ePresCont:"المضارع المستمر", eComp:"المقارنة", ePluralAdv:"الجموع الشاذّة",
     eColl:"المتلازمات اللفظية", eIrregPast:"الأفعال الشاذّة", eSuper:"التفضيل", ePresPerfect:"المضارع التامّ",
-    eSyn:"المرادفات"
+    eSyn:"المرادفات",
+    eFuture:"المستقبل (will)", eGoingTo:"المستقبل (going to)", eModal:"الأفعال الناقصة",
+    ePoss:"ضمائر الملكية", ePron:"ضمائر المفعول", eDoDoes:"السؤال بـ do/does",
+    ePastCont:"الماضي المستمرّ", eCond1:"جملة الشرط", ePassive:"المبنيّ للمجهول",
+    eSomeAny:"some / any"
   };
   /* بنك الإنجليزي المنسّق مكتوب يدويًا بلا وسوم، فنستنتج مهارته من نصّ السؤال
      ومن شكل الخيارات — والخيارات أدقّ دلالة من النصّ. الترتيب مهمّ: الأخصّ أوّلًا. */
@@ -1677,6 +1681,84 @@ if(!STUDENTS[who]){
     var o=opt3(q[0],shuffle(wrong).slice(0,2));
     return ["___ ? — "+q[1]+".",o[0],o[1],"«"+q[1]+"» جواب يدل على أداة الاستفهام «"+q[0]+"».","en"];
   }
+  /* ===== قواعد إضافية — تسدّ فجوات القرامر: مستقبل · أفعال ناقصة · ضمائر · ملكية ·
+     أسئلة · ماضٍ مستمرّ · شرط · مبنيّ للمجهول · some/any ===== */
+  function eFuture(){
+    var v=gpick(["visit","call","help","watch","clean","finish","start","buy"]);
+    var o=opt3("will "+v,["will "+v+"s","wills "+v,"will to "+v]);
+    return ["Tomorrow I ___ my grandmother.",o[0],o[1],"المستقبل: will + الفعل مجرّدًا (بلا s وبلا to).","en"];
+  }
+  function eGoingTo(){
+    var s=gpick([["I","am"],["He","is"],["She","is"],["They","are"],["We","are"],["You","are"]]);
+    var v=gpick(["travel","study","play","cook","paint","swim"]);
+    var wrongBe=(s[1]==="is")?"are":"is";
+    var o=opt3(s[1]+" going to "+v,[wrongBe+" going to "+v,"going to "+v,s[1]+" going "+v]);
+    return [s[0]+" ___ next week.",o[0],o[1],"خطة مستقبلية: "+s[1]+" + going to + فعل مجرّد (مع "+s[0]+").","en"];
+  }
+  function eModal(){
+    var t=gpick([
+      ["You ___ wear a seatbelt. It is the law.","must","إلزام وواجب: must."],
+      ["I ___ swim very well. I learned last year.","can","قدرة: can."],
+      ["You look tired. You ___ rest.","should","نصيحة: should."],
+      ["___ you help me, please?","Can","طلب مهذّب: Can."],
+      ["We ___ be quiet in the library.","must","قاعدة لازمة: must."],
+      ["She ___ speak three languages.","can","قدرة: can."],
+      ["You ___ eat more vegetables.","should","نصيحة: should."]
+    ]);
+    var pool=["must","can","should","Can"].filter(function(x){ return x.toLowerCase()!==t[1].toLowerCase(); });
+    var o=opt3(t[1],shuffle(pool).slice(0,2));
+    return [t[0],o[0],o[1],t[2],"en"];
+  }
+  function ePoss(){
+    /* أسماء وأشخاص فقط — لا ضمائر فاعل بعد «This is» حتى لا تختلّ الجملة. */
+    var t=gpick([["Sara","Her"],["Ali","His"],["my brother","His"],["my sister","Her"],["the boys","Their"],["the girls","Their"],["Noura","Her"],["Omar","His"]]);
+    var pool=["Her","His","Their","My","Our"].filter(function(x){ return x!==t[1]; });
+    var o=opt3(t[1],shuffle(pool).slice(0,2));
+    return ["This is "+t[0]+". ___ bag is new.",o[0],o[1],"ضمير الملكية المناسب لـ«"+t[0]+"» هو "+t[1]+".","en"];
+  }
+  function ePron(){
+    var t=gpick([["Ali","him"],["Sara","her"],["my friends","them"],["the book","it"],["my parents","them"],["the teacher","her"]]);
+    var pool=["him","her","them","it"].filter(function(x){ return x!==t[1]; });
+    var o=opt3(t[1],shuffle(pool).slice(0,2));
+    return ["I know "+t[0]+". I see ___ every day.",o[0],o[1],"ضمير المفعول المناسب لـ«"+t[0]+"» هو "+t[1]+".","en"];
+  }
+  function eDoDoes(){
+    var t=gpick([["he","Does"],["she","Does"],["it","Does"],["they","Do"],["you","Do"],["we","Do"],["Ali","Does"],["the boys","Do"]]);
+    var o=opt3(t[1],[t[1]==="Does"?"Do":"Does","Is","Are"]);
+    return ["___ "+t[0]+" like football?",o[0],o[1],"في السؤال بالمضارع البسيط: "+t[1]+" مع «"+t[0]+"».","en"];
+  }
+  function ePastCont(){
+    var s=gpick([["I","was"],["He","was"],["She","was"],["It","was"],["They","were"],["We","were"],["You","were"]]);
+    var v=gpick(["play","read","sleep","study","watch","cook","run","write"]);
+    var ing=(/e$/.test(v)?v.slice(0,-1):v)+"ing";
+    if(v==="run") ing="running";
+    var wrongBe=(s[1]==="was")?"were":"was";
+    var o=opt3(s[1]+" "+ing,[wrongBe+" "+ing,s[1]+" "+v,"is "+ing]);
+    return [s[0]+" ___ when the phone rang.",o[0],o[1],"الماضي المستمرّ: "+s[1]+" + الفعل+ing (مع "+s[0]+").","en"];
+  }
+  function eCond1(){
+    var t=gpick([["rain","rains"],["snow","snows"],["stop","stops"],["start","starts"]]);
+    var o=opt3(t[1],["will "+t[0],t[0]+"ed","is "+t[0]+"ing"]);
+    return ["If it ___ tomorrow, we will stay at home.",o[0],o[1],"في جملة الشرط بعد if نستخدم المضارع ("+t[1]+") لا will.","en"];
+  }
+  function ePassive(){
+    /* المشتّتات تُشتقّ من الفعل نفسه (المصدر والماضي)، لا من فعل ثابت. */
+    var t=gpick([["window","break","broke","broken"],["letter","write","wrote","written"],["cake","eat","ate","eaten"],
+                 ["door","open","opened","opened"],["room","clean","cleaned","cleaned"],["car","wash","washed","washed"]]);
+    var o=opt3("was "+t[3],["was "+t[1],t[2],"is "+t[1]+"ing"]);
+    return ["The "+t[0]+" ___ by the boy yesterday.",o[0],o[1],"المبنيّ للمجهول في الماضي: was + التصريف الثالث ("+t[3]+")، لأن الفاعل جاء بعد by.","en"];
+  }
+  function eSomeAny(){
+    var t=gpick([
+      ["I don't have ___ money.","any","في النفي نستخدم any."],
+      ["There are ___ apples on the table.","some","في الإثبات نستخدم some."],
+      ["Do you have ___ questions?","any","في السؤال نستخدم any."],
+      ["She bought ___ new books.","some","في الإثبات نستخدم some."],
+      ["We didn't see ___ birds.","any","في النفي نستخدم any."]
+    ]);
+    var o=opt3(t[1],[t[1]==="any"?"some":"any","a"]);
+    return [t[0],o[0],o[1],t[2],"en"];
+  }
   function ePresPerfect(){
     var subs=[["I","have"],["We","have"],["They","have"],["You","have"],["He","has"],["She","has"],["It","has"]];
     var s=gpick(subs), v=gpick([["finish","finished"],["visit","visited"],["eat","eaten"],["see","seen"],["do","done"],["go","gone"],["write","written"],["take","taken"],["give","given"],["read","read"],["break","broken"],["speak","spoken"]]);
@@ -1711,10 +1793,12 @@ if(!STUDENTS[who]){
     return ['Choose the synonym of "'+p[0]+'":', o[0], o[1], p[1]+" مرادف لـ "+p[0]+".", "en"];
   }
   const EGEN = {
-    saud:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh],
-    osama:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh,eMuchMany,ePast],
-    rafeef:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,eWh,eMuchMany,eSyn],
-    hasan:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,ePresPerfect,eWh,eSyn]
+    /* وُسّعت القواعد: كل ابن يأخذ ما يناسب صفّه — الصغار الأساسيات (ملكية/مفعول/سؤال/
+       مستقبل بسيط/ناقصة/some-any)، والكبار يضاف لهم الماضي المستمرّ والشرط والمجهول. */
+    saud:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh,ePoss,ePron,eDoDoes,eFuture,eSomeAny],
+    osama:[eSv,ePlural,ePrep,eOpp,eAan,eThereIs,eWh,eMuchMany,ePast,ePoss,ePron,eDoDoes,eFuture,eGoingTo,eModal,eSomeAny],
+    rafeef:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,eWh,eMuchMany,eSyn,eFuture,eGoingTo,eModal,ePastCont,eCond1,ePassive,ePron,eSomeAny],
+    hasan:[ePast,ePresCont,eComp,ePluralAdv,eColl,eOpp,eIrregPast,eSuper,ePresPerfect,eWh,eSyn,eFuture,eGoingTo,eModal,ePastCont,eCond1,ePassive,ePron,eSomeAny]
   };
 
   document.documentElement.style.setProperty("--accent", S.accent);
