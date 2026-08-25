@@ -54,6 +54,9 @@
   .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
   .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .ftab{direction:ltr;border-collapse:collapse;margin:8px 0;font-size:.86rem;font-weight:600;width:100%}
+  .ftab th,.ftab td{border:1px solid var(--line);padding:4px 8px;text-align:left}
+  .ftab th{background:var(--bg);color:var(--muted);font-size:.78rem;letter-spacing:.4px}
   .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
 </style>
 </head>
@@ -463,6 +466,219 @@ function u3Advice(){
     "u3a:"+a[0]];
 }
 
+/* ===== إضافات الوحدة ٣ (ص ٢٤–٢٧) ===== */
+
+/* مصدر الغرض Infinitives of Purpose — «لماذا؟» (ص ٢٤).
+   القاعدة: to + الفعل المجرّد للإجابة عن سبب فعل الناس للأشياء. */
+var U3_PURPOSE = [
+  ["the airport",       "to catch a plane"],
+  ["the travel agency", "to buy a plane ticket"],
+  ["the bank",          "to change some money"],
+  ["the consulate",     "to get a visa"],
+  ["the mall",          "to buy new clothes"],
+  ["Paris",             "to see the Eiffel Tower"],
+  ["Colorado",          "to ski in the mountains"],
+  ["the library",       "to borrow a book"]
+];
+var U3_NAMES = ["Sam","Ali","Maha","Badr","Ted","Sabah","Rudy","Matt"];
+
+function u3Infinitive(){
+  /* نصفٌ عن المعنى (لماذا؟) ونصفٌ عن الشكل (to + مصدر) */
+  if(Math.random()<0.5){
+    var i=ri(0,U3_PURPOSE.length-1), j=ri(0,U3_PURPOSE.length-1), k=ri(0,U3_PURPOSE.length-1);
+    if(j===i || k===i || k===j) return null;
+    var p=U3_PURPOSE[i], nm=U3_NAMES[i];
+    var o=eOpts(p[1],[U3_PURPOSE[j][1],U3_PURPOSE[k][1]]);
+    if(!o) return null;
+    return [en("Why is "+nm+" going to "+p[0]+"?"),o[0].map(en),o[1],
+      "نجيب عن "+en("Why?")+" بـ "+en("to")+" + الفعل المجرّد: "+
+      en(nm+" is going to "+p[0]+" "+p[1]+".")+" — هذا هو <b>مصدر الغرض</b> (ص <span class=ltr>24</span>).",
+      "u3ip:why:"+p[0]];
+  }
+  var F=[
+    ["I'm going to Saudi Arabia ___ my relatives.","to visit",["for visit","to visiting"]],
+    ["He got up early ___ the plane.","to catch",["for catch","to caught"]],
+    ["She is going to the bank ___ some money.","to change",["for change","to changing"]],
+    ["We went to the mall ___ new clothes.","to buy",["for buy","to bought"]],
+    ["Rudy is going to the consulate ___ a visa.","to get",["for get","to getting"]],
+    ["They are going to Colorado ___ .","to ski",["for ski","to skiing"]],
+    ["Matt goes to the library ___ books.","to borrow",["for borrow","to borrowing"]]
+  ];
+  var c=gp(F);
+  var o2=eOpts(c[1],c[2]);
+  if(!o2) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o2[0].map(en),o2[1],
+    "بعد "+en("to")+" يأتي الفعل <b>مجرّدًا</b> بلا "+en("-ing")+" وبلا ماضٍ: "+
+    en(c[1])+" — ولا نقول "+en("for")+" + فعل (ص <span class=ltr>24</span>).",
+    "u3ip:form:"+c[0]];
+}
+
+/* جدول الوصول والمغادرة (ص ٢٤) — الطفل يقرأ الجدول ويستخرج الجواب */
+var U3_ARR = [
+  ["SV 345","DAMMAM","8:00 A.M.","D20"],
+  ["EK 720","DUBAI","9:45 A.M.","C11"],
+  ["LH 87","FRANKFURT","10:20 A.M.","B19"],
+  ["IB 605","MADRID","11:00 A.M.","A17"],
+  ["SV 94","RIYADH","11:40 A.M.","C8"],
+  ["AZ 348","CAIRO","1:00 P.M.","D7"]
+];
+var U3_DEP = [
+  ["JAL 33","TOKYO","8:15 A.M.","A90"],
+  ["SV 633","AMMAN","9:10 A.M.","B7"],
+  ["BA 239","LONDON","10:00 A.M.","D22"],
+  ["TP 987","LISBON","11:30 A.M.","C15"],
+  ["SV 621","JEDDAH","12:20 P.M.","C10"],
+  ["AF 573","PARIS","1:25 P.M.","B16"]
+];
+function u3Table(rows,head){
+  var h="<table class=ftab><tr><th colspan=4>"+head+"</th></tr>"+
+        "<tr><th>FLIGHT</th><th>"+(head==="ARRIVALS"?"FROM":"TO")+"</th><th>TIME</th><th>GATE</th></tr>";
+  rows.forEach(function(r){
+    h+="<tr><td>"+r[0]+"</td><td>"+r[1]+"</td><td>"+r[2]+"</td><td>"+r[3]+"</td></tr>";
+  });
+  return h+"</table>";
+}
+function u3Flights(){
+  var arr = Math.random()<0.5;
+  var rows = arr ? U3_ARR : U3_DEP;
+  var head = arr ? "ARRIVALS" : "DEPARTURES";
+  var i=ri(0,rows.length-1), r=rows[i];
+  var others = rows.filter(function(x,n){ return n!==i; });
+  var kind = ri(1,3), q, right, wrong;
+  if(kind===1){                                   /* الوقت */
+    q = "What time does flight "+r[0]+" "+(arr?"arrive":"leave")+"?";
+    right = r[2];
+    wrong = shuffle(others.slice()).slice(0,2).map(function(x){ return x[2]; });
+  }else if(kind===2){                             /* البوابة */
+    q = "Which gate is flight "+r[0]+" at?";
+    right = r[3];
+    wrong = shuffle(others.slice()).slice(0,2).map(function(x){ return x[3]; });
+  }else{                                          /* رقم الرحلة */
+    q = arr ? ("Which flight arrives from "+r[1]+"?") : ("Which flight goes to "+r[1]+"?");
+    right = r[0];
+    wrong = shuffle(others.slice()).slice(0,2).map(function(x){ return x[0]; });
+  }
+  var o=eOpts(right,wrong);
+  if(!o) return null;
+  return [u3Table(rows,head)+"<br>"+en(q),o[0].map(en),o[1],
+    "اقرأ الصفّ الذي فيه "+en(r[0])+" : "+en(r[1]+" · "+r[2]+" · Gate "+r[3])+
+    " — من لوحة المطار في الوحدة <span class=ltr>3</span> (ص <span class=ltr>24</span>).",
+    "u3ft:"+head+":"+r[0]+":"+kind];
+}
+
+/* Language in Context — يحيى مسافرٌ إلى لندن (ص ٢٦) */
+var U3_YAHYA = [
+  ["Where does Yahya live?","In Dammam",["In London","In Jeddah"]],
+  ["Where is Yahya going next month?","To London",["To Dammam","To Cairo"]],
+  ["What is Yahya going to need first?","A passport",["A visa photo","A hotel key"]],
+  ["What is he going to have to get?","A U.K. visa",["A Saudi visa","A driver's license"]],
+  ["What is Yahya going to do on his trip?","Take lots of photos",["Buy a plane","Sell his camera"]]
+];
+function u3Yahya(){
+  var y=gp(U3_YAHYA);
+  var o=eOpts(y[1],y[2]);
+  if(!o) return null;
+  return [en(y[0]),o[0].map(en),o[1],
+    "من "+en("Language in Context")+" في الوحدة <span class=ltr>3</span> (ص <span class=ltr>26</span>): "+
+    en(y[1])+". ولاحظ التركيب "+en("be going to + need / have to")+" للمستقبل المخطَّط له.",
+    "u3y:"+y[0]];
+}
+
+/* الاستماع — دان ولاري (ص ٢٦) */
+var U3_LISTEN = [
+  ["When did Dan and Larry last see one another?","Two years ago",
+   ["Two months ago","Last week"]],
+  ["What industry does Dan work in?","The clothing industry",
+   ["The airline industry","The building industry"]],
+  ["Where is Larry going?","To Florence",["To Milan","To Rome"]],
+  ["Why is Larry going there?","To study architecture",
+   ["To find new clothing designs","To visit his family"]],
+  ["Where is Dan going?","To Milan",["To Florence","To London"]],
+  ["Why is Dan going there?","To find new clothing designs",
+   ["To study architecture","To meet Larry's family"]]
+];
+function u3Listen(){
+  var l=gp(U3_LISTEN);
+  var o=eOpts(l[1],l[2]);
+  if(!o) return null;
+  return [en(l[0]),o[0].map(en),o[1],
+    "من نصّ الاستماع في الوحدة <span class=ltr>3</span> (ص <span class=ltr>26</span>): "+en(l[1])+".",
+    "u3li:"+l[0]];
+}
+
+/* محادثة مايكل والسيّد باركر (ص ٢٧) */
+var U3_MICHAEL = [
+  ["Why is Mr. Parker traveling?","He is going on business",
+   ["He is going on vacation","He is going to study"]],
+  ["Where does Mr. Parker's company have a branch?","In Riyadh",
+   ["In Abha","In Dubai"]],
+  ["What is Mr. Parker doing tomorrow morning?","Attending a conference",
+   ["Flying back to London","Starting a new job"]],
+  ["When will Mr. Parker probably fly back to London?","Next week",
+   ["Tomorrow morning","Next year"]],
+  ["Why is Michael going to Saudi Arabia?","To study Arabic",
+   ["To teach English","To attend a conference"]],
+  ["Which university is Michael going to?","King Khalid University",
+   ["King Saud University","Umm Al-Qura University"]],
+  ["How long is Michael staying?","For a year",["For a week","For a month"]],
+  ["Which city is Michael going to?","Abha",["Riyadh","Dubai"]],
+  ["Where did Mr. Parker use to live?","In Dubai",["In Abha","In Riyadh"]]
+];
+function u3Michael(){
+  var m=gp(U3_MICHAEL);
+  var o=eOpts(m[1],m[2]);
+  if(!o) return null;
+  return [en(m[0]),o[0].map(en),o[1],
+    "من محادثة "+en("Michael & Mr. Parker")+" في الوحدة <span class=ltr>3</span> (ص <span class=ltr>27</span>): "+
+    en(m[1])+".",
+    "u3mi:"+m[0]];
+}
+
+/* Real Talk — تعبيرات المحادثة (ص ٢٧) */
+var U3_REALTALK = [
+  ["kind of","in some ways / a little",["completely","never"]],
+  ["pretty","very / quite",["beautiful","slowly"]],
+  ["to pick up","to learn",["to drop","to forget"]]
+];
+function u3RealTalk(){
+  var r=gp(U3_REALTALK);
+  var o=eOpts(r[1],r[2]);
+  if(!o) return null;
+  return ["What does "+en('"'+r[0]+'"')+" mean here?",o[0].map(en),o[1],
+    en(r[0])+" = "+en(r[1])+" — من "+en("Real Talk")+" في محادثة الوحدة <span class=ltr>3</span> "+
+    "(ص <span class=ltr>27</span>): "+en("It's kind of hot. · Your Arabic is pretty good. · I picked it up in Dubai.")+"",
+    "u3rt:"+r[0]];
+}
+
+/* إملاء الفعل مع -ing (ص ٢٦ — النطق والتهجئة) */
+var U3_ING = [
+  ["arrive","arriving",["arriveing","arrivving"]],
+  ["leave","leaving",["leaveing","leavving"]],
+  ["come","coming",["comeing","comming"]],
+  ["take","taking",["takeing","takking"]],
+  ["write","writing",["writeing","writting"]],
+  ["go","going",["goeing","gooing"]],
+  ["stay","staying",["staing","stayying"]],
+  ["fly","flying",["flieing","flyying"]],
+  ["study","studying",["studing","studiing"]],
+  ["get","getting",["geting","getteing"]],
+  ["plan","planning",["planing","planeing"]],
+  ["shop","shopping",["shoping","shopeing"]],
+  ["wait","waiting",["waitting","waiteing"]],
+  ["pack","packing",["packking","packeing"]]
+];
+function u3Ing(){
+  var v=gp(U3_ING);
+  var o=eOpts(v[1],v[2]);
+  if(!o) return null;
+  return ["Write the "+en("-ing")+" form of "+en('"'+v[0]+'"')+" :",o[0].map(en),o[1],
+    en(v[0])+" → "+en(v[1])+" — القاعدة: الفعل المنتهي بـ "+en("e")+" ساكنة نحذفها ("+
+    en("arrive → arriving")+")، والمنتهي بحرفٍ ساكنٍ واحدٍ بعد حركةٍ قصيرة نُضعّفه ("+
+    en("get → getting")+")، وما عدا ذلك نضيف "+en("-ing")+" كما هو ("+en("wait → waiting")+
+    ") — ص <span class=ltr>26</span>.",
+    "u3ing:"+v[0]];
+}
+
 /* ===== إضافات الوحدة ١ (ص ٩–١١) ===== */
 
 /* استبيان نمط الحياة كما في الكتاب ص ١١ — أعمدة: نورة · مها · بدرية */
@@ -776,7 +992,8 @@ function u2King(){
 var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion];
 var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck,
           u2UsedTo,u2IrregPast,u2RealTalk,u2Falcons,u2King];
-var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice];
+var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice,
+          u3Infinitive,u3Flights,u3Yahya,u3Listen,u3Michael,u3RealTalk,u3Ing];
 var ALLU = U1.concat(U2).concat(U3);
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
@@ -798,7 +1015,7 @@ if(!NAMES[who]){
     allu:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–3</span> من كتابك.", label:"إنجليزي م٣ — شامل و1-3"},
     u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>، و<span class=ltr>All / Both / Neither / None</span>، والترابط بالضمائر.", label:"إنجليزي م٣ — Unit 1"},
     u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط وأسئلته، و<span class=ltr>be + born</span> والمبني للمجهول، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ، و<span class=ltr>used to</span> بصيغها الثلاث، وأفعال الماضي، وقطعة <span class=ltr>The King of Saudi Arabia</span>.", label:"إنجليزي م٣ — Unit 2"},
-    u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، ومفردات السفر.", label:"إنجليزي م٣ — Unit 3"}
+    u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، و<b>مصدر الغرض</b> (<span class=ltr>to + verb</span>)، وقراءة لوحة الوصول والمغادرة، وإملاء <span class=ltr>-ing</span>، ومفردات السفر، ومحادثة <span class=ltr>Michael &amp; Mr. Parker</span>.", label:"إنجليزي م٣ — Unit 3"}
   };
 
   var CHAPS = {
