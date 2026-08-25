@@ -93,12 +93,7 @@ function numOpts(correct, cands){
   var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
 }
 
-/* ============================================================
-   رياضيات ثاني متوسط — الفصل ١: الجبر والدوال
-   الدروس ١-١ و١-٢ و١-٣، مبنيّة من كتاب رفيف نفسه (ص ١٢–٢٤).
-   كل مولّد فوقه رقم الدرس والصفحة التي أُخذ منها نوع السؤال.
-   ============================================================ */
-/* ===== دوالّ مساعدة ===== */
+/* ===== دوالّ مساعدة (موروثة من هيكل صفحة الرياضيات) ===== */
 var SUP = ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
 function sup(n){ return String(n).split("").map(function(d){ return SUP[+d]; }).join(""); }
 function pw(b,e){ return mn(b+sup(e)); }
@@ -468,8 +463,196 @@ function u3Advice(){
     "u3a:"+a[0]];
 }
 
-var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab];
-var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab];
+/* ===== إضافات الوحدة ١ (ص ٩–١١) ===== */
+
+/* استبيان نمط الحياة كما في الكتاب ص ١١ — أعمدة: نورة · مها · بدرية */
+var U1_SURVEY = [
+  ["is a vegetarian",           "no","no","no"],
+  ["often eats junk food",      "no","no","yes"],
+  ["can cook",                  "yes","yes","yes"],
+  ["works out regularly",       "yes","yes","no"],
+  ["drinks a lot of coffee",    "no","no","no"]
+];
+
+/* Both / Neither لشخصين — All / None / Not all لثلاثة (ص ١١) */
+function u1Survey(){
+  var r=gp(U1_SURVEY), two=Math.random()<0.5, right, why, opts;
+  if(two){
+    /* نورة ومها فقط */
+    var a=r[1], b=r[2];
+    if(a!==b) return null;                       /* نتجنّب الحالة الملتبسة */
+    right = (a==="yes") ? "Both" : "Neither";
+    opts  = ["Both","Neither","All"];
+    why = en("Both")+" و"+en("Neither")+" لشخصين أو شيئين. و"+en("Neither")+
+          " تعني «ولا واحد» ويأتي بعدها فعلٌ <b>مفرد</b>: "+en("Neither of them is a vegetarian.");
+    return ["من استبيان الكتاب: <b>Noura</b> = "+en(a)+" · <b>Maha</b> = "+en(b)+
+            "<br>أكمل: "+en("___ of them "+r[0]+"."),
+      opts.map(en), opts.indexOf(right), why+" (ص <span class=ltr>11</span>)",
+      "u1s2:"+r[0]];
+  }
+  var yes=[r[1],r[2],r[3]].filter(function(x){ return x==="yes"; }).length;
+  right = (yes===3) ? "All" : (yes===0 ? "None" : "Not all");
+  opts  = ["All","None","Not all"];
+  why = en("All")+" و"+en("None")+" لثلاثةٍ فأكثر: "+en("All")+" إذا انطبق على الجميع، و"+
+        en("None")+" إذا لم ينطبق على أحد، و"+en("Not all")+" إذا انطبق على بعضهم.";
+  return ["من استبيان الكتاب: <b>Noura</b> = "+en(r[1])+" · <b>Maha</b> = "+en(r[2])+
+          " · <b>Badria</b> = "+en(r[3])+"<br>أكمل: "+en("___ of them "+r[0]+"."),
+    opts.map(en), opts.indexOf(right), why+" (ص <span class=ltr>11</span>)",
+    "u1s3:"+r[0]];
+}
+
+/* مطابقة الفعل بعد Neither (مفرد) و Both/All/None (جمع) — ص ١١ */
+function u1AllBothVerb(){
+  var C=[
+    ["Neither of them ___ math.","teaches",["teach","teaching"]],
+    ["Neither of them ___ a math teacher.","is",["are","be"]],
+    ["Both of them ___ science.","teach",["teaches","teaching"]],
+    ["Both of them ___ teachers.","are",["is","be"]],
+    ["All of them ___ science.","teach",["teaches","teaching"]],
+    ["All of them ___ teachers.","are",["is","be"]],
+    ["None of them ___ math.","teach",["teaches","teaching"]],
+    ["None of them ___ math teachers.","are",["is","be"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "بعد "+en("Neither")+" يأتي فعلٌ <b>مفرد</b> ("+en("is / teaches")+")، أمّا "+
+    en("Both / All / None")+" فيأتي بعدها فعلٌ <b>جمع</b> ("+en("are / teach")+") — كما في الكتاب ص <span class=ltr>11</span>.",
+    "u1ab:"+c[0]];
+}
+
+/* موضع All / Both بعد الفعل المساعد وقبل الفعل الرئيس (ص ١١) */
+function u1AllBothPos(){
+  var C=[
+    ["They are both teachers.",      ["Both they are teachers.","They are teachers both."]],
+    ["They can all speak English.",  ["All they can speak English.","They can speak English all."]],
+    ["We both teach science.",       ["Both we teach science.","We teach science both."]],
+    ["We are all having fun.",       ["All we are having fun.","We are having fun all."]],
+    ["Are they both science teachers?", ["Both are they science teachers?","Are they science teachers both?"]],
+    ["Can they all speak English?",  ["All can they speak English?","Can they speak English all?"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[0],c[1]);
+  if(!o) return null;
+  return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1],
+    en("All")+" و"+en("Both")+" تأتيان <b>بعد</b> الفعل المساعد ("+en("be, can, do")+") و<b>قبل</b> الفعل الرئيس: "+
+    en(c[0])+" (ص <span class=ltr>11</span>).",
+    "u1abp:"+c[0]];
+}
+
+/* الترابط: مرجع الضمير (Writing Corner ص ١٠) */
+function u1Cohesion(){
+  var C=[
+    ["Teenagers who play a sport say they often become friends with their teammates.<br>ما مرجع "+en("they")+" ؟",
+     "Teenagers",["a sport","teammates"]],
+    ["Football is popular because it is fun. It has simple rules.<br>ما مرجع "+en("it")+" ؟",
+     "Football",["rules","people"]],
+    ["Playing a team sport is beneficial because it keeps young people in shape.<br>ما مرجع "+en("it")+" ؟",
+     "Playing a team sport",["young people","shape"]],
+    ["Playing a team sport teaches them about cooperation.<br>ما مرجع "+en("them")+" ؟",
+     "young people",["a team sport","cooperation"]],
+    ["Teenagers who play a sport become friends with their teammates.<br>ما مرجع "+en("their")+" ؟",
+     "Teenagers",["a sport","friends"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return [c[0],o[0].map(en),o[1],
+    "<b>الترابط</b> ("+en("Cohesion")+") هو ربط الجمل بعضها ببعض. والضمائر تمنع تكرار الكلمة نفسها، "+
+    "وقد يعود الضمير على كلمةٍ واحدة أو على مجموعة كلمات (ص <span class=ltr>10</span>).",
+    "u1co:"+c[1]];
+}
+
+/* ===== إضافات الوحدة ٢ (ص ١٢–١٩) ===== */
+
+/* الماضي البسيط: السؤال والإجابة القصيرة (ص ١٤) */
+function u2PastQ(){
+  var C=[
+    ["___ you live in Riyadh?","Did",["Do","Was"]],
+    ["Where did they ___ ?","live",["lived","living"]],
+    ["What did she ___ ?","wear",["wore","worn"]],
+    ["They ___ work in an office.","didn't",["don't","wasn't"]],
+    ["He ___ formal clothing.","wore",["did wore","weared"]],
+    ["Yes, they ___ .","did",["do","was"]],
+    ["No, he ___ .","didn't",["doesn't","wasn't"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "في الماضي البسيط: "+en("Did")+" للسؤال، وبعدها يأتي <b>المصدر</b> ("+en("Did you live…?")+")، "+
+    "وكذلك بعد "+en("didn't")+" ("+en("didn't work")+"). أمّا في الإثبات فالفعل في الماضي ("+en("wore")+
+    ") — ص <span class=ltr>14</span>.",
+    "u2pq:"+c[0]];
+}
+
+/* be + born والمبني للمجهول في الماضي (ص ١٤) */
+function u2Born(){
+  var C=[
+    ["I ___ born in Syria.","was",["am",  "were"]],
+    ["The twins ___ born on June 21st.","were",["was","are"]],
+    ["Michael ___ raised in Montreal.","was",["is","were"]],
+    ["His parents ___ married in Tabuk.","were",["was","are"]],
+    ["The team ___ called The Lions.","was",["is","were"]],
+    ["He ___ educated in private schools.","was",["is","were"]],
+    ["Linda and Jenny ___ born at Newton Maternity Hospital.","were",["was","are"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "المبني للمجهول في الماضي = "+en("was/were + past participle")+". "+
+    en("was")+" مع المفرد و"+en("were")+" مع الجمع. وعبارات شائعة في سِيَر الناس: "+
+    en("be born, be raised, be married, be called, be educated")+" (ص <span class=ltr>14</span>).",
+    "u2b:"+c[0]];
+}
+
+/* أخبار «People in the News» — فهم من نصّ ص ١٢ */
+var U2_NEWS = [
+  ["How often does Trent give blood?","Every eight weeks",["Every eight months","Once a year"]],
+  ["How many times had Trent donated blood?","100 times",["10 times","23 times"]],
+  ["How many lives can one donation save?","Up to three",["Up to ten","Only one"]],
+  ["Why was it difficult for Ahmed to walk?","He was born with a crippling disease",
+   ["He had a football injury","He was too young"]],
+  ["Who taught Ahmed to play football?","His older brother Ali",["His father","His school coach"]],
+  ["How old is Ahmed?","16",["12","20"]],
+  ["Why did the employees gather at the beach?","For a clean-up operation",
+   ["For a football match","For a swimming race"]],
+  ["What was Sunset Beach awarded?","The Blue Flag",["Athlete of the Year","A gold medal"]],
+  ["When were the twins born?","On Monday, June 21st",["On Wednesday, June 23rd","On Tuesday, June 12th"]]
+];
+function u2News(){
+  var n=gp(U2_NEWS);
+  var o=eOpts(n[1],n[2]);
+  if(!o) return null;
+  return [en(n[0]),o[0].map(en),o[1],
+    "من "+en("People in the News")+" في الوحدة <span class=ltr>2</span> (ص <span class=ltr>12</span>): "+en(n[1])+".",
+    "u2n:"+n[0]];
+}
+
+/* مفردات Quick Check ص ١٣ — «جد الكلمة التي تعني…» */
+var U2_QC = [
+  ["gave to charity","donated",["gathered","encouraged"]],
+  ["an arrangement to meet","appointment",["ceremony","clinic"]],
+  ["excellent","outstanding",["crippling","formal"]],
+  ["supported someone to succeed","encouraged",["donated","awarded"]],
+  ["got together / met","gathered",["appointed","educated"]],
+  ["a baby","infant",["captain","colleague"]],
+  ["people you work with","colleagues",["teammates","principal"]],
+  ["rubbish left outside","litter",["charity","league"]]
+];
+function u2QuickCheck(){
+  var w=gp(U2_QC);
+  var o=eOpts(w[1],w[2]);
+  if(!o) return null;
+  return ["Find the word that means: "+en('"'+w[0]+'"'),o[0].map(en),o[1],
+    en(w[1])+" = "+en(w[0])+" — من "+en("Quick Check")+" في الوحدة <span class=ltr>2</span> (ص <span class=ltr>13</span>).",
+    "u2qc:"+w[0]];
+}
+
+var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion];
+var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck];
 var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice];
 var ALLU = U1.concat(U2).concat(U3);
 
@@ -490,8 +673,8 @@ if(!NAMES[who]){
 
   var CFG = {
     allu:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–3</span> من كتابك.", label:"إنجليزي م٣ — شامل و1-3"},
-    u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>.", label:"إنجليزي م٣ — Unit 1"},
-    u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ للزمان والمكان، وتعبيرات الماضي.", label:"إنجليزي م٣ — Unit 2"},
+    u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>، و<span class=ltr>All / Both / Neither / None</span>، والترابط بالضمائر.", label:"إنجليزي م٣ — Unit 1"},
+    u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط وأسئلته، و<span class=ltr>be + born</span> والمبني للمجهول، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ، وأخبار <span class=ltr>People in the News</span>.", label:"إنجليزي م٣ — Unit 2"},
     u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، ومفردات السفر.", label:"إنجليزي م٣ — Unit 3"}
   };
 
