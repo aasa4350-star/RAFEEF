@@ -1,5 +1,617 @@
 [
     {
+        "id": "399ce2e3-cb56-4201-b750-467c3e7a89a5",
+        "created_at": "2026-08-25T12:30:05.128626+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-25T12:30:04.137Z",
+            "dur": 105,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0641\u0647\u0645 \u0627\u0644\u0635\u0648\u0631 \ud83e\udd98",
+            "total": 14,
+            "skills": {
+                "\u0637\u064a\u0651 \u0627\u0644\u0648\u0631\u0642": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u0646\u0627\u0638\u0631 \u0628\u0635\u0631\u064a": {
+                    "c": 12,
+                    "t": 12
+                },
+                "\u0635\u0648\u0631\u0629 \u0627\u0644\u0645\u0631\u0622\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 14,
+            "trusted": true
+        }
+    },
+    {
+        "id": "3729a920-71a2-4e7a-aa66-b39b751e130a",
+        "created_at": "2026-08-25T12:25:30.205811+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-25T12:25:29.045Z",
+            "dur": 231,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0631\u064a\u0627\u0636\u064a \ud83e\udd98",
+            "total": 14,
+            "skills": {
+                "\u0623\u0646\u0645\u0627\u0637 \u0639\u062f\u062f\u064a\u0629": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0623\u064a\u0627\u0645 \u0627\u0644\u0623\u0633\u0628\u0648\u0639": {
+                    "c": 2,
+                    "t": 3
+                },
+                "\u0639\u062f\u0651 \u0627\u0644\u0645\u0631\u0628\u0651\u0639\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u062a\u0631\u062a\u064a\u0628 \u0641\u064a \u0635\u0641\u0651": {
+                    "c": 0,
+                    "t": 4
+                },
+                "\u0639\u062f\u0651 \u0631\u0642\u0645 \u062f\u0627\u062e\u0644 \u0645\u062f\u0649": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f \u0627\u0644\u0623\u0648\u0651\u0644\u064a\u0629": {
+                    "c": 1,
+                    "t": 2
+                }
+            },
+            "correct": 6,
+            "trusted": true
+        }
+    },
+    {
+        "id": "09fe6e1c-1a29-418b-9810-7f6cbbc01505",
+        "created_at": "2026-08-25T11:48:20.093493+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 9,
+        "en_total": 12,
+        "ma_correct": 10,
+        "ma_total": 12,
+        "wrong": [
+            {
+                "q": "He ___ football every Friday.",
+                "picked": "playing",
+                "correct": "plays",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "Tomorrow I ___ my grandmother.",
+                "picked": "wills watch",
+                "correct": "will watch",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "There ___ some milk in the fridge.",
+                "picked": "are",
+                "correct": "is",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0645\u0633\u0627\u062d\u0629 \u0645\u062b\u0644\u062b \u0642\u0627\u0639\u062f\u062a\u0647 6 \u0648\u0627\u0631\u062a\u0641\u0627\u0639\u0647 4",
+                "picked": "24",
+                "correct": "12",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 9 \u00d7 6",
+                "picked": "56",
+                "correct": "54",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "at": "2026-08-25T11:48:18.637Z",
+            "per": [
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": null,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 9.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.5,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 5.4,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 4.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 12.9,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 10.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.5,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 22.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 6.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 10.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.5,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 4.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 15.4,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 7.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 7.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 8.4,
+                    "ok": false
+                }
+            ],
+            "away": 0,
+            "fast": 0,
+            "exits": 0,
+            "paper": {
+                "en": [
+                    {
+                        "q": "He ___ football every Friday.",
+                        "opts": [
+                            "play",
+                            "plays",
+                            "playing"
+                        ],
+                        "chosen": 2,
+                        "correct": 1
+                    },
+                    {
+                        "q": "This test is ___ than the last one.",
+                        "opts": [
+                            "difficult",
+                            "more difficult",
+                            "most difficult"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Listen! She ___ a song.",
+                        "opts": [
+                            "sings",
+                            "is singing",
+                            "sang"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "She's the girl ___ won the prize.",
+                        "opts": [
+                            "who",
+                            "which",
+                            "whose"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "How ___ students?",
+                        "opts": [
+                            "many",
+                            "much",
+                            "more"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "You ___ smoke here. It's forbidden.",
+                        "opts": [
+                            "mustn't",
+                            "don't have to",
+                            "should"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "He is the ___ student in class.",
+                        "opts": [
+                            "good",
+                            "better",
+                            "best"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "A mouse is ___ than an elephant.",
+                        "opts": [
+                            "small",
+                            "smaller",
+                            "smallest"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Tomorrow I ___ my grandmother.",
+                        "opts": [
+                            "wills watch",
+                            "will watchs",
+                            "will watch"
+                        ],
+                        "chosen": 0,
+                        "correct": 2
+                    },
+                    {
+                        "q": "She ___ have a car.",
+                        "opts": [
+                            "don't",
+                            "doesn't",
+                            "isn't"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The man ___ lives next door is a pilot.",
+                        "opts": [
+                            "who",
+                            "which",
+                            "where"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "There ___ some milk in the fridge.",
+                        "opts": [
+                            "is",
+                            "are",
+                            "be"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    }
+                ],
+                "ma": [
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 9 \u00d7 6",
+                        "opts": [
+                            "54",
+                            "56",
+                            "45"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: \u221215 + 8",
+                        "opts": [
+                            "\u22127",
+                            "7",
+                            "\u221223"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u062d\u0644 \u0627\u0644\u0645\u062a\u0628\u0627\u064a\u0646\u0629: x + 4 > 10",
+                        "opts": [
+                            "x>6",
+                            "x>14",
+                            "x<6"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 5\u00b2 \u2212 3\u00b2",
+                        "opts": [
+                            "16",
+                            "4",
+                            "34"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 11 \u00d7 4",
+                        "opts": [
+                            "44",
+                            "40",
+                            "48"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %8 \u0645\u0646 150\u061f",
+                        "opts": [
+                            "12",
+                            "8",
+                            "15"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0645\u0633\u0627\u062d\u0629 \u0645\u062b\u0644\u062b \u0642\u0627\u0639\u062f\u062a\u0647 6 \u0648\u0627\u0631\u062a\u0641\u0627\u0639\u0647 4",
+                        "opts": [
+                            "12",
+                            "24",
+                            "10"
+                        ],
+                        "chosen": 1,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 0.5 + 0.25",
+                        "opts": [
+                            "0.75",
+                            "0.7",
+                            "0.30"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 64 \u00f7 8",
+                        "opts": [
+                            "8",
+                            "7",
+                            "9"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: \u221a49 + \u221a16",
+                        "opts": [
+                            "11",
+                            "13",
+                            "7"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: (\u22123)\u00b2 + 2 \u00d7 5",
+                        "opts": [
+                            "19",
+                            "\u22121",
+                            "4"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0645\u062d\u064a\u0637 \u0645\u0633\u062a\u0637\u064a\u0644 \u0637\u0648\u0644\u0647 7 \u0648\u0639\u0631\u0636\u0647 3",
+                        "opts": [
+                            "20",
+                            "21",
+                            "14"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    }
+                ],
+                "date": "2026-08-25T11:48:18.636Z",
+                "en_total": 12,
+                "ma_total": 12,
+                "en_correct": 9,
+                "ma_correct": 10
+            },
+            "skills": {
+                "\u0627\u0644\u0623\u0633\u0633": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0636\u0631\u0628": {
+                    "c": 1,
+                    "t": 2
+                },
+                "much / many": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0642\u0633\u0645\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u062d\u064a\u0637": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0633\u0627\u062d\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0636\u0645\u0627\u0626\u0631 \u0627\u0644\u0648\u0635\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644 (will)": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u062d\u0644\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u0641\u0639\u0627\u0644 \u0627\u0644\u0643\u064a\u0646\u0648\u0646\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u062c\u0630\u0631 \u0627\u0644\u062a\u0631\u0628\u064a\u0639\u064a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0628\u0646\u064a \u0644\u0644\u0645\u062c\u0647\u0648\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0646\u0633\u0628\u0629 \u0627\u0644\u0645\u0626\u0648\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0641\u0647\u0627\u0645": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f \u0627\u0644\u0633\u0627\u0644\u0628\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f \u0627\u0644\u0639\u0634\u0631\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0641\u0639\u0627\u0644 \u0627\u0644\u0646\u0627\u0642\u0635\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0641\u0639\u0627\u0644 \u0627\u0644\u0645\u0633\u0627\u0639\u062f\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629 \u0648\u0627\u0644\u062a\u0641\u0636\u064a\u0644": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0645\u0637\u0627\u0628\u0642\u0629 \u0627\u0644\u0641\u0627\u0639\u0644 \u0648\u0627\u0644\u0641\u0639\u0644": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "avg_sec": 7.5,
+            "trusted": true,
+            "total_sec": 164
+        }
+    },
+    {
         "id": "06ee7441-eb86-4506-9d0d-a9c098d1ceac",
         "created_at": "2026-08-25T11:42:59.687536+00:00",
         "student": "\u062d\u0633\u0646",
@@ -49241,224 +49853,6 @@
             "kind": "activity",
             "event": "lesson",
             "label": "\u0627\u0644\u0647\u0646\u062f\u0633\u0629"
-        }
-    },
-    {
-        "id": "f421c65b-b4f9-492d-abd0-1851b7b1db5b",
-        "created_at": "2026-07-29T13:34:18.020665+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 12,
-        "en_total": 12,
-        "ma_correct": 8,
-        "ma_total": 12,
-        "wrong": [
-            {
-                "q": "\u0627\u062d\u0633\u0628: (\u22123)\u00b2",
-                "picked": "\u22129",
-                "correct": "9",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0628\u0633\u0651\u0637: (x + 6)\u00b2",
-                "picked": "x\u00b2+6x+36",
-                "correct": "x\u00b2+12x+36",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 3\u00b3 \u00f7 3\u00b2",
-                "picked": "243",
-                "correct": "3",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: \u221a16 + \u221a9",
-                "picked": "25",
-                "correct": "7",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 3.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3.8,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 6.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 6.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 138.8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 5.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 7.4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 5.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 8.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 10,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6.8,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 38.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.4,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 26.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 8.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 36.6,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 55.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 6.3,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 13,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 18.5,
-            "total_sec": 406
-        }
-    },
-    {
-        "id": "161c0e2b-a8fb-4034-bab0-0b82daad04c8",
-        "created_at": "2026-07-29T13:33:41.522868+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a"
-        }
-    },
-    {
-        "id": "69cd3a21-4ff3-461a-bf88-4553bbc9a100",
-        "created_at": "2026-07-29T13:33:40.749891+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a"
         }
     }
 ]
