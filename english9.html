@@ -651,8 +651,131 @@ function u2QuickCheck(){
     "u2qc:"+w[0]];
 }
 
+/* ===== إضافات الوحدة ٢ (ص ١٤–١٩) ===== */
+
+/* used to — الإثبات والنفي والسؤال (ص ١٤).
+   القاعدة المفصليّة: بعد didn't و did يأتي «use to» بلا d. */
+function u2UsedTo(){
+  var C=[
+    ["When I was little, I ___ play with toys.","used to",["use to","did use to"]],
+    ["I ___ play video games.","didn't use to",["didn't used to","don't use to"]],
+    ["___ you use to play with dolls?","Did",["Do","Were"]],
+    ["What did you ___ play with?","use to",["used to","using to"]],
+    ["People ___ walk or ride camels in the city.","used to",["use to","are used to"]],
+    ["People ___ drive cars and trucks in the city.","didn't use to",["didn't used to","don't used to"]],
+    ["He ___ live next door to me.","used to",["use to","did used to"]],
+    ["Mona ___ teach English.","used to",["use to","was used to"]],
+    ["They ___ work together.","used to",["use to","did use to"]],
+    ["We ___ practice in the school gym.","used to",["use to","are used to"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    en("used to")+" للعادات والأحوال في الماضي. وفي الإثبات نكتبها "+en("used to")+
+    " ، أمّا بعد "+en("didn't")+" و"+en("did")+" فتصير "+en("use to")+" <b>بلا</b> "+en("d")+
+    " : "+en("I didn't use to play. · Did you use to play?")+" (ص <span class=ltr>14</span>).",
+    "u2ut:"+c[0]];
+}
+
+/* الفعل الماضي — من فقرة التمرين C ص ١٥ (كلّها أفعالٌ وردت في الكتاب) */
+var U2_PAST = [
+  ["meet","met",["meeted","meat"]],
+  ["go","went",["goed","gone"]],
+  ["be","was",["were","been"]],
+  ["spend","spent",["spended","spend"]],
+  ["grow up","grew up",["growed up","grown up"]],
+  ["get","got",["getted","gotten"]],
+  ["know","knew",["knowed","known"]],
+  ["come","came",["comed","come"]],
+  ["try","tried",["tryed","tryied"]],
+  ["agree","agreed",["agred","agreeed"]],
+  ["move","moved",["movd","moveed"]],
+  ["introduce","introduced",["introduceed","introducted"]],
+  ["ask","asked",["askt","asqued"]],
+  ["watch","watched",["watchd","wached"]],
+  ["want","wanted",["wantd","wonted"]],
+  ["play","played",["plaied","playd"]]
+];
+function u2IrregPast(){
+  var v=gp(U2_PAST);
+  var o=eOpts(v[1],v[2]);
+  if(!o) return null;
+  return ["What is the past tense of "+en('"'+v[0]+'"')+" ?",o[0].map(en),o[1],
+    en(v[0])+" → "+en(v[1])+
+    " — من فقرة التمرين في الوحدة <span class=ltr>2</span> (ص <span class=ltr>15</span>).",
+    "u2ip:"+v[0]];
+}
+
+/* Real Talk — تعبيرات المحادثة (ص ١٧) */
+var U2_REALTALK = [
+  ["to turn up","to appear unexpectedly",["to switch off a light","to arrive very late"]],
+  ["What about…?","used to introduce a new topic",["used to say goodbye","used to say sorry"]],
+  ["to be into something","to be interested in it",["to be tired of it","to be afraid of it"]],
+  ["big break","an important opportunity",["a long holiday",  "a serious injury"]]
+];
+function u2RealTalk(){
+  var r=gp(U2_REALTALK);
+  var o=eOpts(r[1],r[2]);
+  if(!o) return null;
+  return ["What does "+en('"'+r[0]+'"')+" mean?",o[0].map(en),o[1],
+    en(r[0])+" = "+en(r[1])+" — من "+en("Real Talk")+" في محادثة الوحدة <span class=ltr>2</span> (ص <span class=ltr>17</span>).",
+    "u2rt:"+r[0]];
+}
+
+/* محادثة فريق The Falcons — فهم (ص ١٧) */
+var U2_FALCONS = [
+  ["How did the Falcons team start?","The coach posted a note on the bulletin board asking for players",
+   ["The school bought a new gym","A reporter interviewed the players"]],
+  ["Where did the hopeful athletes turn up?","At the gym",["At the sports center","At the bulletin board"]],
+  ["What position does Khalid play?","Point guard",["Shooting guard","Forward"]],
+  ["Why did Trevor leave his old team?","He wasn't into the attitude of the players",
+   ["He moved to another city","He was injured"]],
+  ["Where did the Falcons use to practice?","In the school gym",
+   ["In the sports center","In the Junior League"]],
+  ["Which division did the Falcons start in?","B Division",["A Division","The Junior League"]]
+];
+function u2Falcons(){
+  var f=gp(U2_FALCONS);
+  var o=eOpts(f[1],f[2]);
+  if(!o) return null;
+  return [en(f[0]),o[0].map(en),o[1],
+    "من محادثة "+en("The Falcons")+" في الوحدة <span class=ltr>2</span> (ص <span class=ltr>17</span>): "+en(f[1])+".",
+    "u2fa:"+f[0]];
+}
+
+/* قطعة «The King of Saudi Arabia» — فهم (ص ١٨) */
+var U2_KING = [
+  ["Where and when was King Salman born?","In Riyadh on December 31, 1935",
+   ["In Makkah on January 23, 1935","In Madinah on June 18, 1935"]],
+  ["Where did King Salman go to school?","At the Princes' School in Riyadh",
+   ["At the University of Umm Al-Qura","At the Islamic University of Madinah"]],
+  ["When was he appointed Crown Prince?","On June 18, 2012",
+   ["On January 23, 2015","In March 1954"]],
+  ["When did he become King?","On January 23, 2015",["On June 18, 2012","In March 1954"]],
+  ["How old was he when he became Emir of Riyadh?","19",["29","31"]],
+  ["Which centre did he found as king?","The King Salman Humanitarian Aid and Relief Centre",
+   ["The Riyadh Charity for Sciences","The Higher Committee for the Development of Riyadh"]],
+  ["Which sites were named UNESCO World Heritage Sites?","Al-Ahsa Oasis and the Hima Cultural Area",
+   ["The Princes' School and the Red Crescent","Riyadh and Makkah"]],
+  ["From which university did he receive an Honorary Doctorate in Literature?",
+   "The University of Umm Al-Qura in Makkah",
+   ["The Islamic University of Madinah","The Berlin-Brandenburg Academy"]],
+  ["How did the Prince help change Riyadh?","He helped it develop into a major urban metropolis",
+   ["He moved the capital there","He built the Princes' School"]]
+];
+function u2King(){
+  var k=gp(U2_KING);
+  var o=eOpts(k[1],k[2]);
+  if(!o) return null;
+  return [en(k[0]),o[0].map(en),o[1],
+    "من قطعة "+en("The King of Saudi Arabia")+" في الوحدة <span class=ltr>2</span> (ص <span class=ltr>18</span>): "+en(k[1])+".",
+    "u2k:"+k[0]];
+}
+
 var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion];
-var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck];
+var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck,
+          u2UsedTo,u2IrregPast,u2RealTalk,u2Falcons,u2King];
 var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice];
 var ALLU = U1.concat(U2).concat(U3);
 
@@ -674,7 +797,7 @@ if(!NAMES[who]){
   var CFG = {
     allu:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–3</span> من كتابك.", label:"إنجليزي م٣ — شامل و1-3"},
     u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>، و<span class=ltr>All / Both / Neither / None</span>، والترابط بالضمائر.", label:"إنجليزي م٣ — Unit 1"},
-    u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط وأسئلته، و<span class=ltr>be + born</span> والمبني للمجهول، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ، وأخبار <span class=ltr>People in the News</span>.", label:"إنجليزي م٣ — Unit 2"},
+    u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط وأسئلته، و<span class=ltr>be + born</span> والمبني للمجهول، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ، و<span class=ltr>used to</span> بصيغها الثلاث، وأفعال الماضي، وقطعة <span class=ltr>The King of Saudi Arabia</span>.", label:"إنجليزي م٣ — Unit 2"},
     u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، ومفردات السفر.", label:"إنجليزي م٣ — Unit 3"}
   };
 
