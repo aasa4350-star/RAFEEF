@@ -440,16 +440,25 @@ function gPrimeOdd(lvl){
 
 /* ١٢) عدّ المثلّثات في شكل مرسوم */
 function gCountTri(lvl){
-  var k=ri(1, lvl>=2?4:3), total=(k+1)*(k+2)/2, lines="";
+  var k=ri(1, lvl>=2?5:3), total=(k+1)*(k+2)/2;
+  /* الرؤوس الثلاثة، والأشعّة تخرج من رأسٍ نختاره عشوائيًّا إلى الضلع المقابل.
+     القانون نفسه في الحالات كلّها: عدد المثلّثات = C(k+2, 2). */
+  var from=ri(0,2);                                  // من أيّ رأس تخرج الأشعّة
+  var apexX=ri(70,130);                              // موضع القمّة يتغيّر فيتغيّر شكل المثلّث
+  var P=[[apexX,12],[10,112],[190,112]];             // 0 القمّة · 1 يسار · 2 يمين
+  var A=P[from], B=P[(from+1)%3], C=P[(from+2)%3];   // الأشعّة من A إلى الضلع BC
+  var lines="";
   for(var i=1;i<=k;i++){
-    var x=(10+180*i/(k+1)).toFixed(1);
-    lines+='<line x1="100" y1="12" x2="'+x+'" y2="112" stroke="currentColor" stroke-width="2"/>';
+    var f=i/(k+1);
+    var x=(B[0]+(C[0]-B[0])*f).toFixed(1), y=(B[1]+(C[1]-B[1])*f).toFixed(1);
+    lines+='<line x1="'+A[0]+'" y1="'+A[1]+'" x2="'+x+'" y2="'+y+'" stroke="currentColor" stroke-width="2"/>';
   }
   var svg='<svg viewBox="0 0 200 124" width="190" height="118" style="display:block;margin:10px auto;color:var(--accent)">'+
-    '<polygon points="100,12 10,112 190,112" fill="none" stroke="currentColor" stroke-width="2.5"/>'+lines+'</svg>';
-  var o=opt3(total,[total+1,total-1,k+1]);
+    '<polygon points="'+P.map(function(p){return p[0]+","+p[1];}).join(" ")+'" fill="none" stroke="currentColor" stroke-width="2.5"/>'+lines+'</svg>';
+  var o=opt3(total,[k+1,total+1,total-1,2*k+1]);
   return ["كم مثلّثًا في الشكل التالي؟"+svg,o[0],o[1],
-    "الأجزاء الصغيرة "+(k+1)+"، ونضيف المثلّثات الناتجة من دمج الأجزاء المتجاورة، فيصير المجموع "+total+" مثلّثًا."];
+    "الأجزاء الصغيرة "+(k+1)+"، وكلّ مثلّثٍ يتحدّد باختيار خطّين من الخطوط الـ"+(k+2)+" الخارجة من الرأس: "+
+    (k+2)+"×"+(k+1)+" ÷ 2 = "+total+" مثلّثًا.","ct:"+from+"-"+k];
 }
 
 /* ١٣) الكسر من شكل مظلّل */
@@ -491,18 +500,56 @@ function gCompareAges(lvl){
 
 /* ١٥) طاولات مصفوفة في صفّ: شخصان لكلّ طاولة + شخصان في الطرفين */
 function gTableRow(lvl){
-  var n=ri(3,6), correct=2*n+2, tw=34, out="";
-  for(var i=0;i<n;i++){
-    var x=i*tw+10;
-    out+='<rect x="'+x+'" y="24" width="'+(tw-3)+'" height="18" rx="3" fill="#7dd3fc" stroke="currentColor" stroke-width="1.5"/>'+
-         '<circle cx="'+(x+(tw-3)/2)+'" cy="13" r="5" fill="#f59e0b"/>'+
-         '<circle cx="'+(x+(tw-3)/2)+'" cy="53" r="5" fill="#f59e0b"/>';
+  /* ثلاث هيئات مختلفة بقوانين مختلفة، حتى لا يحفظ الطالب «2ن + 2» ويكفّ عن التفكير. */
+  var mode = gp(["joined","separate","square"]);
+  var tw=34, out="", n, s, correct, stem, why, W, H=66;
+
+  if(mode==="joined"){
+    n=ri(3, lvl>=2?8:6); s=(lvl>=2 && Math.random()<0.5)?2:1;
+    correct=2*s*n+2;
+    for(var i=0;i<n;i++){
+      var x=i*tw+10, cx=x+(tw-3)/2;
+      out+='<rect x="'+x+'" y="24" width="'+(tw-3)+'" height="18" rx="3" fill="#7dd3fc" stroke="currentColor" stroke-width="1.5"/>';
+      for(var j=0;j<s;j++){
+        var off=(s===1)?0:(j===0?-7:7);
+        out+='<circle cx="'+(cx+off)+'" cy="13" r="4.5" fill="#f59e0b"/>'+
+             '<circle cx="'+(cx+off)+'" cy="53" r="4.5" fill="#f59e0b"/>';
+      }
+    }
+    out+='<circle cx="4" cy="33" r="4.5" fill="#f59e0b"/><circle cx="'+(n*tw+15)+'" cy="33" r="4.5" fill="#f59e0b"/>';
+    W=n*tw+22;
+    stem="تُصفّ "+n+" طاولات ملتصقة في صفٍّ واحد كما في الشكل: يجلس "+(s===1?"شخصٌ واحد":"شخصان")+
+         " على كلّ جانبٍ من كلّ طاولة، وشخصٌ عند كلّ طرفٍ من طرفَي الصفّ. كم شخصًا يجلس؟";
+    why="لكلّ طاولة "+(2*s)+" أشخاص على الجانبين: (2 × "+s+" × "+n+") + 2 للطرفين = "+correct+" شخصًا.";
   }
-  out+='<circle cx="4" cy="33" r="5" fill="#f59e0b"/><circle cx="'+(n*tw+15)+'" cy="33" r="5" fill="#f59e0b"/>';
-  var svg='<svg viewBox="0 0 '+(n*tw+22)+' 66" width="'+Math.min(300,n*tw+22)+'" style="display:block;margin:10px auto;color:var(--ink)">'+out+'</svg>';
-  var o=opt3(correct,[2*n,correct+2,4*n]);
-  return ["تُصفّ "+n+" طاولات في صفّ واحد كما في الشكل: يجلس شخص على كلّ جانب من كلّ طاولة، وشخص عند كلّ طرف من طرفَي الصفّ. كم شخصًا يجلس؟"+svg,
-    o[0],o[1],"(2 × "+n+") + 2 = "+correct+" شخصًا: شخصان لكلّ طاولة، وشخصان في الطرفين."];
+  else if(mode==="separate"){
+    n=ri(2, lvl>=2?6:4); correct=4*n;
+    for(var i2=0;i2<n;i2++){
+      var x2=i2*(tw+12)+12, c2=x2+(tw-3)/2;
+      out+='<rect x="'+x2+'" y="24" width="'+(tw-3)+'" height="18" rx="3" fill="#bbf7d0" stroke="currentColor" stroke-width="1.5"/>'+
+           '<circle cx="'+c2+'" cy="13" r="4.5" fill="#f59e0b"/><circle cx="'+c2+'" cy="53" r="4.5" fill="#f59e0b"/>'+
+           '<circle cx="'+(x2-6)+'" cy="33" r="4.5" fill="#f59e0b"/><circle cx="'+(x2+tw-3+6)+'" cy="33" r="4.5" fill="#f59e0b"/>';
+    }
+    W=n*(tw+12)+18;
+    stem=n+" طاولات منفصلة، حول كلّ طاولةٍ 4 أشخاص كما في الشكل. كم شخصًا يجلس؟";
+    why="الطاولات منفصلة فلا تُدمج المقاعد: 4 × "+n+" = "+correct+" شخصًا.";
+  }
+  else{
+    /* مربّع مفرّغ: ن طاولة في كلّ ضلع، والزوايا مشتركة */
+    n=ri(2,4); correct=4*n-4>0?4*n-4:4;
+    var side=n, cell=30, pad=14;
+    for(var r=0;r<side;r++) for(var c=0;c<side;c++){
+      if(r>0 && r<side-1 && c>0 && c<side-1) continue;      // الداخل فارغ
+      out+='<rect x="'+(pad+c*cell)+'" y="'+(pad+r*cell)+'" width="'+(cell-6)+'" height="'+(cell-6)+'" rx="3" fill="#fde68a" stroke="currentColor" stroke-width="1.5"/>';
+    }
+    W=side*cell+pad*2; H=side*cell+pad*2;
+    stem="رُتِّبت طاولات على شكل مربّعٍ مفرّغٍ، في كلّ ضلعٍ "+n+" طاولة (وطاولات الزوايا مشتركة بين ضلعين). كم طاولةً في الشكل؟";
+    why="4 أضلاع × "+n+" = "+(4*n)+"، لكنّ الزوايا الأربع عُدَّت مرّتين فنطرحها: "+(4*n)+" − 4 = "+correct+" طاولة.";
+  }
+
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="'+Math.min(300,W)+'" style="display:block;margin:10px auto;color:var(--ink)">'+out+'</svg>';
+  var o=opt3(correct,[correct+2,correct-2,4*n,2*n]);
+  return [stem+svg,o[0],o[1],why,"tr:"+mode+"-"+n+"-"+(s||0)];
 }
 
 /* ١٦) قراءة رسم بيانيّ بالأعمدة */
@@ -560,17 +607,40 @@ function gBiggestNumber(lvl){
     "نضع "+(big?"أكبر":"أصغر")+" رقم في أعلى منزلة ثمّ ننتقل إلى المنازل الأقلّ بالطريقة نفسها: "+sorted.join("")+"."];
 }
 
-/* ١٩) عدّ المربّعات بكلّ الأحجام في شبكة */
+/* ١٩) عدّ المربّعات/المستطيلات بكلّ الأحجام في شبكة m×n
+   شبكة غير مربّعة + سؤال المستطيلات ⟵ عشرات الأشكال بدل ٣ فقط،
+   حتى لا يحفظ الطالب الشكل بدل أن يعدّ. */
 function gCountSquares(lvl){
-  var n=ri(2,(lvl>=2)?4:3), total=n*(n+1)*(2*n+1)/6, cw=26, out="";
-  for(var r=0;r<n;r++){ for(var c=0;c<n;c++){
+  var hi=(lvl>=2)?5:4;
+  var m=ri(2,hi), n=ri(2,hi);                 // m أعمدة × n صفوف
+  var wantRect = (Math.random()<0.4) && lvl>=2;
+
+  var mn=Math.min(m,n), sq=0, i;
+  for(i=1;i<=mn;i++) sq += (m-i+1)*(n-i+1);   // عدد المربّعات بكلّ الأحجام
+  var rects = (m*(m+1)/2) * (n*(n+1)/2);      // عدد المستطيلات بكلّ الأحجام
+  var total = wantRect ? rects : sq;
+
+  var cw = (Math.max(m,n)>=5) ? 22 : 26, out="";
+  for(var r=0;r<n;r++){ for(var c=0;c<m;c++){
     out+='<rect x="'+(c*cw+2)+'" y="'+(r*cw+2)+'" width="'+cw+'" height="'+cw+'" fill="none" stroke="currentColor" stroke-width="2"/>';
   } }
-  var sz=n*cw+4;
-  var svg='<svg viewBox="0 0 '+sz+' '+sz+'" height="'+sz+'" style="display:block;margin:10px auto;color:var(--accent)">'+out+'</svg>';
-  var o=opt3(total,[n*n,total+1,total-2]);
-  return ["كم مربّعًا في الشكل التالي؟ (احسب المربّعات بجميع الأحجام)"+svg,o[0],o[1],
-    "مربّعات 1×1 عددها "+(n*n)+"، ثمّ نضيف المربّعات الأكبر المكوّنة منها، فيصير المجموع "+total+" مربّعًا."];
+  var W=m*cw+4, H=n*cw+4;
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" style="display:block;margin:10px auto;color:var(--accent)">'+out+'</svg>';
+
+  var o=opt3(total,[m*n, total+1, total-2, sq+m*n]);
+  var stem = wantRect
+    ? "كم مستطيلًا في الشكل التالي؟ (احسب المستطيلات بجميع الأحجام، والمربّع مستطيل)"
+    : "كم مربّعًا في الشكل التالي؟ (احسب المربّعات بجميع الأحجام)";
+  var why;
+  if(wantRect){
+    why = "نختار خطّين رأسيّين من "+(m+1)+" وخطّين أفقيّين من "+(n+1)+": "
+        + (m*(m+1)/2)+" × "+(n*(n+1)/2)+" = "+rects+" مستطيلًا.";
+  } else {
+    var parts=[];
+    for(i=1;i<=mn;i++) parts.push(i+"×"+i+": "+((m-i+1)*(n-i+1)));
+    why = "الشبكة "+m+"×"+n+" — "+parts.join(" ، ")+" ← المجموع "+sq+" مربّعًا.";
+  }
+  return [stem+svg,o[0],o[1],why,"cs:"+m+"x"+n+(wantRect?"r":"s")];
 }
 
 /* ===== دفعة الاختبارات التجريبية ١١+ من الكتاب (كمّي ومكاني) ===== */
@@ -590,24 +660,37 @@ function gPicEquation(lvl){
 
 /* ٢١) عدّ المسارات — مبدأ الضرب */
 function gPaths(lvl){
-  var n1=ri(2,4), n2=ri(2,4), correct=n1*n2;
+  /* مرحلتان أو ثلاث، وعدد الطرق حتى ٥ ⟵ عشرات الأشكال بدل ٩. */
+  var three = (lvl>=2) && Math.random()<0.45;
+  var legs = three ? [ri(2,4),ri(2,4),ri(2,3)] : [ri(2,5),ri(2,5)];
+  var correct = legs.reduce(function(a,b){ return a*b; }, 1);
+  var LAB=["أ","ب","ج","د"], COL=["#f97316","#7c3aed","#0891b2"];
+  var nodes=legs.length+1, W=three?300:260;
+  var xs=[]; for(var i=0;i<nodes;i++) xs.push(28 + i*((W-56)/(nodes-1)));
+
   var arcs=function(x1,x2,n,base){
     var s="";
     for(var i=0;i<n;i++){
-      var dy=(i-(n-1)/2)*13;
-      s+='<path d="M'+x1+',40 Q'+((x1+x2)/2)+','+(40+dy*1.8)+' '+x2+',40" fill="none" stroke="'+base+'" stroke-width="2"/>';
+      var dy=(i-(n-1)/2)*12;
+      s+='<path d="M'+x1.toFixed(1)+',40 Q'+((x1+x2)/2).toFixed(1)+','+(40+dy*1.9).toFixed(1)+' '+x2.toFixed(1)+',40" fill="none" stroke="'+base+'" stroke-width="2"/>';
     }
     return s;
   };
-  var svg='<svg viewBox="0 0 260 80" width="270" style="display:block;margin:10px auto;direction:ltr">'+
-    arcs(40,130,n1,"#f97316")+arcs(130,220,n2,"#7c3aed")+
-    '<circle cx="40" cy="40" r="16" fill="#0ea5e9"/><circle cx="130" cy="40" r="16" fill="#f472b6"/><circle cx="220" cy="40" r="16" fill="#22c55e"/>'+
-    '<text x="40" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">أ</text>'+
-    '<text x="130" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">ب</text>'+
-    '<text x="220" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">ج</text></svg>';
-  var o=opt3(correct,[n1+n2,correct+1,correct-1]);
-  return ["من (أ) إلى (ب) "+n1+" طرق، ومن (ب) إلى (ج) "+n2+" طرق. فكم طريقًا من (أ) إلى (ج)؟"+svg,
-    o[0],o[1],"لكلّ طريق من الأولى نختار أيًّا من طرق الثانية: "+n1+" × "+n2+" = "+correct+" طريقًا."];
+  var body="";
+  for(var L=0;L<legs.length;L++) body+=arcs(xs[L],xs[L+1],legs[L],COL[L]);
+  var FILL=["#0ea5e9","#f472b6","#22c55e","#eab308"];
+  for(var k=0;k<nodes;k++){
+    body+='<circle cx="'+xs[k].toFixed(1)+'" cy="40" r="15" fill="'+FILL[k]+'"/>'+
+          '<text x="'+xs[k].toFixed(1)+'" y="45" text-anchor="middle" font-size="15" fill="#fff" font-weight="700">'+LAB[k]+'</text>';
+  }
+  var svg='<svg viewBox="0 0 '+W+' 80" width="'+(W+10)+'" style="display:block;margin:10px auto;direction:ltr">'+body+'</svg>';
+
+  var parts=[];
+  for(var p=0;p<legs.length;p++) parts.push("من ("+LAB[p]+") إلى ("+LAB[p+1]+") "+legs[p]+" طرق");
+  var sum=legs.reduce(function(a,b){ return a+b; },0);
+  var o=opt3(correct,[sum, correct+1, correct-1, legs[0]+legs[1]]);
+  return [parts.join("، ")+". فكم طريقًا من (أ) إلى ("+LAB[nodes-1]+")؟"+svg, o[0],o[1],
+    "نضرب عدد خيارات كلّ مرحلة: "+legs.join(" × ")+" = "+correct+" طريقًا.","pa:"+legs.join("-")];
 }
 
 /* ٢٢) فخّ منطقي: التزامن لا يضاعف الزمن */
@@ -1004,7 +1087,9 @@ if(!NAMES[who]){
     }
     // نحدّث الذاكرة: نصوص هذه الجولة أوّلًا ثم القديم، بلا تكرار، حدّ ٢٠.
     var _mem=[], _ms={};
-    items.map(function(q){ return (q&&q[0])||""; }).concat(recent).forEach(function(k){ if(k && !_ms[k]){ _ms[k]=1; _mem.push(k); } });
+    /* نخزّن مفتاح المولّد إن وُجد بدل النصّ الكامل: أدقّ في منع تكرار نفس الشكل،
+       وأخفّ بكثير من تخزين رسوم SVG كاملة في localStorage. */
+    items.map(function(q){ return (q && (q[4]||q[0]))||""; }).concat(recent).forEach(function(k){ if(k && !_ms[k]){ _ms[k]=1; _mem.push(k); } });
     try{ localStorage.setItem(recentKey, JSON.stringify(_mem.slice(0,20))); }catch(e){}
     var html = '';
     // صندوق دروس الشرح (فيديو) لأصعب مهارات الاستدلال الرياضي — يبرز الأضعف حسب بيانات الطفل.
