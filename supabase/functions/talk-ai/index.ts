@@ -22,6 +22,10 @@ function cleanKey(raw: string | undefined): string {
   let k = String(raw || "").trim();
   k = k.replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
   k = k.replace(/\s+/g, "");
+  // النسخ من المتصفّح قد يجلب محارف غير مرئية (مسافة غير فاصلة، علامات اتجاه،
+  // BOM) لا يمسكها \s وترفضها الترويسة بـ«not a valid ByteString».
+  // نُبقي فقط المحارف التي تسمح بها ترويسة HTTP (ASCII المطبوع).
+  k = k.replace(/[^\x21-\x7E]/g, "");
   return k;
 }
 
