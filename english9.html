@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الإنجليزي — ثالث متوسط · SuperGoal 3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#4f46e5; --accent-deep:#3730a3;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
+  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .ax{direction:rtl;unicode-bidi:isolate;display:inline-block;font-weight:inherit}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 15px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:left;line-height:1.6}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;text-align:left}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<0 ? "\u2212" : "")+s; } // فاصلة آلاف + إشارة سالب رياضية
+function mn(s){ return '<span class="en">'+s+'</span>'; }
+// خيارات رقمية مميّزة: الصحيح + مشتّتات
+function numOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct+10, correct*2+1]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+
+/* ============================================================
+   رياضيات ثاني متوسط — الفصل ١: الجبر والدوال
+   الدروس ١-١ و١-٢ و١-٣، مبنيّة من كتاب رفيف نفسه (ص ١٢–٢٤).
+   كل مولّد فوقه رقم الدرس والصفحة التي أُخذ منها نوع السؤال.
+   ============================================================ */
+/* ===== دوالّ مساعدة ===== */
+var SUP = ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
+function sup(n){ return String(n).split("").map(function(d){ return SUP[+d]; }).join(""); }
+function pw(b,e){ return mn(b+sup(e)); }
+function tmz(n, sing, plur){ return (n>=3 && n<=10) ? plur : sing; }
+function ryl(n){ return tmz(n,"ريالًا","ريالات"); }
+function ax(s){ return '<span class="ax">'+s+'</span>'; }   /* عبارة جبرية بحروف عربية: عزل RTL */
+function pz(n){ return n<0 ? "("+fmt(n)+")" : fmt(n); }
+/* خيارات لأعداد صحيحة (تسمح بالسالب) */
+function zOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([-correct, correct+1, correct-1, correct+2, correct+10]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+/* خيارات نصّية متمايزة */
+function sOpts(right, cands){
+  var o=[right];
+  for(var i=0;i<cands.length && o.length<3;i++){ if(o.indexOf(cands[i])<0) o.push(cands[i]); }
+  shuffle(o); return [o, o.indexOf(right)];
+}
+
+/* ============================================================
+   الإنجليزي — ثالث متوسط · SuperGoal 3 (وزارة التعليم ١٤٤٨/٢٠٢٦)
+   مبنيّ من كتاب حسن نفسه: الوحدات ١–٣ (ص ٢–٣١).
+   كل مولّد يذكر فوقه الوحدة والصفحة التي أُخذت منها القاعدة.
+   ============================================================ */
+
+function en(s){ return '<span class="ltr">'+s+'</span>'; }
+/* خيارات نصّية إنجليزية متمايزة */
+function eOpts(right, cands){
+  var o=[right], i;
+  for(i=0;i<cands.length && o.length<3;i++){ if(cands[i]!=null && o.indexOf(cands[i])<0) o.push(cands[i]); }
+  if(o.length<3) return null;
+  shuffle(o); return [o, o.indexOf(right)];
+}
+
+/* ===================== الوحدة ١ — Lifestyles (ص ٢–١١) ===================== */
+
+/* جدول التكرار كما في الكتاب ص ٤ */
+var FREQ = [
+  {pct:"100%",     band:0, words:["always","all the time"]},
+  {pct:"50%–99%",  band:1, words:["usually","generally","normally","frequently","often","regularly"]},
+  {pct:"20%–49%",  band:2, words:["sometimes","occasionally","from time to time"]},
+  {pct:"1%–19%",   band:3, words:["once in a while","now and then","hardly ever","seldom","rarely"]},
+  {pct:"0%",       band:4, words:["never"]}
+];
+
+/* أيّ كلمة تدلّ على هذه النسبة؟ — المشتّتات من نطاقاتٍ أخرى فلا تلتبس */
+function u1Freq(){
+  var i=ri(0,FREQ.length-1), right=gp(FREQ[i].words);
+  var others=FREQ.filter(function(f){ return f.band!==FREQ[i].band; });
+  shuffle(others);
+  var o=eOpts(right,[gp(others[0].words), gp(others[1].words)]);
+  if(!o) return null;
+  return ["أيُّ كلمةٍ تدلّ على "+en(FREQ[i].pct)+" من الوقت؟",o[0].map(en),o[1],
+    "جدول التكرار في الكتاب (ص <span class=ltr>4</span>): "+
+    FREQ.map(function(f){ return en(f.pct)+" ← "+en(f.words.slice(0,3).join(", ")); }).join(" · ")+".",
+    "u1f:"+FREQ[i].band+":"+right];
+}
+
+/* أيّهما أكثر تكرارًا؟ */
+function u1FreqCompare(){
+  var a=ri(0,FREQ.length-1), b=ri(0,FREQ.length-1);
+  if(a===b) return null;
+  var hi = a<b ? a : b, lo = a<b ? b : a;      /* band الأصغر = أكثر تكرارًا */
+  var wHi=gp(FREQ[hi].words), wLo=gp(FREQ[lo].words);
+  var more = Math.random()<0.5;
+  var right = more ? wHi : wLo;
+  var o=eOpts(right,[more?wLo:wHi, "the same"]);
+  if(!o) return null;
+  return ["أيُّهما "+(more?"<b>أكثر</b>":"<b>أقلّ</b>")+" تكرارًا: "+en(wHi)+" أم "+en(wLo)+" ؟",
+    o[0].map(en),o[1],
+    en(wHi)+" = "+en(FREQ[hi].pct)+" و"+en(wLo)+" = "+en(FREQ[lo].pct)+".",
+    "u1fc:"+hi+"-"+lo+(more?"m":"l")];
+}
+
+/* موضع ظرف التكرار: قبل الفعل · بعد be · في آخر الجملة (ص ٤) */
+var U1_SUBJ = ["Ahmed","Sara","My brother","Ibrahim","Maha","Qassim","Jamal"];
+var U1_VERB = [["exercises","exercise"],["studies","study"],["reads books","read books"],
+               ["checks his email","check his email"],["arrives on time","arrive on time"],
+               ["drinks tea","drink tea"],["plays football","play football"]];
+var U1_ADV  = ["always","usually","often","sometimes","seldom","rarely","never","hardly ever"];
+var U1_END  = ["twice a week","once a month","every two months","all the time","now and then"];
+
+/* المشتّتات هنا <b>خاطئةٌ قطعًا</b> لا «أقلّ فصاحة»: خطأُ مطابقةٍ أو قلبُ ترتيبٍ
+   أو حذفُ الفعل. تجنّبنا صيغًا يمكن الدفاع عنها مثل «hardly ever is» و«Sometimes
+   Ahmed exercises» (والكتاب نفسه يجيز تصدير بعض الظروف)، حتى لا يُحتسب على
+   الطالب خطأٌ في إجابةٍ صحيحة. */
+function u1Place(){
+  var s=gp(U1_SUBJ), pair=gp(U1_VERB), v=pair[0], base=pair[1], mode=gp(["verb","be","end"]);
+  var right, w1, w2, why;
+  if(mode==="verb"){
+    var ad=gp(U1_ADV);
+    right = s+" "+ad+" "+v+".";
+    w1    = s+" "+ad+" "+base+".";              /* خطأ مطابقة: بلا s */
+    w2    = ad+" "+v+" "+s+".";                 /* قلب ترتيب */
+    why   = "ظرف التكرار يأتي <b>قبل الفعل</b>، والفعل مع المفرد الغائب يأخذ "+en("-s")+": "+en(right);
+  } else if(mode==="be"){
+    var ad2=gp(U1_ADV), adj=gp(["late","busy","tired","early","careful","polite"]);
+    right = s+" is "+ad2+" "+adj+".";
+    w1    = s+" is "+adj+" "+ad2+".";           /* الظرف بعد الصفة */
+    w2    = s+" "+ad2+" "+adj+".";              /* حذف الفعل be */
+    why   = "مع الفعل "+en("be")+" يأتي الظرف <b>بعده مباشرةً</b>: "+en(right);
+  } else {
+    var ex=gp(U1_END);
+    right = s+" "+v+" "+ex+".";
+    w1    = s+" "+ex+" "+v+".";                 /* العبارة بين الفاعل والفعل */
+    w2    = ex+" "+v+" "+s+".";                 /* قلب ترتيب */
+    why   = "العبارات مثل "+en(ex)+" تأتي <b>في آخر الجملة</b>: "+en(right);
+  }
+  var o=eOpts(right,[w1,w2]);
+  if(!o) return null;
+  return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1],why+" (الوحدة <span class=ltr>1</span>، ص <span class=ltr>4</span>).",
+    "u1p:"+mode+":"+s+v];
+}
+
+/* How often / How much / How long (ص ٤) */
+var U1_HOWQ = [
+  ["___ do you use your cell phone?","How often","I use it 20 times a day."],
+  ["___ time do you spend in the shower?","How much","I spend about 5 minutes."],
+  ["___ do you spend on your homework?","How long","I spend about 2 hours every night."],
+  ["___ do you go to the gym?","How often","Three times a week."],
+  ["___ money do you spend a week?","How much","About 100 riyals."],
+  ["___ do you sleep every night?","How long","About seven hours."],
+  ["___ does Refaa eat meat?","How often","She hardly ever eats meat."],
+  ["___ time does Noura spend painting?","How much","At least two hours every evening."],
+  ["___ does Martin go on vacation?","How often","He rarely takes a vacation."]
+];
+function u1HowQ(){
+  var q=gp(U1_HOWQ);
+  var o=eOpts(q[1], shuffle(["How often","How much","How long"].filter(function(x){return x!==q[1];})));
+  if(!o) return null;
+  return ["أكمل السؤال:<br>"+en(q[0])+"<br><span style='color:var(--muted)'>الإجابة: "+en(q[2])+"</span>",
+    o[0].map(en),o[1],
+    en("How often")+" لعدد المرّات · "+en("How much")+" لكمّيةٍ غير معدودة (وقت/مال) · "+
+    en("How long")+" لطول المدّة.",
+    "u1h:"+q[0]];
+}
+
+/* شخصيات الوحدة — من نصّ ص ٢–٣ */
+var U1_PEOPLE = [
+  ["Arthur","is really into fitness","works out at the gym regularly","goes rock climbing from time to time"],
+  ["Refaa","is a health food fanatic","normally eats vegetarian meals","hardly ever eats meat"],
+  ["John","hates any type of physical exercise","enjoys challenging puzzles like sudoku","plays video games in his free time"],
+  ["Josh","is an Internet addict","seldom spends less than three hours a day on the computer","often checks his cell phone"],
+  ["Noura","wants to be an artist","paints for at least two hours every evening","always does her homework after school"],
+  ["Martin","works very hard","always takes work home from the office","rarely takes a vacation"]
+];
+function u1People(){
+  var p=gp(U1_PEOPLE), others=U1_PEOPLE.filter(function(x){ return x[0]!==p[0]; });
+  shuffle(others);
+  var fact=gp([p[1],p[2],p[3]]);
+  var o=eOpts(p[0],[others[0][0], others[1][0]]);
+  if(!o) return null;
+  return ["مَن مِن أشخاص الوحدة "+en(fact)+" ؟",o[0].map(en),o[1],
+    en(p[0]+" "+p[1]+". "+p[0]+" "+p[2]+".")+" (ص <span class=ltr>2–3</span>)",
+    "u1pe:"+p[0]+fact];
+}
+
+/* مفردات الوحدة ١ — مرادفٌ إنجليزيّ لا ترجمة */
+var U1_VOC = [
+  ["seldom","rarely","always","quickly"],
+  ["frequently","often","never","slowly"],
+  ["hardly ever","almost never","almost always","very quickly"],
+  ["from time to time","sometimes","every day","never"],
+  ["work out","exercise","sleep","study"],
+  ["fanatic","someone with an extreme interest","someone who is lazy","someone who is late"],
+  ["devoted to","very committed to","bored with","afraid of"],
+  ["overdo","do too much","do too little","do nothing"],
+  ["chores","household jobs","school subjects","sports games"],
+  ["addict","someone who cannot stop","someone who never starts","someone who is new"],
+  ["challenging","difficult and interesting","easy and boring","short and simple"],
+  ["regularly","at regular times","once only","by accident"]
+];
+function u1Vocab(){
+  var w=gp(U1_VOC);
+  var o=eOpts(w[1],[w[2],w[3]]);
+  if(!o) return null;
+  return ["What does "+en('"'+w[0]+'"')+" mean?",o[0].map(en),o[1],
+    en(w[0])+" = "+en(w[1])+" — من مفردات الوحدة <span class=ltr>1</span>.",
+    "u1v:"+w[0]];
+}
+
+/* ===================== الوحدة ٢ — Life Stories (ص ١٢–٢١) ===================== */
+
+/* حروف الجرّ للمكان: in / on / at (ص ٢٠ Writing Corner) */
+var U2_PLACE = [
+  ["Jeddah","in"],["Saudi Arabia","in"],["the world","in"],["Riyadh","in"],["Makkah","in"],
+  ["Earth","on"],["an island","on"],["the second floor","on"],
+  ["school","at"],["home","at"],["work","at"],["the airport","at"]
+];
+function u2PrepPlace(){
+  var p=gp(U2_PLACE);
+  var o=eOpts(p[1], shuffle(["in","on","at"].filter(function(x){return x!==p[1];})));
+  if(!o) return null;
+  return ["أكمل بحرف الجرّ الصحيح:<br>"+en("He lives ___ "+p[0]+"."),o[0].map(en),o[1],
+    en("in")+" للمدن والدول والعالم · "+en("on")+" لـ"+en("Earth")+" والجزر والطوابق · "+
+    en("at")+" لـ"+en("school / home / work / the airport")+
+    " ← "+en("in Jeddah · on Earth · at school")+" (ص <span class=ltr>20</span>).",
+    "u2pp:"+p[0]];
+}
+
+/* حروف الجرّ للزمان: in / on / at (ص ٢٠) */
+var U2_TIME = [
+  ["Monday","on"],["June 3rd","on"],["Friday morning","on"],["May 25th","on"],
+  ["8:00 a.m.","at"],["noon","at"],["6 A.M.","at"],["night","at"],
+  ["2001","in"],["May","in"],["the winter","in"],["1998","in"],["the 20th century","in"]
+];
+function u2PrepTime(){
+  var p=gp(U2_TIME);
+  var o=eOpts(p[1], shuffle(["in","on","at"].filter(function(x){return x!==p[1];})));
+  if(!o) return null;
+  return ["أكمل بحرف الجرّ الصحيح:<br>"+en("It happened ___ "+p[0]+"."),o[0].map(en),o[1],
+    en("on")+" لليوم والتاريخ · "+en("at")+" للساعة و"+en("noon")+" و"+en("night")+" · "+
+    en("in")+" للشهر والسنة والفصل والقرن (ص <span class=ltr>20</span>).",
+    "u2pt:"+p[0]];
+}
+
+/* تعبيرات الزمن الماضي: last / yesterday / ago (ص ٢١) */
+function u2PastTime(){
+  var C=[
+    ["I was in grade 8 ___ year.","last",["ago","yesterday"]],
+    ["I saw him two days ___.","ago",["last","yesterday"]],
+    ["We finished Unit 1 a week ___.","ago",["last","yesterday"]],
+    ["I woke up early ___ morning.","yesterday",["ago","last"]],
+    ["She called me ten minutes ___.","ago",["last","yesterday"]],
+    ["They travelled ___ summer.","last",["ago","yesterday"]],
+    ["He arrived ___ night.","last",["ago","yesterday"]],
+    ["The day before ___ was Sunday.","yesterday",["ago","last"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1], c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    en("last")+" تسبق المدّة ("+en("last night, last week")+") · "+
+    en("ago")+" تأتي <b>بعدها</b> ("+en("two days ago")+") · "+
+    en("yesterday")+" وحدها أو مع "+en("morning/evening")+" (ص <span class=ltr>21</span>).",
+    "u2pa:"+c[0]];
+}
+
+/* جمل when و used to (ص ٢١) */
+function u2When(){
+  var C=[
+    ["أيُّ الجمل صحيحة؟","When I was a child, I used to play with my toys all day.",
+     ["When I was a child, I use to play with my toys all day.",
+      "When I am a child, I used to play with my toys all day."]],
+    ["أيُّ الجمل صحيحة؟","They didn't go to school when they were four years old.",
+     ["They didn't went to school when they were four years old.",
+      "They didn't go to school when they are four years old."]],
+    ["أيُّ الجمل صحيحة؟","I was raised in Abha. Then my family moved to Riyadh when I was twelve.",
+     ["I was raised in Abha. Then my family moves to Riyadh when I was twelve.",
+      "I was raise in Abha. Then my family moved to Riyadh when I was twelve."]],
+    ["أيُّ الجمل صحيحة؟","He learned to read before he went to school.",
+     ["He learned to read before he goes to school.",
+      "He learn to read before he went to school."]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1], c[2]);
+  if(!o) return null;
+  return [c[0]+"<br><span style='color:var(--muted);font-size:.9rem'>(جمل "+en("when")+" و"+en("used to")+" — ص <span class=ltr>21</span>)</span>",
+    o[0].map(en),o[1],
+    "في الحديث عن الماضي: الفعل بعد "+en("when")+" في الماضي أيضًا، و"+en("used to")+
+    " تُكتب هكذا دائمًا (لا "+en("use to")+")، وبعد "+en("didn't")+" يأتي المصدر بلا تصريف.",
+    "u2w:"+c[1]];
+}
+
+/* مفردات قطعة الملك سلمان — من تمرين Match ص ١٩ */
+var U2_VOC = [
+  ["abroad","in other countries","in your own city","at home"],
+  ["humanitarian","a person who helps others","a person who travels a lot","a person who writes books"],
+  ["relief","taking away stress and pain","adding more work","making a plan"],
+  ["appoint","name someone for an important position","remove someone from a job","meet someone by chance"],
+  ["metropolis","a big city","a small village","a desert area"],
+  ["accomplishment","something achieved successfully","something forgotten","something borrowed"],
+  ["governor","the person who governs a region","a person who drives","a person who teaches"],
+  ["biography","the story of a person's life","a list of prices","a type of map"]
+];
+function u2Vocab(){
+  var w=gp(U2_VOC);
+  var o=eOpts(w[1],[w[2],w[3]]);
+  if(!o) return null;
+  return ["What does "+en('"'+w[0]+'"')+" mean?",o[0].map(en),o[1],
+    en(w[0])+" = "+en(w[1])+" — من قطعة القراءة في الوحدة <span class=ltr>2</span> (ص <span class=ltr>19</span>).",
+    "u2v:"+w[0]];
+}
+
+/* ===================== الوحدة ٣ — When Are You Traveling? (ص ٢٢–٣١) ===================== */
+
+/* المضارع المستمر للترتيبات المستقبلية (ص ٢٤) */
+function u3PresProg(){
+  var C=[
+    ["My friends ___ for me at the airport right now.","are waiting",["waits","are wait"]],
+    ["My friends ___ tomorrow.","are arriving",["arrives","are arrive"]],
+    ["What ___ you doing tonight?","are",["is","do"]],
+    ["I ___ to Japan tomorrow morning.","am flying",["fly","am fly"]],
+    ["We ___ our bags now.","are checking",["checks","are check"]],
+    ["She ___ for Paris tomorrow.","is leaving",["leave","is leave"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1], c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "المضارع المستمر = "+en("be + verb-ing")+" ، ويُستعمل لما يحدث <b>الآن</b> أو لترتيبٍ <b>مؤكّد في المستقبل</b>. "+
+    "وكلمات مثل "+en("tonight, tomorrow, next week")+" تدلّ على المستقبل (ص <span class=ltr>24</span>).",
+    "u3pp:"+c[0]];
+}
+
+/* going to مقابل will (ص ٢٤) */
+function u3GoingWill(){
+  var C=[
+    ["I've already decided. I ___ travel to Europe this summer.","am going to",["will",  "am will"]],
+    ["I'm not sure. Maybe I ___ stay with friends.","will",["am going to","going to"]],
+    ["We have our tickets. We ___ leave on Monday.","are going to",["will","are will"]],
+    ["I probably ___ stay in a hotel.","won't",["am not going to","don't going to"]],
+    ["What ___ you going to do on your vacation?","are",["will","do"]],
+    ["Perhaps it ___ rain tomorrow.","will",["is going to","going to"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1], c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    en("be going to")+" لخطّةٍ <b>مقرّرة</b> · "+en("will")+" مع "+en("maybe/probably/perhaps")+
+    " لخطّةٍ <b>غير مؤكّدة</b> (ص <span class=ltr>24</span>).",
+    "u3gw:"+c[0]];
+}
+
+/* مفردات السفر والمطار — من ص ٢٢–٢٣ */
+var U3_VOC = [
+  ["carry-on","a bag you take onto the plane","a bag you check in","a ticket for a bus"],
+  ["boarding pass","the card that lets you get on the plane","a hotel key","a bank card"],
+  ["delayed","later than the planned time","earlier than planned","cancelled forever"],
+  ["gate","the door where passengers board","the airport café","the baggage belt"],
+  ["checked baggage","bags that travel in the hold","bags you keep with you","empty bags"],
+  ["departure","the time a flight leaves","the time a flight lands","the price of a ticket"],
+  ["belongings","the things you own and carry","the rules of the airport","the crew of the plane"],
+  ["vaccination","a medical injection against disease","a travel document","a type of luggage"],
+  ["identification","a document that proves who you are","a map of the airport","a boarding queue"]
+];
+function u3Vocab(){
+  var w=gp(U3_VOC);
+  var o=eOpts(w[1],[w[2],w[3]]);
+  if(!o) return null;
+  return ["What does "+en('"'+w[0]+'"')+" mean?",o[0].map(en),o[1],
+    en(w[0])+" = "+en(w[1])+" — من مفردات السفر في الوحدة <span class=ltr>3</span> (ص <span class=ltr>22–23</span>).",
+    "u3v:"+w[0]];
+}
+
+/* نصائح المسافرين — فهم من نصّ Advice to Travelers ص ٢٣ */
+var U3_ADVICE = [
+  ["Where should you put liquids when you travel?","In your checked baggage",
+   ["In your pockets","In your carry-on bag"]],
+  ["How early should you arrive at the airport?","At least two hours before departure",
+   ["Ten minutes before departure","One hour after departure"]],
+  ["What should you put on your suitcase?","A name tag to identify it",
+   ["A price label","A photograph of the airport"]],
+  ["Should you pack items for strangers?","No, never",
+   ["Yes, if they ask politely","Yes, if the bag is small"]],
+  ["What do you need for international travel?","A passport",
+   ["Only a photograph","Only a credit card"]]
+];
+function u3Advice(){
+  var a=gp(U3_ADVICE);
+  var o=eOpts(a[1],a[2]);
+  if(!o) return null;
+  return [en(a[0]),o[0].map(en),o[1],
+    "من "+en("Advice to Travelers")+" في الوحدة <span class=ltr>3</span> (ص <span class=ltr>23</span>): "+en(a[1])+".",
+    "u3a:"+a[0]];
+}
+
+var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab];
+var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab];
+var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice];
+var ALLU = U1.concat(U2).concat(U3);
+
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الإنجليزي · <span class=ltr>SuperGoal 3</span></p><h1>🔤 الإنجليزي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="math9.html?who='+who+'">🔢 الرياضيات</a></div>'+
+    '<div class="chapsel" id="chapsel"></div>'+
+    '<div class="unit" id="unit"></div>'+
+    '<div class="tabs" role="tablist" id="tabs"></div>'+
+    '<div id="panels"></div>'+
+    '<footer>الإنجليزي · ثالث متوسط · <span class=ltr>SuperGoal 3</span> · مطابق لكتاب الطالب</footer>';
+
+  var CFG = {
+    allu:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–3</span> من كتابك.", label:"إنجليزي م٣ — شامل و1-3"},
+    u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>.", label:"إنجليزي م٣ — Unit 1"},
+    u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ للزمان والمكان، وتعبيرات الماضي.", label:"إنجليزي م٣ — Unit 2"},
+    u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، ومفردات السفر.", label:"إنجليزي م٣ — Unit 3"}
+  };
+
+  var CHAPS = {
+    p1: {name:"Part 1 · الوحدات 1–3", unit:'\ud83d\udcd8 مطابق لكتاب <span class="ltr">SuperGoal 3</span> — ثالث متوسط · <span class="ltr">Part 1</span>: الوحدات <span class="ltr">1–3</span> (ص <span class="ltr">2\u201331</span>)',
+         ids:["allu","u1","u2","u3"]}
+  };
+
+  var curCh = "p1", curId = "allu";
+
+  function panelOf(id){
+    var pan = document.getElementById("p_"+id);
+    if(!pan){ pan = document.createElement("section"); pan.className="panel"; pan.id="p_"+id; document.getElementById("panels").appendChild(pan); }
+    return pan;
+  }
+  function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
+
+  function render(id){
+    var c = CFG[id], sec = panelOf(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="english9", REM_LABEL="الإنجليزي";
+  var REMTOPICS=[
+    {id:"u1", name:"Unit 1 — Lifestyles", tip:"ظرف التكرار يأتي قبل الفعل (He always drinks tea) لكن بعد الفعل be (He is always late). والعبارات مثل twice a week و once a month تأتي في آخر الجملة. وسُلَّم التكرار: always 100% ← usually/often 50–99% ← sometimes 20–49% ← seldom/rarely/hardly ever 1–19% ← never 0%.", yt:"شرح adverbs of frequency ثالث متوسط سوبر قول"},
+    {id:"u2", name:"Unit 2 — Life Stories", tip:"in للشهر والسنة والفصل والقرن، on لليوم والتاريخ، at للساعة و noon و night. وفي المكان: in للمدن والدول، on لـ Earth والجزر، at لـ school/home/work. و last تسبق المدّة (last week) أمّا ago فتأتي بعدها (two days ago). و used to تُكتب هكذا دائمًا.", yt:"شرح prepositions of time and place ثالث متوسط سوبر قول"},
+    {id:"u3", name:"Unit 3 — Traveling", tip:"المضارع المستمر (be + verb-ing) لما يحدث الآن أو لترتيبٍ مؤكّد في المستقبل مع tonight/tomorrow. و be going to لخطّةٍ مقرّرة، أمّا will فمع maybe/probably/perhaps لخطّةٍ غير مؤكّدة.", yt:"شرح going to and will ثالث متوسط سوبر قول"}
+  ];
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=panelOf("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+
+  function showPanel(id){
+    leaveCur();
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var pan = panelOf(id);
+    pan.classList.add("active");
+    curId = id;
+    if(id==="rem"){ renderRem(); }
+    else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  }
+  function drawTabs(){
+    var ch = CHAPS[curCh], t = document.getElementById("tabs");
+    t.innerHTML = ch.ids.map(function(id){
+      return '<button data-tab="'+id+'" aria-selected="'+(id===curId?"true":"false")+'">'+CFG[id].tab+'</button>';
+    }).join("") + '<button data-tab="rem" aria-selected="'+(curId==="rem"?"true":"false")+'">علاجي 💪</button>';
+    t.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        t.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+        b.setAttribute("aria-selected","true");
+        showPanel(b.dataset.tab);
+      });
+    });
+    document.getElementById("unit").innerHTML = ch.unit;
+  }
+  function drawChap(){
+    var e = document.getElementById("chapsel");
+    e.innerHTML = Object.keys(CHAPS).map(function(c){
+      return '<button data-ch="'+c+'" aria-selected="'+(c===curCh?"true":"false")+'">'+CHAPS[c].name+'</button>';
+    }).join("");
+    e.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        if(curCh===b.dataset.ch) return;
+        leaveCur(); curCh=b.dataset.ch; curId=CHAPS[curCh].ids[0];
+        drawChap(); drawTabs(); showPanel(curId);
+      });
+    });
+  }
+  function chapOf(id){
+    var found = null;
+    Object.keys(CHAPS).forEach(function(c){ if(CHAPS[c].ids.indexOf(id) >= 0) found = c; });
+    return found;
+  }
+  function goTo(id){
+    var c = chapOf(id); if(c) curCh = c;
+    curId = id; drawChap(); drawTabs(); showPanel(id);
+  }
+
+  drawChap(); drawTabs(); showPanel("allu");
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
+
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
