@@ -679,6 +679,1875 @@ function u3Ing(){
     "u3ing:"+v[0]];
 }
 
+/* ===== إتمام الوحدة ٣ (ص ٢٨–٣١) ===== */
+
+/* قطعة Study Arabic in Saudi Arabia — فهم (ص ٢٨) */
+var U3_READ = [
+  ["What is Abha the capital of?","Asir province",["Asir Mountains","Riyadh province"]],
+  ["How high above sea level is Abha?","2,200 meters",["7,218 meters","250 meters"]],
+  ["How high is Abha in feet?","7,218 feet",["2,200 feet","1,900 feet"]],
+  ["What is the population of Abha?","Over 250,000",["Over 400 million","About 1,900"]],
+  ["What are the average temperatures in Abha?","Between 12° C and 24° C",
+   ["Between 54° C and 75° C",  "Between 0° C and 12° C"]],
+  ["What is Abha known for?","Traditional stone and mud-brick houses",
+   ["Tall glass towers","Underground trains"]],
+  ["When do most visitors come to Abha?","In summer",["In winter","In spring"]],
+  ["Which sport do some visitors enjoy in Abha?","Paragliding",["Skiing","Sailing"]],
+  ["How many people speak Arabic?","More than 400 million",
+   ["More than 40 million","About 250,000"]],
+  ["Where do most Arabic speakers live?","In the Middle East and North Africa",
+   ["In Europe and the United States","In eastern Asia"]],
+  ["Why is Arabic important to Muslims?","It is the language of the Holy Qur'an",
+   ["It has no dialects","It is easy to write"]],
+  ["Where will the students live during their stay?","With a family",
+   ["In a hotel","At the airport"]],
+  ["What will students do at the Arabic Language School?","Study the language and the culture of Islam",
+   ["Study French and Spanish","Work in a bamboo forest"]],
+  ["Is Abha a big city?","It is neither big nor small",
+   ["It is one of the biggest cities in the world","It is a tiny village"]]
+];
+function u3Read(){
+  var r=gp(U3_READ);
+  var o=eOpts(r[1],r[2]);
+  if(!o) return null;
+  return [en(r[0]),o[0].map(en),o[1],
+    "من قطعة "+en("Study Arabic in Saudi Arabia")+" في الوحدة <span class=ltr>3</span> (ص <span class=ltr>28</span>): "+
+    en(r[1])+".",
+    "u3rd:"+r[0]];
+}
+
+/* After Reading A — معاني الكلمات كما وردت في المطويّة (ص ٢٩).
+   المشتّتات هي خيارات الكتاب نفسها a/b/c، فالجواب الصحيح واحدٌ بنصّ الكتاب. */
+var U3_RVOC = [
+  ["unique",    "special",                                   ["strange","to be chosen"]],
+  ["dialects",  "local varieties of language",               ["spelling differences","different accents"]],
+  ["recite",    "repeat from memory",                        ["tell a story","answer a question"]],
+  ["rich",      "have a lot of good things",                 ["wealthy","have a lot of sugar"]],
+  ["heritage",  "traditions",                                ["money from relatives","a preserved building"]],
+  ["buzzing",   "busy and lively",                           ["chaotic","very hot"]],
+  ["atmosphere","the way a place or situation makes you feel",["traffic","gases surrounding Earth"]]
+];
+function u3ReadVocab(){
+  var w=gp(U3_RVOC);
+  var o=eOpts(w[1],w[2]);
+  if(!o) return null;
+  return ["What does "+en('"'+w[0]+'"')+" mean <b>as used in the brochure</b>?",o[0].map(en),o[1],
+    en(w[0])+" = "+en(w[1])+" — من "+en("After Reading")+" في الوحدة <span class=ltr>3</span> "+
+    "(ص <span class=ltr>29</span>). انتبه: نأخذ المعنى <b>كما استُعمل في النصّ</b> لا كلّ معانيه.",
+    "u3rv:"+w[0]];
+}
+
+/* بريد عدنان من تورنتو — فهم (ص ٣٠) */
+var U3_ADNAN = [
+  ["Where is Adnan studying?","In Toronto",["In London","In Abha"]],
+  ["Is Adnan having a good time?","Yes, he says he is doing fine",
+   ["No, he wants to go home","He does not say"]],
+  ["What is the weather like in Toronto?","Quite cold",["Extremely hot","Very rainy"]],
+  ["What is the temperature in Toronto right now?","About 14° C",["About 40° C","About 24° C"]],
+  ["What did Adnan have this afternoon?","Vegetarian pizza and salad",
+   ["Rice and chicken","Only bread and tea"]],
+  ["What happened to Adnan on his first day?","He got lost",
+   ["He missed his plane","He lost his passport"]],
+  ["How many hours of English does he have every day?","Four",["Two","Fourteen"]],
+  ["What are his teachers like?","Extremely helpful",["Rather strict","Quite boring"]],
+  ["What are his classmates like?","Very friendly",["Very quiet","Not very kind"]],
+  ["Where is his class going next week?","To Niagara Falls",
+   ["To the Tate Modern","To Big Ben"]],
+  ["Who is going to show them around?","A tour guide",["His mother","His teacher"]],
+  ["What is Adnan going to send his parents?","Some photos",["A letter","Some money"]],
+  ["When are they going to talk on Skype?","On Saturday",["On Thursday","Next month"]],
+  ["Where is Adnan going now?","To the library",["To the cafeteria","To the airport"]]
+];
+function u3Adnan(){
+  var a=gp(U3_ADNAN);
+  var o=eOpts(a[1],a[2]);
+  if(!o) return null;
+  return [en(a[0]),o[0].map(en),o[1],
+    "من بريد "+en("Adnan")+" في ركن الكتابة بالوحدة <span class=ltr>3</span> (ص <span class=ltr>30</span>): "+
+    en(a[1])+".",
+    "u3ad:"+a[0]];
+}
+
+/* أدوات التقوية Intensifiers — الموضع (ص ٣٠) */
+function u3Intensifier(){
+  var C=[
+    /* الموضع: قبل الصفة أو الظرف مباشرة */
+    ["The people are ___ friendly.","really",["friendly really","really are"]],
+    ["I feel ___ lonely sometimes.","pretty",["lonely pretty","pretty am"]],
+    ["The weather is ___ cold.","so",["cold so","so is"]],
+    ["I'm learning ___ fast.","quite",["fast quite","quite am"]],
+    ["My teachers are ___ helpful.","extremely",["helpful extremely","extremely are"]],
+    ["I can't speak ___ well yet.","very",["well very","very can"]],
+    /* الموضع مع الاسم المفرد: quite قبل أداة التعريف، و very بعدها */
+    ["Which sentence is correct?","It has quite a large campus.",
+     ["It has quite large a campus.","It has a large quite campus."]],
+    ["Which sentence is correct?","It has a very large campus.",
+     ["It has very a large campus.","It has a large very campus."]],
+    ["Which sentence is correct?","It's quite a long trip.",
+     ["It's quite long a trip.","It's a long quite trip."]],
+    ["Which sentence is correct?","She is an extremely good teacher.",
+     ["She is extremely a good teacher.","She is a good extremely teacher."]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  var isPick = c[0].indexOf("Which sentence")===0;
+  return [isPick ? "أيُّ الجمل صحيحة؟" : ("أكمل الجملة:<br>"+en(c[0])),o[0].map(en),o[1],
+    "أدوات التقوية "+en("very, quite, really, pretty, so, extremely")+" تأتي <b>قبل الصفة أو الظرف</b> مباشرة. "+
+    "ومع الاسم المفرد: "+en("quite")+" <b>قبل</b> أداة التعريف ("+en("quite a large campus")+")، "+
+    "وبقيّتها <b>بعدها</b> ("+en("a very large campus")+") — ص <span class=ltr>30</span>.",
+    "u3in:"+c[0]+"|"+c[1]];
+}
+
+/* الجمل الزمنية — لا نستعمل صيغة المستقبل داخلها (ص ٣١) */
+function u3TimeClause(){
+  var C=[
+    ["They'll probably go skiing when they ___ on vacation.","are",["will be","are going to be"]],
+    ["I'll go shopping while you ___ dinner.","cook",["will cook","are going to cook"]],
+    ["As soon as we ___ , we're going straight to the hotel.","arrive",["will arrive","are arriving"]],
+    ["I won't spend a lot of money when I ___ to the shopping mall.","go",["will go","am going to go"]],
+    ["He won't go out until he ___ his homework.","finishes",["will finish","is finishing"]],
+    ["Call me before you ___ for the airport.","leave",["will leave","are leaving"]],
+    ["We'll wait here until they ___ for boarding.","call",["will call","are calling"]],
+    ["After he ___ his homework, he's going to play football.","does",["will do","is doing"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "الجملة الزمنية تبدأ بـ "+en("after, as soon as, before, until, when, while")+
+    " ، و<b>لا نستعمل صيغة المستقبل داخلها</b> بل المضارع، حتى لو كان الكلام عن المستقبل: "+
+    en("They'll go skiing when they are on vacation.")+" (ص <span class=ltr>31</span>).",
+    "u3tc:"+c[0]];
+}
+
+/* الفاصلة بعد الجملة الزمنية إذا تصدّرت (ص ٣١) */
+function u3TimeComma(){
+  var C=[
+    ["As soon as we arrive, we're going straight to the hotel.",
+     ["As soon as we arrive we're going straight to the hotel.",
+      "As soon as, we arrive we're going straight to the hotel."]],
+    ["Before you board the airplane, you must go through the security check.",
+     ["Before you board the airplane you must go through the security check.",
+      "Before, you board the airplane you must go through the security check."]],
+    ["While you're away at college, we're going to miss you.",
+     ["While you're away at college we're going to miss you.",
+      "While, you're away at college we're going to miss you."]],
+    ["When they're in London, they'll probably visit a museum.",
+     ["When they're in London they'll probably visit a museum.",
+      "When, they're in London they'll probably visit a museum."]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[0],c[1]);
+  if(!o) return null;
+  return ["أيُّ الجمل صحيحة في علامات الترقيم؟",o[0].map(en),o[1],
+    "نضع <b>فاصلة</b> بعد الجملة الزمنية إذا جاءت في <b>أوّل</b> الجملة: "+
+    en("As soon as we arrive, we're going straight to the hotel.")+
+    " ولا فاصلة إذا جاءت في آخرها (ص <span class=ltr>31</span>).",
+    "u3tcm:"+c[0]];
+}
+
+/* تمرين المطابقة A ص ٣١ — المشتّتات مختارة بيدٍ لئلّا تصلح جوابًا */
+var U3_MATCH = [
+  ["Take your ticket and passport with you","before you leave for the airport",
+   ["until he finishes his homework","when they're in London"]],
+  ["He's going to play football with his friends","after he does his homework",
+   ["before you leave for the airport","while you're away at college"]],
+  ["I won't spend a lot of money","when I go to the shopping mall",
+   ["until he finishes his homework","before you board the airplane"]],
+  ["They'll probably visit a museum","when they're in London",
+   ["until he finishes his homework","before you board the airplane"]],
+  ["We're going to miss you","while you're away at college",
+   ["until he finishes his homework","after he does his homework"]],
+  ["You must go through the security check","before you board the airplane",
+   ["until he finishes his homework","after he does his homework"]],
+  ["Passengers should wait by the gate","until they call for boarding",
+   ["before you leave for the airport","while you're away at college"]],
+  ["They're meeting their son at the airport","as soon as he arrives",
+   ["before you leave for the airport","while you're away at college"]],
+  ["You should arrive at the airport","two hours before departure",
+   ["until he finishes his homework","after he does his homework"]],
+  ["He won't go out with his friends","until he finishes his homework",
+   ["before you leave for the airport","while you're away at college"]]
+];
+function u3Match(){
+  var m=gp(U3_MATCH);
+  var o=eOpts(m[1],m[2]);
+  if(!o) return null;
+  return ["أكمل الجملة بالعبارة الزمنية المناسبة:<br>"+en(m[0]+" ___ ."),o[0].map(en),o[1],
+    en(m[0]+" "+m[1]+".")+" — من تمرين المطابقة في الوحدة <span class=ltr>3</span> (ص <span class=ltr>31</span>).",
+    "u3mt:"+m[0]];
+}
+
+/* حروف الحركة Prepositions of Movement — المعنى (ص ٣١) */
+var U3_MOVE = [
+  ["across",   "from one side to the other side",["along the length of something","round and round something"]],
+  ["along",    "following the length of something",["from one side to the other","out to the outside"]],
+  ["around",   "in a circle or on all sides of something",["from one side to the other","following the length"]],
+  ["through",  "in one end and out the other end of something",["on all sides of something","following the length"]],
+  ["into",     "from outside to inside",["from inside to outside","following the length"]],
+  ["out of",   "from inside to outside",["from outside to inside","on all sides of something"]],
+  ["away from","moving so the distance gets bigger",["moving so the distance gets smaller","in one end and out the other"]],
+  ["towards",  "moving so the distance gets smaller",["moving so the distance gets bigger","from inside to outside"]]
+];
+function u3Move(){
+  var m=gp(U3_MOVE);
+  var o=eOpts(m[1],m[2]);
+  if(!o) return null;
+  return ["What does "+en('"'+m[0]+'"')+" mean?",o[0].map(en),o[1],
+    en(m[0])+" = "+en(m[1])+" — من "+en("Prepositions of Movement")+" في الوحدة <span class=ltr>3</span> "+
+    "(ص <span class=ltr>31</span>).",
+    "u3mv:"+m[0]];
+}
+
+/* فقرة عماد وجاسم في لندن — التمرين B ص ٣١ (أخذنا الفراغات غير المحتملة إلّا بوجهٍ واحد) */
+var U3_LONDON = [
+  ["The train travels above ground as it moves ___ the airport.","away from",["into","through"]],
+  ["When it gets near the city, it travels ___ underground tunnels.","through",["across","away from"]],
+  ["After they check ___ the hotel, they'll rest and have dinner.","into",["around","across"]],
+  ["The next day, they're taking a tour ___ the city on a double-decker bus.","around",["through","out of"]],
+  ["The tour includes a short cruise ___ the Thames River.","along",["across","out of"]],
+  ["They want to walk ___ Millennium Bridge to the Tate Modern.","across",["along","out of"]],
+  ["In the evening, they're going to check ___ the hotel and leave.","out of",["into","around"]]
+];
+function u3London(){
+  var c=gp(U3_LONDON);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل بحرف الحركة المناسب:<br>"+en(c[0]),o[0].map(en),o[1],
+    en(c[1])+" هو الصواب — من فقرة "+en("Imad and Jasem in London")+" في الوحدة <span class=ltr>3</span> "+
+    "(ص <span class=ltr>31</span>). و"+en("check into")+" = يسجّل الدخول للفندق، و"+en("check out of")+
+    " = يسجّل الخروج منه.",
+    "u3ln:"+c[0]];
+}
+
+/* ===================== EXPANSION — مراجعة الوحدات ١–٣ (ص ٣٢) ===================== */
+
+/* نمر سيبيريا — صيغة الفعل (ص ٣٢) */
+function exTigers(){
+  var C=[
+    ["What ___ probably become of the Siberian tiger in the future?","will",["is","was"]],
+    ["There ___ now only about 400 to 500 Siberian tigers in the wild.","are",["is","were"]],
+    ["___ authorities be able to protect them?","Will",["Are","Do"]],
+    ["Siberian tigers ___ in the forests of eastern Asia.","live",["lives","living"]],
+    ["Some tigers ___ born and raised in zoos.","are",["is","do"]],
+    ["An adult male normally ___ 440 to 660 pounds.","weighs",["weigh","weighing"]],
+    ["They ___ very large animals.","are",["is","be"]],
+    ["At one meal, a Siberian tiger can ___ up to 95 pounds of meat.","eat",["eats","eating"]],
+    ["They sometimes ___ some of their catch in trees.","hide",["hides","hiding"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    "من فقرة "+en("Siberian Tigers")+" في مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>32</span>): "+
+    en(c[1])+". وبعد "+en("can")+" و"+en("will")+" يأتي الفعل <b>مجرّدًا</b>، والفاعل الجمع يأخذ "+
+    en("are / live")+" لا "+en("is / lives")+".",
+    "exti:"+c[0]];
+}
+
+/* الباندا — فهم (ص ٣٢) */
+var EX_PANDA = [
+  ["Where do pandas live?","In southwestern China",
+   ["In eastern Asia and Russia","In North Africa"]],
+  ["How many pandas remain in the wild?","About 1,900",["About 400 to 500","About 250,000"]],
+  ["What kind of forests do pandas live in?","Misty, rainy bamboo forests",
+   ["Dry desert forests","Cold snowy forests"]],
+  ["How much of a panda's diet is bamboo?","99 percent",["45 percent","16 percent"]],
+  ["How much bamboo does an adult giant panda eat each day?","Up to 95 pounds",
+   ["Up to 45 pounds","Up to 660 pounds"]],
+  ["How long does a panda spend eating each day?","About 16 hours",
+   ["About 9 hours","About 24 hours"]],
+  ["What do conservationists want to maintain?","A bamboo corridor",
+   ["A tiger reserve","A double-decker bus tour"]]
+];
+function exPanda(){
+  var p=gp(EX_PANDA);
+  var o=eOpts(p[1],p[2]);
+  if(!o) return null;
+  return [en(p[0]),o[0].map(en),o[1],
+    "من نصّ "+en("Pandas")+" في مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>32</span>): "+
+    en(p[1])+".",
+    "expa:"+p[0]];
+}
+
+/* صياغة السؤال من الجواب — التمرين B ص ٣٢ */
+function exAskQ(){
+  var C=[
+    ["I don't know what I'm <u>doing next Thursday</u>.","What are you doing next Thursday?",
+     ["What you are doing next Thursday?","What do you doing next Thursday?"]],
+    ["No, I'm <u>going to do my homework</u> tonight.","What are you going to do tonight?",
+     ["What you are going to do tonight?","What are you going to doing tonight?"]],
+    ["He'll probably <u>go to college after high school</u>.","What will he do after high school?",
+     ["What he will do after high school?","What will he doing after high school?"]],
+    ["Their friends are <u>arriving from Syria</u> tomorrow.","Where are their friends arriving from tomorrow?",
+     ["Where their friends are arriving from tomorrow?","Where are their friends arrive from tomorrow?"]],
+    ["She's <u>going to meet her sister</u> at the mall.","Who is she going to meet at the mall?",
+     ["Who she is going to meet at the mall?","Who is she going to meeting at the mall?"]]
+  ];
+  var c=gp(C);
+  var o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["اكتب السؤال المناسب للجزء الذي تحته خطّ:<br>"+en(c[0]),o[0].map(en),o[1],
+    "في السؤال نُقدّم الفعل المساعد على الفاعل: "+en("What are you…?")+" لا "+en("What you are…?")+
+    " ، ويأتي بعده الفعل بالصيغة الصحيحة — من مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>32</span>).",
+    "exaq:"+c[1]];
+}
+
+/* ===== مصانع المولّدات — تختصر التكرار وتوحّد الشكل ===== */
+
+/* سؤال فهم: [السؤال, الصواب, [مشتّتان]] */
+function factGen(list, note, key){
+  return function(){
+    var f=gp(list), o=eOpts(f[1],f[2]);
+    if(!o) return null;
+    return [en(f[0]),o[0].map(en),o[1], note+en(f[1])+".", key+":"+f[0]];
+  };
+}
+/* ملء فراغ: [الجملة بها ___, الصواب, [مشتّتان]] */
+function clozeGen(list, note, key){
+  return function(){
+    var c=gp(list), o=eOpts(c[1],c[2]);
+    if(!o) return null;
+    return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1], note, key+":"+c[0]];
+  };
+}
+/* معنى كلمة: [الكلمة, المعنى, [مشتّتان]] */
+function vocabGen(list, note, key){
+  return function(){
+    var w=gp(list), o=eOpts(w[1],w[2]);
+    if(!o) return null;
+    return ["What does "+en('"'+w[0]+'"')+" mean?",o[0].map(en),o[1],
+      en(w[0])+" = "+en(w[1])+" — "+note, key+":"+w[0]];
+  };
+}
+/* اختيار الجملة الصحيحة: [الصحيحة, [خاطئتان]] */
+function pickGen(list, note, key){
+  return function(){
+    var c=gp(list), o=eOpts(c[0],c[1]);
+    if(!o) return null;
+    return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1], note, key+":"+c[0]];
+  };
+}
+
+/* ===================== EXPANSION ١–٣ — تكملة (ص ٣٤–٣٧) ===================== */
+
+/* قطعة WATER FOR LIFE (ص ٣٤) */
+var EX_WATER = [
+  ["How much of the water on our planet is salt water?","97 percent",["3 percent","70 percent"]],
+  ["How much of the planet's water is usable freshwater?","Less than 1 percent",
+   ["Exactly 3 percent","About 20 percent"]],
+  ["Where is most of the freshwater locked up?","In ice caps and glaciers",
+   ["In rivers and streams","In underground tunnels"]],
+  ["How much accessible freshwater will humanity use up by 2025?","More than 70 percent",
+   ["Only 1 percent","About 3 percent"]],
+  ["How long can people live without food?","Two months",["Two weeks","One week"]],
+  ["How long can people live without water?","Less than a week",["Two months","One month"]],
+  ["How many people lack easy access to safe drinking water?","20 percent or more of Earth's population",
+   ["Less than 1 percent of Earth's population","97 percent of Earth's population"]],
+  ["Which years did the United Nations call the Decade for Action?","From 2005 to 2015",
+   ["From 1995 to 2005","From 2015 to 2025"]],
+  ["Where is Stensund Folk College?","Near Stockholm, Sweden",["In Lima, Peru","In Toronto, Canada"]],
+  ["How does Stensund Folk College treat its wastewater?","In a greenhouse, to grow plants and fish",
+   ["By sending it to the ocean","By freezing it in ice caps"]],
+  ["What cleans up the wastewater in Lima, Peru?","Algae and other small organisms",
+   ["Fish and turtles","Sunlight alone"]],
+  ["How long until the water in Peru is safe for reuse?","After 20 days",["After 20 hours","After 20 years"]],
+  ["Is the water we use today new water?","No, it is the same water the dinosaurs used",
+   ["Yes, the Earth makes new water","Yes, it comes from the ice caps"]]
+];
+var exWater = factGen(EX_WATER,
+  "من قطعة <span class=ltr>Water for Life</span> في مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>34</span>): ",
+  "exw");
+
+/* After Reading A — بخيارات الكتاب نفسها (ص ٣٥) */
+var EX_WATER_A = [
+  ["Why do many people take water for granted?","It's easily available",
+   ["It's cheap","It cools you down"]],
+  ["How much of the water on our planet is freshwater?","A small amount",
+   ["A great part","A lot"]],
+  ["How long can human beings live without water?","Less than one week",
+   ["Two weeks","One month"]],
+  ["What is one of the world's greatest challenges in the 21st century?","To provide freshwater",
+   ["To recycle seawater","To find water"]],
+  ["What do people use to clean up wastewater in Peru?","Algae",["Fish","Sun"]]
+];
+var exWaterA = factGen(EX_WATER_A,
+  "من <span class=ltr>After Reading</span> (ص <span class=ltr>35</span>): ", "exwa");
+
+/* نشيد What Have They Done to You? — مفردات وفهم (ص ٣٦–٣٧) */
+var EX_CHANT1 = [
+  ["Which word in the chant means \"a kind of farm\"?","ranches",["branches","cages"]],
+  ["Which word in the chant means \"move, like water in a river\"?","flow",["grow","blow"]],
+  ["Which word in the chant means \"a kind of flower\"?","lilies",["trunks","bees"]],
+  ["Which word in the chant means \"a kind of insect\"?","bees",["birds","lilies"]],
+  ["What did they do to the parrot?","They put it in a cage and cut its wings",
+   ["They set it free in the forest","They taught it to fly higher"]],
+  ["Is the water in the river clean now?","No, the crystal waters no longer flow",
+   ["Yes, it is cleaner than before","Yes, but only in summer"]],
+  ["Do the fish live in the water now?","No, the fish and the lilies no longer grow",
+   ["Yes, more than before","Yes, but only the lilies died"]],
+  ["Why did they cut the trees down?","They said they needed them for ranches",
+   ["They needed them for cages","They wanted to build a river"]],
+  ["What does the chant say we can still do?","We can make the world a better place",
+   ["We can never change anything","We can cut more trees"]]
+];
+var exChant = factGen(EX_CHANT1,
+  "من نشيد <span class=ltr>What Have They Done to You?</span> (ص <span class=ltr>36–37</span>): ", "exch");
+
+/* ===================== الوحدة ٤ — What Do I Need to Buy? (ص ٣٨–٤٧) ===================== */
+
+/* تصنيف الأطعمة حسب أقسام السوق (ص ٣٨ و Quick Check ص ٣٩) */
+var U4_CAT = [
+  ["beef","MEAT",["SEAFOOD","FRUIT"]],           ["lamb","MEAT",["VEGETABLES","DRINKS"]],
+  ["chicken","MEAT",["SEAFOOD","BREAD AND GRAINS"]], ["sausage","MEAT",["FRUIT","DAIRY PRODUCTS"]],
+  ["turkey","MEAT",["SEAFOOD","VEGETABLES"]],
+  ["salmon","SEAFOOD",["MEAT","VEGETABLES"]],    ["shrimp","SEAFOOD",["MEAT","FRUIT"]],
+  ["crab","SEAFOOD",["MEAT","BREAD AND GRAINS"]],["squid","SEAFOOD",["MEAT","DAIRY PRODUCTS"]],
+  ["tuna","SEAFOOD",["MEAT","VEGETABLES"]],
+  ["mango","FRUIT",["VEGETABLES","MEAT"]],       ["pineapple","FRUIT",["VEGETABLES","SEAFOOD"]],
+  ["strawberries","FRUIT",["VEGETABLES","BREAD AND GRAINS"]],
+  ["papaya","FRUIT",["VEGETABLES","MEAT"]],      ["avocado","FRUIT",["MEAT","BREAD AND GRAINS"]],
+  ["apples","FRUIT",["VEGETABLES","SEAFOOD"]],   ["dates","FRUIT",["VEGETABLES","MEAT"]],
+  ["carrots","VEGETABLES",["FRUIT","SEAFOOD"]],  ["onions","VEGETABLES",["FRUIT","MEAT"]],
+  ["peppers","VEGETABLES",["FRUIT","SEAFOOD"]],  ["potatoes","VEGETABLES",["FRUIT","DAIRY PRODUCTS"]],
+  ["beans","VEGETABLES",["FRUIT","MEAT"]],       ["garlic","VEGETABLES",["FRUIT","SEAFOOD"]],
+  ["butter","DAIRY PRODUCTS",["MEAT","BREAD AND GRAINS"]],
+  ["cheese","DAIRY PRODUCTS",["MEAT","VEGETABLES"]],
+  ["yogurt","DAIRY PRODUCTS",["SEAFOOD","BREAD AND GRAINS"]],
+  ["cereal","BREAD AND GRAINS",["MEAT","DAIRY PRODUCTS"]],
+  ["rice","BREAD AND GRAINS",["MEAT","FRUIT"]],
+  ["couscous","BREAD AND GRAINS",["SEAFOOD","DAIRY PRODUCTS"]],
+  ["olive oil","OILS AND CONDIMENTS",["DAIRY PRODUCTS","BREAD AND GRAINS"]],
+  ["corn oil","OILS AND CONDIMENTS",["VEGETABLES","DAIRY PRODUCTS"]],
+  ["ketchup","OILS AND CONDIMENTS",["VEGETABLES","FRUIT"]],
+  ["salt","OILS AND CONDIMENTS",["BREAD AND GRAINS","DAIRY PRODUCTS"]]
+];
+function u4Category(){
+  var f=gp(U4_CAT), o=eOpts(f[1],f[2]);
+  if(!o) return null;
+  return ["Which group does "+en('"'+f[0]+'"')+" belong to at "+en("Best Price Supermarket")+" ?",
+    o[0].map(en),o[1],
+    en(f[0])+" ← "+en(f[1])+" — من أقسام السوق في الوحدة <span class=ltr>4</span> (ص <span class=ltr>38–39</span>).",
+    "u4ct:"+f[0]];
+}
+
+/* لوحة الأسعار (ص ٣٨) — قراءة السعر ووحدة البيع، وحسابُ عرض النصف */
+var U4_PRICE = [
+  ["grapes","7.45","a kilogram"],
+  ["milk","7.50","a carton"],
+  ["watermelons","18.65","each"],
+  ["eggs","8.40","a dozen"],
+  ["mushrooms","13.45","a box"]
+];
+function u4PriceTab(){
+  var h="<table class=ftab><tr><th colspan=3>THIS WEEK ONLY</th></tr>"+
+        "<tr><th>ITEM</th><th>PRICE</th><th>UNIT</th></tr>";
+  U4_PRICE.forEach(function(r){
+    h+="<tr><td>"+r[0]+"</td><td>SR "+r[1]+"</td><td>"+r[2]+"</td></tr>";
+  });
+  return h+"</table>";
+}
+function u4Prices(){
+  var i=ri(0,U4_PRICE.length-1), r=U4_PRICE[i];
+  var others=U4_PRICE.filter(function(x,n){ return n!==i; });
+  var kind=ri(1,3), q, right, wrong;
+  if(kind===1){
+    q="How much do "+r[0]+" cost?";
+    right="SR "+r[1];
+    wrong=shuffle(others.slice()).slice(0,2).map(function(x){ return "SR "+x[1]; });
+  }else if(kind===2){
+    q="How are "+r[0]+" sold?";
+    right=r[2];
+    wrong=shuffle(others.slice()).slice(0,2).map(function(x){ return x[2]; });
+  }else{
+    /* اشترِ واحدًا واحصل على الثاني بنصف السعر */
+    var one=Number(r[1]), two=one+one/2;
+    var oh=eOpts("SR "+two.toFixed(2),
+                 ["SR "+(one*2).toFixed(2),"SR "+(one/2).toFixed(2)]);
+    if(!oh) return null;
+    return [u4PriceTab()+"<br>"+en("Buy one "+r[0]+" and get the second for half price. "+
+            "How much do you pay for two?"),
+      oh[0].map(en), oh[1],
+      "الأوّل بسعره كاملًا "+en("SR "+one.toFixed(2))+" والثاني بنصفه "+
+      en("SR "+(one/2).toFixed(2))+" ، فالمجموع "+en("SR "+two.toFixed(2))+
+      " (ص <span class=ltr>38</span>).",
+      "u4pr:half:"+r[0]];
+  }
+  var o=eOpts(right,wrong);
+  if(!o) return null;
+  return [u4PriceTab()+"<br>"+en(q),o[0].map(en),o[1],
+    "اقرأ صفّ "+en(r[0])+" : "+en("SR "+r[1]+" "+r[2])+
+    " — من لوحة أسعار الوحدة <span class=ltr>4</span> (ص <span class=ltr>38</span>).",
+    "u4pr:"+r[0]+":"+kind];
+}
+
+/* تعبيرات الكميّة — المعدود وغير المعدود (ص ٤٠) */
+var U4_QTY = [
+  ["I eat ___ carrots.","a few",["a little","much"]],
+  ["I eat ___ seafood.","a little",["a few","many"]],
+  ["I eat ___ vegetables.","many",["much","a little"]],
+  ["I don't eat ___ bread.","much",["many","a few"]],
+  ["___ bananas do you eat?","How many",["How much","How little"]],
+  ["___ milk do you drink?","How much",["How many","How few"]],
+  ["I don't eat ___ fruit. I should eat more.","enough",["a few","many"]],
+  ["We only have ___ olive oil left.","a little",["a few","many"]],
+  ["Tony doesn't eat ___ seafood at all.","any",["a few","many"]],
+  ["Please give me only ___ french fries.","a few",["a little","much"]],
+  ["___ eggs do you eat in a week?","How many",["How much","How little"]],
+  ["I never put ___ onions in the salad.","many",["much","a little"]]
+];
+var u4Quantity = clozeGen(U4_QTY,
+  "المعدود ("+"<span class=ltr>carrots, eggs</span>) يأخذ <span class=ltr>a few · many · How many</span>، "+
+  "وغير المعدود (<span class=ltr>seafood, bread, milk</span>) يأخذ <span class=ltr>a little · much · How much</span>. "+
+  "و<span class=ltr>a lot of</span> و<span class=ltr>enough</span> للاثنين معًا (ص <span class=ltr>40</span>).",
+  "u4qt");
+
+/* something / anything / nothing (ص ٤٠ تمرين A) */
+var U4_SAN = [
+  ["You're a good cook. You always have ___ delicious for dinner.","something",["anything","nothing"]],
+  ["The refrigerator is empty. There is ___ to eat in here.","nothing",["something","anything"]],
+  ["I haven't made ___ special for supper.","anything",["something","nothing"]],
+  ["There's ___ better than a nice cup of coffee after a meal.","nothing",["something","anything"]],
+  ["Aren't you having ___ for breakfast?","anything",["something","nothing"]],
+  ["You should eat ___ in the morning.","something",["anything","nothing"]],
+  ["The fridge is completely empty, so I have ___ for lunch today.","nothing",["something","anything"]],
+  ["I didn't buy ___ at the supermarket.","anything",["something","nothing"]]
+];
+var u4SomeAnyNo = clozeGen(U4_SAN,
+  "<span class=ltr>something</span> في الإثبات · <span class=ltr>anything</span> بعد النفي وفي السؤال · "+
+  "<span class=ltr>nothing</span> = <span class=ltr>not anything</span> فلا يجتمع مع نفيٍ آخر (ص <span class=ltr>40</span>).",
+  "u4san");
+
+/* ترتيب خطوات البيتزا (ص ٤١ تمرين D) */
+var U4_SEQ = [
+  ["___ you start, check that you have all the ingredients.","Before",["Finally","Then"]],
+  ["___ , put three cups of flour and one teaspoon of salt into a bowl.","First",["Finally","After"]],
+  ["After you put the flour in the bowl, ___ add half a cup of milk and one egg.","then",["first","finally"]],
+  ["___ you have made the dough, let it stand for about 30 minutes.","After",["Finally","First"]],
+  ["___ you spread the dough, make sure it has risen enough.","Before",["Finally","First"]],
+  ["___ , you cover it with cheese and tomato sauce and let it bake.","Finally",["First","Before"]]
+];
+var u4Sequence = clozeGen(U4_SEQ,
+  "كلمات الترتيب: <span class=ltr>First</span> للخطوة الأولى، ثم <span class=ltr>Then / Next / After that</span>، "+
+  "و<span class=ltr>Finally</span> للأخيرة. و<span class=ltr>Before / After</span> تربطان خطوتين بزمنٍ لا بترتيبٍ مطلق "+
+  "(ص <span class=ltr>40–41</span>).",
+  "u4sq");
+
+/* محادثة نورة ومنى — الكيك (ص ٤١ تمرين C) */
+var U4_NOURA = [
+  ["Are there ___ eggs in the refrigerator?","any",["much","a dozen"]],
+  ["How ___ eggs are there?","many",["much","a little"]],
+  ["There are only ___ left.","a few",["a little","much"]],
+  ["How ___ butter is there?","much",["many","a few"]],
+  ["There's only ___ butter left.","a little",["a few","many"]],
+  ["There isn't ___ butter for a cake.","enough",["a few","many"]],
+  ["Can you get a ___ of butter?","package",["dozen",  "few"]],
+  ["Can you get a ___ eggs?","dozen",["package","little"]]
+];
+var u4Noura = clozeGen(U4_NOURA,
+  "من محادثة <span class=ltr>Noura &amp; Mona</span> في الوحدة <span class=ltr>4</span> (ص <span class=ltr>41</span>). "+
+  "ولاحظ وحدات الشراء: <span class=ltr>a package of butter</span> و<span class=ltr>a dozen eggs</span>.",
+  "u4no");
+
+/* أفعال الطبخ (ص ٤٢) */
+var U4_COOK = [
+  ["to bake","to cook in an oven — cakes and bread",["to cook in hot oil in a pan","to cook in very hot water"]],
+  ["to fry","to cook in hot oil in a pan",["to cook over boiling water","to cook over a direct fire"]],
+  ["to boil","to cook in very hot water",["to cook in hot oil in a pan","to cook over a direct fire"]],
+  ["to grill","to cook over a direct fire or heat",["to cook in very hot water","to cook over boiling water"]],
+  ["to roast","to cook in an oven — meat and chicken",["to cook in very hot water","to cook in hot oil in a pan"]],
+  ["to steam","to cook over boiling water, in the steam",["to cook in hot oil in a pan","to cook over a direct fire"]]
+];
+var u4Cooking = vocabGen(U4_COOK,
+  "من <span class=ltr>Language in Context</span> في الوحدة <span class=ltr>4</span> (ص <span class=ltr>42</span>).",
+  "u4ck");
+
+/* النطق: ثلاثة أصوات (ص ٤٢) */
+var U4_SOUND = [
+  ["shrimp",["fish","sugar"],["cheese","jam"]],
+  ["fish",["shrimp","sugar"],["chocolate","juice"]],
+  ["sugar",["shrimp","fish"],["chips","orange"]],
+  ["cheese",["chocolate","chips"],["shrimp","jam"]],
+  ["chocolate",["cheese","chips"],["fish","juice"]],
+  ["chips",["cheese","chocolate"],["sugar","orange"]],
+  ["jam",["juice","orange"],["shrimp","cheese"]],
+  ["juice",["jam","orange"],["fish","chocolate"]],
+  ["orange",["jam","juice"],["sugar","chips"]]
+];
+function u4Sound(){
+  var s=gp(U4_SOUND);
+  var right=gp(s[1]);
+  var o=eOpts(right,s[2]);
+  if(!o) return null;
+  return ["Which word has the <b>same sound</b> as "+en('"'+s[0]+'"')+" ?",o[0].map(en),o[1],
+    "الأصوات الثلاثة في الوحدة <span class=ltr>4</span> (ص <span class=ltr>42</span>): "+
+    en("shrimp · fish · sugar")+" ثم "+en("cheese · chocolate · chips")+" ثم "+
+    en("jam · juice · orange")+" — و"+en(s[0])+" مع "+en(right)+".",
+    "u4sd:"+s[0]];
+}
+
+/* محادثة العشاء العالمي (ص ٤٣) */
+var U4_CONV = [
+  ["What was the Mexican dip?","Tortilla chips and guacamole",
+   ["Shrimp cocktail","Chicken tagine"]],
+  ["What was the appetizer?","A shrimp cocktail, New Orleans style",
+   ["A Mexican dip","Passion fruit mousse"]],
+  ["What was the main dish?","Moroccan style chicken tagine and couscous",
+   ["Brazilian mousse","Colombian coffee"]],
+  ["What was for dessert?","Brazilian passion fruit mousse",
+   ["Colombian coffee","A shrimp cocktail"]],
+  ["What did they have at the very end?","Colombian coffee",
+   ["Guacamole","Couscous"]],
+  ["Did the mother need any help?","No, everything was under control",
+   ["Yes, she asked the daughter to cook","Yes, she asked the father to help"]],
+  ["What did the daughter suggest?","That her mother should start her own restaurant",
+   ["That they should eat out more often","That her father should cook"]],
+  ["What did the mother offer the daughter?","To teach her how to cook",
+   ["To buy her a restaurant","To give her the recipes"]],
+  ["What does the father say about eating at home?","It's much cheaper and healthier than eating out",
+   ["It's more expensive than eating out","It takes too much time"]],
+  ["What is guacamole?","An avocado dip",["A spicy chicken stew","Grains of wheat dough"]],
+  ["What is chicken tagine?","A spicy chicken stew, often with olives and apricots",
+   ["An avocado dip","A kind of coffee"]],
+  ["What is couscous?","Grains of wheat dough that resemble rice",
+   ["An avocado dip","A passion fruit dessert"]]
+];
+var u4Conv = factGen(U4_CONV,
+  "من محادثة الوحدة <span class=ltr>4</span> (ص <span class=ltr>43</span>): ", "u4cv");
+
+/* Real Talk للوحدة ٤ (ص ٤٣) */
+var U4_RT = [
+  ["you guys","an informal way to address two or more people",
+   ["a way to say goodbye","a way to say sorry"]],
+  ["I can't wait.","I am very eager for something",
+   ["I have no time at all","I am very tired"]],
+  ["Everything's under control.","Everything is organized",
+   ["Everything went wrong","Everything is very expensive"]],
+  ["I've had more than enough.","I can't eat any more",
+   ["I am still very hungry","I want to try something new"]]
+];
+var u4RealTalk = vocabGen(U4_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>4</span> (ص <span class=ltr>43</span>).", "u4rt");
+
+/* قطعة Foods from the Americas (ص ٤٤–٤٥) */
+var U4_FOODS = [
+  ["Where are tomatoes native to?","Mexico and Central America",["Spain and Italy","Egypt and the Middle East"]],
+  ["When did the Aztecs grow tomatoes?","In the eighth century",["In the sixteenth century","In 1519"]],
+  ["Who introduced tomatoes to Spain?","Spanish explorers, in the sixteenth century",
+   ["A British diplomat","The Aztecs themselves"]],
+  ["Who thought tomatoes were poisonous at first?","The British",["The French","The Italians"]],
+  ["Who introduced tomatoes to the Middle East?","A British diplomat, in the nineteenth century",
+   ["Spanish explorers","Hernán Cortés"]],
+  ["Which country is among the world's top tomato producers?","Egypt",["Spain","Mexico"]],
+  ["What did the Aztecs call the avocado?","Ahuacatl",["Chocolatl","Guacamole"]],
+  ["Which vitamins is the avocado rich in?","A, B, and C",["Only vitamin D","Only vitamin K"]],
+  ["Does the avocado get ripe on the tree?","No, you must pick it first",
+   ["Yes, always","Yes, but only in winter"]],
+  ["Why did sailors call avocados \"seaman's butter\"?","Because the fruit lasts a long time",
+   ["Because it tastes exactly like butter","Because it is yellow inside"]],
+  ["What did the Aztecs call chocolate?","Chocolatl",["Ahuacatl","Cortés"]],
+  ["When did Hernán Cortés arrive in Mexico?","In 1519",["In 1819","In the eighth century"]],
+  ["How much chocolate did Moctezuma drink a day?","50 cups, from a gold cup",
+   ["5 cups, from a silver cup","One cup, from a clay cup"]],
+  ["Who created the first bar of chocolate?","Henri Nestlé, in Switzerland",
+   ["Hernán Cortés, in Spain","Moctezuma, in Mexico"]],
+  ["When was the first chocolate bar created?","In the nineteenth century",
+   ["In the twentieth century","In the sixteenth century"]],
+  ["What is the main ingredient of guacamole?","Avocado",["Tomato","Chocolate"]]
+];
+var u4Foods = factGen(U4_FOODS,
+  "من قطعة <span class=ltr>Foods from the Americas</span> في الوحدة <span class=ltr>4</span> "+
+  "(ص <span class=ltr>44–45</span>): ", "u4fd");
+
+/* رسالة مها ووصفة السبانخ (ص ٤٦) */
+var U4_MAHA = [
+  ["What is Maha going to make for dinner?","Spinach pasta",["Date cakes","Chicken and rice"]],
+  ["Who is Maha writing the note to?","Her father",["Her mother","Her teacher"]],
+  ["Which cheese does she ask for?","Some grated Parmesan cheese",["Some cream cheese","Some yogurt"]],
+  ["What kind of pasta does she ask for?","A package of spaghetti or linguine",
+   ["A box of macaroni","A dozen noodles"]],
+  ["Which vegetable does she ask for?","Some fresh baby spinach",["Some onions","Some peppers"]],
+  ["Why does she ask for olive oil?","Because there isn't much left",
+   ["Because she has none at all","Because it is on sale"]],
+  ["What is the first step of the recipe?","Start by cooking the pasta",
+   ["Heat the olive oil","Add the garlic"]],
+  ["What do you do right after you drain the pasta?","Heat the olive oil in a large frying pan",
+   ["Add the Parmesan cheese","Add the pasta to the sauce"]],
+  ["What do you add to the hot oil?","The garlic",["The spinach","The cream cheese"]],
+  ["What is the last step of the recipe?","Add the pasta and combine it with the sauce",
+   ["Add the garlic to the hot oil","Drain the pasta"]],
+  ["What do you keep when you drain the pasta?","Half a cup of the cooking water",
+   ["The garlic","The Parmesan cheese"]]
+];
+var u4Maha = factGen(U4_MAHA,
+  "من ركن الكتابة في الوحدة <span class=ltr>4</span> (ص <span class=ltr>46</span>): ", "u4mh");
+
+/* الضمائر الانعكاسية (ص ٤٧ تمرين A) */
+var U4_REFL = [
+  ["Nawal cut ___ while she was peeling potatoes.","herself",["himself","yourself"]],
+  ["The instructions on the box say: \"Do it ___ .\"","yourself",["himself","itself"]],
+  ["Welcome everyone! Please help ___ to coffee and snacks.","yourselves",["ourselves","themselves"]],
+  ["My father was hungry, so he made ___ a sandwich.","himself",["herself","itself"]],
+  ["When you set the timer, the oven will turn ___ off.","itself",["himself","themselves"]],
+  ["Our refrigerator broke down, so we bought ___ a new one.","ourselves",["yourselves","themselves"]],
+  ["The children are old enough to look after ___ .","themselves",["ourselves","himself"]],
+  ["I burned ___ when I took the cake out of the oven.","myself",["yourself","himself"]]
+];
+var u4Reflexive = clozeGen(U4_REFL,
+  "نستعمل الضمير الانعكاسي حين يكون الفاعل والمفعول <b>الشخص نفسه</b>: "+
+  "<span class=ltr>I→myself · you→yourself · he→himself · she→herself · it→itself · "+
+  "we→ourselves · you(pl)→yourselves · they→themselves</span> (ص <span class=ltr>47</span>).",
+  "u4rf");
+
+/* because مقابل so (ص ٤٧ تمرين B) */
+var U4_BECSO = [
+  ["The service was excellent, ___ they left the waiter a big tip.","so",["because","but"]],
+  ["She bought four frozen pizzas ___ they were on sale.","because",["so","but"]],
+  ["Avocados are good for you ___ they're rich in vitamins.","because",["so","but"]],
+  ["Ali didn't feel well, ___ his mother made him some chicken soup.","so",["because","but"]],
+  ["I can't make cookies ___ I don't have all the ingredients.","because",["so","but"]],
+  ["She didn't remember the recipe, ___ she called her mother.","so",["because","but"]],
+  ["We need to go grocery shopping ___ the fridge is empty.","because",["so","but"]],
+  ["The bread was stale, ___ we threw it away.","so",["because","but"]],
+  ["Maha avoids foods with lots of calories ___ she is on a diet.","because",["so","but"]],
+  ["She watches cooking shows on TV, ___ she can learn new recipes.","so",["because","but"]]
+];
+var u4BecauseSo = clozeGen(U4_BECSO,
+  "<span class=ltr>because</span> تُدخل <b>السبب</b> (لماذا؟) · و<span class=ltr>so</span> تُدخل <b>النتيجة</b>. "+
+  "جرّبها: إن صحّ أن تضع مكانها «لأنّ» فهي <span class=ltr>because</span>، وإن صحّ «فـ / لذلك» فهي "+
+  "<span class=ltr>so</span> (ص <span class=ltr>47</span>).",
+  "u4bs");
+
+/* ===================== الوحدة ٥ — Since When? (ص ٤٨–٥٧) ===================== */
+
+/* قطعة INVENTIONS (ص ٤٨–٤٩) */
+var U5_INV = [
+  ["Which computer was produced in 1953?","The IBM 701",["The first PC","The first laptop"]],
+  ["What was the IBM 701 like?","Huge and slow, and it took up an entire room",
+   ["Small, fast and portable","As light as a laptop"]],
+  ["When did smaller PCs come into widespread use?","In the 1980s",["In the 1950s","In the 1970s"]],
+  ["Who invented movable type and the printing press?","Johannes Gutenberg",
+   ["Steven Sasson","George Eastman"]],
+  ["When and where was the printing press invented?","In 1440, in Germany",
+   ["In 1888, in the United States","In 1953, in England"]],
+  ["Who captured the first digital image?","Steven Sasson, an engineer at Eastman Kodak",
+   ["George Eastman","Percy Spencer"]],
+  ["When was the first digital image captured?","In 1975",["In 1888","In 1946"]],
+  ["What was the resolution of that first digital image?",".01 megapixels",
+   ["10 megapixels","1 megapixel"]],
+  ["Who introduced rolls of film to the public?","George Eastman, in 1888",
+   ["Steven Sasson, in 1975","Percy Spencer, in 1946"]],
+  ["When did television first become commercially available?","In the late 1930s",
+   ["In the 1960s","In the 1980s"]],
+  ["When did black-and-white TVs become widespread in homes?","In the 1960s",
+   ["In the late 1930s","In the 1990s"]],
+  ["When did the first successful gas stove appear?","In 1826",["In 1891","In 1946"]],
+  ["When did the first electric stove appear?","In 1891",["In 1826","In 1967"]],
+  ["Who invented the microwave oven?","Percy Spencer, an engineer",
+   ["George Eastman","Johannes Gutenberg"]],
+  ["How was the microwave oven invented?","By accident, in 1946",
+   ["After twenty years of research","By a large company in 1967"]],
+  ["When was the first home microwave oven produced?","In 1967",["In 1946","In 1891"]],
+  ["When did portable cell phones first appear?","In the 1970s",["In the 1950s","In the 1990s"]],
+  ["What was the early cell phone model called?","\"The brick\"",["\"The box\"","\"The stone\""]],
+  ["How much did the early cell phone weigh?","2 pounds (907 grams)",
+   ["Half a pound","10 pounds"]],
+  ["How much talk time did it offer per recharge?","Just half an hour",
+   ["Two full days","Ten hours"]],
+  ["How much did the first cellular phones sell for?","$3,995",["$39.95","$399"]]
+];
+var u5Inventions = factGen(U5_INV,
+  "من قطعة <span class=ltr>Inventions</span> في الوحدة <span class=ltr>5</span> (ص <span class=ltr>48–49</span>): ",
+  "u5in");
+
+/* المضارع التامّ مقابل الماضي البسيط (ص ٥٠) */
+var U5_PP = [
+  ["___ you ever been to France?","Have",["Did","Were"]],
+  ["Yes, I ___ been there.","have",["did","was"]],
+  ["When ___ you there?","were",["have","has"]],
+  ["I ___ there two years ago.","was",["have been","am"]],
+  ["Hameed ___ the same TV for 15 years.","has had",["had","is having"]],
+  ["The Chinese ___ ice cream 4,000 years ago.","invented",["have invented","invent"]],
+  ["In 1834, Jacob Perkins ___ a machine to make ice in London.","built",["has built","builds"]],
+  ["The first home refrigerators ___ in the early 1920s.","appeared",["have appeared","appear"]],
+  ["Since then, people ___ their food in refrigerators.","have preserved",["preserved","preserve"]],
+  ["People ___ to keep cool for ages.","have tried",["tried","try"]],
+  ["Since that time, people ___ themselves with air conditioners.","have cooled",
+   ["cooled","are cooling"]],
+  ["Qassim ___ as a guide before he started his travel agency.","worked",["has worked","works"]],
+  ["The team ___ all their games so far this season.","has won",["won","wins"]],
+  ["Hameed and Adel ___ when they were at school.","met",["have met","meet"]]
+];
+var u5Perfect = clozeGen(U5_PP,
+  "نستعمل <b>المضارع التامّ</b> (<span class=ltr>have/has + p.p.</span>) حين لا يُذكر الوقت بالضبط أو "+
+  "حين يستمرّ الأثر إلى الآن (<span class=ltr>for ages · since then · so far</span>)، و<b>الماضي البسيط</b> "+
+  "حين يُذكر وقتٌ محدَّد منتهٍ (<span class=ltr>in 1834 · 4,000 years ago · when they were at school</span>) "+
+  "— ص <span class=ltr>50–51</span>.",
+  "u5pp");
+
+/* for مقابل since (ص ٥٠ تمرين A) */
+var U5_FS = [
+  ["Hameed has had the same TV ___ 15 years.","for",["since","from"]],
+  ["I've had my laptop ___ last June.","since",["for","from"]],
+  ["We've worked on this project ___ a month.","for",["since","from"]],
+  ["My friends haven't visited me ___ my graduation.","since",["for","from"]],
+  ["We haven't used our car ___ a long time.","for",["since","from"]],
+  ["I've been drinking tea ___ years.","for",["since","from"]],
+  ["Tariq has worn glasses ___ the age of seven.","since",["for","from"]],
+  ["___ when have you had that beautiful watch?","Since",["For","From"]],
+  ["I've played football ___ three years.","for",["since","from"]],
+  ["I've played football ___ I was 12.","since",["for","from"]],
+  ["People have had credit cards ___ 1950.","since",["for","from"]],
+  ["People have had credit cards ___ about 70 years.","for",["since","from"]],
+  ["Adel has lived in the suburbs ___ he started college.","since",["for","from"]],
+  ["Fadi has been in the accounting department ___ a year now.","for",["since","from"]]
+];
+var u5ForSince = clozeGen(U5_FS,
+  "<span class=ltr>for</span> + <b>مدّة</b> (<span class=ltr>for 15 years, for a month, for a long time</span>) · "+
+  "و<span class=ltr>since</span> + <b>نقطة بداية</b> (<span class=ltr>since 1950, since last June, since I was 12</span>) "+
+  "— ص <span class=ltr>50</span>.",
+  "u5fs");
+
+/* جدول تواريخ الاختراعات (ص ٥١) */
+var U5_DATES = [
+  ["the credit card","1950"],["canned food","the early 1800s"],["the wristwatch","1868"],
+  ["the radio","1901"],["toothpaste","1824"],["the electric lightbulb","1879"],
+  ["filmmaking","1895"],["the paper clip","1867"],["the airplane","1903"],["the ballpoint pen","1888"]
+];
+function u5Dates(){
+  var i=ri(0,U5_DATES.length-1), r=U5_DATES[i];
+  var others=U5_DATES.filter(function(x,n){ return n!==i; });
+  var back = Math.random()<0.4;
+  var right, wrong, q;
+  if(back){
+    q="Which invention dates from "+r[1]+"?";
+    right=r[0];
+    wrong=shuffle(others.slice()).slice(0,2).map(function(x){ return x[0]; });
+  }else{
+    q="When was "+r[0]+" invented?";
+    right=r[1];
+    wrong=shuffle(others.slice()).slice(0,2).map(function(x){ return x[1]; });
+  }
+  var o=eOpts(right,wrong);
+  if(!o) return null;
+  return [en(q),o[0].map(en),o[1],
+    en(r[0]+" — "+r[1])+" · "+en("People have had "+r[0].replace(/^the /,"")+"s since "+r[1]+".")+
+    " — من جدول الاختراعات في الوحدة <span class=ltr>5</span> (ص <span class=ltr>51</span>).",
+    "u5dt:"+r[0]+":"+(back?"b":"f")];
+}
+
+/* محادثة فادي وعدنان (ص ٥٣) */
+var U5_FADI = [
+  ["How long has it been since Adnan and Fadi saw each other?","About five years, since high school",
+   ["About five months","Since last year"]],
+  ["Has Adnan changed?","No, Fadi says he hasn't changed at all",
+   ["Yes, he looks completely different","Yes, he has grown a beard"]],
+  ["Where is Fadi working?","In a bank",["In a restaurant","In a school"]],
+  ["How long has Fadi been in the accounting department?","For a year",
+   ["For five years","Since high school"]],
+  ["Is Fadi happy with his job?","Yes, very much so",["No, not at all","He hasn't started yet"]],
+  ["What has Adnan been up to?","He has taken over his father's restaurant",
+   ["He has opened a bank","He has moved abroad"]],
+  ["When did Adnan get married?","Last year",["Next month","Five years ago"]],
+  ["When is Fadi getting married?","Next month",["Last year","He is already married"]],
+  ["Why did Fadi wait to get married?","He wanted to finish college and start a career first",
+   ["He wanted to travel first","He wanted to buy a restaurant first"]]
+];
+var u5Fadi = factGen(U5_FADI,
+  "من محادثة <span class=ltr>Fadi &amp; Adnan</span> في الوحدة <span class=ltr>5</span> (ص <span class=ltr>53</span>): ",
+  "u5fa");
+
+var U5_RT = [
+  ["Long time no see.","I haven't seen you for a long time",
+   ["I saw you yesterday","I don't want to see you"]],
+  ["What have you been up to?","What are you doing these days?",
+   ["Where are you going now?","How much did it cost?"]],
+  ["Congratulations!","a response to good news relating to an achievement",
+   ["a way to say sorry","a way to ask for help"]],
+  ["to settle down","to get married",["to sit on a chair","to move to a new city"]],
+  ["...er","a sound of hesitation, to show that the speaker is thinking",
+   ["a sound of anger","a way to say goodbye"]]
+];
+var u5RealTalk = vocabGen(U5_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>5</span> (ص <span class=ltr>53</span>).", "u5rt");
+
+/* قطعة A History of Special Effects (ص ٥٤) */
+var U5_FX = [
+  ["Who first showed short films in a café in Paris?","The Lumière brothers",
+   ["Georges Méliès","George Lucas"]],
+  ["When was that first showing?","On December 28, 1895",["In 1896","In 1933"]],
+  ["Why did the audience scream?","A train on the film came straight toward them",
+   ["The cinema caught fire","A gorilla appeared on the screen"]],
+  ["Who discovered the \"stop trick\"?","Georges Méliès",["The Lumière brothers","Steven Spielberg"]],
+  ["How was the \"stop trick\" discovered?","By accident, when his camera stopped and started again",
+   ["After years of research","By using a computer"]],
+  ["Where and when did that happen?","In the streets of Paris, in 1896",
+   ["In Hollywood, in 1933","In London, in 1895"]],
+  ["What did the \"stop trick\" make the bus turn into?","A carriage",
+   ["A train","A gorilla"]],
+  ["When was King Kong made?","In 1933",["In 1895","In 1977"]],
+  ["How tall was the King Kong gorilla model really?","18 inches (45 centimeters)",
+   ["18 feet","45 meters"]],
+  ["Who created Star Wars?","George Lucas",["Georges Méliès","The Lumière brothers"]],
+  ["When was Star Wars made?","In 1977",["In 1933","In 1896"]],
+  ["What did the Star Wars crew develop?","A computer-controlled camera for more realistic motion",
+   ["The first colour film","The stop trick"]],
+  ["Which films are named as references in visual effects?",
+   "Jurassic Park, Transformers, and Pirates of the Caribbean",
+   ["King Kong and Star Wars only","Only old black-and-white films"]],
+  ["How was Spiderman made to look realistic?","Thanks to computer-generated images",
+   ["With miniature models only","With the stop trick"]]
+];
+var u5Effects = factGen(U5_FX,
+  "من قطعة <span class=ltr>A History of Special Effects</span> في الوحدة <span class=ltr>5</span> "+
+  "(ص <span class=ltr>54</span>): ", "u5fx");
+
+/* معاني كلمات القطعة (ص ٥٥ تمرين A) — خيارات الكتاب نفسها */
+var U5_FXV = [
+  ["technique","a way of doing things",["a small model","stop in the middle"]],
+  ["sequence","actions or events in a particular order",["a new way of doing things","a small model"]],
+  ["interrupt","stop in the middle",["succeed in doing something","a way of doing things"]],
+  ["miniature","a small model",["a new way of doing things","actions or events in a particular order"]],
+  ["innovation","a new way of doing things",["a small model","stop in the middle"]],
+  ["accomplish","succeed in doing something",["stop in the middle","a small model"]]
+];
+var u5FxVocab = vocabGen(U5_FXV,
+  "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>5</span> (ص <span class=ltr>55</span>).",
+  "u5fv");
+
+/* مرجع الضمائر في القطعة (ص ٥٦ ركن الكتابة) */
+var U5_REF = [
+  ["\"These techniques form the art of special effects.\"<br>ما مرجع "+
+   "<span class=ltr>These</span> ؟","The techniques filmmakers have used to amaze viewers",
+   ["The Lumière brothers","The films of 1895"]],
+  ["\"The film contained many revolutionary innovations for its time.\"<br>ما مرجع "+
+   "<span class=ltr>its</span> ؟","King Kong",["Star Wars","The Empire State Building"]],
+  ["\"They made many improvements in effects technology.\"<br>ما مرجع "+
+   "<span class=ltr>They</span> ؟","The special effects crew of Star Wars",
+   ["The Lumière brothers","The audience in the café"]],
+  ["\"You'll see them on the screen soon!\"<br>ما مرجع "+
+   "<span class=ltr>them</span> ؟","The amazing visual effects of the future",
+   ["The old black-and-white films","The Lumière brothers"]],
+  ["\"Filmmakers have used tricks like this.\"<br>ما مرجع "+
+   "<span class=ltr>this</span> ؟","The \"stop trick\"",
+   ["The computer-controlled camera","The miniature of King Kong"]]
+];
+function u5Ref(){
+  var r=gp(U5_REF), o=eOpts(r[1],r[2]);
+  if(!o) return null;
+  return [r[0],o[0].map(en),o[1],
+    "<b>الترابط</b>: الضمائر وأسماء الإشارة (<span class=ltr>this, that, these, those, they, them, its</span>) "+
+    "تعود على ما سبقها فتمنع التكرار. والمرجع هنا: "+en(r[1])+" (ص <span class=ltr>56</span>).",
+    "u5rf:"+r[1]];
+}
+
+/* المبني للمجهول (ص ٥٧) */
+var U5_PASS = [
+  ["The Internet ___ by millions of people.","is used",["uses","is using"]],
+  ["Our lives ___ by technology.","have been changed",["have changed","are changing"]],
+  ["The telephone ___ by Alexander Graham Bell.","was invented",["invented","was invent"]],
+  ["The first car ___ by Karl Benz in 1886.","was made",["made","was make"]],
+  ["Cars ___ by companies all over the world today.","are produced",["produce","are producing"]],
+  ["Many changes ___ in our city.","have been made",["have made","are make"]],
+  ["The documentary ___ in a desert oasis.","was filmed",["filmed","was film"]],
+  ["English ___ all over the world.","is spoken",["speaks","is speaking"]],
+  ["The digital camera ___ by Steven Sasson in 1975.","was invented",["invented","was invent"]],
+  ["My bike ___ .","was stolen",["was steal","stole"]],
+  ["The window ___ .","has been broken",["has broken","is break"]],
+  ["Roughly thirteen percent of the world's oil ___ by Saudi Arabia.","is produced",
+   ["produces","is producing"]],
+  ["An encyclopedia of medical practices ___ by Al-Zahrawi in 1000.","was written",
+   ["wrote","was write"]],
+  ["Many flying machines ___ by da Vinci, but they were never built.","were designed",
+   ["designed","were design"]]
+];
+var u5Passive = clozeGen(U5_PASS,
+  "المبني للمجهول = <span class=ltr>be + past participle</span>، ونستعمله حين يهمّنا <b>الفعل</b> لا فاعله: "+
+  "<span class=ltr>is used · was invented · have been changed</span>. ونذكر الفاعل بـ <span class=ltr>by</span> "+
+  "فقط إذا كان مهمًّا (ص <span class=ltr>57</span>).",
+  "u5ps");
+
+/* ===================== الوحدة ٦ — Do You Know Where It Is? (ص ٥٨–٦٧) ===================== */
+
+/* الأماكن الأربعة (ص ٥٨–٥٩) */
+var U6_PLACES = [
+  ["Which country has the most efficient public transportation in the world?","Japan",
+   ["Hong Kong","Mexico"]],
+  ["How fast do the bullet trains travel?","186 miles (300 kilometers) per hour",
+   ["86 miles per hour","300 miles per hour"]],
+  ["Are express train fares in Japan cheap?","No, they are as expensive as airplane fares",
+   ["Yes, much cheaper than planes","Yes, they are free"]],
+  ["Why is the train trip usually shorter than flying?","Because there is no need to travel to an airport",
+   ["Because trains fly faster than planes","Because the trains never stop"]],
+  ["Which city is one of the safest in the world?","Hong Kong",["Mexico City","Cambridge"]],
+  ["Which city has a crime rate roughly the same as Singapore?","Hong Kong",
+   ["Toronto","Sao Paulo"]],
+  ["Which town is home to one of the oldest universities in the world?","Cambridge, England",
+   ["Hong Kong","Tokyo"]],
+  ["How much of Cambridge's population cycles around the town?","A quarter",
+   ["A half","All of it"]],
+  ["Which city has the worst traffic in the world?","Mexico City",
+   ["Sao Paulo","Hong Kong"]],
+  ["How long does the average commuter in Mexico City spend in traffic?","Four hours per day",
+   ["Four hours per week","Half an hour per day"]],
+  ["How many vehicles are there in Mexico City?","Approximately 6 million",
+   ["22 million","300,000"]],
+  ["How many people do those vehicles carry?","22 million",["6 million","2 million"]],
+  ["Is the traffic in Mexico City worse than in Sao Paulo?","Yes, it is worse",
+   ["No, it is much better","No, they are exactly the same"]],
+  ["Is noise a problem in Cambridge?","No — the town isn't as quiet as it used to be, but the quality of life is still good",
+   ["Yes, it is the noisiest town in England","Yes, because of the bullet trains"]]
+];
+var u6Places = factGen(U6_PLACES,
+  "من نصوص الوحدة <span class=ltr>6</span> (ص <span class=ltr>58–59</span>): ", "u6pl");
+
+/* المقارنة والتفضيل (ص ٦٠ تمرين A و D) */
+var U6_COMP = [
+  ["The downtown area is usually ___ than the suburbs.","noisier",["noisiest","more noisier"]],
+  ["The hospitals in cities are usually ___ than ones in the country.","better",
+   ["gooder","more good"]],
+  ["My hometown has the ___ air of all the towns in this country.","cleanest",
+   ["cleaner","most cleanest"]],
+  ["Many people say that Sao Paulo has the ___ traffic in the world.","worst",
+   ["baddest","most worst"]],
+  ["The subway is ___ at rush hour than at other times.","more crowded",
+   ["most crowded","crowdeder"]],
+  ["The cost of living in small towns is usually ___ than in big cities.","cheaper",
+   ["cheapest","more cheaper"]],
+  ["Trains are ___ than buses.","faster",["fastest","more faster"]],
+  ["Plane tickets are ___ of all.","the most expensive",["more expensive","expensivest"]],
+  ["The subway is ___ way to travel.","the least expensive",["less expensive","the less expensive"]],
+  ["In your opinion, what is the ___ restaurant in town?","best",["better","goodest"]],
+  ["Gino's has ___ pasta than Antonio's.","better",["best","more better"]],
+  ["It's the ___ restaurant in town.","most popular",["more popular","popularest"]]
+];
+var u6Compare = clozeGen(U6_COMP,
+  "المقارنة: الصفة القصيرة + <span class=ltr>-er</span> ومعها <span class=ltr>than</span> "+
+  "(<span class=ltr>faster than</span>)، والطويلة <span class=ltr>more + adjective</span>. "+
+  "والتفضيل يسبقه <span class=ltr>the</span> : <span class=ltr>the fastest · the most expensive</span>. "+
+  "وشاذّة: <span class=ltr>good/better/the best · bad/worse/the worst</span> (ص <span class=ltr>60</span>).",
+  "u6cp");
+
+/* as ... as (ص ٦٠ تمرين B) */
+var U6_ASAS = [
+  ["In Japan, trains are ___ planes.","as expensive as",["as expensive than","more expensive as"]],
+  ["This hostel is just ___ the hotel.","as comfortable as",["as comfortable than","so comfortable as"]],
+  ["Our neighborhood isn't ___ our old one.","as noisy as",["as noisy than","as noisier as"]],
+  ["The Flash computer is just ___ the XYZ model.","as fast as",["as faster as","as fast than"]],
+  ["Majid is just ___ his brother Nasr.","as smart as",["as smarter as","as smart than"]],
+  ["The blue car isn't ___ the red car.","as expensive as",["as expensive than","as more expensive as"]],
+  ["Rome is just ___ Paris.","as amazing as",["as amazing than","so amazing as"]],
+  ["Antonio's isn't ___ Gino's.","as good as",["as better as","as good than"]],
+  ["Sao Paulo is just ___ Mexico City.","as polluted as",["as polluted than","as more polluted as"]]
+];
+var u6AsAs = clozeGen(U6_ASAS,
+  "<span class=ltr>as + adjective + as</span> تعني أنّ الشيئين <b>متساويان</b>، ونضيف <span class=ltr>just</span> "+
+  "للتوكيد. وفي النفي <span class=ltr>isn't as … as</span> تعني «أقلّ». والصفة تبقى <b>مجرّدة</b> بلا "+
+  "<span class=ltr>-er</span> ولا <span class=ltr>more</span> (ص <span class=ltr>60</span>).",
+  "u6aa");
+
+/* الأسئلة غير المباشرة (ص ٦٠ تمرين C) */
+var U6_IND = [
+  ["Do you know what the name of the street is?",
+   ["Do you know what is the name of the street?","Do you know what does the name of the street is?"]],
+  ["Do you know where the nearest bank is?",
+   ["Do you know where is the nearest bank?","Do you know where does the nearest bank is?"]],
+  ["Do you know when the store opens?",
+   ["Do you know when does the store open?","Do you know when is the store opens?"]],
+  ["Could you tell me where I can get good pizza?",
+   ["Could you tell me where can I get good pizza?","Could you tell me where do I can get good pizza?"]],
+  ["Could you tell me how many people live here?",
+   ["Could you tell me how many people do live here?","Could you tell me how many do people live here?"]],
+  ["Do you know where the main post office is?",
+   ["Do you know where is the main post office?","Do you know where does the main post office is?"]],
+  ["Do you know how often the buses come?",
+   ["Do you know how often do the buses come?","Do you know how often are the buses come?"]],
+  ["Do you know what time the bank opens?",
+   ["Do you know what time does the bank open?","Do you know what time is the bank opens?"]],
+  ["Do you know when the gas station closes?",
+   ["Do you know when does the gas station close?","Do you know when is the gas station closes?"]],
+  ["Do you know where the nearest pharmacy is?",
+   ["Do you know where is the nearest pharmacy?","Do you know where does the nearest pharmacy is?"]],
+  ["Do you know which way the center of town is?",
+   ["Do you know which way is the center of town?","Do you know which way does the center of town is?"]]
+];
+var u6Indirect = pickGen(U6_IND,
+  "في السؤال <b>غير المباشر</b> لا نقلب الفاعل والفعل: نقول "+
+  "<span class=ltr>Do you know where the bank <b>is</b>?</span> لا "+
+  "<span class=ltr>…where <b>is</b> the bank?</span> ، ولا نستعمل "+
+  "<span class=ltr>do/does</span> بل نصرّف الفعل نفسه: "+
+  "<span class=ltr>…when the store <b>opens</b>?</span> (ص <span class=ltr>60</span>).",
+  "u6id");
+
+/* إعلانات For Rent (ص ٦٢) */
+var U6_RENT = [
+  ["Which place is the cheapest?","The large room near the university, at $350 a month",
+   ["The studio apartment, at $450 a month","The small house, at $900 a month"]],
+  ["Which place is the most expensive?","The small house with a garden, at $900 a month",
+   ["The one-bedroom apartment, at $700 a month","The large room, at $350 a month"]],
+  ["How much is the one-bedroom apartment?","$700 a month",["$450 a month","$900 a month"]],
+  ["Which place has parking available?","The small studio apartment",
+   ["The large room near the university","The one-bedroom apartment"]],
+  ["Which place has no parking?","The large room near the university",
+   ["The small studio apartment","The small house with a garden"]],
+  ["Which floor is the one-bedroom apartment on?","The third floor, with no elevator",
+   ["The ground floor","The first floor, with an elevator"]],
+  ["Which place is two blocks from a train station?","The small studio apartment",
+   ["The small house","The large room"]],
+  ["Which place is in the downtown area?","The small house with a garden",
+   ["The studio apartment","The one-bedroom apartment"]],
+  ["When should you call Mr. Hammer?","After 6 P.M.",["Before 6 A.M.","Only on Fridays"]],
+  ["How much does Yousef earn a month?","About $1,500",["About $500","About $3,500"]],
+  ["What kind of place does Yousef want?","A small, quiet place in a good neighborhood",
+   ["A large noisy place downtown","A place with a big garage for his car"]],
+  ["Does Yousef have a car?","No, but he has a motorcycle",
+   ["Yes, he has two cars","Yes, but it is broken"]]
+];
+var u6Rent = factGen(U6_RENT,
+  "من إعلانات <span class=ltr>For Rent</span> في الوحدة <span class=ltr>6</span> (ص <span class=ltr>62</span>): ",
+  "u6rn");
+
+/* محادثة فارس وعادل (ص ٦٣) */
+var U6_FARIS = [
+  ["How long has Adel lived in the suburbs?","Since he started college, about two years ago",
+   ["Since he was a child","For about ten years"]],
+  ["What was the apartment like when he moved in?","A bit run down, so he had to renovate it",
+   ["Brand new and fully furnished","Too small for one person"]],
+  ["Is Adel's neighborhood dangerous?","No, it is quiet and safe",
+   ["Yes, very dangerous at night","Yes, because of the stadium"]],
+  ["What is there in Adel's neighborhood?","Parks, supermarkets and a mall",
+   ["Only a train station","Nothing at all"]],
+  ["What doesn't Adel like about the suburbs?","He spends a lot of time commuting to college",
+   ["The neighbors are unfriendly","There are no shops"]],
+  ["Where does Faris live?","About two blocks from the Rangers' stadium",
+   ["In the suburbs, next to Adel","Downtown, near his college"]],
+  ["What doesn't Faris like about his place?","He often can't find a place to park, and there is noise from the games",
+   ["It is too far from the city","There are no parks nearby"]],
+  ["What does Adel suggest to Faris?","That he find another place and move out",
+   ["That he buy a car","That he become a Rangers fan"]]
+];
+var u6Faris = factGen(U6_FARIS,
+  "من محادثة <span class=ltr>Faris &amp; Adel</span> في الوحدة <span class=ltr>6</span> (ص <span class=ltr>63</span>): ",
+  "u6fr");
+
+var U6_RT = [
+  ["a bit","a little",["a lot","never"]],
+  ["run down","in need of fixing, not looked after",["brand new","very expensive"]],
+  ["Definitely!","an expression that shows strong agreement",
+   ["an expression of doubt","a way to say goodbye"]],
+  ["The only thing is that…","used to introduce a problem or an issue",
+   ["used to end a conversation","used to give a compliment"]],
+  ["You can't have it all.","Everything has something negative",
+   ["You must buy everything","Nothing is ever good"]]
+];
+var u6RealTalk = vocabGen(U6_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>6</span> (ص <span class=ltr>63</span>).", "u6rt");
+
+/* قطعة The Bride of the Red Sea — جدّة (ص ٦٤) */
+var U6_JEDDAH = [
+  ["For how many consecutive years has Jeddah been named a \"global city\"?","20 years",
+   ["10 years","50 years"]],
+  ["Who names Jeddah a \"global city\"?","The GaWC",["The United Nations","UNESCO"]],
+  ["Why is Jeddah called the gateway to Makkah?","Because it hosts millions of pilgrims on their way to Hajj",
+   ["Because it is the capital","Because it is the oldest city"]],
+  ["Which is the highest fountain in the world?","King Fahd's Fountain",
+   ["The Kingdom Tower fountain","The Corniche fountain"]],
+  ["How high does King Fahd's Fountain jet water?","312 meters (1024 feet)",
+   ["1,000 meters","124 meters"]],
+  ["How high will the Kingdom Tower be?","1,000 meters",["312 meters","500 meters"]],
+  ["What will the Kingdom Tower be when it is completed?","The world's tallest building",
+   ["The world's highest fountain","The world's largest museum"]],
+  ["Which are landmarks of Jeddah?","The NCB Tower, the IDB Tower and the Jeddah Municipality Tower",
+   ["Bayt Naseef and the Kingdom Tower only","The Asir Mountains"]],
+  ["When were many works of art introduced into Jeddah's public areas?","During the 1980s",
+   ["During the 1920s","During the 2010s"]],
+  ["What is Jeddah one of the largest of, in the world?","An open-air gallery",
+   ["A shopping mall","An amusement park"]],
+  ["Who did the family of Bayt Naseef host in 1925?","King Abdulaziz Ibn Saud",
+   ["King Fahd","King Salman"]],
+  ["What does Bayt Naseef house today?","A historic museum and heritage exhibits",
+   ["Modern sculptures","A designer boutique"]],
+  ["What is Al-Balad?","The historic center of Jeddah",
+   ["The Corniche beach","A university campus"]],
+  ["What does the Al-Balad marketplace feature?","Traditional souqs and designer boutiques",
+   ["Only modern shopping malls","Only fish markets"]],
+  ["What cools the coast in the Corniche area?","A light breeze",
+   ["The King Fahd Fountain","The Asir Mountains"]],
+  ["What in the Red Sea is popular with scuba divers?","The beautiful coral reefs",
+   ["The bullet trains","The open-air galleries"]]
+];
+var u6Jeddah = factGen(U6_JEDDAH,
+  "من قطعة <span class=ltr>The Bride of the Red Sea</span> في الوحدة <span class=ltr>6</span> "+
+  "(ص <span class=ltr>64</span>): ", "u6jd");
+
+/* معاني كلمات القطعة — خيارات الكتاب (ص ٦٥) */
+var U6_JV = [
+  ["consecutive","an unbroken series",["recent","next or future"]],
+  ["aspects","features",["ideas","ways"]],
+  ["leading","most important",["popular","winning"]],
+  ["houses","holds",["visits","protects"]],
+  ["combination","mixture",["series of numbers","things joined"]]
+];
+var u6JeddahVocab = vocabGen(U6_JV,
+  "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>6</span> (ص <span class=ltr>65</span>) — "+
+  "المعنى <b>كما استُعمل في النصّ</b>.", "u6jv");
+
+/* ماذا يستطيع الزائر أن يفعل في جدّة (ص ٦٥ تمرين B) */
+var U6_JB = [
+  ["Can a visitor meet people from different cultures in Jeddah?","Yes — the city has cultural diversity",
+   ["No, everyone is from one culture","Only during Hajj"]],
+  ["Can a visitor study at university in Jeddah?","Yes — it has several public and private universities",
+   ["No, there are no universities","Only online"]],
+  ["Can a visitor see the world's tallest fountain in Jeddah?","Yes — King Fahd's Fountain is the highest in the world",
+   ["No, the highest fountain is in Riyadh","Only when the Kingdom Tower is finished"]],
+  ["Can a visitor see modern sculptures at Bayt Naseef?","No — Bayt Naseef houses a historic museum and heritage exhibits",
+   ["Yes, it is full of modern sculptures","Yes, but only in summer"]],
+  ["Can a visitor go shopping in Al-Balad?","Yes — its marketplace has souqs and boutiques",
+   ["No, Al-Balad has no shops","Only for pilgrims"]],
+  ["Can a visitor go up the Kingdom Tower today?","No — it has not been built yet, there are only plans",
+   ["Yes, it opened in the 1980s","Yes, it is the oldest tower in Jeddah"]]
+];
+var u6JeddahB = factGen(U6_JB,
+  "من تمرين <span class=ltr>B</span> بعد القراءة في الوحدة <span class=ltr>6</span> (ص <span class=ltr>65</span>): ",
+  "u6jb");
+
+/* أداة التعريف the (ص ٦٧) */
+var U6_ART = [
+  ["When ___ sun goes down, you can see ___ moon.","the … the",["a … a","(no article) … (no article)"]],
+  ["Planes are ___ fastest means of transport.","the",["a","(no article)"]],
+  ["___ Burj Khalifa in ___ Dubai is the tallest building in ___ world.","The … (no article) … the",
+   ["(no article) … the … a","The … the … (no article)"]],
+  ["Fahd is ___ my brother.","(no article)",["the","a"]],
+  ["He is in ___ Dubai on ___ business.","(no article) … (no article)",["the … the","a … a"]],
+  ["Let's play ___ tennis after ___ lunch.","(no article) … (no article)",["the … the","a … the"]],
+  ["___ Red Sea is famous for its coral reefs.","The",["A","(no article)"]],
+  ["___ Arabian Desert is very large.","The",["A","(no article)"]],
+  ["We went on ___ vacation to ___ island of Penang in ___ Malaysia.","(no article) … the … (no article)",
+   ["the … a … the","a … the … the"]],
+  ["___ technology is used in ___ classrooms.","(no article) … (no article)",["The … the","A … the"]],
+  ["He is ___ tourist. ___ tourist is in Jeddah.","a … The",["the … A","(no article) … A"]],
+  ["What are ___ official languages of Canada?","the",["a","(no article)"]]
+];
+var u6Article = clozeGen(U6_ART,
+  "نستعمل <span class=ltr>the</span> مع المعروف والمحدَّد، ومع التفضيل، ومع الأشياء الفريدة "+
+  "(<span class=ltr>the sun, the moon, the world</span>)، ومع البحار والأنهار والصحاري والجبال والمعالم "+
+  "(<span class=ltr>the Red Sea, the Arabian Desert</span>). ولا نستعملها مع أسماء الأعلام، وضمائر الملكية، "+
+  "والشهور والأيام والوجبات والألعاب والرياضات، ولا مع "+
+  "<span class=ltr>home, school, work, business, vacation</span> حين تُستعمل لغرضها "+
+  "(ص <span class=ltr>67</span>). و<span class=ltr>(no article)</span> تعني بلا أداة.",
+  "u6ar");
+
+/* ===================== EXPANSION ٤–٦ (ص ٦٨–٧٣) ===================== */
+
+/* اختيار الجملة المرادفة (ص ٦٨ تمرين B) */
+var EX2_SAME = [
+  ["The cost of living in Rome is just about the same as in Paris.","There isn't much difference.",
+   ["Rome is cheaper.","They're both expensive."]],
+  ["My new air conditioner isn't as noisy as the old one.","The new one is less noisy.",
+   ["The new one is just as noisy.","The new one is much noisier."]],
+  ["This is the most crowded restaurant I've ever been in, but it's always like this.",
+   "It's as crowded as usual.",
+   ["It's more crowded today than usual.","It's sometimes more crowded than this."]],
+  ["The taxis are as slow as the buses during rush hour.","Buses are as slow as taxis.",
+   ["Taxis are faster.","Rush hour is annoying."]],
+  ["Our TV screen is as large as yours, but yours has a higher definition.",
+   "One has a better definition.",
+   ["They're not the same size.","They're exactly the same."]]
+];
+function ex2Same(){
+  var c=gp(EX2_SAME), o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أيُّ الجمل تحمل المعنى نفسه؟<br>"+en(c[0]),o[0].map(en),o[1],
+    en(c[0])+" = "+en(c[1])+" — من مراجعة الوحدات <span class=ltr>4–6</span> (ص <span class=ltr>68</span>).",
+    "ex2sm:"+c[0]];
+}
+
+/* قطعة Adventure Trips (ص ٧٠–٧١) */
+var EX2_ADV = [
+  ["Where is the SKYHI skydiving facility?","In Colorado, one hour from Denver",
+   ["In the Bavarian Alps","In Patagonia, Chile"]],
+  ["How many jumps does SKYHI make every year?","More than 35,000",["About 3,000","About 300"]],
+  ["From what height do skydivers jump at SKYHI?","About 3,000 feet (900 meters)",
+   ["About 35,000 feet","About 300 meters"]],
+  ["Which river do bikers pass in Germany?","The Danube",["The Futaleufu","The Thames"]],
+  ["Which town is Germany's most famous winter sports center?","Garmisch-Partenkirchen",
+   ["Stockholm","Zugspitze"]],
+  ["What is Zugspitze?","Germany's highest mountain",["A German river","A rafting company"]],
+  ["How can you get to the peak of Zugspitze?","By a mountain railway and a cable car",
+   ["Only by bike","Only by parachute"]],
+  ["Where is the white-water rafting trip?","In Patagonia, Chile",
+   ["In Colorado, USA","In Bavaria, Germany"]],
+  ["Which river offers the rafting?","The Futaleufu River",["The Danube","The Thames"]],
+  ["How long is the white-water stretch?","40 miles (64 kilometers)",
+   ["4 miles","400 kilometers"]],
+  ["Which mountain range are the rapids in?","The Andean mountain range",
+   ["The Alps","The Rockies"]],
+  ["How long has the company been providing rafting trips?","For more than 30 years",
+   ["For 3 years","Since last year"]],
+  ["Which adventure did Mitch Taylor describe?","Skydiving",["Biking","White-water rafting"]],
+  ["Which adventure did Daniel Garcia describe?","Biking",["Skydiving","White-water rafting"]],
+  ["Which adventure did Neil Davenport describe?","White-water rafting",["Skydiving","Biking"]],
+  ["What did Mitch Taylor hear as he fell?","The wind rushing by",
+   ["The birds and the streams","The boat hitting the water"]],
+  ["What could Daniel Garcia smell?","The fresh scent of the plants in the air",
+   ["The freezing water","The parachute"]],
+  ["What did Neil Davenport hear?","The sound of the boat hitting the water",
+   ["The wind rushing by","The birds in the trees"]]
+];
+var ex2Adventure = factGen(EX2_ADV,
+  "من قطعة <span class=ltr>Adventure Trips</span> في مراجعة الوحدات <span class=ltr>4–6</span> "+
+  "(ص <span class=ltr>70–71</span>): ", "ex2ad");
+
+/* نشيد I've Missed You! (ص ٧٢–٧٣) */
+var EX2_CHANT = [
+  ["What does \"constantly\" mean in the chant?","All the time",["Forever","Occasionally"]],
+  ["What does \"proud\" mean in the chant?","Pleased",["Disappointed","Worried"]],
+  ["What does \"wonder\" mean in the chant?","Ask oneself",["Be amazed","Dream"]],
+  ["What does \"terribly\" mean in the chant?","Very much",["Not well","Just a little"]],
+  ["Has the student seen his family recently?","No, it has been a long, long time",
+   ["Yes, he saw them last week","Yes, he lives with them"]],
+  ["Is the student near his family?","No, he is in a distant place",
+   ["Yes, he lives next door","Yes, he is in the same city"]],
+  ["Has the student studied hard?","Yes, night and day",
+   ["No, he hasn't studied at all","Only before the exams"]],
+  ["What do the parents want to know?","Whether their son has missed them",
+   ["Whether he wants more money","Whether he will change university"]],
+  ["Does the student want to come home?","Yes, he can't wait to come home",
+   ["No, he wants to stay away","He hasn't decided yet"]],
+  ["What has happened to the little brother?","He has grown an inch or two",
+   ["He has started university","He has moved away"]]
+];
+var ex2Chant = factGen(EX2_CHANT,
+  "من نشيد <span class=ltr>I've Missed You!</span> في مراجعة الوحدات <span class=ltr>4–6</span> "+
+  "(ص <span class=ltr>72–73</span>): ", "ex2ch");
+
+/* ===================== الوحدة ٧ — It's a Good Deal, Isn't It? (ص ٧٤–٧٦) ===================== */
+
+/* أدوات البيت في سوق المرآب (ص ٧٥) */
+var U7_TOOLS = [
+  ["a teapot","cooking",["repairing","cleaning"]],
+  ["a frying pan","cooking",["repairing","cleaning"]],
+  ["knives and forks","cooking",["repairing","cleaning"]],
+  ["saucers","cooking",["repairing","cleaning"]],
+  ["a pot","cooking",["repairing","cleaning"]],
+  ["a vacuum cleaner","cleaning",["cooking","repairing"]],
+  ["a broom","cleaning",["cooking","repairing"]],
+  ["a garbage can","cleaning",["cooking","repairing"]],
+  ["a hose","cleaning",["cooking","repairing"]],
+  ["a hammer","repairing",["cooking","cleaning"]],
+  ["a saw","repairing",["cooking","cleaning"]],
+  ["pliers","repairing",["cooking","cleaning"]],
+  ["a screwdriver","repairing",["cooking","cleaning"]]
+];
+function u7Tools(){
+  var t=gp(U7_TOOLS), o=eOpts(t[1],t[2]);
+  if(!o) return null;
+  return ["What do you use "+en(t[0])+" for?",o[0].map(en),o[1],
+    en(t[0])+" → "+en(t[1])+" — من قائمة أغراض سوق المرآب في الوحدة <span class=ltr>7</span> "+
+    "(ص <span class=ltr>75</span>).",
+    "u7tl:"+t[0]];
+}
+
+/* أسئلة الذيل Tag Questions (ص ٧٦) */
+var U7_TAG = [
+  ["Your name is Ali Khalid, ___ ?","isn't it",["is it","doesn't it"]],
+  ["You were born in Abha, ___ ?","weren't you",["were you","didn't you"]],
+  ["You live in Dammam, ___ ?","don't you",["do you","aren't you"]],
+  ["You studied in Dhahran, ___ ?","didn't you",["did you","weren't you"]],
+  ["You've graduated, ___ ?","haven't you",["have you","didn't you"]],
+  ["You're going to work in Riyadh, ___ ?","aren't you",["are you","don't you"]],
+  ["Mariam isn't American, ___ ?","is she",["isn't she","does she"]],
+  ["She wasn't born in the United States, ___ ?","was she",["wasn't she","did she"]],
+  ["She doesn't speak English, ___ ?","does she",["doesn't she","is she"]],
+  ["She didn't work in a school, ___ ?","did she",["didn't she","was she"]],
+  ["She hasn't lived in the United States, ___ ?","has she",["hasn't she","did she"]],
+  ["She isn't going to move here, ___ ?","is she",["isn't she","does she"]],
+  ["These toys are in good condition, ___ ?","aren't they",["are they","don't they"]],
+  ["You've had garage sales before, ___ ?","haven't you",["have you","didn't you"]],
+  ["He didn't buy that fan, ___ ?","did he",["didn't he","was he"]],
+  ["They weren't able to sell the tools, ___ ?","were they",["weren't they","did they"]],
+  ["She found a set of nice crystal glasses, ___ ?","didn't she",["did she","hasn't she"]],
+  ["That vacuum cleaner works OK, ___ ?","doesn't it",["does it","isn't it"]],
+  ["We have lots of bargains here today, ___ ?","don't we",["do we","aren't we"]],
+  ["This lawn mower is really high-tech, ___ ?","isn't it",["is it","doesn't it"]]
+];
+var u7Tags = clozeGen(U7_TAG,
+  "الجملة <b>المثبتة</b> يتبعها ذيلٌ <b>منفيّ</b>، والجملة <b>المنفيّة</b> يتبعها ذيلٌ <b>مثبت</b>. "+
+  "ونكرّر الفعل المساعد نفسه: <span class=ltr>is→isn't it · were→weren't you · have→haven't you</span>، "+
+  "وإن لم يكن ثمّ مساعد استعملنا <span class=ltr>do/does/did</span> (ص <span class=ltr>76</span>).",
+  "u7tg");
+
+/* الإجابة على أسئلة الذيل (ص ٧٦ ملاحظة) */
+var U7_ANS = [
+  ["A: You're from Riyadh, aren't you?<br>B: (نعم، أنا منها)","Yes, I am.",
+   ["No, I am.","Yes, I'm not."]],
+  ["A: You aren't from Riyadh, are you?<br>B: (لا، أنا من جدّة)","No, I'm not. I'm from Jeddah.",
+   ["Yes, I'm not. I'm from Jeddah.","No, I am. I'm from Jeddah."]],
+  ["A: Andrew doesn't have a brother, does he?<br>B: (بلى، ستيف أخوه التوأم)","Yes, he does.",
+   ["No, he does.","Yes, he doesn't."]],
+  ["A: John is organizing a garage sale, isn't he?<br>B: (نعم)","Yes, he is.",
+   ["No, he is.","Yes, he isn't."]],
+  ["A: The lawn mower runs on electricity, doesn't it?<br>B: (نعم، وله ريموت)","Yes, it does.",
+   ["No, it does.","Yes, it doesn't."]],
+  ["A: The elderly couple need a new lamp, don't they?<br>B: (نعم)","Yes, they do.",
+   ["No, they do.","Yes, they don't."]],
+  ["A: There aren't any plants for sale, are there?<br>B: (لا، ما فيه)","No, there aren't.",
+   ["Yes, there aren't.","No, there are."]]
+];
+function u7Answer(){
+  var a=gp(U7_ANS), o=eOpts(a[1],a[2]);
+  if(!o) return null;
+  return ["اختر الجواب الصحيح:<br>"+a[0],o[0].map(en),o[1],
+    "الجواب يوافق <b>الحقيقة</b> لا صيغة السؤال: إن كان الأمر واقعًا فـ <span class=ltr>Yes + مثبت</span>، "+
+    "وإن لم يكن فـ <span class=ltr>No + منفيّ</span>. ولا يجتمع <span class=ltr>Yes</span> مع نفيٍ أبدًا "+
+    "(ص <span class=ltr>76</span>).",
+    "u7an:"+a[0]];
+}
+
+/* be able to (ص ٧٦) */
+var U7_ABLE = [
+  ["He ___ play basketball today because he hurt his hand.","won't be able to",
+   ["won't able to","doesn't able to"]],
+  ["I ___ come to the park because I had a previous appointment.","wasn't able to",
+   ["wasn't able","didn't able to"]],
+  ["___ you be able to go out with us tomorrow?","Will",["Do","Are"]],
+  ["They ___ sell the tools at the garage sale.","weren't able to",
+   ["weren't able","didn't able to"]],
+  ["She ___ fix the vacuum cleaner by herself.","was able to",["was able","did able to"]],
+  ["We ___ find a parking place near the stadium.","aren't able to",
+   ["aren't able","don't able to"]]
+];
+var u7BeAble = clozeGen(U7_ABLE,
+  "<span class=ltr>be able to</span> للقدرة، وتُصرَّف بـ <span class=ltr>be</span> في كلّ الأزمنة: "+
+  "<span class=ltr>am/is/are able to · was/were able to · will be able to</span>، ويأتي بعدها الفعل "+
+  "<b>مجرّدًا</b>، ولا يجوز حذف <span class=ltr>to</span> (ص <span class=ltr>76</span>).",
+  "u7ab");
+
+/* ===================== الوحدة ٨ — Drive Slowly! (ص ٨٧–٩٣) ===================== */
+
+/* السائق العدواني وما ينبغي فعله (ص ٨٨) */
+var U8_AGGR = [
+  ["Does an aggressive driver drive recklessly?","Yes — dangerously and recklessly",
+   ["No, always carefully","Only on the highway"]],
+  ["Does an aggressive driver stop at red lights?","No — they go through stop signs and red lights",
+   ["Yes, always","Only at night"]],
+  ["What is tailgating?","Driving closely behind the car in front",
+   ["Driving very slowly","Letting others pass you"]],
+  ["Is being courteous to other motorists a sign of an aggressive driver?",
+   "No — that is the opposite of aggressive driving",
+   ["Yes, it is a warning sign","Yes, but only in traffic"]],
+  ["What should you do when you meet an aggressive driver?","Get out of the way",
+   ["Challenge them to show you aren't scared","Blow your horn at them"]],
+  ["Should you look at an aggressive driver?","No — avoid eye contact",
+   ["Yes, stare at them","Yes, and make gestures back"]],
+  ["What should you do about their gestures?","Ignore them",
+   ["Answer with your own gestures","Follow their car"]],
+  ["Who should you tell about a dangerous driver?","The authorities",
+   ["Nobody at all","Only your friends"]]
+];
+var u8Aggressive = factGen(U8_AGGR,
+  "من <span class=ltr>Language in Context</span> في الوحدة <span class=ltr>8</span> (ص <span class=ltr>88</span>): ",
+  "u8ag");
+
+/* محادثة جورج ووالده (ص ٨٩) */
+var U8_GEORGE = [
+  ["How does the father want George to drive?","Slowly and carefully",
+   ["Fast, to save time","However he likes"]],
+  ["What should George do before he starts the car?","Put on his seat belt",
+   ["Open the window","Call the airport"]],
+  ["What time is the father's flight?","At 6:00 P.M.",["At 6:00 A.M.","In two hours"]],
+  ["How long does the trip to the airport take?","Less than an hour",
+   ["More than three hours","Exactly two hours"]],
+  ["How early does the father say you should arrive?","At least two hours before departure",
+   ["Ten minutes before departure","One hour after departure"]],
+  ["Which road does the father want to take?","The highway",
+   ["The small road George chose","The road past the stadium"]],
+  ["Why does he prefer the highway?","It's faster because it's more direct",
+   ["It has less traffic at night","It is the only road"]],
+  ["Where should George turn right?","At the next traffic light",
+   ["At the airport gate","At the stop sign"]],
+  ["What is the speed limit on that road?","70 kilometers per hour",
+   ["60 kilometers per hour","90 kilometers per hour"]],
+  ["How fast is George driving?","60 kilometers per hour",
+   ["70 kilometers per hour","100 kilometers per hour"]],
+  ["What must George watch out for?","The traffic",["The traffic light","The seat belt"]]
+];
+var u8George = factGen(U8_GEORGE,
+  "من محادثة الوحدة <span class=ltr>8</span> (ص <span class=ltr>89</span>): ", "u8gr");
+
+var U8_RT = [
+  ["You can't be serious!","used to express surprise or disbelief",
+   ["used to agree strongly","used to say goodbye"]],
+  ["Hey","used to attract someone's attention",
+   ["used to apologize","used to say thank you"]],
+  ["I'm doing 60.","I'm driving 60 kilometers per hour",
+   ["I'm 60 years old","I've done 60 exercises"]]
+];
+var u8RealTalk = vocabGen(U8_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>8</span> (ص <span class=ltr>89</span>).", "u8rt");
+
+/* قطعة Is Right, Right? (ص ٩٠) */
+var U8_RIGHT = [
+  ["How much of the world drives on the left?","About a quarter",["About a half","Almost all of it"]],
+  ["What do most of those countries have in common?","Most of them used to be British colonies",
+   ["They are all in Asia","They all have no cars"]],
+  ["In England, which side do people stand on, on escalators?","The right",
+   ["The left","Both sides equally"]],
+  ["In Japan, which side do people drive on?","The left",["The right","It changes by city"]],
+  ["In Japan, which side do people usually stand on, on escalators?","The left",
+   ["The right","In the middle"]],
+  ["Why do some people believe we naturally keep right?","Because most people are right-handed",
+   ["Because the sun rises in the east","Because cars are made that way"]],
+  ["Why did Europeans ride on the left hundreds of years ago?",
+   "So their sword was between them and anyone coming toward them",
+   ["Because their horses were trained that way","Because the roads were narrow"]],
+  ["Which ancient troops marched on the left?","Greek, Egyptian and Roman troops",
+   ["Only the Roman troops","Only the French troops"]],
+  ["When did Rome make marching on the left a law?","In the 1300s",
+   ["In the 1700s","In the early 1800s"]],
+  ["Why was it easier for wagon drivers to sit on the left?",
+   "So they could control the horses with the whip in the right hand",
+   ["So they could see the sun","So they could talk to passengers"]],
+  ["Who ordered people to drive on the right?","Napoleon, in the early 1800s",
+   ["The Roman emperors","The British king"]],
+  ["Why did England keep driving on the left?","Because France never conquered England",
+   ["Because England had no horses","Because England changed its laws in 1967"]],
+  ["Which country changed its laws as recently as 1967?","Sweden",
+   ["France","England"]],
+  ["Which side do people in Sweden drive on now?","The right",["The left","Either side"]],
+  ["What does the article advise you to do?","Follow the customs of the country where you are",
+   ["Always drive on the right","Never drive abroad"]]
+];
+var u8Right = factGen(U8_RIGHT,
+  "من قطعة <span class=ltr>Is Right, Right?</span> في الوحدة <span class=ltr>8</span> "+
+  "(ص <span class=ltr>90</span>): ", "u8rg");
+
+/* معاني كلمات القطعة (ص ٩١ تمرين B) */
+var U8_RV = [
+  ["to investigate","to study and research",["to take control by force","a direction of change"]],
+  ["confusion","uncertainty about what happened",["something that is usually done","study and research"]],
+  ["to conquer","to take control of a country or city through the use of force",
+   ["to study and research","to be uncertain"]],
+  ["custom","something that is usually done",["a direction of change","uncertainty"]],
+  ["trend","a direction of change, a tendency",["something that is usually done","study and research"]]
+];
+var u8RightVocab = vocabGen(U8_RV,
+  "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>8</span> (ص <span class=ltr>91</span>).",
+  "u8rv");
+
+/* رخصة القيادة في كندا (ص ٩٢) */
+var U8_LIC = [
+  ["What is the legal driving age in most provinces of Canada?","16",["18","21"]],
+  ["What must new drivers pass first?","A written exam on the rules of the road",
+   ["A road test with an examiner","A medical test"]],
+  ["What licence do they get after the written exam?","A Learner's License",
+   ["A Novice License","A full license"]],
+  ["What must a learner display on the car?","An L sign on the back",
+   ["An N sign on the back","A red flag"]],
+  ["How long must a learner drive under an adult's supervision?","For one year",
+   ["For two years","For one month"]],
+  ["What licence comes after passing the road test?","A Novice License",
+   ["A Learner's License","A full license"]],
+  ["How many passengers may a novice drive with?","Only one",["Any number","None at all"]],
+  ["What must a novice display on the car?","An N sign on the back",
+   ["An L sign on the back","Nothing at all"]],
+  ["What must a novice do after two years of safe driving?","Pass another road test to get a full license",
+   ["Nothing — the licence becomes full automatically","Retake the written exam"]]
+];
+var u8License = factGen(U8_LIC,
+  "من نصّ رخصة القيادة في كندا بالوحدة <span class=ltr>8</span> (ص <span class=ltr>92</span>): ", "u8lc");
+
+/* السبب والنتيجة (ص ٩٢ ركن الكتابة والتمرين B) */
+var U8_CAUSE = [
+  ["Many adolescents can't control their emotions and ___ .","impulses",["reflexes","attention"]],
+  ["Because of that, they are prone to road ___ .","rage",["reflexes","attention"]],
+  ["Teenagers are easily ___ by their cell phone.","distracted",["immature","responsible"]],
+  ["As a result, they don't pay careful ___ to the road.","attention",["rage","reflexes"]],
+  ["Teenagers are still mentally young and ___ .","immature",["responsible","distracted"]],
+  ["For this reason, they are not ___ drivers.","responsible",["immature","distracted"]],
+  ["They don't have the ___ to react quickly.","reflexes",["impulses","attention"]],
+  ["Consequently, they are more likely to cause an ___ .","accident",["attention","reflex"]],
+  ["You should eat a good breakfast ___ it gives you energy.","because",
+   ["as a result","consequently"]],
+  ["We had nothing to eat at home, ___ we went out for dinner.","so",
+   ["because","since"]],
+  ["___ the fact that the road was icy, the bus was late.","Due to",
+   ["As a result","Consequently"]],
+  ["The road was icy. ___ , the bus was late.","As a result",["Because","Due to"]]
+];
+var u8CauseResult = clozeGen(U8_CAUSE,
+  "عبارات <b>السبب</b>: <span class=ltr>because (of) · since · as · due to</span> — "+
+  "وعبارات <b>النتيجة</b>: <span class=ltr>for this reason · as a result · consequently · so</span>. "+
+  "ولاحظ أنّ <span class=ltr>due to</span> يتبعها <b>اسم</b>، و<span class=ltr>because</span> يتبعها "+
+  "<b>جملة</b> (ص <span class=ltr>92</span>).",
+  "u8cr");
+
+/* نقل الطلبات والأوامر (ص ٩٣) */
+var U8_REP = [
+  ["\"Put on your seat belts,\" the father said to his children.",
+   "The father told his children to put on their seat belts.",
+   ["The father told to his children put on their seat belts.",
+    "The father told his children put on their seat belts."]],
+  ["\"Would you drive us to the airport?\" Abdullah's cousins asked him.",
+   "Abdullah's cousins asked him to drive them to the airport.",
+   ["Abdullah's cousins asked him drive them to the airport.",
+    "Abdullah's cousins asked to him to drive them to the airport."]],
+  ["\"Please don't drive so fast,\" the woman said to her husband.",
+   "The woman told her husband not to drive so fast.",
+   ["The woman told her husband to not drive so fast.",
+    "The woman told to her husband don't drive so fast."]],
+  ["\"Don't ride your motorcycle in the rain,\" said the mother to her son.",
+   "The mother told her son not to ride his motorcycle in the rain.",
+   ["The mother told her son don't ride his motorcycle in the rain.",
+    "The mother said her son not to ride his motorcycle in the rain."]],
+  ["\"Could you please fill up the gas tank?\" the man asked the attendant.",
+   "The man asked the attendant to fill up the gas tank.",
+   ["The man asked the attendant fill up the gas tank.",
+    "The man asked to the attendant to fill up the gas tank."]],
+  ["\"Can you check the brakes?\" Ahmed asked the mechanic.",
+   "Ahmed asked the mechanic to check the brakes.",
+   ["Ahmed asked the mechanic checking the brakes.",
+    "Ahmed asked to the mechanic to check the brakes."]],
+  ["\"Turn right,\" said Omar to his brother.",
+   "Omar told his brother to turn right.",
+   ["Omar told to his brother to turn right.","Omar said his brother to turn right."]],
+  ["\"Don't be late,\" said their parents.",
+   "Their parents told them not to be late.",
+   ["Their parents told them to not be late.","Their parents said them not to be late."]]
+];
+function u8Report(){
+  var r=gp(U8_REP), o=eOpts(r[1],r[2]);
+  if(!o) return null;
+  return ["انقل الطلب أو الأمر:<br>"+en(r[0]),o[0].map(en),o[1],
+    "الصيغة: <span class=ltr>ask / tell + مفعول + to + مصدر</span> ، وفي النفي "+
+    "<span class=ltr>not to</span> <b>قبل</b> <span class=ltr>to</span> لا بعدها. "+
+    "ولا نقول <span class=ltr>told to somebody</span> ولا <span class=ltr>said somebody</span> "+
+    "(ص <span class=ltr>93</span>).",
+    "u8rp:"+r[0]];
+}
+
+/* ===================== الوحدة ٩ — All Kinds of People (ص ٩٤–١٠١) ===================== */
+
+/* who / that / which (ص ٩٦–٩٧ تمرين D) */
+var U9_REL = [
+  ["The neighbor ___ lives downstairs is very quiet.","who",["which","whose"]],
+  ["The flowers ___ grow in the city garden are very colorful.","that",["who","whom"]],
+  ["I'd like to introduce you to the person ___ organized the conference.","who",["which","whose"]],
+  ["That isn't the camera ___ is on sale.","that",["who","whom"]],
+  ["The actor ___ was playing the lead role was very funny.","who",["which","whose"]],
+  ["Isn't that the book ___ you were reading last week?","that",["who","whom"]],
+  ["The clothes designer ___ made this dress was very creative.","who",["which","whose"]],
+  ["Mom, may I eat the mango ___ is in the refrigerator?","that",["who","whom"]],
+  ["The horse ___ pulled the carriage was black.","which",["who","whose"]],
+  ["The man ___ was talking to the tourists was friendly.","who",["which","whose"]],
+  ["The watches ___ the man was selling were fakes.","that",["who","whom"]],
+  ["The officer ___ was on duty saw the thief.","who",["which","whose"]]
+];
+var u9Relative = clozeGen(U9_REL,
+  "الضمائر الموصولة: <span class=ltr>who</span> أو <span class=ltr>that</span> <b>للناس</b>، "+
+  "و<span class=ltr>that</span> أو <span class=ltr>which</span> <b>للأشياء والحيوانات</b>. "+
+  "ولا تُستعمل <span class=ltr>which</span> للناس ولا <span class=ltr>who</span> للأشياء "+
+  "(ص <span class=ltr>96</span>).",
+  "u9rl");
+
+/* الماضي المستمر مع when و while (ص ٩٦) */
+var U9_PROG = [
+  ["I ___ in the store window when the thief grabbed my bag.","was looking",
+   ["looked","am looking"]],
+  ["I was looking in the store window when the thief ___ my bag.","grabbed",
+   ["was grabbing","grabs"]],
+  ["He was driving while he ___ on his cell phone.","was talking",["talked","talks"]],
+  ["It ___ while Yahya was washing the car.","was raining",["rained","rains"]],
+  ["We ___ for the bus when it started to rain.","were waiting",["waited","are waiting"]],
+  ["I was crossing the street when the car ___ .","stopped",["was stopping","stops"]],
+  ["A man was talking on his cell phone while he ___ for the bus.","was waiting",
+   ["waited","waits"]],
+  ["The thief was trying to steal the backpack when the police officer ___ him.","saw",
+   ["was seeing","sees"]]
+];
+var u9PastProg = clozeGen(U9_PROG,
+  "الفعل <b>الطويل</b> الذي كان جاريًا يأخذ الماضي المستمرّ (<span class=ltr>was/were + -ing</span>)، "+
+  "والفعل <b>القصير</b> الذي قطعه يأخذ الماضي البسيط بعد <span class=ltr>when</span>. "+
+  "وإذا جرى فعلان معًا في الوقت نفسه فكلاهما مستمرّ ويربطهما <span class=ltr>while</span> "+
+  "(ص <span class=ltr>96</span>).",
+  "u9pg");
+
+/* صفات الشخصية (ص ٩٦ تمرين A و ص ٩٨) */
+var U9_ADJ = [
+  ["athletic","someone who enjoys sports",["someone who speaks a lot","someone who dresses well"]],
+  ["talkative","someone who speaks a lot",["someone who is very quiet","someone who enjoys sports"]],
+  ["efficient","someone who does things well and quickly",
+   ["someone who is never on time","someone who makes you laugh"]],
+  ["rude","someone who isn't polite",["someone who is very kind","someone who is intelligent"]],
+  ["clever","someone who is intelligent",["someone who isn't polite","someone who dresses well"]],
+  ["fashionable","someone who dresses well",["someone who enjoys sports","someone who speaks a lot"]],
+  ["funny","someone who makes you laugh",["someone who is always serious","someone who is intelligent"]],
+  ["friendly","someone who likes to be with others",
+   ["someone who prefers to be alone","someone who does things quickly"]],
+  ["generous","someone who likes to give to others",
+   ["someone who keeps everything","someone who forgets things"]],
+  ["hardworking","someone who works a lot and doesn't give up",
+   ["someone who avoids work","someone who talks a lot"]],
+  ["absentminded","someone who forgets things easily",
+   ["someone who remembers everything","someone who is very polite"]],
+  ["optimistic","someone who expects good things to happen",
+   ["someone who expects bad things to happen","someone who never decides"]],
+  ["pessimistic","someone who expects bad things to happen",
+   ["someone who expects good things to happen","someone who works very hard"]],
+  ["reliable","someone you can always depend on",
+   ["someone who is never there when you need them","someone who talks a lot"]],
+  ["selfish","someone who thinks only of himself",
+   ["someone who thinks of others first","someone who is very funny"]],
+  ["patient","someone who can wait calmly",
+   ["someone who gets angry quickly","someone who is very rich"]],
+  ["persuasive","someone who is good at convincing others",
+   ["someone who never speaks","someone who is easily convinced"]],
+  ["lazy","someone who avoids work",["someone who works very hard","someone who is very clever"]]
+];
+var u9Adjectives = vocabGen(U9_ADJ,
+  "من صفات الشخصية في الوحدة <span class=ltr>9</span> (ص <span class=ltr>96–98</span>).", "u9aj");
+
+/* انطباعات عن مدينة (ص ٩٤–٩٥) */
+var U9_CITY = [
+  ["The people who live in the city ___ .","seem to have little time",
+   ["saw the thief stealing the backpack","were fakes"]],
+  ["The man was talking on the phone ___ .","while he was waiting for the bus",
+   ["to some tourists who were lost","two hours before departure"]],
+  ["The officer who was on duty ___ .","saw the thief stealing the backpack",
+   ["was in a hurry","seem to have little time"]],
+  ["The man who was hailing the taxi ___ .","was in a hurry",
+   ["saw the thief stealing the backpack","to some tourists who were lost"]],
+  ["The man was giving directions ___ .","to some tourists who were lost",
+   ["while he was waiting for the bus","saw the thief stealing the backpack"]],
+  ["A man who was dressed in black ___ .","was handing out flyers",
+   ["was selling fake watches","was hailing a taxi"]],
+  ["The watches that the man was selling ___ .","were fakes",
+   ["were handed out as flyers","were in a hurry"]],
+  ["The pedal cab at the side of the road ___ .","is a typical attraction in the town",
+   ["was stolen by the thief","was hailing a taxi"]]
+];
+function u9City(){
+  var c=gp(U9_CITY), o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+    en(c[0].replace("___",c[1]))+" — من <span class=ltr>Impressions of a City</span> في الوحدة "+
+    "<span class=ltr>9</span> (ص <span class=ltr>94–95</span>).",
+    "u9ct:"+c[0]];
+}
+
+/* محادثة لارس وكِن في حفل الخير (ص ٩٩) */
+var U9_LARS = [
+  ["Who is Colin Parker?","The man who started his own airline",
+   ["The editor of Success","A football player"]],
+  ["Where was Colin Parker standing when they came in?","At the door",
+   ["Near the paintings","By the coffee table"]],
+  ["Who is Tony Kramer?","The editor of the magazine Success",
+   ["A British TV director","A football player"]],
+  ["How does Ken know Tony Kramer?","He worked with him on the magazine while he was in London",
+   ["They went to college together","Tony was his boss in Riyadh"]],
+  ["Who is Patrick Logan?","The football player",
+   ["A reporter","The editor of Success"]],
+  ["Why didn't Lars recognize Patrick Logan?","Because he looks different in a suit",
+   ["Because he was too far away","Because he had changed his name"]],
+  ["Who is wearing a turtleneck sweater?","B.W.",["Colin Parker","Tony Kramer"]],
+  ["Is Tony talking to a reporter?","No — the man with him is Patrick Logan, the football player",
+   ["Yes, a reporter from Success","Yes, a TV reporter"]]
+];
+var u9Lars = factGen(U9_LARS,
+  "من محادثة الوحدة <span class=ltr>9</span> (ص <span class=ltr>99</span>): ", "u9lr");
+
+var U9_RT = [
+  ["a real treat","something very pleasant and enjoyable",
+   ["something very expensive","something very boring"]],
+  ["Of course.","a way to answer yes very strongly",
+   ["a way to say maybe","a way to refuse politely"]],
+  ["I mean","a phrase to introduce an explanation of what one has said",
+   ["a phrase to end a conversation","a phrase to ask a question"]]
+];
+var u9RealTalk = vocabGen(U9_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>9</span> (ص <span class=ltr>99</span>).", "u9rt");
+
+/* قطعة Simple Ideas, BIG Results (ص ١٠٠) */
+var U9_YUNUS = [
+  ["What is Muhammad Yunus often called?","The world's banker to the poor",
+   ["The Saudi Volunteer of the Year","The founder of J-PAL"]],
+  ["When did Yunus receive the Nobel Peace Prize?","In 2006",["In 1976","In 2012"]],
+  ["Why did he receive it?","For his pioneering work against poverty",
+   ["For creating jobs in Saudi Arabia","For teaching at MIT"]],
+  ["How much was the prize money?","$1.35 million",["$27","$9"]],
+  ["When did Yunus found the Grameen Bank?","In 1976",["In 2006","In 2005"]],
+  ["How much money did he start it with?","Just $27 from his own pocket",
+   ["$1.35 million","$24 billion"]],
+  ["Where did the idea come to him?","While he was teaching economics at Chittagong University",
+   ["While he was studying at MIT","While he was working at a bank"]],
+  ["Where is Chittagong University?","In southern Bangladesh",["In India","In Saudi Arabia"]],
+  ["What did Yunus and his students do?","They lent poor people small amounts of money for their own businesses",
+   ["They gave away free food","They opened a school"]],
+  ["Who did local people rely on before that?","Local moneylenders, who were not always fair",
+   ["The government","International banks"]],
+  ["In how many countries has the Grameen model been duplicated?","More than 100",
+   ["More than 9 million","81,000"]],
+  ["How many borrowers does the bank have in Bangladesh?","Over 9 million",
+   ["100 million","2,500"]],
+  ["How many branches does it have?","Over 2,500, in over 81,000 villages",
+   ["Only 100","9 million"]],
+  ["How big is the small loan to buy items like bread and toys?","About $9",
+   ["About $27","About $900"]],
+  ["How much has the bank lent over the past 38 years?","$24 billion",
+   ["$1.35 million","$3,995"]],
+  ["What is the bank's repayment rate?","99.6 percent",["69 percent","39 percent"]],
+  ["Who were among the first borrowers of Grameen America?","One hundred people in Queens, New York",
+   ["Students at MIT","Villagers in Bangladesh"]],
+  ["How many borrowers are there worldwide?","100 million",["9 million","2,500"]]
+];
+var u9Yunus = factGen(U9_YUNUS,
+  "من قطعة <span class=ltr>Simple Ideas, BIG Results</span> في الوحدة <span class=ltr>9</span> "+
+  "(ص <span class=ltr>100</span>): ", "u9yn");
+
+var U9_JAMEEL = [
+  ["What was Mohammed Abdul Latif Jameel named in 2012?","Saudi Volunteer of the Year",
+   ["Nobel Peace Prize winner","Editor of the Year"]],
+  ["Why was he given that name?","For establishing job creation programs in Saudi Arabia and the Middle East",
+   ["For founding a bank in Bangladesh","For writing a book on poverty"]],
+  ["What does Jameel say is the main cause of poverty?","Unemployment",
+   ["Lack of education","Lack of water"]],
+  ["What did his father teach him?","Never to forget that life is not just about you — it is about what you can do for others",
+   ["Never to lend money","Always to work alone"]],
+  ["Where did Jameel study?","At MIT",["At Chittagong University","In Bangladesh"]],
+  ["Which lab did he join there?","The Poverty Action Lab",
+   ["The Grameen Bank","Bab Rizq Jameel"]],
+  ["When was it renamed J-PAL?","In 2005",["In 2012","In 2003"]],
+  ["Who was J-PAL named in honor of?","His father, Abdul Latif Jameel",
+   ["Muhammad Yunus","The king"]],
+  ["What is J-PAL's mission?","To reduce poverty by finding scientifically-based solutions",
+   ["To lend money to banks","To build universities"]],
+  ["What does Bab Rizq Jameel focus on?","Creating job opportunities",
+   ["Lending $9 to buy bread","Building museums"]],
+  ["How many jobs did BRJ create in the Kingdom between 2003 and 2012?","More than 230,000",
+   ["More than 300,000","About 2,500"]],
+  ["How many jobs did it create in the Middle East?","Over 300,000",
+   ["Over 230,000","Over 100,000"]],
+  ["What kinds of projects does ALJCI support?","Business financing, education and training, health, and art and culture",
+   ["Only sports projects","Only building projects"]]
+];
+var u9Jameel = factGen(U9_JAMEEL,
+  "من قطعة <span class=ltr>Simple Ideas, BIG Results</span> في الوحدة <span class=ltr>9</span> "+
+  "(ص <span class=ltr>100</span>): ", "u9jm");
+
+/* معاني كلمات القطعة — خيارات الكتاب (ص ١٠١) */
+var U9_YV = [
+  ["poverty","being poor",["pollution","disease"]],
+  ["to rely on","to depend on",["to accept","to trust"]],
+  ["a loan","money you borrow",["money you earn","money lost"]],
+  ["to establish","to create",["to buy","to give money to"]],
+  ["unemployment","lack of jobs",["lack of money","lack of education"]],
+  ["to reduce","to make less",["to make more","to stop"]]
+];
+var u9YunusVocab = vocabGen(U9_YV,
+  "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>9</span> (ص <span class=ltr>101</span>).",
+  "u9yv");
+
 /* ===== إضافات الوحدة ١ (ص ٩–١١) ===== */
 
 /* استبيان نمط الحياة كما في الكتاب ص ١١ — أعمدة: نورة · مها · بدرية */
@@ -993,8 +2862,25 @@ var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBot
 var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck,
           u2UsedTo,u2IrregPast,u2RealTalk,u2Falcons,u2King];
 var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice,
-          u3Infinitive,u3Flights,u3Yahya,u3Listen,u3Michael,u3RealTalk,u3Ing];
-var ALLU = U1.concat(U2).concat(U3);
+          u3Infinitive,u3Flights,u3Yahya,u3Listen,u3Michael,u3RealTalk,u3Ing,
+          u3Read,u3ReadVocab,u3Adnan,u3Intensifier,u3TimeClause,u3TimeComma,
+          u3Match,u3Move,u3London];
+var EXP = [exTigers,exPanda,exAskQ,exWater,exWaterA,exChant];
+var U4  = [u4Category,u4Prices,u4Quantity,u4SomeAnyNo,u4Sequence,u4Noura,u4Cooking,
+           u4Sound,u4Conv,u4RealTalk,u4Foods,u4Maha,u4Reflexive,u4BecauseSo];
+var U5  = [u5Inventions,u5Perfect,u5ForSince,u5Dates,u5Fadi,u5RealTalk,u5Effects,
+           u5FxVocab,u5Ref,u5Passive];
+var U6  = [u6Places,u6Compare,u6AsAs,u6Indirect,u6Rent,u6Faris,u6RealTalk,u6Jeddah,
+           u6JeddahVocab,u6JeddahB,u6Article];
+var EXP2= [ex2Same,ex2Adventure,ex2Chant];
+var U7  = [u7Tools,u7Tags,u7Answer,u7BeAble];
+var U8  = [u8Aggressive,u8George,u8RealTalk,u8Right,u8RightVocab,u8License,
+           u8CauseResult,u8Report];
+var U9  = [u9Relative,u9PastProg,u9Adjectives,u9City,u9Lars,u9RealTalk,u9Yunus,
+           u9Jameel,u9YunusVocab];
+var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
+var ALLU2 = U4.concat(U5).concat(U6).concat(EXP2);     /* الجزء الثاني */
+var ALLU3 = U7.concat(U8).concat(U9);                  /* الجزء الثالث */
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 
@@ -1015,12 +2901,26 @@ if(!NAMES[who]){
     allu:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–3</span> من كتابك.", label:"إنجليزي م٣ — شامل و1-3"},
     u1: {tab:"1 Lifestyles", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Lifestyles</span> (ص <span class=ltr>2–11</span>):</b> المضارع البسيط للعادات، وظروف التكرار ومواضعها، وأسئلة <span class=ltr>How often / How much / How long</span>، و<span class=ltr>All / Both / Neither / None</span>، والترابط بالضمائر.", label:"إنجليزي م٣ — Unit 1"},
     u2: {tab:"2 Life Stories", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — Life Stories</span> (ص <span class=ltr>12–21</span>):</b> الماضي البسيط وأسئلته، و<span class=ltr>be + born</span> والمبني للمجهول، و<span class=ltr>used to</span>، وجمل <span class=ltr>when</span>، وحروف الجرّ، و<span class=ltr>used to</span> بصيغها الثلاث، وأفعال الماضي، وقطعة <span class=ltr>The King of Saudi Arabia</span>.", label:"إنجليزي م٣ — Unit 2"},
-    u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، و<b>مصدر الغرض</b> (<span class=ltr>to + verb</span>)، وقراءة لوحة الوصول والمغادرة، وإملاء <span class=ltr>-ing</span>، ومفردات السفر، ومحادثة <span class=ltr>Michael &amp; Mr. Parker</span>.", label:"إنجليزي م٣ — Unit 3"}
+    u3: {tab:"3 Traveling", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — When Are You Traveling?</span> (ص <span class=ltr>22–31</span>):</b> المضارع المستمر للترتيبات المستقبلية، و<span class=ltr>going to</span> مقابل <span class=ltr>will</span>، و<b>مصدر الغرض</b> (<span class=ltr>to + verb</span>)، وقراءة لوحة الوصول والمغادرة، وإملاء <span class=ltr>-ing</span>، ومفردات السفر، ومحادثة <span class=ltr>Michael &amp; Mr. Parker</span>.", label:"إنجليزي م٣ — Unit 3"},
+    exp:{tab:"مراجعة 1–3 \u2705", gens:EXP, n:9, intro:"<b><span class=ltr>Expansion — Units 1\u20133</span> (ص <span class=ltr>32</span>):</b> صيغ الأفعال في فقرة <span class=ltr>Siberian Tigers</span>، ونصّ <span class=ltr>Pandas</span>، وصياغة السؤال من الجواب.", label:"إنجليزي م٣ — Expansion 1-3"},
+    allu2:{tab:"اختبار شامل 📝", gens:ALLU2, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>4–6</span> ومراجعتها.", label:"إنجليزي م٣ — شامل و4-6"},
+    u4:{tab:"4 Buying", gens:U4, n:10, intro:"<b><span class=ltr>Unit 4 — What Do I Need to Buy?</span> (ص <span class=ltr>38–47</span>):</b> تعبيرات الكميّة، و<span class=ltr>something/anything/nothing</span>، وكلمات الترتيب، وأفعال الطبخ، والضمائر الانعكاسية، و<span class=ltr>because</span> مقابل <span class=ltr>so</span>، وقطعة <span class=ltr>Foods from the Americas</span>.", label:"إنجليزي م٣ — Unit 4"},
+    u5:{tab:"5 Since When", gens:U5, n:10, intro:"<b><span class=ltr>Unit 5 — Since When?</span> (ص <span class=ltr>48–57</span>):</b> المضارع التامّ مقابل الماضي البسيط، و<span class=ltr>for</span> مقابل <span class=ltr>since</span>، والمبني للمجهول، وقطعتا <span class=ltr>Inventions</span> و<span class=ltr>A History of Special Effects</span>.", label:"إنجليزي م٣ — Unit 5"},
+    u6:{tab:"6 Where Is It", gens:U6, n:10, intro:"<b><span class=ltr>Unit 6 — Do You Know Where It Is?</span> (ص <span class=ltr>58–67</span>):</b> المقارنة والتفضيل، و<span class=ltr>as … as</span>، والأسئلة غير المباشرة، وأداة التعريف <span class=ltr>the</span>، وقطعة <span class=ltr>The Bride of the Red Sea</span> عن جدّة.", label:"إنجليزي م٣ — Unit 6"},
+    exp2:{tab:"مراجعة 4–6 ✅", gens:EXP2, n:9, intro:"<b><span class=ltr>Expansion — Units 4–6</span> (ص <span class=ltr>68–73</span>):</b> الجمل المترادفة، وقطعة <span class=ltr>Adventure Trips</span>، ونشيد <span class=ltr>I've Missed You!</span>.", label:"إنجليزي م٣ — Expansion 4-6"},
+    allu3:{tab:"اختبار شامل 📝", gens:ALLU3, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>7–9</span>.", label:"إنجليزي م٣ — شامل و7-9"},
+    u7:{tab:"7 Good Deal", gens:U7, n:8, intro:"<b><span class=ltr>Unit 7 — It's a Good Deal, Isn't It?</span> (ص <span class=ltr>74–76</span>):</b> أسئلة الذيل وإجاباتها، و<span class=ltr>be able to</span>، وأدوات البيت. <b>ناقص:</b> ص <span class=ltr>77–86</span> لم تصل بعد.", label:"إنجليزي م٣ — Unit 7"},
+    u8:{tab:"8 Drive Slowly", gens:U8, n:10, intro:"<b><span class=ltr>Unit 8 — Drive Slowly!</span> (ص <span class=ltr>87–93</span>):</b> السبب والنتيجة، ونقل الطلبات والأوامر، وقطعة <span class=ltr>Is Right, Right?</span>، ورخصة القيادة في كندا.", label:"إنجليزي م٣ — Unit 8"},
+    u9:{tab:"9 All Kinds", gens:U9, n:10, intro:"<b><span class=ltr>Unit 9 — All Kinds of People</span> (ص <span class=ltr>94–101</span>):</b> الضمائر الموصولة <span class=ltr>who/that/which</span>، والماضي المستمرّ مع <span class=ltr>when/while</span>، وصفات الشخصية، وقطعة <span class=ltr>Simple Ideas, BIG Results</span>.", label:"إنجليزي م٣ — Unit 9"}
   };
 
   var CHAPS = {
     p1: {name:"Part 1 · الوحدات 1–3", unit:'\ud83d\udcd8 مطابق لكتاب <span class="ltr">SuperGoal 3</span> — ثالث متوسط · <span class="ltr">Part 1</span>: الوحدات <span class="ltr">1–3</span> (ص <span class="ltr">2\u201331</span>)',
-         ids:["allu","u1","u2","u3"]}
+         ids:["allu","u1","u2","u3","exp"]},
+    p2: {name:"Part 2 · الوحدات 4–6", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 2</span>: الوحدات <span class="ltr">4–6</span> ومراجعتها (ص <span class="ltr">38\u201373</span>)',
+         ids:["allu2","u4","u5","u6","exp2"]},
+    p3: {name:"Part 3 · الوحدات 7–9", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 3</span>: الوحدات <span class="ltr">7–9</span> (ص <span class="ltr">74\u2013101</span>)',
+         ids:["allu3","u7","u8","u9"]}
   };
 
   var curCh = "p1", curId = "allu";
