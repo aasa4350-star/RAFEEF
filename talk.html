@@ -6,6 +6,7 @@
 <title>محادثة إنجليزية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="mic-help.js"></script>
 <script src="azure-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
@@ -99,10 +100,19 @@ function tutorSpeak(text){
 }
 
 /* ===== يسمع الطفل بحرية: تفريغ + تقييم نطق غير مقيّد ===== */
+var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
 function listen(statusEl, btn, onDone){
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
-  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure."; return; }
-  if(!SDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق..."; return; }
+  function resetBtn(){ if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; } }
+  if(!cr){ statusEl.innerHTML="⚠️ لم يُضبط مفتاح Azure." + MIC_TAIL; resetBtn(); return; }
+  /* كانت رسالة الانتظار تعود أبدًا إن لم تصل الأداة — انظر mic-help.js */
+  if(!SDK){
+    MIC.waitSDK(statusEl, btn, function(){ listen(statusEl, btn, onDone); },
+      function(){ statusEl.style.color="var(--bad)";
+        statusEl.innerHTML="❌ ما قدرت أحمّل أداة تقييم النطق — غالبًا الإنترنت." + MIC_TAIL;
+        resetBtn(); });
+    return;
+  }
   try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
   try{
     cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
@@ -117,7 +127,7 @@ function listen(statusEl, btn, onDone){
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
   statusEl.style.color="var(--muted)"; statusEl.textContent="🎙️ تكلّم الآن بالإنجليزي...";
   var fin=false;
-  var to=setTimeout(function(){ if(fin)return; fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما سمعتك — على الآيفون افتح من <b>Safari</b>، واضغط وتكلّم أعلى."; if(btn){btn.disabled=false;btn.classList.remove("rec");btn.textContent="🎤 اضغط وتكلّم";} try{rec.close();}catch(e){} }, 14000);
+  var to=setTimeout(function(){ if(fin)return; fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما سمعتك — قرّب المايك وتكلّم بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية."; resetBtn(); try{rec.close();}catch(e){} }, 14000);
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; clearTimeout(to);
     var out={text:"",wordsHtml:"",pron:null};
@@ -136,7 +146,7 @@ function listen(statusEl, btn, onDone){
     statusEl.textContent="";
     try{rec.close();}catch(e){}
     onDone(out);
-  }, function(err){ if(fin)return; fin=true; clearTimeout(to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح من <b>Safari</b> مباشرة."; if(btn){btn.disabled=false;btn.classList.remove("rec");btn.textContent="🎤 اضغط وتكلّم";} try{rec.close();}catch(e){} });
+  }, function(err){ if(fin)return; fin=true; clearTimeout(to); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} });
 }
 
 /* ===== مواضيع الحوار ===== */
@@ -182,7 +192,7 @@ function renderHome(){
   app.innerHTML=
     '<header class="top"><p class="eyebrow">محادثة إنجليزية · تكلّم بحرية 🎙️</p><h1>تحدّث معي — '+name+'</h1></header>'+
     '<div class="bar"><a href="home.html?who='+who+'">⬅ الرئيسية</a></div>'+
-    '<div class="intro">اختر موضوعًا، وأنا أبدأ أسألك بالصوت 🔊 — <b>وأنت تردّ بكلامك أنت</b> (مب تقرأ). أسمعك وأردّ عليك وأكمّل الحوار، وأقيّم نطقك بالألوان. <b>على الآيفون افتح من Safari.</b></div>'+
+    '<div class="intro">اختر موضوعًا، وأنا أبدأ أسألك بالصوت 🔊 — <b>وأنت تردّ بكلامك أنت</b> (مب تقرأ). أسمعك وأردّ عليك وأكمّل الحوار، وأقيّم نطقك بالألوان.'+(MIC.inAppBrowser()?' <b>أنت داخل متصفّح تطبيق — اضغط «···» ثمّ «فتح في Safari» ليعمل المايك.</b>':'')+'</div>'+
     '<div class="grid">'+cards+'</div>'+
     '<footer>كلامك يُفرَّغ ويُقيَّم عبر Azure · الردود موجّهة بالموضوع</footer>';
   app.querySelectorAll("[data-t]").forEach(function(b){ b.addEventListener("click",function(){ startTopic(b.getAttribute("data-t")); }); });

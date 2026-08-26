@@ -8,6 +8,7 @@
 <title>اختبارات ومراجعات الأبناء</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="mic-help.js"></script>
 <script src="attempts-queue.js"></script>
 <script src="azure-config.js"></script>
 <script src="writing-en.js"></script>
@@ -1282,7 +1283,7 @@ function _paRun(refText, statusEl, btn, tries){
       setTimeout(function(){ _paRun(refText, statusEl, btn, tries+1); }, 700);
     } else { statusEl.style.color="var(--bad)"; statusEl.innerHTML=finalMsg; }
   }
-  var _to=setTimeout(function(){ if(_fin) return; _fin=true; _end(); _retryOrFail("⚠️ ما التقطتُ صوتك. اقرأ بصوت أعلى وأوضح، وتأكّد إنك تفتح من <b>Safari</b> مباشرة."); }, 15000);
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; _end(); _retryOrFail("⚠️ ما التقطتُ صوتك. قرّب المايك من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية."); }, 15000);
   rec.recognizeOnceAsync(function(result){
     if(_fin) return; _fin=true; clearTimeout(_to);
     var outcome="nomatch";
@@ -1309,12 +1310,20 @@ function _paRun(refText, statusEl, btn, tries){
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();
     if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
-  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); statusEl.style.color="var(--bad)"; statusEl.innerHTML="❌ تعذّر المايكروفون — افتح الموقع من متصفح <b>Safari</b> مباشرة."; _end(); });
+  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); MIC.fail(statusEl, btn, { tail:MIC_TAIL }); _end(); });
 }
+var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
 function azureAssess(refText, statusEl, btn){
   var cr=azureCreds();
-  if(!cr){ statusEl.textContent="⚠️ لم يُضبط مفتاح Azure بعد."; return; }
-  if(!window.SpeechSDK){ statusEl.textContent="⏳ جارٍ تحميل أداة النطق... جرّب بعد ثانية."; return; }
+  if(!cr){ statusEl.innerHTML="⚠️ لم يُضبط مفتاح Azure بعد." + MIC_TAIL; return; }
+  /* كانت «جرّب بعد ثانية» تعود أبدًا إن لم تصل الأداة — انظر mic-help.js */
+  if(!window.SpeechSDK){
+    MIC.waitSDK(statusEl, btn, function(){ azureAssess(refText, statusEl, btn); },
+      function(){ statusEl.style.color="var(--bad)";
+        statusEl.innerHTML="❌ ما قدرت أحمّل أداة تقييم النطق — غالبًا الإنترنت." + MIC_TAIL;
+        if(btn){ btn.disabled=false; } });
+    return;
+  }
   if(btn) btn.disabled=true;
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
   try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){} // تنشيط الصوت على iOS
