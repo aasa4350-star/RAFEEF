@@ -86,9 +86,18 @@ function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<
 function mn(s){ return '<span class="en">'+s+'</span>'; }
 // خيارات رقمية مميّزة: الصحيح + مشتّتات
 function numOpts(correct, cands){
+  /* لا بدّ من ثلاثة خيارات متمايزة. المشتّتات المقترحة قد تتصادم مع الجواب
+     أو ببعضها (مثلًا حين يتساوى الطرفان في معادلة)، فنُتبعها باحتياطيٍّ
+     موسَّع. وإن لم تكتمل الثلاثة رجّعنا null فيتخطّى genN المولّد ويعيد
+     المحاولة — أهون من عرض خيارين على الطفل. */
   var seen={}; seen[correct]=1; var others=[];
-  var pool = cands.concat([correct+1, correct-1, correct+2, correct+10, correct*2+1]);
-  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct-2, correct+3,
+                           correct+5, correct+10, correct*2, correct*2+1, correct+100]);
+  for(var i=0;i<pool.length && others.length<2;i++){
+    var v=pool[i];
+    if(v!==correct && v>=0 && isFinite(v) && !seen[v]){ seen[v]=1; others.push(v); }
+  }
+  if(others.length<2) return null;
   var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
 }
 
@@ -114,8 +123,11 @@ function zOpts(correct, cands){
 }
 /* خيارات نصّية متمايزة */
 function sOpts(right, cands){
+  /* كسابقتها: ثلاثة متمايزة أو null. المشتّتات هنا نصوص فلا يمكن توليد
+     احتياطيٍّ لها، والبديل الوحيد أن يتخطّى genN هذه التوليدة. */
   var o=[right];
-  for(var i=0;i<cands.length && o.length<3;i++){ if(o.indexOf(cands[i])<0) o.push(cands[i]); }
+  for(var i=0;i<cands.length && o.length<3;i++){ if(cands[i]!=null && o.indexOf(cands[i])<0) o.push(cands[i]); }
+  if(o.length<3) return null;
   shuffle(o); return [o, o.indexOf(right)];
 }
 

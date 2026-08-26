@@ -82,8 +82,18 @@ function fmt(n){ return Number(n).toLocaleString('en-US'); } // فاصلة آل�
 function mn(s){ return '<span class="en">'+s+'</span>'; }
 // خيارات رقمية مميّزة: الصحيح + مشتّتات
 function numOpts(correct, cands){
+  /* لا بدّ من ثلاثة خيارات متمايزة. المشتّتات المقترحة قد تتصادم مع الجواب
+     أو ببعضها (مثلًا حين يتساوى الطرفان في معادلة)، فنُتبعها باحتياطيٍّ
+     موسَّع. وإن لم تكتمل الثلاثة رجّعنا null فيتخطّى genN المولّد ويعيد
+     المحاولة — أهون من عرض خيارين على الطفل. */
   var seen={}; seen[correct]=1; var others=[];
-  for(var i=0;i<cands.length && others.length<2;i++){ var v=cands[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct-2, correct+3,
+                           correct+5, correct+10, correct*2, correct*2+1, correct+100]);
+  for(var i=0;i<pool.length && others.length<2;i++){
+    var v=pool[i];
+    if(v!==correct && v>=0 && isFinite(v) && !seen[v]){ seen[v]=1; others.push(v); }
+  }
+  if(others.length<2) return null;
   var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
 }
 

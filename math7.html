@@ -86,9 +86,18 @@ function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<
 function mn(s){ return '<span class="en">'+s+'</span>'; }
 // خيارات رقمية مميّزة: الصحيح + مشتّتات
 function numOpts(correct, cands){
+  /* لا بدّ من ثلاثة خيارات متمايزة. المشتّتات المقترحة قد تتصادم مع الجواب
+     أو ببعضها (مثلًا حين يتساوى الطرفان في معادلة)، فنُتبعها باحتياطيٍّ
+     موسَّع. وإن لم تكتمل الثلاثة رجّعنا null فيتخطّى genN المولّد ويعيد
+     المحاولة — أهون من عرض خيارين على الطفل. */
   var seen={}; seen[correct]=1; var others=[];
-  var pool = cands.concat([correct+1, correct-1, correct+2, correct+10, correct*2+1]);
-  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && v>=0 && !seen[v]){ seen[v]=1; others.push(v); } }
+  var pool = cands.concat([correct+1, correct-1, correct+2, correct-2, correct+3,
+                           correct+5, correct+10, correct*2, correct*2+1, correct+100]);
+  for(var i=0;i<pool.length && others.length<2;i++){
+    var v=pool[i];
+    if(v!==correct && v>=0 && isFinite(v) && !seen[v]){ seen[v]=1; others.push(v); }
+  }
+  if(others.length<2) return null;
   var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
 }
 
@@ -1344,10 +1353,15 @@ function gPerimOrArea(){
 function gPairFromRule(){
   var a = ri(2,9), b = ri(-5,9), x = ri(1,8), y = a*x+b;
   var right = "("+fmt(x)+", "+fmt(y)+")";
-  var o = [right, "("+fmt(y)+", "+fmt(x)+")", "("+fmt(x)+", "+fmt(a*x)+")"];
-  o = o.filter(function(v,i,arr){ return arr.indexOf(v)===i; });
-  if(o.length<3) o.push("("+fmt(x)+", "+fmt(y+a)+")");
-  o = o.slice(0,3); shuffle(o);
+  /* المشتّتان قد يتصادمان مع الجواب أو ببعضهما (مثلًا حين س = ص أو ب = 0)،
+     والحشو الواحد لا يكفي إن سقط اثنان. فنملأ من قائمةٍ حتى تكتمل ثلاثة. */
+  var o = [right];
+  var fill = ["("+fmt(y)+", "+fmt(x)+")", "("+fmt(x)+", "+fmt(a*x)+")",
+              "("+fmt(x)+", "+fmt(y+a)+")", "("+fmt(x)+", "+fmt(y-a)+")",
+              "("+fmt(x+1)+", "+fmt(y)+")", "("+fmt(x)+", "+fmt(y+1)+")"];
+  for(var fi=0; fi<fill.length && o.length<3; fi++){ if(o.indexOf(fill[fi])<0) o.push(fill[fi]); }
+  if(o.length<3) return null;
+  shuffle(o);
   return ["قاعدة الدالّة "+ax("ص = "+a+"س "+(b<0?"− "+Math.abs(b):"+ "+b))+". أيُّ زوجٍ مرتّبٍ يقع على تمثيلها البياني عندما "+ax("س = "+x)+" ؟",
     o.map(mn), o.indexOf(right),
     "نعوّض: "+mn(a+" × "+x+" "+(b<0?"− "+Math.abs(b):"+ "+b)+" = "+fmt(y))+" ⇐ الزوج المرتّب "+mn(right)+"."];
@@ -1403,8 +1417,11 @@ function frq(a,b){ var g=gcd(a,b); return (b/g===1) ? String(a/g) : (a/g)+"/"+(b
 function rto(a,b){ var g=gcd(a,b); return (a/g)+" : "+(b/g); }        /* نسبة في أبسط صورة */
 /* خيارات نصّية متمايزة */
 function sOpts(right, cands){
+  /* كسابقتها: ثلاثة متمايزة أو null. المشتّتات هنا نصوص فلا يمكن توليد
+     احتياطيٍّ لها، والبديل الوحيد أن يتخطّى genN هذه التوليدة. */
   var o=[right];
-  for(var i=0;i<cands.length && o.length<3;i++){ if(o.indexOf(cands[i])<0) o.push(cands[i]); }
+  for(var i=0;i<cands.length && o.length<3;i++){ if(cands[i]!=null && o.indexOf(cands[i])<0) o.push(cands[i]); }
+  if(o.length<3) return null;
   shuffle(o); return [o, o.indexOf(right)];
 }
 
