@@ -8,6 +8,7 @@
 <title>صفحة الابن</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="report-rules.js"></script>
 <style>
   :root{
     --accent:#3b5bdb; --accent-soft:#bac8ff; --accent-deep:#2b3fa0;
@@ -194,7 +195,10 @@ async function main(){
 
   if(practice.length){
     const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
-    const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2)?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
+    /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
+    const fresh=p=> !window.RR || RR.freshFlag(p);
+    const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2 && fresh(p))?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits && fresh(p)){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
+    const untrustedTxt=p=> (p.meta.trusted===false && fresh(p))?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``;
     const currMap={}, otherMap={};
     const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
@@ -204,27 +208,37 @@ async function main(){
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
       let vLearned=0, vTotal=300;
-      vocabAll.forEach(p=>{ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal) vTotal=p.meta.vocTotal; });
-      const rev=vocabAll.filter(p=> p.meta.mode==="review");
-      const revT=rev.filter(p=> p.meta.trusted!==false), vocabT=vocabAll.filter(p=> p.meta.trusted!==false);
+      /* عدد المحفوظ تراكميّ فيُقرأ من كلّ الجلسات؛ وما عداه محصورٌ
+         بأسبوع بطلب الأب — الجلسات القديمة كانت تزاحم جلسات اليوم. */
+      /* vocTotal يُؤخذ من أحدث جلسةٍ تحمله لا من أقدمها: الجلسات
+         مرتّبةٌ تنازليًّا، وكان الإسناد يمرّ عليها كلّها فيستقرّ على
+         الأقدم — فظهر «450 / 300 كلمة (150%)». ثمّ نجعل المقام لا
+         يقلّ عن المحفوظ، فلا تتجاوز النسبة مئةً بحال. */
+      let vTotSet=false;
+      vocabAll.forEach(p=>{ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal && !vTotSet){ vTotal=p.meta.vocTotal; vTotSet=true; } });
+      vTotal=Math.max(vTotal, vLearned);
+      let vocabWk=vocabAll.filter(p=> !window.RR || RR.recentVocab(p));
+      if(!vocabWk.length) vocabWk=vocabAll.slice(0,1);   /* لا نُفرغ البطاقة تمامًا */
+      const rev=vocabWk.filter(p=> p.meta.mode==="review");
+      const revT=rev.filter(p=> p.meta.trusted!==false), vocabT=vocabWk.filter(p=> p.meta.trusted!==false);
       const rW=revT.reduce((s,p)=>s+(p.meta.total||0),0), rC=revT.reduce((s,p)=>s+(p.meta.correct||0),0);
       const allW=vocabT.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabT.reduce((s,p)=>s+(p.meta.correct||0),0);
-      const untrustedN=vocabAll.length-vocabT.length;
+      const untrustedN=vocabWk.filter(p=> p.meta.trusted===false && fresh(p)).length;
       const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      const isFlag=p=> p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2);
+      const isFlag=p=> fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2));
       const mIco=p=> p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖";
-      const flagged=vocabAll.filter(isFlag), show=vocabAll.filter(p=>!isFlag(p)).slice(0,1).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
-      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=(p.meta.trusted===false)?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``; return `<li>${mIco(p)} ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
+      const flagged=vocabWk.filter(isFlag), show=vocabWk.filter(p=>!isFlag(p)).slice(0,3).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
+      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
       const byDay={}; vocabT.forEach(p=>{ const f=saTime(p.created_at); const d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
       const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
         (vLearned>0?`<li>📚 حفظ: <b>${vLearned} / ${vTotal} كلمة</b> (${lpct}%)</li>`:``)+
         dayList+
-        `<li>📊 إجمالي جلسات الكلمات (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
+        `<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
         (untrustedN?`<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>${untrustedN}</b></li>`:``)+
         `</ul>`+
-        (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 آخر جلسات الكلمات + أي جلسة فيها ملاحظة:</div><ul class="weak">${revList}</ul>`:``)+
+        (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul class="weak">${revList}</ul>`:``)+
         `</div>`;
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
@@ -247,7 +261,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div>
         <div class="card"><ul class="weak">`+
         Object.keys(otherMap).map(t=>{ const p=otherMap[t]; const pc=pct(p.meta.correct,p.meta.total);
-          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${p.meta.trusted===false?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``}</li>`; }).join("")+
+          return `<li><b>${t}</b>: ${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
         `</ul></div>`;
     }
   }
@@ -262,7 +276,7 @@ async function main(){
       <div class="stat"><div class="lbl">الرياضيات</div><div class="val">${maAvg}%</div></div>
     </div>
     ${beh?`<div style="margin-top:12px" class="behav ${beh.good?'ok':'no'}"><span class="be">${beh.emoji}</span>
-      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}${(latest.meta&&latest.meta.total_sec)?` · المدة الكلية ${latest.meta.total_sec}ث`:''}${(latest.meta&&latest.meta.exits)?` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${latest.meta.exits} مرة ⚠️</span>`:''}</span></div>`:''}
+      <span><b>أسلوب الحل:</b> ${beh.label}${beh.avg!=null?` · ${beh.avg}ث/سؤال`:''}${(latest.meta&&latest.meta.total_sec)?` · المدة الكلية ${latest.meta.total_sec}ث`:''}${(latest.meta&&latest.meta.exits&&(!window.RR||RR.freshFlag(latest)))?` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${latest.meta.exits} مرة ⚠️</span>`:''}</span></div>`:''}
     ${tr.length>1?`<div class="sec-title" style="margin:16px 4px 6px"><span class="dot"></span> التطوّر</div>
       <div class="trend">${tr.map(p=>`<div class="col"><div class="pc">${p}%</div><div class="bxr" style="height:${Math.max(6,p*0.8)}px"></div></div>`).join("")}</div>`:''}
     </div>`;

@@ -6,6 +6,7 @@
 <title>تقرير المستوى 📊</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="report-rules.js"></script>
 <style>
   :root{
     --accent:#0f766e; --accent-deep:#115e59;
@@ -96,7 +97,12 @@ function isStretch(r){
 /* يجمع تفصيل المهارات لطالب واحد. يستبعد الجلسات غير الموثوقة (خروج/سرعة مريبة). */
 function build(student){
   var rows = ALL.filter(function(r){ return r.student === student && r.meta && r.meta.skills; });
-  var skipped = rows.filter(function(r){ return r.meta.trusted === false; }).length;
+  /* الاستبعاد من الحساب باقٍ كما هو — سببه لا يبطل بمرور يومين.
+     الذي يسقط هو التنبيه: بعد ٤٨ ساعة لم يعُد فيه ما يُفعل.
+     (طلب الأب، ٢٦ أغسطس ٢٠٢٦ — انظر report-rules.js) */
+  var skipped = rows.filter(function(r){
+    return r.meta.trusted === false && (!window.RR || RR.freshFlag(r));
+  }).length;
   rows = rows.filter(function(r){ return r.meta.trusted !== false; });
   var cutoff = Date.now() - RECENT_DAYS*86400000;
   var sk = {}, stretchSk = {}, dates = [], stretchRows = 0;

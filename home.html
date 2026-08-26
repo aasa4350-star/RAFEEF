@@ -8,6 +8,7 @@
 <title>صفحة البداية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="report-rules.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
   :root{
@@ -239,7 +240,10 @@ async function loadReport(){
 
   if(practice.length){
     var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
-    var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2)?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
+    /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
+    var fresh=function(p){ return !window.RR || RR.freshFlag(p); };
+    var untrustedTxt=function(p){ return (p.meta.trusted===false && fresh(p))?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; };
+    var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2 && fresh(p))?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits && fresh(p)){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
     var currMap={}, otherMap={};
     var vocabAll=[];
     practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
@@ -249,27 +253,33 @@ async function loadReport(){
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
       var vLearned=0, vTotal=300;
-      vocabAll.forEach(function(p){ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal) vTotal=p.meta.vocTotal; });
-      var rev=vocabAll.filter(function(p){ return p.meta.mode==="review"; });
-      var revT=rev.filter(function(p){ return p.meta.trusted!==false; }), vocabT=vocabAll.filter(function(p){ return p.meta.trusted!==false; });
+      /* vocTotal من أحدث جلسةٍ تحمله لا من أقدمها — وإلّا ظهر «450/300» */
+      var vTotSet=false;
+      vocabAll.forEach(function(p){ if(p.meta.learned!=null && p.meta.learned>vLearned) vLearned=p.meta.learned; if(p.meta.vocTotal && !vTotSet){ vTotal=p.meta.vocTotal; vTotSet=true; } });
+      vTotal=Math.max(vTotal, vLearned);
+      /* المحفوظ تراكميّ؛ وما عداه محصورٌ بأسبوع بطلب الأب */
+      var vocabWk=vocabAll.filter(function(p){ return !window.RR || RR.recentVocab(p); });
+      if(!vocabWk.length) vocabWk=vocabAll.slice(0,1);
+      var rev=vocabWk.filter(function(p){ return p.meta.mode==="review"; });
+      var revT=rev.filter(function(p){ return p.meta.trusted!==false; }), vocabT=vocabWk.filter(function(p){ return p.meta.trusted!==false; });
       var rW=revT.reduce(function(s,p){return s+(p.meta.total||0);},0), rC=revT.reduce(function(s,p){return s+(p.meta.correct||0);},0);
       var allW=vocabT.reduce(function(s,p){return s+(p.meta.total||0);},0), allC=vocabT.reduce(function(s,p){return s+(p.meta.correct||0);},0);
-      var untrustedN=vocabAll.length-vocabT.length;
+      var untrustedN=vocabWk.filter(function(p){ return p.meta.trusted===false && fresh(p); }).length;
       var lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
-      var isFlag=function(p){ return p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2); };
+      var isFlag=function(p){ return fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2)); };
       var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; };
-      var flagged=vocabAll.filter(isFlag), show=vocabAll.filter(function(p){return !isFlag(p);}).slice(0,1).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
-      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=(p.meta.trusted===false)?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; return '<li>'+mIco(p)+' '+saTime(rowTime(p))+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
+      var flagged=vocabWk.filter(isFlag), show=vocabWk.filter(function(p){return !isFlag(p);}).slice(0,3).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
+      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=untrustedTxt(p); return '<li>'+mIco(p)+' '+saTime(rowTime(p))+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
       var byDay={}; vocabT.forEach(function(p){ var f=saTime(rowTime(p)); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
       var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
         (vLearned>0?'<li>📚 حفظ: <b>'+vLearned+' / '+vTotal+' كلمة</b> ('+lpct+'%)</li>':'')+
         dayList+
-        '<li>📊 إجمالي جلسات الكلمات (المحتسبة): <b>'+allC+'/'+allW+' ('+apct+'%)</b> · '+vocabT.length+' جلسة</li>'+
+        '<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>'+allC+'/'+allW+' ('+apct+'%)</b> · '+vocabT.length+' جلسة</li>'+
         (untrustedN?'<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>'+untrustedN+'</b></li>':'')+
         '</ul>'+
-        (revList?'<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 آخر جلسات الكلمات + أي جلسة فيها ملاحظة:</div><ul class="weak">'+revList+'</ul>':'')+
+        (revList?'<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر '+(window.RR?RR.VOCAB_DAYS:7)+' أيام:</div><ul class="weak">'+revList+'</ul>':'')+
         '</div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
@@ -291,7 +301,7 @@ async function loadReport(){
     if(Object.keys(otherMap).length){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
         Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
-          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+(p.meta.trusted===false?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':'')+'</li>'; }).join("")+
+          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
         '</ul></div>';
     }
   }
@@ -300,7 +310,7 @@ async function loadReport(){
     html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">المستوى (متوسط '+rows.length+' محاولة)</div><div class="grid2">'+
       '<div class="stat"><div class="lbl">الإنجليزي</div><div class="val">'+enAvg+'%</div></div>'+
       '<div class="stat"><div class="lbl">الرياضيات</div><div class="val">'+maAvg+'%</div></div></div>'+
-      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+((latest.meta&&latest.meta.total_sec)?' · المدة الكلية '+latest.meta.total_sec+'ث':'')+((latest.meta&&latest.meta.exits)?' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+latest.meta.exits+' مرة ⚠️</span>':'')+'</span></div>':'')+
+      (beh?'<div style="margin-top:12px" class="behav '+(beh.good?'ok':'no')+'"><span class="be">'+beh.emoji+'</span><span><b>أسلوب الحل:</b> '+beh.label+(beh.avg!=null?' · '+beh.avg+'ث/سؤال':'')+((latest.meta&&latest.meta.total_sec)?' · المدة الكلية '+latest.meta.total_sec+'ث':'')+((latest.meta&&latest.meta.exits&&(!window.RR||RR.freshFlag(latest)))?' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+latest.meta.exits+' مرة ⚠️</span>':'')+'</span></div>':'')+
       (tr.length>1?'<div style="font-weight:800;margin:16px 4px 6px">التطوّر</div><div class="trend">'+tr.map(function(p){return '<div class="col"><div class="pc">'+p+'%</div><div class="bxr" style="height:'+Math.max(6,p*0.8)+'px"></div></div>';}).join("")+'</div>':'')+
       '</div>';
 
