@@ -2,7 +2,7 @@
 /* ============================================================
    تقطيع تسجيلٍ واحدٍ طويل إلى مقاطع الإملاء، وربطها بالمانيفست.
 
-       node tools/split-recording.js <الملفّ> ar|en [--dry]
+       node tools/split-recording.js <الملفّ> ar|en [--from N --to M] [--dry]
 
    الفكرة: الأب يسجّل كلّ بنود لغةٍ في ملفٍّ واحد — يقرأ من
    tools/recording-script.txt بالترتيب ويسكت ثانيتين بين بندٍ وآخر —
@@ -11,6 +11,10 @@
 
    لماذا التقطيع بالسكوت لا بعدد ثابت: القراءة البشرية تتفاوت، فالبند
    قد يطول ثانيةً وقد يقصر. والسكتة هي الفاصل الوحيد الموثوق.
+
+   ويجوز التسجيل على دفعات: ‎--from 1 --to 13‎ تعني أنّ هذا الملفّ يحوي
+   البنود من الأوّل إلى الثالث عشر فقط. فلا يضطرّ الأب إلى خمسين بندًا
+   في نفَسٍ واحد، ولا تُفسد غلطةٌ في الأخير ما قبله.
 
    تحقّقٌ إلزاميّ قبل الكتابة: عدد المقاطع المستخرَجة يجب أن يساوي
    عدد البنود المنتظَرة بالضبط. فإن اختلّ توقّفنا وأخبرنا أين اختلّ —
@@ -41,9 +45,22 @@ function main(){
   }
   if (!fs.existsSync(src)){ console.log('لا أجد الملفّ: ' + src); process.exit(1); }
 
-  const index = JSON.parse(fs.readFileSync(path.join(__dirname,'recording-index.json'),'utf8'))
-                  .filter(x => x.lang === lang);
-  console.log('البنود المنتظَرة في ' + (lang==='ar'?'العربي':'الإنجليزي') + ': ' + index.length);
+  const argOf = n => { const i = process.argv.indexOf(n); return i > -1 ? Number(process.argv[i+1]) : null; };
+  const from = argOf('--from'), to = argOf('--to');
+
+  let index = JSON.parse(fs.readFileSync(path.join(__dirname,'recording-index.json'),'utf8'))
+                .filter(x => x.lang === lang);
+  const total = index.length;
+  if (from || to){
+    const a = (from || 1) - 1, b = (to || total);
+    if (a < 0 || b > total || a >= b){
+      console.log('مدًى غير صالح. البنود من 1 إلى ' + total + '.');
+      process.exit(1);
+    }
+    index = index.slice(a, b);
+    console.log('الدفعة: البنود ' + (a+1) + '–' + b + ' من ' + total);
+  }
+  console.log('البنود المنتظَرة في هذا الملفّ: ' + index.length);
 
   /* ١) نكشف السكتات */
   const log = sh('ffmpeg', ['-hide_banner','-i',src,'-af',
