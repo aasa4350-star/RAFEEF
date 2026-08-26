@@ -345,12 +345,38 @@ function tabs(){
   });
 }
 
+/* جلب كلّ الصفوف على دفعات.
+   Supabase يفرض سقفًا ثابتًا (١٠٠٠ صفّ) على كلّ طلبٍ مهما كان limit،
+   فالطلب الواحد كان يرجع ١٠٠٠ بصمت ويُخفي ما قبلها — وقد بلغ الجدول
+   ١١٤٣ صفًّا في ٢٠٢٦-٠٨، أي إنّ أقدم الجلسات اختفت من التقرير بلا إشعار.
+   الحلّ: نطلب صفحةً بعد صفحة بـ offset حتى تنقص الدفعة عن الحجم.
+   (جرّبنا ترويسة Range أوّلًا — تسمح بها CORS لكنّ المتصفّح يرفض ضبطها،
+   و offset يؤدّي الغرض نفسه بلا ترويسةٍ مخصّصة ولا طلب preflight.) */
+var PAGE = 1000, MAX_PAGES = 20;
+function fetchAll(){
+  var out = [];
+  function page(i){
+    if(i >= MAX_PAGES) return Promise.resolve(out);
+    return fetch(SUPA_URL+"/rest/v1/attempts?select=student,created_at,meta"+
+                 "&order=created_at.desc&limit="+PAGE+"&offset="+(i*PAGE),
+      { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+      .then(function(r){
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        return r.json();
+      })
+      .then(function(rows){
+        if(!Array.isArray(rows)) rows = [];
+        out = out.concat(rows);
+        return rows.length < PAGE ? out : page(i+1);
+      });
+  }
+  return page(0);
+}
+
 function load(){
   var st = document.getElementById("status");
   st.style.display = "block"; st.textContent = "جارٍ التحميل...";
-  fetch(SUPA_URL+"/rest/v1/attempts?select=student,created_at,meta&order=created_at.desc&limit=2000",
-        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
-  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  fetchAll()
   .then(function(data){
     ALL = Array.isArray(data) ? data : [];
     var withSkills = ALL.filter(function(r){ return r.meta && r.meta.skills; }).length;
