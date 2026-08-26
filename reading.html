@@ -590,6 +590,16 @@ function speak(text, rate, lang, onEnd){
     speechSynthesis.speak(u);
   }catch(e){ if(onEnd){ onEnd(); } alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
 }
+/* نطق بند الإملاء: تسجيلٌ محفوظ إن وُجد، وإلّا Azure، وإلّا نطق المتصفّح.
+   الترتيب مقصود: المحفوظ أوثق وأسرع ولا يحتاج شبكة، وAzure أحسن من
+   نطق المتصفّح بكثير في العربية المشكولة. */
+function sayDict(text, isAr, ratePct){
+  var lk = isAr ? "ar" : "en";
+  var file = MANIFEST && MANIFEST[lk] && (MANIFEST[lk][text] || MANIFEST[lk][audioKey(text)]);
+  if(file){ speak(text, isAr ? 0.9 : 1, isAr ? "ar-SA" : "en-US"); return; }
+  azureTTS(text, isAr, ratePct);
+}
+
 // نطق عصبي بشري من Azure (مبطّأ للأطفال) للكلمة المفردة أو القطعة — يرجع لصوت المتصفح فقط إذا تعذّر Azure
 var _ttsSynth=null;
 function azureTTS(text, isAr, ratePct, onEnd){
@@ -752,8 +762,13 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
-      qEl.querySelector("[data-say]").addEventListener("click",function(){ speak(text,1,ar?"ar-SA":"en-US"); });
-      qEl.querySelector("[data-slow]").addEventListener("click",function(){ speak(text,0.7,ar?"ar-SA":"en-US"); });
+      /* الإملاء كان يستدعي speak() مباشرةً: تسجيلٌ محفوظ وإلّا نطقُ المتصفّح.
+         و١٠٨ من ١٢٠ بندًا بلا تسجيل — والجُمل كلّها — فكان الكبار يسمعون
+         صوت المتصفّح، وهو على آيفون رديءٌ للعربية المشكولة وصامتٌ أحيانًا،
+         فيتركون النشاط. وazureTTS يجرّب التسجيل المحفوظ أوّلًا كذلك (عبر
+         speak في مسار الفشل)، فلا نخسر شيئًا ونكسب صوتًا بشريًّا وسطًا. */
+      qEl.querySelector("[data-say]").addEventListener("click",function(){ sayDict(text,ar,"-10%"); });
+      qEl.querySelector("[data-slow]").addEventListener("click",function(){ sayDict(text,ar,"-35%"); });
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
       wireMic(qEl, text, ar);
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
