@@ -67,10 +67,93 @@ const chopped = o => /^[B-HJ-Zb-hj-z]$/.test(strip(o));
    فتجريدها من الوسوم يُفرغها كلّها. عندئذٍ نقارن النصّ الخام. */
 const optKey = o => { const t = strip(o); return t || String(o); };
 
+/* ═══ تعارض الإجابات بين الصفحات ══════════════════════════════
+
+   سأل الأب (٢٦ أغسطس ٢٠٢٦): «حسن يقول إنّ كلمة بخيل لها أكثر من
+   معنًى بالإنجليزي، هل هو صادق؟» — وكان صادقًا، وكان قد وقع على
+   تناقضٍ في الموقع نفسه:
+
+       quiz.html      «The opposite of generous is:»  →  mean
+       practice.html  «The opposite of generous is:»  →  stingy
+
+   السؤال نفسه بجوابين. فالطفل يحفظ أحدهما فيُخطَّأ في الصفحة
+   الأخرى، ولا يدري أيّهما الصواب — وكلاهما صواب في الحقيقة.
+
+   وهذا الفحص لم يكن يمسكه لأنّه كان يفحص المولّدات وحدها، وهذه
+   أسئلةٌ ثابتة مكتوبة في مصفوفات. فصار يجمعها من كلّ الصفحات
+   ويقارن نصّ الجواب الصحيح عند تطابق نصّ السؤال.
+
+   تكرار السؤال بالجواب نفسه لا يُنبَّه عليه — فهو تكرارٌ لا تناقض.
+   ═══════════════════════════════════════════════════════════ */
+const stemKey = s => strip(s)
+  .replace(/^(vocabulary|grammar|reading|writing|listening)\s*:\s*/i, '')
+  .replace(/[.:؟?!،,]+\s*$/, '')
+  .replace(/[«»"'']/g, '"')
+  .toLowerCase();
+
+/* نجمع كلّ ما شكله [نصّ، [خيارات]، رقم] مهما كان عمق تعشيشه.
+   ونمرّ بالكائنات كما نمرّ بالمصفوفات: بنك quiz.html كائنٌ
+   ‎{ en:[…], ma:[…] }‎ فلو اقتصرنا على المصفوفات فاتنا كلّه. */
+function harvest(v, out, depth){
+  if (depth > 6 || v == null || typeof v !== 'object') return;
+  if (Array.isArray(v)){
+    if (typeof v[0] === 'string' && Array.isArray(v[1]) && typeof v[2] === 'number'
+        && v[2] >= 0 && v[2] < v[1].length && v[1].every(x => typeof x === 'string')){
+      out.push({ stem: v[0], answer: v[1][v[2]] });
+      return;
+    }
+    for (const x of v) harvest(x, out, depth + 1);
+    return;
+  }
+  for (const k of Object.keys(v)){
+    let x; try { x = v[k]; } catch(e){ continue; }
+    harvest(x, out, depth + 1);
+  }
+}
+
+/* شرطُ الاقتباس — وهو ضبطٌ لزِمَ ولا يُلغى بلا سبب:
+
+   بلا هذا الشرط يمتلئ التقرير بـ«تعارضاتٍ» ليست بتعارض: «ما الفكرة
+   الرئيسة؟» تُسأل عن عشرات القطع فلكلٍّ جوابها، و«Which one is a
+   fruit?» تُطرح بخياراتٍ مختلفة كلّ مرّة، و«Choose the correct
+   sentence:» كذلك. هذه قوالبُ لا أسئلةٌ بعينها.
+
+   أمّا السؤال الذي يسمّي هدفه بين علامتَي اقتباس — ‎The opposite of
+   "generous"‎ — فهو سؤالٌ واحدٌ حيثما ورد، وجوابه يجب أن يكون واحدًا.
+   فبهذا الشرط بقي التعارض الحقيقيّ وحده. */
+const TARGETED = /["«][^"»]{2,}["»]/;
+
+function conflicts(banks){
+  const map = {};
+  banks.forEach(({ file, stem, answer }) => {
+    const k = stemKey(stem);
+    if (k.length < 12) return;              /* نصٌّ قصير يتشابه بلا معنًى */
+    if (!TARGETED.test(strip(stem))) return;
+    const a = strip(answer).toLowerCase();
+    (map[k] = map[k] || []).push({ file, a, stem, answer });
+  });
+  const out = [];
+  Object.values(map).forEach(list => {
+    const answers = [...new Set(list.map(x => x.a))];
+    if (answers.length < 2) return;         /* تكرارٌ لا تناقض */
+    const where = [...new Set(list.map(x => x.file))];
+    /* تنبيهٌ لا خطأ: قد يكون الجوابان صحيحين معًا (large وhuge كلاهما
+       مرادفٌ لـ big)، وقد لا يكون في أيّ سؤالٍ منهما لبسٌ لأنّ خيارات
+       كلٍّ تخلو من جواب الآخر. فالحكم هنا للأب لا للأداة — ولكنّه
+       يستحقّ النظر: الطفل يحفظ أحد الجوابين ثمّ يرى الآخر فيظنّ
+       أحدهما غلطًا، وهو ما وقع في «بخيل» فسأل عنه. */
+    out.push({ sev:'تنبيه', file: where.join(' / '),
+      msg: 'جوابان مختلفان لسؤالٍ واحد — «' + strip(list[0].stem).slice(0, 60) + '» → ' +
+           [...new Set(list.map(x => strip(x.answer)))].join(' / ') });
+  });
+  return out;
+}
+
 function run(){
   const issues = [];
   const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html')).sort();
   let genCount = 0, pageCount = 0;
+  const allBanks = [];
 
   for (const f of files){
     const html = fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -93,6 +176,21 @@ function run(){
     for (const src of inline){ try { vm.runInContext(src, ctx); } catch(e){} }
     /* أخطاء التشغيل هنا متوقّعة (لا DOM حقيقيّ) — يعنينا الصياغة والمولّدات */
     pageCount++;
+
+    /* بنوك الأسئلة الثابتة في هذه الصفحة — للمقارنة بين الصفحات لاحقًا.
+       نأخذ الأسماء من المصدر لا من مفاتيح البيئة، لأنّ ما أُعلن بـ const
+       أو let لا يصير خاصّيةً على الكائن العامّ فلا تراه Object.keys —
+       وبنك quiz.html منها، فكان يفوت كلّه. وتقييم الاسم داخل البيئة
+       نفسها يبلغ الارتباط المعجميّ. */
+    const declared = new Set([...inline.join('\n')
+      .matchAll(/\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*[[{]/g)].map(m => m[1]));
+    for (const k of declared){
+      let v; try { v = vm.runInContext(k, ctx); } catch(e){ continue; }
+      if (!v || typeof v !== 'object') continue;
+      const found = [];
+      try { harvest(v, found, 0); } catch(e){ continue; }
+      found.forEach(q => allBanks.push({ file:f, stem:q.stem, answer:q.answer }));
+    }
 
     /* أسماء المولّدات: كلّ ما جُمع في مصفوفات الاختبار داخل الصفحة */
     let names = [];
@@ -148,7 +246,9 @@ function run(){
     }
   }
 
-  return { issues, pageCount, genCount, fileCount: files.length };
+  issues.push(...conflicts(allBanks));
+
+  return { issues, pageCount, genCount, fileCount: files.length, bankCount: allBanks.length };
 }
 
 module.exports = run;
