@@ -95,6 +95,30 @@ async function run(){
   }).length;
   if (stub) issues.push({ sev:'خطأ', msg:stub + ' جلسة بلا اسم اختبارٍ ولا نتيجة ولا تفصيل' });
 
+  /* ٥) جلساتٌ لا يستطيع التقرير عرض درجتها.
+     بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «حسن حلّ اختبر نفسك وما طلع في التقرير».
+     وكانت جلساته محفوظةً فعلًا، ولكنّ التقرير كان يقرأ meta.skills وحده
+     فسقطت ٦٧٠ جلسة من ١٢٠٦ بصمت. فأُصلح التقرير ليقرأ الصيغ الثلاث:
+     {total,correct} أو skills أو per.
+
+     وهذا الفحص يحرس ذلك: أيّ صفحةٍ تحفظ بصيغةٍ رابعة لن تُعرض درجتها،
+     فالعطب نفسه يعود ولا يُرى. والصامت أخطر من الظاهر. */
+  const scorable = m =>
+    (typeof m.total === 'number' && m.total > 0) ||
+    (m.skills && Object.values(m.skills).some(v => v && v.t > 0)) ||
+    (Array.isArray(m.per) && m.per.length > 0);
+  const mute = rows.filter(r => {
+    const m = r.meta || {};
+    return m.kind !== 'activity' && !scorable(m);
+  });
+  if (mute.length){
+    const by = {};
+    mute.forEach(r => { const t = (r.meta||{}).test || '(بلا اسم)'; by[t] = (by[t]||0)+1; });
+    issues.push({ sev:'خطأ', msg: mute.length + ' جلسة لا يعرف التقرير كيف يقرأ درجتها — ' +
+      Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4)
+        .map(([t,n]) => t + ' × ' + n).join('، ') });
+  }
+
   return { issues, rows: rows.length, tests: Object.keys(last).length };
 }
 

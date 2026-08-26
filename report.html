@@ -156,6 +156,100 @@ function listHtml(items, neutral){
   }).join("") + '</ul>';
 }
 
+/* ═══ سجلّ الجلسات ═══════════════════════════════════════════
+
+   بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «حسن دخل قسم اختبر نفسك الرياضيات
+   والإنجليزي وحلّ الأسئلة، بس ما طلع عندي في التقرير».
+
+   وكانت جلستاه محفوظتين في القاعدة فعلًا — الرياضيات ٥/١٢ والإنجليزي
+   ٥/١٠ — ولكنّ التقرير كلّه كان مبنيًّا على صفوفٍ فيها meta.skills،
+   وصفحات المواد تحفظ {test,total,correct} بلا تفصيل مهارات. فكانت
+   ٦٧٠ جلسة من ١٢٠٦ — أكثر من نصف تاريخ الموقع — لا تظهر لأحد.
+
+   وأسوأ من ذلك: الطفل الذي كلّ جلساته من هذا النوع كانت صفحته تقول
+   «ما فيه تفصيل مهارات بعد» وكأنّه لم يفتح الموقع قطّ.
+
+   فهذا السجلّ يعرض كلّ جلسةٍ كما هي. وتحليل المهارات يبقى على ما
+   فيه تفصيل — لأنّه لا يُشتقّ من درجةٍ مجملة — ولكن لا يُخفي البقيّة.
+   ═══════════════════════════════════════════════════════════ */
+
+/* الدرجة قد تُحفظ بثلاث صيغ تراكمت مع الوقت: مجملة، أو مفصّلة
+   بالمهارات، أو قائمة أسئلةٍ في الصيغة الأقدم. نقرأ الثلاث. */
+function scoreOf(m){
+  if(typeof m.total === "number" && m.total > 0)
+    return { c: m.correct || 0, t: m.total };
+  if(m.skills){
+    var c = 0, t = 0;
+    Object.keys(m.skills).forEach(function(k){
+      var v = m.skills[k];
+      if(v && typeof v.t === "number" && v.t > 0){ c += (v.c||0); t += v.t; }
+    });
+    if(t) return { c:c, t:t };
+  }
+  if(Array.isArray(m.per) && m.per.length)
+    return { c: m.per.filter(function(x){ return x && x.ok; }).length, t: m.per.length };
+  return null;
+}
+
+/* الاسم كذلك تراكمت له صيغ. وأقدمها بلا اسمٍ البتّة، فنشتقّه من نوع
+   أسئلتها: per[].s تحمل "en" أو "ma". و«اختبار» وحدها لا تُفيد الأب
+   بشيء حين يقرأ السجلّ. */
+function nameOf(m){
+  if(m.test) return m.test;
+  if(m.kind === "writing") return "تعبير إنجليزي ✍️";
+  if(m.kind === "writing-drill") return "تدريب كتابة" + (m.level ? " — مستوى "+m.level : "");
+  if(Array.isArray(m.per) && m.per.length){
+    var has = {};
+    m.per.forEach(function(x){ if(x && x.s) has[x.s] = 1; });
+    var t = (has.en && has.ma) ? "إنجليزي ورياضيات" : has.ma ? "رياضيات" : has.en ? "إنجليزي" : "";
+    return "اختبار " + (t ? t + " " : "") + "(صيغة قديمة)";
+  }
+  return "اختبار";
+}
+
+function sessionsOf(student){
+  return ALL.filter(function(r){
+      var m = r.meta;
+      /* صفوف activity أحداثُ فتحِ درس لا اختبارات، فلا درجة لها */
+      return r.student === student && m && m.kind !== "activity" && scoreOf(m);
+    })
+    .map(function(r){
+      var m = r.meta, s = scoreOf(m);
+      return { t: m.at || r.created_at,
+               name: nameOf(m),
+               c: s.c, n: s.t, detailed: !!m.skills,
+               trusted: m.trusted !== false };
+    })
+    .sort(function(a, b){ return String(b.t).localeCompare(String(a.t)); });
+}
+
+var SESS_SHOW = 25;
+function sessionsCardHtml(student){
+  var ss = sessionsOf(student);
+  if(!ss.length) return "";
+  var shown = ss.slice(0, SESS_SHOW), rest = ss.length - shown.length;
+  var nDet = ss.filter(function(x){ return x.detailed; }).length;
+  return '<div class="card"><h2>🗓️ سجلّ الجلسات</h2>'+
+    '<p class="note"><b>'+ss.length+'</b> جلسة · منها <b>'+nDet+'</b> بتفصيل مهارات '+
+      '(هي وحدها التي تُبنى منها بطاقات المهارات أعلاه؛ والباقي تُعرض درجته هنا).</p>'+
+    /* التاريخ سطرٌ ثانٍ تحت الاسم لا عمودًا بجانبه: على عرض الجوّال
+       كان الاسم الطويل ينكسر ثلاثة أسطر ويبقى التاريخ معلّقًا. */
+    '<ul class="sk">'+ shown.map(function(x){
+      var p = pct(x.c, x.n);
+      return '<li><span class="pill '+cls(p)+'">'+p+'%</span>'+
+             '<span class="nm">'+esc(x.name)+
+               '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+
+                 saDate(x.t)+
+                 (x.detailed ? ' · بتفصيل مهارات' : '')+
+                 (x.trusted ? '' : ' · <span style="color:var(--bad)">مستبعدة</span>')+
+               '</span>'+
+             '</span>'+
+             '<span class="frac">'+x.c+'/'+x.n+'</span></li>';
+    }).join("") +'</ul>'+
+    (rest ? '<p class="note">وأقدم منها '+rest+' جلسة.</p>' : '')+
+    '</div>';
+}
+
 /* مؤشّر تكرار المادة المكتوبة (القطع): يوضّح أن نسبة القراءة قد تعكس الحفظ
    لا الفهم حين تتكرّر القطعة نفسها كثيرًا. */
 function repeatCardHtml(d){
@@ -255,9 +349,14 @@ function render(){
   var out = document.getElementById("out");
   var stretchCard = stretchCardHtml(d);
   if(!names.length){
+    /* لا مهارات مفصّلة — ولكن قد تكون له جلساتٌ كثيرة بدرجاتٍ مجملة.
+       فلا نقل «ما فيه شيء» ونحن نملك سجلّه: نُظهر السجلّ أوّلًا. */
+    var sc = sessionsCardHtml(current);
     out.innerHTML = '<div class="card empty">ما فيه تفصيل مهارات (في مستوى صفّه) لـ'+esc(current)+' بعد.<br>'+
-      'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.'+
+      (sc ? 'لكن جلساته محفوظة — تجدها في سجلّ الجلسات تحت.'
+          : 'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.')+
       (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
+      sc+
       writingCardHtml(current)+
       stretchCard;
     return;
@@ -276,7 +375,8 @@ function render(){
 
   out.innerHTML =
     '<div class="stats">'+
-      '<div class="stat"><div class="v">'+d.rows+'</div><div class="l">جلسة محتسبة</div></div>'+
+      /* «محتسبة» كانت توهم أنّها كلّ جلساته، وهي جلسات التفصيل وحدها */
+      '<div class="stat"><div class="v">'+d.rows+'</div><div class="l">جلسة مفصّلة</div></div>'+
       '<div class="stat"><div class="v">'+names.length+'</div><div class="l">مهارة مُقاسة</div></div>'+
       '<div class="stat"><div class="v">'+totT+'</div><div class="l">سؤال</div></div>'+
       '<div class="stat"><div class="v">'+pct(totC,totT)+'%</div><div class="l">المعدّل العام</div></div>'+
@@ -287,6 +387,7 @@ function render(){
     (strong.length ? '<div class="card"><h2>💪 أقوى المهارات</h2>'+listHtml(strong)+'</div>' : '')+
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
+    sessionsCardHtml(current)+
     repeatCardHtml(d)+
     writingCardHtml(current)+
     stretchCard+
@@ -298,8 +399,19 @@ function render(){
   document.getElementById("mk").addEventListener("click", function(){
     var L = [];
     L.push("تقرير "+current+" — "+(KIDS.filter(function(k){return k[0]===current;})[0]||["",""])[1]);
-    L.push("الفترة: "+d.from+" ← "+d.to+" · "+d.rows+" جلسة · "+totT+" سؤال · المعدّل "+pct(totC,totT)+"%");
+    L.push("الفترة: "+d.from+" ← "+d.to+" · "+d.rows+" جلسة مفصّلة · "+totT+" سؤال · المعدّل "+pct(totC,totT)+"%");
     if(d.skipped) L.push("جلسات مستبعدة (خروج/سرعة): "+d.skipped);
+    /* آخر الجلسات في النصّ المنسوخ أيضًا — الأب ينسخه ليناقشه، وأحدثُ
+       ما فعله الطفل أهمّ ما يُناقش، وكان يسقط منه كلّه. */
+    var ss = sessionsOf(current);
+    if(ss.length){
+      L.push("");
+      L.push("آخر الجلسات ("+ss.length+" جلسة إجمالًا):");
+      ss.slice(0, 12).forEach(function(x){
+        L.push("  - "+saDate(x.t)+" · "+x.name+": "+x.c+"/"+x.n+" ("+pct(x.c,x.n)+"%)"+
+               (x.detailed ? "" : " [بلا تفصيل مهارات]"));
+      });
+    }
     L.push("");
     L.push(single ? "كل المهارات (من الأضعف):" : "الأضعف:");
     weak.forEach(function(it){ L.push("  - "+it.name+": "+it.s.c+"/"+it.s.t+" ("+pct(it.s.c,it.s.t)+"%)"); });
