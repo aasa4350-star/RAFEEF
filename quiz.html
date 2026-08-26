@@ -2125,8 +2125,9 @@ if(!STUDENTS[who]){
       savedThisRound = false; saveState = "pending";
       const total = (en?en.total:0)+(ma?ma.total:0);
       const done = (en?en.done:0)+(ma?ma.done:0);
-      sec.innerHTML = `<div class="locked">🏁 أكمل حل <b>الإنجليزي</b> و<b>الرياضيات</b> كاملين، وبعدها تظهر النتيجة وتُحفظ تلقائيًا.<br><br>
-        تم حلّ <b>${done}</b> من <b>${total}</b> سؤال.</div>`;
+      sec.innerHTML = `<div class="locked">🏁 أكمل حل <b>الإنجليزي</b> و<b>الرياضيات</b> كاملين، وبعدها تظهر النتيجة كاملة.<br><br>
+        تم حلّ <b>${done}</b> من <b>${total}</b> سؤال.<br><br>
+        <span style="font-weight:400">وإن خرجت الآن فما حللته محفوظ — يظهر لوالدك «غير مكتمل».</span></div>`;
       return;
     }
     const totCorrect = en.correct+ma.correct, totAll = en.total+ma.total;
@@ -2196,6 +2197,78 @@ if(!STUDENTS[who]){
       });
     }
   }
+
+  /* ═══ حفظ الجهد الناقص ═══════════════════════════════════════
+
+     بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «حسن دخل اختبر نفسك الرياضيات
+     والإنجليزي وحلّ الأسئلة، بس ما طلع عندي».
+
+     والسبب أنّ الحفظ كان مشروطًا بإكمال المادّتين كاملتين
+     (bothDone أعلاه). فمن حلّ عشرين سؤالًا من أربعةٍ وعشرين ثمّ
+     أغلق الصفحة — ضاع كلّ ما حلّه، ولم يبقَ منه أثر. وأبوه يراه
+     يذاكر ولا يجد في اللوحة شيئًا، فيظنّ الموقع لا يسجّل.
+
+     فالآن: إن غادر قبل الإكمال حفظنا ما أجاب عليه فعلًا، ووسمناه
+     partial. والمقام عدد ما أجاب لا عدد الأسئلة كلّها — لأنّ
+     احتساب ما لم يُسأل عنه خطأً ظلمٌ يُنقص نسبته بلا ذنب.
+
+     وحدّ الأربعة: ما دون ذلك فتحةُ فضولٍ لا مذاكرة، وحفظها يملأ
+     السجلّ بصفوفٍ لا تدلّ على شيء.
+
+     ولا تدخل الجلسات الناقصة في حساب المستوى في child.html —
+     تُعرض في السجلّ ليراها الأب، ولا يُقاس عليها.
+     ═══════════════════════════════════════════════════════════ */
+  const PARTIAL_MIN = 4;
+  let partialSaved = false;
+  function savePartialIfAny(){
+    if(savedThisRound || partialSaved) return;
+    const en = RESULTS.en, ma = RESULTS.ma;
+    const doneEn = en ? en.done : 0, doneMa = ma ? ma.done : 0;
+    if(doneEn + doneMa < PARTIAL_MIN) return;
+    partialSaved = true;
+
+    /* الصحيح والخطأ من المُجاب وحده */
+    const tally = (R)=>{
+      let c = 0; const wrong = [];
+      if(R) (R.items||[]).forEach((q,i)=>{
+        const ch = R.chosen[i];
+        if(ch == null) return;
+        if(ch === q[2]) c++;
+        else wrong.push({ q:q[0], picked:(q[1]||[])[ch], correct:(q[1]||[])[q[2]] });
+      });
+      return { c:c, wrong:wrong };
+    };
+    const tEn = tally(en), tMa = tally(ma);
+    const per = [
+      ...((en&&en.events)||[]).map(e=>({s:"en", ok:e.ok, dt:e.dt, c:e.c})),
+      ...((ma&&ma.events)||[]).map(e=>({s:"ma", ok:e.ok, dt:e.dt, c:e.c}))
+    ];
+    const sk = {};
+    [["en", en], ["ma", ma]].forEach(pair=>{
+      const id = pair[0], R = pair[1];
+      if(!R) return;
+      (R.items||[]).forEach((q,i)=>{
+        const ch = R.chosen[i];
+        if(ch == null) return;
+        const g = skillOfQ(q, id);
+        const s = sk[g] || (sk[g] = {c:0, t:0});
+        s.t++; if(ch === q[2]) s.c++;
+      });
+    });
+
+    saveResult({
+      student: S.name, grade: S.grade,
+      en_correct: tEn.c, en_total: doneEn,
+      ma_correct: tMa.c, ma_total: doneMa,
+      wrong: [...tEn.wrong.map(w=>({subject:"إنجليزي", ...w})),
+              ...tMa.wrong.map(w=>({subject:"رياضيات", ...w}))],
+      meta: { partial:true, per:per, skills:sk,
+              away: awayNow().away, exits: awayNow().exits,
+              asked: (en?en.total:0) + (ma?ma.total:0) }
+    });
+  }
+  document.addEventListener("visibilitychange", function(){ if(document.hidden) savePartialIfAny(); });
+  window.addEventListener("pagehide", savePartialIfAny);
 
   let arbBuilt = false;
   // ===== مولّد أسئلة اللغة العربية (يتجدّد كل مرة) =====

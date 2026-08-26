@@ -149,22 +149,27 @@ async function main(){
   // نفصل الاختبارات التجريبية والنشاط عن اختبارات المدرسة
   const practice=rows.filter(x=> x.meta && x.meta.kind==="practice");
   rows=rows.filter(x=> !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice")));
+  /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
+     في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
+     فجلسةُ خمسة أسئلة تُزحزح «المستوى الحالي» كأنّها ورقةٌ كاملة. */
+  const isPartial=x=> !!(x.meta && x.meta.partial);
+  const full=rows.filter(x=> !isPartial(x));
 
   let notes=[];
   try{ const nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
 
-  const latest=rows[0];
+  const latest=full[0];
   const latPct=latest?pct(latest.en_correct+latest.ma_correct,latest.en_total+latest.ma_total):null;
-  const enAvg=rows.length?Math.round(rows.reduce((s,r)=>s+pct(r.en_correct,r.en_total),0)/rows.length):0;
-  const maAvg=rows.length?Math.round(rows.reduce((s,r)=>s+pct(r.ma_correct,r.ma_total),0)/rows.length):0;
+  const enAvg=full.length?Math.round(full.reduce((s,r)=>s+pct(r.en_correct,r.en_total),0)/full.length):0;
+  const maAvg=full.length?Math.round(full.reduce((s,r)=>s+pct(r.ma_correct,r.ma_total),0)/full.length):0;
   const beh=latest?behavior(latest):null;
 
-  // weak areas aggregate
+  // weak areas aggregate — الأخطاء تُجمع من الناقصة أيضًا، فالخطأ خطأ
   const wmap={}; rows.forEach(r=>(r.wrong||[]).forEach(w=>{const k="["+(w.subject||"")+"] "+w.q; wmap[k]=(wmap[k]||0)+1;}));
   const weak=Object.entries(wmap).sort((a,b)=>b[1]-a[1]).slice(0,6);
 
-  // trend (oldest -> newest, last 6)
-  const tr=rows.slice(0,6).reverse().map(r=>pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total));
+  // trend (oldest -> newest, last 6) — من الأوراق الكاملة وحدها
+  const tr=full.slice(0,6).reverse().map(r=>pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total));
 
   let html=`
     <header class="top">
@@ -248,8 +253,10 @@ async function main(){
   }
 
   if(rows.length){
-    html+=`
-    <div class="sec-title"><span class="dot"></span> المستوى (متوسط ${rows.length} محاولة)</div>
+    /* المستوى يُعرض فقط إن وُجدت ورقةٌ كاملة؛ ومن لم يُكمل بعدُ
+       تظهر جلساته في السجلّ ولا يُختلق له معدّل من لا شيء. */
+    if(full.length) html+=`
+    <div class="sec-title"><span class="dot"></span> المستوى (متوسط ${full.length} محاولة كاملة)</div>
     <div class="card"><div class="grid2">
       <div class="stat"><div class="lbl">الإنجليزي</div><div class="val">${enAvg}%</div></div>
       <div class="stat"><div class="lbl">الرياضيات</div><div class="val">${maAvg}%</div></div>
@@ -266,7 +273,8 @@ async function main(){
     html+=`</div>`;
 
     // سجل كل الاختبارات السابقة
-    html+=`<div class="sec-title"><span class="dot"></span> سجل الاختبارات (${rows.length})</div>
+    const nPart=rows.length-full.length;
+    html+=`<div class="sec-title"><span class="dot"></span> سجل الاختبارات (${rows.length}${nPart?` · منها ${nPart} غير مكتملة`:""})</div>
       <div class="card" style="overflow-x:auto;padding:0">
       <table style="width:100%;border-collapse:collapse;font-size:.92rem">
         <thead><tr style="color:var(--muted);text-align:center">
@@ -280,10 +288,13 @@ async function main(){
       const t=pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total);
       const col=t>=80?"var(--good)":t>=50?"var(--warn)":"var(--bad)";
       const dt=saTime(r.created_at);
-      html+=`<tr style="border-top:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums">
+      /* الناقصة تُعرض ولا يُقاس عليها: مقامها عدد ما أجاب لا عدد
+         الأسئلة، فنسبتها ليست نسبة ورقةٍ كاملة ولا تُقارن بها. */
+      const part=isPartial(r);
+      html+=`<tr style="border-top:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums${part?';opacity:.72':''}">
         <td style="padding:11px 8px;color:var(--muted)">${rows.length-i}</td>
-        <td style="padding:11px 8px;color:var(--muted);font-size:.82rem">${dt}</td>
-        <td style="padding:11px 8px;font-weight:800;color:${col}">${t}%</td>
+        <td style="padding:11px 8px;color:var(--muted);font-size:.82rem">${dt}${part?'<br><span style="font-size:.78rem">غير مكتمل</span>':''}</td>
+        <td style="padding:11px 8px;font-weight:800;color:${part?'var(--muted)':col}">${t}%</td>
         <td style="padding:11px 8px">${r.en_correct}/${r.en_total}</td>
         <td style="padding:11px 8px">${r.ma_correct}/${r.ma_total}</td>
       </tr>`;
@@ -323,7 +334,7 @@ async function main(){
   }
 
   html+=`<div class="sec-title"><span class="dot"></span> توصيات المعلّم 📌</div>`;
-  const auto=autoRec(rows);
+  const auto=autoRec(full);   // المستوى من الأوراق الكاملة وحدها
   const allNotes=auto?[auto].concat(notes):notes;
   if(allNotes.length){
     html+=allNotes.map(n=>`<div class="note"${n.auto?' style="border-color:var(--accent)"':''}><div class="nd">${n.date||""}${n.auto?' · يتحدّث تلقائيًا':''}</div>
