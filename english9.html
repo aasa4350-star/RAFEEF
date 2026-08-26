@@ -2548,6 +2548,488 @@ var u9YunusVocab = vocabGen(U9_YV,
   "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>9</span> (ص <span class=ltr>101</span>).",
   "u9yv");
 
+/* ===== إتمام الوحدة ٧ (ص ٧٧–٨٣) ===== */
+
+/* الأسئلة المنفيّة — الشكل والوظيفة (ص ٧٦ و٧٧) */
+var U7_NEGQ = [
+  ["___ he tired of working there?","Isn't",["Is not","Isn't he"]],
+  ["___ you coming with us?","Aren't",["Are not","Aren't you"]],
+  ["___ you finished your homework yet?","Haven't",["Have not","Haven't you"]],
+  ["___ you live near the beach?","Don't",["Do not","Doesn't"]],
+  ["___ you going to buy one too?","Aren't",["Are not","Amn't"]],
+  ["___ she work at the hospital?","Doesn't",["Don't","Does not"]],
+  ["___ we meet before?","Didn't",["Don't","Did not"]],
+  ["___ they able to sell the tools?","Weren't",["Were not","Wasn't"]]
+];
+var u7NegQ = clozeGen(U7_NEGQ,
+  "السؤال المنفيّ يبدأ بالمساعد <b>مختصرًا مع</b> <span class=ltr>n't</span> ثمّ الفاعل: "+
+  "<span class=ltr>Isn't he…? · Aren't you…? · Don't you…? · Haven't you…?</span> ولا نفصل "+
+  "<span class=ltr>not</span> عن المساعد في أوّل السؤال. ونستعمله لـ<b>التأكّد من معلومة</b> أو "+
+  "<b>إظهار الدهشة</b> (ص <span class=ltr>76–77</span>).",
+  "u7ng");
+
+/* مواقف التمرين D — أيّ سؤالٍ منفيّ يناسب الموقف (ص ٧٧) */
+var U7_SITU = [
+  ["You just bought a new cell phone. Your friend is still deciding about whether to buy one.",
+   "Aren't you going to buy one too?",
+   ["Didn't you sell your phone last year?","Isn't the beach closed today?"]],
+  ["You recognize an old friend at the mall, but the friend doesn't recognize you.",
+   "Don't you remember me?",
+   ["Aren't you going to eat your popcorn?","Didn't the class start at eight?"]],
+  ["Your friend is eating popcorn and is not offering you any.",
+   "Aren't you going to offer me some?",
+   ["Don't you remember me?","Haven't you finished your homework?"]],
+  ["You are playing a board game and you want your friend to play too.",
+   "Don't you want to play with us?",
+   ["Aren't you going to offer me some?","Didn't you see me?"]],
+  ["Someone joined your group, greeted everyone, but forgot you.",
+   "Didn't you see me?",
+   ["Don't you want to play with us?","Aren't you going to buy one too?"]],
+  ["Classes start at eight o'clock. It's 8:30 and your brother is still in bed.",
+   "Aren't you going to school today?",
+   ["Didn't you see me?","Don't you remember me?"]]
+];
+function u7Situation(){
+  var s=gp(U7_SITU), o=eOpts(s[1],s[2]);
+  if(!o) return null;
+  return ["أيُّ سؤالٍ منفيّ يناسب هذا الموقف؟<br>"+en(s[0]),o[0].map(en),o[1],
+    "الموقف يقتضي "+en(s[1])+" — والسؤال المنفيّ هنا للتأكّد أو للدهشة "+
+    "(ص <span class=ltr>77</span>).",
+    "u7si:"+s[0]];
+}
+
+/* be able to في سياق صور التمرين C (ص ٧٧) */
+var U7_ABLE2 = [
+  ["Ahmed's car broke down and he couldn't repair it.","He wasn't able to fix the car.",
+   ["He was able to fix the car.","He isn't able to fix the car."]],
+  ["The football game was sold out when the fans arrived.",
+   "They weren't able to buy tickets.",
+   ["They were able to buy tickets.","They aren't able to buy tickets."]],
+  ["It rained hard, so the match was cancelled.","The players weren't able to play.",
+   ["The players were able to play.","The players aren't able to play."]],
+  ["The students both got 100% on the test.","They were able to pass the test.",
+   ["They weren't able to pass the test.","They aren't able to pass the test."]],
+  ["Majedah took a hot pie out of the oven.","She was able to bake a pie.",
+   ["She wasn't able to bake a pie.","She isn't able to bake a pie."]],
+  ["Adnan lost control and drove into the flowers.","He wasn't able to stop the car.",
+   ["He was able to stop the car.","He isn't able to stop the car."]]
+];
+function u7AbleCtx(){
+  var a=gp(U7_ABLE2), o=eOpts(a[1],a[2]);
+  if(!o) return null;
+  return ["اختر الجملة الصحيحة لهذا الموقف:<br>"+en(a[0]),o[0].map(en),o[1],
+    en(a[1])+" — والموقف <b>ماضٍ</b> فنستعمل "+en("was/were able to")+" لا "+
+    en("am/is/are able to")+" (ص <span class=ltr>77</span>).",
+    "u7ac:"+a[0]];
+}
+
+/* Language in Context — مسابقة الحقائق التاريخية (ص ٧٨) */
+var U7_QUIZ = [
+  ["Which volcano destroyed Pompeii?","Vesuvius",["Etna","Krakatoa"]],
+  ["Who invented the printing press?","Gutenberg",["Da Vinci","Nestlé"]],
+  ["\"Vesuvius destroyed Pompeii, ___ ?\"","didn't it",["did it","wasn't it"]],
+  ["\"Da Vinci was the inventor of the printing press, ___ ?\"","wasn't he",["was he","didn't he"]]
+];
+var u7Quiz = factGen(U7_QUIZ,
+  "من <span class=ltr>Language in Context</span> في الوحدة <span class=ltr>7</span> "+
+  "(ص <span class=ltr>78</span>): ", "u7qz");
+
+/* محادثة تِد وشون (ص ٧٩) */
+var U7_TED = [
+  ["Where is Sean from?","Ireland — Dublin, actually",["Scotland","Chicago"]],
+  ["How did Ted guess that Sean isn't from around there?","From his accent",
+   ["From his clothes","From his books"]],
+  ["What does Ted know about the Irish?","Lots of Irish came over to the United States in the past",
+   ["They all speak Spanish","They never leave Ireland"]],
+  ["Which language do some Irish people speak?","Gaelic",["Latin","Welsh"]],
+  ["Why do they still speak it?","They like to hold on to the tradition",
+   ["It is the only language they know","The government forces them"]],
+  ["What is Sean doing in Chicago?","He is an exchange student",
+   ["He is working in a bank","He is visiting his cousin"]],
+  ["What does Ted offer to do?","To show Sean around the campus",
+   ["To lend Sean his car","To teach Sean Gaelic"]]
+];
+var u7Ted = factGen(U7_TED,
+  "من محادثة <span class=ltr>Ted &amp; Sean</span> في الوحدة <span class=ltr>7</span> "+
+  "(ص <span class=ltr>79</span>): ", "u7td");
+
+var U7_RT = [
+  ["How do you do?","a way to respond to an introduction",
+   ["a way to ask about someone's health","a way to say goodbye"]],
+  ["Is that so?","a way to show surprise",
+   ["a way to refuse politely","a way to agree strongly"]],
+  ["I'll be happy to…","a way to offer to do something for someone",
+   ["a way to complain","a way to ask for money"]],
+  ["to show someone around","to act as a guide",
+   ["to point at someone","to send someone away"]]
+];
+var u7RealTalk = vocabGen(U7_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>7</span> (ص <span class=ltr>79</span>).",
+  "u7rt");
+
+/* قطعة You Look Just Like Me! (ص ٨٠) */
+var U7_TWINS = [
+  ["How many brothers met for the first time?","Three — they were triplets",
+   ["Two — they were twins","Four"]],
+  ["How old were they when they met?","19",["39","15"]],
+  ["Where did Bobby Shafran start a new semester?","At Sullivan Community College in New York",
+   ["At a college in Chicago","At a college in Dublin"]],
+  ["Who had been a student there the previous semester?","Eddy Galland",
+   ["David Kellman","Bobby Shafran"]],
+  ["How did the brothers find each other?","Another student confused Bobby with Eddy and introduced them",
+   ["Their parents told them","They met at a garage sale"]],
+  ["Why didn't the families know?","The boys were orphans and grew up in two different families",
+   ["The families lived abroad","The boys changed their names"]],
+  ["Who was the third brother?","David Kellman",["Eddy Galland","Bobby Shafran"]],
+  ["How did the third brother find out?","He read the story in the newspapers",
+   ["A student introduced him","He saw them at college"]],
+  ["Who were Daphne Goodship and Barbara Herbert?","Twins who met for the first time at the age of 39",
+   ["Triplets who met at 19","Two students at Sullivan College"]],
+  ["What were they both wearing when they met?","A beige dress and a brown jacket",
+   ["A blue dress and a black coat","A school uniform"]],
+  ["What was their favorite color?","Blue",["Beige","Brown"]],
+  ["How did they both like their coffee?","Cold and black",["Hot and sweet","With a lot of milk"]],
+  ["What happened to both of them at the age of 15?","They fell down some stairs",
+   ["They moved to another country","They started college"]],
+  ["What problems did they later have?","Problems with their ankles",
+   ["Problems with their eyes","Problems with their memory"]],
+  ["What did they both use in the kitchen?","The same recipe book",
+   ["The same frying pan","The same oven"]],
+  ["Why were they called the \"Giggle\" twins?","Because they were talkative and laughed a lot",
+   ["Because they were very quiet","Because they were born on the same day"]],
+  ["What classic question do scientists want to answer?","What's more important — heredity or environment?",
+   ["Why do twins look alike?","How many twins are born each year?"]]
+];
+var u7Twins = factGen(U7_TWINS,
+  "من قطعة <span class=ltr>You Look Just Like Me!</span> في الوحدة <span class=ltr>7</span> "+
+  "(ص <span class=ltr>80</span>): ", "u7tw");
+
+/* معاني كلمات القطعة — خيارات الكتاب (ص ٨١) */
+var U7_TV = [
+  ["coincidence","a situation in which two things happen together by chance",
+   ["three children born at the same time","what you get from your parents"]],
+  ["to confuse","to think wrongly that a person is someone else",
+   ["to lose your parents","to have a strong emotional effect"]],
+  ["an orphan","a child who has lost his parents",
+   ["three children born at the same time","a situation that happens by chance"]],
+  ["heredity","what you get from your parents",
+   ["a child who has lost his parents","to think wrongly about a person"]],
+  ["triplets","three children born at the same time",
+   ["what you get from your parents","a situation that happens by chance"]],
+  ["touching","having a strong emotional effect",
+   ["happening together by chance","born at the same time"]]
+];
+var u7TwinsVocab = vocabGen(U7_TV,
+  "من <span class=ltr>After Reading</span> في الوحدة <span class=ltr>7</span> (ص <span class=ltr>81</span>).",
+  "u7tv");
+
+/* ترتيب فقرات المصادفة (ص ٨٢ تمرين A) */
+var U7_ORDER = [
+  ["ما الفقرة التي تبدأ بها القصّة؟",
+   "I arrived here in Chicago two months ago as an exchange student.",
+   ["One afternoon, I was walking around the campus looking for a place to eat lunch.",
+    "The three of us went for lunch that afternoon."]],
+  ["ما الذي يأتي بعد فقرة الوصول إلى شيكاغو؟",
+   "One afternoon, I was walking around the campus looking for a place to eat lunch.",
+   ["The three of us went for lunch that afternoon.",
+    "\"Well, I live in Chicago and I'm studying economics here at the college.\""]],
+  ["بعد أن سمع صوتًا مألوفًا، ماذا حدث؟",
+   "It took me a second to realize who it was — it was my cousin, Mike.",
+   ["The three of us went for lunch that afternoon.",
+    "I arrived here in Chicago two months ago as an exchange student."]],
+  ["ماذا قال شون حين عرف ابن عمّه؟",
+   "\"Mike, what are you doing here in Chicago?\"",
+   ["\"Well, I live in Chicago and I'm studying economics here at the college.\"",
+    "I arrived here in Chicago two months ago as an exchange student."]],
+  ["ما الفقرة التي تُختم بها القصّة؟",
+   "The three of us went for lunch that afternoon, and Mike and I did a lot of catching up.",
+   ["One afternoon, I was walking around the campus looking for a place to eat lunch.",
+    "I arrived here in Chicago two months ago as an exchange student."]],
+  ["كم مضى على شون في شيكاغو حين وقعت المصادفة؟","Two months",
+   ["Five years","Two years"]],
+  ["كم مضى على شون بلا رؤية ابن عمّه مايك؟","Five years",
+   ["Two months","Nineteen years"]],
+  ["لماذا انتقلت أسرة مايك؟","They had moved to the United States",
+   ["They had moved to Ireland","They had moved to Chicago for the beach"]],
+  ["من الذي كان مع مايك؟","Lee, a student in one of Sean's classes",
+   ["Bobby, a student from New York","Ted, a student from Chicago"]],
+  ["ماذا يدرس مايك في شيكاغو؟","Economics",["Medicine","Engineering"]]
+];
+function u7Order(){
+  var c=gp(U7_ORDER), o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return [c[0],o[0].map(en),o[1],
+    en(c[1])+" — من قصّة المصادفة في ركن الكتابة بالوحدة <span class=ltr>7</span> "+
+    "(ص <span class=ltr>82</span>). وترتيبها: الوصول، ثمّ نداءٌ في الحرم، ثمّ التعرّف على مايك، "+
+    "ثمّ سؤاله، ثمّ جوابه، ثمّ الغداء.",
+    "u7or:"+c[0]];
+}
+
+/* أزمنة السرد في ركن الكتابة (ص ٨٢) */
+var U7_TENSE = [
+  ["Suddenly I ___ someone call my name.","heard",["was hearing","had heard"]],
+  ["I ___ around.","turned",["was turning","had turned"]],
+  ["I ___ around the campus when suddenly I heard someone call my name.","was walking",
+   ["walked","had walked"]],
+  ["I ___ him in five years because his family had moved to the U.S.","hadn't seen",
+   ["didn't see","wasn't seeing"]],
+  ["I hadn't seen him in five years because his family ___ to the U.S.","had moved",
+   ["moved","was moving"]],
+  ["I ___ a few students in my classes, but I hadn't made any friends yet.","had met",
+   ["met","was meeting"]],
+  ["During my first week, everything ___ still a bit confusing.","was",["had been","is"]],
+  ["The three of us ___ for lunch that afternoon.","went",["were going","had gone"]]
+];
+var u7Tense = clozeGen(U7_TENSE,
+  "في سرد القصّة: <b>الماضي البسيط</b> للأحداث المنتهية (<span class=ltr>heard, turned, went</span>)، "+
+  "و<b>الماضي المستمرّ</b> لفعلٍ كان جاريًا فقطعه حدثٌ آخر (<span class=ltr>I was walking … when I heard</span>)، "+
+  "و<b>الماضي التامّ</b> (<span class=ltr>had + p.p.</span>) لفعلٍ وقع <b>قبل</b> ماضٍ آخر "+
+  "(<span class=ltr>his family had moved</span>) — ص <span class=ltr>82</span>.",
+  "u7tn");
+
+/* الاقتراحات (ص ٨٣) */
+var U7_SUGG = [
+  ["___ go get some pizza and hang out by the beach.","Let's",["Let us to","Lets"]],
+  ["Sorry, I ___ . I have to clean my room.","can't",["don't can","not can"]],
+  ["___ don't you let me help you?","Why",["What","How"]],
+  ["That ___ good!","sounds",["sound","is sounds"]],
+  ["What ___ I do with all my stuff?","should",["shoulds","should to"]],
+  ["I ___ take it with me because my room at the college is really small.","can't",
+   ["don't can","am not can"]],
+  ["Then, why ___ you have a garage sale?","don't",["not","aren't"]],
+  ["Hmm… That's a good ___ .","idea",["advice","suggest"]],
+  ["What day ___ I have it?","should",["shoulds","should to"]],
+  ["___ don't you have it on Saturday?","Why",["What","When"]],
+  ["No, you ___ sell those! They're worth a lot.","shouldn't",["should not to","don't should"]],
+  ["You ___ keep them.","should",["shoulds","should to"]],
+  ["Why ___ you come to my garage sale on Saturday?","don't",["not","aren't"]],
+  ["What ___ we do tonight?","should",["shoulds","should to"]],
+  ["I don't know, but we ___ stay home.","shouldn't",["don't should","should not to"]],
+  ["Let's go to the park. — OK. Why ___ we take our bikes?","don't",["not","aren't"]]
+];
+var u7Suggest = clozeGen(U7_SUGG,
+  "للاقتراح: <span class=ltr>should / shouldn't</span> و<span class=ltr>can / could</span> "+
+  "و<span class=ltr>Why don't…?</span> و<span class=ltr>Let's…</span> — ويأتي بعدها كلّها الفعل "+
+  "<b>مجرّدًا</b> بلا <span class=ltr>to</span> وبلا <span class=ltr>s</span>. "+
+  "وللقبول: <span class=ltr>OK · That's a good idea · Sure · All right · That sounds good</span>، "+
+  "وللرفض بلطف: <span class=ltr>Sorry, I can't · Let's … instead</span> (ص <span class=ltr>83</span>).",
+  "u7sg");
+
+var U7_ACCEPT = [
+  ["A: Why don't we go to the museum? — Which reply <b>accepts</b>?","That sounds good.",
+   ["Sorry, I can't.","Museums are boring."]],
+  ["A: Let's go to the park this afternoon. — Which reply <b>accepts</b>?","That's a good idea.",
+   ["Sorry, I can't.","No, I don't want to."]],
+  ["A: Can you go out tonight? — Which reply <b>refuses politely</b>?",
+   "Sorry, I can't. I have to study.",
+   ["That sounds good.","All right."]],
+  ["A: Why don't we go to the museum? — Which reply <b>refuses and offers something else</b>?",
+   "Let's go to the zoo instead.",["That's a good idea.","Sure."]],
+  ["A: Let's take our bikes to the park. — Which reply <b>accepts</b>?","All right.",
+   ["Sorry, I can't.","Bikes are too slow."]]
+];
+function u7Accept(){
+  var c=gp(U7_ACCEPT), o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return [en(c[0]),o[0].map(en),o[1],
+    "للقبول نقول "+en("OK · That's a good idea · Sure · All right · That sounds good")+
+    " ، وللرفض بلطف "+en("Sorry, I can't")+" أو نعرض بديلًا بـ "+en("Let's … instead")+
+    " (ص <span class=ltr>83</span>).",
+    "u7ap:"+c[1]];
+}
+
+/* ===== إتمام الوحدة ٨ (ص ٨٤–٨٦) ===== */
+
+/* أجزاء السيارة — التعريف (ص ٨٤) */
+var U8_CAR = [
+  ["the windshield","the big glass window at the front of the car",
+   ["the cover over the engine","the space at the back for luggage"]],
+  ["the windshield wipers","they clear the rain off the front window",
+   ["they light the road at night","they hold the car on the road"]],
+  ["the hood","the cover over the engine at the front",
+   ["the space at the back for luggage","the big glass window at the front"]],
+  ["the trunk","the space at the back for luggage",
+   ["the cover over the engine","the small box in front of the passenger"]],
+  ["the bumper","the bar at the front and the back that protects the car",
+   ["the light that shows you are turning","the panel with the instruments"]],
+  ["a headlight","the light at the front that lights the road",
+   ["the light that shows you are turning","the mirror that shows the road behind"]],
+  ["a signal light","the light that shows you are going to turn",
+   ["the light at the front that lights the road","the bar that protects the car"]],
+  ["the gas tank","where the fuel goes",
+   ["where you put the key to start the car","where you keep your papers"]],
+  ["the rearview mirror","you look in it to see the road behind you",
+   ["you hold it to turn the car","you press it to stop the car"]],
+  ["the dashboard","the panel with the instruments in front of the driver",
+   ["the cover over the engine","the space at the back for luggage"]],
+  ["the ignition","where you put the key to start the car",
+   ["where the fuel goes","where you keep your papers"]],
+  ["the glove compartment","the small closed box in front of the passenger",
+   ["the space at the back for luggage","the cover over the engine"]],
+  ["the steering wheel","you hold it to turn the car",
+   ["you press it to go faster","you press it to stop the car"]],
+  ["the gas pedal","you press it to go faster",
+   ["you press it to stop the car","you hold it to turn the car"]],
+  ["the brake pedal","you press it to stop the car",
+   ["you press it to go faster","you hold it to turn the car"]],
+  ["the seat belt","you wear it to stay safe in the car",
+   ["you look in it to see behind you","you press it to go faster"]],
+  ["the GPS","it shows you the way",
+   ["it clears the rain off the window","it protects the car in a small crash"]]
+];
+var u8Car = vocabGen(U8_CAR,
+  "من مخطّط <span class=ltr>The New X Model</span> في الوحدة <span class=ltr>8</span> "+
+  "(ص <span class=ltr>84</span>).", "u8cr");
+
+/* خارج السيارة أم داخلها (ص ٨٤) */
+var U8_INOUT = [
+  ["the windshield wipers","EXTERIOR"],["the hood","EXTERIOR"],["the bumper","EXTERIOR"],
+  ["a headlight","EXTERIOR"],["a signal light","EXTERIOR"],["the trunk","EXTERIOR"],
+  ["the gas tank","EXTERIOR"],
+  ["the rearview mirror","INTERIOR"],["the dashboard","INTERIOR"],["the ignition","INTERIOR"],
+  ["the glove compartment","INTERIOR"],["the steering wheel","INTERIOR"],
+  ["the gas pedal","INTERIOR"],["the brake pedal","INTERIOR"],
+  ["the automatic transmission","INTERIOR"],["the seat belt","INTERIOR"]
+];
+function u8InOut(){
+  var r=gp(U8_INOUT);
+  var o=eOpts(r[1],[r[1]==="EXTERIOR"?"INTERIOR":"EXTERIOR","Neither — it is not part of a car"]);
+  if(!o) return null;
+  return ["Is "+en(r[0])+" on the "+en("EXTERIOR")+" or the "+en("INTERIOR")+" of the car?",
+    o[0].map(en),o[1],
+    en(r[0])+" ← "+en(r[1])+" — من مخطّط السيارة في الوحدة <span class=ltr>8</span> "+
+    "(ص <span class=ltr>84</span>).",
+    "u8io:"+r[0]];
+}
+
+/* الكلمات المركّبة — Quick Check A (ص ٨٥) */
+var U8_COMP = [
+  ["steering","wheel",["shield","board"]],
+  ["wind","shield",["wheel","belt"]],
+  ["dash","board",["mirror","sign"]],
+  ["seat","belt",["wheel","shield"]],
+  ["rearview","mirror",["board","belt"]],
+  ["road","sign",["wheel","mirror"]]
+];
+function u8Compound(){
+  var c=gp(U8_COMP), o=eOpts(c[1],c[2]);
+  if(!o) return null;
+  return ["Which word goes with "+en('"'+c[0]+'"')+" to make one word?",o[0].map(en),o[1],
+    en(c[0]+" + "+c[1]+" = "+c[0]+c[1])+" — من "+en("Quick Check")+" في الوحدة "+
+    "<span class=ltr>8</span> (ص <span class=ltr>85</span>).",
+    "u8cm:"+c[0]];
+}
+
+/* إشارات المرور الدولية (ص ٨٥) */
+var U8_SIGNS = [
+  ["the Stop sign","You must stop.",["You must not enter.","You can park here."]],
+  ["the No Entry sign","You must not enter.",["You must stop.","You must not pass."]],
+  ["the No Passing sign","You must not pass.",["You must not park here.","You must stop."]],
+  ["the No Parking sign","You must not park here.",["You can park here.","You must not pass."]],
+  ["the Parking Area sign","You can park here.",["You must not park here.","You must not enter."]],
+  ["the Speed Limit sign","You must not drive faster than 70.",
+   ["You must drive at exactly 70.","You must not pass."]],
+  ["the Pedestrian Crossing sign","People cross the road here, so you must slow down.",
+   ["You must not enter.","You can park here."]],
+  ["the Danger sign","You must be careful.",["You must stop.","You can park here."]]
+];
+function u8Sign(){
+  var s=gp(U8_SIGNS), o=eOpts(s[1],s[2]);
+  if(!o) return null;
+  return ["What does "+en(s[0])+" mean?",o[0].map(en),o[1],
+    en(s[0])+" → "+en(s[1])+" — من إشارات المرور الدولية في الوحدة <span class=ltr>8</span> "+
+    "(ص <span class=ltr>85</span>).",
+    "u8sg:"+s[0]];
+}
+
+/* must مقابل should — المعنى والشكل (ص ٨٦) */
+var U8_MODAL = [
+  ["Which word do we use to talk about a <b>law or a rule</b>?","must",["should","could"]],
+  ["Which word do we use to <b>give advice</b>?","should",["must","mustn't"]],
+  ["Which is <b>stronger</b> and more official?","must",["should","could"]],
+  ["\"You must stop at the traffic lights.\" Is this a law or advice?","A law",
+   ["Advice","A suggestion"]],
+  ["\"You shouldn't eat when you're driving.\" Is this a law or advice?","Advice",
+   ["A law","An order from the police"]],
+  ["\"You must not park on the sidewalk.\" Is this a law or advice?","A law",
+   ["Advice","A friendly idea"]]
+];
+var u8Modal = factGen(U8_MODAL,
+  "<span class=ltr>must</span> للقوانين والأنظمة، و<span class=ltr>should</span> للنصيحة، "+
+  "و<span class=ltr>must</span> أقوى وأكثر رسميّة (ص <span class=ltr>86</span>). الجواب: ",
+  "u8md");
+
+var U8_MODALF = [
+  ["You ___ stop at the traffic lights. It's the law.","must",["musts","must to"]],
+  ["You ___ park on the sidewalk. It's against the law.","must not",["not must","must don't"]],
+  ["You ___ drive under the speed limit.","should",["shoulds","should to"]],
+  ["You ___ eat when you're driving.","shouldn't",["don't should","should not to"]],
+  ["You ___ always wear your seat belt. It's the law.","must",["musts","must to"]],
+  ["You ___ obey the road signs. It's the law.","must",["musts","must to"]],
+  ["Drivers ___ drive too quickly.","shouldn't",["don't should","should not to"]]
+];
+var u8ModalForm = clozeGen(U8_MODALF,
+  "بعد <span class=ltr>must</span> و<span class=ltr>should</span> يأتي الفعل <b>مجرّدًا</b>: "+
+  "بلا <span class=ltr>to</span> وبلا <span class=ltr>s</span>. والنفي "+
+  "<span class=ltr>must not / mustn't</span> و<span class=ltr>should not / shouldn't</span> "+
+  "(ص <span class=ltr>86</span>).",
+  "u8mf");
+
+/* ظروف الكيفيّة (ص ٨٦) */
+var U8_ADV = [
+  ["slow","slowly",["slowy","slowily"]],
+  ["quick","quickly",["quicky","quickily"]],
+  ["careful","carefully",["carefuly","carefullly"]],
+  ["beautiful","beautifully",["beautifuly","beautifullly"]],
+  ["aggressive","aggressively",["aggressivly","aggressivelly"]],
+  ["dangerous","dangerously",["dangerousy","dangerousely"]],
+  ["reckless","recklessly",["recklesly","recklessley"]],
+  ["quiet","quietly",["quietely","quietlly"]],
+  ["enthusiastic","enthusiastically",["enthusiasticly","enthusiasticaly"]],
+  ["good","well",["goodly","gooder"]],
+  ["fast","fast",["fastly","fastily"]],
+  ["hard","hard",["hardly","hardily"]]
+];
+function u8Adverb(){
+  var v=gp(U8_ADV), o=eOpts(v[1],v[2]);
+  if(!o) return null;
+  var why;
+  if(v[0]==="good") why="شاذّة: ظرف "+en("good")+" هو "+en("well")+" لا "+en("goodly")+".";
+  else if(v[0]==="fast"||v[0]==="hard")
+    why=en(v[0])+" صفةٌ وظرفٌ بالصورة نفسها: "+en("a "+v[0]+" driver")+" و"+en("he drives "+v[0])+
+        ". ولا نقول "+en(v[0]+"ly")+" — و"+en("hardly")+" كلمةٌ أخرى معناها «بالكاد».";
+  else if(/l$/.test(v[0])) why="الصفة المنتهية بـ "+en("l")+" نُضعّف اللام: "+en(v[0]+" → "+v[1])+".";
+  else if(/ic$/.test(v[0])) why="الصفة المنتهية بـ "+en("-ic")+" تأخذ "+en("-ally")+" : "+en(v[0]+" → "+v[1])+".";
+  else why="نضيف "+en("-ly")+" إلى الصفة: "+en(v[0]+" → "+v[1])+".";
+  return ["What is the <b>adverb</b> form of "+en('"'+v[0]+'"')+" ?",o[0].map(en),o[1],
+    why+" وظرف الكيفيّة يصف <b>كيف</b> يحدث الفعل (ص <span class=ltr>86</span>).",
+    "u8av:"+v[0]];
+}
+
+/* تحويل الصفة إلى ظرف في جملة (ص ٨٦ تمرينا A و B) */
+var U8_ADVS = [
+  ["Badr is an aggressive driver. → Badr drives ___ .","aggressively",
+   ["aggressive","aggressivly"]],
+  ["Stunt pilots fly in a dangerous way. → Stunt pilots fly ___ .","dangerously",
+   ["dangerous","dangerousy"]],
+  ["Fadwa and Amal are enthusiastic readers. → They read ___ .","enthusiastically",
+   ["enthusiastic","enthusiasticly"]],
+  ["Saeed is a really good player. → Saeed plays really ___ .","well",["good","goodly"]],
+  ["Sabah is a quiet talker. → Sabah talks ___ .","quietly",["quiet","quietely"]],
+  ["Khalid is a hard worker. → Khalid works ___ .","hard",["hardly","hardily"]],
+  ["Majid and Ali are fast runners. → They run ___ .","fast",["fastly","fastily"]],
+  ["Adel is a careful driver. → Adel drives ___ .","carefully",["careful","carefuly"]],
+  ["Brian doesn't stop at stop signs. He drives ___ .","recklessly",["reckless","recklesly"]],
+  ["He had to go to a special class for people who drive ___ .","dangerously",
+   ["dangerous","dangerousy"]]
+];
+var u8AdverbSent = clozeGen(U8_ADVS,
+  "الصفة تصف <b>الاسم</b> (<span class=ltr>a careful driver</span>)، وظرف الكيفيّة يصف "+
+  "<b>الفعل</b> (<span class=ltr>he drives carefully</span>). و<span class=ltr>fast</span> و"+
+  "<span class=ltr>hard</span> بصورةٍ واحدة، وظرف <span class=ltr>good</span> هو "+
+  "<span class=ltr>well</span> (ص <span class=ltr>86</span>).",
+  "u8as");
+
 /* ===== إضافات الوحدة ١ (ص ٩–١١) ===== */
 
 /* استبيان نمط الحياة كما في الكتاب ص ١١ — أعمدة: نورة · مها · بدرية */
@@ -2873,9 +3355,11 @@ var U5  = [u5Inventions,u5Perfect,u5ForSince,u5Dates,u5Fadi,u5RealTalk,u5Effects
 var U6  = [u6Places,u6Compare,u6AsAs,u6Indirect,u6Rent,u6Faris,u6RealTalk,u6Jeddah,
            u6JeddahVocab,u6JeddahB,u6Article];
 var EXP2= [ex2Same,ex2Adventure,ex2Chant];
-var U7  = [u7Tools,u7Tags,u7Answer,u7BeAble];
+var U7  = [u7Tools,u7Tags,u7Answer,u7BeAble,u7NegQ,u7Situation,u7AbleCtx,u7Quiz,
+           u7Ted,u7RealTalk,u7Twins,u7TwinsVocab,u7Order,u7Tense,u7Suggest,u7Accept];
 var U8  = [u8Aggressive,u8George,u8RealTalk,u8Right,u8RightVocab,u8License,
-           u8CauseResult,u8Report];
+           u8CauseResult,u8Report,u8Car,u8InOut,u8Compound,u8Sign,u8Modal,
+           u8ModalForm,u8Adverb,u8AdverbSent];
 var U9  = [u9Relative,u9PastProg,u9Adjectives,u9City,u9Lars,u9RealTalk,u9Yunus,
            u9Jameel,u9YunusVocab];
 var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
@@ -2909,8 +3393,8 @@ if(!NAMES[who]){
     u6:{tab:"6 Where Is It", gens:U6, n:10, intro:"<b><span class=ltr>Unit 6 — Do You Know Where It Is?</span> (ص <span class=ltr>58–67</span>):</b> المقارنة والتفضيل، و<span class=ltr>as … as</span>، والأسئلة غير المباشرة، وأداة التعريف <span class=ltr>the</span>، وقطعة <span class=ltr>The Bride of the Red Sea</span> عن جدّة.", label:"إنجليزي م٣ — Unit 6"},
     exp2:{tab:"مراجعة 4–6 ✅", gens:EXP2, n:9, intro:"<b><span class=ltr>Expansion — Units 4–6</span> (ص <span class=ltr>68–73</span>):</b> الجمل المترادفة، وقطعة <span class=ltr>Adventure Trips</span>، ونشيد <span class=ltr>I've Missed You!</span>.", label:"إنجليزي م٣ — Expansion 4-6"},
     allu3:{tab:"اختبار شامل 📝", gens:ALLU3, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>7–9</span>.", label:"إنجليزي م٣ — شامل و7-9"},
-    u7:{tab:"7 Good Deal", gens:U7, n:8, intro:"<b><span class=ltr>Unit 7 — It's a Good Deal, Isn't It?</span> (ص <span class=ltr>74–76</span>):</b> أسئلة الذيل وإجاباتها، و<span class=ltr>be able to</span>، وأدوات البيت. <b>ناقص:</b> ص <span class=ltr>77–86</span> لم تصل بعد.", label:"إنجليزي م٣ — Unit 7"},
-    u8:{tab:"8 Drive Slowly", gens:U8, n:10, intro:"<b><span class=ltr>Unit 8 — Drive Slowly!</span> (ص <span class=ltr>87–93</span>):</b> السبب والنتيجة، ونقل الطلبات والأوامر، وقطعة <span class=ltr>Is Right, Right?</span>، ورخصة القيادة في كندا.", label:"إنجليزي م٣ — Unit 8"},
+    u7:{tab:"7 Good Deal", gens:U7, n:10, intro:"<b><span class=ltr>Unit 7 — It's a Good Deal, Isn't It?</span> (ص <span class=ltr>74–83</span>):</b> أسئلة الذيل والأسئلة المنفيّة، و<span class=ltr>be able to</span>، والاقتراحات بـ<span class=ltr>should / Why don't / Let's</span>، وأزمنة السرد، وقطعة <span class=ltr>You Look Just Like Me!</span> عن التوائم.", label:"إنجليزي م٣ — Unit 7"},
+    u8:{tab:"8 Drive Slowly", gens:U8, n:10, intro:"<b><span class=ltr>Unit 8 — Drive Slowly!</span> (ص <span class=ltr>84–93</span>):</b> أجزاء السيارة وإشارات المرور، و<span class=ltr>must</span> مقابل <span class=ltr>should</span>، وظروف الكيفيّة، والسبب والنتيجة، ونقل الطلبات والأوامر، وقطعة <span class=ltr>Is Right, Right?</span>.", label:"إنجليزي م٣ — Unit 8"},
     u9:{tab:"9 All Kinds", gens:U9, n:10, intro:"<b><span class=ltr>Unit 9 — All Kinds of People</span> (ص <span class=ltr>94–101</span>):</b> الضمائر الموصولة <span class=ltr>who/that/which</span>، والماضي المستمرّ مع <span class=ltr>when/while</span>، وصفات الشخصية، وقطعة <span class=ltr>Simple Ideas, BIG Results</span>.", label:"إنجليزي م٣ — Unit 9"}
   };
 
