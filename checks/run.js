@@ -13,6 +13,7 @@
 const pages   = require('./pages');
 const answers = require('./answers-en9');
 const data    = require('./data');
+const audio   = require('./audio');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -36,7 +37,15 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   console.log('  ' + (a.bad ? '❌ أخطاء: ' + a.bad : '✅ ' + a.ok + ' مولّدًا سليمًا'));
   errors += a.bad;
 
-  head('٣ · طبقة البيانات');
+  head('٣ · تغطية الصوت');
+  const au = audio();
+  au.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!au.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٤ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {
