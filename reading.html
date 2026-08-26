@@ -611,9 +611,15 @@ function azureTTS(text, isAr, ratePct, onEnd){
     if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
     var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
-    var voice=isAr?"ar-SA-ZariyahNeural":"en-US-AvaMultilingualNeural";
+    /* الصوتان هنا هما نفسهما اللذان وُلّدت بهما المقاطع المحفوظة في
+       tools/generate-audio.js — ولا يجوز أن يختلفا. فالطفل في الجلسة
+       الواحدة يسمع بندًا من ملفٍّ محفوظ وبندًا من الشبكة، فإن اختلف
+       الصوتان ظنّ أنّ أحدهما عطب. وكان العربي قبلها ZariyahNeural
+       والإنجليزي AvaMultilingual، فيسمع صوتين لا صوتًا. */
+    var voice=isAr?"ar-SA-HamedNeural":"en-GB-RyanNeural";
+    var vLang=isAr?"ar-SA":"en-GB";
     var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="'+lang+'"><voice name="'+voice+'"><prosody rate="'+(ratePct||"-15%")+'">'+esc+'</prosody></voice></speak>';
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="'+vLang+'"><voice name="'+voice+'"><prosody rate="'+(ratePct||"-15%")+'">'+esc+'</prosody></voice></speak>';
     synth.speakSsmlAsync(ssml,
       function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; if(onEnd){ try{onEnd();}catch(e){} } },
       function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speak(text, 0.8, lang, onEnd); });
