@@ -44,6 +44,19 @@ function run(){
   if (missing)
     issues.push({ sev:'خطأ', msg:missing + ' من ' + total + ' ملفّ صوتٍ مذكورٍ في المانيفست مفقودٌ على القرص' });
 
+  /* مقاطعُ ثبت أنّ الآلة تنطقها خطأً — يكتبها tools/verify-audio.js
+     بردّ كلّ مقطعٍ إلى محرّك التعرّف ومقارنة ما سُمع بما كُتب.
+     تبقى مذكورةً هنا حتى تُستبدل بصوت الأب، فلا تُنسى بمرور الوقت. */
+  const susPath = path.join(ROOT, 'audio', 'suspect.json');
+  if (fs.existsSync(susPath)){
+    const sus = JSON.parse(fs.readFileSync(susPath, 'utf8'));
+    for (const lang of ['ar','en']){
+      (sus[lang] || []).forEach(s => issues.push({ sev:'تنبيه',
+        msg:'نطقٌ مشبوه · ' + lang + ' · ' + s.id + ' — مكتوب «' + s.text +
+            '» ويُسمع «' + s.heard + '» — مرشَّحٌ لصوت الأب' }));
+    }
+  }
+
   /* تغطية بنوك الإملاء */
   const ctx = { window:{} }; ctx.globalThis = ctx; vm.createContext(ctx);
   for (const f of ['reading-bank.js','reading-bank2.js']){
