@@ -3412,14 +3412,14 @@ if(!NAMES[who]){
 
   var CHAPS = {
     p1: {name:"Part 1 · الوحدات 1–3", unit:'\ud83d\udcd8 مطابق لكتاب <span class="ltr">SuperGoal 3</span> — ثالث متوسط · <span class="ltr">Part 1</span>: الوحدات <span class="ltr">1–3</span> (ص <span class="ltr">2\u201331</span>)',
-         ids:["allu","u1","u2","u3","exp"]},
+         ids:["u1","u2","u3","exp","allu"]},
     p2: {name:"Part 2 · الوحدات 4–6", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 2</span>: الوحدات <span class="ltr">4–6</span> ومراجعتها (ص <span class="ltr">38\u201373</span>)',
-         ids:["allu2","u4","u5","u6","exp2"]},
+         ids:["u4","u5","u6","exp2","allu2"]},
     p3: {name:"Part 3 · الوحدات 7–9", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 3</span>: الوحدات <span class="ltr">7–9</span> (ص <span class="ltr">74\u2013101</span>)',
-         ids:["allu3","u7","u8","u9"]}
+         ids:["u7","u8","u9","allu3"]}
   };
 
-  var curCh = "p1", curId = "allu";
+  var curCh = "p1", curId = "u1";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -3534,7 +3534,7 @@ if(!NAMES[who]){
     curId = id; drawChap(); drawTabs(); showPanel(id);
   }
 
-  drawChap(); drawTabs(); showPanel("allu");
+  drawChap(); drawTabs(); showPanel(curId);   // يتبع curId لا اسمًا مكتوبًا
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
 
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====

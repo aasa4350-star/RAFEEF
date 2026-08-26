@@ -173,8 +173,7 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="math4.html?who='+who+'">🔢 الرياضيات</a></div>'+
     '<div class="unit">📘 <b>المخلوقات الحية</b> · <b>التغذية والصحة</b> · <b>الأنظمة البيئية</b></div>'+
     '<div class="tabs" role="tablist">'+
-      '<button data-tab="all" aria-selected="true">اختبار شامل 📝</button>'+
-      '<button data-tab="cells" aria-selected="false">الخلية 🔬</button>'+
+            '<button data-tab="cells" aria-selected="true">الخلية 🔬</button>'+
       '<button data-tab="clas" aria-selected="false">التصنيف 🌿</button>'+
       '<button data-tab="inv" aria-selected="false">اللافقاريات 🐛</button>'+
       '<button data-tab="vert" aria-selected="false">الفقاريات 🐟</button>'+
@@ -182,10 +181,11 @@ if(!NAMES[who]){
       '<button data-tab="health" aria-selected="false">الصحة 🩺</button>'+
       '<button data-tab="eco" aria-selected="false">النظام البيئي 🌍</button>'+
       '<button data-tab="food" aria-selected="false">السلاسل الغذائية 🔗</button>'+
+      '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
-    '<section class="panel active" id="all"></section>'+
-    '<section class="panel" id="cells"></section>'+
+    '<section class="panel" id="all"></section>'+
+    '<section class="panel active" id="cells"></section>'+
     '<section class="panel" id="clas"></section>'+
     '<section class="panel" id="inv"></section>'+
     '<section class="panel" id="vert"></section>'+
@@ -272,7 +272,9 @@ if(!NAMES[who]){
     sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
-  render("all");
+  /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
+     اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
+  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab);
 
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){

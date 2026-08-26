@@ -1143,12 +1143,12 @@ if(!NAMES[who]){
 
   var CHAPS = {
     c1: {name:"الفصل الأول", unit:'\ud83d\udcd8 مطابق لكتاب الرياضيات — ثالث متوسط · الفصل الأول: المعادلات الخطية (ص <span class="en">10\u201329</span>)',
-         ids:["allh1","h1","h2","h3","h4","h5"]},
+         ids:["h1","h2","h3","h4","h5","allh1"]},
     c2: {name:"الفصل الثاني", unit:'\ud83d\udcd8 مطابق لكتاب الرياضيات — ثالث متوسط · الفصل الثاني: العلاقات والدوال الخطّية (ص <span class="en">50\u201391</span>)',
-         ids:["allr2","r1","r2","r3","r4","r5","r6"]}
+         ids:["r1","r2","r3","r4","r5","r6","allr2"]}
   };
 
-  var curCh = "c1", curId = "allh1";
+  var curCh = "c1", curId = "h1";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -1271,7 +1271,7 @@ if(!NAMES[who]){
     curId = id; drawChap(); drawTabs(); showPanel(id);
   }
 
-  drawChap(); drawTabs(); showPanel("allh1");
+  drawChap(); drawTabs(); showPanel(curId);   // يتبع curId لا اسمًا مكتوبًا
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
 
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====

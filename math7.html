@@ -1824,16 +1824,16 @@ if(!NAMES[who]){
 
   var CHAPS = {
     c1: {name:"الفصل الأول", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الأول: الجبر والدوال (ص <span class="en">12–44</span>)',
-         ids:["all1","d1","d2","d3","d4","d5","d6","d7","d8"]},
+         ids:["d1","d2","d3","d4","d5","d6","d7","d8","all1"]},
     c2: {name:"الفصل الثاني", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الثاني: الأعداد الصحيحة (ص <span class="en">49–91</span>)',
-         ids:["all2","e1","e2","e3","e4","e5","e6","e7","e8"]},
+         ids:["e1","e2","e3","e4","e5","e6","e7","e8","all2"]},
     c3: {name:"الفصل الثالث", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الثالث: المعادلات الخطية والدوال (ص <span class="en">93–137</span>)',
-         ids:["all3","f1","f2","f3","f4","f5","f6","f7"]},
+         ids:["f1","f2","f3","f4","f5","f6","f7","all3"]},
     c4: {name:"الفصل الرابع", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط · الفصل الرابع: النِّسبة والتَّناسب (ص <span class="en">139–182</span>)',
-         ids:["all4","g1","g2","g3","g4","g5","g6","g7","g8"]}
+         ids:["g1","g2","g3","g4","g5","g6","g7","g8","all4"]}
   };
 
-  var curCh = "c1", curId = "all1";
+  var curCh = "c1", curId = "d1";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -1976,7 +1976,7 @@ if(!NAMES[who]){
     curId = id; drawChap(); drawTabs(); showPanel(id);
   }
 
-  drawChap(); drawTabs(); showPanel("all1");
+  drawChap(); drawTabs(); showPanel(curId);   // يتبع curId لا اسمًا مكتوبًا
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
 
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
