@@ -1248,7 +1248,7 @@ function azureSpeak(text){
     var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
     var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-AvaMultilingualNeural"><prosody rate="-15%">'+esc+'</prosody></voice></speak>';
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-GB"><voice name="en-GB-RyanNeural"><prosody rate="-15%">'+esc+'</prosody></voice></speak>';
     synth.speakSsmlAsync(ssml, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; }, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speakEN(text); });
   }catch(e){ speakEN(text); }
 }
@@ -1257,7 +1257,9 @@ function _paRun(refText, statusEl, btn, tries){
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
-    cfg.speechRecognitionLanguage="en-US";
+    // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
+    // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
+    cfg.speechRecognitionLanguage="en-GB";
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
     audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
     rec=new SDK.SpeechRecognizer(cfg, audio);

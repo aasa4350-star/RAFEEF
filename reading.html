@@ -447,7 +447,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone){
     var cfg, audio, pa, cr=azureCreds();
     try{
       cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
-      cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
+      cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
       try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"25000"); }catch(e){}
       audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
       rec = new SDK.SpeechRecognizer(cfg, audio);
@@ -486,7 +486,7 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries){
   var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
-    cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-US";
+    cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
     // القطعة الطويلة: نسمح بوقفات أطول بين الجمل (٤ث) ومهلة بدء أطول حتى لا يتقطّع
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, longText?"15000":"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, longText?"4000":"1500"); }catch(e){}
     audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
