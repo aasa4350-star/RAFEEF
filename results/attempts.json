@@ -1,5 +1,239 @@
 [
     {
+        "id": "84878e7e-72b6-4dbc-9fb4-68e4dfa33bb5",
+        "created_at": "2026-08-28T11:26:26.10735+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:26:25.733Z",
+            "dur": 89,
+            "away": 0,
+            "kind": "practice",
+            "mode": "new",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 10,
+            "correct": 10,
+            "learned": 390,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "6577a1db-f287-453d-a9cf-b1fcd3de2a27",
+        "created_at": "2026-08-28T06:55:35.595998+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T06:55:34.841Z",
+            "dur": 140,
+            "away": 0,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 25,
+            "correct": 25,
+            "learned": 470,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "bf73bb7d-bce0-4666-867d-9186206b79ae",
+        "created_at": "2026-08-28T06:53:06.7432+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T06:53:06.098Z",
+            "dur": 83,
+            "away": 0,
+            "kind": "practice",
+            "mode": "new",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 10,
+            "correct": 10,
+            "learned": 470,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "21408600-12d9-4638-8f5a-5c99b5b34eeb",
+        "created_at": "2026-08-28T06:51:35.014133+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 8,
+        "en_total": 12,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [
+            {
+                "q": "I'm good ___ mathematics.",
+                "picked": "in",
+                "correct": "at",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "She is married ___ it.",
+                "picked": "at",
+                "correct": "to",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "The window ___ by the boy yesterday.",
+                "picked": "was break",
+                "correct": "was broken",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "There ___ some milk in the fridge.",
+                "picked": "are",
+                "correct": "is",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "at": "2026-08-28T06:51:32.835Z",
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.4,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 5.9,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.2,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.3,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.7,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.5,
+                    "ok": false
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.3,
+                    "ok": true
+                }
+            ],
+            "away": 0,
+            "asked": 24,
+            "exits": 0,
+            "skills": {
+                "some / any": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u062c\u0645\u0639": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0636\u062f\u0627\u062f": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062d\u0631\u0648\u0641 \u0627\u0644\u062c\u0631\u0651": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0623\u0641\u0639\u0627\u0644 \u0627\u0644\u0643\u064a\u0646\u0648\u0646\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0628\u0646\u064a \u0644\u0644\u0645\u062c\u0647\u0648\u0644": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0644\u0645\u0635\u062f\u0631 \u0648\u0635\u064a\u063a\u0629 ing": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0641\u0647\u0627\u0645": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0641\u0639\u0627\u0644 \u0627\u0644\u0645\u0633\u0627\u0639\u062f\u0629": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0645\u062a\u0644\u0627\u0632\u0645\u0627\u062a \u0627\u0644\u0644\u0641\u0638\u064a\u0629": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "partial": true
+        }
+    },
+    {
         "id": "e7fc7609-faba-4fae-9732-06b119a6bbe4",
         "created_at": "2026-08-27T18:26:15.380812+00:00",
         "student": "\u0631\u0641\u064a\u0641",
@@ -51695,418 +51929,6 @@
             "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
             "total": 8,
             "correct": 8
-        }
-    },
-    {
-        "id": "0051c92b-7b27-4a7d-a23d-22be12bf0d78",
-        "created_at": "2026-08-02T14:34:41.187946+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0639\u0631\u0628\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "1c6e9db2-d03c-4cfa-9830-d9e90620fe0d",
-        "created_at": "2026-08-02T14:34:15.169199+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0639\u0631\u0628\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "81964b30-be4c-441c-be94-9b60d3be8b6d",
-        "created_at": "2026-08-02T14:31:32.701227+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 4,
-        "en_total": 10,
-        "ma_correct": 6,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "We meet ___ May.",
-                "picked": "on",
-                "correct": "in",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The opposite of \"in\" is:",
-                "picked": "big",
-                "correct": "out",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "A ___ has a long neck.",
-                "picked": "rabbit",
-                "correct": "giraffe",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The opposite of \"easy\" is:",
-                "picked": "happy",
-                "correct": "difficult",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "I have ___ pen.",
-                "picked": "an",
-                "correct": "a",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "Which one is a fruit?",
-                "picked": "car",
-                "correct": "apple",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 48 \u00d7 6",
-                "picked": "282",
-                "correct": "288",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 96 \u00f7 8",
-                "picked": "11",
-                "correct": "12",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 402 \u2212 158",
-                "picked": "254",
-                "correct": "244",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 368 \u2212 167",
-                "picked": "211",
-                "correct": "201",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.9,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.6,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.7,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 6.9,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 9.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.9,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 1.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 53.4,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 9.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 7,
-            "total_sec": 125
-        }
-    },
-    {
-        "id": "de95179c-1a54-46db-9ed6-3dfa6b16d47d",
-        "created_at": "2026-08-02T14:29:00.279559+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 5,
-        "en_total": 10,
-        "ma_correct": 8,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "We meet ___ night.",
-                "picked": "on",
-                "correct": "at",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The opposite of \"day\" is:",
-                "picked": "sun",
-                "correct": "night",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "___ is a pen.",
-                "picked": "Those",
-                "correct": "This",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "Which one is an animal?",
-                "picked": "hat",
-                "correct": "fish",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "We meet ___ 6 o'clock.",
-                "picked": "on",
-                "correct": "at",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 455 \u2212 98",
-                "picked": "347",
-                "correct": "357",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 883 \u2212 309",
-                "picked": "584",
-                "correct": "574",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.9,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 14.4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2.7,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.4,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 11.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 20.5,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.7,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 13.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 30.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 11.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 1.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 7.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 89,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 12.8,
-            "total_sec": 231
         }
     }
 ]
