@@ -1,5 +1,1911 @@
 [
     {
+        "id": "0427a6a0-480d-4caf-a0bc-4d1864251dea",
+        "created_at": "2026-08-28T18:36:39.684332+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:36:39.135Z",
+            "dur": 43,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0631\u064a\u0627\u0636\u064a \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\ud83d\udcd8 \u0643\u0645\u0651\u064a (\u0627\u0644\u0643\u062a\u0627\u0628)": {
+                    "c": 10,
+                    "t": 12
+                }
+            },
+            "correct": 10,
+            "trusted": true
+        }
+    },
+    {
+        "id": "acedda60-63e3-4ec1-a371-f583e973e51e",
+        "created_at": "2026-08-28T18:34:16.524787+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 9,
+        "en_total": 10,
+        "ma_correct": 9,
+        "ma_total": 10,
+        "wrong": [
+            {
+                "q": "There ___ many books on the table.",
+                "picked": "is",
+                "correct": "are",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            },
+            {
+                "q": "\u0627\u062d\u0633\u0628: 153 \u00f7 9",
+                "picked": "18",
+                "correct": "17",
+                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
+            }
+        ],
+        "meta": {
+            "at": "2026-08-28T18:34:16.098Z",
+            "per": [
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 3.4,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 3.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 1.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.3,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.6,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 2.2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 1.6,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 9.6,
+                    "ok": true
+                }
+            ],
+            "away": 0,
+            "fast": 1,
+            "exits": 0,
+            "paper": {
+                "en": [
+                    {
+                        "q": "___ do you go to school? By bus.",
+                        "opts": [
+                            "How",
+                            "What",
+                            "Who"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "There ___ many books on the table.",
+                        "opts": [
+                            "is",
+                            "are",
+                            "am"
+                        ],
+                        "chosen": 0,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The opposite of \"day\" is:",
+                        "opts": [
+                            "night",
+                            "sun",
+                            "light"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "How ___ water do you drink?",
+                        "opts": [
+                            "many",
+                            "much",
+                            "some"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Look! The baby ___ now.",
+                        "opts": [
+                            "sleep",
+                            "is sleeping",
+                            "sleeps"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "I have ___ book.",
+                        "opts": [
+                            "a",
+                            "an",
+                            "the"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "There are five ___ on the table.",
+                        "opts": [
+                            "knife",
+                            "knifes",
+                            "knives"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "___ is my pen.",
+                        "opts": [
+                            "These",
+                            "This",
+                            "Those"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Which one is a fruit?",
+                        "opts": [
+                            "banana",
+                            "chair",
+                            "door"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "You ___ next week.",
+                        "opts": [
+                            "is going to swim",
+                            "are going to swim",
+                            "going to swim"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    }
+                ],
+                "ma": [
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 5.4 \u2212 2.7",
+                        "opts": [
+                            "2.7",
+                            "2.3",
+                            "3.7"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 24 \u00d7 13",
+                        "opts": [
+                            "302",
+                            "312",
+                            "322"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 25 + 37",
+                        "opts": [
+                            "52",
+                            "62",
+                            "72"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0645\u0633\u0627\u062d\u0629 \u0645\u0633\u062a\u0637\u064a\u0644 \u0637\u0648\u0644\u0647 12 \u0648\u0639\u0631\u0636\u0647 7\u061f",
+                        "opts": [
+                            "84",
+                            "38",
+                            "19"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 7 \u00d7 6",
+                        "opts": [
+                            "42",
+                            "48",
+                            "36"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 153 \u00f7 9",
+                        "opts": [
+                            "18",
+                            "17",
+                            "16"
+                        ],
+                        "chosen": 0,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u062d\u062c\u0645 \u0645\u0643\u0639\u0628 \u0637\u0648\u0644 \u062d\u0631\u0641\u0647 2\u061f",
+                        "opts": [
+                            "8",
+                            "4",
+                            "6"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 121 \u00f7 11",
+                        "opts": [
+                            "10",
+                            "11",
+                            "12"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0623\u064a\u0647\u0645\u0627 \u0623\u0643\u0628\u0631: 0.6 \u0623\u0645 0.06\u061f",
+                        "opts": [
+                            "0.6",
+                            "0.06",
+                            "\u0645\u062a\u0633\u0627\u0648\u064a\u0627\u0646"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 0.4 + 0.5",
+                        "opts": [
+                            "0.9",
+                            "0.09",
+                            "1"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    }
+                ],
+                "date": "2026-08-28T18:34:16.097Z",
+                "en_total": 10,
+                "ma_total": 10,
+                "en_correct": 9,
+                "ma_correct": 9
+            },
+            "skills": {
+                "a / an": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u062c\u0645\u0639": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u062d\u062c\u0645": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0636\u0631\u0628": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0642\u0633\u0645\u0629": {
+                    "c": 1,
+                    "t": 2
+                },
+                "There is / are": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0636\u062f\u0627\u062f": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0633\u0627\u062d\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0643\u0645\u0651\u064a\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u0633\u0645\u0627\u0621 \u0627\u0644\u0625\u0634\u0627\u0631\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0628\u0646\u064a \u0644\u0644\u0645\u062c\u0647\u0648\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644 (going to)": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u0645\u0641\u0631\u062f\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0627\u0633\u062a\u0641\u0647\u0627\u0645": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f \u0627\u0644\u0639\u0634\u0631\u064a\u0629": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629 \u0648\u0627\u0644\u062a\u0631\u062a\u064a\u0628": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "avg_sec": 2.9,
+            "trusted": true,
+            "total_sec": 53
+        }
+    },
+    {
+        "id": "16a8e1a8-be35-4005-81d0-aff9f0f5c301",
+        "created_at": "2026-08-28T18:33:03.846467+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:33:03.446Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 10,
+            "correct": 8
+        }
+    },
+    {
+        "id": "8c8d3c2b-e4ab-4934-9d10-5439eca2a66c",
+        "created_at": "2026-08-28T18:32:01.536906+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:32:01.180Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 10,
+            "correct": 4
+        }
+    },
+    {
+        "id": "9f6dab69-060b-4852-91c9-8478d8aa826f",
+        "created_at": "2026-08-28T18:31:17.464629+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:31:16.922Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 10,
+            "correct": 6
+        }
+    },
+    {
+        "id": "b8ad8ba2-a140-4834-a186-bf1ff016fa5a",
+        "created_at": "2026-08-28T18:30:10.975089+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:30:10.498Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 8,
+            "correct": 4
+        }
+    },
+    {
+        "id": "06eabbb8-1bc2-47f1-8276-c4f3579ed964",
+        "created_at": "2026-08-28T18:29:34.221558+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:29:33.871Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 8,
+            "correct": 4
+        }
+    },
+    {
+        "id": "16e22c40-e92a-48c4-a26e-7bc27cd41826",
+        "created_at": "2026-08-28T18:28:36.934494+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:28:36.538Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 10,
+            "correct": 4
+        }
+    },
+    {
+        "id": "b800c030-f6d8-4303-8abe-d2af33f5042a",
+        "created_at": "2026-08-28T18:27:48.749367+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:27:48.050Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "1f0c3fbb-274d-4a3c-9e06-d03471868b97",
+        "created_at": "2026-08-28T18:26:20.542817+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:26:20.120Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 8,
+            "correct": 5
+        }
+    },
+    {
+        "id": "d0f2c510-2d76-46be-bada-fa25c1319ee6",
+        "created_at": "2026-08-28T18:24:53.366349+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:24:52.988Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 8,
+            "correct": 4
+        }
+    },
+    {
+        "id": "65a6e071-6007-4a23-ae33-ae9c6f048082",
+        "created_at": "2026-08-28T18:23:57.695692+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:23:57.342Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "8418c343-cab9-4e8a-8a63-c8a10aff5ad6",
+        "created_at": "2026-08-28T18:23:15.275937+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:23:14.917Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 6,
+            "correct": 2
+        }
+    },
+    {
+        "id": "9375c2bf-8436-4f0e-ae68-0b2d080a3dcd",
+        "created_at": "2026-08-28T18:22:12.624124+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:22:12.204Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 9,
+            "correct": 4
+        }
+    },
+    {
+        "id": "2d686811-25af-4d07-b238-f3bb0ea8a974",
+        "created_at": "2026-08-28T18:21:16.040632+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:21:15.370Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "da46b1dc-6763-490a-bab9-61ed4ee53c49",
+        "created_at": "2026-08-28T18:18:44.294852+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:18:43.911Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 6,
+            "correct": 3
+        }
+    },
+    {
+        "id": "537ab512-a04b-4a9b-b2e0-29f1c6e5c91f",
+        "created_at": "2026-08-28T18:17:20.263307+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:17:19.926Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06416 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0627\u0639\u062a\u064a\u0627\u062f\u064a\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "94ec2c69-6081-4d7e-ac3f-bf428dd07c68",
+        "created_at": "2026-08-28T18:16:04.489762+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:16:04.067Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06415 \u2014 \u0627\u0644\u0639\u0628\u0627\u0631\u0627\u062a \u0648\u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a",
+            "total": 10,
+            "correct": 8
+        }
+    },
+    {
+        "id": "eaaef8c8-3cd9-4a80-9d8d-9e04a0576c14",
+        "created_at": "2026-08-28T18:15:08.814318+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:15:08.474Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06415 \u2014 \u0627\u0644\u0639\u0628\u0627\u0631\u0627\u062a \u0648\u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a",
+            "total": 5,
+            "correct": 3
+        }
+    },
+    {
+        "id": "6d24c968-88ec-46c3-a1d5-92ffd1bf45ed",
+        "created_at": "2026-08-28T18:13:48.059355+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:13:47.658Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 10,
+            "correct": 9
+        }
+    },
+    {
+        "id": "2a69d571-0f83-4fb5-b3ec-2d7f307f9f94",
+        "created_at": "2026-08-28T18:12:48.708987+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:12:48.301Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 6,
+            "correct": 4
+        }
+    },
+    {
+        "id": "898b9857-5aef-4922-90f0-538af9e9b501",
+        "created_at": "2026-08-28T18:11:46.132387+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:11:45.833Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 6,
+            "correct": 3
+        }
+    },
+    {
+        "id": "187419cd-a374-4ee7-9c27-7702031342c1",
+        "created_at": "2026-08-28T18:11:19.83908+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:11:19.542Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 5,
+            "correct": 3
+        }
+    },
+    {
+        "id": "defe63e5-f9a8-4273-b2cc-3bbd54b6d383",
+        "created_at": "2026-08-28T18:10:58.966567+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:10:58.399Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 10,
+            "correct": 7
+        }
+    },
+    {
+        "id": "6247a759-8156-4c3e-b6bd-1e7ea72eb8e0",
+        "created_at": "2026-08-28T18:09:32.932317+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:09:32.611Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 5,
+            "correct": 3
+        }
+    },
+    {
+        "id": "b8e3931d-a171-46a8-9ffc-ffb2289b2e46",
+        "created_at": "2026-08-28T18:08:38.889713+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:08:38.581Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "7495ec15-0c94-43e4-a852-7258ab3810b2",
+        "created_at": "2026-08-28T18:08:25.427377+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:08:25.113Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 5,
+            "correct": 3
+        }
+    },
+    {
+        "id": "f77dfada-8379-4ade-9868-a1db7aa65410",
+        "created_at": "2026-08-28T18:07:49.792227+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:07:49.474Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 4,
+            "correct": 1
+        }
+    },
+    {
+        "id": "44b1e62a-8dc8-45da-98f0-1d831768d883",
+        "created_at": "2026-08-28T18:06:27.159561+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:06:26.836Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 6,
+            "correct": 3
+        }
+    },
+    {
+        "id": "cac3a22b-2897-4cd9-8478-7edc105bf948",
+        "created_at": "2026-08-28T18:05:51.699099+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:05:51.279Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "4dbe9b10-2430-4384-b845-6d0820643356",
+        "created_at": "2026-08-28T18:04:34.22467+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:04:33.906Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "06f494db-9eba-4f00-a737-e9764c61d33e",
+        "created_at": "2026-08-28T18:03:31.624669+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:03:31.028Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "dbbf652a-ebc5-41cb-b6d5-ff890a927570",
+        "created_at": "2026-08-28T18:03:01.770742+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:03:01.378Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 3,
+            "correct": 2
+        }
+    },
+    {
+        "id": "5de2389f-5f2b-4066-b730-96a66ec9a171",
+        "created_at": "2026-08-28T18:02:01.552861+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:02:01.231Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 6,
+            "correct": 4
+        }
+    },
+    {
+        "id": "96aa1d07-f02c-40d0-b365-8162b0c14c14",
+        "created_at": "2026-08-28T18:01:27.876041+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:01:27.561Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06414 \u2014 \u0627\u0644\u0642\u0633\u0645\u0629",
+            "total": 4,
+            "correct": 1
+        }
+    },
+    {
+        "id": "b25aadec-d4bf-4d55-bd63-0d84496c9e19",
+        "created_at": "2026-08-28T18:00:53.230779+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T18:00:52.114Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06413 \u2014 \u0627\u0644\u0636\u0631\u0628",
+            "total": 10,
+            "correct": 7
+        }
+    },
+    {
+        "id": "13dcadc4-c8b3-4b84-bd21-6e7c5448c34c",
+        "created_at": "2026-08-28T17:57:38.255603+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:57:37.789Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 10,
+            "correct": 8
+        }
+    },
+    {
+        "id": "90d93d9e-dbb9-4c86-b431-89ce26a14918",
+        "created_at": "2026-08-28T17:55:21.840861+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:55:21.411Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 5,
+            "correct": 2
+        }
+    },
+    {
+        "id": "6db4e08a-da50-4e1c-a910-5e11a259bfbd",
+        "created_at": "2026-08-28T17:53:59.453843+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:53:58.792Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "27f065eb-b957-4f02-92f0-88dad3162d10",
+        "created_at": "2026-08-28T17:49:44.75449+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:49:44.219Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 10,
+            "correct": 4
+        }
+    },
+    {
+        "id": "1bab77d0-527d-49ff-93ad-d2343dfc30b5",
+        "created_at": "2026-08-28T17:46:52.750313+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:46:52.291Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 7,
+            "correct": 2
+        }
+    },
+    {
+        "id": "2763aec2-1157-4425-8a17-3d2338377c46",
+        "created_at": "2026-08-28T17:45:19.745658+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:45:19.336Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u062c\u0645\u0639 \u0648\u0637\u0631\u062d \u0639\u0634\u0631\u064a",
+            "total": 5,
+            "correct": 2
+        }
+    },
+    {
+        "id": "865b9679-3bce-432c-8f1b-c329909ba3c7",
+        "created_at": "2026-08-28T17:44:17.845258+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:44:17.182Z",
+            "kind": "practice",
+            "test": "\u0644\u063a\u062a\u064a \u0648\u0661 \u2014 \u0625\u0645\u0644\u0627\u0621",
+            "total": 10,
+            "correct": 9
+        }
+    },
+    {
+        "id": "dfcf8535-a5f0-4cde-b597-978e25591728",
+        "created_at": "2026-08-28T17:43:02.283557+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:43:01.802Z",
+            "kind": "practice",
+            "test": "\u0644\u063a\u062a\u064a \u0648\u0661 \u2014 \u0625\u0645\u0644\u0627\u0621",
+            "total": 10,
+            "correct": 9
+        }
+    },
+    {
+        "id": "22f7181c-bd6e-4513-afca-cd9e9c055147",
+        "created_at": "2026-08-28T17:41:58.849715+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:41:58.437Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06411 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0639\u0634\u0631\u064a\u0629",
+            "total": 10,
+            "correct": 10
+        }
+    },
+    {
+        "id": "8321914f-8dcb-4b6d-a530-fc510469bfe3",
+        "created_at": "2026-08-28T17:41:15.232372+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:29:17.000Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 7,
+            "correct": 5
+        }
+    },
+    {
+        "id": "05814b2e-8dc1-4144-ac7f-09f4b3f9eff2",
+        "created_at": "2026-08-28T17:40:41.916612+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:40:41.330Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 10,
+            "correct": 10
+        }
+    },
+    {
+        "id": "552c63db-3738-4436-9319-e1b076257743",
+        "created_at": "2026-08-28T17:39:12.380579+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:39:11.762Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06411 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0639\u0634\u0631\u064a\u0629",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "8ee08d19-0d26-46e5-8221-ab452d846285",
+        "created_at": "2026-08-28T17:38:25.214938+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:38:24.759Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06411 \u2014 \u0627\u0644\u0643\u0633\u0648\u0631 \u0627\u0644\u0639\u0634\u0631\u064a\u0629",
+            "total": 3,
+            "correct": 1
+        }
+    },
+    {
+        "id": "ac013963-a2d9-4b8d-a1e2-b8de5297b838",
+        "created_at": "2026-08-28T17:35:45.682198+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:35:44.980Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "aa5a7e56-0457-4214-a5e2-5ddf6e48b962",
+        "created_at": "2026-08-28T17:34:22.296765+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:34:21.531Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 5,
+            "correct": 3
+        }
+    },
+    {
+        "id": "d48c12b4-2bf4-4a42-b838-324a5cce13cd",
+        "created_at": "2026-08-28T17:31:45.973208+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:31:44.723Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 4,
+            "correct": 2
+        }
+    },
+    {
+        "id": "8683b9b8-2196-48a6-a808-9b17fcc64a78",
+        "created_at": "2026-08-28T17:26:18.034289+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:26:17.148Z",
+            "kind": "practice",
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
+            "total": 9,
+            "correct": 6
+        }
+    },
+    {
+        "id": "5c31188d-e90c-4645-832e-462792a17fa6",
+        "created_at": "2026-08-28T17:25:49.385405+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:25:48.658Z",
+            "dur": 83,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0631\u064a\u0627\u0636\u064a \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\ud83d\udcd8 \u0643\u0645\u0651\u064a (\u0627\u0644\u0643\u062a\u0627\u0628)": {
+                    "c": 10,
+                    "t": 12
+                }
+            },
+            "correct": 10,
+            "trusted": true
+        }
+    },
+    {
+        "id": "e6621cec-faae-4835-87bb-4156f105dc53",
+        "created_at": "2026-08-28T17:21:51.702536+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:21:51.319Z",
+            "kind": "practice",
+            "test": "\u0639\u0644\u0648\u0645 \u06481 \u2014 \u0627\u0644\u062a\u0635\u0646\u064a\u0641",
+            "total": 7,
+            "correct": 7
+        }
+    },
+    {
+        "id": "5d79261f-da6d-499d-b4b1-4d52de06548c",
+        "created_at": "2026-08-28T17:21:23.578054+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:21:22.997Z",
+            "kind": "practice",
+            "test": "\u0639\u0644\u0648\u0645 \u06481 \u2014 \u0627\u0644\u062a\u0635\u0646\u064a\u0641",
+            "total": 7,
+            "correct": 6
+        }
+    },
+    {
+        "id": "6546beb4-ad4f-4854-a14f-7d4216fd04c6",
+        "created_at": "2026-08-28T17:20:05.017255+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:20:04.307Z",
+            "kind": "practice",
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u06481 \u2014 Family",
+            "total": 10,
+            "correct": 9
+        }
+    },
+    {
+        "id": "c1fa09d4-7181-4414-9197-7d161728ce66",
+        "created_at": "2026-08-28T17:19:13.604461+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T17:19:12.936Z",
+            "kind": "practice",
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u06481 \u2014 Family",
+            "total": 10,
+            "correct": 4
+        }
+    },
+    {
+        "id": "fafb377e-b0af-4bae-a14f-a3f513559ca8",
+        "created_at": "2026-08-28T14:21:31.50868+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T14:21:31.095Z",
+            "dur": 298,
+            "away": 0,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 0,
+            "total": 25,
+            "correct": 25,
+            "learned": 390,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "4fe9106f-a77e-43fc-97dc-e9c4c35224d4",
+        "created_at": "2026-08-28T13:27:10.062921+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:27:09.258Z",
+            "dur": 137,
+            "away": 0,
+            "item": "p56g2gk",
+            "kind": "practice",
+            "test": "\u0642\u0631\u0627\u0621\u0629 \u0639\u0631\u0628\u064a \ud83d\udcd6",
+            "exits": 0,
+            "total": 5,
+            "skills": {
+                "\u0645\u0639\u0644\u0648\u0645\u0629 \u0635\u0631\u064a\u062d\u0629 \u0645\u0646 \u0627\u0644\u0646\u0635\u0651": {
+                    "c": 5,
+                    "t": 5
+                }
+            },
+            "correct": 5,
+            "trusted": true
+        }
+    },
+    {
+        "id": "d8830849-9ef4-4bb5-982d-d6ab5632044d",
+        "created_at": "2026-08-28T13:24:46.396738+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:24:44.750Z",
+            "dur": 459,
+            "away": 4,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 1,
+            "total": 30,
+            "correct": 30,
+            "learned": 61,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
+        "id": "4bb5a6bc-c77a-4d35-ac89-46bb3a6d51c9",
+        "created_at": "2026-08-28T13:16:53.890782+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:16:52.665Z",
+            "dur": 460,
+            "away": 0,
+            "item": "py88uv7",
+            "kind": "practice",
+            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
+            "exits": 0,
+            "total": 6,
+            "skills": {
+                "\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629 \u0645\u0646 \u0627\u0644\u0633\u064a\u0627\u0642": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0639\u0644\u0648\u0645\u0629 \u0635\u0631\u064a\u062d\u0629 \u0645\u0646 \u0627\u0644\u0646\u0635\u0651": {
+                    "c": 5,
+                    "t": 5
+                }
+            },
+            "correct": 6,
+            "trusted": true
+        }
+    },
+    {
+        "id": "f96a758c-b30b-4a97-b8d9-b765899324c5",
+        "created_at": "2026-08-28T13:15:59.476878+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:15:57.583Z",
+            "kind": "practice",
+            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
+            "total": 13,
+            "wrong": [
+                "<b>\u0645\u0631\u0627\u062f\u0641:</b> \u0645\u0631\u0627\u062f\u0641 \u00ab\u0642\u0648\u064a\u0651\u00bb:",
+                "<b>\u0625\u0643\u0645\u0627\u0644 \u062c\u0645\u0644:</b> \u0625\u0646\u0651 \u0645\u0639 \u0627\u0644\u0639\u0633\u0631 ______ ."
+            ],
+            "skills": {
+                "\u0645\u0631\u0627\u062f\u0641": {
+                    "c": 4,
+                    "t": 5
+                },
+                "\u0625\u0643\u0645\u0627\u0644 \u062c\u0645\u0644": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 11,
+            "stretch": false
+        }
+    },
+    {
+        "id": "930e895a-b38a-4481-bcc9-212063c75ca5",
+        "created_at": "2026-08-28T13:11:57.084802+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:11:56.501Z",
+            "dur": 164,
+            "away": 0,
+            "kind": "practice",
+            "test": "\u0625\u0645\u0644\u0627\u0621 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \u270d\ufe0f",
+            "exits": 0,
+            "total": 8,
+            "correct": 7,
+            "trusted": true
+        }
+    },
+    {
+        "id": "fc6a5c07-d998-41b2-badb-67b6b56593b6",
+        "created_at": "2026-08-28T13:08:06.929294+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:08:06.131Z",
+            "dur": 486,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0631\u064a\u0627\u0636\u064a \ud83e\udd98",
+            "total": 14,
+            "skills": {
+                "\u0623\u064a\u0627\u0645 \u0627\u0644\u0623\u0633\u0628\u0648\u0639": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0639\u062f\u0651 \u0627\u0644\u0645\u0633\u0627\u0631\u0627\u062a": {
+                    "c": 2,
+                    "t": 3
+                },
+                "\u0639\u062f\u0651 \u0627\u0644\u0645\u062b\u0644\u0651\u062b\u0627\u062a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0639\u062f\u0651 \u0631\u0642\u0645 \u062f\u0627\u062e\u0644 \u0645\u062f\u0649": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0644\u0643\u0633\u0631 \u0645\u0646 \u0634\u0643\u0644 \u0645\u0638\u0644\u0651\u0644": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0645\u0642\u0627\u0631\u0646\u0629 \u0646\u0648\u0627\u062a\u062c \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a": {
+                    "c": 2,
+                    "t": 2
+                }
+            },
+            "correct": 12,
+            "trusted": true
+        }
+    },
+    {
+        "id": "ec581fce-b99e-4f9f-802a-43f2b7c467d3",
+        "created_at": "2026-08-28T13:02:52.13598+00:00",
+        "student": "\u0631\u0641\u064a\u0641",
+        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T13:02:49.709Z",
+            "dur": 172,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0641\u0647\u0645 \u0627\u0644\u0635\u0648\u0631 \ud83e\udd98",
+            "total": 14,
+            "skills": {
+                "\u0635\u0648\u0631\u0629 \u0627\u0644\u0645\u0631\u0622\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0637\u064a\u0651 \u0627\u0644\u0645\u0643\u0639\u0651\u0628": {
+                    "c": 13,
+                    "t": 13
+                }
+            },
+            "correct": 13,
+            "trusted": true
+        }
+    },
+    {
+        "id": "dd9fbfb0-6a27-4853-8341-f35cacc68b1c",
+        "created_at": "2026-08-28T11:54:12.534448+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:54:11.431Z",
+            "dur": 98,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0644\u063a\u0648\u064a \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\u0627\u0644\u062a\u0635\u0646\u064a\u0641": {
+                    "c": 5,
+                    "t": 5
+                },
+                "\u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062c\u0645\u0644\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u0642\u0631\u0627\u0621 \u0627\u0644\u063a\u0631\u0636": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0645\u0642\u062f\u0651\u0645\u0627\u062a \u062e\u064a\u0627\u0644\u064a\u0629": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0639\u0628\u0627\u0631\u0629 \u0627\u0644\u0635\u062d\u064a\u062d\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 12,
+            "trusted": true
+        }
+    },
+    {
+        "id": "d29420c7-0e78-43bd-86e7-cdb6933234fe",
+        "created_at": "2026-08-28T11:52:32.174907+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:52:30.783Z",
+            "dur": 415,
+            "fast": 3,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0627\u0633\u062a\u062f\u0644\u0627\u0644 \u0644\u063a\u0648\u064a \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\u0627\u0644\u062a\u0633\u0644\u0633\u0644": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0644\u062a\u0635\u0646\u064a\u0641": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062c\u0645\u0644\u0629": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0644\u062a\u0646\u0627\u0638\u0631 \u0627\u0644\u0644\u0641\u0638\u064a": {
+                    "c": 3,
+                    "t": 4
+                },
+                "\u0645\u0642\u062f\u0651\u0645\u0627\u062a \u062e\u064a\u0627\u0644\u064a\u0629": {
+                    "c": 0,
+                    "t": 2
+                },
+                "\u0627\u0644\u0639\u0628\u0627\u0631\u0629 \u0627\u0644\u0635\u062d\u064a\u062d\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 6,
+            "trusted": true
+        }
+    },
+    {
+        "id": "c47d5351-270b-4bb6-89fa-7aa1ecef5711",
+        "created_at": "2026-08-28T11:50:51.061524+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:50:49.818Z",
+            "dur": 221,
+            "fast": 0,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0641\u0647\u0645 \u0627\u0644\u0635\u0648\u0631 \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\u0637\u064a\u0651 \u0627\u0644\u0645\u0643\u0639\u0651\u0628": {
+                    "c": 12,
+                    "t": 12
+                }
+            },
+            "correct": 12,
+            "trusted": true
+        }
+    },
+    {
+        "id": "be98e620-ed14-4923-a514-fc5246c6defd",
+        "created_at": "2026-08-28T11:47:09.579487+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:47:07.267Z",
+            "dur": 95,
+            "fast": 1,
+            "kind": "practice",
+            "test": "\u0643\u0627\u0646\u062c\u0631\u0648 \u2014 \u0641\u0647\u0645 \u0627\u0644\u0635\u0648\u0631 \ud83e\udd98",
+            "total": 12,
+            "skills": {
+                "\u062a\u0646\u0627\u0638\u0631 \u0628\u0635\u0631\u064a": {
+                    "c": 6,
+                    "t": 7
+                },
+                "\u0645\u0635\u0641\u0648\u0641\u0629 \u0628\u0635\u0631\u064a\u0629": {
+                    "c": 4,
+                    "t": 5
+                }
+            },
+            "correct": 10,
+            "trusted": true
+        }
+    },
+    {
+        "id": "b681dfe7-2c46-4f1e-ae93-bfe1335d37fc",
+        "created_at": "2026-08-28T11:30:58.743508+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-08-28T11:30:57.889Z",
+            "dur": 266,
+            "away": 24,
+            "kind": "practice",
+            "mode": "review",
+            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
+            "exits": 1,
+            "total": 25,
+            "correct": 25,
+            "learned": 390,
+            "trusted": true,
+            "vocTotal": 910
+        }
+    },
+    {
         "id": "84878e7e-72b6-4dbc-9fb4-68e4dfa33bb5",
         "created_at": "2026-08-28T11:26:26.10735+00:00",
         "student": "\u062d\u0633\u0646",
@@ -49248,2677 +51154,6 @@
         "created_at": "2026-08-06T14:48:02.398037+00:00",
         "student": "\u062d\u0633\u0646",
         "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "e3f7bdac-f12a-44d1-a8cd-af31550ec0a1",
-        "created_at": "2026-08-06T14:42:01.560116+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 3,
-            "correct": 2
-        }
-    },
-    {
-        "id": "2e0f26f3-54c3-4904-afd2-378559604b17",
-        "created_at": "2026-08-06T14:35:50.198595+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "add18bfc-a29f-45c8-afcc-806f6cbf33b1",
-        "created_at": "2026-08-06T14:33:42.986631+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "3c0d77bd-6c9e-4f71-8517-ea31d9d68c89",
-        "created_at": "2026-08-06T14:32:32.000078+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "c885967e-daf9-4b20-b21e-1f040bb5706d",
-        "created_at": "2026-08-06T14:30:59.8264+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "3f6fff9a-8d06-4306-856e-da45dc42950a",
-        "created_at": "2026-08-06T14:30:32.488404+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 2
-        }
-    },
-    {
-        "id": "ad89918e-2505-413c-9bb8-cfeda76bebc1",
-        "created_at": "2026-08-06T14:29:48.635677+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "a63b1c10-dd69-40dd-a5fe-2c3d88c2481d",
-        "created_at": "2026-08-06T14:25:36.125997+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 8,
-        "en_total": 10,
-        "ma_correct": 8,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "I have ___ book.",
-                "picked": "an",
-                "correct": "a",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "We meet ___ 2020.",
-                "picked": "on",
-                "correct": "in",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 356 + 199",
-                "picked": "565",
-                "correct": "555",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 23 \u00d7 8",
-                "picked": "176",
-                "correct": "184",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.2,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.9,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 8.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 7.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 8.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 13.3,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 20.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 23,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 6.6,
-            "total_sec": 118
-        }
-    },
-    {
-        "id": "f2700b6d-0ef9-40e6-8376-da6497f1ad9c",
-        "created_at": "2026-08-06T14:14:18.048186+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 5
-        }
-    },
-    {
-        "id": "1e9dd76a-0616-49e1-bdb6-e9d5da763a3a",
-        "created_at": "2026-08-06T13:58:32.564713+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 4
-        }
-    },
-    {
-        "id": "413e44f3-b1ae-4398-a83a-42a5f0095162",
-        "created_at": "2026-08-06T13:53:58.264653+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "d1b6f29f-fd31-458c-bba8-ac6b91cb1bdb",
-        "created_at": "2026-08-06T13:06:05.908408+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062d\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a"
-        }
-    },
-    {
-        "id": "22c165ff-7243-4a31-81be-890f527ac4ca",
-        "created_at": "2026-08-05T23:08:40.456333+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "total": 12,
-            "wrong": [
-                "<b>Grammar:</b> He apologized ___ being late.",
-                "<b>Grammar:</b> By next year, she ___ graduated.",
-                "<b>Grammar:</b> If she ___ harder, she would have passed.",
-                "<b>Grammar:</b> Not only ___ he sing, but he also dances.",
-                "<b>Grammar:</b> ___ hard he tried, he couldn't open it.",
-                "<b>Grammar:</b> The report must ___ by tomorrow.",
-                "<b>Grammar:</b> She has been living here ___ 2015."
-            ],
-            "correct": 5
-        }
-    },
-    {
-        "id": "b2f58b29-a5e9-43b5-bfe6-717534def345",
-        "created_at": "2026-08-05T23:06:59.937828+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
-            "total": 13,
-            "wrong": [
-                "<b>\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621:</b> \u00ab\u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0644\u0637\u064a\u0651\u0628\u0629 \u0635\u062f\u0642\u0629 \u062a\u0632\u0631\u0639 \u0627\u0644\u0645\u062d\u0628\u0651\u0629.\u00bb \u0627\u0644\u0641\u0643\u0631\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u0629:",
-                "<b>\u0645\u0631\u0627\u062f\u0641:</b> \u0645\u0631\u0627\u062f\u0641 \u00ab\u062d\u0643\u064a\u0645\u00bb:",
-                "<b>\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a:</b> \u0642\u0627\u0626\u062f : \u062c\u064a\u0634 \u060c \u0631\u0628\u0651\u0627\u0646 : \u061f",
-                "<b>\u0645\u0631\u0627\u062f\u0641:</b> \u0645\u0631\u0627\u062f\u0641 \u00ab\u0645\u0627\u0647\u0631\u00bb:",
-                "<b>\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621:</b> \u00ab\u0627\u0644\u062a\u0639\u0627\u0648\u0646 \u064a\u0628\u0646\u064a \u0627\u0644\u0645\u062c\u062a\u0645\u0639\u0627\u062a \u0648\u064a\u0642\u0648\u0651\u064a \u0627\u0644\u0631\u0648\u0627\u0628\u0637.\u00bb \u0627\u0644\u0641\u0643\u0631\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u0629:"
-            ],
-            "correct": 8
-        }
-    },
-    {
-        "id": "f3104c93-0dff-4c80-a3a6-931aff6a152f",
-        "created_at": "2026-08-05T22:44:32.519519+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "total": 12,
-            "wrong": [
-                "<b>Grammar:</b> The more you practice, ___ you become.",
-                "<b>Vocabulary:</b> \"Reluctant\" means:",
-                "<b>Vocabulary:</b> The opposite of \"scarce\" is:",
-                "<b>Grammar:</b> ___ hard he tried, he couldn't open it.",
-                "<b>Grammar:</b> By the time we arrived, the movie ___ .",
-                "<b>Grammar:</b> She has been living here ___ 2015."
-            ],
-            "correct": 6
-        }
-    },
-    {
-        "id": "8288643d-eea4-4242-9299-b5385f8ebaf3",
-        "created_at": "2026-08-05T22:43:06.155836+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 3,
-            "correct": 2
-        }
-    },
-    {
-        "id": "471fee35-bfd8-400f-81d6-538b00e7bd43",
-        "created_at": "2026-08-05T22:41:54.089143+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 3,
-            "correct": 2
-        }
-    },
-    {
-        "id": "f2690baa-da19-4990-a127-282be3a43bef",
-        "created_at": "2026-08-05T22:41:53.187244+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 4
-        }
-    },
-    {
-        "id": "12fce690-0783-4634-bf03-632b927074a0",
-        "created_at": "2026-08-05T22:40:09.897341+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
-            "total": 13,
-            "wrong": [
-                "<b>\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a:</b> \u0643\u0644\u0645\u0629 : \u062c\u0645\u0644\u0629 \u060c \u062d\u0631\u0641 : \u061f",
-                "<b>\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a:</b> \u062c\u0648\u0639 : \u0637\u0639\u0627\u0645 \u060c \u0639\u0637\u0634 : \u061f",
-                "<b>\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a:</b> \u062e\u064a\u0651\u0627\u0637 : \u062b\u0648\u0628 \u060c \u0646\u062c\u0651\u0627\u0631 : \u061f"
-            ],
-            "correct": 10
-        }
-    },
-    {
-        "id": "efdac177-0274-4af1-8652-f503c145bad1",
-        "created_at": "2026-08-05T21:26:42.511304+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
-            "total": 13,
-            "wrong": [
-                "<b>\u0636\u062f\u0651:</b> \u0636\u062f\u0651 \u00ab\u062d\u0628\u0651\u00bb:",
-                "<b>\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621:</b> \u00ab\u0627\u0644\u0634\u062c\u0631\u0629 \u062a\u0639\u0637\u064a \u0627\u0644\u0638\u0644\u0651 \u0648\u0627\u0644\u062b\u0645\u0631 \u0648\u062a\u0646\u0642\u0651\u064a \u0627\u0644\u0647\u0648\u0627\u0621.\u00bb \u0627\u0644\u0641\u0643\u0631\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u0629:",
-                "<b>\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a:</b> \u0631\u064a\u0634\u0629 : \u0637\u0627\u0626\u0631 \u060c \u062d\u0631\u0634\u0641\u0629 : \u061f",
-                "<b>\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629:</b> \u0645\u0627 \u0645\u0639\u0646\u0649 \u00ab\u0627\u0644\u062d\u0635\u0627\u0641\u0629\u00bb\u061f"
-            ],
-            "correct": 9
-        }
-    },
-    {
-        "id": "413d52af-d0bf-477f-8f03-c64bc607a63f",
-        "created_at": "2026-08-05T14:14:15.899975+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 9,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "She ___ a book.",
-                "picked": "reading",
-                "correct": "reads",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 4.8 \u2212 1.8",
-                "picked": "2",
-                "correct": "3",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 14.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 13.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.6,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 5.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 7.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 9.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 10.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 9.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.9,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 6.1,
-            "total_sec": 110
-        }
-    },
-    {
-        "id": "1acc20bf-0daf-4d22-a0a8-c3ca837377c2",
-        "created_at": "2026-08-05T14:12:24.660666+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 7,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "She ___ a book.",
-                "picked": "reading",
-                "correct": "reads",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: \u2157 + \u2155",
-                "picked": "1",
-                "correct": "\u2158",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 4.2 \u2212 3.1",
-                "picked": "0.1",
-                "correct": "1.1",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0645\u062d\u064a\u0637 \u0645\u0633\u062a\u0637\u064a\u0644 \u0637\u0648\u0644\u0647 12 \u0648\u0639\u0631\u0636\u0647 5",
-                "picked": "60",
-                "correct": "34",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 14.6,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 13.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.6,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.8,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6.6,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4.7,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.8,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 5.2,
-            "total_sec": 94
-        }
-    },
-    {
-        "id": "af54aaa3-0e82-48a9-a049-7305060c400f",
-        "created_at": "2026-08-05T14:03:46.6308+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "total": 12,
-            "wrong": [
-                "<b>Grammar:</b> By the time we arrived, the movie ___ .",
-                "<b>Vocabulary:</b> \"Reluctant\" means:",
-                "<b>Grammar:</b> ___ hard he tried, he couldn't open it.",
-                "<b>Grammar:</b> Neither the students nor the teacher ___ present.",
-                "<b>Grammar:</b> Not only ___ he sing, but he also dances.",
-                "<b>Vocabulary:</b> \"Consequently\" means:",
-                "<b>Reading:</b> \"Reading widens the mind and builds vocabulary.\" What is the main idea?"
-            ],
-            "correct": 5
-        }
-    },
-    {
-        "id": "00e2f31f-84f0-4706-8fc4-15d8c85cbb1a",
-        "created_at": "2026-08-05T14:03:34.82195+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 4
-        }
-    },
-    {
-        "id": "bc7702d7-614d-49ad-b737-e7623f4393f4",
-        "created_at": "2026-08-05T14:03:25.301244+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 7,
-        "en_total": 12,
-        "ma_correct": 9,
-        "ma_total": 12,
-        "wrong": [
-            {
-                "q": "The opposite of \"day\" is:",
-                "picked": "dirty",
-                "correct": "night",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "How ___ books do you have?",
-                "picked": "more",
-                "correct": "many",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "This one is ___ than that one.",
-                "picked": "more short",
-                "correct": "shorter",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The plural of \"woman\" is:",
-                "picked": "womans",
-                "correct": "women",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The plural of \"man\" is:",
-                "picked": "manes",
-                "correct": "men",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a \u00bd \u0645\u0646 16\u061f",
-                "picked": "4",
-                "correct": "8",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %25 \u0645\u0646 20\u061f",
-                "picked": "0",
-                "correct": "5",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 3\u00b2 + 1",
-                "picked": "7",
-                "correct": "10",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4.3,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 7.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 6.6,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 7.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5.3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 4.8,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 8.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.2,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.9,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 8.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.7,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 12.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 8.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 5.7,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.8,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 6.1,
-            "total_sec": 133
-        }
-    },
-    {
-        "id": "5c045977-5c12-431d-b1c0-b6a4db8cee27",
-        "created_at": "2026-08-05T14:03:18.88742+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u062a\u062d\u0635\u064a\u0644\u064a",
-            "total": 12,
-            "wrong": [
-                "<b>\u0631\u064a\u0627\u0636\u064a\u0627\u062a:</b> \u0645\u062d\u064a\u0637 \u062f\u0627\u0626\u0631\u0629 \u0646\u0635\u0641 \u0642\u0637\u0631\u0647\u0627 7 (2\u03c0\u0631\u060c \u03c0\u224822/7):",
-                "<b>\u0631\u064a\u0627\u0636\u064a\u0627\u062a:</b> \u0645\u064a\u0644 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 y = 3x \u2212 2 \u0647\u0648:",
-                "<b>\u0641\u064a\u0632\u064a\u0627\u0621:</b> \u0627\u0644\u0636\u063a\u0637 = \u0627\u0644\u0642\u0648\u0629 \u00f7 \u061f",
-                "<b>\u0643\u064a\u0645\u064a\u0627\u0621:</b> \u0639\u062f\u062f \u0630\u0631\u0627\u062a \u0627\u0644\u0623\u0643\u0633\u062c\u064a\u0646 \u0641\u064a H\u2082O:",
-                "<b>\u0631\u064a\u0627\u0636\u064a\u0627\u062a:</b> \u0642\u064a\u0645\u0629 \u221a81 ="
-            ],
-            "correct": 7
-        }
-    },
-    {
-        "id": "df378029-938a-42c7-b5b1-3b2143188877",
-        "created_at": "2026-08-05T14:02:09.592977+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0643\u0645\u064a",
-            "total": 10,
-            "wrong": [
-                "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a 1/5 \u0645\u0646 35\u061f",
-                "\u0645\u0633\u062a\u0637\u064a\u0644 \u0637\u0648\u0644\u0647 6 \u0648\u0639\u0631\u0636\u0647 5\u060c \u0645\u0627 \u0645\u062d\u064a\u0637\u0647\u061f",
-                "\u0645\u0633\u0627\u062d\u0629 \u062f\u0627\u0626\u0631\u0629 \u0646\u0635\u0641 \u0642\u0637\u0631\u0647\u0627 7 (\u03c0\u224822/7)\u061f"
-            ],
-            "correct": 7
-        }
-    },
-    {
-        "id": "3d7297b6-43b9-4167-afed-01423eb0bc2e",
-        "created_at": "2026-08-05T14:00:46.445791+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
-            "total": 13,
-            "wrong": [
-                "<b>\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621:</b> \u00ab\u0627\u0644\u0642\u0631\u0627\u0621\u0629 \u062a\u063a\u0630\u0651\u064a \u0627\u0644\u0639\u0642\u0644 \u0648\u062a\u0648\u0633\u0651\u0639 \u0627\u0644\u0645\u062f\u0627\u0631\u0643.\u00bb \u0627\u0644\u0641\u0643\u0631\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u0629:",
-                "<b>\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629:</b> \u0645\u0627 \u0645\u0639\u0646\u0649 \u00ab\u0627\u0644\u062d\u0635\u0627\u0641\u0629\u00bb\u061f"
-            ],
-            "correct": 11
-        }
-    },
-    {
-        "id": "8a0de978-e2ea-4484-ba62-5f3e421c7955",
-        "created_at": "2026-08-05T13:59:23.406243+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 5
-        }
-    },
-    {
-        "id": "64f46b6d-997b-44c8-8adc-527544cf515b",
-        "created_at": "2026-08-05T13:57:07.054537+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "d4039438-dfd5-4d50-8131-fa46ee615ccb",
-        "created_at": "2026-08-05T13:57:05.036532+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "8a09d808-0237-4bd0-815a-0e93dfd15001",
-        "created_at": "2026-08-05T13:56:57.140197+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "2a694b69-4556-4b2b-8606-28c45e686bba",
-        "created_at": "2026-08-05T13:56:36.030473+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 5
-        }
-    },
-    {
-        "id": "2a72ea5e-934e-4e97-b9e2-9e692b409417",
-        "created_at": "2026-08-05T13:56:20.797994+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "aefeda9c-38b2-4212-a3f0-769bdcbe7348",
-        "created_at": "2026-08-05T13:52:42.687637+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "e7781b48-eda7-4406-a681-1573438beb74",
-        "created_at": "2026-08-05T13:52:41.608781+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "1943ff6a-659a-479d-bd62-c0db279ce7cf",
-        "created_at": "2026-08-05T13:49:56.537281+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0632\u0645\u0646\u0629"
-        }
-    },
-    {
-        "id": "15d68303-bc45-4b3b-8d5e-65dfa18ee70a",
-        "created_at": "2026-08-05T13:49:54.44159+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "0595a426-6202-4faa-a980-59806295178c",
-        "created_at": "2026-08-05T13:45:11.114823+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "7bcc5675-df58-435a-88f5-a8e636c576fb",
-        "created_at": "2026-08-05T13:44:14.637408+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 7,
-        "en_total": 12,
-        "ma_correct": 9,
-        "ma_total": 12,
-        "wrong": [
-            {
-                "q": "This one is ___ than that one.",
-                "picked": "strong",
-                "correct": "stronger",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "Look! She ___ now.",
-                "picked": "talks",
-                "correct": "is talking",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "If he studies, he ___ succeed.",
-                "picked": "would",
-                "correct": "will",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "Yesterday, they ___ a lot.",
-                "picked": "walking",
-                "correct": "walked",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "The plural of \"shelf\" is:",
-                "picked": "shelfes",
-                "correct": "shelves",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: \u221a169",
-                "picked": "12",
-                "correct": "13",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: \u221a225",
-                "picked": "25",
-                "correct": "15",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u062d\u0644: x\u00b2 \u2212 7x + 6 = 0",
-                "picked": "1 \u0648 7",
-                "correct": "1 \u0648 6",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 30.6,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5.3,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 37.3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 0.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.6,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 5.6,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 12.3,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 3.7,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 55.4,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 3.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 9,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 7.1,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 41.8,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 6.2,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 7.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.2,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 11.7,
-            "total_sec": 257
-        }
-    },
-    {
-        "id": "7293c8ed-54d6-4fe4-aac3-18535dfe7f47",
-        "created_at": "2026-08-05T13:44:03.939023+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0639\u0631\u0628\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "6935b859-19f4-4091-8041-06d505fb23fc",
-        "created_at": "2026-08-05T13:43:11.473915+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0639\u0631\u0628\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "4245f662-2377-4d40-9575-64d5d30e47ca",
-        "created_at": "2026-08-05T13:39:52.854565+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 8,
-        "en_total": 10,
-        "ma_correct": 8,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "The opposite of \"in\" is:",
-                "picked": "big",
-                "correct": "out",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "You ___ my friend.",
-                "picked": "is",
-                "correct": "are",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 49 \u00f7 7",
-                "picked": "8",
-                "correct": "7",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0643\u0645 \u0628\u0627\u0642\u064a \u0627\u0644\u0642\u0633\u0645\u0629 29 \u00f7 6\u061f",
-                "picked": "6",
-                "correct": "5",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 1.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.9,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 8.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 5.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 3.8,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 11.4,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 4.4,
-            "total_sec": 80
-        }
-    },
-    {
-        "id": "7578a5a3-5022-4c19-80a7-a53a4cf959bb",
-        "created_at": "2026-08-05T13:23:59.598289+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 9
-        }
-    },
-    {
-        "id": "c58bdf08-bfc8-4ae4-88d3-47df3c9822ad",
-        "created_at": "2026-08-05T13:17:43.825194+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 9
-        }
-    },
-    {
-        "id": "6c0eb352-2bb3-4200-95b7-251ddb7ffa53",
-        "created_at": "2026-08-05T13:13:17.487296+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "3f311507-962e-4c70-a356-9400239dc852",
-        "created_at": "2026-08-05T02:01:31.589769+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "e6d6ba9d-9be7-4fa3-bb2c-3db2ae9d9d16",
-        "created_at": "2026-08-04T21:21:09.998302+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 5,
-            "correct": 5
-        }
-    },
-    {
-        "id": "694b490a-3d28-495c-a6fe-f5f244366962",
-        "created_at": "2026-08-04T21:18:13.645081+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "2caa0c88-ee2c-44a2-8526-23961d2ed57b",
-        "created_at": "2026-08-04T21:17:26.429871+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0627\u0633\u062a\u0645\u0627\u0639 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83c\udfa7",
-            "total": 8,
-            "correct": 8
-        }
-    },
-    {
-        "id": "9e2243c5-417e-4b01-8faa-3998e7f962c4",
-        "created_at": "2026-08-04T21:13:51.792406+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 9,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "The opposite of \"cheap\" is:",
-                "picked": "fast",
-                "correct": "expensive",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 46 + 39",
-                "picked": "75",
-                "correct": "85",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 1.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.2,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 4.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 3.1,
-            "total_sec": 55
-        }
-    },
-    {
-        "id": "91ed7b43-177f-42af-914b-a614feb193bd",
-        "created_at": "2026-08-04T21:12:39.750144+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 9,
-        "en_total": 10,
-        "ma_correct": 6,
-        "ma_total": 10,
-        "wrong": [
-            {
-                "q": "The opposite of \"cheap\" is:",
-                "picked": "fast",
-                "correct": "expensive",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 22 \u00d7 13",
-                "picked": "276",
-                "correct": "286",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 156 \u00f7 6",
-                "picked": "24",
-                "correct": "26",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0627\u062d\u0633\u0628: 156 \u00f7 12",
-                "picked": "12",
-                "correct": "13",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %40 \u0645\u0646 150\u061f",
-                "picked": "50",
-                "correct": "60",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 4.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.8,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 5.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.8,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.3,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 3.3,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 4.1,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 6.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.2,
-                    "ok": false
-                }
-            ],
-            "avg_sec": 3.6,
-            "total_sec": 64
-        }
-    },
-    {
-        "id": "0851e795-345c-4fd5-8ce8-7ee44eb6997f",
-        "created_at": "2026-08-04T17:04:40.676333+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 9
-        }
-    },
-    {
-        "id": "eb640829-e8c3-49f4-802f-d7dbe6aaaced",
-        "created_at": "2026-08-04T15:44:49.036378+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "cd49090c-022c-48ee-ade1-9c16f2a1a409",
-        "created_at": "2026-08-03T00:44:33.444461+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "337bf798-0886-4a16-a983-bac7be4ac775",
-        "created_at": "2026-08-03T00:35:16.757198+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 11,
-        "en_total": 12,
-        "ma_correct": 6,
-        "ma_total": 12,
-        "wrong": [
-            {
-                "q": "The homework ___ by all students.",
-                "picked": "did",
-                "correct": "was done",
-                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
-            },
-            {
-                "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %20 \u0645\u0646 90\u061f",
-                "picked": "20",
-                "correct": "18",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u062d\u0644: 6x \u2212 2 = 64",
-                "picked": "x=12",
-                "correct": "x=11",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u062d\u0644: 2x \u2212 10 = 12",
-                "picked": "x=12",
-                "correct": "x=11",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0625\u0630\u0627 2x + 3y = 12 \u0648 x = 3\u060c \u0641\u0625\u0646 y =",
-                "picked": "1",
-                "correct": "2",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u062d\u0644: 3x \u2212 4 = 11",
-                "picked": "x = 4",
-                "correct": "x = 5",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            },
-            {
-                "q": "\u0645\u064a\u0644 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0627\u0644\u0645\u0627\u0631 \u0628\u0640 (1,2) \u0648 (3,8)",
-                "picked": "2",
-                "correct": "3",
-                "subject": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a"
-            }
-        ],
-        "meta": {
-            "per": [
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 2.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 5.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 2.4,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 11.1,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 3.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 8.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 19.2,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 1.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "en",
-                    "dt": 1.5,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "en",
-                    "dt": 1.7,
-                    "ok": false
-                },
-                {
-                    "c": 2,
-                    "s": "en",
-                    "dt": 1.9,
-                    "ok": true
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": null,
-                    "ok": true
-                },
-                {
-                    "c": 2,
-                    "s": "ma",
-                    "dt": 35.5,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.9,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.4,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 2.3,
-                    "ok": false
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.8,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 4.4,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.7,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 1.7,
-                    "ok": true
-                },
-                {
-                    "c": 1,
-                    "s": "ma",
-                    "dt": 2.2,
-                    "ok": false
-                },
-                {
-                    "c": 0,
-                    "s": "ma",
-                    "dt": 1.5,
-                    "ok": true
-                }
-            ],
-            "avg_sec": 5.5,
-            "total_sec": 121
-        }
-    },
-    {
-        "id": "0374b485-e916-472a-9a2a-cdf61473a15d",
-        "created_at": "2026-08-02T20:07:06.252047+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a"
-        }
-    },
-    {
-        "id": "5e4613e3-2da5-4c3d-bcca-f1227e99793e",
-        "created_at": "2026-08-02T20:07:04.821699+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0647\u0646\u062f\u0633\u0629"
-        }
-    },
-    {
-        "id": "34fb132e-7ebd-4258-8904-e18ac8bfe31c",
-        "created_at": "2026-08-02T20:07:03.069354+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0633\u0633"
-        }
-    },
-    {
-        "id": "f16df166-6e74-4650-913d-8da4b284ba94",
-        "created_at": "2026-08-02T20:07:01.806176+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062d\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a"
-        }
-    },
-    {
-        "id": "5b23b995-0353-4fe8-b1f8-ce5f19edf702",
-        "created_at": "2026-08-02T18:10:45.186486+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0632\u0645\u0646\u0629"
-        }
-    },
-    {
-        "id": "8a121b61-a55c-407a-83fa-d6097c247e23",
-        "created_at": "2026-08-02T18:10:44.289668+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0632\u0645\u0646\u0629"
-        }
-    },
-    {
-        "id": "704b311c-8e89-4e91-8cef-9d8e776b16fe",
-        "created_at": "2026-08-02T18:09:51.615144+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0632\u0645\u0646\u0629"
-        }
-    },
-    {
-        "id": "8dcd09c8-8ef8-435f-a3db-8e1c114a6385",
-        "created_at": "2026-08-02T18:09:46.367301+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0632\u0645\u0646\u0629"
-        }
-    },
-    {
-        "id": "2303f7a7-81ed-4da2-93cd-8cd24e77835b",
-        "created_at": "2026-08-02T18:07:08.65782+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "5dbdb3f0-ac92-4979-98f3-62f08c9ab09b",
-        "created_at": "2026-08-02T18:07:07.855775+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u0627\u0644\u0623\u0636\u062f\u0627\u062f"
-        }
-    },
-    {
-        "id": "ace8ca40-d22d-432c-9f32-059ba40fc7d6",
-        "created_at": "2026-08-02T18:02:39.107656+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "video",
-            "label": "\u062d\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a"
-        }
-    },
-    {
-        "id": "bb5976d3-eea8-4c8e-9855-6da89f22691b",
-        "created_at": "2026-08-02T18:02:38.221398+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "activity",
-            "event": "lesson",
-            "label": "\u062d\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a"
-        }
-    },
-    {
-        "id": "30e186a3-a037-4ee4-89a8-c0c87c58cfd5",
-        "created_at": "2026-08-02T17:47:05.740299+00:00",
-        "student": "\u0631\u0641\u064a\u0641",
-        "grade": "\u062b\u0627\u0646\u064a \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "total": 10,
-            "correct": 10
-        }
-    },
-    {
-        "id": "3a5f7150-4c32-41c1-b146-3b54012fe6b4",
-        "created_at": "2026-08-02T14:40:10.571818+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "practice",
-            "test": "\u0642\u0631\u0627\u0621\u0629 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udcd6",
-            "total": 3,
-            "correct": 3
-        }
-    },
-    {
-        "id": "1ec0ab7d-7f1e-43f1-8d9f-cd665a674666",
-        "created_at": "2026-08-02T14:39:08.6285+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
         "en_correct": 0,
         "en_total": 0,
         "ma_correct": 0,
