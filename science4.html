@@ -160,9 +160,13 @@ var FOOD = [
 ];
 function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
 var CELLSG=[bankGen(CELLS)], CLASG=[bankGen(CLASSIFY)], INVG=[bankGen(INVERT)], VERTG=[bankGen(VERT)], NUTRIG=[bankGen(NUTRI)], HEALTHG=[bankGen(HEALTH)], ECOG=[bankGen(ECO)], FOODG=[bankGen(FOOD)];
-var ALLG=[bankGen(CELLS), bankGen(CLASSIFY), bankGen(INVERT), bankGen(VERT), bankGen(NUTRI), bankGen(HEALTH), bankGen(ECO), bankGen(FOOD)];
+/* نُعيد استعمال مولّدات الدروس نفسها لا نصنع نسخًا جديدة، فتُعرف
+   هُويّة المولّد فيُعرف درسه — وبه يُغذّي الشاملُ «علاجي». */
+var ALLG=[CELLSG[0], CLASG[0], INVG[0], VERTG[0], NUTRIG[0], HEALTHG[0], ECOG[0], FOODG[0]];
 
-function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var q; try{ q=gp(gens)(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
+/* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
+   يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
 
 var app = document.getElementById("app");
 if(!NAMES[who]){
@@ -221,6 +225,7 @@ if(!NAMES[who]){
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
     var answered={}, correct=0, total=items.length, saved=false;
+    var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];
@@ -228,16 +233,18 @@ if(!NAMES[who]){
         btn.addEventListener("click",function(){
           if(answered[i]) return; answered[i]=1;
           qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var __ok = (+btn.dataset.j===ans);
+          if(id==="all"){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
           if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
           if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
-            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }
@@ -254,17 +261,58 @@ if(!NAMES[who]){
     {id:"eco", name:"النظام البيئي 🌍", tip:"النظام البيئي = مكوّنات حية + غير حية. والمحلِّلات تحلّل بقايا الكائنات، والمحميات تحمي الحياة الفطرية.", yt:"شرح النظام البيئي رابع ابتدائي علوم"},
     {id:"food", name:"السلاسل الغذائية 🔗", tip:"تبدأ السلسلة بالنبات (المنتِج) ← مستهلك ← مفترس. ومصدر الطاقة الأصلي هو الشمس.", yt:"شرح السلاسل الغذائية رابع ابتدائي علوم"}
   ];
+  var ALL_IDS = ["all"];
+
+  /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
+     بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «قسم علاجي ما حطّيت فيه دروس بعد
+     الاختبار». وسببه أنّ تسجيل نتيجة الدرس كان مشروطًا بألّا يكون
+     الاختبار شاملًا — فمن اختبر الشامل وحده لم يُسجَّل له درسٌ
+     واحد، فيجد «علاجي» فارغًا وقد اختبر لتوّه.
+
+     وهذا نقيض المقصود: الشامل هو الاختبار الوحيد الذي يمسح الدروس
+     كلّها، فهو أولى ما يُبنى عليه ترتيب الضعف.
+
+     ولكنّه اثنا عشر سؤالًا موزّعةً على الدروس، فنصيب الدرس سؤالان
+     أو ثلاثة — وهذا تقديرٌ لا حكم. فنُسجّله موسومًا بعدده،
+     ولا نطمس به نتيجةَ درسٍ اختُبر وحده، فالعشرة أصدق من الاثنين. */
+  /* المطابقة بالاسم أوّلًا، وبهُويّة الدالّة إن كانت مجهولة الاسم —
+     فبعض المولّدات تُصنع بمصنعٍ (bankGen) فتخرج بلا اسم، وكانت
+     تسقط كلّها من الحصر فيبقى «علاجي» فارغًا رغم الاختبار. */
+  function topicOfGen(name, fn){
+    if(!window.__g2t){
+      var m={}, pairs=[];
+      Object.keys(CFG).forEach(function(id){
+        if(ALL_IDS.indexOf(id)>-1 || id==="rem") return;
+        (CFG[id].gens||[]).forEach(function(g){ if(!g) return; if(g.name) m[g.name]=id; pairs.push([g,id]); });
+      });
+      window.__g2t=m; window.__g2tp=pairs;
+    }
+    if(name && window.__g2t[name]) return window.__g2t[name];
+    if(fn){ for(var i=0;i<window.__g2tp.length;i++) if(window.__g2tp[i][0]===fn) return window.__g2tp[i][1]; }
+    return null;
+  }
+  function saveTopicTallies(tally){
+    Object.keys(tally).forEach(function(tid){
+      var v=tally[tid]; if(!v.t) return;
+      var prev=null; try{ prev=JSON.parse(localStorage.getItem(remKey(tid))); }catch(e){}
+      /* نتيجةُ درسٍ اختُبر وحده لا تُطمَس بتقديرٍ من الشامل */
+      if(prev && typeof prev.pct==="number" && !prev.from) return;
+      try{ localStorage.setItem(remKey(tid), JSON.stringify(
+        { pct:Math.round(v.c/v.t*100), n:v.t, from:"all" })); }catch(e){}
+    });
+  }
+
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
     var sec=document.getElementById("rem");
-    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null}; });
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null, est:!!(s&&s.from==="all"), n:(s&&s.n)||null}; });
     var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
     var html='<div class="intro">💪 <b>علاجي</b> — نرتّب أقسامك من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل قسم.)</div>';
     if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الأقسام. جرّب أقسام '+REM_LABEL+' ويرجع هنا يعرض أضعف قسم مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
-      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
         (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
-        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">راجع «'+x.t.name+'» ←</button></div>'; }); }
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 أقسام ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
     html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
