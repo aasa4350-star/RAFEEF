@@ -403,7 +403,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
     if(btn){ btn.disabled=false; }
-    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك بعد محاولتين. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية." + KEEP_GOING; if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); return; }
+    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية." + KEEP_GOING; if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); return; }
     var sum=0,n=0; allWords.forEach(function(w){ var a=w.PronunciationAssessment||{}; if(typeof a.AccuracyScore==="number" && (a.ErrorType||"None")!=="Insertion"){ sum+=a.AccuracyScore; n++; } });
     var wordAcc = n?Math.round(sum/n):0;
     // متوسّط مرجّح بعدد كلمات كل مقطع للدقّة/الطلاقة/النطق
@@ -439,10 +439,19 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       '<button data-stopread class="say small" style="background:#dc2626;border-color:#dc2626;color:#fff;margin-top:6px">⏹️ خلّصت القراءة</button>';
     var sb = statusEl.querySelector("[data-stopread]"); if(sb) sb.addEventListener("click", function(){ _userStopped=true; finish(); });
   }
+  /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «أسامة كل الأقسام تقبل معه إلا قراءة
+     القطعة» — على آيفون، صوته عالٍ وواضح (تأكّدنا)، وموصولٌ بسفاري
+     مباشرة بلا بلوتوث ولا صامت، ومع ذلك أخفقت محاولتان متتاليتان في
+     التقاط أيّ كلمة. هذا يطابق قيد آيفون المعروف على مايك Azure
+     (تعليق أعلاه): جلسة الصوت الداخلية لسفاري أحيانًا تحتاج وقتًا
+     أطول من ٤٠٠ملّي ثانية لتُحرَّر فعليًّا بين إغلاق مايكٍ وفتح آخر،
+     فتُعاد المحاولة قبل أن يستقرّ المسار الصوتيّ فتفشل مثل الأولى.
+     فرفعنا المهلة بين المحاولات، وأضفنا محاولةً ثالثة؛ فإن كانت
+     العلّة بُطء التحرّر لا عطبًا دائمًا فالمحاولة الإضافية تنجح. */
   function _retryOrFail(){
     if(_fin || _userStopped) return true;
     if(allWords.length){ finish(); return true; }
-    if(_tries<1){ _tries++; _closeRec(); window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; startRec("retry"); }, 400); return true; }
+    if(_tries<2){ _tries++; _closeRec(); window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; startRec("retry"); }, 900); return true; }
     return false;
   }
   function startRec(retry){
