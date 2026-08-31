@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>العلوم — ثالث متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#0891b2; --accent-deep:#0e7490;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:105px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:260px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function en(s){ return '<span class="en">'+s+'</span>'; }
+
+/* ============================================================
+   العلوم — ثالث متوسط (حسن) — الفصل ٢: تغيّرات الأرض
+   مبنيّةٌ من كتاب حسن نفسه (ص ٤٧–٨١):
+     الدرس ١: الزلازل (ص 52–60) · الدرس ٢: البراكين (ص 61–65)
+     الدرس ٣: الصفائح الأرضية وعلاقتها بالزلازل والبراكين (ص 66–73)
+   الفصل الأول «طبيعة العلم» يُضاف لاحقًا حين تصل صوره من جديد.
+   بنك أسئلة: [السؤال، [الصحيح، مشتت، مشتت]، الشرح]
+   ============================================================ */
+
+/* ===== الدرس ١: الزلازل ===== */
+var EQ = [
+  ["ما سبب حدوث الزلازل؟",["تحرّر الطاقة المفاجئ من الإجهادات المتراكمة في الصخور","ارتفاع درجة حرارة الجوّ","دوران الأرض حول محورها"],
+    "تتراكم الإجهادات في صخور القشرة الأرضية حتى تتجاوز حدّ مرونتها، فتتحرّر الطاقة فجأةً على هيئة اهتزازات — وهذا هو الزلزال."],
+  ["ما <b>الارتداد المرن</b>؟",["عودة الصخور المشوَّهة إلى وضعها الأصلي بسرعة بعد تجاوز حدّ المرونة","ذوبان الصخور بفعل الحرارة","تمدّد الصخور تحت الماء"],
+    "تتعرّض الصخور بمشيئة الله لقوّةٍ فيتغيّر شكلها، وإذا تجاوزت القوّة حدّ المرونة تنكسر ويعود حوافّ الأجزاء المكسورة سريعًا إلى مكانها الأصلي — وتُسمّى هذه العملية الارتداد المرن."],
+  ["ما <b>الصدع</b>؟"+en(" (Fault)"),["مقطعٌ يُكسَر من الصخر تتحرّك الصخور على جانبيه","نوعٌ من الموجات الزلزالية","جهازٌ لقياس الزلازل"],
+    "عندما يُكسَر مقطعٌ من الصخر وتتحرّك الصخور التي على جانبيه نتيجة الارتداد المرن، يتشكّل صدع."],
+  ["يحدث <b>الصدع العادي</b> بسبب:",["إجهادات الشدّ، فتتحرّك الصخور فوق مستوى الصدع نسبةً إلى أسفله","إجهادات الضغط","إجهادات القصّ الجانبيّ"],
+    "الصدع العادي يحدُث بسبب قوى الشدّ حيث تتحرّك الصخور فوق مستوى الصدع إلى أسفل نسبةً إلى الصخور التي تقع أسفل المستوى."],
+  ["يحدث <b>الصدع العكسيّ</b> بفعل قوى الضغط، فتتحرّك الصخور:",["فوق مستوى الصدع إلى أعلى نسبةً إلى ما أسفله","فوق مستوى الصدع إلى أسفل","بجانب بعضها بصورة جانبية"],
+    "الصدع العكسيّ يحدث بفعل قوى الضغط؛ إذ تقع الصخور فوق مستوى الصدع المائل وتتحرّك إلى أعلى نسبةً لما أسفل المستوى."],
+  ["يحدث <b>الصدع الجانبيّ (الإنزلاقي)</b> عندما تتعرّض الصخور لإجهادات:",["قصٍّ تؤثّر فيها بصورة جانبية","شدٍّ فقط","ضغطٍ فقط"],
+    "الصدع الجانبيّ ينتج عندما تتعرّض الصخور لإجهادات قصٍّ تؤثّر فيها بصورة جانبية، فتتحرّك على جانبَي الصدع بمحاذاة بعضها."],
+  ["ما <b>بؤرة الزلزال</b>؟"+en(" (Focus)"),["النقطة داخل الأرض التي تبدأ عندها الحركة وتتحرّر منها الطاقة","النقطة على السطح فوق الصدع مباشرة","جهاز تسجيل الاهتزازات"],
+    "بؤرة الزلزال هي النقطة داخل الأرض التي تبدأ الحركة عندها، وتتحرّر منها الطاقة على هيئة موجات زلزالية."],
+  ["ما <b>المركز السطحيّ للزلزال</b>؟"+en(" (Epicenter)"),["النقطة على سطح الأرض الواقعة مباشرة فوق بؤرة الزلزال","نفس بؤرة الزلزال","نقطة انتهاء الصدع"],
+    "المركز السطحيّ هو النقطة على سطح الأرض الواقعة مباشرة فوق بؤرة الزلزال."],
+  ["أيُّ الموجات الزلزالية <b>طوليّة</b> وتتحرّك بأقصى سرعة داخل الصخر؟",["الموجات الأولية"+en(" P"),"الموجات الثانوية"+en(" S"),"الموجات السطحية"],
+    "الموجات الأولية (P) طولية تتحرّك جزيئات الصخر فيها للأمام والخلف بالاتجاه نفسه لسير الموجة، وهي أسرع الموجات الزلزالية."],
+  ["الموجات <b>الثانوية</b>"+en(" S")+" موجاتٌ مستعرضة تنتقل خلال:",["المواد الصخرية الصلبة فقط","المواد الصلبة والسائلة معًا","الهواء فقط"],
+    "الموجات الثانوية (S) موجاتٌ مستعرضة تهتزّ فيها جزيئات الصخر عموديًّا على اتجاه سير الموجة، ولا تنتقل إلّا خلال المواد الصلبة."],
+  ["أيُّ الموجات الزلزالية <b>أطول</b> وأقلّها سرعة وأكثرها تسبّبًا بالدمار؟",["الموجات السطحية","الموجات الأولية"+en(" P"),"الموجات الثانوية"+en(" S")],
+    "الموجات السطحية تنتقل على امتداد سطح الأرض فقط، وهي أطول الموجات الزلزالية وأقلّها سرعة، وهي المسبِّبة لمعظم الدمار."],
+  ["الجهاز الذي يُستعمل لتسجيل الموجات الزلزالية يُسمّى:",["السيزموجراف"+en(" (Seismograph)"),"مقياس ريختر","الترمومتر"],
+    "السيزموجراف جهازٌ راسمٌ للهزّة يسجّل حركة الاهتزازات الزلزالية على ورقة، ومنه تُستَنتَج قوّة الزلزال ومركزه السطحي."],
+  ["<b>مقياس ريختر</b> يقيس قوّة الزلزال اعتمادًا على:",["سعة (ارتفاع) الموجة الزلزالية المسجَّلة على السيزموجراف","عدد القتلى والمصابين","مقدار الدمار في المباني"],
+    "مقياس ريختر يعتمد على قياسات سعة الموجة الزلزالية. وكلّ زيادة درجةٍ واحدة على المقياس تعني مضاعفة السعة عشر مرّات، وزيادة الطاقة المتحرّرة نحو 32 ضعفًا."],
+  ["أمّا <b>مقياس ميركالي</b> فيقيس:",["شدّة الزلزال، أي مقدار التدمير الجيولوجي والبنائي الناتج عنه","سعة الموجة الزلزالية","سرعة الموجات الأولية"],
+    "مقياس ميركالي لقياس شدّة الزلزال، وهي مقدار التدمير الحادث في منطقةٍ معيّنة بسبب الزلزال، ويتراوح من درجة I إلى XII."],
+  ["ما <b>التسونامي</b>؟"+en(" (Tsunami)"),["أمواج بحرية ضخمة تنتج عن الزلزال في قاع المحيط","موجاتٌ صوتية ناتجة عن البراكين","تيّاراتٌ هوائية بعد الزلزال"],
+    "عندما يحدث زلزالٌ في قاع المحيط فإنّ الحركة المفاجئة تدفع المياه فتولّد موجات التسونامي المائية الهائلة التي تنتشر بعيدًا في جميع الاتجاهات."],
+  ["تصل سرعة موجات التسونامي في المحيطات المفتوحة إلى:",["950–500 كم/ساعة تقريبًا","5–10 كم/ساعة","تساوي سرعة الصوت"],
+    "تصل سرعة أمواج التسونامي في المحيطات المفتوحة إلى ما بين 500 و950 كم/ساعة، وعندما تقترب من الشاطئ تتباطأ ويزداد ارتفاعها حتى يصل أحيانًا إلى 30 مترًا قبل أن تتكسّر."],
+  ["من طرق <b>السلامة</b> أثناء حدوث الزلازل:",["الابتعاد عن النوافذ وكابلات الكهرباء، والحذر من الحوافّ الحادّة للمباني المنهارة","الوقوف بجانب النوافذ لمشاهدة الحدث","تشغيل الفرن للتدفئة"],
+    "يجب أثناء حدوث الزلازل الابتعاد عن النوافذ أو أيّ شيء يمكن أن يتساقط، ومراقبة كابلات الكهرباء التي قد تسبّب اندلاع الحرائق، والحذر من الحوافّ الحادّة للمباني المنهارة."],
+  ["توضع <b>حسّاسات إغلاق الغاز</b> في المباني الآمنة ضدّ الزلازل لأنّها:",["تُغلق خطوط الغاز تلقائيًّا عند حدوث اهتزاز ناتج عن زلزال","تطفئ الكهرباء فقط","تُصدر إنذارًا صوتيًّا فقط"],
+    "تُستعمل حسّاسات الغاز المبيّنة على خطوط الغاز؛ لأنّها تغلق جميع خطوط الغاز تلقائيًّا في حالة حدوث اهتزاز الأرض الناتج عن الزلازل، ممّا يمنع تكسّرها ويقلّل من خطر اندلاع الحرائق."],
+  ["يعتمد الباحثون في <b>توقّع الزلازل</b> على ملاحظة التغيّرات التي تسبق حدوثها، مثل:",["التغيّرات الحركية عند الصدوع ومنسوب المياه الجوفية والخصائص الكهربائية للصخور","لون السماء وقت الزلزال","درجة حرارة الجوّ فقط"],
+    "يحاول الباحثون توقّع وقت حدوث الزلازل من خلال ملاحظة التغيّرات التي تسبق حدوثها، ومنها التغيّرات الحركية عند الصدوع، والاختلاف في منسوب المياه الجوفية، وتغيّر الخصائص الكهربائية لبعض الصخور تحت قوى الإجهاد."],
+  ["<b>زلزال العيص</b> بالمملكة العربية السعودية بلغت قوّته على مقياس ريختر:",["5.8 درجة","2.5 درجة","8.9 درجة"],
+    "شهدت المملكة العربية السعودية عدّة زلازل بالقرب من المدينة المنورة، منها زلزال العيص الذي بلغت قوّته 5.8 على مقياس ريختر، وهو أكبر زلزال سُجِّل رسميًّا على أجهزة الرصد الزلزالي في المملكة."],
+  ["من الأمثلة على الزلازل القوية في التاريخ: زلزال اليابان "+en("2011")+" الذي بلغت قوّته "+en("9.9")+" وسبّب موجات تسونامي وصل ارتفاعها إلى:",["نحو 10 أمتار","نحو متر واحد","لم يُسبِّب تسونامي"],
+    "زلزال اليابان في 11 مارس 2011م بلغت قوّته 8.9 على مقياس ريختر، وهو الأعنف في تاريخ اليابان منذ 140 عامًا، وأدّى إلى حدوث موجات تسونامي وصل ارتفاعها إلى 10 أمتار اجتاحت مئات المنازل على الساحل الشمالي الشرقي لليابان."]
+];
+
+/* ===== الدرس ٢: البراكين ===== */
+var VOLC = [
+  ["ما الذي يجبر الصهارة على الصعود إلى سطح الأرض عند تكوّن البراكين؟",["كثافتها الأقلّ من كثافة الصخور المحيطة بها ذات الكثافة العالية","برودة الصخور المحيطة","ثقل الغلاف الجوّي"],
+    "تجبر الصهارة على الصعود إلى سطح الأرض من قبل الصخور المحيطة بها ذات الكثافة العالية؛ لأنّ كثافة الصهارة أقلّ منها."],
+  ["ماذا نُسمّي الصهارة عندما تتدفّق على سطح الأرض من فوهة البركان؟",["اللابة"+en(" (Lava)"),"الرماد البركاني","القنابل البركانية"],
+    "عندما تتدفّق الصهارة على سطح الأرض من فوهة البركان فإنّها تُسمّى اللابة."],
+  ["ما <b>البركان</b>؟"+en(" (Volcano)"),["فتحةٌ دائرية على سطح الأرض تُقذف من خلالها اللابة والمواد البركانية الأخرى","نوعٌ من الصدوع فقط","جهازٌ لقياس شدّة الزلازل"],
+    "تحتوي البراكين على فتحاتٍ دائرية على سطح الأرض عند قممها تُسمّى الفوهة، ومن خلالها يتمّ قذف اللابة والمواد البركانية الأخرى."],
+  ["تتراوح أحجام المقذوفات الصخرية الصلبة عند ثوران البركان بين:",["غبار ورماد بركاني، وصخور كبيرة تُسمّى قنابل بركانية","الغازات فقط","الماء فقط"],
+    "تُلقي بعض الثورانات البركانية اللابة المتفجّرة والصخور في الهواء آلاف الأمتار، وتُسمّى هذه القطع الصخرية المتصلّبة أو اللابة المتصلّبة المتساقطة من الهواء بالمقذوفات الصلبة، ويتراوح حجمها بين غبار ورماد بركاني وصخور كبيرة تُسمّى قنابل بركانية."],
+  ["أيُّ العوامل الآتية يحدِّد <b>طريقة ثوران</b> البركان؟",["تركيب الصهارة (نسبة السيليكا) ولزوجتها وكميّة بخار الماء والغازات فيها","لون الصخور المحيطة فقط","ارتفاع الجبل عن سطح البحر"],
+    "يلعب تركيب الصهارة دورًا كبيرًا في تحديد طريقة تفريغ الطاقة أثناء ثوران البركان؛ فاللاّبة التي تحوي نسبة سيليكا عالية تكون ذات لزوجة (زوجة) أكبر، ومن ثمّ تقاوم التدفّق فيؤدّي ثورانها إلى الحديد والماغنسيوم وكمّيات قليلة من السيليكا فتؤدّي لثوران البراكين بهدوء."],
+  ["اللابة الغنيّة <b>بالسيليكا</b> ذات لزوجةٍ عالية، فيؤدّي ثورانها إلى:",["ثوران البراكين بعنف","ثوران البراكين بهدوء دائمًا","عدم الثوران إطلاقًا"],
+    "بينما تندفع اللابة المحتوية على الحديد والماغنسيوم وكمّيات قليلة من السيليكا بسهولة أكبر ممّا يؤدّي إلى ثوران البراكين بهدوء، فإنّ ارتفاع نسبة السيليكا يزيد اللزوجة فيؤدّي إلى ثوران البراكين بعنف."],
+  ["<b>البراكين الدرعية</b>"+en(" (Shield volcano)")+" تتدفّق منها لابةٌ بازلتية غنية بالحديد والماغنسيوم في صورة طبقاتٍ أفقية منبسطة، وتتميّز بأنّها:",["أكبر أنواع البراكين، وقليلة الانحدار","أصغر أنواع البراكين، وحادّة الانحدار","لا تحتوي على فوهة"],
+    "تتدفّق اللابة البازلتية الغنية بالحديد والماغنسيوم في صورة طبقات أفقية منبسطة، ويؤدّي تراكم هذه الطبقات إلى تكوّن بركانٍ واسع الامتداد له جوانب قليلة الانحدار — وتُعدّ البراكين الدرعية أكبر أنواع البراكين. ومن أمثلتها بركان جبل مار في حرّة رهط بالمملكة."],
+  ["<b>البراكين المخروطية</b>"+en(" (Cone volcano)")+" تنتج عن ثورانٍ متوسّط الشدّة يقذف غبارًا ورمادًا ولابةً بركانية بكمّيات كبيرة، وتوجد على ارتفاعات:",["أقلّ من 300 متر عادةً","أكبر من 3000 متر دائمًا","تحت سطح البحر فقط"],
+    "يقذف الثوران البركاني المتوسّط الشدّة القويّ الغبار والرماد البركاني واللابة في الهواء لتصل إلى ارتفاعات كبيرة، ثمّ تتصلّب المادة المقذوفة بسرعة وتعود إلى الأرض وتشكِّل مقذوفاتٍ صلبة تتراكم عند قمة الفوهة مكوّنةً بركانًا مخروطيًّا صغيرًا. وتوجد هذه البراكين على ارتفاعاتٍ أقلّ من 300م، ولا يدوم ثورانها فترة طويلة."],
+  ["<b>البراكين المركّبة</b>"+en(" (Composite volcano)")+" تتكوّن من:",["طبقاتٍ متتابعة من اللابة والمقذوفات الصلبة، وتأخذ شكل جبالٍ حادّة الجوانب","لابةٍ بازلتية سيّالة فقط","رمادٍ بركاني فقط بلا لابة"],
+    "تتكوّن البراكين المركّبة من تتابع طبقات اللابة والمقذوفات الصلبة، وتأخذ شكل جبالٍ حادّة الجوانب، إذ تثور هذه البراكين أحيانًا بقوّةٍ فتخرج منها كمّيات كبيرة من الرماد والغاز، يتبع ذلك ثوران هادئ يشكِّل طبقة من اللابة. ومن أمثلتها بركان جبل القدر شمال شرق المدينة المنورة."],
+  ["في <b>ثوران الشقوق</b> ترشح الصهارة ذات السيولة العالية من:",["شقوقٍ في سطح الأرض، وتتميّز اللابة فيها بأنّها قليلة اللزوجة","فوّهةٍ واحدة دائرية فقط","باطن الأرض عبر الزلازل فقط"],
+    "ترشح الصهارة ذات السيولة العالية في هذا النوع من البراكين من شقوق في سطح الأرض. وتتميّز اللابة في هذه البراكين بأنّها قليلة اللزوجة ممّا يعني أنّها تنساب بسهولة فوق الأرض لتكوِّن الانسيابات البازلتية. ومن أشهر الأمثلة عليها في المملكة حرّة رهط."],
+  ["ما <b>البقع الساخنة</b>؟"+en(" (Hot spots)"),["مناطق تصعد فيها الصهارة إلى أعلى من أعماق الأرض في أيّ مكان، وليس بالضرورة عند حدود الصفائح","حدود الصفائح المتباعدة فقط","أماكن انصهار القشرة المحيطية عند الاندساس"],
+    "لم تتكوّن جزر هاواي البركانية على حدود الصفائح، وإنّما في وسط صفيحة المحيط الهادئ؛ فما العمليات التي أدّت إلى تشكّلها؟ تُجبَر كتل كبيرة من الصهارة إلى الصعود إلى أعلى، خلال الستار والقشرة، فيما يُسمّى بالبقع الساخنة، ويعتقد العلماء أنّ ذلك ما يحدث للبقعة الساخنة الموجودة حاليًّا أسفل جزيرة هاواي."]
+];
+
+/* ===== الدرس ٣: الصفائح الأرضية وعلاقتها بالزلازل والبراكين ===== */
+var PLATE = [
+  ["نصّت <b>نظرية الصفائح الأرضية</b> (طُوِّرت عام 1960م) على أنّ:",["الغلاف الصخري للقشرة الأرضية وأعلى الستار مقسَّمٌ إلى قطعٍ تُسمّى صفائح تتحرّك على الغلاف المائع","الأرض ثابتةٌ تمامًا ولا تتحرّك أيّ صفيحة فيها","القارّات تكوّنت دفعةً واحدة ولم تتغيّر أبدًا"],
+    "تنصّ نظرية الصفائح الأرضية على أنّ الغلاف الصخري (Lithosphere) المكوَّن من القشرة الأرضية وأعلى الستار مقسَّمٌ إلى قطعٍ يُسمّى كلٌّ منها صفيحة (Plate)، تتحرّك هذه القطع على طبقةٍ لدنة من الستار تُسمّى الغلاف المائع (Asthenosphere)."],
+  ["ينتج عن حركة الصفائح الأرضية:",["جميع المعالم والأحداث الجيولوجية، ومنها الزلازل والبراكين وتكوّن الجبال والمحيطات","الزلازل فقط دون غيرها من الظواهر","لا شيء؛ فحركتها بطيئة جدًّا ولا تأثير لها"],
+    "تتحرّك الصفائح الأرضية على طبقةٍ لدنة من الستار، وينتج عن هذه الحركة جميع المعالم والأحداث الجيولوجية، ومنها الزلازل والبراكين، وتكوُّن الجبال وتشكُّل المحيطات."],
+  ["تُقسَّم الصفائح الأرضية إلى:",["صفائح محيطية تقع أسفل المحيط، وصفائح قارّية تشكِّل القارّات","صفائح شمالية وصفائح جنوبية فقط","صفائح صخرية وصفائح مائية فقط"],
+    "تُقسَّم الصفائح الأرضية إلى صفائح محيطية تقع أسفل المحيط، وصفائح قارّية تشكِّل القارّات. وتتميّز الصفائح المحيطية بأنّها أكبر كثافةً وأقلّ سُمكًا من الصفائح القارّية."],
+  ["الحدود الفاصلة بين الصفائح المتحرّكة تُسمّى:",["حدود الصفائح","الغلاف المائع","البقع الساخنة"],
+    "تُسمّى الحدود الفاصلة بين الصفائح حدود الصفائح، وتُصنَّف اعتمادًا على حركة الصفائح الأرضية النسبية إلى حدود متقاربة، وحدود متباعدة، وحدود جانبية (تحويلية)."],
+  ["<b>حدود الصفائح المتباعدة</b> هي التي تتحرّك فيها الصفائح مبتعدةً عن بعضها، ويتكوّن بينها:",["شقوقٌ طويلة تُسمّى حفر الانهدام","سلاسل جبلية مرتفعة جدًّا فقط","لا شيء؛ فلا يحدث بها نشاط جيولوجي"],
+    "عند الحدود المتباعدة تتحرّك الصفائح مبتعدةً عن بعضها، ومع تباعد الصفائح تتكوّن شقوقٌ طويلة بينها تُسمّى حفر الانهدام (Rifts). وتحوي حفر الانهدام شقوقًا تُسهِّل خروج الصهارة التي تنشأ في الستار، ويحدث ثوران الشقوق غالبًا على امتداد مناطق حفر الانهدام، مثل حفرة الانهدام الإفريقي العظيم."],
+  ["من الأماكن الشائعة لتكوّن البراكين <b>حدود الصفائح المتقاربة</b>؛ إذ تغوص فيها الصفيحة المحيطية الأكبر كثافة أسفل صفيحةٍ أخرى، وتنصهر مكوِّنةً:",["صهارةً تصعد إلى أعلى وتكوِّن براكين حدود الصفائح المتقاربة","حفرة انهدامٍ طويلة فقط","بقعةً ساخنة في وسط الصفيحة"],
+    "عند غوص صفيحةٍ محيطية أسفل صفيحةٍ أخرى ينزل قشرة المحيط إلى الستار، فتذوب كمّية المياه الموجودة في الرسوبيات والبازلت المحيطة، وتؤدّي حرارة الستار عندها إلى صهر جزءٍ من الصفيحة الغاطسة والصخور التي تعلوها، مكوِّنةً الصهارة. تصعد هذه الصهارة إلى أعلى المكوِّنة براكين تحيط جميع البراكين المكوّنة بهذه الطريقة بالمحيط الهادئ، ويُسمّى الحزام الذي يحيط بالمحيط الهادئ بالحزام الناري."],
+  ["<b>حدود الصفائح الجانبية (التحويلية)</b> تنزلق فيها الصفائح بمحاذاة بعضها، وتنجم عنها:",["حركة الصفائح الزلازل، ولا تتشكّل عندها البراكين عادةً","براكين مركّبة فقط، دون زلازل","بقعٌ ساخنة فقط"],
+    "عند الحدود الجانبية (التحويلية) تنزلق الصفائح بمحاذاة بعضها بلا تباعدٍ ولا تقارب، وينجم عن حركة الصفائح عندها الزلازل، ولا تتشكّل عندها البراكين في العادة."],
+  ["ما الذي يحرِّك الصفائح الأرضية؟",["تيّارات الحمل الحراري في الستار: تسخّن مادّة الستار فتقلّ كثافتها وتصعد، ثمّ تبرد وتنزل مكوّنةً تيّارات الحمل","دوران الأرض حول الشمس","اختلاف حرارة الغلاف الجوّي فقط"],
+    "تنصّ إحدى الفرضيات على أنّ مادّة الستار يتم تسخينها بوساطة لبّ الأرض، فتقلّ كثافتها وتصعد إلى أعلى، ثمّ تبرد هذه المادّة وتنزل إلى أسفل في اتّجاه اللبّ، مكوِّنةً تيّارات الحمل، وتقدِّم تيّارات الحمل الحراري في باطن الأرض تفسيرًا لحركة الصفائح الأرضية."],
+  ["نسبة الزلازل التي تحدُث على طول <b>حزام المحيط الهادئ الناري</b> من مجمل زلازل العالم تبلغ نحو:",["80%","10%","50%"],
+    "إذا نُظِر إلى خريطة زلزالية فسيُلاحَظ أنّ معظم الزلازل تتركّز في صورة أحزمة مميّزة، حيث يتركّز 80% من الزلازل على طول حزام المحيط الهادئ الناري، وهو حزام البراكين نفسه."],
+  ["<b>البقع الساخنة</b> مثل جزر هاواي تختلف عن حدود الصفائح المتباعدة أو المتقاربة في أنّها:",["تتكوّن في وسط الصفيحة، وليست بالضرورة عند حدودها","توجد فقط عند حدود الصفائح المتقاربة","لا يُمكن أن تُكوِّن براكين إطلاقًا"],
+    "تُعدّ جزر هاواي على البركانية مثالًا مهمًّا، ولم تتكوّن هذه الجزر على حدود الصفائح، وإنّما في وسط صفيحة المحيط الهادئ فوق بقعةٍ ساخنة تُجبَر فيها كتل كبيرة من الصهارة على الصعود إلى أعلى خلال الستار والقشرة."],
+  ["يتركّز <b>النشاط الزلزالي</b> في المملكة العربية السعودية على امتداد:",["البحر الأحمر وحتى خليج العقبة؛ لأنّها تمثِّل حدود تباعدٍ بين الصفيحة العربية والإفريقية","الحدود الشرقية للمملكة فقط","وسط الصفيحة العربية بعيدًا عن أيّ حدود"],
+    "يتركّز النشاط الزلزالي في المملكة العربية السعودية على امتداد البحر الأحمر وحتى خليج العقبة؛ حيث تمثِّل هذه المناطق حدود تباعدٍ بين الصفيحة العربية والصفيحة الإفريقية، كما أنّ هناك بعض النشاط الزلزالي حول بعض الحرّات البركانية."],
+  ["يتركّز <b>النشاط البركاني</b> في المملكة العربية السعودية في الجهة الغربية على امتداد ساحل البحر الأحمر، وعدد الحرّات البركانية فيها نحو:",["12 حرّة بركانية، من أهمّها حرّة رهط قرب المدينة المنورة","حرّةٌ واحدة فقط","لا توجد حرّاتٌ بركانية في المملكة"],
+    "النشاط البركاني في المملكة يرتبط عادةً مع حركة الصفيحة العربية؛ لذا فإنّ النشاط البركاني في المملكة يتركّز في الجهة الغربية حيث تمثِّل حدود الصفيحة العربية مع الصفيحة الإفريقية، ويوجد في المملكة 12 حرّة بركانية، من أهمّها حرّة رهط بالقرب من المدينة المنورة، وحرّة الشاقة."]
+];
+
+function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
+var EQG=[bankGen(EQ)], VOLCG=[bankGen(VOLC)], PLATEG=[bankGen(PLATE)];
+var ALLG=[EQG[0], VOLCG[0], PLATEG[0]];
+
+/* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
+   يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · العلوم</p><h1>🌋 العلوم — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="math9.html?who='+who+'">🔢 الرياضيات</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب العلوم — ثالث متوسط · الفصل الثاني: تغيّرات الأرض (ص <span class="en">47–81</span>)<br>'+
+      '<span style="font-weight:400;font-size:.85rem;color:var(--muted)">الفصل الأول «طبيعة العلم» يُضاف لاحقًا.</span></div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="eq" aria-selected="true">١ الزلازل 🌍</button>'+
+      '<button data-tab="volc" aria-selected="false">٢ البراكين 🌋</button>'+
+      '<button data-tab="plate" aria-selected="false">٣ الصفائح 🧩</button>'+
+      '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
+    '</div>'+
+    '<section class="panel" id="all"></section>'+
+    '<section class="panel active" id="eq"></section>'+
+    '<section class="panel" id="volc"></section>'+
+    '<section class="panel" id="plate"></section>'+
+    '<section class="panel" id="rem"></section>'+
+    '<footer>العلوم · ثالث متوسط · الفصل الثاني «تغيّرات الأرض» · مطابق للكتاب</footer>';
+
+  var CFG = {
+    all:  {gens:ALLG,  n:15, intro:"اختبار شامل: الزلازل + البراكين + الصفائح الأرضية — <b>أسئلة جديدة كل مرة</b>.", label:"علوم م٣ — شامل ف٢"},
+    eq:   {gens:EQG,   n:12, intro:"<b>الدرس ١ — الزلازل:</b> أسباب الزلازل والارتداد المرن، أنواع الصدوع الثلاثة، الموجات الزلزالية، بؤرة الزلزال ومركزه السطحي، مقياسا ريختر وميركالي، التسونامي، والسلامة من الزلازل.", label:"علوم م٣ — 2-1 الزلازل"},
+    volc: {gens:VOLCG, n:10, intro:"<b>الدرس ٢ — البراكين:</b> كيف تتشكّل البراكين، اللابة والمقذوفات الصلبة، وأنواع البراكين الثلاثة (الدرعية والمخروطية والمركّبة) وثوران الشقوق والبقع الساخنة.", label:"علوم م٣ — 2-2 البراكين"},
+    plate:{gens:PLATEG,n:11, intro:"<b>الدرس ٣ — الصفائح الأرضية وعلاقتها بالزلازل والبراكين:</b> نظرية الصفائح، حدود الصفائح الثلاثة (متباعدة ومتقاربة وجانبية)، تيّارات الحمل الحراري، والنشاط الزلزالي والبركاني في المملكة.", label:"علوم م٣ — 2-3 الصفائح الأرضية"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var __ok = (+btn.dataset.j===ans);
+          if(id==="all"){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="science9", REM_LABEL="العلوم";
+  var REMTOPICS=[
+    {id:"eq", name:"1 الزلازل 🌍", tip:"الصدع العادي (شدّ) تهبط فيه الصخور، والعكسي (ضغط) ترتفع، والجانبي (قصّ) تنزلق جانبيًّا. والبؤرة داخل الأرض، والمركز السطحي فوقها على السطح مباشرة. وموجات P طولية وأسرع، وS مستعرضة ولا تعبر السوائل، والسطحية أبطأ وأكثر دمارًا. ريختر يقيس قوّة الزلزال (الطاقة)، وميركالي يقيس شدّته (الدمار).", yt:"شرح الزلازل ثالث متوسط علوم"},
+    {id:"volc", name:"2 البراكين 🌋", tip:"اللابة الغنية بالسيليكا لزجة فثورانها عنيف، والفقيرة بالسيليكا (غنية بالحديد والماغنسيوم) سيّالة فثورانها هادئ. الدرعية: لابة سيّالة، أكبر حجمًا وأقلّ انحدارًا (جبل مار). المخروطية: أصغر وحادّة الانحدار وثورانها قصير الأمد (حرّة البرك). المركّبة: طبقات متبادلة من اللابة والمقذوفات (جبل القدر).", yt:"شرح البراكين ثالث متوسط علوم"},
+    {id:"plate", name:"3 الصفائح 🧩", tip:"الحدود المتباعدة تكوّن حفر انهدام وثوران شقوق. المتقاربة أشهر أماكن تكوّن البراكين (اندساس صفيحة تحت أخرى فتنصهر). الجانبية (التحويلية) تسبّب زلازل بلا براكين عادةً. البقع الساخنة (كهاواي) تتكوّن وسط الصفيحة لا عند حدودها. ويحرّك الصفائحَ تيّاراتُ الحمل الحراري في الستار. والنشاط الزلزالي بالمملكة على امتداد البحر الأحمر.", yt:"شرح الصفائح الأرضية وعلاقتها بالزلازل والبراكين ثالث متوسط"}
+  ];
+  var ALL_IDS = ["all"];
+
+  /* ═══ الاختبار الشامل يُغذّي «علاجي» — راجع تعليل هذا النمط في
+     math9.html/science4.html: الشامل يسجَّل مقسَّمًا على الدروس
+     بوسم كلّ سؤالٍ باسم مولّده، فلا يبقى «علاجي» فارغًا لمن اختبر
+     الشامل فقط، ولا يُطمَس تقييم درسٍ اختُبر وحده بتقديرٍ من الشامل. */
+  function topicOfGen(name, fn){
+    if(!window.__g2t){
+      var m={}, pairs=[];
+      Object.keys(CFG).forEach(function(id){
+        if(ALL_IDS.indexOf(id)>-1 || id==="rem") return;
+        (CFG[id].gens||[]).forEach(function(g){ if(!g) return; if(g.name) m[g.name]=id; pairs.push([g,id]); });
+      });
+      window.__g2t=m; window.__g2tp=pairs;
+    }
+    if(name && window.__g2t[name]) return window.__g2t[name];
+    if(fn){ for(var i=0;i<window.__g2tp.length;i++) if(window.__g2tp[i][0]===fn) return window.__g2tp[i][1]; }
+    return null;
+  }
+  function saveTopicTallies(tally){
+    Object.keys(tally).forEach(function(tid){
+      var v=tally[tid]; if(!v.t) return;
+      var prev=null; try{ prev=JSON.parse(localStorage.getItem(remKey(tid))); }catch(e){}
+      /* نتيجةُ درسٍ اختُبر وحده لا تُطمَس بتقديرٍ من الشامل */
+      if(prev && typeof prev.pct==="number" && !prev.from) return;
+      try{ localStorage.setItem(remKey(tid), JSON.stringify(
+        { pct:Math.round(v.c/v.t*100), n:v.t, from:"all" })); }catch(e){}
+    });
+  }
+
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null, est:!!(s&&s.from==="all"), n:(s&&s.n)||null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+  /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
+     اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
+  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"eq"}}).dataset.tab);
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
+      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+    });
+  });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
