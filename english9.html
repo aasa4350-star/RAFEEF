@@ -3430,10 +3430,22 @@ if(!NAMES[who]){
   }
   function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
 
+  /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «الأولاد يبون رابط يوتيوب على كل درس»
+     — رابط بحثٍ في يوتيوب بعبارةٍ مخصَّصةٍ لكلّ درس (نفس REMTOPICS.yt
+     المستعملة أصلًا في «علاجي») بدل رابط فيديوٍ محدَّد؛ فرابط الفيديو
+     الثابت يحتاج تحقّقًا يدويًّا من مطابقته للكتاب لكلّ درس، وقد يموت
+     صامتًا لو حُذف الفيديو أو أُخفي لاحقًا. يظهر من أوّل ما يُفتح
+     الدرس لا بعد اختباره والإخفاق فيه فقط كما كان الحال في «علاجي». */
+  function ytLinkHtml(id){
+    var rt=null;
+    for(var i=0;i<REMTOPICS.length;i++){ if(REMTOPICS[i].id===id){ rt=REMTOPICS[i]; break; } }
+    if(!rt) return '';
+    return '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(rt.yt||rt.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح الدرس</a></div>';
+  }
   function render(id){
     var c = CFG[id], sec = panelOf(id);
     var items = genN(c.gens, c.n);
-    var html = '<div class="intro">'+c.intro+'</div>';
+    var html = '<div class="intro">'+c.intro+ytLinkHtml(id)+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
@@ -3472,7 +3484,15 @@ if(!NAMES[who]){
   var REMTOPICS=[
     {id:"u1", name:"Unit 1 — Lifestyles", tip:"ظرف التكرار يأتي قبل الفعل (He always drinks tea) لكن بعد الفعل be (He is always late). والعبارات مثل twice a week و once a month تأتي في آخر الجملة. وسُلَّم التكرار: always 100% ← usually/often 50–99% ← sometimes 20–49% ← seldom/rarely/hardly ever 1–19% ← never 0%.", yt:"شرح adverbs of frequency ثالث متوسط سوبر قول"},
     {id:"u2", name:"Unit 2 — Life Stories", tip:"in للشهر والسنة والفصل والقرن، on لليوم والتاريخ، at للساعة و noon و night. وفي المكان: in للمدن والدول، on لـ Earth والجزر، at لـ school/home/work. و last تسبق المدّة (last week) أمّا ago فتأتي بعدها (two days ago). و used to تُكتب هكذا دائمًا.", yt:"شرح prepositions of time and place ثالث متوسط سوبر قول"},
-    {id:"u3", name:"Unit 3 — Traveling", tip:"المضارع المستمر (be + verb-ing) لما يحدث الآن أو لترتيبٍ مؤكّد في المستقبل مع tonight/tomorrow. و be going to لخطّةٍ مقرّرة، أمّا will فمع maybe/probably/perhaps لخطّةٍ غير مؤكّدة.", yt:"شرح going to and will ثالث متوسط سوبر قول"}
+    {id:"u3", name:"Unit 3 — Traveling", tip:"المضارع المستمر (be + verb-ing) لما يحدث الآن أو لترتيبٍ مؤكّد في المستقبل مع tonight/tomorrow. و be going to لخطّةٍ مقرّرة، أمّا will فمع maybe/probably/perhaps لخطّةٍ غير مؤكّدة.", yt:"شرح going to and will ثالث متوسط سوبر قول"},
+    {id:"exp", name:"Expansion 1–3", tip:"راجع صيغ الفعل الثلاث (المصدر/الماضي/التصريف الثالث) للأفعال الشاذّة والمنتظمة؛ فهي أساس كلّ الأزمنة. ولتكوين سؤالٍ من جواب: حدِّد الجزء المسؤول عنه في الجواب، ثمّ اختر أداة السؤال المناسبة له (who/what/when/where/why/how).", yt:"شرح irregular verbs forms ثالث متوسط سوبر قول"},
+    {id:"u4", name:"Unit 4 — Buying", tip:"some في الجمل المثبتة، any في المنفية والاستفهام. و something/anything/nothing يتبعان القاعدة نفسها. الضمائر الانعكاسية (myself, herself, themselves…) حين يعود الفعل على الفاعل نفسه. و because تسبق السبب، أمّا so فتسبق النتيجة.", yt:"شرح quantifiers and reflexive pronouns ثالث متوسط سوبر قول"},
+    {id:"u5", name:"Unit 5 — Since When", tip:"المضارع التامّ (have/has + p.p) لفعلٍ بدأ في الماضي واستمرّ أو له أثرٌ الآن، والماضي البسيط لفعلٍ انتهى في وقتٍ محدَّد. و for + مدّة (for three years)، و since + نقطة بداية (since 2020). والمبني للمجهول: be + p.p حين يكون المهمّ الفعل نفسه لا فاعله.", yt:"شرح present perfect for and since ثالث متوسط سوبر قول"},
+    {id:"u6", name:"Unit 6 — Where Is It", tip:"صفة+er أو more+صفة للمقارنة، و the+صفة+est أو the most+صفة للتفضيل. و as+صفة+as للتساوي. الأسئلة غير المباشرة (Could you tell me where…) ترتيبها ترتيب الجملة الخبرية لا السؤال. و the تُستخدم للشيء المعروف أو الفريد.", yt:"شرح comparatives and superlatives ثالث متوسط سوبر قول"},
+    {id:"u7", name:"Unit 7 — Good Deal", tip:"سؤال الذيل: إن كانت الجملة مثبتة يكون الذيل منفيًّا والعكس صحيح (You're tired, aren't you؟). و be able to بديل can في الأزمنة الأخرى. والاقتراحات: should + مصدر، Why don't you…؟، Let's + مصدر.", yt:"شرح tag questions and be able to ثالث متوسط سوبر قول"},
+    {id:"u8", name:"Unit 8 — Drive Slowly", tip:"must للإلزام القويّ (كالقانون)، أمّا should فللنصيحة. ظروف الكيفية غالبًا فعل+ly (slowly, carefully). ونقل الأوامر: He told me to + مصدر، ونقل الطلبات: He asked me to + مصدر.", yt:"شرح must and should reported speech ثالث متوسط سوبر قول"},
+    {id:"u9", name:"Unit 9 — All Kinds", tip:"who للأشخاص، which للأشياء، that للاثنين معًا. والماضي المستمرّ (was/were + ing) لفعلٍ مستمرٍّ قطعه فعلٌ آخر بالماضي البسيط، ويأتي معه غالبًا when أو while.", yt:"شرح relative pronouns and past continuous ثالث متوسط سوبر قول"},
+    {id:"exp2", name:"Expansion 4–6", tip:"الجمل المترادفة تُعبِّر عن المعنى نفسه بصياغةٍ مختلفة — كتحويل الجملة من المبني للمعلوم إلى المجهول، أو استبدال الفعل بمرادفه مع تعديل التركيب حوله.", yt:"شرح sentence transformation ثالث متوسط سوبر قول"}
   ];
   var ALL_IDS = ["allu", "allu2", "allu3"];
 
