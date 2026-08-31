@@ -1168,7 +1168,7 @@ if(!NAMES[who]){
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
       html += '</div><div class="explain">'+q[3]+'</div></div>';
     });
-    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
     var answered={}, correct=0, total=items.length, saved=false;

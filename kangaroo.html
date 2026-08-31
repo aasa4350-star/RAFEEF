@@ -1124,7 +1124,7 @@ if(!NAMES[who]){
       }
       html += '<div class="explain">'+q[3]+'</div></div>';
     });
-    html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
     var answered={}, correct=0, total=items.length, saved=false;
@@ -1207,7 +1207,7 @@ if(!NAMES[who]){
     var el=Math.floor((Date.now()-t0)/60000), sec=Math.floor(((Date.now()-t0)%60000)/1000);
     var clock=el+":"+String(sec).padStart(2,"0");
     var col=el>=hardMin?"var(--bad)":(el>=softMin?"#d97706":"var(--muted)");
-    var timeHtml='<span style="font-weight:800;color:'+col+'">⏱️ '+clock+' / '+hardMin+' د</span>';
+    var timeHtml='<span style="font-weight:800;color:'+col+'">⏱️ <span dir="ltr">'+clock+' / '+hardMin+'</span> د</span>';
     if(el>=hardMin && !doseDone){ doseDone=true; }
     var note = doseDone ? '<span style="color:var(--bad);font-weight:800">🎉 كفاية اليوم — خلّصت جرعتك، ارتاح وباجر نكمّل</span>'
              : (el>=softMin ? '<span style="color:#d97706;font-weight:700">قربت تخلّص — أنهِ جولتك الحالية</span>' : '');

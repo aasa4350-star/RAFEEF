@@ -283,7 +283,15 @@ function writingCardHtml(student){
   var rows = ALL.filter(function(r){
     return r.student===student && r.meta && r.meta.kind==="writing" && r.meta.text;
   });
-  if(!rows.length) return "";
+  /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «قسم التعبير ما يطلع لي في التقرير كم
+     نتيجتهم». وسبب ذلك أنّ البطاقة كانت تختفي تمامًا حين لا توجد فقرةٌ
+     مكتوبة — فثلاثةٌ من الأربعة (سعود وأسامة وحسن) لم يفتحوا تبويب
+     «التعبير ✍️» في اختبر نفسك بعد، فرأى الأب صفحاتهم خاليةً من أيّ
+     ذكرٍ لهذا القسم، ولم يفرّق بين «معطَّل» و«لم يُجرَّب بعد». فصار
+     يظهر تنويهًا محايدًا بدل الاختفاء الصامت. */
+  if(!rows.length)
+    return '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
+      '<p class="note">لم يفتح تبويب «التعبير ✍️» في اختبر نفسك بعد — القسم موجودٌ وشغّال، بس ما جُرِّب.</p></div>';
   /* meta.at وقت الجهاز الحقيقي، وcreated_at احتياطي لو غاب */
   var rowT=function(r){ return (r.meta && r.meta.at) || r.created_at; };
   rows.sort(function(a,b){ return String(rowT(b)).localeCompare(String(rowT(a))); });
@@ -308,7 +316,7 @@ function writingCardHtml(student){
   if(aggN){
     html += '<ul class="sk">'+SUBS.map(function(s){
       var avg=agg[s[0]]/aggN, p=Math.round(avg/5*100);
-      return '<li><span class="pill '+cls(p)+'">'+(Math.round(avg*10)/10)+' / 5</span>'+
+      return '<li><span class="pill '+cls(p)+'" dir="ltr">'+(Math.round(avg*10)/10)+' / 5</span>'+
              '<span class="nm">'+s[1]+'</span>'+
              '<span class="frac">'+s[0]+'</span></li>';
     }).join("")+'</ul>'+
@@ -330,7 +338,7 @@ function writingCardHtml(student){
     html += '<div style="border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:10px">'+
       '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800">'+
         '<span>'+esc(m.topic||"—")+'</span>'+
-        '<span class="pill '+cls(p)+'">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+
+        '<span class="pill '+cls(p)+'" dir="ltr">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+
       '</div>'+
       '<p class="note" style="margin:4px 0 6px">'+saDate(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+
         (m.cefr? ' · هدف '+esc(m.cefr) : '')+

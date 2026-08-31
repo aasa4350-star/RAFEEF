@@ -804,7 +804,10 @@ if(!META[who] || !DATA[who]){
           '<div class="row"><button class="say small pchk">افحص النطق</button>'+azBtnHtml()+'<span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
-    html += '<div class="score" data-score>الدرجة: 0 / '+items.length+'</div>'+
+    /* dir="ltr" على رقم الدرجة وحده لا على السطر كلّه: بلا هذا كان
+       الرقمان ينعكسان بصريًّا داخل السياق العربيّ («3 / 10» يظهر
+       «10 / 3») — عيبٌ في كلّ عدّادات الدرجة على الموقع، لا هنا فقط. */
+    html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
     var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
@@ -837,7 +840,7 @@ if(!META[who] || !DATA[who]){
         if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
         else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
         tried[i]=1;
-        scoreEl.textContent="الدرجة: "+correct+" / "+total;
+        scoreEl.textContent=correct+" / "+total;
         maybeSave();
       });
     });
@@ -933,7 +936,7 @@ if(!META[who] || !DATA[who]){
       shuffle(q[1].map(function(_,j){ return j; })).forEach(function(j){ html += '<button data-j="'+j+'" disabled style="direction:'+dir+';text-align:'+ta+'">'+q[1][j]+'</button>'; });
       html += '</div></div>';
     });
-    html += '<div class="score" data-score>الفهم: 0 / '+questions.length+'</div>'+
+    html += '<div class="score">الفهم: <span data-score dir="ltr">0 / '+questions.length+'</span></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:12px">نصّ جديد 🔄</button>';
     sec.innerHTML = html;
     var unlocked=false, listened=false, noMic=false, lockEl=sec.querySelector("[data-lock]"), qButtons=sec.querySelectorAll(".q .opts button");
@@ -996,7 +999,7 @@ if(!META[who] || !DATA[who]){
           var okC=(+btn.dataset.j===right); markComp(i, okC);
           if(okC){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); var rb=qEl.querySelector('.opts button[data-j="'+right+'"]'); if(rb) rb.classList.add("correct"); }
-          scoreEl.textContent="الفهم: "+correct+" / "+total;
+          scoreEl.textContent=correct+" / "+total;
           // صف اختبار نطق السؤال (يظهر بعد الإجابة): استمع + قيّم نطقي
           if(!qEl.querySelector(".qprow")){
             var qtext = questions[i][0];
@@ -1324,7 +1327,7 @@ if(!META[who] || !DATA[who]){
     var btn = function(m,txt){ var on=(vocMode===m); return '<button data-mode="'+m+'" style="flex:1;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+txt+'</button>'; };
     var html = '<div class="block-title"><span class="dot"></span> حفظ الكلمات ✍️</div>'+
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
-        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت '+learned+' / '+goal+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت <span dir="ltr">'+learned+' / '+goal+'</span></span></div>'+
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
@@ -1375,7 +1378,7 @@ if(!META[who] || !DATA[who]){
           '<div class="row"><button class="say small pchk">افحص المكتوب</button><span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
-    html += '<div class="score" data-score>الدرجة: 0 / '+V.length+'</div>'+
+    html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+V.length+'</span></div>'+
       '<div class="fb" data-donemsg style="text-align:center;min-height:20px;margin-top:8px"></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
       '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button></div>';
@@ -1403,9 +1406,9 @@ if(!META[who] || !DATA[who]){
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
       } else if(isNew && advanced){
-        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن "+getLearned()+" / "+vocGoal(getLearned())+". بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
+        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن <span dir=\"ltr\">"+getLearned()+" / "+vocGoal(getLearned())+"</span>. بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
       } else {
-        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ أحسنت! النتيجة "+correct+" / "+total+".";
+        doneMsg.className="fb ok"; doneMsg.innerHTML="✅ أحسنت! النتيجة <span dir=\"ltr\">"+correct+" / "+total+"</span>.";
       }
     }
     // حفظ جزئي للمراجعة: حتى لو ما كمّل كل المجموعة، نحفظ الكلمات اللي جاوبها
@@ -1449,7 +1452,7 @@ if(!META[who] || !DATA[who]){
         } else {
           fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>';
         }
-        scoreEl.textContent="الدرجة: "+correct+" / "+total;
+        scoreEl.textContent=correct+" / "+total;
         onComplete();
       });
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");

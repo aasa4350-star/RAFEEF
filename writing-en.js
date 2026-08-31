@@ -629,7 +629,10 @@ function render(el, ctx){
       '<div style="margin-top:8px"><span class="wtag">📐 التقييم بمقاييس كامبردج الأربعة</span> '+
       '<span class="wtag">🎯 مستواك المستهدف: '+cef.name+'</span></div></div>'+
     '<div class="wsec"><b>الجزء الأول — تدريب</b><div id="wquiz"></div>'+
-      '<div style="text-align:center;font-weight:800;margin-top:10px"><span id="wscore">0 / '+items.length+'</span></div>'+
+      /* dir="ltr" على الرقم وحده — بلاه ينعكس بصريًّا داخل السياق العربيّ
+         («3 / 10» يظهر «10 / 3»)، وهو عيبٌ وقع في كل عدّادات الدرجة
+         على الموقع، هنا وفي كل صفحات الاختبارات. */
+      '<div style="text-align:center;font-weight:800;margin-top:10px"><span id="wscore" dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="wbtn ghost" id="wnew">تدريب جديد 🔄</button></div>'+
     '<div class="wsec"><b>الجزء الثاني — اكتب فقرتك</b>'+
       '<div style="margin:8px 0 4px;font-size:1.05rem"><b>'+en(prompts[pIdx].t)+'</b></div>'+
@@ -701,7 +704,7 @@ function render(el, ctx){
 
     var bcls=function(b){ return b>=4?"wb-hi":(b>=3?"wb-ok":"wb-lo"); };
     var h='<div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">'+
-            '<b style="font-size:1.05rem">النتيجة: '+g.total+' / 20</b>'+
+            '<b style="font-size:1.05rem">النتيجة: <span dir="ltr">'+g.total+' / 20</span></b>'+
             '<span class="wband '+(g.pass?"wb-hi":"wb-lo")+'">'+(g.pass?"✅ اجتزت":"⚠️ لم تجتز")+'</span>'+
           '</div>'+
           '<p style="color:var(--muted);font-size:.86rem;margin:4px 0 0">'+
@@ -710,7 +713,7 @@ function render(el, ctx){
     g.subs.forEach(function(s){
       var open = s.band<3 ? " open" : "";
       h+='<details class="wsub"'+open+'><summary><span>'+s.ar+' <span style="color:var(--muted);font-weight:600;font-size:.85rem">'+s.en+'</span></span>'+
-         '<span class="wband '+bcls(s.band)+'">'+s.band+' / 5</span></summary><ul class="wchk">';
+         '<span class="wband '+bcls(s.band)+'" dir="ltr">'+s.band+' / 5</span></summary><ul class="wchk">';
       s.checks.forEach(function(c){
         h+='<li>'+(c.ok?'✅':'⚠️')+' '+c.label+(!c.ok&&c.hint?'<span class="h">'+c.hint+'</span>':'')+'</li>';
       });

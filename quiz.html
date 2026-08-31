@@ -2074,7 +2074,7 @@ if(!STUDENTS[who]){
       }
       html += `<div class="explain" ${(id==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
     });
-    html += `<div class="scorebar"><span class="txt" data-score>0 / ${d.quiz.length}</span>
+    html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${d.quiz.length}</span>
       <div class="track"><div class="fill" data-fill></div></div></div>
       <button class="reset">إعادة المحاولة 🔄</button>`;
     sec.innerHTML = html;
@@ -2354,7 +2354,7 @@ if(!STUDENTS[who]){
       q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+o+'</button>'; });
       h += '</div><div class="explain">'+q[3]+'</div></div>';
     });
-    h += '<div class="scorebar"><span class="txt" data-ars>0 / '+arq.length+'</span>'+
+    h += '<div class="scorebar"><span class="txt" data-ars dir="ltr">0 / '+arq.length+'</span>'+
          '<div class="track"><div class="fill" data-arf></div></div></div>'+
          '<button type="button" data-arreset style="margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">أسئلة جديدة 🔄</button>';
     sec.innerHTML = h;
@@ -2555,7 +2555,7 @@ if(!STUDENTS[who]){
       q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
       html += `</div><div class="explain" ${(q[4]==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
     });
-    html += `<div class="scorebar"><span class="txt" data-score>0 / ${items.length}</span>`+
+    html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${items.length}</span>`+
       `<div class="track"><div class="fill" data-fill></div></div></div>`+
       `<button class="reset">إعادة التمارين 🔄</button>`;
     sec.innerHTML = html;

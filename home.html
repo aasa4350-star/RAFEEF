@@ -279,7 +279,7 @@ async function loadReport(){
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
       var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
-        (vLearned>0?'<li>📚 حفظ: <b>'+vLearned+' / '+vTotal+' كلمة</b> ('+lpct+'%)</li>':'')+
+        (vLearned>0?'<li>📚 حفظ: <b><span dir="ltr">'+vLearned+' / '+vTotal+'</span> كلمة</b> ('+lpct+'%)</li>':'')+
         dayList+
         '<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>'+allC+'/'+allW+' ('+apct+'%)</b> · '+vocabT.length+' جلسة</li>'+
         (untrustedN?'<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>'+untrustedN+'</b></li>':'')+
