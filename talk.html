@@ -252,11 +252,12 @@ function onMic(){
 function aiTurn(childText){
   state.msgs.push({role:"user", content:childText});
   var st=document.getElementById("st"); if(st){ st.style.color="var(--muted)"; st.textContent="🤔 يفكّر بالرد..."; }
-  /* talk-ai صار يجرّب حتى ٣ محاولات (نموذجٌ مزدحمٌ حديثًا ثمّ نموذجٌ
-     احتياطيّ أقدم) قبل أن يستسلم — فقد تستغرق ثوانيَ أكثر من محاولةٍ
-     واحدة. رفعنا مهلة الانتظار هنا لتتّسع لها، وإلّا استسلم العميل
-     للردّ الآلي قبل أن تصل محاولات السيرفر لفرصتها الأخيرة. */
-  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; if(st)st.textContent=""; replyThenAsk(childText); }, 20000);
+  /* talk-ai صار يجرّب حتى مزوّدين (Gemini بمحاولتين، ثمّ OpenAI ملاذًا
+     أخيرًا إن وُجد مفتاحه) قبل أن يستسلم — وكل محاولة Gemini فاشلة
+     استغرقت نحو ١٠ ثوانٍ في القياس الفعليّ. رفعنا مهلة الانتظار هنا
+     لتتّسع للسيناريو الأسوأ (محاولتا Gemini + OpenAI)، وإلّا استسلم
+     العميل للردّ الآلي قبل أن تصل محاولات السيرفر لفرصتها الأخيرة. */
+  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; if(st)st.textContent=""; replyThenAsk(childText); }, 28000);
   fetch(AI_ENDPOINT, { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPA_ANON,"apikey":SUPA_ANON},
     body: JSON.stringify({ messages: state.msgs.slice(-14), child: name, topic: TOPICS[state.topic].t }) })
    .then(function(r){ if(!r.ok) throw 0; return r.json(); })

@@ -81,8 +81,12 @@ async function callGemini(key: string, system: string, messages: any[]): Promise
   }));
   // مفاتيح Google الجديدة تبدأ بـ«AQ.» ولا تُقبل في ?key= بل في ترويسة x-goog-api-key،
   // والقديمة «AIza» تُقبل في الاثنين — فنرسلها في الترويسة دائمًا (مُطبَّقٌ داخل callGeminiModel).
-  const models = ["gemini-flash-latest", "gemini-flash-latest", "gemini-2.5-flash"];
-  const delays = [0, 900, 900];
+  // محاولتان لا ثلاث: كل محاولةٍ فاشلة على Gemini تستغرق نحو ١٠ ثوانٍ في
+  // الملاحظة الفعلية، فثلاثٌ منها وحدها تلامس مهلة العميل. محاولتان هنا
+  // تترك متّسعًا لمحاولة OpenAI بعدهما (انظر Deno.serve أسفله) دون تجاوز
+  // مهلة العميل الإجمالية.
+  const models = ["gemini-flash-latest", "gemini-2.5-flash"];
+  const delays = [0, 500];
   let lastErr: unknown = null;
   for (let i = 0; i < models.length; i++) {
     if (delays[i]) await sleep(delays[i]);
@@ -130,12 +134,27 @@ Deno.serve(async (req: Request) => {
 
     const gk = cleanKey(Deno.env.get("GEMINI_API_KEY"));
     const ok = cleanKey(Deno.env.get("OPENAI_API_KEY"));
-    let reply = "";
-    if (gk) reply = await callGemini(gk, system, messages);
-    else if (ok) reply = await callOpenAI(ok, system, messages);
-    else {
+    if (!gk && !ok) {
       return new Response(JSON.stringify({ error: "no API key configured" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
     }
+    // بلاغ الأب (٣١ أغسطس ٢٠٢٦): كان الكود يختار مزوّدًا واحدًا فقط حسب
+    // أيّ مفتاحٍ موجود (Gemini إن وُجد، وإلّا OpenAI) — فلو أُضيف مفتاح
+    // OpenAI بجانب مفتاح Gemini القائم، بقي Gemini هو المُستعمَل دائمًا
+    // ولن يُجرَّب OpenAI أبدًا مهما فشل Gemini؛ إذ لم يكن هناك تحوّلٌ بين
+    // مزوِّدَين، بل اختيارٌ واحدٌ فقط عند بداية الطلب. فصرنا نُجرِّب Gemini
+    // أوّلًا إن وُجد مفتاحه (مجّانيّ)، فإن فشل ووُجد مفتاح OpenAI (مدفوع)
+    // نستعمله ملاذًا أخيرًا بدل الاستسلام مباشرةً للردّ الآلي بالعميل.
+    let reply = "";
+    let lastErr: unknown = null;
+    if (gk) {
+      try { reply = await callGemini(gk, system, messages); }
+      catch (e) { lastErr = e; }
+    }
+    if (!reply && ok) {
+      try { reply = await callOpenAI(ok, system, messages); lastErr = null; }
+      catch (e) { lastErr = e; }
+    }
+    if (!reply && lastErr) throw lastErr;
 
     if (!reply) reply = "That's nice! Can you tell me more?";
     return new Response(JSON.stringify({ reply }), { headers: { ...cors, "Content-Type": "application/json" } });
