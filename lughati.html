@@ -199,7 +199,18 @@ var ALL  = NAHW.concat(IMLA).concat(FAHM).concat(SHER);
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
 
 var app = document.getElementById("app");
-if(!NAMES[who]){
+/* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
+   رابع وأسامة صفّ خامس». والمحتوى هنا فعلًا مطابقٌ لكتاب لغتي —
+   رابع ابتدائي (الوحدة الأولى: صحتي وبيئتي) لا خامس. وكان الوصول
+   إليه ممكنًا رغم ذلك: زرّ «📗 لغتي» في math5.html (صفحة أسامة نفسه)
+   يمرّر who الحاليّ كما هو، فيفتح له محتوى صفٍّ دونه — وهذا ما فعله
+   فعلًا (ستّ جلساتٍ نحوٍ مسجّلة له في ٣٠ أغسطس). فأُزيل الزرّ من
+   math5.html، وصار الوصول هنا محجوبًا صراحةً لا بصمتٍ فحسب. */
+if(who==="osama"){
+  app.innerHTML = '<div class="locked">📗 لغتي هنا لكتاب <b>رابع ابتدائي</b>، وأسامة صار <b>خامس</b> —'+
+    ' فلا ينزل درجةً في المنهج. مادّة اللغة العربية له داخل صفحته:'+
+    ' <a href="math5.html?who=osama">🔢 صفحة أسامة</a> ← 📝 اختبر نفسك (فيها فقراتٌ عربية) أو 🔊 القراءة والاستماع.</div>';
+} else if(!NAMES[who]){
   app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
 } else {
   app.innerHTML =

@@ -490,7 +490,10 @@ if(!NAMES[who]){
 } else {
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
-    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="lughati.html?who='+who+'">📗 لغتي</a></div>'+
+    /* أُزيل زرّ «لغتي»: هذه الصفحة لأسامة (خامس) حصرًا، ومحتوى lughati.html
+       مطابقٌ لكتاب رابع ابتدائي — درسٌ دونه، ولا ينبغي أن يُعرض عليه.
+       (بلاغ الأب ٣١ أغسطس ٢٠٢٦: «احذف قسم لغتي حق أسامة».) */
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>'+
     '<div class="unit">📘 مطابق لكتاب الرياضيات — الخامس الابتدائي</div>'+
     '<div class="tabs" role="tablist">'+
             '<button data-tab="f1" aria-selected="true">1) الكسور العشرية</button>'+

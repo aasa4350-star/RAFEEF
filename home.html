@@ -244,9 +244,14 @@ async function loadReport(){
     var fresh=function(p){ return !window.RR || RR.freshFlag(p); };
     var untrustedTxt=function(p){ return (p.meta.trusted===false && fresh(p))?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; };
     var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2 && fresh(p))?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits && fresh(p)){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
+    /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
+       رابع وأسامة صفّ خامس». انظر الشرح الكامل في child.html. */
+    var HIDE_SUBJ = { osama: ["لغتي"] };
+    var hidden = HIDE_SUBJ[who] || [];
     var currMap={}, otherMap={};
     var vocabAll=[];
     practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
+      if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { if(!otherMap[t]) otherMap[t]=p; } });

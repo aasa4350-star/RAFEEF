@@ -199,9 +199,18 @@ async function main(){
     const fresh=p=> !window.RR || RR.freshFlag(p);
     const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2 && fresh(p))?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits && fresh(p)){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
     const untrustedTxt=p=> (p.meta.trusted===false && fresh(p))?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``;
+    /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
+       رابع وأسامة صفّ خامس». lughati.html مطابقٌ لكتاب رابع ابتدائي،
+       وأسامة صار في الخامس، فلا يصحّ أن يظهر في منهجه الدراسي مادّةٌ
+       من صفٍّ دونه — ولو بقيت جلساتٌ قديمةٌ مسجَّلةً له فيها (سُجّلت
+       عبر رابطٍ أُزيل الآن من math5.html). النطاق مُعرَّفٌ بالاسم لا
+       بالابن وحده، ليتّسع بسهولةٍ لو تكرّر نظير هذا الموقف. */
+    const HIDE_SUBJ = { osama: ["لغتي"] };
+    const hidden = HIDE_SUBJ[who] || [];
     const currMap={}, otherMap={};
     const vocabAll=[];
     practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
+      if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { if(!otherMap[t]) otherMap[t]=p; } });
