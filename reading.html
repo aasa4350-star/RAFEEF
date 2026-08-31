@@ -1226,9 +1226,28 @@ if(!META[who] || !DATA[who]){
       V = fpool.slice(0, rvSize).sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
     } else if(vocMode==="review"){
       headTitle = "🔁 مراجعة المحفوظ";
-      var pool = VOCAB300.slice(0, learned);
+      var fullPool = VOCAB300.slice(0, learned);
+      var wk = getWeak(), srs = getSR();
+      /* ═══ لا تدخل هنا كلمةٌ لا تزال في نافذة «راجع الجديد» ═══════════
+         بلاغ الأب (٣١ أغسطس ٢٠٢٦): «مراجعة المحفوظ القديم يجيهم فيها
+         حفظ الكلمات الجديدة». وسببه أنّ «راجع المحفوظ» كان يضمّ pool
+         الكلمات المتعلَّمة كلّها بلا استثناء، فكلمةٌ حُفظت أمس (لم ترسخ
+         بعد، صندوقها دون الرابع) تدخل الاختيار هنا بمجرّد أن يحين
+         موعدها الأوّل — وهي في الوقت نفسه ظاهرةٌ في تبويب «راجع الجديد»
+         الخاصّ بها. فيراها الطفل في التبويبين معًا، وهذا ما اشتكى منه.
+
+         فصارت كلمة نافذة «الجديد» (آخر FRESH_WINDOW كلمةً ولم تصل
+         الصندوق الرابع) تبقى حصرًا في تبويبها حتى ترسخ، ثم تنضمّ هنا.
+         وحارسٌ يمنع الفراغ: لو صار الابن حديث العهد فلن يبقى له شيءٌ
+         بعد الاستثناء، فنُلغي الاستثناء ونعرض المحفوظ كاملًا كما كان. */
+      var freshCut = Math.max(0, learned - FRESH_WINDOW);
+      var pool = fullPool.filter(function(w, i){
+        if(i < freshCut) return true;
+        var st = srs[w[0]];
+        return !!(st && (st.b||0) >= MASTERED_BOX);
+      });
+      if(pool.length < Math.min(fullPool.length, VOC_STEP)) pool = fullPool;
       if(pool.length){
-        var wk = getWeak(), srs = getSR();
         /* الترتيب: الكلمة الي غلط فيها أوّلًا، ثم الأكثر تأخّرًا عن موعدها،
            ثم الأقدم حفظًا — فالكلمات القديمة ترجع أوّل لا آخِرًا. */
         /* ثلاث درجات أولويّة:
@@ -1259,11 +1278,26 @@ if(!META[who] || !DATA[who]){
         var sel = dueL.slice(0, wantDue).concat(newL.slice(0, wantNew));
         if(sel.length < rvSize) sel = sel.concat(dueL.slice(wantDue, wantDue + (rvSize - sel.length)));
         if(sel.length < rvSize) sel = sel.concat(newL.slice(wantNew, wantNew + (rvSize - sel.length)));
-        if(sel.length < rvSize) sel = sel.concat(restL.slice(0, rvSize - sel.length));
+        /* ═══ حشوٌ عشوائيّ لا حتميّ ═══════════════════════════════════
+           بلاغ الأب نفسه — الشقّ الثاني: «١٠ كلمات دايم تجيهم». فحين
+           لا يكفي المستحقّ والجديد لملء الجلسة (شائعٌ إن راجع مرّتين في
+           اليوم نفسه، أو كان محفوظه معتدلًا) كان الحشو يأخذ دائمًا
+           الشريحة الأولى نفسها من restL — وهي مرتّبةٌ ترتيبًا ثابتًا،
+           فتتكرّر الكلمات ذاتها في كل جلسةٍ حشوٍ حتى يحين موعدها فعلًا.
+           محاكاةٌ بمحفوظ ٢٠٠ وثلاث جلساتٍ في يومٍ واحد أظهرت أنّ الجلسة
+           الثالثة كانت تكرّر شريحةً متتاليةً ثابتة (٠،١،٢،٣...١٩) حرفيًّا.
+           فصار الحشو عشوائيًّا من نافذةٍ أوسع (ثلاثة أضعاف المطلوب)
+           بدل شريحةٍ ثابتة، فتختلف الكلمات المحشوّة بين جلسةٍ وأخرى. */
+        if(sel.length < rvSize){
+          var need = rvSize - sel.length;
+          var padPool = restL.slice(0, Math.max(need*3, need));
+          for(var pi=padPool.length-1; pi>0; pi--){ var pj=Math.floor(Math.random()*(pi+1)); var tmp=padPool[pi]; padPool[pi]=padPool[pj]; padPool[pj]=tmp; }
+          sel = sel.concat(padPool.slice(0, need));
+        }
         /* العرض بترتيب الملف أيضًا (انظر التعليق أعلاه) */
         V = sel.sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
         dueNow = dueL.length + newL.length;
-        masteredNow = srMastered(pool);
+        masteredNow = srMastered(fullPool);
       } else { V=[]; }
     } else {
       isNew=true; headTitle = "📚 تعلّم كلمات جديدة";
@@ -1388,14 +1422,32 @@ if(!META[who] || !DATA[who]){
       qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>'; });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var enOk = norm(ein.value,false)===norm(word,false);
-        if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(!done[i]){done[i]=1;correct++;} }
-        else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'; }
-        if(!tried[i]){
+        /* ═══ الدرجة تعكس أوّل محاولة، لا آخرها ═══════════════════════
+           بلاغ الأب (٣١ أغسطس ٢٠٢٦): «مراجعة المحفوظ يجيهم فيها نفس
+           الكلمات دايم، مثلاً من ٢٥ كلمة ١٠ دايم تجيهم» — مع أنّ التقرير
+           كان يُظهر درجاتٍ شبه كاملة (٢٥/٢٥) في كل جلسة تقريبًا.
+
+           والسبب: كان correct++ يقع عند أيّ ضغطةٍ ناجحة، حتى لو كانت
+           بعد أن رأى الطفل «الصحيح: <كلمة>» معروضةً على الشاشة ونسخها.
+           فالنتيجة المعروضة تُجمَّل، بينما srMark كان يسجّل الغلطة
+           الأولى فعلًا ويُرجع صندوق الكلمة إلى صفر — فتعود فورًا. فبدا
+           للأب تناقضًا: «كامل الدرجة، لكن نفس الكلمات تتكرّر» — وهو
+           بالضبط ما بلّغ عنه. الدرجة الآن = أوّل محاولةٍ فقط، فتطابق
+           سبب رجوع الكلمة بدل أن تخفيه. وتبقى إعادة المحاولة مسموحةً
+           للتدريب — بس ما تُغيّر الدرجة ولا صندوق المراجعة. */
+        var first = !tried[i];
+        if(first){
           tried[i]=1; markWeak(word, !enOk); srMark(word, enOk);
-          /* نُري الطفل موعد رجوع الكلمة فورًا — هذا جوابُ سؤال «متى أراجعهم» */
+          if(enOk){ done[i]=1; correct++; }
           var nx=srNextTxt(word);
-          if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>';
+          if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>'; }
+          else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best);
+        } else if(enOk){
+          /* محاولةٌ لاحقة صحيحة: نُشجّعه، ونُصرّح أنّها للتدريب لا للدرجة */
+          fb.className="fb ok"; fb.textContent="✅ صحيح — بس أوّل محاولة كانت الأساس، فسجّلناها عشان ترجع لك قريب وترسخ أكثر.";
+        } else {
+          fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>';
         }
         scoreEl.textContent="الدرجة: "+correct+" / "+total;
         onComplete();
