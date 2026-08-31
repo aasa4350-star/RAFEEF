@@ -83,9 +83,13 @@ var SURAH = {
   osama:  {name:"ص",      start:453, end:458, juz:"٢٣"},
   saud:   {name:"ق",      start:518, end:520, juz:"٢٦"}
 };
-var TARTEEL_UNIVERSAL = "https://download.tarteel.ai/";
-var TARTEEL_IOS = "https://apps.apple.com/us/app/tarteel-ai-quran-memorization/id1391009396";
-var TARTEEL_ANDROID = "https://play.google.com/store/apps/details?id=com.mmmoussa.iqra";
+/* بلاغ الأب (٣١ أغسطس ٢٠٢٦): كشف الأخطاء الفعليّ في ترتيل («وضع
+   الاختبار») مقفلٌ بحدّ ٣ محاولاتٍ مجانية باليوم فقط، والباقي مدفوعٌ
+   (Premium). فاستبدلناه بـQuranly الذي تفيد مراجعاتٌ حديثة (٢٠٢٦) أنّ
+   كشف الأخطاء فيه بالذكاء الاصطناعي بلا حدٍّ يوميّ — لم نُجرِّبه
+   بأنفسنا فلا نضمنه ضمان ترتيل، فإن لم يُرضِ الأولاد يسهل الرجوع. */
+var TARTEEL_IOS = "https://apps.apple.com/us/app/quran-by-quranly/id1559233786";
+var TARTEEL_ANDROID = "https://play.google.com/store/apps/details?id=com.quranly.app";
 
 // نفس جدول التكرار المتباعد المستعمل في مراجعة كلمات القراءة (reading.html)
 var SR_DAYS = [0,1,2,4,8,16,30,45];
@@ -116,7 +120,7 @@ if(!NAMES[who] || !SURAH[who]){
       '<header class="top"><p class="eyebrow">القرآن الكريم · مراجعة الحفظ</p><h1>📖 القرآن — '+name+'</h1></header>'+
       '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
       '<div class="card" style="text-align:center;font-weight:800;font-size:1.05rem">سورتك الحالية: سورة '+S.name+'<div style="font-weight:400;font-size:.85rem;color:var(--muted);margin-top:4px">صفحات <span class="en">'+S.start+'–'+S.end+'</span> من المصحف (الجزء <span class="en">'+S.juz+'</span>) · <span class="en">'+totalPages+'</span> صفحة</div></div>'+
-      '<a class="tarteel" href="'+TARTEEL_UNIVERSAL+'" target="_blank" rel="noopener">🎙️ افتح تطبيق ترتيل — سمّع حفظك بصوتك<small>يتابع تلاوتك آيةً آية ويصحّح أخطاءك — تطبيقٌ متخصّص، لا نبنيه هنا</small></a>'+
+      '<a class="tarteel" href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">🎙️ افتح تطبيق Quranly — سمّع حفظك بصوتك<small>يتابع تلاوتك آيةً آية ويصحّح أخطاءك — تطبيقٌ متخصّص، لا نبنيه هنا</small></a>'+
       '<div class="storelinks"><a href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">آيفون (App Store)</a><a href="'+TARTEEL_ANDROID+'" target="_blank" rel="noopener">أندرويد (Google Play)</a></div>'+
 
       '<div class="sec-title"><span class="dot"></span> 📅 مراجعة اليوم ('+dueList.length+')</div>'+
@@ -148,7 +152,7 @@ if(!NAMES[who] || !SURAH[who]){
         (nextNew!=null ? '<button class="addbtn" data-addnew="'+nextNew+'">➕ أضفت صفحة <span class="en">'+nextNew+'</span> إلى حفظي</button>' : '<div class="note" style="text-align:center;margin-top:10px;font-weight:800;color:var(--good)">🎉 كل صفحات السورة بدأت مراجعتها!</div>')+
       '</div>'+
 
-      '<div class="note" style="text-align:center">هذا التتبّع لا يختبر حفظك بأسئلة — فقط يذكّرك بموعد المراجعة (بعد يوم، يومين، ٤ أيام...) حتى يثبت الحفظ. التسميع الفعليّ عبر ترتيل. والتقدّم محفوظٌ على هذا الجهاز فقط.</div>'+
+      '<div class="note" style="text-align:center">هذا التتبّع لا يختبر حفظك بأسئلة — فقط يذكّرك بموعد المراجعة (بعد يوم، يومين، ٤ أيام...) حتى يثبت الحفظ. التسميع الفعليّ عبر Quranly. والتقدّم محفوظٌ على هذا الجهاز فقط.</div>'+
       '<footer>القرآن الكريم · مراجعة الحفظ بالتكرار المتباعد</footer>';
     app.innerHTML = html;
 
