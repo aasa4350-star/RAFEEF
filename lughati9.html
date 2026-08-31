@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>لغتي — ثالث متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:105px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:280px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function en(s){ return '<span class="en">'+s+'</span>'; }
+
+/* ============================================================
+   لغتي — ثالث متوسط (حسن) — الوحدة الأولى: حقوق وواجبات (ص ١٣–١٠٥)
+   مبنيّةٌ من كتاب حسن نفسه، وتقتصر على النطاق المتّفق عليه:
+   نحو / إملاء / بلاغة وتحليل أدبي — دون تمارين الكتابة والتحدّث
+   الإنشائية (خطبة محفلية) لأنها لا تصلح لصيغة اختيار من متعدد.
+   بنك أسئلة: [السؤال، [الصحيح، مشتت، مشتت]، الشرح]
+   ============================================================ */
+
+/* ===== الرسم الإملائي: الألف اللينة في الأفعال الثلاثية (ص٥٣) ===== */
+var IMLA = [
+  ["ما القاعدة العامة لرسم الألف اللينة في آخر الفعل الثلاثي؟",["تُكتب ألفًا قائمة إن كان أصلها واوًا، وعلى صورة الياء إن كان أصلها ياءً","تُكتب دائمًا ألفًا قائمة مهما كان أصلها","تُكتب دائمًا على صورة الياء مهما كان أصلها"],
+    "إذا كان الفعل الثلاثي مختومًا بألفٍ لينة كُتبت ألفه بحسب أصلها: فإن كان أصلها الواو كُتبت ألفًا قائمة، وإن كان أصلها الياء كُتبت على صورة الياء (ى)."],
+  ["كيف تُكتب ألف الفعل "+en("«دعا»")+" ولماذا؟",["ألفًا قائمة؛ لأنّ أصلها واو (من "+en("«يدعو»")+")","على صورة الياء؛ لأنّ أصلها ياء","لا فرق، تُكتب بأيّ صورة"],
+    "دعا أصلها الواو؛ لأنّ مضارعها "+en("«يدعو»")+"، ولأنّ إسنادها إلى تاء الفاعل يعطي "+en("«دعوتُ»")+"، فتُكتب ألفها اللينة قائمة."],
+  ["كيف تُكتب ألف الفعل "+en("«سما»")+" (بمعنى ارتفع) ولماذا؟",["ألفًا قائمة؛ لأنّ أصلها واو (من "+en("«يسمو»")+")","على صورة الياء؛ لأنّ أصلها ياء","تُحذف الألف كليًّا في الكتابة"],
+    "سما أصلها الواو؛ فمضارعها "+en("«يسمو»")+"، وإسنادها إلى تاء الفاعل "+en("«سموتُ»")+"، فتُكتب ألفها اللينة قائمة كـ"+en("«دعا»")+"."],
+  ["كيف تُكتب ألف الفعل "+en("«رمى»")+" ولماذا؟",["على صورة الياء؛ لأنّ أصلها ياء (من "+en("«يرمي»")+")","ألفًا قائمة؛ لأنّ أصلها واو","تُكتب همزة على السطر"],
+    "رمى أصلها الياء؛ فمضارعها "+en("«يرمي»")+"، وإسنادها إلى تاء الفاعل يعطي "+en("«رميتُ»")+"، فتُكتب ألفها اللينة على صورة الياء (ى)."],
+  ["كيف تُكتب ألف الفعل "+en("«بنى»")+" ولماذا؟",["على صورة الياء؛ لأنّ أصلها ياء (من "+en("«يبني»")+")","ألفًا قائمة؛ لأنّ أصلها واو","تُكتب ألفًا ممدودة"],
+    "بنى أصلها الياء؛ فمضارعها "+en("«يبني»")+"، وإسنادها إلى تاء الفاعل "+en("«بنيتُ»")+"، فتُكتب ألفها اللينة على صورة الياء، وهو المثال الذي ذكره الكتاب في مخطّط «أستنتج»."],
+  ["كيف تُكتب ألف الفعل "+en("«سعى»")+" (من السعي) ولماذا؟",["على صورة الياء؛ لأنّ أصلها ياء (من مصدر «السعي»)","ألفًا قائمة؛ لأنّ أصلها واو","تُكتب بلا نقطتين تحتها أبدًا"],
+    "سعى أصلها الياء؛ فمصدرها «السعي»، وإسنادها لتاء الفاعل "+en("«سعيتُ»")+"، فتُكتب ألفها اللينة على صورة الياء."],
+  ["من الطرائق التي يذكرها الكتاب لمعرفة أصل الألف اللينة في الأسماء: الرجوع إلى المعاجم اللغوية وملاحظة مثنّى الاسم، مثل "+en("«عصا، عصوان»")+" الذي يدلّ على أنّ أصل ألف "+en("«عصا»")+" هو:",["الواو","الياء","لا يمكن معرفته"],
+    "لمعرفة أصل الألف اللينة في الأسماء الثلاثية يُرجع للمعاجم اللغوية ويُلاحَظ مثناها، فمثل "+en("«عصا، عصوان»")+" يدلّ على أنّ أصلها الواو، ومثل "+en("«فتى، فتية»")+" يدلّ على أنّ أصلها الياء."],
+  ["من طرائق معرفة أصل الألف اللينة في الفعل الثلاثي: إسناده إلى تاء الفاعل. فإذا أُسند الفعل "+en("«رمى»")+" إلى تاء الفاعل ظهرت الياء "+en("«رميتُ»")+"، فهذا يدلّ على أنّ:",["أصل الألف اللينة فيه ياء","أصل الألف اللينة فيه واو","الفعل ليس ثلاثيًّا"],
+    "إسناد الفعل الثلاثي المختوم بألفٍ لينة إلى تاء الفاعل يكشف أصلها: فظهور الياء (كما في «رميتُ») يدلّ على أنّ أصلها ياء، وظهور الواو (كما في «دعوتُ») يدلّ على أنّ أصلها واو."],
+  ["الألف اللينة الساكنة تقع في آخر الكلمة، وحركة الحرف الذي قبلها تكون دائمًا:",["مفتوحة","مضمومة","مكسورة"],
+    "الألف اللينة الساكنة يكون ما قبلها مفتوحًا دائمًا؛ فهي تنشأ من إشباع الفتحة، سواء كُتبت قائمة أم على صورة الياء."]
+];
+
+/* ===== الصنف اللغوي: اسم الفاعل (ص٦٢) ===== */
+var ISMF = [
+  ["ما تعريف <b>اسم الفاعل</b>؟",["اسم مشتقّ من الفعل المبني للمعلوم، يدلّ على من وقع منه الفعل أو اتّصف به","اسم مشتقّ يدلّ على من وقع عليه الفعل","اسم جامد لا علاقة له بأيّ فعل"],
+    "اسم الفاعل: اسم مشتقّ من الفعل المبني للمعلوم، يدلّ على من وقع منه الفعل أو اتّصف به، ويُصاغ من الثلاثي على وزن «فاعل»، ومن غير الثلاثي على صورة مضارعه مع إبدال حرف المضارعة ميمًا مضمومة وكسر ما قبل الآخر."],
+  ["يُصاغ اسم الفاعل من الفعل <b>الثلاثي</b> على وزن:",["فاعل","مُفعِل","مُفتعِل"],
+    "يُصاغ اسم الفاعل من الفعل الثلاثي على وزن «فاعل»، مثل: كتب ← كاتب، صلح ← صالح، سأل ← سائل، جعل ← جاعل."],
+  ["ما اسم الفاعل من الفعل الثلاثي "+en("«كتب»")+" ؟",["كاتب","مكتوب","كتّاب"],
+    "من الثلاثي «كتب» على وزن فاعل: كاتب — يدلّ على من وقع منه فعل الكتابة."],
+  ["ما اسم الفاعل من الفعل الثلاثي "+en("«صلح»")+" ؟",["صالح","مُصلِح","صلاح"],
+    "من الثلاثي «صلح» على وزن فاعل: صالح — كما ورد في آية "+en("﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً﴾")+" السياق، وفي مثال الكتاب «كافل اليتيم»."],
+  ["يُصاغ اسم الفاعل من الفعل <b>غير الثلاثي</b> من صيغة مضارعه، بإبدال حرف المضارعة:",["ميمًا مضمومة، وكسر ما قبل الآخر","تاءً مفتوحة، وفتح ما قبل الآخر","نونًا ساكنة، وضمّ ما قبل الآخر"],
+    "من غير الثلاثي يُصاغ اسم الفاعل على صورة الفعل المضارع، مع إبدال حرف المضارعة ميمًا مضمومة، وكسر ما قبل الآخر."],
+  ["ما اسم الفاعل من الفعل غير الثلاثي "+en("«تكاتف»")+" (مضارعه "+en("يتكاتف")+")؟",["متكاتِف","تكاتُف","كاتِف"],
+    "«تكاتف» فعلٌ غير ثلاثي، مضارعه «يتكاتف»، فيُبدَل حرف المضارعة (الياء) ميمًا مضمومة، ويُكسر ما قبل الآخر ← متكاتِف."],
+  ["ما اسم الفاعل من الفعل غير الثلاثي "+en("«بذّر»")+" (مضارعه "+en("يبذّر")+")؟",["مُبذِّر","بذّار","تبذير"],
+    "«بذّر» غير ثلاثي، مضارعه «يبذّر»، فيصير اسم الفاعل «مُبذِّر»، كما ورد في الآية "+en("﴿إِنَّ الْمُبَذِّرِينَ كَانُوا إِخْوَانَ الشَّيَاطِينِ﴾")+"."],
+  ["إذا كان الفعل الثلاثي <b>أجوف</b> (وسطه ألف)، فإنّ ألفه عند صياغة اسم الفاعل:",["تُقلَب همزة، مثل: عال ← عائل","تبقى كما هي دون تغيير","تُحذَف كليًّا من الكلمة"],
+    "عند صياغة اسم الفاعل من الفعل الثلاثي الذي وسطه ألف تُقلَب الألف همزة في اسم الفاعل، مثل: عال ← عائل."],
+  ["الفعل الذي عدد أحرفه أكثر من ثلاثة أحرف، هل يُصاغ منه اسم الفاعل على وزن «فاعل»؟",["لا؛ وزن «فاعل» خاصٌّ بالثلاثي فقط، وغير الثلاثي يُصاغ من صيغة مضارعه","نعم دائمًا مهما زاد عدد الأحرف","نعم، لكن بحذف الحرف الزائد أوّلًا"],
+    "لاحِظ أنّ الفعل الذي عدد أحرفه أكثر من ثلاثة أحرف لا يُصاغ منه اسم الفاعل على وزن «فاعل»؛ فهذا الوزن خاصٌّ بالفعل الثلاثي فحسب."]
+];
+
+/* ===== الأسلوب اللغوي: القسَم (ص٦٨) ===== */
+var QASAM = [
+  ["ما <b>القسَم</b>؟",["الحلف واليمين، وهو تأكيد الشيء بذكر معظَّم بصيغة مخصوصة","سؤال يُطرح للاستفهام عن أمر مجهول","أسلوب طلبي يدلّ على الأمر أو النهي"],
+    "القسَم: هو الحَلْف واليمين، مِن «أقسَم» إذا حَلَف، وهو تأكيد الشيء بذكر معظَّم بصيغة مخصوصة."],
+  ["لماذا لا يجوز لأحدٍ أن يُقسِم إلّا بالله عزّ وجلّ؟",["لأنّ ذلك من تعظيم المُقسَم به، ولا يجوز تعظيم غير الله بأوصافه","لأنّ القوانين المدرسية تمنع ذلك فقط","لا يوجد مانعٌ من القسم بغير الله"],
+    "لله عزّ وجلّ أن يُقسِم بما شاء من مخلوقاته، وليس لأحدٍ أن يُقسِم إلّا بالله عزّ وجلّ من صفاته؛ وذلك لِما في القسم به من تعظيمٍ للمُقسَم به."],
+  ["ما مكوّنات أسلوب القسم <b>الثلاثة</b>؟",["أداة القسم، والمُقسَم به، وجواب القسم","الفعل والفاعل والمفعول به","المبتدأ والخبر والرابط"],
+    "مكوّنات أسلوب القسم ثلاثة: أداة القسم، والمُقسَم به، وجواب القسم."],
+  ["من أدوات القسم <b>بالحروف</b>:",["الواو، والباء، والتاء","اللام، والنون، والسين","الفاء، والثمّ، وحتى"],
+    "تكون أداة القسم بحروف، وهي: الواو، والباء، والتاء، مثل: والله، بالله، تالله."],
+  ["من أدوات القسم <b>بالأفعال</b>:",["أقسمُ، وأحلفُ","أرى، وأظنّ","كان، وأصبح"],
+    "تكون أداة القسم بأفعال، ومنها: أقسمُ، وأحلفُ، مثل: «أقسمُ بالله»."],
+  ["من صيغ القسم الأخرى الواردة في الدرس:",["ايم الله، ويمين الله، وايمن الله","سبحان الله، والحمد لله","إن شاء الله، وما شاء الله"],
+    "من صيغ القسم الأخرى: ايم الله، ويمين الله، وايمن الله — وكلّها صيغٌ لتوكيد الكلام بالقسم."],
+  ["في قول القائل: "+en("«والله لأجتهدنّ في طلب العلم»")+"، ما <b>أداة القسم</b>؟",["الواو","لفظ الجلالة «الله»","«لأجتهدنّ»"],
+    "«والله لأجتهدنّ»: أداة القسم هي الواو، والمُقسَم به لفظ الجلالة «الله»، وجواب القسم «لأجتهدنّ»."],
+  ["في المثال نفسه "+en("«والله لأجتهدنّ في طلب العلم»")+"، ما <b>المُقسَم به</b>؟",["لفظ الجلالة «الله»","الواو","«في طلب العلم»"],
+    "المُقسَم به في هذا المثال هو لفظ الجلالة «الله»، وهو ما يجب أن يكون التعظيم مقصورًا عليه."],
+  ["في المثال نفسه "+en("«والله لأجتهدنّ في طلب العلم»")+"، ما <b>جواب القسم</b>؟",["لأجتهدنّ في طلب العلم","والله","لا شيء؛ فالقسم لا يحتاج جوابًا"],
+    "جواب القسم هو الجملة التي تؤكِّدها أداة القسم والمُقسَم به، وهنا: «لأجتهدنّ في طلب العلم»."],
+  ["يجب ألّا يكون القسَم إلّا على شيءٍ:",["يمكن الوفاء به","مستحيل الحدوث","لا يعلمه المُقسِم أصلًا"],
+    "من آداب القسم أن يكون على شيءٍ يمكن الوفاء به؛ فلا يليق أن يُقسِم الإنسان على أمرٍ يعلم أنّه لن يفي به."]
+];
+
+/* ===== الوظيفة النحوية: الحال (ص٧٢) ===== */
+var HAL = [
+  ["ما تعريف <b>الحال</b>؟",["اسم نكرة منصوب يبيّن هيئة صاحبه وقت حدوث الفعل","اسم معرفة مرفوع يقع بعد الفعل مباشرة","حرف يدلّ على القسم أو التوكيد"],
+    "الحال: اسم نكرة منصوب يبيّن هيئة صاحبه وقت حدوث الفعل."],
+  ["ما <b>صاحب الحال</b> من حيث التعريف والتنكير؟",["اسم معرفة دائمًا","اسم نكرة دائمًا","قد يكون معرفة أو نكرة بلا فرق"],
+    "صاحب الحال اسم معرفة، وقد يُعرب فاعلًا أو مفعولًا به أو نائب فاعل."],
+  ["كيف تتطابق الحال مع صاحبها؟",["في التذكير والتأنيث، وفي العدد (الإفراد أو التثنية أو الجمع)","في الإعراب فقط دون المعنى","لا تطابق بينهما إطلاقًا"],
+    "تطابق الحال صاحبها في: التذكير والتأنيث، والعدد (الإفراد أو التثنية أو الجمع)."],
+  ["في جملة "+en("«يؤدّي المسلمُ الصلاةَ خاشعًا»")+"، ما <b>الحال</b> وما نوعها؟",["خاشعًا؛ وهي حالٌ مفردة","الصلاةَ؛ وهي حالٌ جملة","يؤدّي؛ وهي حالٌ شبه جملة"],
+    "«خاشعًا» هي الحال في هذه الجملة، وهي كلمةٌ واحدة تدلّ على هيئة صاحبها (المسلم) وقت حدوث الفعل، فهي حالٌ مفردة."],
+  ["من أنواع الحال بحسب تركيبها:",["مفردة، أو جملة اسمية، أو جملة فعلية","اسمية فقط لا غير","فعل أمر فقط"],
+    "تكون الحال مفردة، أو جملة اسمية، أو جملة فعلية."],
+  ["إذا كانت الحال جملة، فلا بدّ من وجود رابطٍ يربطها بصاحبها. من هذا الرابط:",["الواو، أو الضمير، أو الواو والضمير معًا","حرف الجرّ فقط","لا يوجد رابطٌ من الأصل"],
+    "الحال إذا كانت جملة لا بدّ من وجود رابطٍ يربط جملة الحال بصاحبها؛ قد يكون الرابط: الواو، أو الضمير، أو الواو والضمير معًا."],
+  ["الواو التي تسبق جملة الحال تُسمّى:",["واو الحال","واو العطف","واو القسم"],
+    "الواو التي تسبق جملة الحال تُسمّى (واو الحال)، مثل: «رأى هارون الرشيد السحابة وهي غادية»."],
+  ["في جملة "+en("«رأى هارون الرشيد السحابة تغدو»")+"، ربط جملة الحال (تغدو) بصاحبها (السحابة) تمّ عن طريق:",["الضمير المستتر (هي) في الفعل «تغدو»","الواو فقط","لا يوجد رابط في هذه الجملة"],
+    "في «رأى هارون الرشيد السحابة تغدو» الحال جملةٌ فعلية «تغدو»، وربطها بصاحبها (السحابة) تمّ بالضمير المستتر تقديره «هي» في الفعل."],
+  ["كيف يُعرَب صاحب الحال في جملة "+en("«يؤدّي المسلمُ الصلاةَ خاشعًا»")+"؟",["فاعل، وهو «المسلمُ»","مفعول به، وهو «الصلاةَ»","حال، وهو «خاشعًا»"],
+    "صاحب الحال هنا «المسلمُ»، وهو فاعل الفعل «يؤدّي»؛ فالحال «خاشعًا» تبيّن هيئته وقت أداء الصلاة."],
+  ["ما إعراب الحال دائمًا؟",["منصوبة","مرفوعة","مجرورة"],
+    "الحال منصوبةٌ دائمًا مهما كان نوعها (مفردة أو جملة)؛ فإن كانت جملة فهي في محل نصب حال."]
+];
+
+/* ===== التحليل الأدبي: قصيدة «دَيْن الكريم» للمقنَّع الكندي (ص٤٥) ===== */
+var ADAB = [
+  ["من هو الشاعر <b>المقنَّع الكندي</b>؟",["محمد بن ظفر الكندي، شاعرٌ من قبيلة كِندة اليمنية من أهل حضرموت، عاش في العصر الأموي","شاعرٌ جاهليٌّ من قبيلة قريش","شاعرٌ عباسيٌّ من بغداد"],
+    "محمد بن ظفر الكندي، شاعرٌ من قبيلة كِندة في جنوب الجزيرة العربية، من أهل حضرموت، وُلد ببوادي دوعن، واشتهر في العصر الأموي، توفّي عام ٦٩٨م."],
+  ["لماذا لُقِّب الشاعر بـ<b>«المقنَّع»</b>؟",["لأنّه كان جميلًا يستر وجهه خوفَ العين، وقيل لأنّه فارسٌ مُغطًّى بالسلاح","لأنّه كان يخفي شعره دائمًا","لأنّه رفض الظهور أمام الناس طيلة حياته"],
+    "لُقِّب بالمقنَّع لأنّه كان جميلًا يستر وجهه خوفَ العين، وقيل لأنّه فارسٌ مُغطًّى بالسلاح."],
+  ["ما السبب الذي دفع المقنَّع لقول هذه القصيدة؟",["استعلاء بني عمّه عليه بماله وجاهه، وردُّهم له حين خطب منهم، وتعييرهم إيّاه بتضييع ماله وفقره ودَينه","رغبته في مدح الخليفة الأمويّ فحسب","احتفاله بانتصارٍ عسكريّ حقّقه"],
+    "لمّا سمح المقنَّع بماله حتى نفد ما خلَّفه له أبوه من مال، استعلى عليه بنو عمّه بأموالهم وجاههم، وردُّوه حين خطب منهم، وعيَّروه بتضييع ماله وبفقره ودَينه، فقال هذه القصيدة."],
+  ["ما مضمون قول الشاعر: "+en("«ديونِيَ في أشياءَ تُكسِبُهُم حَمدا»")+" ردًّا على عتاب قومه؟",["أنّ ديونه أُنفقت في أمورٍ تكسبهم حمدًا ومجدًا، لا في سفهٍ أو تبذير","أنّه يعترف بأنّ ديونه كانت خطأً محضًا","أنّه سينكر وجود أيّ دَينٍ عليه"],
+    "يردّ الشاعر على عتاب قومه له في الدَّين بأنّ ديونه أُنفقت في أشياء تكسبهم هم أنفسهم حمدًا ومجدًا، لا في سفهٍ أو إسرافٍ لنفسه."],
+  ["ما الصورة التي يرسمها قول الشاعر "+en("«مُكلَّلةً لحمًا مُدَفَّقةً ثردا»")+" في وصف جفنته؟",["صورة الكرم والسخاء، بجفنةٍ ملأى بالطعام يقدّمها لضيوفه وقومه","صورة الفقر وشحّ الطعام","صورة معركةٍ حربية"],
+    "يصف الشاعر جفنته (وعاء طعامه) بأنّها مليئة باللحم والثريد، في صورةٍ فنّية تجسِّد كرمه وسخاءه على قومه وضيوفه."],
+  ["ماذا فعل الشاعر بفرسه الذي كان يحمي به بيته؟",["أخدَمه لبيتِه (تنازل عنه ليخدم بيته أو أهله)، إيثارًا وكرمًا","باعه لسداد دَينه","قتله ليأكل قومه لحمه"],
+    "يقول الشاعر إنّه جعل فرسه النجيب حجابًا (حاميًا) لبيته، ثمّ أخدَمه لبيته عبدًا؛ في صورةٍ أخرى من صور كرمه وإيثاره."],
+  ["ما القيمة التي يُستشَفّ من قوله "+en("«وفي جَفنةٍ ما يُغلَقُ البابُ دونَها»")+" ؟",["الكرم وعدم منع الطعام عمّن يطرق بابه من محتاجٍ أو ضيف","الحرص الشديد على المال","الخوف من الغرباء"],
+    "يدلّ هذا البيت على كرم الشاعر؛ فجفنته (وعاء طعامه) لا يُغلَق دونها الباب، أي إنّه لا يمنع الطعام عن طارقٍ محتاجٍ أو ضيف."],
+  ["ما موقف الشاعر ممّن بادَهُوه بالعداوة وقطعوا صلتهم به؟",["لا يحمل عليهم الحقد، ويسعى لمودّتهم رغم إساءتهم","يردّ إساءتهم بمثلها أو أشدّ","يدعو عليهم بالهلاك"],
+    "يقول الشاعر إنّه وإن بادَهُوه بالعداوة وقطعوا الأواصر (صلات القرابة) معه فإنّه لا يحمل الحقد القديم عليهم، وهذا يدلّ على سموّ خلقه رغم إساءتهم إليه."],
+  ["كيف وصف الشاعر قومه في مقابل كرمه هو؟",["بالبخل والتقتير، خلافًا لكرمه وسخائه","بالكرم الشديد أيضًا مثله تمامًا","بأنّهم أغنى منه بكثير فقط"],
+    "عاتب قومُ المقنَّع عليه إنفاقَه وكرمه، وفي المقابل وصفهم الشاعر بضيق العطاء والاستعلاء عليه بمالهم وجاههم، في تباينٍ واضح بين سخائه وبخلهم."],
+  ["ما طبيعة العلاقة بين الشاعر وقومه كما تصوّرها القصيدة؟",["علاقةٌ متوتّرة؛ إذ عاتبوه واستعلَوا عليه رغم إحسانه وكرمه معهم","علاقةٌ ودّية لا خلاف فيها أبدًا","لا علاقة بينهم إطلاقًا؛ فهو غريبٌ عنهم"],
+    "تصوِّر القصيدة علاقةً متوتّرة بين الشاعر وقومه؛ فقد عيَّروه بدَينه واستعلَوا عليه بمالهم رغم كرمه وسخائه المستمرّ معهم، وهو ما دفعه لنظم هذه القصيدة دفاعًا عن نفسه."]
+];
+
+function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
+var IMLAG=[bankGen(IMLA)], ISMFG=[bankGen(ISMF)], QASAMG=[bankGen(QASAM)], HALG=[bankGen(HAL)], ADABG=[bankGen(ADAB)];
+var ALLG=[IMLAG[0], ISMFG[0], QASAMG[0], HALG[0], ADABG[0]];
+
+/* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
+   يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · لغتي</p><h1>📗 لغتي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="math9.html?who='+who+'">🔢 الرياضيات</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب لغتي — ثالث متوسط · الوحدة الأولى: حقوق وواجبات (ص <span class="en">13–105</span>)<br>'+
+      '<span style="font-weight:400;font-size:.85rem;color:var(--muted)">الدروس اللغوية (نحو/إملاء/بلاغة) والتحليل الأدبي فقط — الوحدتان ٢ و٣ تُضافان لاحقًا.</span></div>'+
+    '<div class="tabs" role="tablist">'+
+      '<button data-tab="imla" aria-selected="true">إملاء ✍️</button>'+
+      '<button data-tab="ismf" aria-selected="false">صرف 🔤</button>'+
+      '<button data-tab="qasam" aria-selected="false">أسلوب 🗣️</button>'+
+      '<button data-tab="hal" aria-selected="false">نحو 📐</button>'+
+      '<button data-tab="adab" aria-selected="false">أدبي 📜</button>'+
+      '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
+    '</div>'+
+    '<section class="panel" id="all"></section>'+
+    '<section class="panel active" id="imla"></section>'+
+    '<section class="panel" id="ismf"></section>'+
+    '<section class="panel" id="qasam"></section>'+
+    '<section class="panel" id="hal"></section>'+
+    '<section class="panel" id="adab"></section>'+
+    '<section class="panel" id="rem"></section>'+
+    '<footer>لغتي · ثالث متوسط · الوحدة الأولى «حقوق وواجبات» · مطابق للكتاب</footer>';
+
+  var CFG = {
+    all:  {gens:ALLG,  n:15, intro:"اختبار شامل: الإملاء + الصرف + الأسلوب اللغوي + النحو + التحليل الأدبي — <b>أسئلة جديدة كل مرة</b>.", label:"لغتي م٣ — شامل و١"},
+    imla: {gens:IMLAG, n:9,  intro:"<b>الرسم الإملائي — الألف اللينة في الأفعال الثلاثية:</b> تُكتب قائمة إن كان أصلها واوًا، وعلى صورة الياء إن كان أصلها ياءً. ويُعرف الأصل بالمعجم، أو بإسناد الفعل إلى تاء الفاعل.", label:"لغتي م٣ — إملاء: الألف اللينة"},
+    ismf: {gens:ISMFG, n:9,  intro:"<b>الصنف اللغوي — اسم الفاعل:</b> من الثلاثي على وزن «فاعل»، ومن غير الثلاثي من صيغة المضارع بإبدال حرف المضارعة ميمًا مضمومة وكسر ما قبل الآخر.", label:"لغتي م٣ — صرف: اسم الفاعل"},
+    qasam:{gens:QASAMG,n:10, intro:"<b>الأسلوب اللغوي — القسَم:</b> تأكيد الشيء بذكر معظَّم، بمكوّناته الثلاثة: أداة القسم، والمُقسَم به، وجواب القسم. ولا يجوز القسم إلا بالله.", label:"لغتي م٣ — أسلوب: القسَم"},
+    hal:  {gens:HALG,  n:10, intro:"<b>الوظيفة النحوية — الحال:</b> اسم نكرة منصوب يبيّن هيئة صاحبه وقت حدوث الفعل، وتكون مفردة أو جملة اسمية أو فعلية، وتتطابق مع صاحبها تذكيرًا وتأنيثًا وعددًا.", label:"لغتي م٣ — نحو: الحال"},
+    adab: {gens:ADABG, n:10, intro:"<b>التحليل الأدبي — قصيدة «دَيْن الكريم» للمقنَّع الكندي:</b> قصيدةٌ في الكرم ورحابة الصدر، ردّ بها الشاعر على عتاب قومه له في دَينه.", label:"لغتي م٣ — أدبي: دَيْن الكريم"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var __ok = (+btn.dataset.j===ans);
+          if(id==="all"){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="lughati9", REM_LABEL="لغتي";
+  var REMTOPICS=[
+    {id:"imla", name:"إملاء: الألف اللينة", tip:"إن كان أصل الألف اللينة واوًا (كدعا ← يدعو) تُكتب قائمة، وإن كان أصلها ياءً (كرمى ← يرمي) تُكتب على صورة الياء. اكشف الأصل بالمعجم، أو بإسناد الفعل إلى تاء الفاعل: دعوتُ (واو) مقابل رميتُ (ياء).", yt:"شرح الألف اللينة في الأفعال الثلاثية ثالث متوسط"},
+    {id:"ismf", name:"صرف: اسم الفاعل", tip:"من الثلاثي على وزن فاعل (كتب ← كاتب). ومن غير الثلاثي من صيغة المضارع بإبدال حرف المضارعة ميمًا مضمومة وكسر ما قبل الآخر (يتكاتف ← متكاتِف). والأجوف تُقلب ألفه همزة (عال ← عائل).", yt:"شرح اسم الفاعل ثالث متوسط لغتي"},
+    {id:"qasam", name:"أسلوب: القسَم", tip:"مكوّنات القسم ثلاثة: الأداة (كالواو والباء والتاء، أو أقسم/أحلف)، والمُقسَم به، وجواب القسم. ولا يجوز القسم إلا بالله من صفاته.", yt:"شرح أسلوب القسم ثالث متوسط لغتي"},
+    {id:"hal", name:"نحو: الحال", tip:"الحال اسم نكرة منصوب يبيّن هيئة صاحبه وقت حدوث الفعل، وتتطابق معه في التذكير والتأنيث والعدد. وتكون مفردة أو جملة (اسمية/فعلية) لها رابط بصاحبها: الواو أو الضمير أو كلاهما.", yt:"شرح الحال ثالث متوسط لغتي"},
+    {id:"adab", name:"أدبي: دَيْن الكريم", tip:"المقنَّع الكندي (محمد بن ظفر)، عصرٌ أمويّ، قال القصيدة ردًّا على عتاب قومه له في دَينه بعد أن أنفق ماله كرمًا، وهم استعلوا عليه بمالهم وجاههم رغم إحسانه لهم.", yt:"شرح قصيدة دين الكريم للمقنع الكندي"}
+  ];
+  var ALL_IDS = ["all"];
+
+  /* ═══ الاختبار الشامل يُغذّي «علاجي» — راجع تعليل هذا النمط في
+     math9.html/science9.html: الشامل يُسجَّل مقسَّمًا على الدروس
+     بوسم كلّ سؤالٍ باسم مولّده، فلا يبقى «علاجي» فارغًا لمن اختبر
+     الشامل فقط، ولا يُطمَس تقييم درسٍ اختُبر وحده بتقديرٍ من الشامل. */
+  function topicOfGen(name, fn){
+    if(!window.__g2t){
+      var m={}, pairs=[];
+      Object.keys(CFG).forEach(function(id){
+        if(ALL_IDS.indexOf(id)>-1 || id==="rem") return;
+        (CFG[id].gens||[]).forEach(function(g){ if(!g) return; if(g.name) m[g.name]=id; pairs.push([g,id]); });
+      });
+      window.__g2t=m; window.__g2tp=pairs;
+    }
+    if(name && window.__g2t[name]) return window.__g2t[name];
+    if(fn){ for(var i=0;i<window.__g2tp.length;i++) if(window.__g2tp[i][0]===fn) return window.__g2tp[i][1]; }
+    return null;
+  }
+  function saveTopicTallies(tally){
+    Object.keys(tally).forEach(function(tid){
+      var v=tally[tid]; if(!v.t) return;
+      var prev=null; try{ prev=JSON.parse(localStorage.getItem(remKey(tid))); }catch(e){}
+      /* نتيجةُ درسٍ اختُبر وحده لا تُطمَس بتقديرٍ من الشامل */
+      if(prev && typeof prev.pct==="number" && !prev.from) return;
+      try{ localStorage.setItem(remKey(tid), JSON.stringify(
+        { pct:Math.round(v.c/v.t*100), n:v.t, from:"all" })); }catch(e){}
+    });
+  }
+
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null, est:!!(s&&s.from==="all"), n:(s&&s.n)||null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+  /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
+     اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
+  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"imla"}}).dataset.tab);
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
+      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+    });
+  });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
