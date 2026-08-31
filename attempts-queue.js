@@ -22,8 +22,27 @@
   function write(a){
     try{ localStorage.setItem(K, JSON.stringify(a.slice(-MAX))); }catch(e){}
   }
-  function enqueue(url, key, payload){
-    var a = read(); a.push({ u:url, k:key, p:payload, t:Date.now() }); write(a);
+  function enqueue(url, key, payload, id){
+    var a = read(); a.push({ id:id, u:url, k:key, p:payload, t:Date.now() }); write(a);
+  }
+  /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): رفيف شافت نتيجة قراءة القطعة والإملاء
+     على الشاشة، لكنّها لم تصل التقرير إطلاقًا — لا نجاحًا ولا حتى في
+     طابور الإعادة. والعلّة أنّ enqueue() كانت تُستدعى فقط من داخل
+     then/catch لنتيجة fetch؛ فإن غادر الطفل الصفحة (سكّر التطبيق أو
+     رجع للخلف بسرعة) بينما الطلب لا يزال في الطريق، قد يُقطَع الاتصال
+     قبل أن يصل الوعد إلى then أو catch على الإطلاق — فلا يُسجَّل فشلًا
+     ولا نجاحًا، ويضيع بصمتٍ تام رغم keepalive. حماية keepalive تحفظ
+     الطلب من موت التبويب نفسه، لكنها لا تحفظ سطر الجافاسكربت الذي
+     يُفترض أن يستجيب لنتيجته.
+
+     فصرنا نكتب في التخزين المحلي أوّلًا (تفاؤلًا) قبل الإرسال أصلًا،
+     لا بعد فشله؛ فإن قُطع كلّ شيء من نصف الطريق تبقى النسخة المحلية
+     موجودة، وتُرسَل تلقائيًّا في أوّل فتحةٍ قادمة لأيّ صفحة. ونحذفها
+     من الطابور فقط بعد تأكّد النجاح. */
+  function removeById(id){
+    if(id==null) return;
+    var a = read().filter(function(it){ return it.id !== id; });
+    write(a);
   }
   function send(url, key, payload){
     return fetch(url, {
@@ -42,12 +61,14 @@
     /* onState: "pending" ثم "ok" أو "queued" */
     post: function(url, key, payload, onState){
       stamp(payload);
+      var id = Date.now()+"_"+Math.random().toString(36).slice(2);
+      enqueue(url, key, payload, id);   /* نكتب أوّلًا، قبل أن نحاول الإرسال */
       try{ if(onState) onState("pending"); }catch(e){}
       return send(url, key, payload).then(function(r){
-        if(r && r.ok){ try{ if(onState) onState("ok"); }catch(e){} return true; }
-        enqueue(url, key, payload); try{ if(onState) onState("queued"); }catch(e){} return false;
+        if(r && r.ok){ removeById(id); try{ if(onState) onState("ok"); }catch(e){} return true; }
+        try{ if(onState) onState("queued"); }catch(e){} return false;
       }).catch(function(){
-        enqueue(url, key, payload); try{ if(onState) onState("queued"); }catch(e){} return false;
+        try{ if(onState) onState("queued"); }catch(e){} return false;
       });
     },
     pending: function(){ return read().length; },
