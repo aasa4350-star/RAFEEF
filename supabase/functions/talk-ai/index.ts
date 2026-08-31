@@ -40,15 +40,18 @@ function sys(child: string, topic: string): string {
   ].filter(Boolean).join(" ");
 }
 
-async function callGemini(key: string, system: string, messages: any[]): Promise<string> {
-  const contents = messages.slice(-14).map((m) => ({
-    role: m.role === "model" ? "model" : "user",
-    parts: [{ text: String(m.content || "") }],
-  }));
-  // مفاتيح Google الجديدة تبدأ بـ«AQ.» ولا تُقبل في ?key= بل في ترويسة x-goog-api-key،
-  // والقديمة «AIza» تُقبل في الاثنين — فنرسلها في الترويسة دائمًا.
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
+// بلاغ الأب (٣١ أغسطس ٢٠٢٦): المحادثة "آلية مكررة" — يقصد الردّ
+// الاحتياطي المُقيَّد بأسئلةٍ ثابتة، لأنّ talk-ai كانت تفشل دائمًا فيرجع
+// إليه. فحصنا الاتصال الحقيقي بالدالّة فوجدناها تصل Gemini فعلًا (المفتاح
+// سليم، لا 401 كما كان موثَّقًا سابقًا)، لكنّها تنهار بخطأ "503 مزدحمٌ
+// حاليًا" باستمرار — وسبب هذا أنّ "gemini-flash-latest" صار يُشير الآن
+// إلى Gemini 3.7 Flash، النموذج الذي أُطلق قبل أيامٍ قليلة (١٣ أغسطس
+// ٢٠٢٦) ولا يزال زحامه شديدًا من كثرة من يهاجرون إليه. فنحاول عليه أوّلًا
+// (فهو الأحدث)، وإن ازدحم (503) نُعيد المحاولة مرّةً بعد مهلةٍ قصيرة —
+// فرسالة Google نفسها تقول إنّ الازدحام "عادةً مؤقّت" — فإن استمرّ نتحوّل
+// إلى "gemini-2.5-flash" الأقدم والأكثر استقرارًا كخيارٍ أخير.
+async function callGeminiModel(model: string, key: string, system: string, contents: any[]): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": key },
@@ -60,14 +63,40 @@ async function callGemini(key: string, system: string, messages: any[]): Promise
     }),
   });
   if (!res.ok) {
-    // نضيف طول المفتاح فقط (بدون كشفه) لأن 401 غالبًا سببه مفتاح ناقص أو ملصوق غلط.
-    throw new Error(
-      "gemini " + res.status + " (keyLen=" + key.length + ") " + (await res.text()).slice(0, 200),
-    );
+    const status = res.status;
+    const bodyText = (await res.text()).slice(0, 200);
+    const err = new Error("gemini " + status + " (keyLen=" + key.length + ") " + bodyText) as Error & { status?: number };
+    err.status = status;
+    throw err;
   }
   const data = await res.json();
   const parts = data?.candidates?.[0]?.content?.parts || [];
   return parts.map((p: any) => p.text || "").join(" ").trim();
+}
+function sleep(ms: number): Promise<void> { return new Promise((r) => setTimeout(r, ms)); }
+async function callGemini(key: string, system: string, messages: any[]): Promise<string> {
+  const contents = messages.slice(-14).map((m) => ({
+    role: m.role === "model" ? "model" : "user",
+    parts: [{ text: String(m.content || "") }],
+  }));
+  // مفاتيح Google الجديدة تبدأ بـ«AQ.» ولا تُقبل في ?key= بل في ترويسة x-goog-api-key،
+  // والقديمة «AIza» تُقبل في الاثنين — فنرسلها في الترويسة دائمًا (مُطبَّقٌ داخل callGeminiModel).
+  const models = ["gemini-flash-latest", "gemini-flash-latest", "gemini-2.5-flash"];
+  const delays = [0, 900, 900];
+  let lastErr: unknown = null;
+  for (let i = 0; i < models.length; i++) {
+    if (delays[i]) await sleep(delays[i]);
+    try {
+      return await callGeminiModel(models[i], key, system, contents);
+    } catch (e) {
+      lastErr = e;
+      const status = (e as { status?: number })?.status;
+      // 401/403 (مفتاحٌ فاسد) لا تنفع فيه إعادة المحاولة على نموذجٍ آخر — نتوقّف فورًا.
+      if (status === 401 || status === 403) throw e;
+      // غير ذلك (503 ازدحام غالبًا) نجرّب الخطوة التالية في القائمة.
+    }
+  }
+  throw lastErr;
 }
 
 async function callOpenAI(key: string, system: string, messages: any[]): Promise<string> {
