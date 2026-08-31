@@ -396,10 +396,10 @@ function azureConfigured(){ return !!azureCreds(); }
 function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var SDK = window.SpeechSDK;
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
-  var MAX_RESUMES=8;
+  var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
-  function _closeRec(){ var r=rec; rec=null; if(!r) return; try{ r.stopContinuousRecognitionAsync(function(){ try{r.close();}catch(e){} }, function(){ try{r.close();}catch(e){} }); }catch(e){ try{r.close();}catch(e2){} } }
+  function _closeRec(){ var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
     if(btn){ btn.disabled=false; }
@@ -440,77 +440,77 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     var sb = statusEl.querySelector("[data-stopread]"); if(sb) sb.addEventListener("click", function(){ _userStopped=true; finish(); });
   }
   /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «أسامة كل الأقسام تقبل معه إلا قراءة
-     القطعة» — على آيفون، صوته عالٍ وواضح (تأكّدنا)، وموصولٌ بسفاري
-     مباشرة بلا بلوتوث ولا صامت، ومع ذلك أخفقت محاولتان متتاليتان في
-     التقاط أيّ كلمة. هذا يطابق قيد آيفون المعروف على مايك Azure
-     (تعليق أعلاه): جلسة الصوت الداخلية لسفاري أحيانًا تحتاج وقتًا
-     أطول من ٤٠٠ملّي ثانية لتُحرَّر فعليًّا بين إغلاق مايكٍ وفتح آخر،
-     فتُعاد المحاولة قبل أن يستقرّ المسار الصوتيّ فتفشل مثل الأولى.
-     فرفعنا المهلة بين المحاولات، وأضفنا محاولةً ثالثة؛ فإن كانت
-     العلّة بُطء التحرّر لا عطبًا دائمًا فالمحاولة الإضافية تنجح. */
+     القطعة» — على آيفون، صوته عالٍ وواضح (تأكّدنا)، موصولٌ بسفاري
+     مباشرة بلا بلوتوث ولا صامت، وحتى بعد رفع مهلة إعادة المحاولة
+     ومحاولة ثالثة (تعديلٌ أوّل جرّبناه) استمرّ الإخفاق التامّ. لكنّه
+     أوضح أنّ الكلمات المفردة (بمسار «محاولة واحدة» أي recognizeOnceAsync
+     في _paRun) تلتقط صوته زين — فالعلّة إذن ليست بالمايك ولا بالجهاز
+     ولا بالإذن، بل خاصّةٌ بمسار «التسجيل المستمر»
+     (startContinuousRecognitionAsync) الذي كانت قراءة القطعة وحدها
+     تستعمله؛ وهو معروفٌ بعدم استقراره على سفاري/آيفون تحديدًا مع
+     Azure SDK بخلاف المسار أحادي المحاولة.
+
+     فأعدنا بناء قراءة القطعة كلّها من مسار «محاولة واحدة» نفسه الذي
+     أثبت نجاحه: نكرّر recognizeOnceAsync دورةً بعد دورة تلقائيًّا (لا
+     تسجيلًا مستمرًّا واحدًا)، ونجمع نتائج كلّ دورةٍ في allWords، حتى
+     يضغط الطفل «خلّصت القراءة» أو تنقضي مهلة الأمان. فتجربة الطفل
+     تبدو قراءةً متواصلة، والتقنية تحتها هي نفسها التي نجحت معه. */
   function _retryOrFail(){
     if(_fin || _userStopped) return true;
     if(allWords.length){ finish(); return true; }
-    if(_tries<2){ _tries++; _closeRec(); window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; startRec("retry"); }, 900); return true; }
+    if(_tries<2){ _tries++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; startRec("retry"); }, 900); return true; }
     return false;
   }
-  function startRec(retry){
-    try{ if(window.__ac && window.__ac.state==="suspended") window.__ac.resume(); }catch(e){}
+  function _cycle(consecNoMatch){
+    if(_fin || _userStopped) return;
     var cfg, audio, pa, cr=azureCreds();
     try{
       cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
       cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
-      /* ٤ ثوانٍ بين الجملتين: الطفل يقف عند النقطة ويتنفّس، والافتراضيّ
-         نصفُ ثانيةٍ فيقطع عليه عند كلّ جملة. */
-      try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"25000");
+      /* نفس القيم المستعملة في _paRun (المسار المُثبَت نجاحه) — لا قيم
+         جديدة نخمّنها. ٤ ثوانٍ سكوتٍ بين الجملة والتالية قبل أن تُنهي
+         الخدمة الدورة، حتى يقف الطفل عند النقطة ويتنفّس بلا انقطاعٍ عليه. */
+      try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"15000");
            cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"4000"); }catch(e){}
       audio = SDK.AudioConfig.fromDefaultMicrophoneInput();
       rec = new SDK.SpeechRecognizer(cfg, audio);
       pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
       pa.applyTo(rec);
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
-    rec.recognized = function(s, e){
+    rec.recognizeOnceAsync(function(result){
+      if(_fin || _userStopped){ _closeRec(); return; }
+      var gotWords=false;
       try{
-        if(e && e.result && e.result.reason===SDK.ResultReason.RecognizedSpeech){
-          var r = SDK.PronunciationAssessmentResult.fromResult(e.result);
+        if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+          var r = SDK.PronunciationAssessmentResult.fromResult(result);
           var ws = (r.detailResult && r.detailResult.Words) || [];
-          allWords = allWords.concat(ws);
-          // درجات المقطع (لحساب الدقّة والطلاقة الإجمالية للقطعة)
-          if(typeof r.accuracyScore==="number" || typeof r.fluencyScore==="number"){
-            segs.push({ acc:r.accuracyScore, flu:r.fluencyScore, prn:r.pronunciationScore, n:(ws.length||1) });
+          if(ws.length){
+            allWords = allWords.concat(ws);
+            gotWords = true;
+            if(typeof r.accuracyScore==="number" || typeof r.fluencyScore==="number"){
+              segs.push({ acc:r.accuracyScore, flu:r.fluencyScore, prn:r.pronunciationScore, n:(ws.length||1) });
+            }
+            window.__micGrace=Date.now()+9000;
+            var cn = statusEl.querySelector("[data-readcnt]"); if(cn) cn.textContent = allWords.length;
           }
-          window.__micGrace=Date.now()+9000;
-          var cn = statusEl.querySelector("[data-readcnt]"); if(cn) cn.textContent = allWords.length;
         }
       }catch(err){}
-    };
-    /* الخدمة تُلغي الجلسة عند السكتة الطويلة بين الجملتين أو عند تعثّرٍ
-       في الشبكة — والطفل ما زال يقرأ. وكان الكود يُنهي التقييم عند أوّل
-       إلغاءٍ ما دام قد التقط كلمةً واحدة (شرط allWords.length في
-       _retryOrFail)، فتُحتسب القطعة ناقصةً وهو لم يُنهِها: قرأ حسن
-       الجملة الأولى فوقف عند نقطتها، فجاءه «اكتمال ٥٩» وانقطع عليه
-       الباقي (٢٦ أغسطس ٢٠٢٦).
-
-       فنستأنف التسجيل ونحتفظ بما جُمع، ولا يُنهيه إلّا زرّ «خلّصت
-       القراءة» أو مهلة الأمان. وللاستئناف حدٌّ لئلّا ندور بلا نهاية
-       إن كان العطب دائمًا. */
-    rec.canceled = function(s, e){
+      _closeRec();
       if(_fin || _userStopped) return;
-      if(_resumes < MAX_RESUMES){
-        _resumes++;
-        _closeRec();
-        window.__micGrace = Date.now()+9000;
-        setTimeout(function(){ if(_fin || _userStopped) return; startRec("resume"); }, 250);
-        return;
-      }
+      var next = gotWords ? 0 : consecNoMatch+1;
+      if(next >= MAX_CONSEC_NOMATCH){ if(!_retryOrFail()) finish(); return; }
+      setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 150);
+    }, function(err){
+      if(_fin || _userStopped) return;
+      _closeRec();
+      if(_resumes < MAX_RESUMES){ _resumes++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
       if(!_retryOrFail()) finish();
-    };
-    _showListening(retry);
-    rec.startContinuousRecognitionAsync(function(){}, function(err){
-      if(_fin || _userStopped) return;
-      if(_retryOrFail()) return;
-      _fin=true; clearTimeout(_to); _releaseBusy(); micFail(statusEl, btn, onFail); _closeRec();
     });
+  }
+  function startRec(retry){
+    try{ if(window.__ac && window.__ac.state==="suspended") window.__ac.resume(); }catch(e){}
+    _showListening(retry);
+    _cycle(0);
   }
   _to = setTimeout(finish, 150000); // أمان عام: يوقف تلقائيًا بعد دقيقتين ونصف (يشمل الإعادات)
   startRec("");
