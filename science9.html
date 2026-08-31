@@ -349,10 +349,22 @@ if(!NAMES[who]){
   }
   function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
 
+  /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «الأولاد يبون رابط يوتيوب على كل درس»
+     — لا رابط فيديوٍ محدَّد لكل درس (يحتاج تحقّقًا يدويًّا من مطابقته
+     للكتاب لكلّ درسٍ في كلّ مادّة، وقد يُحذف الفيديو أو يُخفى لاحقًا
+     فيموت الرابط بصمت)، بل رابط بحثٍ في يوتيوب بعبارةٍ مخصَّصةٍ لكلّ
+     درس (نفس عبارة REMTOPICS.yt المستعملة أصلًا في «علاجي»)، يظهر
+     من أوّل ما يفتح الطالب الدرس لا بعد اختباره وإخفاقه فيه فقط. */
+  function ytLinkHtml(id){
+    var rt=null;
+    for(var i=0;i<REMTOPICS.length;i++){ if(REMTOPICS[i].id===id){ rt=REMTOPICS[i]; break; } }
+    if(!rt) return '';
+    return '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(rt.yt||rt.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح الدرس</a></div>';
+  }
   function render(id){
     var c = CFG[id], sec = panelOf(id);
     var items = genN(c.gens, c.n);
-    var html = '<div class="intro">'+c.intro+'</div>';
+    var html = '<div class="intro">'+c.intro+ytLinkHtml(id)+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
