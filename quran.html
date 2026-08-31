@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>القرآن — مراجعة الحفظ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#0e9f6e; --accent-deep:#057a55;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --warn:#b45309; --warn-bg:#fef3e0;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;--warn-bg:#3a2a0f;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a,.bar button{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow);cursor:pointer;font-family:inherit}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .sec-title{font-weight:800;margin:20px 2px 10px;display:flex;align-items:center;gap:8px}
+  .sec-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .tarteel{display:block;text-align:center;background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:16px;border-radius:16px;font-weight:800;font-size:1.05rem;text-decoration:none;box-shadow:var(--shadow);margin-bottom:8px}
+  .tarteel small{display:block;font-weight:400;font-size:.8rem;opacity:.92;margin-top:4px}
+  .storelinks{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+  .storelinks a{font-size:.82rem;color:var(--muted);text-decoration:underline}
+  .pagegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:10px}
+  .pchip{border:1.5px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;font-weight:700;font-size:.85rem;background:var(--bg)}
+  .pchip.due{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+  .pchip.mastered{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+  .pchip.pending{opacity:.55}
+  .duelist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .duerow{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:12px;padding:10px 14px}
+  .duerow .p{font-weight:800}
+  .duerow .btns{display:flex;gap:6px}
+  .duerow button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:7px 11px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .duerow button.ok{border-color:var(--good);color:var(--good)}
+  .duerow button.again{border-color:var(--bad);color:var(--bad)}
+  .progressbar{background:var(--line);border-radius:99px;height:10px;overflow:hidden;margin-top:8px}
+  .progressbar>div{background:var(--accent);height:100%;border-radius:99px}
+  .addbtn{width:100%;margin-top:10px;background:var(--accent);color:#fff;border:0;padding:13px;border-radius:12px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit}
+  .note{font-size:.85rem;color:var(--muted);margin-top:6px}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var name = NAMES[who] || "الطالب";
+
+/* ============================================================
+   قسم القرآن — تتبّع مراجعة الحفظ بالتكرار المتباعد فقط، دون أي
+   أسئلة اختيار من متعدد على نصّ الآيات (قرارٌ ثابتٌ من الأب: لا
+   يجوز اختبار حفظ القرآن بأسئلةٍ آلية، فقط تتبّع مراجعة). والتسميع
+   الفعليّ (سلامة النطق والتلاوة) عبر تطبيق ترتيل الذي يستعمل محرّك
+   تمييز صوتٍ متخصّصًا بالقرآن — لا نبنيه نحن.
+
+   طلب الأب (٣١ أغسطس ٢٠٢٦): ربط ترتيل + قسم قرآن لكل ابنٍ بسورته:
+   حسن: النساء (٧٧-١٠٦) · رفيف: التوبة (١٨٧-٢٠٧) ·
+   أسامة: ص (٤٥٣-٤٥٨) · سعود: ق (٥١٨-٥٢٠)
+   أرقام الصفحات مطابقةٌ لمصحف المدينة المنورة القياسيّ (٦٠٤ صفحة).
+   ============================================================ */
+var SURAH = {
+  hasan:  {name:"النساء", start:77,  end:106, juz:"٤-٦"},
+  rafeef: {name:"التوبة", start:187, end:207, juz:"١٠-١١"},
+  osama:  {name:"ص",      start:453, end:458, juz:"٢٣"},
+  saud:   {name:"ق",      start:518, end:520, juz:"٢٦"}
+};
+var TARTEEL_UNIVERSAL = "https://download.tarteel.ai/";
+var TARTEEL_IOS = "https://apps.apple.com/us/app/tarteel-ai-quran-memorization/id1391009396";
+var TARTEEL_ANDROID = "https://play.google.com/store/apps/details?id=com.mmmoussa.iqra";
+
+// نفس جدول التكرار المتباعد المستعمل في مراجعة كلمات القراءة (reading.html)
+var SR_DAYS = [0,1,2,4,8,16,30,45];
+var MASTERED_BOX = 4;
+
+function todayStr(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(dstr, n){ var d=new Date(dstr+"T00:00:00"); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function storeKey(){ return "quran_pages_"+who; }
+function loadPages(){ try{ return JSON.parse(localStorage.getItem(storeKey())||"{}"); }catch(e){ return {}; } }
+function savePages(p){ try{ localStorage.setItem(storeKey(), JSON.stringify(p)); }catch(e){} }
+
+var app = document.getElementById("app");
+if(!NAMES[who] || !SURAH[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
+} else {
+  var S = SURAH[who], totalPages = S.end - S.start + 1;
+
+  function render(){
+    var pages = loadPages(); // { "77": {box:2, next:"2026-09-02"}, ... }
+    var today = todayStr();
+    var startedList = [];
+    for(var p=S.start; p<=S.end; p++){ if(pages[p]) startedList.push(p); }
+    var dueList = startedList.filter(function(p){ return pages[p].next<=today; }).sort(function(a,b){return a-b;});
+    var masteredCount = startedList.filter(function(p){ return pages[p].box>=MASTERED_BOX; }).length;
+    var nextNew = null; for(var p2=S.start; p2<=S.end; p2++){ if(!pages[p2]){ nextNew=p2; break; } }
+
+    var html =
+      '<header class="top"><p class="eyebrow">القرآن الكريم · مراجعة الحفظ</p><h1>📖 القرآن — '+name+'</h1></header>'+
+      '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
+      '<div class="card" style="text-align:center;font-weight:800;font-size:1.05rem">سورتك الحالية: سورة '+S.name+'<div style="font-weight:400;font-size:.85rem;color:var(--muted);margin-top:4px">صفحات <span class="en">'+S.start+'–'+S.end+'</span> من المصحف (الجزء <span class="en">'+S.juz+'</span>) · <span class="en">'+totalPages+'</span> صفحة</div></div>'+
+      '<a class="tarteel" href="'+TARTEEL_UNIVERSAL+'" target="_blank" rel="noopener">🎙️ افتح تطبيق ترتيل — سمّع حفظك بصوتك<small>يتابع تلاوتك آيةً آية ويصحّح أخطاءك — تطبيقٌ متخصّص، لا نبنيه هنا</small></a>'+
+      '<div class="storelinks"><a href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">آيفون (App Store)</a><a href="'+TARTEEL_ANDROID+'" target="_blank" rel="noopener">أندرويد (Google Play)</a></div>'+
+
+      '<div class="sec-title"><span class="dot"></span> 📅 مراجعة اليوم ('+dueList.length+')</div>'+
+      '<div class="card">'+
+      (dueList.length ?
+        '<div class="duelist">'+dueList.map(function(p){
+          return '<div class="duerow"><span class="p">صفحة <span class="en">'+p+'</span></span><div class="btns">'+
+            '<button class="again" data-again="'+p+'">🔁 أعيدها</button>'+
+            '<button class="ok" data-ok="'+p+'">✅ راجعتها</button>'+
+            '</div></div>';
+        }).join('')+'</div>'
+        : '<div style="text-align:center;color:var(--muted)">لا صفحات عليك مراجعتها اليوم 🎉'+(startedList.length?'':' — ابدأ بإضافة أول صفحة تحفظها تحت.')+'</div>')+
+      '</div>'+
+
+      '<div class="sec-title"><span class="dot"></span> 📊 تقدّمك في السورة</div>'+
+      '<div class="card">'+
+        '<div style="display:flex;justify-content:space-between;font-size:.9rem"><span>بدأت مراجعة <b class="en">'+startedList.length+'</b> من <b class="en">'+totalPages+'</b> صفحة</span><span style="color:var(--good);font-weight:800">✅ <span class="en">'+masteredCount+'</span> متقنة</span></div>'+
+        '<div class="progressbar"><div style="width:'+(totalPages?Math.round(startedList.length/totalPages*100):0)+'%"></div></div>'+
+        '<div class="pagegrid">'+(function(){
+          var out='';
+          for(var p3=S.start;p3<=S.end;p3++){
+            var st=pages[p3];
+            var cls = !st ? 'pending' : (st.box>=MASTERED_BOX ? 'mastered' : (st.next<=today?'due':''));
+            out += '<div class="pchip '+cls+'">'+p3+'</div>';
+          }
+          return out;
+        })()+'</div>'+
+        '<div class="note">🟩 متقنة (راجعتها ٤ مرات فأكثر بفواصل متباعدة) · 🟧 عليها مراجعة اليوم · رمادي باهت لم تبدأ بعد</div>'+
+        (nextNew!=null ? '<button class="addbtn" data-addnew="'+nextNew+'">➕ أضفت صفحة <span class="en">'+nextNew+'</span> إلى حفظي</button>' : '<div class="note" style="text-align:center;margin-top:10px;font-weight:800;color:var(--good)">🎉 كل صفحات السورة بدأت مراجعتها!</div>')+
+      '</div>'+
+
+      '<div class="note" style="text-align:center">هذا التتبّع لا يختبر حفظك بأسئلة — فقط يذكّرك بموعد المراجعة (بعد يوم، يومين، ٤ أيام...) حتى يثبت الحفظ. التسميع الفعليّ عبر ترتيل. والتقدّم محفوظٌ على هذا الجهاز فقط.</div>'+
+      '<footer>القرآن الكريم · مراجعة الحفظ بالتكرار المتباعد</footer>';
+    app.innerHTML = html;
+
+    app.querySelectorAll("[data-addnew]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var p = +b.dataset.addnew, pg = loadPages();
+        pg[p] = { box:0, next: today };
+        savePages(pg); render();
+      });
+    });
+    app.querySelectorAll("[data-ok]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var p = +b.dataset.ok, pg = loadPages();
+        var st = pg[p] || {box:0, next:today};
+        st.box = Math.min(st.box+1, SR_DAYS.length-1);
+        st.next = addDays(today, SR_DAYS[st.box]);
+        pg[p] = st; savePages(pg); render();
+      });
+    });
+    app.querySelectorAll("[data-again]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var p = +b.dataset.again, pg = loadPages();
+        pg[p] = { box:0, next: today };
+        savePages(pg); render();
+      });
+    });
+  }
+  render();
+}
+</script>
+</body>
+</html>
