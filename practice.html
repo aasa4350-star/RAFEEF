@@ -735,6 +735,16 @@ async function renderRemedial(){
     .filter(function(o){ return !STRETCH_GROUPS[o.s.group] && o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
     .sort(function(a,b){ return (a.st.c/a.st.t)-(b.st.c/b.st.t); });
   var inLevelData = SKILLS.some(function(s){ return !STRETCH_GROUPS[s.group] && topicStat(s).t>0; });
+  // بلاغ الأب (١ سبتمبر ٢٠٢٦): «ستيب ليش ماله قسم علاجي روابط يوتيوب».
+  // وسبب ذلك أن STRETCH_GROUPS يستثني تحصيلي وSTEP من كشف الضعف أعلاه
+  // عمدًا (فوق المستوى، لا تُحسب على الابن) — فحتى لو كانت نسبة حسن
+  // في Grammar ٣٧٪ (تحقّقتُ: فعلًا كذلك)، لا يظهر له تنبيهٌ ولا فيديو
+  // إلا لو فتح يدويًّا «تصفّح كل الدروس» المطويّة أسفل الصفحة. نُبقي
+  // الفصل نفسه (لا نخلطها بضعف مستوى الصفّ) لكن نُظهرها في قسمٍ خاصٍّ
+  // بها هنا، بنفس تحذير «فوق المستوى، للتعوّد فقط» حتى لا تُفهم خطأً.
+  var weakStretch = SKILLS.map(function(s){ return {s:s, st:topicStat(s)}; })
+    .filter(function(o){ return STRETCH_GROUPS[o.s.group] && o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
+    .sort(function(a,b){ return (a.st.c/a.st.t)-(b.st.c/b.st.t); });
 
   var html='';
   if(weak.length){
@@ -744,6 +754,10 @@ async function renderRemedial(){
     html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪ في مستوى صفّك. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span></div>';
   } else {
     html += '<div class="intro">لسّا ما فيه بيانات كافية في القدرات الكمي. اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
+  }
+  if(weakStretch.length){
+    html += '<div class="intro" style="margin-top:14px">🚀 <b>فوق المستوى — تحصيلي/STEP تحت ٥٠٪</b> (لا تُحسب ضعفًا في مستوى صفّك، لكنها فرصة تهيئة مبكرة). شاهد الفيديو ثم حُلّ الجولة تحتها.</div>';
+    weakStretch.forEach(function(o){ html += lessonCard(o.s, o.st, true); });
   }
   // مكتبة كل الدروس — مطويّة، اختيارية (والتحصيلي/STEP فوق المستوى، للتعوّد فقط)
   var lib='';
