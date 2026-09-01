@@ -147,9 +147,16 @@ async function main(){
     rows=await r.json();
     rows=Array.isArray(rows)?rows:[];
   }catch(e){}
-  // نفصل الاختبارات التجريبية والنشاط عن اختبارات المدرسة
-  const practice=rows.filter(x=> x.meta && x.meta.kind==="practice");
-  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice")));
+  // نفصل الاختبارات التجريبية والنشاط والتعبير عن اختبارات المدرسة
+  /* بلاغ الأب (١ سبتمبر ٢٠٢٦): «أصلًا مايطلع لي في التقرير قسم
+     التعبير». والسبب أعمق من مجرّد غياب القسم: جلسات kind="writing"
+     و"writing-drill" لم تكن تُستثنى هنا كما استُثنيت "activity" و
+     "practice"، فبقيت ضمن rows/full العامّة — وهي محفوظة دائمًا
+     en_total=0 وma_total=0 (التعبير لا يقاس بهما)، فكانت pct(0,0)=٪٠
+     تدخل في متوسّط enAvg/maAvg («المستوى») وتُخفضه زورًا كلّما كتب
+     الابن فقرة، فوق أنها لا تُعرض في أي قسم مخصّص أصلًا. */
+  const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"));
+  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
      فجلسةُ خمسة أسئلة تُزحزح «المستوى الحالي» كأنّها ورقةٌ كاملة. */
@@ -208,8 +215,11 @@ async function main(){
     const HIDE_SUBJ = { osama: ["لغتي"] };
     const hidden = HIDE_SUBJ[who] || [];
     const currMap={}, otherMap={};
-    const vocabAll=[];
-    practice.forEach(p=>{ const t=(p.meta.test||""); const subj=t.split(" ")[0];
+    const vocabAll=[], writingAll=[], writingDrill=[];
+    practice.forEach(p=>{
+      if(p.meta.kind==="writing"){ writingAll.push(p); return; }
+      if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
+      const t=(p.meta.test||""); const subj=t.split(" ")[0];
       if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
@@ -252,6 +262,33 @@ async function main(){
         (untrustedN?`<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>${untrustedN}</b></li>`:``)+
         `</ul>`+
         (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul class="weak">${revList}</ul>`:``)+
+        `</div>`;
+    }
+    // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
+    if(writingAll.length){
+      const WSUBS=[["Content","المحتوى","اقرأ نقاط المهمّة أولًا وغطِّها كلّها، واكتب بالطول المطلوب لهدف CEFR.",
+                    "طريقة كتابة فقرة انجليزي تغطية نقاط الموضوع content"],
+                   ["Organisation","الترتيب والربط","ابدأ بجملةٍ تُقدّم الموضوع، ورتّب أفكارك بأدوات ربطٍ مثل first/then/finally، واختم برأيك.",
+                    "أدوات الربط في الكتابة الانجليزية linking words paragraph organisation"],
+                   ["Language","اللغة","ابدأ كل جملة بحرفٍ كبير، واكتب الضمير I كبيرًا دائمًا، ونوّع مفرداتك بدل تكرار نفس الكلمة.",
+                    "تحسين الاملاء والترقيم والمفردات في الكتابة الانجليزية"],
+                   ["Communicative Achievement","مناسبة الأسلوب","تجنّب لغة الدردشة (u, plz, lol...) واكتب جُملًا كاملة بأسلوبٍ رسمي.",
+                    "اسلوب الكتابة الرسمي في الانجليزي paragraph writing style"]];
+      const wAgg={}; let wAggN=0;
+      writingAll.forEach(p=>{ if(p.meta.bands){ wAggN++; WSUBS.forEach(s=>{ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
+      const dc2=writingDrill.reduce((s,p)=>s+(p.meta.correct||0),0), dt2=writingDrill.reduce((s,p)=>s+(p.meta.total||0),0);
+      html+=`<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">`+
+        `<li>📝 كتب <b>${writingAll.length}</b> فقرة${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``}</li>`;
+      if(wAggN){
+        const avgs=WSUBS.map(s=>({s, avg:wAgg[s[0]]/wAggN}));
+        const weakestW=avgs.slice().sort((a,b)=>a.avg-b.avg)[0];
+        html+=avgs.map(o=>{ const p2=Math.round(o.avg/5*100);
+          return `<li><span style="color:${p2>=80?'var(--good)':p2>=50?'var(--warn)':'var(--bad)'};font-weight:800">${(Math.round(o.avg*10)/10)}/5</span> ${o.s[1]} <span class="cnt">${o.s[0]}</span></li>`; }).join("")+
+          (weakestW.avg<5?`<li style="background:var(--bg);border-radius:10px;padding:8px 10px;margin-top:4px">👈 <b>أضعف مقياس:</b> ${weakestW.s[1]} — ${weakestW.s[2]}<div style="margin-top:6px"><a href="https://www.youtube.com/results?search_query=${encodeURIComponent(weakestW.s[3])}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:8px 13px;border-radius:11px;font-weight:800;font-size:.86rem">🎬 شاهد شرح ${weakestW.s[1]}</a></div></li>`:``);
+      }
+      html+=`</ul>`+
+        writingAll.slice(0,3).map(p=>{ const m=p.meta;
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(p.created_at)}</span><div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
         `</div>`;
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
