@@ -1784,7 +1784,7 @@ if(!STUDENTS[who]){
   function eIrregPast(){
     var v=gpick([["go","went"],["eat","ate"],["see","saw"],["buy","bought"],["take","took"],["come","came"],["give","gave"],["make","made"],["find","found"],["write","wrote"],["drink","drank"],["run","ran"],["swim","swam"],["sing","sang"],["teach","taught"],["think","thought"],["bring","brought"],["catch","caught"],["know","knew"],["drive","drove"],["fly","flew"],["speak","spoke"],["break","broke"],["choose","chose"],["get","got"],["leave","left"],["meet","met"],["pay","paid"],["sell","sold"],["tell","told"]]);
     var o=opt3(v[1],[v[0]+"ed",v[0],v[0]+"d"]);
-    return ["Yesterday, I ___ (to "+v[0]+").",o[0],o[1],"فعل شاذ: "+v[0]+" ← "+v[1]+" في الماضي.","en"];
+    return ["Yesterday, I ___ (to "+v[0]+").",o[0],o[1],"فعل شاذّ لا يأخذ ed: "+v[0]+" (المصدر) ← "+v[1]+" (الماضي). احفظه كزوج: "+v[0]+"–"+v[1]+".","en"];
   }
   function eSuper(){
     var a=gpick(["tall","short","fast","old","young","strong","big","small","cheap","cold","warm","long","clean","rich","high","low","new"]);
