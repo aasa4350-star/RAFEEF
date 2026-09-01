@@ -351,6 +351,55 @@ function writingCardHtml(student){
   return html+'</div>';
 }
 
+/* 🗣️ المحادثة الإنجليزية: talk.html لم تكن تحفظ شيئًا (بلاغ الأب ١
+   سبتمبر ٢٠٢٦: «كيف أتابع مستواهم بالمحادثة؟»). صارت الآن تسجّل كل
+   جلسة (الموضوع، عدد الجمل، متوسط درجة النطق). نعرض هنا عدد الجلسات،
+   متوسط النطق العام، الموضوع الأكثر تكرارًا، والاتجاه الأخير. */
+function talkCardHtml(student){
+  var rows = ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="talk"; });
+  if(!rows.length)
+    return '<div class="card"><h2>🗣️ المحادثة الإنجليزية</h2>'+
+      '<p class="note">لم يجرّب المحادثة الحرة (talk.html) بعد — القسم موجودٌ وشغّال، بس ما جُرِّب.</p></div>';
+  var rowT=function(r){ return r.created_at; };
+  rows.sort(function(a,b){ return String(rowT(b)).localeCompare(String(rowT(a))); });
+  var totTurns=0, pronRows=[], topicCount={};
+  rows.forEach(function(r){
+    var m=r.meta;
+    totTurns += (m.turns||0);
+    if(typeof m.avgPron==="number") pronRows.push({v:m.avgPron, t:rowT(r)});
+    var tp = m.topic||"—"; topicCount[tp]=(topicCount[tp]||0)+1;
+  });
+  var avgPronAll = pronRows.length ? Math.round(pronRows.reduce(function(a,b){return a+b.v;},0)/pronRows.length) : null;
+  var topTopic = Object.keys(topicCount).sort(function(a,b){ return topicCount[b]-topicCount[a]; })[0];
+  var cutoff = Date.now()-RECENT_DAYS*86400000;
+  var recentP = pronRows.filter(function(x){ return new Date(x.t).getTime()>=cutoff; });
+  var olderP = pronRows.filter(function(x){ return new Date(x.t).getTime()<cutoff; });
+  var trendHtml = "";
+  if(recentP.length>=2 && olderP.length>=2){
+    var ra=Math.round(recentP.reduce(function(a,b){return a+b.v;},0)/recentP.length);
+    var oa=Math.round(olderP.reduce(function(a,b){return a+b.v;},0)/olderP.length);
+    var dd=ra-oa;
+    trendHtml='<p class="note">اتجاه النطق آخر '+RECENT_DAYS+' أيام: '+oa+'% ← '+ra+'% ('+(dd>0?"+":"")+dd+' نقطة)</p>';
+  }
+  var html='<div class="card"><h2>🗣️ المحادثة الإنجليزية</h2>'+
+    '<div class="stats">'+
+      '<div class="stat"><div class="v">'+rows.length+'</div><div class="l">جلسة</div></div>'+
+      '<div class="stat"><div class="v">'+totTurns+'</div><div class="l">جملة قالها</div></div>'+
+      (avgPronAll!=null ? '<div class="stat"><div class="v">'+avgPronAll+'%</div><div class="l">متوسّط النطق</div></div>' : '')+
+      (topTopic ? '<div class="stat"><div class="v" style="font-size:1rem">'+esc(topTopic)+'</div><div class="l">الموضوع الأكثر</div></div>' : '')+
+    '</div>'+trendHtml+
+    '<ul class="sk">'+ rows.slice(0,10).map(function(r){
+      var m=r.meta, p=(typeof m.avgPron==="number")?m.avgPron:null;
+      return '<li>'+(p!=null?'<span class="pill '+cls(p)+'">'+p+'%</span>':'<span class="pill" style="background:var(--bg)">—</span>')+
+        '<span class="nm">'+esc(m.topic||"—")+
+          '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saDate(rowT(r))+' · '+(m.turns||0)+' جملة'+(m.secs?' · '+Math.round(m.secs/60)+' د':'')+'</span>'+
+        '</span></li>';
+    }).join("")+'</ul>'+
+    (rows.length>10 ? '<p class="note">وأقدم منها '+(rows.length-10)+' جلسة.</p>' : '')+
+  '</div>';
+  return html;
+}
+
 /* قسم «فوق المستوى»: تحصيلي وSTEP — يُعرض محايدًا ولا يُحسب في التقييم. */
 function stretchCardHtml(d){
   var items = Object.keys(d.stretchSk).map(function(n){ return {name:n, s:d.stretchSk[n]}; });
@@ -376,6 +425,7 @@ function render(){
       (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
       sc+
       writingCardHtml(current)+
+      talkCardHtml(current)+
       stretchCard;
     return;
   }
@@ -408,6 +458,7 @@ function render(){
     sessionsCardHtml(current)+
     repeatCardHtml(d)+
     writingCardHtml(current)+
+    talkCardHtml(current)+
     stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+
       '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+
