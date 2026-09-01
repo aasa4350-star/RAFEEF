@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الرياضيات — ثاني متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
+  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .ax{direction:rtl;unicode-bidi:isolate;display:inline-block;font-weight:inherit}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.1rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:260px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<0 ? "−" : "")+s; } // فاصلة آلاف + إشارة سالب رياضية
+function mn(s){ return '<span class="en">'+s+'</span>'; }
+function ax(s){ return '<span class="ax">'+s+'</span>'; }
+function nz(a,b){ var v=ri(a,b); return v===0 ? (Math.random()<0.5?1:-1)*ri(1,b) : v; }
+function gcdi(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ var t=b; b=a%b; a=t; } return a||1; }
+/* كسر مبسّط بإشارةٍ رياضية، أو عدد صحيح، أو «غير معرّف» */
+function fracStr(n,d){
+  if(d===0) return "غير معرّف";
+  if(n===0) return "0";
+  var neg = (n<0)!==(d<0);
+  n=Math.abs(n); d=Math.abs(d);
+  var g=gcdi(n,d); n=n/g; d=d/g;
+  return (neg?"−":"") + (d===1 ? String(n) : (n+"/"+d));
+}
+/* خيارات لأعداد صحيحة (تسمح بالسالب) */
+function zOpts(correct, cands){
+  var seen={}; seen[correct]=1; var others=[];
+  var pool = cands.concat([-correct, correct+1, correct-1, correct+2, correct+10]);
+  for(var i=0;i<pool.length && others.length<2;i++){ var v=pool[i]; if(v!==correct && !seen[v]){ seen[v]=1; others.push(v); } }
+  var arr=[correct].concat(others).map(fmt); shuffle(arr); return [arr, arr.indexOf(fmt(correct))];
+}
+/* خيارات نصّية، ٣ على الأقل وإلا null */
+function sOpts(right, cands){
+  var o=[right];
+  for(var i=0;i<cands.length && o.length<3;i++){ if(cands[i]!=null && o.indexOf(cands[i])<0) o.push(cands[i]); }
+  if(o.length<3) return null;
+  shuffle(o); return [o, o.indexOf(right)];
+}
+function sOpts3(right, cands, filler){
+  var o=[right];
+  var pool=cands.concat(filler||[]);
+  for(var i=0;i<pool.length && o.length<3;i++){ if(pool[i]!=null && o.indexOf(pool[i])<0) o.push(pool[i]); }
+  if(o.length<3) return null;
+  shuffle(o); return [o, o.indexOf(right)];
+}
+var SUP = ["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
+function sup(n){ var s=String(n); var neg=(s[0]==="-"||s[0]==="−"); if(neg) s=s.slice(1); var out=s.split("").map(function(d){ return SUP[+d]||""; }).join(""); return (neg?"⁻":"")+out; }
+function pw(b,e){ var bs=fmt(b); if(b<0) bs="("+bs+")"; return mn(bs+sup(e)); }
+
+/* ============================================================
+   رياضيات ثاني متوسط — رفيف — مبنيّة من كتاب الرياضيات (الجزء الأول)
+   الفصل الأول: الجبر — الأعداد النسبية (ص ١٠–٥٩)
+   الفصل الرابع: النسبة المئوية (ص ١٤٩–١٧٥)
+   كل مولّد فوقه رقم الدرس، مبنيّ من أمثلة الكتاب نفسها.
+   ============================================================ */
+
+/* ===== ١-١ الأعداد النسبية (كسر عشري منتهٍ / دوري) ===== */
+var TERM_D = [2,4,5,8,10,16,20,25,40,50];
+function decDigits(d){ var c2=0,c5=0; while(d%2===0){d/=2;c2++;} while(d%5===0){d/=5;c5++;} return d===1?Math.max(c2,c5):null; }
+function classifyTermRepeat(n,d){ var g=gcdi(n,d); var dd=d/g; while(dd%2===0) dd/=2; while(dd%5===0) dd/=5; return dd===1?"term":"repeat"; }
+
+function gFracToDecTerm(){
+  var d=gp(TERM_D), n=ri(1,d-1);
+  var k=decDigits(d); if(k==null) return null;
+  var neg = Math.random()<0.3;
+  var val = n/d;
+  var decStr = (neg?"−":"")+val.toFixed(k);
+  var wrongA = (neg?"−":"")+(val+1/Math.pow(10,k)).toFixed(k);
+  var wrongB = (neg?"−":"")+((d-n)/d).toFixed(k);
+  var o=sOpts3(decStr, [wrongA, wrongB], [(neg?"−":"")+Math.abs(val-1/Math.pow(10,k)).toFixed(k)]);
+  if(!o) return null;
+  var fracDisp=(neg?"−":"")+n+"/"+d;
+  return ["اكتب الكسر "+mn(fracDisp)+" على صورة كسر عشري:",
+    o[0].map(mn), o[1],
+    "نقسم "+mn(n)+" ÷ "+mn(d)+" = "+mn(decStr)+".", "fracToDecTerm"];
+}
+
+var NICE_DEC = [[4,10],[75,100],[125,1000],[6,10],[35,100],[28,100],[15,100],[85,100],[325,1000],[8,100],[5,10],[45,100],[12,100],[625,1000]];
+function gDecToFrac(){
+  var pair=gp(NICE_DEC), num=pair[0], den=pair[1];
+  var neg=Math.random()<0.3;
+  var k=String(den).length-1;
+  var decStr=(num/den).toFixed(k);
+  if(neg) decStr="−"+decStr;
+  var correct=fracStr(neg?-num:num, den);
+  var wrong1=fracStr(neg?-num:num, den*10);
+  var wrong2=fracStr((neg?-num:num)+1, den);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(neg?-num:num, den*2)]);
+  if(!o) return null;
+  return ["اكتب العدد العشري "+mn(decStr)+" على صورة كسر اعتيادي في أبسط صورة:",
+    o[0].map(mn), o[1],
+    "المقام هو قوّة العشرة بعدد المنازل العشرية، ثم نبسّط: "+mn(decStr)+" = "+mn((neg?"−":"")+num+"/"+den)+" = "+mn(correct)+".", "decToFrac"];
+}
+
+function gTermOrRepeat(){
+  var pool=[2,3,4,5,6,7,8,9,10,11,12,13,16,20,25];
+  var d=gp(pool), n=ri(1,d-1);
+  var cls=classifyTermRepeat(n,d);
+  var lbl = cls==="term" ? "منتهٍ" : "دوري";
+  var wrong = cls==="term" ? "دوري" : "منتهٍ";
+  var o=sOpts(lbl, [wrong, "غير معرّف"]);
+  if(!o) return null;
+  var fracDisp=n+"/"+d;
+  return ["الكسر العشري الناتج عن كتابة "+mn(fracDisp)+" على صورة عشرية هو:",
+    o[0], o[1],
+    (cls==="term" ? "بعد التبسيط يبقى في المقام العاملان ٢ و٥ فقط، فالكسر العشري "+mn("منتهٍ")+"."
+                  : "بعد التبسيط يبقى في المقام عاملٌ غير ٢ و٥ (كـ٣ أو ٧)، فالكسر العشري "+mn("دوري")+"."), "termOrRepeat"];
+}
+var N1=[gFracToDecTerm, gDecToFrac, gTermOrRepeat];
+
+/* ===== ١-٢ مقارنة الأعداد النسبية وترتيبها ===== */
+function gCompareFrac(){
+  var d1=ri(2,12), d2=ri(2,12);
+  if(d1===d2) d2=d1+1;
+  var n1=ri(1,d1-1), n2=ri(1,d2-1);
+  var s1=Math.random()<0.3?-1:1, s2=s1;
+  if(Math.random()<0.3) s2=-s2;
+  var v1=s1*n1/d1, v2=s2*n2/d2;
+  if(Math.abs(v1-v2)<1e-9) return null;
+  var symbol = v1<v2?"<":">";
+  var o=sOpts(symbol, ["<",">","="].filter(function(x){return x!==symbol;}));
+  if(!o) return null;
+  var f1=(s1<0?"−"+n1:n1)+"/"+d1, f2=(s2<0?"−"+n2:n2)+"/"+d2;
+  return ["ضع الإشارة المناسبة (< أو > أو =) بين "+mn(f1)+" و"+mn(f2)+" :",
+    o[0].map(mn), o[1],
+    "نوحّد المقامين بإيجاد مضاعفٍ مشتركٍ لهما، ثم نقارن البسطين: "+mn(f1)+" "+mn(symbol)+" "+mn(f2)+".", "compareFrac"];
+}
+function gOrderThree(){
+  var vals=[], strs=[];
+  for(var i=0;i<3;i++){
+    if(Math.random()<0.5){ var d=ri(2,10), n=ri(1,d-1); vals.push(n/d); strs.push(n+"/"+d); }
+    else{ var dec=ri(10,95)/100; vals.push(dec); strs.push(dec.toFixed(2)); }
+  }
+  if(Math.abs(vals[0]-vals[1])<0.01||Math.abs(vals[1]-vals[2])<0.01||Math.abs(vals[0]-vals[2])<0.01) return null;
+  var askMax=Math.random()<0.5;
+  var target = askMax?Math.max.apply(null,vals):Math.min.apply(null,vals);
+  var idx = vals.indexOf(target);
+  var o=sOpts(strs[idx], strs.filter(function(s,i2){return i2!==idx;}));
+  if(!o) return null;
+  return ["أيّ الأعداد الآتية "+(askMax?"الأكبر":"الأصغر")+"؟ "+strs.map(mn).join(" ، "),
+    o[0].map(mn), o[1],
+    "نقارن الأعداد بتوحيد صورتها (كسور عشرية مثلًا)، فيكون "+(askMax?"الأكبر":"الأصغر")+" هو "+mn(strs[idx])+".", "orderThree"];
+}
+var N2=[gCompareFrac, gOrderThree];
+
+/* ===== ١-٣ ضرب الأعداد النسبية ===== */
+function gMulFrac(){
+  var d1=ri(2,9), n1=ri(1,d1-1)*(Math.random()<0.4?-1:1);
+  var d2=ri(2,9), n2=ri(1,d2-1)*(Math.random()<0.4?-1:1);
+  var rn=n1*n2, rd=d1*d2;
+  var correct=fracStr(rn,rd);
+  var wrong1=fracStr(rn, d1+d2);
+  var wrong2=fracStr(-rn, rd);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(rn+1,rd)]);
+  if(!o) return null;
+  var f1=(n1<0?"−"+Math.abs(n1):n1)+"/"+d1, f2=(n2<0?"−"+Math.abs(n2):n2)+"/"+d2;
+  return ["أوجد ناتج "+mn(f1)+" × "+mn(f2)+" في أبسط صورة:",
+    o[0].map(mn), o[1],
+    "نضرب البسط في البسط، والمقام في المقام: "+mn(fmt(n1)+"×"+fmt(n2))+" ÷ "+mn(fmt(d1)+"×"+fmt(d2))+" = "+mn(correct)+".", "mulFrac"];
+}
+function gMulSignOnly(){
+  var s1=gp([1,-1]), s2=gp([1,-1]);
+  var res = s1*s2>0?"موجب":"سالب";
+  var o=sOpts(res, [res==="موجب"?"سالب":"موجب","صفر"]);
+  if(!o) return null;
+  var a=s1*ri(2,9), b=s2*ri(2,9);
+  return ["ناتج ضرب "+mn(fmt(a))+" في "+mn(fmt(b))+" يكون:",
+    o[0], o[1],
+    "الإشارتان "+(s1===s2?"متشابهتان فالناتج موجب":"مختلفتان فالناتج سالب")+".", "mulSignOnly"];
+}
+var N3=[gMulFrac, gMulSignOnly];
+
+/* ===== ١-٤ قسمة الأعداد النسبية ===== */
+function gDivFrac(){
+  var d1=ri(2,9), n1=ri(1,d1-1)*(Math.random()<0.4?-1:1);
+  var d2=ri(2,9), n2=ri(1,d2-1)*(Math.random()<0.4?-1:1);
+  var rn=n1*d2, rd=d1*n2;
+  if(rd===0) return null;
+  var correct=fracStr(rn,rd);
+  var wrong1=fracStr(n1*n2, d1*d2);
+  var wrong2=fracStr(-rn, rd);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(rn, rd+1)]);
+  if(!o) return null;
+  var f1=(n1<0?"−"+Math.abs(n1):n1)+"/"+d1, f2=(n2<0?"−"+Math.abs(n2):n2)+"/"+d2;
+  var recip=(n2<0?"−":"")+d2+"/"+Math.abs(n2);
+  return ["أوجد ناتج "+mn(f1)+" ÷ "+mn(f2)+" في أبسط صورة:",
+    o[0].map(mn), o[1],
+    "نضرب الكسر الأول في مقلوب الثاني: "+mn(f1)+" × "+mn(recip)+" = "+mn(correct)+".", "divFrac"];
+}
+function gReciprocal(){
+  var d=ri(2,9), n=ri(1,d-1)*(Math.random()<0.4?-1:1);
+  var correct=fracStr(d*(n<0?-1:1), Math.abs(n));
+  var wrong1=fracStr(-d*(n<0?-1:1), Math.abs(n));
+  var wrong2=fracStr(n,d);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(d+1,Math.abs(n))]);
+  if(!o) return null;
+  var f=(n<0?"−"+Math.abs(n):n)+"/"+d;
+  return ["ما المقلوب الضربي (النظير الضربي) للعدد "+mn(f)+" ؟",
+    o[0].map(mn), o[1],
+    "نظير الضرب لعددٍ نسبيّ هو مقلوبه، وناتج ضرب العدد في نظيره يساوي ١: "+mn(f)+" × "+mn(correct)+" = ١.", "reciprocal"];
+}
+var N4=[gDivFrac, gReciprocal];
+
+/* ===== ١-٥ جمع وطرح الأعداد النسبية (مقامات متشابهة) ===== */
+function gAddSubSame(){
+  var d=ri(3,12);
+  var n1=ri(1,d*2)*(Math.random()<0.5?-1:1);
+  var n2=ri(1,d*2)*(Math.random()<0.5?-1:1);
+  var isAdd=Math.random()<0.5;
+  var rn = isAdd? n1+n2 : n1-n2;
+  var correct=fracStr(rn,d);
+  var wrong1=fracStr(isAdd? n1-n2 : n1+n2, d);
+  var wrong2=fracStr(rn, d*2);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(rn+1,d)]);
+  if(!o) return null;
+  var f1=(n1<0?"−"+Math.abs(n1):n1)+"/"+d, f2=(n2<0?"−"+Math.abs(n2):n2)+"/"+d;
+  return ["أوجد ناتج "+mn(f1)+(isAdd?" + ":" − ")+mn(f2)+" في أبسط صورة:",
+    o[0].map(mn), o[1],
+    "المقامان متشابهان، فنجمع (أو نطرح) البسطين ونُبقي المقام كما هو: "+mn(fmt(n1)+(isAdd?"+":"−")+fmt(n2))+" ÷ "+mn(d)+" = "+mn(correct)+".", "addSubSame"];
+}
+var N5=[gAddSubSame];
+
+/* ===== ١-٦ جمع وطرح الأعداد النسبية (مقامات مختلفة) ===== */
+function gAddSubDiff(){
+  var d1=ri(2,9), d2=ri(2,9);
+  if(d1===d2) d2=d1+1;
+  var n1=ri(1,d1-1)*(Math.random()<0.5?-1:1);
+  var n2=ri(1,d2-1)*(Math.random()<0.5?-1:1);
+  var isAdd=Math.random()<0.5;
+  var rn = isAdd? (n1*d2+n2*d1) : (n1*d2-n2*d1);
+  var rd = d1*d2;
+  var correct=fracStr(rn,rd);
+  var wrong1=fracStr(isAdd?(n1*d2-n2*d1):(n1*d2+n2*d1), rd);
+  var wrong2=fracStr(isAdd?(n1+n2):(n1-n2), d1+d2);
+  var o=sOpts3(correct,[wrong1,wrong2],[fracStr(rn+1,rd)]);
+  if(!o) return null;
+  var f1=(n1<0?"−"+Math.abs(n1):n1)+"/"+d1, f2=(n2<0?"−"+Math.abs(n2):n2)+"/"+d2;
+  return ["أوجد ناتج "+mn(f1)+(isAdd?" + ":" − ")+mn(f2)+" في أبسط صورة:",
+    o[0].map(mn), o[1],
+    "نوحّد المقامين بضربهما: "+mn(f1)+" = "+mn(fmt(n1*d2)+"/"+fmt(rd))+" و"+mn(f2)+" = "+mn(fmt(n2*d1)+"/"+fmt(rd))+"، ثم "+(isAdd?"نجمع":"نطرح")+" البسطين: "+mn(correct)+".", "addSubDiff"];
+}
+var N6=[gAddSubDiff];
+
+/* ===== ١-٧ استراتيجية حل المسألة: البحث عن نمط ===== */
+function gPatternArith(){
+  var start=ri(2,20), step=ri(2,9)*(Math.random()<0.3?-1:1);
+  var seq=[start, start+step, start+2*step, start+3*step];
+  var askIdx = ri(5,7);
+  var nth = start + (askIdx-1)*step;
+  var o=zOpts(nth, [nth+step, nth-step, start+askIdx*step]);
+  return ["يتّبع النمط الآتي قاعدةً ثابتة: "+seq.map(fmt).map(mn).join(" ، ")+" ، ...<br>ما الحدّ رقم "+mn(fmt(askIdx))+" في النمط؟",
+    o[0].map(mn), o[1],
+    "الفرق الثابت بين الحدود هو "+mn(fmt(step))+"، فنبدأ من "+mn(fmt(start))+" ونضيف "+mn(fmt(step))+" في كل مرة حتى الحدّ "+mn(fmt(askIdx))+" فنحصل على "+mn(fmt(nth))+".", "patternArith"];
+}
+function gPatternMultiply(){
+  var start=ri(1,4), ratio=gp([2,3]);
+  var seq=[start, start*ratio, start*ratio*ratio];
+  var nxt=seq[2]*ratio;
+  var o=zOpts(nxt,[nxt+ratio, nxt-ratio, seq[2]*(ratio+1)]);
+  return ["يتّبع النمط الآتي قاعدةً ثابتة (كل حدٍّ = الحدّ السابق × عددٍ ثابت): "+seq.map(fmt).map(mn).join(" ، ")+" ، ...<br>ما الحدّ التالي؟",
+    o[0].map(mn), o[1],
+    "كل حدٍّ يساوي الحدّ السابق مضروبًا في "+mn(fmt(ratio))+"، فالحدّ التالي بعد "+mn(fmt(seq[2]))+" هو "+mn(fmt(seq[2]))+" × "+mn(fmt(ratio))+" = "+mn(fmt(nxt))+".", "patternMultiply"];
+}
+var N7=[gPatternArith, gPatternMultiply];
+
+/* ===== ١-٨ القوى والأسس ===== */
+function gPowerEval(){
+  var b=ri(2,6)*(Math.random()<0.3?-1:1);
+  var e=ri(2,4);
+  var val=Math.pow(b,e);
+  var wrong1=b*e;
+  var wrong2=-val;
+  var o=zOpts(val,[wrong1, wrong2, Math.pow(b,e-1)]);
+  var repeat=Array(e).fill(fmt(b)).join("×");
+  return ["أوجد قيمة "+pw(b,e)+" :",
+    o[0].map(mn), o[1],
+    "الأساس "+mn(fmt(b))+" مضروبٌ في نفسه "+mn(fmt(e))+" مرّات: "+mn(repeat)+" = "+mn(fmt(val))+
+    (b<0&&e%2===0?" (أساسٌ سالبٌ لأُسٍّ زوجيّ فالناتج موجب)":(b<0?" (أساسٌ سالبٌ لأُسٍّ فرديّ فالناتج سالب)":""))+".", "powerEval"];
+}
+function gPowerNegExp(){
+  var b=ri(2,6), e=ri(1,3);
+  var pe=Math.pow(b,e);
+  var correct=fracStr(1,pe);
+  var wrong2=String(-pe);
+  var wrong3=String(pe);
+  var o=sOpts3(correct,[wrong2,wrong3],[fracStr(1,pe+1)]);
+  if(!o) return null;
+  return ["أوجد قيمة "+pw(b,-e)+" :",
+    o[0].map(mn), o[1],
+    "الأُسّ السالب يعني مقلوب القوّة الموجبة: "+pw(b,-e)+" = 1 ÷ "+pw(b,e)+" = "+mn(correct)+".", "powerNegExp"];
+}
+var N8=[gPowerEval, gPowerNegExp];
+
+/* ===== ١-٩ الصيغة العلمية ===== */
+function gStdToSci(){
+  var m1=ri(10,99), k=ri(3,7);
+  var mantissa=(m1/10).toFixed(1);
+  var standard=m1*Math.pow(10,k-1);
+  var sciStr=mantissa+"×10"+sup(k);
+  var wrong1=mantissa+"×10"+sup(k-1);
+  var wrong2=mantissa+"×10"+sup(k+1);
+  var o=sOpts3(sciStr,[wrong1,wrong2],[mantissa+"×10"+sup(k+2)]);
+  if(!o) return null;
+  return ["اكتب العدد "+mn(fmt(standard))+" بالصيغة العلمية:",
+    o[0].map(mn), o[1],
+    "نحرّك الفاصلة العشرية حتى يبقى رقمٌ واحد غير صفريّ قبلها، وعدد المنازل التي تحرّكت هو الأُسّ: "+mn(fmt(standard))+" = "+mn(sciStr)+".", "stdToSci"];
+}
+function gSciToStd(){
+  var m1=ri(10,99), k=ri(3,7);
+  var mantissa=(m1/10).toFixed(1);
+  var standard=m1*Math.pow(10,k-1);
+  var wrong1=m1*Math.pow(10,k-2);
+  var wrong2=m1*Math.pow(10,k);
+  var o=zOpts(standard,[wrong1,wrong2]);
+  return ["اكتب العدد "+mn(mantissa+"×10"+sup(k))+" بالصيغة القياسية (العادية):",
+    o[0].map(mn), o[1],
+    "نحرّك الفاصلة العشرية "+mn(fmt(k))+" منازل يمينًا (لأنّ الأُسّ موجب): "+mn(mantissa+"×10"+sup(k))+" = "+mn(fmt(standard))+".", "sciToStd"];
+}
+function gStdToSciSmall(){
+  var m1=ri(10,99), k=ri(2,6);
+  var mantissa=(m1/10).toFixed(1);
+  var zeros=k-1;
+  var stdStr="0."+Array(zeros).fill("0").join("")+m1;
+  var sciStr=mantissa+"×10"+sup(-k);
+  var wrong1=mantissa+"×10"+sup(-(k-1));
+  var wrong2=mantissa+"×10"+sup(-(k+1));
+  var o=sOpts3(sciStr,[wrong1,wrong2],[mantissa+"×10"+sup(-(k+2))]);
+  if(!o) return null;
+  return ["اكتب العدد "+mn(stdStr)+" بالصيغة العلمية:",
+    o[0].map(mn), o[1],
+    "نحرّك الفاصلة حتى يبقى رقمٌ واحد غير صفريّ قبلها. عدد المنازل التي تحرّكت فيها الفاصلة يمينًا يعطي أُسًّا سالبًا: "+mn(stdStr)+" = "+mn(sciStr)+".", "stdToSciSmall"];
+}
+var N9=[gStdToSci, gSciToStd, gStdToSciSmall];
+
+var ALL1 = N1.concat(N2).concat(N3).concat(N4).concat(N5).concat(N6).concat(N7).concat(N8).concat(N9);
+
+/* ============================================================
+   الفصل الرابع: النسبة المئوية (ص ١٤٩–١٧٥)
+   ============================================================ */
+
+/* ===== ٤-١ إيجاد النسب المئوية ذهنيًا ===== */
+var NICE_PCTS=[1,5,10,15,20,25,30,40,50,60,70,75,80,90];
+function gMentalPct(){
+  var p=gp(NICE_PCTS);
+  var g=gcdi(p,100), num=p/g, den=100/g;
+  var k=ri(1,15);
+  var N=den*k, result=num*k;
+  var o=zOpts(result,[result+den, result-den, N-result]);
+  return ["احسب ذهنيًّا: كم يساوي "+mn(p+"٪")+" من "+mn(fmt(N))+" ؟",
+    o[0].map(mn), o[1],
+    mn(p+"٪")+" تعادل الكسر "+mn(num+"/"+den)+"، و"+mn(num+"/"+den)+" من "+mn(fmt(N))+" = "+mn(fmt(N))+" ÷ "+mn(fmt(den))+" × "+mn(fmt(num))+" = "+mn(fmt(result))+".", "mentalPct"];
+}
+var P1=[gMentalPct];
+
+/* ===== ٤-٢ النسبة المئوية والتقدير ===== */
+var NICE_PCTS2=[10,20,25,50,75,5,15,40,60,80,90];
+function gEstimatePct(){
+  var p=gp(NICE_PCTS2);
+  var g=gcdi(p,100), num=p/g, den=100/g;
+  var Nbase=den*ri(2,20);
+  var off=ri(-Math.floor(den/2),Math.floor(den/2));
+  var N=Nbase+off; if(N<=0) N=Nbase+1;
+  var roundedN=Math.round(N/den)*den;
+  var estimate=(roundedN/den)*num;
+  var o=zOpts(estimate,[estimate+num, estimate-num, estimate*2]);
+  return ["قدّر: "+mn(p+"٪")+" من "+mn(fmt(N))+" تقريبًا تساوي:",
+    o[0].map(mn), o[1],
+    "نقرّب "+mn(fmt(N))+" لأقرب عددٍ يقبل القسمة على "+mn(fmt(den))+" وهو "+mn(fmt(roundedN))+"، و"+mn(p+"٪")+" = "+mn(num+"/"+den)+"، فالتقدير = "+mn(fmt(roundedN))+" ÷ "+mn(fmt(den))+" × "+mn(fmt(num))+" = "+mn(fmt(estimate))+".", "estimatePct"];
+}
+var P2=[gEstimatePct];
+
+/* ===== ٤-٣ استراتيجية حل المسألة: التحقّق من معقولية الإجابة ===== */
+function gReasonCheck(){
+  var M=ri(3,40)*50;
+  var p=gp([10,20,25,40,50,75,80]);
+  var g=gcdi(p,100), num=p/g, den=100/g;
+  var exact=M*num/den;
+  var makeReasonable=Math.random()<0.5;
+  var claim = makeReasonable
+    ? Math.round(exact*(0.88+Math.random()*0.24))
+    : Math.round(exact*gp([0.3,0.4,0.5,1.7,2,2.3]));
+  if(!makeReasonable && claim===Math.round(exact)) claim=Math.round(exact*2);
+  var diffRatio = Math.abs(claim-exact)/exact;
+  var reasonable = diffRatio <= 0.15;
+  var lbl = reasonable? "نعم، تقديرٌ معقول":"لا، غير معقول";
+  var wrong = reasonable? "لا، غير معقول":"نعم، تقديرٌ معقول";
+  var o=sOpts(lbl,[wrong,"لا يمكن الحكم دون حسابٍ دقيق"]);
+  if(!o) return null;
+  return ["يريد شخصٌ إنفاق "+mn(p+"٪")+" من مبلغ "+mn(fmt(M))+" ريالًا، ويظنّ أنّ ذلك يساوي تقريبًا "+mn(fmt(claim))+" ريالًا. هل هذا التقدير معقول؟",
+    o[0], o[1],
+    "نقدّر ذهنيًّا: "+mn(p+"٪")+" ≈ "+mn(num+"/"+den)+" من "+mn(fmt(M))+" ≈ "+mn(fmt(Math.round(exact)))+" ريالًا. "+(reasonable?"وهذا قريبٌ من "+mn(fmt(claim))+"، فالتقدير معقول.":"وهذا بعيدٌ عن "+mn(fmt(claim))+"، فالتقدير غير معقول."), "reasonCheck"];
+}
+var P3=[gReasonCheck];
+
+/* ===== ٤-٤ الجبر: المعادلة المئوية (الجزء = النسبة × الكل) ===== */
+function gFindPart(){
+  var p=gp([5,10,15,20,25,30,40,50,60,70,75,80,90]);
+  var g=gcdi(p,100), num=p/g, den=100/g;
+  var k=ri(1,20), whole=den*k, part=num*k;
+  var o=zOpts(part,[part+den,part-den,whole-part]);
+  return ["أوجد "+mn(p+"٪")+" من "+mn(fmt(whole))+" :",
+    o[0].map(mn), o[1],
+    "الجزء = النسبة المئوية × الكل = "+mn(p+"٪")+" × "+mn(fmt(whole))+" = "+mn(num+"/"+den)+" × "+mn(fmt(whole))+" = "+mn(fmt(part))+".", "findPart"];
+}
+function gFindPercent(){
+  var den=gp([2,4,5,10,20,25,50]);
+  var num=ri(1,den-1);
+  var p=Math.round(num/den*100);
+  var k=ri(1,15), whole=den*k, part=num*k;
+  var o=zOpts(p,[p+5,p-5,Math.round(part/whole*10)]);
+  return ["ما النسبة المئوية للعدد "+mn(fmt(part))+" من "+mn(fmt(whole))+" ؟",
+    o[0].map(function(x){return mn(x+"٪");}), o[1],
+    "النسبة المئوية = (الجزء ÷ الكل) × ١٠٠٪ = ("+mn(fmt(part))+" ÷ "+mn(fmt(whole))+") × ١٠٠٪ = "+mn(fmt(p)+"٪")+".", "findPercent"];
+}
+function gFindWhole(){
+  var p=gp([5,10,15,20,25,30,40,50,60,70,75,80]);
+  var g=gcdi(p,100), num=p/g, den=100/g;
+  var k=ri(1,20), whole=den*k, part=num*k;
+  var o=zOpts(whole,[whole+den,whole-den,part*2]);
+  return [mn(fmt(part))+" تمثّل "+mn(p+"٪")+" من عددٍ ما. أوجد ذلك العدد (الكل):",
+    o[0].map(mn), o[1],
+    "الكل = الجزء ÷ النسبة المئوية = "+mn(fmt(part))+" ÷ "+mn(p+"٪")+" = "+mn(fmt(part))+" ÷ "+mn(num+"/"+den)+" = "+mn(fmt(whole))+".", "findWhole"];
+}
+var P4=[gFindPart, gFindPercent, gFindWhole];
+
+/* ===== ٤-٥ التغيّر المئوي (والربح والخصم) ===== */
+function gPercentChange(){
+  var pct=gp([10,20,25,50,5,15,40]);
+  var g=gcdi(pct,100), num=pct/g, den=100/g;
+  var orig=den*ri(2,20);
+  var change=orig*num/den;
+  var increase=Math.random()<0.5;
+  var newVal = increase? orig+change : orig-change;
+  if(newVal<=0){ increase=true; newVal=orig+change; }
+  var computedPct = Math.round(Math.abs(newVal-orig)/orig*100);
+  var o=zOpts(computedPct,[computedPct+5,computedPct-5,Math.round(newVal/orig*100)]);
+  return ["تغيّرت كمّيةٌ من "+mn(fmt(orig))+" إلى "+mn(fmt(newVal))+". أوجد <b>نسبة التغيّر المئوي</b>:",
+    o[0].map(function(x){return mn(x+"٪");}), o[1],
+    "مقدار التغيّر = "+mn(fmt(Math.abs(newVal-orig)))+"، والتغيّر المئوي = (مقدار التغيّر ÷ الكمّية الأصلية) × ١٠٠٪ = ("+mn(fmt(Math.abs(newVal-orig)))+" ÷ "+mn(fmt(orig))+") × ١٠٠٪ = "+mn(fmt(computedPct)+"٪")+" ("+(increase?"زيادة":"نقصان")+").", "percentChange"];
+}
+function gDiscountProfit(){
+  var isDiscount=Math.random()<0.5;
+  var pct=gp([10,20,25,50,5,15,30,40]);
+  var g=gcdi(pct,100), num=pct/g, den=100/g;
+  var price=den*ri(2,25);
+  var change=price*num/den;
+  var final= isDiscount? price-change : price+change;
+  var o=zOpts(final,[final+Math.max(1,Math.round(change/2)),final-Math.max(1,Math.round(change/2)), price]);
+  return [(isDiscount
+      ? "سعر سلعةٍ الأصلي "+mn(fmt(price))+" ريالًا، وعليها خصمٌ "+mn(pct+"٪")+". ما ثمنها بعد الخصم؟"
+      : "اشترى تاجرٌ سلعةً بـ "+mn(fmt(price))+" ريالًا وباعها بربح "+mn(pct+"٪")+". بكم باعها؟"),
+    o[0].map(mn), o[1],
+    (isDiscount
+      ? "مقدار الخصم = "+mn(pct+"٪")+" × "+mn(fmt(price))+" = "+mn(fmt(change))+"، والثمن بعد الخصم = "+mn(fmt(price))+" − "+mn(fmt(change))+" = "+mn(fmt(final))+"."
+      : "مقدار الربح = "+mn(pct+"٪")+" × "+mn(fmt(price))+" = "+mn(fmt(change))+"، وثمن البيع = "+mn(fmt(price))+" + "+mn(fmt(change))+" = "+mn(fmt(final))+"."),
+    "discountProfit"];
+}
+var P5=[gPercentChange, gDiscountProfit];
+
+var ALL4 = P1.concat(P2).concat(P3).concat(P4).concat(P5);
+
+/* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء — يحتاجه
+   الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=rafeef</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
+    '<div class="chapsel" id="chapsel"></div>'+
+    '<div class="unit" id="unit"></div>'+
+    '<div class="tabs" role="tablist" id="tabs"></div>'+
+    '<div id="panels"></div>'+
+    '<footer>الرياضيات · ثاني متوسط · مطابق للكتاب · أرقام جديدة كل مرة</footer>';
+
+  var CFG = {
+    all1:{tab:"اختبار شامل 📝", gens:ALL1, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الأول التسعة.", label:"رياضيات م٢ — شامل ف١"},
+    n1:{tab:"1-1 الأعداد النسبية", gens:N1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — الأعداد النسبية:</b> أي عددٍ يمكن كتابته على صورة كسرٍ يسمّى عددًا نسبيًّا. كسره العشري إمّا منتهٍ أو دوري.", label:"رياضيات م٢ — 1-1 الأعداد النسبية"},
+    n2:{tab:"1-2 المقارنة والترتيب", gens:N2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — مقارنة الأعداد النسبية وترتيبها:</b> نوحّد المقامين (أو نستعمل الكسور العشرية) ثم نقارن.", label:"رياضيات م٢ — 1-2 المقارنة والترتيب"},
+    n3:{tab:"1-3 الضرب", gens:N3, n:10, intro:"<b>الدرس <span class=en>1-3</span> — ضرب الأعداد النسبية:</b> نضرب البسط في البسط والمقام في المقام. إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب.", label:"رياضيات م٢ — 1-3 الضرب"},
+    n4:{tab:"1-4 القسمة", gens:N4, n:10, intro:"<b>الدرس <span class=en>1-4</span> — قسمة الأعداد النسبية:</b> نضرب في مقلوب (النظير الضربي لـ) المقسوم عليه.", label:"رياضيات م٢ — 1-4 القسمة"},
+    n5:{tab:"1-5 جمع وطرح متشابهة", gens:N5, n:10, intro:"<b>الدرس <span class=en>1-5</span> — جمع وطرح الأعداد النسبية ذات المقامات المتشابهة:</b> نجمع أو نطرح البسطين ونُبقي المقام كما هو.", label:"رياضيات م٢ — 1-5 جمع وطرح متشابهة"},
+    n6:{tab:"1-6 جمع وطرح مختلفة", gens:N6, n:10, intro:"<b>الدرس <span class=en>1-6</span> — جمع وطرح الأعداد النسبية ذات المقامات المختلفة:</b> نوحّد المقامين أوّلًا (بضربهما أو بإيجاد م.م.أ) ثم نجمع أو نطرح.", label:"رياضيات م٢ — 1-6 جمع وطرح مختلفة"},
+    n7:{tab:"1-7 البحث عن نمط", gens:N7, n:10, intro:"<b>الدرس <span class=en>1-7</span> — استراتيجية حل المسألة: البحث عن نمط:</b> افهم ← خطّط (اكتشف النمط) ← حُلّ (وسّعه) ← تحقّق.", label:"رياضيات م٢ — 1-7 البحث عن نمط"},
+    n8:{tab:"1-8 القوى والأسس", gens:N8, n:10, intro:"<b>الدرس <span class=en>1-8</span> — القوى والأسس:</b> الأُسّ يعني كم مرّة يُستعمل الأساس عاملًا في الضرب. والأُسّ السالب يعني المقلوب.", label:"رياضيات م٢ — 1-8 القوى والأسس"},
+    n9:{tab:"1-9 الصيغة العلمية", gens:N9, n:10, intro:"<b>الدرس <span class=en>1-9</span> — الصيغة العلمية:</b> طريقةٌ مختصرة لكتابة الأعداد الكبيرة جدًّا أو الصغيرة جدًّا، بصورة (عاملٌ بين ١ و١٠) × (قوّة للعدد ١٠).", label:"رياضيات م٢ — 1-9 الصيغة العلمية"},
+
+    all4:{tab:"اختبار شامل 📝", gens:ALL4, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الرابع الخمسة.", label:"رياضيات م٢ — شامل ف٤"},
+    p1:{tab:"4-1 ذهنيًا", gens:P1, n:10, intro:"<b>الدرس <span class=en>4-1</span> — إيجاد النسب المئوية ذهنيًا:</b> حوّل النسبة المئوية إلى كسرٍ اعتياديّ مكافئ يسهل الضرب به ذهنيًّا (مثل ٢٥٪ = ¼).", label:"رياضيات م٢ — 4-1 ذهنيًا"},
+    p2:{tab:"4-2 التقدير", gens:P2, n:10, intro:"<b>الدرس <span class=en>4-2</span> — النسبة المئوية والتقدير:</b> نقرّب العدد لأقرب عددٍ متوافقٍ مع مقام الكسر المكافئ للنسبة، ثم نحسب.", label:"رياضيات م٢ — 4-2 التقدير"},
+    p3:{tab:"4-3 معقولية الإجابة", gens:P3, n:10, intro:"<b>الدرس <span class=en>4-3</span> — استراتيجية حل المسألة: التحقّق من معقولية الإجابة:</b> قدّر ذهنيًّا أوّلًا، ثم قارن التقدير بالإجابة المطروحة.", label:"رياضيات م٢ — 4-3 معقولية الإجابة"},
+    p4:{tab:"4-4 المعادلة المئوية", gens:P4, n:10, intro:"<b>الدرس <span class=en>4-4</span> — الجبر: المعادلة المئوية:</b> الجزء = النسبة المئوية × الكل. من هذه المعادلة نوجد أيًّا من الثلاثة إذا عرفنا الآخرَين.", label:"رياضيات م٢ — 4-4 المعادلة المئوية"},
+    p5:{tab:"4-5 التغيّر المئوي", gens:P5, n:10, intro:"<b>الدرس <span class=en>4-5</span> — التغيّر المئوي:</b> التغيّر المئوي = (مقدار التغيّر ÷ الكمّية الأصلية) × ١٠٠٪. ويشمل ذلك الربح وثمن البيع والخصم.", label:"رياضيات م٢ — 4-5 التغيّر المئوي"}
+  };
+
+  var CHAPS = {
+    c1: {name:"الفصل الأول", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط (الجزء الأول) · الفصل الأول: الجبر — الأعداد النسبية (ص <span class="en">10–59</span>)',
+         ids:["n1","n2","n3","n4","n5","n6","n7","n8","n9","all1"]},
+    c4: {name:"الفصل الرابع", unit:'📘 مطابق لكتاب الرياضيات — ثاني متوسط (الجزء الأول) · الفصل الرابع: النسبة المئوية (ص <span class="en">149–175</span>)',
+         ids:["p1","p2","p3","p4","p5","all4"]}
+  };
+
+  var curCh = "c1", curId = "n1";
+
+  function panelOf(id){
+    var pan = document.getElementById("p_"+id);
+    if(!pan){ pan = document.createElement("section"); pan.className="panel"; pan.id="p_"+id; document.getElementById("panels").appendChild(pan); }
+    return pan;
+  }
+  function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
+
+  function render(id){
+    var c = CFG[id], sec = panelOf(id);
+    var items = genN(c.gens, c.n);
+    // 📚 اتعلّم أولًا: فيديو شرح الدرس (من عين) قبل الأسئلة — مستثنى من كشف الخروج
+    var html = '';
+    var topic=null; for(var ti=0;ti<REMTOPICS.length;ti++){ if(REMTOPICS[ti].id===id){ topic=REMTOPICS[ti]; break; } }
+    if(topic){
+      html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الدرس من قناة عين، ثم ابدأ الحل تحت.'+
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الدرس</a></div></div>';
+    }
+    html += '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
+    var answered={}, correct=0, total=items.length, saved=false;
+    var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var __ok = (+btn.dataset.j===ans);
+          if(/^all/.test(id)){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="math8", REM_LABEL="الرياضيات";
+  var REMTOPICS=[
+    {id:"n1", name:"1-1 الأعداد النسبية", tip:"العدد النسبي هو أي عددٍ يُكتب على صورة كسر. كسره العشري منتهٍ إذا كان مقامه (بعد التبسيط) لا يحوي إلا العاملين ٢ و٥، وإلا فهو دوري.", yt:"شرح الأعداد النسبية والكسور العشرية المنتهية والدورية ثاني متوسط"},
+    {id:"n2", name:"1-2 المقارنة والترتيب", tip:"لمقارنة كسرين بمقامين مختلفين وحّد المقامين أوّلًا (بضربهما مثلًا) ثم قارن البسطين. أو حوّلهما لكسرين عشريّين وقارن.", yt:"شرح مقارنة الأعداد النسبية وترتيبها ثاني متوسط"},
+    {id:"n3", name:"1-3 الضرب", tip:"نضرب البسط في البسط والمقام في المقام مباشرةً دون توحيد المقامات. وقاعدة الإشارة: متشابهتان ⇐ موجب، مختلفتان ⇐ سالب.", yt:"شرح ضرب الأعداد النسبية ثاني متوسط"},
+    {id:"n4", name:"1-4 القسمة", tip:"لقسمة كسرين: اضرب الأول في مقلوب (النظير الضربي لـ) الثاني. والمقلوب هو العدد الذي إذا ضُرب في الأصل أعطى ١.", yt:"شرح قسمة الأعداد النسبية والنظير الضربي ثاني متوسط"},
+    {id:"n5", name:"1-5 جمع وطرح متشابهة", tip:"إذا تشابه المقامان: اجمع أو اطرح البسطين فقط، وأبقِ المقام كما هو دون تغيير.", yt:"شرح جمع وطرح الأعداد النسبية ذات المقامات المتشابهة ثاني متوسط"},
+    {id:"n6", name:"1-6 جمع وطرح مختلفة", tip:"إذا اختلف المقامان: وحّدهما أوّلًا (بضربهما أو بإيجاد المضاعف المشترك الأصغر) قبل الجمع أو الطرح.", yt:"شرح جمع وطرح الأعداد النسبية ذات المقامات المختلفة ثاني متوسط"},
+    {id:"n7", name:"1-7 البحث عن نمط", tip:"رتّب المعطيات وابحث عن الفرق الثابت (نمط جمعي) أو النسبة الثابتة (نمط ضربي) بين الحدود المتتالية، ثم وسّع النمط للحدّ المطلوب.", yt:"شرح استراتيجية البحث عن نمط ثاني متوسط رياضيات"},
+    {id:"n8", name:"1-8 القوى والأسس", tip:"الأُسّ عدد مرّات ضرب الأساس في نفسه، وليس ضربًا في الأُسّ. والأُسّ السالب يعني مقلوب القوّة الموجبة: س⁻ⁿ = ١ ÷ سⁿ.", yt:"شرح القوى والأسس السالبة ثاني متوسط رياضيات"},
+    {id:"n9", name:"1-9 الصيغة العلمية", tip:"الصيغة العلمية = عاملٌ بين ١ و١٠ مضروبٌ في قوّةٍ للعدد ١٠. للعدد الكبير الأُسّ موجب، وللعدد الصغير (أقلّ من ١) الأُسّ سالب.", yt:"شرح الصيغة العلمية ثاني متوسط رياضيات"},
+    {id:"p1", name:"4-1 ذهنيًا", tip:"حوّل النسبة المئوية الشائعة إلى كسرها المكافئ (١٠٪=١٠/١، ٢٥٪=¼، ٥٠٪=½، ٧٥٪=¾...) واضرب به مباشرةً بدل الحساب الطويل.", yt:"شرح إيجاد النسب المئوية ذهنيا ثاني متوسط"},
+    {id:"p2", name:"4-2 التقدير", tip:"قرّب العدد لأقرب عددٍ يقبل القسمة على مقام الكسر المكافئ للنسبة المئوية، ثم احسب بسهولة.", yt:"شرح النسبة المئوية والتقدير ثاني متوسط"},
+    {id:"p3", name:"4-3 معقولية الإجابة", tip:"قدّر الإجابة ذهنيًّا أوّلًا باستعمال كسرٍ مكافئ قريب، ثم قارنها بالإجابة المطروحة: إن قربت منها فمعقولة، وإلا فغير معقولة.", yt:"شرح التحقق من معقولية الإجابة ثاني متوسط"},
+    {id:"p4", name:"4-4 المعادلة المئوية", tip:"الجزء = النسبة المئوية × الكل. لإيجاد الكل: اقسم الجزء على النسبة. ولإيجاد النسبة: اقسم الجزء على الكل واضرب في ١٠٠٪.", yt:"شرح المعادلة المئوية ثاني متوسط"},
+    {id:"p5", name:"4-5 التغيّر المئوي", tip:"التغيّر المئوي = (مقدار التغيّر ÷ الكمّية الأصلية) × ١٠٠٪. وفي الربح نجمع مقدار الربح للثمن الأصلي، وفي الخصم نطرحه.", yt:"شرح التغير المئوي والربح والخصم ثاني متوسط"}
+  ];
+  var ALL_IDS = ["all1", "all4"];
+
+  /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
+     نفس الحلّ المطبَّق في بقية صفحات الموقع: الشامل يُسجَّل موسومًا
+     بعدد أسئلة كل درسٍ منه (تقديرٌ لا حكم)، ولا يطمس نتيجةَ درسٍ
+     اختُبر وحده — فالعشرة أصدق من الاثنين. */
+  function topicOfGen(name, fn){
+    if(!window.__g2t){
+      var m={}, pairs=[];
+      Object.keys(CFG).forEach(function(id){
+        if(ALL_IDS.indexOf(id)>-1 || id==="rem") return;
+        (CFG[id].gens||[]).forEach(function(g){ if(!g) return; if(g.name) m[g.name]=id; pairs.push([g,id]); });
+      });
+      window.__g2t=m; window.__g2tp=pairs;
+    }
+    if(name && window.__g2t[name]) return window.__g2t[name];
+    if(fn){ for(var i=0;i<window.__g2tp.length;i++) if(window.__g2tp[i][0]===fn) return window.__g2tp[i][1]; }
+    return null;
+  }
+  function saveTopicTallies(tally){
+    Object.keys(tally).forEach(function(tid){
+      var v=tally[tid]; if(!v.t) return;
+      var prev=null; try{ prev=JSON.parse(localStorage.getItem(remKey(tid))); }catch(e){}
+      if(prev && typeof prev.pct==="number" && !prev.from) return;
+      try{ localStorage.setItem(remKey(tid), JSON.stringify(
+        { pct:Math.round(v.c/v.t*100), n:v.t, from:"all" })); }catch(e){}
+    });
+  }
+
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=panelOf("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null, est:!!(s&&s.from==="all"), n:(s&&s.n)||null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الدروس من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل درس.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+
+  function showPanel(id){
+    leaveCur();
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var pan = panelOf(id);
+    pan.classList.add("active");
+    curId = id;
+    if(id==="rem"){ renderRem(); }
+    else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  }
+  function drawTabs(){
+    var ch = CHAPS[curCh], t = document.getElementById("tabs");
+    t.innerHTML = ch.ids.map(function(id){
+      return '<button data-tab="'+id+'" aria-selected="'+(id===curId?"true":"false")+'">'+CFG[id].tab+'</button>';
+    }).join("") + '<button data-tab="rem" aria-selected="'+(curId==="rem"?"true":"false")+'">علاجي 💪</button>';
+    t.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        t.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+        b.setAttribute("aria-selected","true");
+        showPanel(b.dataset.tab);
+      });
+    });
+    document.getElementById("unit").innerHTML = ch.unit;
+  }
+  function drawChap(){
+    var e = document.getElementById("chapsel");
+    e.innerHTML = Object.keys(CHAPS).map(function(c){
+      return '<button data-ch="'+c+'" aria-selected="'+(c===curCh?"true":"false")+'">'+CHAPS[c].name+'</button>';
+    }).join("");
+    e.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        if(curCh===b.dataset.ch) return;
+        leaveCur(); curCh=b.dataset.ch; curId=CHAPS[curCh].ids[0];
+        drawChap(); drawTabs(); showPanel(curId);
+      });
+    });
+  }
+  function chapOf(id){
+    var found = null;
+    Object.keys(CHAPS).forEach(function(c){ if(CHAPS[c].ids.indexOf(id) >= 0) found = c; });
+    return found;
+  }
+  function goTo(id){
+    var c = chapOf(id); if(c) curCh = c;
+    curId = id; drawChap(); drawTabs(); showPanel(id);
+  }
+
+  drawChap(); drawTabs(); showPanel(curId);
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
+
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
