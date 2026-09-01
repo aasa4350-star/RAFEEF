@@ -299,9 +299,18 @@ function writingCardHtml(student){
   var dc=0, dt=0;
   drills.forEach(function(r){ dc += (r.meta.correct||0); dt += (r.meta.total||0); });
 
-  /* أسماء مقاييس كامبردج الأربعة كما تُحفظ في meta.bands */
-  var SUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],
-            ["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
+  /* أسماء مقاييس كامبردج الأربعة كما تُحفظ في meta.bands، ونصيحة+بحث
+     يوتيوب لكلٍّ منها — بلاغ الأب (١ سبتمبر ٢٠٢٦): «حتى التعبير حط
+     فيه علاجي»، فأضفنا هنا نفس نمط أضعف-مهارة+نصيحة+فيديو المستعمل
+     في بقية صفحات الموقع، مبنيًّا على متوسط كل الفقرات لا فقرةٍ واحدة. */
+  var SUBS=[["Content","المحتوى","اقرأ نقاط المهمّة أولًا وغطِّها كلّها، واكتب بالطول المطلوب لهدف CEFR.",
+             "طريقة كتابة فقرة انجليزي تغطية نقاط الموضوع content"],
+            ["Organisation","الترتيب والربط","ابدأ بجملةٍ تُقدّم الموضوع، ورتّب أفكارك بأدوات ربطٍ مثل first/then/finally، واختم برأيك.",
+             "أدوات الربط في الكتابة الانجليزية linking words paragraph organisation"],
+            ["Language","اللغة","ابدأ كل جملة بحرفٍ كبير، واكتب الضمير I كبيرًا دائمًا، ونوّع مفرداتك بدل تكرار نفس الكلمة.",
+             "تحسين الاملاء والترقيم والمفردات في الكتابة الانجليزية"],
+            ["Communicative Achievement","مناسبة الأسلوب","تجنّب لغة الدردشة (u, plz, lol...) واكتب جُملًا كاملة بأسلوبٍ رسمي.",
+             "اسلوب الكتابة الرسمي في الانجليزي paragraph writing style"]];
   /* متوسّط كل مقياس عبر كل الفقرات — يكشف الضعف المتكرّر لا نتيجة يومٍ واحد */
   var agg={}, aggN=0;
   rows.forEach(function(r){ if(r.meta.bands){ aggN++;
@@ -314,13 +323,18 @@ function writingCardHtml(student){
     'والطول وأدوات الربط المطلوبة من هدف <b>CEFR</b> لصفّه.</p>';
 
   if(aggN){
-    html += '<ul class="sk">'+SUBS.map(function(s){
-      var avg=agg[s[0]]/aggN, p=Math.round(avg/5*100);
-      return '<li><span class="pill '+cls(p)+'" dir="ltr">'+(Math.round(avg*10)/10)+' / 5</span>'+
+    var avgs=SUBS.map(function(s){ return {s:s, avg:agg[s[0]]/aggN}; });
+    var weakestS=avgs.slice().sort(function(a,b){ return a.avg-b.avg; })[0];
+    html += '<ul class="sk">'+avgs.map(function(o){
+      var s=o.s, p=Math.round(o.avg/5*100);
+      return '<li><span class="pill '+cls(p)+'" dir="ltr">'+(Math.round(o.avg*10)/10)+' / 5</span>'+
              '<span class="nm">'+s[1]+'</span>'+
              '<span class="frac">'+s[0]+'</span></li>';
     }).join("")+'</ul>'+
-    '<p class="note">متوسّط '+aggN+' فقرة — أضعف مقياس هو الذي يستحقّ التدريب.</p>';
+    '<p class="note">متوسّط '+aggN+' فقرة — أضعف مقياس هو الذي يستحقّ التدريب.</p>'+
+    (weakestS.avg<5 ? ('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">'+
+      '👈 <b>أضعف مقياس:</b> '+weakestS.s[1]+' — '+weakestS.s[2]+
+      '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(weakestS.s[3])+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح '+weakestS.s[1]+'</a></div></div>') : '');
   }
 
   rows.slice(0,5).forEach(function(r){

@@ -14,6 +14,20 @@ function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function en(s){ return '<span class="wen" dir="ltr">'+esc(s)+'</span>'; }
+
+/* بلاغ الأب (١ سبتمبر ٢٠٢٦): «حتى التعبير حط فيه علاجي» — نفس نمط
+   الفيديو التوضيحي الموجود في كل درسٍ آخر بالموقع، لأضعف مقياسٍ من
+   مقاييس كامبردج الأربعة بعد كل تقييم. */
+var WRITING_YT = {
+  "Content":"طريقة كتابة فقرة انجليزي تغطية نقاط الموضوع content",
+  "Organisation":"أدوات الربط في الكتابة الانجليزية linking words paragraph organisation",
+  "Language":"تحسين الاملاء والترقيم والمفردات في الكتابة الانجليزية",
+  "Communicative Achievement":"اسلوب الكتابة الرسمي في الانجليزي paragraph writing style"
+};
+function ytLinkHtmlW(nameEn, label){
+  var q = WRITING_YT[nameEn]; if(!q) return '';
+  return '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(q)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح '+(label||'الدرس')+'</a></div>';
+}
 /* يبني الخيارات ويعيد [مصفوفة, فهرس الصحيح] بعد الخلط، مع إسقاط المكرّر */
 function pick3(correct, wrongs){
   var seen={}, out=[correct]; seen[correct]=1;
@@ -726,7 +740,8 @@ function render(el, ctx){
       var firstMiss=weakest.checks.filter(function(c){ return !c.ok; })[0];
       h+='<div style="margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">'+
          '👈 <b>ابدأ من هنا:</b> أضعف مقياس عندك هو <b>'+weakest.ar+'</b>'+
-         (firstMiss? ' — '+(firstMiss.hint||firstMiss.label) : '')+'</div>';
+         (firstMiss? ' — '+(firstMiss.hint||firstMiss.label) : '')+
+         ytLinkHtmlW(weakest.en, weakest.ar)+'</div>';
     } else {
       h+='<div style="margin-top:10px;color:var(--good);font-weight:800">ممتاز! خمسة من خمسة في المقاييس الأربعة 🎉</div>';
     }
