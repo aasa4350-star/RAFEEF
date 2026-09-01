@@ -229,11 +229,13 @@ async function main(){
       let vocabWk=vocabAll.filter(p=> !window.RR || RR.recentVocab(p));
       if(!vocabWk.length) vocabWk=vocabAll.slice(0,1);   /* لا نُفرغ البطاقة تمامًا */
       const rev=vocabWk.filter(p=> p.meta.mode==="review");
-      const revT=rev.filter(p=> p.meta.trusted!==false), vocabT=vocabWk.filter(p=> p.meta.trusted!==false);
+      const neu=vocabWk.filter(p=> p.meta.mode==="new");
+      const revT=rev.filter(p=> p.meta.trusted!==false), neuT=neu.filter(p=> p.meta.trusted!==false), vocabT=vocabWk.filter(p=> p.meta.trusted!==false);
       const rW=revT.reduce((s,p)=>s+(p.meta.total||0),0), rC=revT.reduce((s,p)=>s+(p.meta.correct||0),0);
+      const nW=neuT.reduce((s,p)=>s+(p.meta.total||0),0), nC=neuT.reduce((s,p)=>s+(p.meta.correct||0),0);
       const allW=vocabT.reduce((s,p)=>s+(p.meta.total||0),0), allC=vocabT.reduce((s,p)=>s+(p.meta.correct||0),0);
       const untrustedN=vocabWk.filter(p=> p.meta.trusted===false && fresh(p)).length;
-      const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, apct=allW?Math.round(allC/allW*100):0;
+      const lpct=vTotal?Math.round(vLearned/vTotal*100):0, rpct=rW?Math.round(rC/rW*100):0, npct=nW?Math.round(nC/nW*100):0, apct=allW?Math.round(allC/allW*100):0;
       const isFlag=p=> fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2));
       const mIco=p=> p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖";
       const flagged=vocabWk.filter(isFlag), show=vocabWk.filter(p=>!isFlag(p)).slice(0,3).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
@@ -245,6 +247,8 @@ async function main(){
         (vLearned>0?`<li>📚 حفظ: <b><span dir="ltr">${vLearned} / ${vTotal}</span> كلمة</b> (${lpct}%)</li>`:``)+
         dayList+
         `<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
+        (rW?`<li>🔁 راجع محفوظ: <b><span dir="ltr">${rC}/${rW}</span> كلمة</b> (${rpct}%)</li>`:``)+
+        (nW?`<li>📚 راجع جديد: <b><span dir="ltr">${nC}/${nW}</span> كلمة</b> (${npct}%)</li>`:``)+
         (untrustedN?`<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>${untrustedN}</b></li>`:``)+
         `</ul>`+
         (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul class="weak">${revList}</ul>`:``)+
