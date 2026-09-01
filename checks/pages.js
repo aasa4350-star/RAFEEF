@@ -192,25 +192,40 @@ function run(){
       found.forEach(q => allBanks.push({ file:f, stem:q.stem, answer:q.answer }));
     }
 
-    /* أسماء المولّدات: كلّ ما جُمع في مصفوفات الاختبار داخل الصفحة */
-    let names = [];
-    for (const arr of ['ALLU','ALLU2','ALLU3','SKILLS','GENS','ALL']){
+    /* مولّدات الصفحة: كلّ ما جُمع في مصفوفات الاختبار داخلها.
+       نجمع الدوالّ نفسها لا أسماءها — فبعض الصفحات (كـ english9.html)
+       تبني مولّداتها بمصانع (clozeGen/vocabGen/…) تُرجع دالّةً مجهولة
+       الاسم (function(){...})، فـ.name عليها سلسلةٌ فارغة، وكانت تُستبعد
+       صامتةً بـ.filter(Boolean) فيفوتها الفحص كلّه دون أثر. */
+    let fns = [];
+    for (const arr of ['ALLU','ALLU2','ALLU3','ALLU4','SKILLS','GENS','ALL']){
       try {
         const v = vm.runInContext(arr, ctx);
-        if (Array.isArray(v)) names = names.concat(v.filter(x => typeof x === 'function').map(x => x.name));
+        if (Array.isArray(v)) fns = fns.concat(v.filter(x => typeof x === 'function'));
       } catch(e){}
     }
-    /* وإلّا فكلّ دالّةٍ اسمها على نمط مولّد */
-    if (!names.length){
-      const decl = [...inline.join('\n').matchAll(/\bfunction\s+((?:g|u\d|ex|m|e)[A-Z0-9]\w*)\s*\(/g)].map(m => m[1]);
-      names = decl;
+    /* وإلّا فكلّ دالّةٍ اسمها على نمط مولّد (لا مفرّ من الاسم هنا: لا مصفوفة نجمعها منها) */
+    if (!fns.length){
+      const decl = [...new Set([...inline.join('\n').matchAll(/\bfunction\s+((?:g|u\d|ex|m|e)[A-Z0-9]\w*)\s*\(/g)].map(m => m[1]))];
+      for (const n of decl){ try { const fn = vm.runInContext(n, ctx); if (typeof fn === 'function') fns.push(fn); } catch(e){} }
     }
-    names = [...new Set(names)].filter(Boolean);
+    fns = [...new Set(fns)]; // دالّةٌ واحدة قد تتكرّر عبر أكثر من مصفوفة (نادرًا) أو عبر الفرعين معًا
 
-    for (const n of names){
-      let fn; try { fn = vm.runInContext(n, ctx); } catch(e){ continue; }
-      if (typeof fn !== 'function') continue;
+    let anonIdx = 0;
+    for (const fn of fns){
       genCount++;
+      let n = fn.name;
+      if (!n){
+        /* عيّنة أولى لاشتقاق اسمٍ مفهوم من مفتاح q[4] ("u10pp:...")
+           بدل رقمٍ مجرّد لا يدلّ صاحب البلاغ على المولّد المقصود. */
+        anonIdx++;
+        n = '(مجهول #' + anonIdx + ')';
+        try {
+          const q0 = fn();
+          if (Array.isArray(q0) && typeof q0[4] === 'string' && q0[4].includes(':'))
+            n = q0[4].split(':')[0];
+        } catch(e){}
+      }
 
       const seen = new Set();
       let ran = 0, firstBad = null, nOpts = null;

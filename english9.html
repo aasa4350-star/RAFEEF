@@ -3352,6 +3352,371 @@ function u2King(){
     "u2k:"+k[0]];
 }
 
+/* ===================== الوحدة ١٠ — Who Used My Toothpaste? (ص ١١٠–١١٩) ===================== */
+
+/* المضارع التام مع already/yet/just (ص ١١٢) */
+var U10_PP = [
+  ["A: Have you cleaned up your room ___? B: Yes, I've already done it.","yet",["already","just"]],
+  ["A: Have you taken out the garbage ___? B: Yes, I've just done it.","yet",["already","never"]],
+  ["A: Have you fed the goldfish ___? B: Yes, I've already given them some food.","yet",["just","never"]],
+  ["A: Have you done the dishes ___? B: No, I haven't done them yet.","yet",["already","just"]],
+  ["A: Have you ___ washed the clothes? B: Yes, I've already washed them.","already",["yet","never"]],
+  ["A: Have you put away your toys ___? B: Yes, I've just put them away.","yet",["already","never"]]
+];
+var u10PresPerfect = clozeGen(U10_PP,
+  "المضارع التامّ لحدثٍ وقع <b>قبل الآن</b>: <span class=ltr>yet</span> في الأسئلة والنفي، و<span class=ltr>already</span> "+
+  "و<span class=ltr>just</span> في الإثبات (ص <span class=ltr>112</span>).", "u10pp");
+
+/* الفعل + gerund (ص ١١٢–١١٣) */
+var U10_GER = [
+  ["He can't stand ___ in line. (wait)","waiting",["wait","to wait"]],
+  ["I don't enjoy ___ in the sun. (sit)","sitting",["sit","to sit"]],
+  ["We miss ___ with our friends. (be)","being",["be","to be"]],
+  ["They stop ___ tennis in the winter. (play)","playing",["play","to play"]],
+  ["I can't resist ___ dessert after meals. (eat)","eating",["eat","to eat"]],
+  ["My sister can't stand ___ the house. (clean)","cleaning",["clean","to clean"]],
+  ["We enjoy ___ in the country. (live)","living",["live","to live"]],
+  ["The children hate ___ their ice cream. (share)","sharing",["share","to share"]],
+  ["We miss Mom's food. (eat)","eating",["eat","to eat"]],
+  ["My sister has to ___ using my toothpaste. (stop)","stop",["stops","stopping"]]
+];
+var u10Gerund = clozeGen(U10_GER,
+  "بعد أفعالٍ معيّنة مثل <span class=ltr>avoid, can't stand, enjoy, finish, give up, hate, imagine, keep, "+
+  "mind, miss, stop, suggest</span> نستعمل صيغة <span class=ltr>-ing</span> (المصدر المؤول)، لا المصدر بـ"+
+  "<span class=ltr>to</span> (ص <span class=ltr>112</span>).", "u10gr");
+
+/* الأفعال المركّبة (Two-Word Verbs) — موضع الضمير (ص ١١٢) */
+var U10_PHRASAL = [
+  ["Turn it down.",["Turn down it.","Turn it downs."]],
+  ["Put them away.",["Put away them.","Put them aways."]],
+  ["Take it out.",["Take out it.","Taken it out."]],
+  ["Clean it up.",["Clean up it.","Cleaned it up."]],
+  ["Throw them away.",["Throw away them.","Threw them away."]],
+  ["Turn off the light.",["Turn the light off it.","Turned off the light."]]
+];
+var u10Phrasal = pickGen(U10_PHRASAL,
+  "الضمير (مفعولٌ به) يأتي دائمًا <b>بين</b> الفعل والأداة في الأفعال المركّبة ذات الكلمتين، لا بعد الأداة: "+
+  "<span class=ltr>turn it down</span> لا <span class=ltr>turn down it</span> — أمّا مع الاسم فيصحّ الترتيبان "+
+  "(ص <span class=ltr>112</span>).", "u10ph");
+
+var U10_RT = [
+  ["At long last!","Finally!",["Not at all.","I'm sorry."]],
+  ["That's a bit too much.","This has gone too far.",["That's very kind.","That's not enough."]]
+];
+var u10RealTalk = vocabGen(U10_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>10</span> (ص <span class=ltr>115</span>).", "u10rt");
+
+/* محادثة أمل وسارة عن قريمي (ص ١١٥) */
+var U10_SARAH = [
+  ["How long did Kareem stay with Sarah?","Almost three months",["Three weeks","A year"]],
+  ["Why was Kareem staying there?","He was doing a research project at the university",
+   ["He was on vacation","He was looking for a job"]],
+  ["What did Sarah tell Kareem when he arrived?","Make yourself at home",
+   ["Clean up after yourself","Don't touch my things"]],
+  ["What was one of Sarah's complaints about Kareem?","He took over the house and never put things back",
+   ["He never ate anything","He left early every day"]],
+  ["What did Sarah see Kareem doing in the living room?","Eating with his feet on the furniture",
+   ["Cleaning the kitchen","Doing his homework"]]
+];
+var u10Sarah = factGen(U10_SARAH,
+  "من محادثة الوحدة <span class=ltr>10</span> (ص <span class=ltr>115</span>): ", "u10sr");
+
+/* الأفعال المركّبة — معانيها من القراءة (ص ١١٧) */
+var U10_2WORD = [
+  ["let out","express yourself freely",["learn","phone"]],
+  ["find out","learn",["let someone have","make things neat"]],
+  ["clean up","make things neat",["return","express yourself freely"]],
+  ["give back","return",["make things neat","phone"]],
+  ["call up","phone",["learn","return"]],
+  ["give up","let someone have",["phone","make things neat"]]
+];
+var u10TwoWordVocab = vocabGen(U10_2WORD,
+  "من تمرين <span class=ltr>After Reading</span> في الوحدة <span class=ltr>10</span> (ص <span class=ltr>117</span>).", "u102w");
+
+/* الضمائر الموصولة who/that/which/whose/where (ص ١١٨) */
+var U10_REL = [
+  ["I can't stand people ___ throw litter in the street.","who",["which","whose"]],
+  ["I don't care for people ___ ring tone is too loud.","whose",["who","which"]],
+  ["It irritates me when people don't put things back ___ they found them.","where",["who","which"]],
+  ["It gets on my nerves when people say things ___ aren't true.","that",["who","whose"]],
+  ["I hate advertisements ___ continuously pop up on my computer screen.","which",["who","whose"]],
+  ["Car alarms ___ go off in the middle of the night are really annoying.","that",["who","whose"]],
+  ["It bothers me when a friend ___ is constantly texting doesn't listen to me.","who",["which","where"]]
+];
+var u10RelClause = clozeGen(U10_REL,
+  "نستعمل <span class=ltr>who/that</span> للناس، و<span class=ltr>which/that</span> للأشياء، و"+
+  "<span class=ltr>whose</span> للملكيّة، و<span class=ltr>where</span> للأماكن (ص <span class=ltr>118</span>).", "u10rl");
+
+/* can't/must للتخمين، so...that / such...that (ص ١١٩) */
+var U10_MODAL = [
+  ["Badria couldn't sleep last night. She ___ be tired.","must",["can't","might"]],
+  ["Ahmed's just joking. He ___ be serious.","can't",["must","should"]],
+  ["You haven't eaten all day. You ___ be hungry.","must",["can't","won't"]],
+  ["It's impossible. It ___ be true.","can't",["must","shouldn't"]]
+];
+var u10Modal = clozeGen(U10_MODAL,
+  "نستعمل <span class=ltr>must</span> عندما نكون متأكّدين من شيء، و<span class=ltr>can't</span> عندما نظنّ "+
+  "الشيء مستحيلًا (ص <span class=ltr>119</span>).", "u10md");
+
+var U10_SOSUCH = [
+  ["He is ___ fast that he won the race.","so",["such","too"]],
+  ["He has ___ many books that he can hardly carry them.","so",["such","too"]],
+  ["It was ___ difficult a test that none of the students did well.","such",["so","too"]],
+  ["I have ___ much homework that I can't go out tonight.","so",["such","too"]]
+];
+var u10SoSuch = clozeGen(U10_SOSUCH,
+  "<span class=ltr>so + صفة/ظرف + that</span>، و<span class=ltr>so + many/much + اسم + that</span>، و"+
+  "<span class=ltr>such + صفة + اسم + that</span> — لإظهار السبب والنتيجة (ص <span class=ltr>119</span>).", "u10ss");
+
+/* ===================== الوحدة ١١ — Making Choices (ص ١٢٠–١٢٩) ===================== */
+
+/* جملة الشرط الأولى — حقائق ومستقبل (ص ١٢٢) */
+var U11_COND1 = [
+  ["If you heat water to 100 degrees Celsius, it ___. (boil)","boils",["will boil","boiled"]],
+  ["If they climb up to 4,000 meters, they ___ oxygen. (need)","need",["will need","needed"]],
+  ["If you don't cross its path, the snake ___ you. (not bite)","won't bite",["doesn't bite","didn't bite"]],
+  ["If we get this 4K television, we will ___ the game better. (see)","see",["saw","seeing"]],
+  ["If you mix flour and water, you ___ up with batter. (end)","end",["will end","ended"]],
+  ["If he doesn't obey the speed limit, he will ___ a ticket. (get)","get",["gets","got"]]
+];
+var u11Cond1 = clozeGen(U11_COND1,
+  "في الشرط لحقيقةٍ ثابتة نستعمل المضارع البسيط في الشرطين. وللمستقبل نستعمل المضارع البسيط بعد "+
+  "<span class=ltr>if</span> و<span class=ltr>will</span> في جواب الشرط (ص <span class=ltr>122</span>).", "u11c1");
+
+/* I'd rather (ص ١٢٠، ١٢٣) */
+var U11_RATHER = [
+  ["I'd rather stay home tonight.",["I'd rather to stay home tonight.","I'd rather staying home tonight."]],
+  ["I'd rather travel by train.",["I'd rather to travel by train.","I'd rather traveling by train."]],
+  ["I'd rather live in the country than in the city.",
+   ["I'd rather to live in the country.","I'd rather living in the country."]],
+  ["She'd rather cook dinner than wash the dishes.",
+   ["She'd rather to cook dinner.","She'd rather cooking dinner."]]
+];
+var u11Rather = pickGen(U11_RATHER,
+  "بعد <span class=ltr>I'd rather</span> نضع الفعل في صورته الأساسية، بلا <span class=ltr>to</span> وبلا "+
+  "<span class=ltr>-ing</span> (ص <span class=ltr>120، 123</span>).", "u11rt");
+
+/* جملة الشرط الافتراضية (الثانية) وwish (ص ١٢٩) */
+var U11_COND2 = [
+  ["If I ___ rich, I wouldn't have to work. (be)","was",["am","will be"]],
+  ["If they built a new highway, it ___ affect the farmers.","would",["will","did"]],
+  ["They'd be happy if they ___ time to take a vacation. (have)","had",["have","will have"]],
+  ["If I ___ speak French, I would travel more. (can)","could",["can","will"]],
+  ["I wish I ___ more free time. (have)","had",["have","will have"]],
+  ["I wish I ___ speak French. (can)","could",["can","will"]],
+  ["Faisal wishes he ___ rich. (be)","was",["is","will be"]],
+  ["I wish I ___ have to study today. (not)","didn't",["don't","won't"]]
+];
+var u11Cond2 = clozeGen(U11_COND2,
+  "في الجملة الافتراضية عن الحاضر نستعمل الماضي البسيط بعد <span class=ltr>if</span>، و"+
+  "<span class=ltr>would</span> في جواب الشرط. وبعد <span class=ltr>wish</span> نستعمل الماضي البسيط للتمنّي "+
+  "بشيءٍ غير واقع (ص <span class=ltr>129</span>).", "u11c2");
+
+var U11_RT = [
+  ["up in the air","undecided",["decided already","canceled"]],
+  ["make up your mind","decide",["change your clothes","forget about it"]],
+  ["It seems to me","a way to introduce an opinion",["a way to say goodbye","a way to apologize"]]
+];
+var u11RealTalk = vocabGen(U11_RT,
+  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>11</span> (ص <span class=ltr>125</span>).", "u11rt2");
+
+/* الاستماع: المزارعون مقابل إدارة الطرق (ص ١٢٤) */
+var U11_HIGHWAY = [
+  ["What does the Highway Department say building a new highway will bring?",
+   "A lot of development to the area",["Traffic and pollution","New farms"]],
+  ["What do the local farmers prefer?","To keep the scenic route",
+   ["To build the highway quickly","To move to another town"]],
+  ["What are the farmers worried about?","A lot of traffic and pollution in the area",
+   ["Losing their scenic route only","Losing their jobs"]]
+];
+var u11Highway = factGen(U11_HIGHWAY,
+  "من استماع الوحدة <span class=ltr>11</span> (ص <span class=ltr>124</span>): ", "u11hw");
+
+/* محادثة عادل وفيصل (ص ١٢٥) */
+var U11_FAISAL = [
+  ["What is Faisal's problem this weekend?","He has three good choices and doesn't know which one to do",
+   ["He has nothing to do","He lost his invitation"]],
+  ["What is Faisal's first choice?","Going to Fahd's graduation dinner",
+   ["Going to the airshow","Going to Khalid's family beach house"]],
+  ["What will happen if Faisal doesn't go to the airshow?","He may not get another chance to see it",
+   ["Fahd will be upset","He'll lose his ticket"]],
+  ["What does Faisal prefer to do?","Go to the Saudi Hawks airshow",
+   ["Go to Fahd's graduation","Go to Khalid's beach house"]],
+  ["What does Adel advise Faisal to do?","Do what he feels like doing, and explain to Fahd and Khalid",
+   ["Skip all three events","Go to all three at once"]]
+];
+var u11Faisal = factGen(U11_FAISAL,
+  "من محادثة الوحدة <span class=ltr>11</span> (ص <span class=ltr>125</span>): ", "u11fs");
+
+/* قطعة The Right Choice — قصة دورر (ص ١٢٦–١٢٧) */
+var U11_DURER = [
+  ["How many children did the family have?","18",["8","4"]],
+  ["What was the father's profession?","A goldsmith",["A farmer","A teacher"]],
+  ["What did the two elder sons want to pursue?","Art, at the academy in Nuremberg",
+   ["Farming","Mining"]],
+  ["What did Albert offer to do?","Work in the mines to support Albrecht while he studied art",
+   ["Study art himself","Sell the family's gold"]],
+  ["How long did Albert work in the mines?","Four years",["Eighteen years","One year"]],
+  ["Why couldn't Albert go to the academy in the end?","His hands had been ruined by four years in the mines",
+   ["He didn't want to go anymore","Their father refused"]],
+  ["What did Albrecht draw to thank his brother?","A drawing of his brother's hands, called Hands",
+   ["A portrait of their father","A picture of the mine"]]
+];
+var u11Durer = factGen(U11_DURER,
+  "من قطعة <span class=ltr>The Right Choice</span> في الوحدة <span class=ltr>11</span> (ص <span class=ltr>126–127</span>): ", "u11dr");
+
+/* gerund كفاعل ومفعول به (ص ١٢٨) */
+var U11_GERUND = [
+  ["___ what to wear is usually of very little consequence. (Decide)","Deciding",["Decide","To decide"]],
+  ["The next time it's cold, you will consider ___ a jacket. (wear)","wearing",["wear","to wear"]],
+  ["Make a list of the positive and negative aspects before ___. (decide)","deciding",["decide","to decide"]]
+];
+var u11Gerund = clozeGen(U11_GERUND,
+  "يمكن أن يكون <span class=ltr>gerund</span> (المصدر المؤول بـ<span class=ltr>-ing</span>) فاعلًا للجملة، "+
+  "أو مفعولًا به لفعلٍ أو حرف جرّ (ص <span class=ltr>128</span>).", "u11gr");
+
+/* ===================== الوحدة ١٢ — Culture Shock (ص ١٣٠–١٣٩) ===================== */
+
+/* الفعل + infinitive (ص ١٣٢) */
+var U12_INF = [
+  ["We didn't expect ___ so late. (arrive)","to arrive",["arriving","arrive"]],
+  ["They managed ___ an earlier flight. (get)","to get",["getting","get"]],
+  ["The airline refused ___ for our hotel. (pay)","to pay",["paying","pay"]],
+  ["I didn't remember ___ my toothpaste. (bring)","to bring",["bringing","bring"]],
+  ["She tried ___ on the plane, but she couldn't. (sleep)","to sleep",["sleeping","sleep"]]
+];
+var u12Infinitive = clozeGen(U12_INF,
+  "بعد أفعالٍ معيّنة مثل <span class=ltr>afford, choose, decide, expect, forget, hope, learn, manage, "+
+  "offer, promise, refuse, remember, try</span> نستعمل المصدر بـ<span class=ltr>to</span>، لا صيغة "+
+  "<span class=ltr>-ing</span> (ص <span class=ltr>132</span>).", "u12in");
+
+/* الفعل + اسم/ضمير + infinitive (ص ١٣٢) */
+var U12_VNI = [
+  ["In Latin America, families allow children ___ up late. (stay)","to stay",["staying","stay"]],
+  ["In China, people don't expect you ___. (tip)","to tip",["tipping","tip"]]
+];
+var u12VerbNounInf = clozeGen(U12_VNI,
+  "بعض الأفعال مثل <span class=ltr>allow, expect</span> تأخذ اسمًا أو ضميرًا ثم مصدرًا بـ<span class=ltr>to</span>: "+
+  "<span class=ltr>allow children to stay up</span> (ص <span class=ltr>132</span>).", "u12vn");
+
+/* It's ... + infinitive (ص ١٣٢–١٣٣) */
+var U12_ITS = [
+  ["It's advisable to arrive early in Germany.",
+   ["It's advisable arriving early in Germany.","It's advisable arrive early in Germany."]],
+  ["It's polite to say please and thank you in England.",
+   ["It's polite say please and thank you.","It's polite saying please and thank you."]],
+  ["It's not common to tip in China.",
+   ["It's not common tipping in China.","It's not common tip in China."]],
+  ["It's a good idea to remove your shoes in India.",
+   ["It's a good idea removing your shoes.","It's a good idea remove your shoes."]]
+];
+var u12Its = pickGen(U12_ITS,
+  "بعد <span class=ltr>It's + صفة</span> نستعمل المصدر بـ<span class=ltr>to</span> دائمًا: "+
+  "<span class=ltr>It's polite to shake hands</span> (ص <span class=ltr>132–133</span>).", "u12its");
+
+/* gerund كفاعل (ص ١٣٢) */
+var U12_GS = [
+  ["___ is a good way to learn about other cultures. (Travel)","Traveling",["Travel","To travel"]],
+  ["___ is not common in Japan. (Tip)","Tipping",["Tip","To tip"]]
+];
+var u12GerundSubj = clozeGen(U12_GS,
+  "يمكن أن يكون <span class=ltr>gerund</span> فاعلًا للجملة، مثل الفعل + <span class=ltr>ing</span> في أوّلها "+
+  "(ص <span class=ltr>132</span>).", "u12gs");
+
+/* قطعة When in Rome — عادات الدول (ص ١٣٠–١٣١) */
+var U12_CUSTOMS = [
+  ["What is customary to say in England?","Please, thank you, excuse me, and sorry",
+   ["Nothing in particular","Only thank you"]],
+  ["What is a common custom in Mediterranean countries?","Eating dinner late, after 9 P.M.",
+   ["Eating dinner very early","Skipping dinner"]],
+  ["What should you do with a business card in Japan?",
+   "Read it and even comment on it, not put it away right away",
+   ["Put it in your pocket immediately","Throw it away"]],
+  ["What is impolite in many Asian countries?","Playing with chopsticks or leaving them standing up in rice",
+   ["Using a spoon","Asking for a fork"]],
+  ["What do university graduates in Mexico expect?","To be addressed by their title, like Licenciado",
+   ["To be called by their first name only","Nothing special"]],
+  ["What should you remember to do in the United States?","Tip porters, taxi drivers, and waiters about 15 percent",
+   ["Never tip anyone","Tip only at restaurants"]],
+  ["Is tipping practiced in China?","No, tipping is not practiced there",
+   ["Yes, it's required","Yes, but only 5 percent"]],
+  ["What is important to Germans?","Being punctual, even arriving a few minutes early",
+   ["Being casual about time","Arriving late on purpose"]],
+  ["What should you do before entering a home in India?","Remove your shoes",
+   ["Bring a gift","Knock three times"]]
+];
+var u12Customs = factGen(U12_CUSTOMS,
+  "من قطعة <span class=ltr>When in Rome, Do as the Romans Do</span> في الوحدة <span class=ltr>12</span> "+
+  "(ص <span class=ltr>130–131</span>): ", "u12cu");
+
+/* محادثة ويل وإدجار في الصين (ص ١٣٥) */
+var U12_EDGAR = [
+  ["Where is Edgar based?","Shanghai",["Beijing","Hong Kong"]],
+  ["What struck Edgar as different?","The food — eating with chopsticks was tricky at first",
+   ["The weather","The traffic"]],
+  ["How is Edgar's Chinese?","He's still learning it, but most people he works with speak English well",
+   ["He speaks it fluently","He doesn't know any Chinese"]],
+  ["What does Edgar find kind of weird?",
+   "That the family name comes before the first name, and many people share the same surname",
+   ["That people don't use chopsticks","That the city is too modern"]],
+  ["What happened when Edgar called out \"Zhou\" at work?","Three colleagues answered him",
+   ["No one answered","His boss got angry"]]
+];
+var u12Edgar = factGen(U12_EDGAR,
+  "من محادثة الوحدة <span class=ltr>12</span> (ص <span class=ltr>135</span>): ", "u12ed");
+
+/* قطعة A Fish Out of Water — مراحل صدمة الثقافة (ص ١٣٦–١٣٧) */
+var U12_SHOCK = [
+  ["Who first used the term \"culture shock\"?","The writer Kalervo Oberg, in 1954",
+   ["Marcus Garvey","T.S. Eliot"]],
+  ["How many stages of culture shock did Oberg identify?","Five",["Three","Seven"]],
+  ["What happens in the Adjustment Phase?","The newcomer is excited about the new place and feels welcome",
+   ["The newcomer feels homesick","The newcomer rejects the new culture"]],
+  ["What happens in the Emptiness or Rejection Phase?",
+   "The newcomer deals with problems and may start to complain about or reject the new country",
+   ["The newcomer feels completely comfortable","The newcomer returns home"]],
+  ["What happens in the Conformist Phase?",
+   "The newcomer gains understanding of the new culture and starts feeling pleasure",
+   ["The newcomer feels culture shock for the first time","The newcomer refuses to adapt"]],
+  ["What happens in the Assimilation Phase?",
+   "The person accepts the food, habits, and customs, and feels completely comfortable",
+   ["The person feels homesick","The person goes back home immediately"]],
+  ["What is Reverse Culture Shock?",
+   "The \"re-entry shock\" a person feels when they return to their home country after a long time away",
+   ["Culture shock felt on the first day abroad","A phase that never happens"]]
+];
+var u12Shock = factGen(U12_SHOCK,
+  "من قطعة <span class=ltr>A Fish Out of Water</span> في الوحدة <span class=ltr>12</span> (ص <span class=ltr>136–137</span>): ", "u12sk");
+
+/* used to / be used to / get used to (ص ١٣٨) */
+var U12_USEDTO = [
+  ["The people here are used to ___ in line at the bus stop. (stand)","standing",["stand","to stand"]],
+  ["It isn't easy to get used to ___ in a new cultural environment. (live)","living",["live","to live"]],
+  ["We are not used to the weather ___ so cold and rainy. (be)","being",["be","to be"]],
+  ["She used to ___ coffee in the morning, but now she drinks tea. (drink)","drink",["drinking","to drink"]],
+  ["He has gotten used to ___ on the left side of the road. (drive)","driving",["drive","to drive"]],
+  ["I had difficulty with the language at first, but I'm used to ___ it now. (speak)","speaking",
+   ["speak","to speak"]],
+  ["I didn't use to ___ a nap, but now I rest every afternoon. (take)","take",["taking","took"]]
+];
+var u12UsedTo = clozeGen(U12_USEDTO,
+  "<span class=ltr>used to + فعل</span> لعادةٍ ماضية انتهت. <span class=ltr>be used to + gerund/اسم</span> "+
+  "و<span class=ltr>get used to + gerund/اسم</span> للتعوّد على شيء (ص <span class=ltr>138</span>).", "u12ut");
+
+/* الماضي التام (ص ١٣٩) */
+var U12_PP = [
+  ["By the time we got to the airport, our flight ___ already left. (had)","had",["has","have"]],
+  ["After she ___ gone to the hotel, Amal exchanged some money. (had)","had",["has","was"]],
+  ["___ you ever eaten sushi before you traveled to Japan?","Had",["Have","Did"]],
+  ["No, I'd never ___ sushi until I visited Japan. (taste)","tasted",["taste","tasting"]],
+  ["He'd had the car for ten years before he ___ it. (sell)","sold",["sells","selling"]],
+  ["Sabah didn't know how to use chopsticks because she ___ never eaten at a Chinese restaurant before. (have)",
+   "had",["has","was"]]
+];
+var u12PastPerfect = clozeGen(U12_PP,
+  "الماضي التامّ (<span class=ltr>had + التصريف الثالث</span>) لحدثٍ وقع <b>قبل</b> حدثٍ آخر في الماضي "+
+  "(ص <span class=ltr>139</span>).", "u12pp");
+
 var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion];
 var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck,
           u2UsedTo,u2IrregPast,u2RealTalk,u2Falcons,u2King];
@@ -3374,9 +3739,15 @@ var U8  = [u8Aggressive,u8George,u8RealTalk,u8Right,u8RightVocab,u8License,
            u8ModalForm,u8Adverb,u8AdverbSent];
 var U9  = [u9Relative,u9PastProg,u9Adjectives,u9City,u9Lars,u9RealTalk,u9Yunus,
            u9Jameel,u9YunusVocab];
+var U10 = [u10PresPerfect,u10Gerund,u10Phrasal,u10RealTalk,u10Sarah,u10TwoWordVocab,
+           u10RelClause,u10Modal,u10SoSuch];
+var U11 = [u11Cond1,u11Rather,u11Cond2,u11RealTalk,u11Highway,u11Faisal,u11Durer,u11Gerund];
+var U12 = [u12Infinitive,u12VerbNounInf,u12Its,u12GerundSubj,u12Customs,u12Edgar,u12Shock,
+           u12UsedTo,u12PastPerfect];
 var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
 var ALLU2 = U4.concat(U5).concat(U6).concat(EXP2);     /* الجزء الثاني */
 var ALLU3 = U7.concat(U8).concat(U9);                  /* الجزء الثالث */
+var ALLU4 = U10.concat(U11).concat(U12);               /* الجزء الرابع */
 
 /* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
    يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
@@ -3409,7 +3780,12 @@ if(!NAMES[who]){
     allu3:{tab:"اختبار شامل 📝", gens:ALLU3, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>7–9</span>.", label:"إنجليزي م٣ — شامل و7-9"},
     u7:{tab:"7 Good Deal", gens:U7, n:10, intro:"<b><span class=ltr>Unit 7 — It's a Good Deal, Isn't It?</span> (ص <span class=ltr>74–83</span>):</b> أسئلة الذيل والأسئلة المنفيّة، و<span class=ltr>be able to</span>، والاقتراحات بـ<span class=ltr>should / Why don't / Let's</span>، وأزمنة السرد، وقطعة <span class=ltr>You Look Just Like Me!</span> عن التوائم.", label:"إنجليزي م٣ — Unit 7"},
     u8:{tab:"8 Drive Slowly", gens:U8, n:10, intro:"<b><span class=ltr>Unit 8 — Drive Slowly!</span> (ص <span class=ltr>84–93</span>):</b> أجزاء السيارة وإشارات المرور، و<span class=ltr>must</span> مقابل <span class=ltr>should</span>، وظروف الكيفيّة، والسبب والنتيجة، ونقل الطلبات والأوامر، وقطعة <span class=ltr>Is Right, Right?</span>.", label:"إنجليزي م٣ — Unit 8"},
-    u9:{tab:"9 All Kinds", gens:U9, n:10, intro:"<b><span class=ltr>Unit 9 — All Kinds of People</span> (ص <span class=ltr>94–101</span>):</b> الضمائر الموصولة <span class=ltr>who/that/which</span>، والماضي المستمرّ مع <span class=ltr>when/while</span>، وصفات الشخصية، وقطعة <span class=ltr>Simple Ideas, BIG Results</span>.", label:"إنجليزي م٣ — Unit 9"}
+    u9:{tab:"9 All Kinds", gens:U9, n:10, intro:"<b><span class=ltr>Unit 9 — All Kinds of People</span> (ص <span class=ltr>94–101</span>):</b> الضمائر الموصولة <span class=ltr>who/that/which</span>، والماضي المستمرّ مع <span class=ltr>when/while</span>، وصفات الشخصية، وقطعة <span class=ltr>Simple Ideas, BIG Results</span>.", label:"إنجليزي م٣ — Unit 9"},
+
+    allu4:{tab:"اختبار شامل 📝", gens:ALLU4, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>10–12</span>.", label:"إنجليزي م٣ — شامل و10-12"},
+    u10:{tab:"10 Toothpaste", gens:U10, n:10, intro:"<b><span class=ltr>Unit 10 — Who Used My Toothpaste?</span> (ص <span class=ltr>110–119</span>):</b> المضارع التامّ مع <span class=ltr>already/yet/just</span>، والفعل + <span class=ltr>gerund</span>، والأفعال المركّبة، والضمائر الموصولة <span class=ltr>whose/where</span>، و<span class=ltr>can't/must</span> للتخمين، و<span class=ltr>so…that/such…that</span>.", label:"إنجليزي م٣ — Unit 10"},
+    u11:{tab:"11 Choices", gens:U11, n:10, intro:"<b><span class=ltr>Unit 11 — Making Choices</span> (ص <span class=ltr>120–129</span>):</b> جملة الشرط الأولى (حقائق ومستقبل)، و<span class=ltr>I'd rather</span>، وجملة الشرط الافتراضية و<span class=ltr>wish</span>، وقطعة <span class=ltr>The Right Choice</span>.", label:"إنجليزي م٣ — Unit 11"},
+    u12:{tab:"12 Culture Shock", gens:U12, n:10, intro:"<b><span class=ltr>Unit 12 — Culture Shock</span> (ص <span class=ltr>130–139</span>):</b> الفعل + <span class=ltr>infinitive</span>، و<span class=ltr>It's…to</span>، وgerund كفاعل، وعادات دولٍ مختلفة، و<span class=ltr>used to / be used to / get used to</span>، والماضي التامّ.", label:"إنجليزي م٣ — Unit 12"}
   };
 
   var CHAPS = {
@@ -3418,7 +3794,9 @@ if(!NAMES[who]){
     p2: {name:"Part 2 · الوحدات 4–6", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 2</span>: الوحدات <span class="ltr">4–6</span> ومراجعتها (ص <span class="ltr">38\u201373</span>)',
          ids:["u4","u5","u6","exp2","allu2"]},
     p3: {name:"Part 3 · الوحدات 7–9", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 3</span>: الوحدات <span class="ltr">7–9</span> (ص <span class="ltr">74\u2013101</span>)',
-         ids:["u7","u8","u9","allu3"]}
+         ids:["u7","u8","u9","allu3"]},
+    p4: {name:"Part 4 · الوحدات 10–12", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 4</span>: الوحدات <span class="ltr">10–12</span> (ص <span class="ltr">110\u2013139</span>)',
+         ids:["u10","u11","u12","allu4"]}
   };
 
   var curCh = "p1", curId = "u1";
@@ -3492,9 +3870,12 @@ if(!NAMES[who]){
     {id:"u7", name:"Unit 7 — Good Deal", tip:"سؤال الذيل: إن كانت الجملة مثبتة يكون الذيل منفيًّا والعكس صحيح (You're tired, aren't you؟). و be able to بديل can في الأزمنة الأخرى. والاقتراحات: should + مصدر، Why don't you…؟، Let's + مصدر.", yt:"شرح tag questions and be able to ثالث متوسط سوبر قول"},
     {id:"u8", name:"Unit 8 — Drive Slowly", tip:"must للإلزام القويّ (كالقانون)، أمّا should فللنصيحة. ظروف الكيفية غالبًا فعل+ly (slowly, carefully). ونقل الأوامر: He told me to + مصدر، ونقل الطلبات: He asked me to + مصدر.", yt:"شرح must and should reported speech ثالث متوسط سوبر قول"},
     {id:"u9", name:"Unit 9 — All Kinds", tip:"who للأشخاص، which للأشياء، that للاثنين معًا. والماضي المستمرّ (was/were + ing) لفعلٍ مستمرٍّ قطعه فعلٌ آخر بالماضي البسيط، ويأتي معه غالبًا when أو while.", yt:"شرح relative pronouns and past continuous ثالث متوسط سوبر قول"},
-    {id:"exp2", name:"Expansion 4–6", tip:"الجمل المترادفة تُعبِّر عن المعنى نفسه بصياغةٍ مختلفة — كتحويل الجملة من المبني للمعلوم إلى المجهول، أو استبدال الفعل بمرادفه مع تعديل التركيب حوله.", yt:"شرح sentence transformation ثالث متوسط سوبر قول"}
+    {id:"exp2", name:"Expansion 4–6", tip:"الجمل المترادفة تُعبِّر عن المعنى نفسه بصياغةٍ مختلفة — كتحويل الجملة من المبني للمعلوم إلى المجهول، أو استبدال الفعل بمرادفه مع تعديل التركيب حوله.", yt:"شرح sentence transformation ثالث متوسط سوبر قول"},
+    {id:"u10", name:"Unit 10 — Toothpaste", tip:"المضارع التامّ: already/just في الإثبات، yet في السؤال والنفي. وبعد أفعالٍ مثل can't stand وenjoy وmiss نستعمل gerund لا مصدرًا. والضمير في الأفعال المركّبة يأتي بين الفعل والأداة (turn it off).", yt:"شرح present perfect already yet just verb gerund ثالث متوسط سوبر قول"},
+    {id:"u11", name:"Unit 11 — Choices", tip:"الشرط الأول (حقائق/مستقبل): مضارع + مضارع أو مضارع + will. والشرط الافتراضي (غير واقعي): ماضٍ بسيط + would. وwish + ماضٍ بسيط للتمنّي بشيءٍ غير واقع.", yt:"شرح first and second conditional wish ثالث متوسط سوبر قول"},
+    {id:"u12", name:"Unit 12 — Culture Shock", tip:"أفعال مثل expect وmanage وrefuse تأخذ مصدرًا بـto. وIt's + صفة يأخذ مصدرًا بـto دائمًا. وused to لعادةٍ ماضية، وbe/get used to + gerund للتعوّد. والماضي التامّ لحدثٍ سبق حدثًا آخر في الماضي.", yt:"شرح verb infinitive used to past perfect ثالث متوسط سوبر قول"}
   ];
-  var ALL_IDS = ["allu", "allu2", "allu3"];
+  var ALL_IDS = ["allu", "allu2", "allu3", "allu4"];
 
   /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
      بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «قسم علاجي ما حطّيت فيه دروس بعد

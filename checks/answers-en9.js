@@ -816,7 +816,7 @@ clozeCheck('u8AdverbSent','U8_ADVS');
 /* لا خيار من حرفٍ واحد في أيّ مولّد — الحارس ضدّ خطأ [..][0] */
 say('\n### حارس الخيارات المقطوعة');
 (function(){
-  let names=[]; try{ names=vm.runInContext('ALLU.concat(ALLU2).concat(ALLU3).map(function(f){return f.name;})',ctx); }catch(e){}
+  let names=[]; try{ names=vm.runInContext('ALLU.concat(ALLU2).concat(ALLU3).concat(ALLU4).map(function(f){return f.name;})',ctx); }catch(e){}
   let bad1=0;
   names.forEach(n=>{ const f=vm.runInContext(n,ctx);
     for(let i=0;i<400;i++){ let q; try{q=f();}catch(e){continue;} if(!q) continue;
