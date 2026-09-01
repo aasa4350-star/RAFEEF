@@ -220,8 +220,13 @@ async function loadReport(){
       {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
     rows=await r.json(); rows=Array.isArray(rows)?rows:[];
   }catch(e){}
-  var practice=rows.filter(function(x){ return x.meta && x.meta.kind==="practice"; });
-  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice")); });
+  /* نفس علّة child.html وindex.html بالضبط (بلاغا الأب ١ سبتمبر ٢٠٢٦:
+     قسم التعبير وقسم المحادثة ماطلعا له) — writing/writing-drill/talk
+     لم تكن تُستثنى هنا أيضًا، وهي محفوظة دائمًا en_total=0/ma_total=0
+     فتُخفّض enAvg/maAvg و«المستوى الحالي» زورًا كلّما كتب الابن فقرة
+     أو تكلّم في talk.html. هذه هي الصفحة التي يفتحها الابن نفسه. */
+  var practice=rows.filter(function(x){ return x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"); });
+  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
 
   var notes=[];
   try{ var nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
@@ -252,8 +257,12 @@ async function loadReport(){
     var HIDE_SUBJ = { osama: ["لغتي"] };
     var hidden = HIDE_SUBJ[who] || [];
     var currMap={}, otherMap={};
-    var vocabAll=[];
-    practice.forEach(function(p){ var t=(p.meta.test||""); var subj=t.split(" ")[0];
+    var vocabAll=[], writingAll=[], writingDrill=[], talkAll=[];
+    practice.forEach(function(p){
+      if(p.meta.kind==="writing"){ writingAll.push(p); return; }
+      if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
+      if(p.meta.kind==="talk"){ talkAll.push(p); return; }
+      var t=(p.meta.test||""); var subj=t.split(" ")[0];
       if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
@@ -289,6 +298,27 @@ async function loadReport(){
         '</ul>'+
         (revList?'<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر '+(window.RR?RR.VOCAB_DAYS:7)+' أيام:</div><ul class="weak">'+revList+'</ul>':'')+
         '</div>';
+    }
+    // ✍️ التعبير الإنجليزي
+    if(writingAll.length){
+      var WSUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
+      var wAgg={}, wAggN=0;
+      writingAll.forEach(function(p){ if(p.meta.bands){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
+      var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
+      html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
+        '<li>📝 كتب <b>'+writingAll.length+'</b> فقرة'+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+'</li>'+
+        (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
+        '</ul></div>';
+    }
+    // 🗣️ المحادثة الإنجليزية
+    if(talkAll.length){
+      var tks=talkAll.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
+      var totTurns=tks.reduce(function(s,p){return s+(p.meta.turns||0);},0);
+      var pronRows=tks.filter(function(p){return typeof p.meta.avgPron==="number";});
+      var avgPronAll=pronRows.length?Math.round(pronRows.reduce(function(s,p){return s+p.meta.avgPron;},0)/pronRows.length):null;
+      html+='<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">'+
+        '<li>💬 <b>'+tks.length+'</b> جلسة محادثة · <b>'+totTurns+'</b> جملة'+(avgPronAll!=null?' · متوسط النطق <b>'+avgPronAll+'%</b>':'')+'</li>'+
+        '</ul></div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
     var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
