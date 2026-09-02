@@ -878,6 +878,87 @@ if(!META[who] || !DATA[who]){
     ["ضرورية","لا يُستغنى عنها"], ["الطاقة","القوّة التي تحرّك الأشياء"],
     ["الصحراء","أرض واسعة رمليّة قليلة الماء"], ["مفيدة","تنفع صاحبها"], ["الأسرة","الأب والأمّ والأولاد"]
   ];
+  /* نظير AR_GLOSS للقطع الإنجليزية: كلمة إنجليزية + تعريفها بالإنجليزية (لا ترجمة عربية)،
+     حتى يبقى سؤال «قطعة الإنجليزي» وخياراته إنجليزيّين معًا كما هي القطعة نفسها. */
+  var EN_GLOSS = [
+    ["warn","tell someone about a possible danger"], ["urge","strongly encourage someone to do something"],
+    ["valuable","worth a lot, or very useful"], ["expands","makes something larger or wider"],
+    ["critically","in a careful, questioning way, not just accepting things"],
+    ["renewable","able to be used again and again without running out"],
+    ["pollution","dirty or harmful waste in the air, water, or land"],
+    ["combine","join two or more things together"], ["achieve","succeed in doing something after effort"],
+    ["communication","sharing information or ideas with others"],
+    ["vital","extremely important, needed for life"], ["repairs","fixes something that is broken or damaged"],
+    ["advise","give someone helpful suggestions about what to do"],
+    ["focused","giving full attention to one thing"], ["benefits","does good for someone; helps someone"],
+    ["responsibility","a duty to take care of something"], ["connected","linked or joined with others"],
+    ["analyze","look at something carefully to understand it"], ["misled","given a false or wrong idea"],
+    ["encourage","give someone support and confidence to do something"],
+    ["transforming","completely changing"], ["diagnose","find out what illness or problem someone has"],
+    ["responsibly","in a careful, sensible way that avoids harm"], ["purpose","a reason for doing something"],
+    ["extraordinary","very unusual, far beyond what is normal"],
+    ["organ","a part of the body with a special job, like the heart"],
+    ["constantly","all the time, without stopping"],
+    ["fossil","the remains of a very old plant or animal preserved in rock"],
+    ["investing","putting money or effort into something for future benefit"],
+    ["reasoned","based on careful thinking, not just guessing"],
+    ["remarkable","worth noticing because it is unusual or impressive"],
+    ["achievements","important things done successfully"],
+    ["philosophy","the study of ideas about knowledge, truth, and how to live"],
+    ["foundations","the basic ideas that something is built upon"],
+    ["literacy","the ability to read and write, or basic knowledge of a subject"],
+    ["budget","a plan for how to spend and save money"],
+    ["secure","safe, and free from danger or worry"],
+    ["regulating","controlling something so it stays balanced or works properly"],
+    ["absorbs","takes in or soaks up something"],
+    ["oxygen","the gas in the air that people and animals need to breathe"],
+    ["enormous","extremely large in size or amount"], ["amounts","quantities of something"],
+    ["reefs","underwater ridges made of coral, near the sea's surface"],
+    ["shelter","give protection or a safe place to live"],
+    ["threaten","be likely to cause harm or danger to something"],
+    ["invention","something new that someone has created or designed"],
+    ["privilege","a special right or advantage only some people have"],
+    ["evidence","facts or information that show something is true"],
+    ["confidence","a feeling of being sure about something"],
+    ["proof","facts that show something is certainly true"],
+    ["reserves","supplies of something stored for future use"],
+    ["economists","people who study how money, goods, and services are used"],
+    ["bias","an unfair preference for or against something"],
+    ["solidarity","unity and support among the people in a group"],
+    ["decline","become smaller, weaker, or worse over time"],
+    ["comfort","a feeling of being relaxed, safe, and free from difficulty"],
+    ["civilisations","societies with their own culture, laws, and cities"],
+    ["essential","extremely necessary"], ["strengthens","makes something stronger"],
+    ["reliable","able to be trusted to be correct or to work well"],
+    ["recycling","turning used materials into new products instead of throwing them away"],
+    ["protect","keep someone or something safe from harm"],
+    ["honesty","always telling the truth"], ["earns","gets something because it is deserved"],
+    ["respect","a feeling of admiration for someone"], ["treasure","something very valuable and precious"],
+    ["successful","having achieved what was wanted; having done well"],
+    ["managing","controlling or organizing something well"],
+    ["habit","something a person does often and regularly"],
+    ["patience","the ability to stay calm while waiting or facing difficulty"],
+    ["tombs","places where dead bodies are buried, often built as monuments"],
+    ["bacteria","very small living things, some of which can cause disease"],
+    ["synonyms","words that have the same or a very similar meaning"],
+    ["quiet","with little or no noise"],
+    ["respects","shows admiration and consideration for someone or something"],
+    ["energy","the power needed to make things work or move"],
+    ["planet","a large body in space that moves around a star, like Earth"],
+    ["hump","a rounded lump on an animal's back, like a camel's"],
+    ["important","having great value or meaning; serious"],
+    ["lesson","something learned, often from an experience"],
+    ["solid","a firm substance that keeps its shape, not a liquid or gas"],
+    ["liquid","a substance that flows freely, like water"],
+    ["cycle","a series of events that repeat in the same order"],
+    ["sunlight","light that comes from the sun"],
+    ["soil","the top layer of earth in which plants grow"],
+    ["library","a place with many books that people can read or borrow"],
+    ["wonderful","extremely good; causing great pleasure"],
+    ["knowledge","information and understanding gained through learning or experience"],
+    ["exciting","causing strong feelings of interest and happiness"],
+    ["museum","a building where interesting or historical objects are shown"]
+  ];
   /* أسئلة مؤلّفة يدويًا (الفكرة الرئيسة / الاستنتاج / المثل) — من reading-xq.js */
   function xqAuthored(passage){
     var X = window.READING_XQ;
@@ -896,35 +977,20 @@ if(!META[who] || !DATA[who]){
       if(others.length<2) return [];
       return [["ما معنى كلمة «"+g[0]+"» كما وردت في النصّ؟", [g[1], others[0][1], others[1][1]], 0]];
     }
-    if(typeof VOCAB300 === "undefined") return [];
-    var seen={}, hits2=[];
-    (p.toLowerCase().match(/[a-z]+/g)||[]).forEach(function(w){
-      if(w.length<4 || seen[w]) return; seen[w]=1;
-      for(var i=0;i<VOCAB300.length;i++){ if(VOCAB300[i][0]===w){ hits2.push(i); return; } }
-    });
+    /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «القسم إنجليزي!» — سؤال «معنى كلمة» في قطعةٍ إنجليزية
+       يجب أن يبقى إنجليزيًّا بالكامل (سؤالًا وخيارات)، تمامًا كنظيره العربي أعلاه الذي
+       يستخدم AR_GLOSS (كلمة + تعريفها بنفس لغتها، لا ترجمة). أوّل محاولة صاغت السؤال
+       عربيًّا لتطابق خياراته العربية — فأصلحنا الجهة الخطأ؛ اللغة الصحيحة لقطعة إنجليزية
+       إنجليزية لا عربية. الحل الصحيح: EN_GLOSS، نظير AR_GLOSS، كلمة إنجليزية + تعريفها
+       بالإنجليزية — لا نعتمد على VOCAB300 هنا لأنه يخزّن الترجمة العربية فقط. */
+    if(typeof EN_GLOSS === "undefined" || !EN_GLOSS.length) return [];
+    var words2 = (p.toLowerCase().match(/[a-z]+/g)||[]);
+    var hits2 = EN_GLOSS.filter(function(g){ return words2.indexOf(g[0])>=0; });
     if(!hits2.length) return [];
-    /* القائمة مرتّبة من الأساسي إلى المتقدّم، فنختار الأبعد فيها = الكلمة الأصعب */
-    var gi = hits2.reduce(function(a,b){ return b>a?b:a; }, -1), g2 = VOCAB300[gi];
-    /* المشتّتات من جوار الكلمة في القائمة — نفس المجال الدلالي، فتكون معقولة لا عشوائية */
-    var pool=[], used={};
-    used[g2[1][0]]=1;
-    for(var d=1; d<=22 && pool.length<10; d++){
-      [gi-d, gi+d].forEach(function(j){
-        if(j<0 || j>=VOCAB300.length) return;
-        var mn=VOCAB300[j][1][0];
-        if(used[mn]) return; used[mn]=1; pool.push(VOCAB300[j]);
-      });
-    }
-    if(pool.length<2) pool = VOCAB300.filter(function(x){ return x[1][0]!==g2[1][0]; }).slice();
-    shuffle(pool);
-    if(pool.length<2) return [];
-    /* بلاغ الأب (٢ سبتمبر ٢٠٢٦، صورة): سؤالٌ إنجليزيّ اللفظ «What does the
-       word ... mean?» بخياراتٍ عربية! السبب: VOCAB300 يخزّن الترجمة
-       العربية فقط لكل كلمة (لا مرادفًا إنجليزيًّا)، وسؤال «قطعة الإنجليزي»
-       كان يُصاغ إنجليزيًّا رغم أنّ خياراته عربيةٌ بالضرورة. صيغة السؤال
-       الآن عربية — تطابق تمامًا صيغة سؤال «قطعة العربي» أعلاه — فيتّسق
-       السؤال مع خياراته دائمًا. */
-    return [['ما معنى كلمة «'+g2[0]+'» كما وردت في النصّ؟', [g2[1][0], pool[0][1][0], pool[1][1][0]], 0]];
+    var g2 = hits2[Math.floor(Math.random()*hits2.length)];
+    var others2 = shuffle(EN_GLOSS.filter(function(x){ return x[1]!==g2[1]; }).slice());
+    if(others2.length<2) return [];
+    return [['What does the word "'+g2[0]+'" mean in the text?', [g2[1], others2[0][1], others2[1][1]], 0]];
   }
 
   function renderRead(){
