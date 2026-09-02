@@ -52,16 +52,47 @@
       body: JSON.stringify(payload)
     });
   }
-  function stamp(p){
-    try{ p.meta = p.meta || {}; if(!p.meta.at) p.meta.at = new Date().toISOString(); }catch(e){}
+  function stamp(p, id){
+    try{
+      p.meta = p.meta || {};
+      if(!p.meta.at) p.meta.at = new Date().toISOString();
+      /* بصمةٌ فريدة لكل محاولة إرسال، تُحفظ داخل الصفّ نفسه — بها نعرف
+         لاحقًا إن كان قد وصل فعلًا (انظر alreadyThere أدناه). */
+      if(id && !p.meta.cid) p.meta.cid = id;
+    }catch(e){}
     return p;
+  }
+
+  /* ═══ هل وصل هذا الصفّ فعلًا من قبل؟ ═══════════════════════════
+     بلاغ الأب (٢ سبتمبر ٢٠٢٦): جلساتٌ مكرّرة في التقرير — فحصنا القاعدة
+     فوجدنا ١٢ جلسةً مكرّرة عند الأبناء الأربعة (نفس meta.at بالضبط،
+     وcreated_at مختلف)، أكثرها من «اختبر نفسك».
+
+     السبب: الصفحات تحفظ عند pagehide/visibilitychange (وهو الصواب، لئلّا
+     يضيع نصف اختبارٍ لم يُكمله الطفل). وهناك يُرسَل الطلب فعلًا — keepalive
+     يضمن وصوله للخادم — لكنّ سياق الجافاسكربت يموت مع الصفحة قبل أن يصل
+     ردّ fetch إلى then، فلا يُنفَّذ removeById، فيبقى الصفّ في الطابور
+     المحلّي «كأنّه فشل»، ويُعاد إرساله في أوّل فتحةٍ قادمة لأيّ صفحة —
+     فيتكرّر صفٌّ ناجحٌ أصلًا. عالجناه في talk.html وحدها بـ sendBeacon،
+     لكنّ العلّة في الطابور نفسه فتصيب كلّ صفحةٍ تستعمله.
+
+     فصار كلّ صفٍّ يحمل بصمته (meta.cid)، وقبل إعادة الإرسال نسأل القاعدة:
+     أعندك صفٌّ بهذه البصمة؟ فإن كان، أسقطناه بلا إرسال. */
+  function alreadyThere(it){
+    var cid = it && it.p && it.p.meta && it.p.meta.cid;
+    if(!cid) return Promise.resolve(false);   /* صفوفٌ من نسخةٍ أقدم بلا بصمة */
+    return fetch(it.u + "?select=id&limit=1&meta-%3E%3Ecid=eq." + encodeURIComponent(cid),
+      { headers:{ "apikey": it.k, "Authorization": "Bearer " + it.k } })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ return Array.isArray(j) && j.length > 0; })
+      .catch(function(){ return false; });    /* تعذّر السؤال → نرسل كالمعتاد */
   }
 
   var AQ = {
     /* onState: "pending" ثم "ok" أو "queued" */
     post: function(url, key, payload, onState){
-      stamp(payload);
       var id = Date.now()+"_"+Math.random().toString(36).slice(2);
+      stamp(payload, id);
       enqueue(url, key, payload, id);   /* نكتب أوّلًا، قبل أن نحاول الإرسال */
       try{ if(onState) onState("pending"); }catch(e){}
       return send(url, key, payload).then(function(r){
@@ -79,9 +110,13 @@
       var left = [], done = 0;
       return a.reduce(function(chain, it){
         return chain.then(function(){
-          return send(it.u, it.k, it.p).then(function(r){
-            if(r && r.ok) done++; else left.push(it);
-          }).catch(function(){ left.push(it); });
+          /* لا نُعيد إرسال صفٍّ وصل فعلًا — وإلّا تكرّر (انظر alreadyThere) */
+          return alreadyThere(it).then(function(dup){
+            if(dup){ done++; return; }
+            return send(it.u, it.k, it.p).then(function(r){
+              if(r && r.ok) done++; else left.push(it);
+            }).catch(function(){ left.push(it); });
+          });
         });
       }, Promise.resolve()).then(function(){
         if(left.length) write(read().concat(left));
