@@ -82,6 +82,16 @@ function saDate(iso){
   var p = function(n){ return String(n).padStart(2,"0"); };
   return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate());
 }
+/* saDate بلا وقت — كافٍ لسجلّ الجلسات العام، لكن بلاغ الأب (٢ سبتمبر
+   ٢٠٢٦) على قسم التعبير تحديدًا: «مايطلع عندي تاريخ ووقت الاختبار».
+   saTime نفس الاصطلاح المستعمل في child.html وindex.html وhome.html. */
+function saTime(iso){
+  if(!iso) return "";
+  var d = new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," ");
+  d = new Date(d.getTime() + 3*3600*1000);
+  var p = function(n){ return String(n).padStart(2,"0"); };
+  return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes());
+}
 function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
 
 var ALL = [], current = KIDS[0][0];
@@ -364,8 +374,12 @@ function writingCardHtml(student){
   rows.forEach(function(r){ if(r.meta.bands){ aggN++;
     SUBS.forEach(function(s){ agg[s[0]]=(agg[s[0]]||0)+(r.meta.bands[s[0]]||0); }); } });
 
+  /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «التعبير مايطلع عندي في التقرير تاريخ
+     ووقت الاختبار» — تاريخ ووقت آخر فقرةٍ مكتوبة يظهران هنا أعلى
+     البطاقة مباشرة (rows مرتّبة تنازليًّا فالأحدث rows[0])، فضلًا عن
+     الوقت الكامل (لا التاريخ فقط) في بطاقة كل فقرةٍ تحت. */
   var html = '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
-    '<p class="note">كتب <b>'+rows.length+'</b> فقرة'+
+    '<p class="note">كتب <b>'+rows.length+'</b> فقرة · آخر مرة: <b>'+saTime(rowT(rows[0]))+'</b>'+
     (dt ? ' · تدريب بناء الجملة: <b>'+dc+'/'+dt+'</b> ('+pct(dc,dt)+'%)' : '')+
     '<br>التقييم بمقاييس <b>كامبردج</b> الأربعة (كلٌّ من 5، والنجاح 3 فأكثر)، '+
     'والطول وأدوات الربط المطلوبة من هدف <b>CEFR</b> لصفّه.</p>';
@@ -402,7 +416,7 @@ function writingCardHtml(student){
         '<span>'+esc(m.topic||"—")+'</span>'+
         '<span class="pill '+cls(p)+'" dir="ltr">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+
       '</div>'+
-      '<p class="note" style="margin:4px 0 6px">'+saDate(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+
+      '<p class="note" style="margin:4px 0 6px">'+saTime(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+
         (m.cefr? ' · هدف '+esc(m.cefr) : '')+
         (typeof m.pass==="boolean" ? (m.pass?' · ✅ اجتاز':' · ⚠️ لم يجتز') : '')+'</p>'+
       bandsHtml+
