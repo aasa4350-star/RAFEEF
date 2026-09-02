@@ -1128,25 +1128,6 @@
         }
     },
     {
-        "id": "c1dba215-a8ab-4edd-9bb2-57ee4a44eecd",
-        "created_at": "2026-09-02T14:04:13.049211+00:00",
-        "student": "__probe__",
-        "grade": "",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "kind": "talk",
-            "secs": 1,
-            "probe": true,
-            "topic": "probe",
-            "turns": 1,
-            "avgPron": null
-        }
-    },
-    {
         "id": "14d78efe-9d9d-4ebb-8461-dd1c1fa7132b",
         "created_at": "2026-09-02T13:58:38.019324+00:00",
         "student": "\u0633\u0639\u0648\u062f",
@@ -52614,6 +52595,27 @@
             "learned": 210,
             "trusted": true,
             "vocTotal": 300
+        }
+    },
+    {
+        "id": "87ce8f0a-8bc4-4e82-a2e0-749437e3dedf",
+        "created_at": "2026-08-14T01:00:35.164785+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "dur": 405,
+            "away": 0,
+            "kind": "practice",
+            "test": "\u0625\u0645\u0644\u0627\u0621 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \u270d\ufe0f",
+            "exits": 0,
+            "total": 8,
+            "correct": 8,
+            "trusted": true
         }
     }
 ]
