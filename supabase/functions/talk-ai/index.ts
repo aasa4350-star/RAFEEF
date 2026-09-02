@@ -2,7 +2,7 @@
 // وسيط آمن بين صفحة المحادثة (talk.html) ونموذج ذكاء اصطناعي.
 // المفتاح يبقى سرًّا على السيرفر ولا يظهر في المتصفح.
 //
-// النشر (مرة واحدة):
+// النشر (مرة واحدة، أو بعد أيّ تعديلٍ على هذا الملف):
 //   1) احصل على مفتاح Gemini مجّاني من https://aistudio.google.com/apikey
 //   2) أضف السرّ:   supabase secrets set GEMINI_API_KEY=المفتاح
 //   3) انشر:        supabase functions deploy talk-ai --no-verify-jwt
@@ -29,15 +29,49 @@ function cleanKey(raw: string | undefined): string {
   return k;
 }
 
+/* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «هل يطلع لي نسبة صحة الجملة؟» — التقييم
+   السابق كان صوتيًّا بحتًا (نطق الكلمات عبر Azure)، ولا شيء يقيس هل
+   الجملة التي قالها الطفل صحيحةٌ نحويًّا ومعناها مضبوط. صار النموذج
+   نفسه (الذي يردّ على الطفل أصلًا) يُقيّم جملته الأخيرة معه في نفس
+   الطلب — لا طلبٌ إضافي، فلا تكلفة أو بطءٌ زائد — ويُعيد الردّ بصيغة
+   JSON منظّمة بدل نصٍّ حرّ، ليقدر talk.html يستخرج التقييم بثقة. */
 function sys(child: string, topic: string): string {
   return [
     `You are a warm, patient English conversation partner for ${child || "a student"}, an Arabic-speaking school child.`,
     `Speak ONLY in simple, clear English suitable for a young learner.`,
-    `Keep EVERY reply to 1-2 short sentences, then ask ONE easy follow-up question to keep the conversation going.`,
-    `Be encouraging and friendly. If the child makes a small mistake, gently say the correct sentence once, without lecturing.`,
-    `Never use difficult words. Never write Arabic. Do not use emojis heavily (one at most).`,
+    `Keep your "reply" to 1-2 short sentences, then ask ONE easy follow-up question to keep the conversation going.`,
+    `Be encouraging and friendly. Never use difficult words. Never write Arabic. Do not use emojis heavily (one at most).`,
+    `Also silently grade the CHILD'S LAST message for basic English correctness (grammar, word order, word choice) —`,
+    `be lenient, as expected from a young learner speaking aloud, and ignore capitalization/punctuation since it comes from speech-to-text, not real writing mistakes.`,
+    `Set "correct" to true if the sentence is understandable and reasonably correct English for this age, false only if it has a real grammar mistake.`,
+    `If false, set "fixed" to the corrected full sentence (simple English, same meaning); otherwise leave "fixed" as an empty string.`,
+    `Respond ONLY with a JSON object, no text before or after it, in exactly this shape: {"reply": "...", "correct": true, "fixed": ""}`,
     topic ? `Current topic: ${topic}.` : "",
   ].filter(Boolean).join(" ");
+}
+
+type ModelResult = { reply: string; correct: boolean | null; fixed: string | null };
+
+/* استخراج {reply, correct, fixed} من نصّ النموذج الخام. بعض النماذج
+   تُغلّف الـJSON بأسوار ```json``` رغم التعليمات — نُزيلها. وإن فشل
+   التحليل كليًّا (نموذجٌ لم يلتزم بالصيغة) نُرجع النصّ الخام كردٍّ
+   عاديّ بلا تقييم (correct:null) بدل إفشال الطلب كلّه — فالردّ نفسه
+   أهمّ من التقييم، ولا نُخاطر به. */
+function parseModelJSON(raw: string): ModelResult {
+  let t = raw.trim();
+  if (t.startsWith("```")) t = t.replace(/^```json?\s*/i, "").replace(/```\s*$/, "").trim();
+  try {
+    const obj = JSON.parse(t);
+    const reply = String(obj.reply || "").trim();
+    if (!reply) throw new Error("empty reply");
+    return {
+      reply,
+      correct: typeof obj.correct === "boolean" ? obj.correct : null,
+      fixed: (obj.fixed && String(obj.fixed).trim()) || null,
+    };
+  } catch {
+    return { reply: raw.trim(), correct: null, fixed: null };
+  }
 }
 
 // بلاغ الأب (٣١ أغسطس ٢٠٢٦): المحادثة "آلية مكررة" — يقصد الردّ
@@ -59,7 +93,21 @@ async function callGeminiModel(model: string, key: string, system: string, conte
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
       contents,
-      generationConfig: { maxOutputTokens: 800, temperature: 0.85, topP: 0.9 },
+      generationConfig: {
+        maxOutputTokens: 800,
+        temperature: 0.85,
+        topP: 0.9,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            reply: { type: "STRING" },
+            correct: { type: "BOOLEAN" },
+            fixed: { type: "STRING" },
+          },
+          required: ["reply", "correct"],
+        },
+      },
     }),
   });
   if (!res.ok) {
@@ -113,7 +161,13 @@ async function callOpenAI(key: string, system: string, messages: any[]): Promise
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-    body: JSON.stringify({ model: "gpt-4o-mini", messages: msgs, max_tokens: 120, temperature: 0.85 }),
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: msgs,
+      max_tokens: 200,
+      temperature: 0.85,
+      response_format: { type: "json_object" },
+    }),
   });
   if (!res.ok) throw new Error("openai " + res.status + " " + (await res.text()).slice(0, 200));
   const data = await res.json();
@@ -144,20 +198,21 @@ Deno.serve(async (req: Request) => {
     // مزوِّدَين، بل اختيارٌ واحدٌ فقط عند بداية الطلب. فصرنا نُجرِّب Gemini
     // أوّلًا إن وُجد مفتاحه (مجّانيّ)، فإن فشل ووُجد مفتاح OpenAI (مدفوع)
     // نستعمله ملاذًا أخيرًا بدل الاستسلام مباشرةً للردّ الآلي بالعميل.
-    let reply = "";
+    let raw = "";
     let lastErr: unknown = null;
     if (gk) {
-      try { reply = await callGemini(gk, system, messages); }
+      try { raw = await callGemini(gk, system, messages); }
       catch (e) { lastErr = e; }
     }
-    if (!reply && ok) {
-      try { reply = await callOpenAI(ok, system, messages); lastErr = null; }
+    if (!raw && ok) {
+      try { raw = await callOpenAI(ok, system, messages); lastErr = null; }
       catch (e) { lastErr = e; }
     }
-    if (!reply && lastErr) throw lastErr;
+    if (!raw && lastErr) throw lastErr;
 
-    if (!reply) reply = "That's nice! Can you tell me more?";
-    return new Response(JSON.stringify({ reply }), { headers: { ...cors, "Content-Type": "application/json" } });
+    let result: ModelResult = raw ? parseModelJSON(raw) : { reply: "", correct: null, fixed: null };
+    if (!result.reply) result.reply = "That's nice! Can you tell me more?";
+    return new Response(JSON.stringify(result), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ error: String((e as Error)?.message || e) }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
   }

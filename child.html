@@ -304,14 +304,17 @@ async function main(){
       const totTurns=tks.reduce((s,p)=>s+(p.meta.turns||0),0);
       const pronRows=tks.filter(p=> typeof p.meta.avgPron==="number");
       const avgPronAll=pronRows.length?Math.round(pronRows.reduce((s,p)=>s+p.meta.avgPron,0)/pronRows.length):null;
+      const correctRows=tks.filter(p=> typeof p.meta.avgCorrect==="number");
+      const avgCorrectAll=correctRows.length?Math.round(correctRows.reduce((s,p)=>s+p.meta.avgCorrect,0)/correctRows.length):null;
       const topicCount={}; tks.forEach(p=>{ const tp=p.meta.topic||"—"; topicCount[tp]=(topicCount[tp]||0)+1; });
       const topTopic=Object.keys(topicCount).sort((a,b)=>topicCount[b]-topicCount[a])[0];
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">`+
-        `<li>💬 <b>${tks.length}</b> جلسة محادثة · <b>${totTurns}</b> جملة قالها${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}</li>`+
+        `<li>💬 <b>${tks.length}</b> جلسة محادثة · <b>${totTurns}</b> جملة قالها${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}${avgCorrectAll!=null?` · صحّة الجملة <b>${avgCorrectAll}%</b>`:``}</li>`+
         (topTopic?`<li>⭐ الموضوع الأكثر: <b>${topTopic}</b></li>`:``)+
         tks.slice(0,6).map(p=>{ const m=p.meta; const pr=typeof m.avgPron==="number"?`${m.avgPron}%`:"—";
           const col=typeof m.avgPron==="number"?(m.avgPron>=80?"var(--good)":m.avgPron>=50?"var(--warn)":"var(--bad)"):"var(--muted)";
-          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(p.created_at)} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}</span></li>`; }).join("")+
+          const co=typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:"";
+          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(p.created_at)} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}</span></li>`; }).join("")+
         `</ul>`+(tks.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${tks.length-6} جلسة.</p>`:``)+
         `</div>`;
     }

@@ -309,7 +309,9 @@ async function load(){
           var totTurns=tks.reduce(function(s,p){return s+(p.meta.turns||0);},0);
           var pronRows=tks.filter(function(p){return typeof p.meta.avgPron==="number";});
           var avgPronAll=pronRows.length?Math.round(pronRows.reduce(function(s,p){return s+p.meta.avgPron;},0)/pronRows.length):null;
-          out+=`<div class="weak"><div class="wt">🗣️ المحادثة الإنجليزية:</div><ul><li>💬 <b>${tks.length}</b> جلسة · <b>${totTurns}</b> جملة${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}</li></ul></div>`;
+          var correctRows=tks.filter(function(p){return typeof p.meta.avgCorrect==="number";});
+          var avgCorrectAll=correctRows.length?Math.round(correctRows.reduce(function(s,p){return s+p.meta.avgCorrect;},0)/correctRows.length):null;
+          out+=`<div class="weak"><div class="wt">🗣️ المحادثة الإنجليزية:</div><ul><li>💬 <b>${tks.length}</b> جلسة · <b>${totTurns}</b> جملة${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}${avgCorrectAll!=null?` · صحّة الجملة <b>${avgCorrectAll}%</b>`:``}</li></ul></div>`;
         }
         return out; })()}
         ${(function(){ var acts=actBy[name]||[]; return acts.length
