@@ -300,13 +300,16 @@ async function loadReport(){
         '</div>';
     }
     // ✍️ التعبير الإنجليزي
-    if(writingAll.length){
+    /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير» —
+       الشرط كان writingAll.length فقط، فحلّ «تدريب بناء الجملة» وحده
+       بلا فقرةٍ كاملة كان يُخفي القسم كلّه صامتًا. */
+    if(writingAll.length || writingDrill.length){
       var WSUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
       var wAgg={}, wAggN=0;
       writingAll.forEach(function(p){ if(p.meta.bands){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
       var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
       html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
-        '<li>📝 كتب <b>'+writingAll.length+'</b> فقرة'+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+'</li>'+
+        '<li>📝 '+(writingAll.length?('كتب <b>'+writingAll.length+'</b> فقرة'):'لسّا ما كتب فقرةً كاملة')+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+'</li>'+
         (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
         '</ul></div>';
     }

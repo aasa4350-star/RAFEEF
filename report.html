@@ -341,21 +341,32 @@ function writingCardHtml(student){
   var rows = ALL.filter(function(r){
     return r.student===student && r.meta && r.meta.kind==="writing" && r.meta.text;
   });
+  var drills = ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="writing-drill"; });
+  var dc=0, dt=0;
+  drills.forEach(function(r){ dc += (r.meta.correct||0); dt += (r.meta.total||0); });
   /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «قسم التعبير ما يطلع لي في التقرير كم
      نتيجتهم». وسبب ذلك أنّ البطاقة كانت تختفي تمامًا حين لا توجد فقرةٌ
      مكتوبة — فثلاثةٌ من الأربعة (سعود وأسامة وحسن) لم يفتحوا تبويب
      «التعبير ✍️» في اختبر نفسك بعد، فرأى الأب صفحاتهم خاليةً من أيّ
      ذكرٍ لهذا القسم، ولم يفرّق بين «معطَّل» و«لم يُجرَّب بعد». فصار
      يظهر تنويهًا محايدًا بدل الاختفاء الصامت. */
-  if(!rows.length)
+  if(!rows.length && !drills.length)
     return '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
       '<p class="note">لم يفتح تبويب «التعبير ✍️» في اختبر نفسك بعد — القسم موجودٌ وشغّال، بس ما جُرِّب.</p></div>';
+  /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير».
+     نفس علّة ٣١ أغسطس بالضبط، لكن حالةٌ لم تُعالَج وقتها: الشرط أعلاه
+     اكتفى بفحص drills.length لمنع اختفاء البطاقة بالكامل حين لا يوجد
+     شيء إطلاقًا — لكن لم يُعالَج تحديدًا حال طفلٍ حلّ «تدريب بناء
+     الجملة» (drills) فقط ولم يكتب فقرةً كاملة بعد (rows فارغة): كانت
+     البطاقة السابقة تشترط rows.length>0 لعرض أيّ نتيجة، فتسقط في نفس
+     رسالة «لم يفتح التبويب بعد» رغم أنّ الطفل فتحه وحلّ فيه فعلًا —
+     وهذا بالضبط حال حسن (٤ جلسات تدريبٍ محفوظة، ولا فقرة واحدة بعد). */
+  if(!rows.length)
+    return '<div class="card"><h2>✍️ التعبير الإنجليزي</h2>'+
+      '<p class="note">حلّ تدريب بناء الجملة: <b>'+dc+'/'+dt+'</b> ('+pct(dc,dt)+'%) — بس لسّا ما كتب فقرةً كاملة في «التعبير الحرّ» من نفس التبويب.</p></div>';
   /* meta.at وقت الجهاز الحقيقي، وcreated_at احتياطي لو غاب */
   var rowT=function(r){ return (r.meta && r.meta.at) || r.created_at; };
   rows.sort(function(a,b){ return String(rowT(b)).localeCompare(String(rowT(a))); });
-  var drills = ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="writing-drill"; });
-  var dc=0, dt=0;
-  drills.forEach(function(r){ dc += (r.meta.correct||0); dt += (r.meta.total||0); });
 
   /* أسماء مقاييس كامبردج الأربعة كما تُحفظ في meta.bands، ونصيحة+بحث
      يوتيوب لكلٍّ منها — بلاغ الأب (١ سبتمبر ٢٠٢٦): «حتى التعبير حط
