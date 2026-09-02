@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>تقوية التفكير 🧠</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --soft:#c4b5fd; --deep:#5b21b6;
+    --bg:#f6f8fa; --card:#fff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --warn:#b45309; --step-bg:#f3f0ff;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1216;--card:#121e25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c;
+          --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;
+          --accent:#a78bfa;--soft:#4c1d95;--deep:#c4b5fd;--step-bg:#1c1830;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;line-height:1.75}
+  .wrap{max-width:760px;margin:0 auto;padding:16px 14px 60px}
+  .top{text-align:center;margin-bottom:14px}
+  .eyebrow{color:var(--muted);font-size:.9rem;margin:0 0 4px}
+  h1{margin:0;font-size:1.5rem}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+  .bar a,.bar button{background:transparent;border:1.5px solid var(--line);color:var(--accent);
+    border-radius:12px;padding:9px 14px;font-weight:700;cursor:pointer;font-family:inherit;
+    font-size:.9rem;text-decoration:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+        padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .intro{background:linear-gradient(135deg,var(--deep),var(--accent));color:#fff;
+         border-radius:16px;padding:14px 16px;margin-bottom:14px;font-weight:700;line-height:1.8}
+  .intro small{display:block;font-weight:400;opacity:.92;margin-top:6px;font-size:.88rem}
+  .skills{list-style:none;margin:10px 0 0;padding:0}
+  .skills li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .skills li:last-child{border-bottom:0}
+  .pill{min-width:54px;text-align:center;border-radius:9px;padding:3px 8px;font-weight:800;font-size:.86rem}
+  .lo{background:var(--bad-bg);color:var(--bad)} .mid{background:#fff4e5;color:var(--warn)}
+  .hi{background:var(--good-bg);color:var(--good)}
+  .nm{flex:1;font-weight:700;font-size:.96rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;
+     padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .num{color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:4px}
+  .tag{display:inline-block;background:var(--soft);color:var(--deep);border-radius:8px;
+       padding:2px 9px;font-size:.78rem;font-weight:800;margin-right:6px}
+  @media (prefers-color-scheme:dark){ .tag{color:#fff} }
+  .stem{font-weight:800;font-size:1.06rem;margin:6px 0 10px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opts button{background:var(--bg);border:1.5px solid var(--line);color:var(--ink);
+    border-radius:12px;padding:11px 13px;font-weight:700;cursor:pointer;
+    font-family:inherit;font-size:1rem;text-align:right}
+  .opts button:hover:not(:disabled){border-color:var(--accent)}
+  .opts button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .opts button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .opts button:disabled{cursor:default}
+  .sol{display:none;margin-top:11px;background:var(--step-bg);border-radius:12px;padding:11px 13px}
+  .sol.show{display:block}
+  .sol .rule{font-weight:800;color:var(--deep);margin-bottom:7px;font-size:.95rem}
+  @media (prefers-color-scheme:dark){ .sol .rule{color:var(--soft)} }
+  .sol ol{margin:0;padding-inline-start:20px}
+  .sol li{margin:4px 0;font-size:.97rem}
+  .sol .tip{margin-top:8px;font-size:.9rem;color:var(--muted);font-weight:700}
+  .score{text-align:center;font-weight:800;margin:14px 0;font-size:1.05rem}
+  .go{width:100%;background:var(--accent);color:#fff;border:0;border-radius:14px;
+      padding:13px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;margin-top:6px}
+  .note{color:var(--muted);font-size:.88rem;margin:6px 0 0}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"hasan").toLowerCase();
+var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
+var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي"};
+var name = NAMES[who] || "الطالب";
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+/* ثلاثة خيارات: الصحيح ومشتّتان، مخلوطة. نُرجع [الخيارات، فهرس الصحيح] */
+function opt3(correct, ds){
+  var o=[correct];
+  (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<3) o.push(d); });
+  var p=1; while(o.length<3){ var c=(typeof correct==="number")?correct+p:String(correct)+"*"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
+  shuffle(o);
+  return [o.map(function(v){ return String(v).replace(/-/g,"−"); }), o.indexOf(correct)];
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   مولّدات علاجية — لماذا صفحةٌ مستقلّة عن practice.html؟
+
+   سؤال الأب (٢ سبتمبر ٢٠٢٦): «وش رايك في مستوى حسن في مهارات
+   التفكير؟». حلّلنا ٣٧١ جلسة له فظهر ملفٌّ مشقوق: استدلال لغوي ٩٢٪
+   وفهم صور ٩٠٪، مقابل استدلال رياضي ٥٢٪ وقدرات كمي ٦٦٪. والأهمّ أنّ
+   بطأه في الرياضي هو الأعلى (١٧ ثانية للسؤال مقابل ٤ في المعرفة
+   العامة) وصفر جلسة خرج منها — أي أنّه يجلس ويحاول ويعجز، لا يستهتر.
+   وخمسة أسابيع من التكرار العشوائي لم ترفع المستوى (٥٨٪ ← ٤٧٪).
+
+   فالعلاج ليس مزيدًا من الأسئلة العشوائية، بل:
+     ١) استهدافُ ثقوبه هو — تُقرأ من meta.skills في جلساته الفعلية،
+        فتتغيّر الأسئلة تلقائيًّا كلّما تغيّر ضعفه (وتصلح لكلّ ابن).
+     ٢) شرحٌ بخطوات مرقّمة + القاعدة + حيلةٌ سريعة، لا سطرَ جوابٍ واحدًا
+        كما في practice.html — فالسطر يصحّح الإجابة ولا يُعلّم الطريقة.
+
+   أسماء المهارات هنا تطابق QUANT_AR في practice.html حرفًا بحرف،
+   وإلّا لن يلتقي الضعفُ المقروء من القاعدة بعلاجه هنا.
+   ═══════════════════════════════════════════════════════════════ */
+var REMEDY = {
+
+"أعداد متتالية": function(){
+  var st=ri(4,20), s=st+(st+1)+(st+2);
+  var o=opt3(s,[s+3,s-3,st*3]);
+  return { q:"مجموع ثلاثة أعداد متتالية أوّلها "+st+" =؟", opts:o[0], ans:o[1],
+    rule:"المتتالية تزيد واحدًا واحدًا.",
+    steps:["الأعداد هي: "+st+"، "+(st+1)+"، "+(st+2)+".",
+           "نجمعها: "+st+" + "+(st+1)+" + "+(st+2)+" = "+s+"."],
+    tip:"حيلة: مجموع ثلاثة متتالية = الأوسط × 3 ← "+(st+1)+"×3 = "+s+"." };
+},
+
+"أنماط عددية": function(){
+  var start=ri(2,9), step=gp([3,4,5,6,7]), seq=[start,start+step,start+2*step,start+3*step], nx=start+4*step;
+  var o=opt3(nx,[nx+step,nx-1,nx+2]);
+  return { q:"أكمل النمط: "+seq.join("، ")+"، ...؟", opts:o[0], ans:o[1],
+    rule:"لمعرفة النمط اطرح كل عددٍ ممّا قبله.",
+    steps:[(seq[1])+" − "+seq[0]+" = "+step+"، و"+seq[2]+" − "+seq[1]+" = "+step+" ← الفرق ثابت "+step+".",
+           "نضيف "+step+" للأخير: "+seq[3]+" + "+step+" = "+nx+"."],
+    tip:"دائمًا افحص الفرق بين رقمين متجاورين أوّلًا — أغلب الأنماط جمعٌ ثابت." };
+},
+
+"النسبة المئوية": function(){
+  var cf=gp([[10,10],[20,5],[25,4],[50,2],[40,5]]), p=cf[0], N=cf[1]*ri(3,20), v=N*p/100;
+  var o=opt3(v,[v+5,v-5,N-v]);
+  return { q:"كم يساوي "+p+"% من "+N+"؟", opts:o[0], ans:o[1],
+    rule:"«من» تعني ضربًا، و«%» تعني ÷100.",
+    steps:[p+"% = "+p+" ÷ 100 = "+(p/100)+".",
+           "نضربها في العدد: "+(p/100)+" × "+N+" = "+v+"."],
+    tip:"أسرع: "+p+"% من "+N+" = ("+N+" ÷ 100) × "+p+" = "+(N/100)+" × "+p+" = "+v+"." };
+},
+
+"نسبة الزيادة": function(){
+  var base=ri(20,60), inc=gp([10,20,25,50]), add=base*inc/100, nv=base+add;
+  var o=opt3(nv,[base+inc,nv+5,base]);
+  return { q:"زاد سعرٌ من "+base+" ريالًا بنسبة "+inc+"%، فما السعر الجديد؟", opts:o[0], ans:o[1],
+    rule:"الزيادة تُحسب من السعر القديم ثم تُضاف إليه.",
+    steps:["مقدار الزيادة = "+inc+"% × "+base+" = "+add+" ريالًا.",
+           "السعر الجديد = "+base+" + "+add+" = "+nv+" ريالًا."],
+    tip:"خطأٌ شائع: إضافة "+inc+" نفسها (تصير "+(base+inc)+") — لا! "+inc+" نسبةٌ لا ريالات." };
+},
+
+"نسبة النقص": function(){
+  var base=ri(40,90), dec=gp([10,20,25,50]), cut=base*dec/100, nv=base-cut;
+  var o=opt3(nv,[base-dec,nv+5,cut]);
+  return { q:"نقص سعرٌ من "+base+" ريالًا بنسبة "+dec+"%، فما السعر الجديد؟", opts:o[0], ans:o[1],
+    rule:"النقص يُحسب من السعر القديم ثم يُطرح منه.",
+    steps:["مقدار النقص = "+dec+"% × "+base+" = "+cut+" ريالًا.",
+           "السعر الجديد = "+base+" − "+cut+" = "+nv+" ريالًا."],
+    tip:"تحقّق: الباقي = "+(100-dec)+"% من "+base+" = "+nv+" ✔" };
+},
+
+"الخصم": function(){
+  var cf=gp([[10,10],[20,5],[25,4],[50,2]]), p=cf[0], price=cf[1]*ri(4,18), disc=price*p/100, fin=price-disc;
+  var o=opt3(fin,[disc,price,fin+5]);
+  return { q:"خصمٌ "+p+"% على سعر "+price+" ريالًا، فكم السعر بعد الخصم؟", opts:o[0], ans:o[1],
+    rule:"المطلوب السعر بعد الخصم، لا الخصم نفسه.",
+    steps:["الخصم = "+p+"% × "+price+" = "+disc+" ريالًا.",
+           "السعر بعد الخصم = "+price+" − "+disc+" = "+fin+" ريالًا."],
+    tip:"أشهر غلطة: اختيار "+disc+" (وهو الخصم) بدل "+fin+" (وهو المطلوب). اقرأ السؤال مرّتين." };
+},
+
+"نظرية فيثاغورس": function(){
+  var t=gp([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25]]);
+  var o=opt3(t[2],[t[0]+t[1],t[2]+1,t[2]-2]);
+  return { q:"مثلث قائم الزاوية ضلعاه القائمان "+t[0]+" و "+t[1]+"، فما طول الوتر؟", opts:o[0], ans:o[1],
+    rule:"في المثلث القائم: (الوتر)² = (الضلع الأول)² + (الضلع الثاني)².",
+    steps:[t[0]+"² = "+(t[0]*t[0])+"، و "+t[1]+"² = "+(t[1]*t[1])+".",
+           "مجموعهما = "+(t[0]*t[0])+" + "+(t[1]*t[1])+" = "+(t[2]*t[2])+".",
+           "الوتر = الجذر التربيعي لـ "+(t[2]*t[2])+" = "+t[2]+"."],
+    tip:"لا تجمع الضلعين مباشرة ("+(t[0]+t[1])+") — الجمع يكون للمربّعات لا للأطوال." };
+},
+
+"مساحة المربّع": function(){
+  var s=ri(3,14), o=opt3(s*s,[4*s,2*s,s*s+s]);
+  return { q:"مربّعٌ طول ضلعه "+s+" سم، ما مساحته؟", opts:o[0], ans:o[1],
+    rule:"مساحة المربّع = الضلع × الضلع.",
+    steps:["نضرب الضلع في نفسه: "+s+" × "+s+" = "+(s*s)+".",
+           "المساحة = "+(s*s)+" سم²."],
+    tip:"فرّق: المساحة ضربٌ ("+s+"×"+s+"="+(s*s)+")، والمحيط جمعُ الأضلاع الأربعة (4×"+s+"="+(4*s)+")." };
+},
+
+"محيط المربّع": function(){
+  var s=ri(3,16), o=opt3(4*s,[s*s,2*s,4*s+2]);
+  return { q:"مربّعٌ طول ضلعه "+s+" سم، ما محيطه؟", opts:o[0], ans:o[1],
+    rule:"المحيط = مجموع الأضلاع، وأضلاع المربّع أربعةٌ متساوية.",
+    steps:[s+" + "+s+" + "+s+" + "+s+" = "+(4*s)+"، أو باختصار 4 × "+s+" = "+(4*s)+".",
+           "المحيط = "+(4*s)+" سم."],
+    tip:"المحيط طولٌ (سم)، والمساحة مربّعة (سم²) — الوحدة تكشف الغلط." };
+},
+
+"مساحة المثلّث": function(){
+  var b=gp([4,6,8,10,12]), h=ri(3,11), a=b*h/2;
+  var o=opt3(a,[b*h,b+h,a+b]);
+  return { q:"مثلثٌ قاعدته "+b+" وارتفاعه "+h+"، ما مساحته؟", opts:o[0], ans:o[1],
+    rule:"مساحة المثلث = (القاعدة × الارتفاع) ÷ 2.",
+    steps:["القاعدة × الارتفاع = "+b+" × "+h+" = "+(b*h)+".",
+           "نقسم على 2: "+(b*h)+" ÷ 2 = "+a+"."],
+    tip:"لا تنسَ القسمة على 2 — بدونها تصير مساحة مستطيل ("+(b*h)+")، وهي أشهر غلطة هنا." };
+},
+
+"مساحة المستطيل": function(){
+  var L=ri(5,15), W=ri(3,L-1), o=opt3(L*W,[2*(L+W),L+W,L*W-W]);
+  return { q:"مستطيلٌ طوله "+L+" وعرضه "+W+"، ما مساحته؟", opts:o[0], ans:o[1],
+    rule:"مساحة المستطيل = الطول × العرض.",
+    steps:[L+" × "+W+" = "+(L*W)+".", "المساحة = "+(L*W)+" وحدة مربّعة."],
+    tip:"المحيط لهذا المستطيل = (الطول+العرض)×2 = "+(2*(L+W))+" — لا تخلط بينهما." };
+},
+
+"محيط المستطيل": function(){
+  var L=ri(5,15), W=ri(3,L-1), o=opt3(2*(L+W),[L*W,L+W,2*L+W]);
+  return { q:"مستطيلٌ طوله "+L+" وعرضه "+W+"، ما محيطه؟", opts:o[0], ans:o[1],
+    rule:"المحيط = (الطول + العرض) × 2.",
+    steps:["الطول + العرض = "+L+" + "+W+" = "+(L+W)+".",
+           "نضرب في 2 (لأنّ لكلٍّ ضلعين): "+(L+W)+" × 2 = "+(2*(L+W))+"."],
+    tip:"أو اجمع الأربعة: "+L+"+"+W+"+"+L+"+"+W+" = "+(2*(L+W))+" — النتيجة نفسها." };
+},
+
+"تحويل الكتلة": function(){
+  var kg=ri(2,9), o=opt3(kg*1000,[kg*100,kg*10,kg*500]);
+  return { q:"كم غرامًا في "+kg+" كيلوغرامات؟", opts:o[0], ans:o[1],
+    rule:"الكيلوغرام = 1000 غرام. ومن الأكبر إلى الأصغر نضرب.",
+    steps:["ننتقل من كيلو إلى غرام (أصغر) ← ضرب.",
+           kg+" × 1000 = "+(kg*1000)+" غرامًا."],
+    tip:"القاعدة العامة: كبير ← صغير = ضرب، وصغير ← كبير = قسمة." };
+},
+
+"تحويل الأطوال": function(){
+  var m=ri(2,9), o=opt3(m*100,[m*10,m*1000,m*60]);
+  return { q:"كم سنتيمترًا في "+m+" أمتار؟", opts:o[0], ans:o[1],
+    rule:"المتر = 100 سم. ومن الأكبر إلى الأصغر نضرب.",
+    steps:["ننتقل من متر إلى سنتيمتر (أصغر) ← ضرب.",
+           m+" × 100 = "+(m*100)+" سم."],
+    tip:"احذر 1000 — تلك للكيلومتر/المتر أو الكيلوغرام/الغرام، لا للمتر/السنتيمتر." };
+},
+
+"تحويل الزمن": function(){
+  var h=ri(2,9), o=opt3(h*60,[h*100,h*24,h*30]);
+  return { q:"كم دقيقة في "+h+" ساعات؟", opts:o[0], ans:o[1],
+    rule:"الساعة = 60 دقيقة (لا 100).",
+    steps:["ننتقل من ساعة إلى دقيقة (أصغر) ← ضرب.",
+           h+" × 60 = "+(h*60)+" دقيقة."],
+    tip:"الزمن ليس عشريًّا: 60 للدقائق والثواني، و24 للساعات في اليوم." };
+},
+
+"المتوسط الحسابي": function(){
+  var n=gp([3,4,5]), m=ri(6,20), arr=[];
+  for(var i=0;i<n;i++) arr.push(m+(i-Math.floor(n/2))*2);
+  var s=arr.reduce(function(a,b){return a+b;},0), av=s/n;
+  var o=opt3(av,[av+2,av-2,s]);
+  return { q:"ما متوسط الأعداد: "+arr.join("، ")+"؟", opts:o[0], ans:o[1],
+    rule:"المتوسط = المجموع ÷ عددها.",
+    steps:["المجموع = "+arr.join(" + ")+" = "+s+".",
+           "عددها = "+n+".", "المتوسط = "+s+" ÷ "+n+" = "+av+"."],
+    tip:"المتوسط يقع دائمًا بين أصغر عددٍ وأكبره — لو خرج عنهما فالحساب غلط." };
+},
+
+"الوسيط": function(){
+  var arr=[ri(2,9),ri(11,19),ri(21,29),ri(31,39),ri(41,49)].slice(0,gp([3,5]));
+  shuffle(arr);
+  var sorted=arr.slice().sort(function(x,y){return x-y;});
+  var med=sorted[Math.floor(sorted.length/2)];
+  var o=opt3(med,[sorted[0],sorted[sorted.length-1],Math.round(sorted.reduce(function(a,b){return a+b;},0)/sorted.length)]);
+  return { q:"ما الوسيط للأعداد: "+arr.join("، ")+"؟", opts:o[0], ans:o[1],
+    rule:"الوسيط = القيمة الوسطى بعد الترتيب (لا المتوسط).",
+    steps:["نرتّبها تصاعديًّا: "+sorted.join("، ")+".",
+           "عددها "+sorted.length+"، فالوسطى هي رقم "+(Math.floor(sorted.length/2)+1)+" = "+med+"."],
+    tip:"الترتيب أوّلًا دائمًا — أغلب الأخطاء من أخذ الرقم الأوسط قبل الترتيب." };
+},
+
+"كسر من عدد": function(){
+  var den=gp([3,4,5,6,8]), mult=ri(2,9), N=den*mult, num=ri(1,den-1), v=N*num/den;
+  var o=opt3(v,[N-v,v+num,N/den]);
+  return { q:"كم يساوي "+num+"/"+den+" من "+N+"؟", opts:o[0], ans:o[1],
+    rule:"«كسرٌ من عدد» = العدد ÷ المقام × البسط.",
+    steps:["نقسم على المقام: "+N+" ÷ "+den+" = "+(N/den)+" (وهذا "+"1/"+den+").",
+           "نضرب في البسط: "+(N/den)+" × "+num+" = "+v+"."],
+    tip:"تحقّق: لو كان الكسر أقلّ من واحد فالناتج ("+v+") أصغر من العدد ("+N+")." };
+}
+};
+
+/* ═══ قراءة ضعف الابن من جلساته الفعلية ═══════════════════════
+   نقرأ meta.skills من كل جلساته (اختبر نفسك/قدرات...)، ونجمع لكل
+   مهارةٍ صحيحَها من مجموعها. الأضعف أوّلًا — بشرط ٣ أسئلةٍ فأكثر،
+   فنسبةٌ من سؤالٍ واحد لا يُبنى عليها حكم. */
+var MIN_ASK = 3, SESSION = 8, TOP_WEAK = 4;
+function fetchSkills(){
+  var url = SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+
+            "&order=created_at.desc&limit=1000";
+  return fetch(url, { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      var agg = {};
+      (rows||[]).forEach(function(r){
+        var sk = (r.meta && r.meta.skills) || null;
+        if(!sk) return;
+        Object.keys(sk).forEach(function(k){
+          var v = sk[k];
+          if(!v || !v.t) return;
+          if(!agg[k]) agg[k] = {c:0,t:0};
+          agg[k].c += (v.c||0); agg[k].t += v.t;
+        });
+      });
+      return agg;
+    })
+    .catch(function(){ return {}; });
+}
+function weakest(agg){
+  var list = Object.keys(agg)
+    .filter(function(k){ return REMEDY[k] && agg[k].t >= MIN_ASK; })
+    .map(function(k){ return { k:k, c:agg[k].c, t:agg[k].t, p:Math.round(100*agg[k].c/agg[k].t) }; })
+    .sort(function(a,b){ return a.p - b.p; });
+  return list.slice(0, TOP_WEAK);
+}
+/* لا بيانات بعد (ابنٌ جديد أو لم يحلّ قدرات): نبدأ بأساسيّاتٍ يُبنى عليها */
+var DEFAULT_WEAK = ["النسبة المئوية","مساحة المثلّث","نظرية فيثاغورس","أعداد متتالية"]
+  .map(function(k){ return { k:k, c:0, t:0, p:null }; });
+
+/* الأضعف يأخذ نصيبًا أكبر من الجلسة: الأوّل ٤ حصص، ثمّ ٣، ٢، ١ */
+function buildSession(weak){
+  var pool=[];
+  weak.forEach(function(w,i){ var reps = Math.max(1, 4-i); for(var j=0;j<reps;j++) pool.push(w.k); });
+  shuffle(pool);
+  var out=[], seen={}, guard=0;
+  while(out.length < SESSION && guard < SESSION*30){
+    guard++;
+    var k = pool[out.length % pool.length];
+    var item;
+    try{ item = REMEDY[k](); }catch(e){ continue; }
+    if(!item || seen[item.q]) continue;
+    seen[item.q]=1; item.skill=k; out.push(item);
+  }
+  return out;
+}
+
+/* ═══ الحفظ — بنفس اصطلاح بقيّة الصفحات، وبتفصيل مهاراتٍ يقرأه التقرير ═══ */
+function saveScore(correct, total, skills){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
+      meta:{ kind:"practice", test:"تقوية التفكير 🧠", correct:correct, total:total,
+             skills:(skills||{}), targeted:true } };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body) });
+  }catch(e){}
+}
+
+var app = document.getElementById("app");
+function cls(p){ return p==null ? "" : (p<60 ? "lo" : (p<80 ? "mid" : "hi")); }
+
+function renderLoading(){
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+(GRADES[who]||"")+'</p><h1>🧠 تقوية التفكير — '+esc(name)+'</h1></header>'+
+    '<div class="card"><p class="note">أقرأ نتائجك السابقة لأحدّد أضعف مهاراتك…</p></div>';
+}
+
+function render(weak, hasData){
+  var items = buildSession(weak);
+  var answered = {}, correct = 0, saved = false;
+  var skillTally = {};
+
+  var head =
+    '<header class="top"><p class="eyebrow">'+(GRADES[who]||"")+' · تدريبٌ مُوجَّه</p>'+
+    '<h1>🧠 تقوية التفكير — '+esc(name)+'</h1></header>'+
+    '<div class="bar"><a href="home.html?who='+who+'">⬅ الرئيسية</a>'+
+    '<a href="practice.html?who='+who+'">📊 قدرات وتحصيلي</a></div>';
+
+  var intro = '<div class="intro">'+
+    (hasData ? 'هذي أسئلةٌ مختارةٌ لك أنت — من أضعف مهاراتك في نتائجك السابقة.'
+             : 'أوّل جلسة لك — نبدأ بمهاراتٍ أساسيّة، وبعدها تصير الأسئلة مُفصّلةً على ضعفك أنت.')+
+    '<small>كل سؤالٍ بعد إجابتك يفتح لك <b>الحلّ خطوة بخطوة</b> — اقرأه حتى لو أجبت صح.</small></div>';
+
+  var skillsCard = '<div class="card"><b>مهاراتك المستهدَفة اليوم:</b><ul class="skills">'+
+    weak.map(function(w){
+      return '<li><span class="pill '+cls(w.p)+'">'+(w.p==null?"جديد":w.p+"%")+'</span>'+
+             '<span class="nm">'+esc(w.k)+'</span>'+
+             (w.t ? '<span class="note">'+w.c+'/'+w.t+' سابقًا</span>' : '')+'</li>';
+    }).join("")+'</ul></div>';
+
+  var qs_ = items.map(function(it,i){
+    return '<div class="q" data-i="'+i+'">'+
+      '<div class="num">سؤال '+(i+1)+' <span class="tag">'+esc(it.skill)+'</span></div>'+
+      '<div class="stem">'+esc(it.q)+'</div>'+
+      '<div class="opts">'+ it.opts.map(function(o,j){
+        return '<button data-j="'+j+'">'+esc(o)+'</button>'; }).join("") +'</div>'+
+      '<div class="sol" data-sol>'+
+        '<div class="rule">📌 القاعدة: '+esc(it.rule)+'</div>'+
+        '<ol>'+ it.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join("") +'</ol>'+
+        (it.tip ? '<div class="tip">💡 '+esc(it.tip)+'</div>' : '')+
+      '</div></div>';
+  }).join("");
+
+  app.innerHTML = head + intro + skillsCard + qs_ +
+    '<div class="score" data-score>الدرجة: 0 / '+items.length+'</div>'+
+    '<button class="go" data-again>جلسة جديدة 🔄</button>'+
+    '<footer>الأسئلة تتغيّر أرقامها كل مرّة · والمهارات تتحدّث تلقائيًّا مع تقدّمك</footer>';
+
+  function finishIfDone(){
+    var n = Object.keys(answered).length;
+    if(saved) return;
+    if(n === items.length){ saved = true; saveScore(correct, items.length, skillTally); }
+  }
+  /* حفظٌ جزئيّ إن غادر قبل أن يُكمل — كبقيّة صفحات الموقع، فلا يضيع جهده */
+  function savePartial(){
+    if(saved) return;
+    var n = Object.keys(answered).length;
+    if(n < MIN_ASK) return;
+    saved = true; saveScore(correct, n, skillTally);
+  }
+  document.addEventListener("visibilitychange", function(){ if(document.hidden) savePartial(); });
+  window.addEventListener("pagehide", function(){ savePartial(); });
+
+  app.querySelectorAll(".q").forEach(function(qEl){
+    var i = +qEl.getAttribute("data-i"), it = items[i];
+    var sol = qEl.querySelector("[data-sol]");
+    qEl.querySelectorAll(".opts button").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(answered[i]) return;
+        var j = +btn.getAttribute("data-j");
+        answered[i] = true;
+        var ok = (j === it.ans);
+        if(ok){ correct++; btn.classList.add("ok"); }
+        else {
+          btn.classList.add("no");
+          qEl.querySelectorAll(".opts button").forEach(function(b){
+            if(+b.getAttribute("data-j") === it.ans) b.classList.add("ok"); });
+        }
+        var t = skillTally[it.skill] || (skillTally[it.skill] = {c:0,t:0});
+        t.t++; if(ok) t.c++;
+        qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled = true; });
+        sol.classList.add("show");
+        var sc = app.querySelector("[data-score]");
+        if(sc) sc.textContent = "الدرجة: "+correct+" / "+items.length;
+        finishIfDone();
+      });
+    });
+  });
+
+  var again = app.querySelector("[data-again]");
+  if(again) again.addEventListener("click", function(){ savePartial(); start(); });
+}
+
+function start(){
+  renderLoading();
+  fetchSkills().then(function(agg){
+    var w = weakest(agg);
+    if(w.length) render(w, true);
+    else render(DEFAULT_WEAK, false);
+  });
+}
+start();
+</script>
+</body>
+</html>
