@@ -221,7 +221,7 @@ async function main(){
     const HIDE_SUBJ = { osama: ["لغتي"] };
     const hidden = HIDE_SUBJ[who] || [];
     const currMap={}, otherMap={};
-    const vocabAll=[], writingAll=[], writingDrill=[], talkAll=[];
+    const vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[];
     practice.forEach(p=>{
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
@@ -229,6 +229,7 @@ async function main(){
       const t=(p.meta.test||""); const subj=t.split(" ")[0];
       if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
+      else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { if(!otherMap[t]) otherMap[t]=p; } });
     // 📖 حفظ الكلمات (إنجليزي)
@@ -270,6 +271,26 @@ async function main(){
         `</ul>`+
         (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul class="weak">${revList}</ul>`:``)+
         `</div>`;
+    }
+    // 📖 القراءة (فهم المقروء)
+    /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل القراءة اليوم بس ما بان إلا
+       حق أمس» — «قراءة إنجليزي 📖» كانت تسقط في otherMap (subj="قراءة"
+       غير مسجّلة في SUBJ_EMOJI)، وotherMap يحتفظ بمحاولةٍ واحدة فقط لكل
+       اسم اختبار — فتُخفى بقيّة محاولات القراءة (حسن وحده له ١٦ محاولة
+       قراءة إنجليزي محفوظة، ولا يظهر منها إلا واحدة). صار لها قسمها
+       الخاصّ يعرض آخر خمس محاولات لكل نوعٍ (عربي/إنجليزي). */
+    if(readAll.length){
+      const readByT={};
+      readAll.forEach(p=>{ const t=p.meta.test||"قراءة"; (readByT[t]=readByT[t]||[]).push(p); });
+      html+=`<div class="sec-title"><span class="dot"></span> 📖 القراءة (فهم المقروء)</div><div class="card">`;
+      Object.keys(readByT).forEach(t=>{
+        const arr=readByT[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
+        const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
+        html+=`<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul class="weak">`+
+          arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
+          `</ul>`;
+      });
+      html+=`</div>`;
     }
     // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير» —
