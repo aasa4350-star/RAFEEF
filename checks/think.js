@@ -66,7 +66,7 @@ const CHECK_R = {
                          return Math.abs(4*p*(1 - d/100) - 3*p); },
   'أعمار بعد سنوات': q => { const m = q.match(/الآن (\d+) سنة.*?بعد (\d+) سنوات/s);
                             const f=+m[1], n=+m[2];
-                            return (f + n)/2 - n; },
+                            return (f + n)/3 - n; },
   'رفع المعدّل': q => { const m = q.match(/في 4 مواد (\d+).*?في 5 موادّ (\d+)/s);
                         const a=+m[1], w=+m[2];
                         return 5*w - 4*a; },
@@ -96,7 +96,7 @@ function auditGroup(gens, rules, label, issues, opts){
       issues.push({ sev:'تنبيه', msg:'«' + skill + '» بلا قاعدة تحقّقٍ مستقلّة في checks/think.js' });
       return;
     }
-    let wrongAns = 0, dupOpt = 0, badIdx = 0, noSteps = 0, threw = 0, noViz = 0, noCheck = 0, ugly = 0, sample = '';
+    let wrongAns = 0, dupOpt = 0, badIdx = 0, noSteps = 0, threw = 0, noViz = 0, noCheck = 0, ugly = 0, unreal = 0, sample = '';
     for (let i = 0; i < SAMPLES; i++){
       let it;
       try { it = gens[skill](); } catch(e){ threw++; continue; }
@@ -112,6 +112,13 @@ function auditGroup(gens, rules, label, issues, opts){
          يُفقد الصفحةَ سببَ وجودها، فنعدّه خطأً لا تنبيهًا */
       if (opts.needViz && !it.viz) noViz++;
       if (opts.needCheck && !it.check) noCheck++;
+      /* واقعيّة السياق: مسألةٌ صحيحةٌ حسابيًّا وسخيفةٌ واقعيًّا (أبٌ عمره ٢٤
+         وابنه ١٠) تُفقد الطفل ثقته بالمسألة — فتُفحص أعمار الأب والابن */
+      if (/عمر الأب/.test(it.q)){
+        const mm = it.q.match(/الآن (\d+) سنة/);
+        const fa = mm ? +mm[1] : 0, so = parseFloat(String(it.opts[it.ans]).replace(/−/g,'-'));
+        if (fa < 28 || (fa - so) < 18) unreal++;
+      }
       /* أرقامٌ كسريّةٌ طويلة تُربك الطفل ولا تظهر في اختبارٍ حقيقيّ */
       if (Number.isFinite(expect) && Math.abs(expect - Math.round(expect)) > 1e-9) ugly++;
     }
@@ -124,6 +131,7 @@ function auditGroup(gens, rules, label, issues, opts){
     if (noViz)    issues.push({ sev:'خطأ', msg:P+'بلا رسمٍ توضيحيّ في ' + noViz + ' عيّنة (توصية ٣ — دليل قويّ)' });
     if (noCheck)  issues.push({ sev:'خطأ', msg:P+'بلا خطوة تحقّقٍ في ' + noCheck + ' عيّنة (توصية ٢ — دليل قويّ)' });
     if (ugly)     issues.push({ sev:'خطأ', msg:P+'جوابٌ كسريّ غير صحيحٍ في ' + ugly + ' عيّنة' });
+    if (unreal)   issues.push({ sev:'خطأ', msg:P+'أعمارٌ غير واقعية (أبٌ دون ٢٨ أو فرقٌ دون ١٨ سنة) في ' + unreal + ' عيّنة' });
   });
   return samples;
 }
