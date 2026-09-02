@@ -267,7 +267,7 @@ async function loadReport(){
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
-      else { if(!otherMap[t]) otherMap[t]=p; } });
+      else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
       var vLearned=0, vTotal=300;
@@ -361,12 +361,19 @@ async function loadReport(){
           '</ul></div>';
       });
     }
-    // الاختبارات التجريبية (قدرات/تحصيلي/STEP)
+    // الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)
+    /* بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل») — نفس علّة «قراءة» بالضبط
+       كانت موجودةً في otherMap كلّه: يحتفظ بمحاولةٍ واحدة فقط لكل اسم
+       اختبار، فتُخفى بقيّة محاولات قدرات/تحصيلي/STEP/كانجرو المتكرّرة. */
     if(Object.keys(otherMap).length){
-      html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP)</div><ul class="weak">'+
-        Object.keys(otherMap).map(function(t){ var p=otherMap[t]; var pc=pct(p.meta.correct,p.meta.total);
-          return '<li><b>'+t+'</b>: '+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
-        '</ul></div>';
+      html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)</div>'+
+        Object.keys(otherMap).map(function(t){
+          var arr=otherMap[t].slice().sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; });
+          var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
+          return '<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
+            arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
+            '</ul>'; }).join("")+
+        '</div>';
     }
   }
 
