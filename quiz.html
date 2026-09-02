@@ -2329,24 +2329,34 @@ if(!STUDENTS[who]){
   function aComp(){var it=gpick(AR_COMP),c=it[1][it[2]],ds=it[1].filter(function(_,k){return k!==it[2];}),o=opt3(c,ds);return [it[0],o[0],o[1],"الكلمة المناسبة للسياق: "+c+".","ar"];}
   var AGEN=[aOpp,aSyn,aPlu,aMean,aType,aComp];
 
+  /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «شل قسم الإملاء» من تبويب لغتي هنا حق
+     حسن ورفيف تحديدًا — عندهم إملاءٌ أوسع وأدقّ في reading.html (٣٠
+     جملة لكلٍّ منهما، بصوتٍ حقيقي وبلا تكرار قريب)، فهذا القسم المصغّر
+     هنا (٥ جملٍ فقط بصوت المتصفح) صار زائدًا لهما تحديدًا. يبقى كما هو
+     لأسامة وسعود. */
+  var NO_QUIZ_DICTATION = { hasan:1, rafeef:1 };
   function renderArb(){
     const sec = document.getElementById("arb");
     const A = ARABIC[who];
     if(!A){ sec.innerHTML='<div class="locked">قسم العربية غير متاح.</div>'; return; }
-    const dict = shuffle(A.dictation.slice()).slice(0, Math.min(6, A.dictation.length));
+    const showDict = !NO_QUIZ_DICTATION[who];
+    const dict = showDict ? shuffle(A.dictation.slice()).slice(0, Math.min(6, A.dictation.length)) : [];
     const arq = genN(AGEN, 8);
-    let h = '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
-      '<p class="explain show" style="display:block">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
-    dict.forEach(function(text,i){
-      h += '<div class="q" data-d="'+i+'"><div class="num">إملاء '+(i+1)+'</div>'+
-        '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
-        '<button type="button" data-say style="background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800">🔊 استمع</button>'+
-        '<button type="button" data-slow>🐢 أبطأ</button></div>'+
-        '<input class="dinp" placeholder="اكتب هنا..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)">'+
-        '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
-        '<button type="button" data-chk>تحقّق</button><button type="button" data-show>👁️ أظهر</button></div>'+
-        '<div class="dfb" style="margin-top:8px;font-weight:700;min-height:20px"></div></div>';
-    });
+    let h = "";
+    if(showDict){
+      h += '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
+        '<p class="explain show" style="display:block">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>';
+      dict.forEach(function(text,i){
+        h += '<div class="q" data-d="'+i+'"><div class="num">إملاء '+(i+1)+'</div>'+
+          '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
+          '<button type="button" data-say style="background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800">🔊 استمع</button>'+
+          '<button type="button" data-slow>🐢 أبطأ</button></div>'+
+          '<input class="dinp" placeholder="اكتب هنا..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)">'+
+          '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
+          '<button type="button" data-chk>تحقّق</button><button type="button" data-show>👁️ أظهر</button></div>'+
+          '<div class="dfb" style="margin-top:8px;font-weight:700;min-height:20px"></div></div>';
+      });
+    }
     h += '<div class="block-title"><span class="dot"></span> أسئلة اللغة العربية</div>';
     arq.forEach(function(q,i){
       h += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
