@@ -1137,8 +1137,8 @@ if(!META[who] || !DATA[who]){
     var g = GOAL_STEP[who];
     return (g && learned < g) ? g : VOC_TOTAL;
   }
-  var VOC_STEP = (who==="saud") ? 3 : (who==="osama") ? 5 : 10; // سعود ٣، أسامة ٥، الكبار ١٠
-  var VOC_STEP_AR = (VOC_STEP===3) ? "٣" : (VOC_STEP===5) ? "٥" : "١٠";
+  var VOC_STEP = 10; // طلب الأب صراحةً (٢ سبتمبر ٢٠٢٦): سعود وأسامة يحفظون ١٠ كلمات جديدة كل جلسة، مثل حسن ورفيف بالضبط
+  var VOC_STEP_AR = "١٠";
   var vocMode = "new"; // "new" = تعلّم جديد · "review" = مراجعة
   function vKey(k){ return "vocab_"+k+"_"+who; }
   function getLearned(){ var n=parseInt(localStorage.getItem(vKey("learned"))||"0",10); return isNaN(n)?0:Math.max(0,Math.min(VOC_TOTAL,n)); }
