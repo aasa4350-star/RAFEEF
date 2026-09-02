@@ -15,6 +15,7 @@ const answers = require('./answers-en9');
 const data    = require('./data');
 const audio   = require('./audio');
 const think   = require('./think');
+const kangaroo= require('./kangaroo');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -55,7 +56,16 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   });
   if (!th.issues.length) console.log('  ✅ كل المولّدات سليمة');
 
-  head('٥ · طبقة البيانات');
+  head('٥ · تنوّع أسئلة مهارات التفكير (كانجرو)');
+  const kg = kangaroo();
+  console.log('بنك المعرفة العامة: ' + kg.gkBank + ' سؤالًا · السعة — ' + kg.caps);
+  kg.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!kg.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٦ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {
