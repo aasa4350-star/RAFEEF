@@ -2349,6 +2349,30 @@ if(!STUDENTS[who]){
   function aComp(){var it=gpick(AR_COMP),c=it[1][it[2]],ds=it[1].filter(function(_,k){return k!==it[2];}),o=opt3(c,ds);return [it[0],o[0],o[1],"الكلمة المناسبة للسياق: "+c+".","ar"];}
   var AGEN=[aOpp,aSyn,aPlu,aMean,aType,aComp];
 
+  /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «والأسئلة كمان ركز عليها» — نفس علّة
+     الإملاء أعلاه، بس هنا للأسئلة: genN() العادي يمنع تكرار السؤال
+     داخل الجولة نفسها فقط، ولا يتذكّر شيئًا بين الجولات، فتتكرّر نفس
+     الأسئلة تقريبًا عند كل ضغطة «أسئلة جديدة». والبنك الكلي هنا كبيرٌ
+     فعلًا (~٢٠٩ سؤالًا مختلفًا عبر الأنواع الستّة) فيستحقّ نفس أسلوب
+     الذاكرة المتباعدة المستعمل في الإملاء أعلاه، بدل أن يضيع بلا فائدة. */
+  var AR_POOL_TOTAL = AR_OPP.length + AR_SYN.length + AR_PLU.length + AR_MEAN.length + AR_TYPE.length + AR_COMP.length;
+  function genNFreshAr(gens, n, key){
+    var k = "seen_"+key+"_"+who;
+    var seen; try{ seen=JSON.parse(localStorage.getItem(k)||"{}")||{}; }catch(e){ seen={}; }
+    if(Object.keys(seen).length + n > AR_POOL_TOTAL) seen = {};
+    var out=[], tries=0;
+    while(out.length<n && tries<n*40){
+      var f=gpick(gens), q=f(); tries++;
+      if(seen[q[0]]) continue;
+      seen[q[0]]=1;
+      if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name];
+      if(f.name) q.genFn = f.name;
+      out.push(q);
+    }
+    try{ localStorage.setItem(k, JSON.stringify(seen)); }catch(e){}
+    return out;
+  }
+
   /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «شل قسم الإملاء» من تبويب لغتي هنا حق
      حسن ورفيف تحديدًا — عندهم إملاءٌ أوسع وأدقّ في reading.html (٣٠
      جملة لكلٍّ منهما، بصوتٍ حقيقي وبلا تكرار قريب)، فهذا القسم المصغّر
@@ -2361,7 +2385,7 @@ if(!STUDENTS[who]){
     if(!A){ sec.innerHTML='<div class="locked">قسم العربية غير متاح.</div>'; return; }
     const showDict = !NO_QUIZ_DICTATION[who];
     const dict = showDict ? pickFresh(A.dictation, "dictarbquiz", 6) : [];
-    const arq = genN(AGEN, 8);
+    const arq = genNFreshAr(AGEN, 8, "arbq");
     let h = "";
     if(showDict){
       h += '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
