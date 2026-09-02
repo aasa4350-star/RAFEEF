@@ -71,18 +71,42 @@ async function run(){
   Object.entries(orphan).forEach(([k, n]) =>
     issues.push({ sev:'خطأ', msg:'صفوفٌ باسمٍ مجهول «' + k + '» × ' + n + ' — لن تظهر لأيّ ابن' }));
 
-  /* ٣) أدواتٌ مهجورة */
+  /* ٣) أدواتٌ مهجورة — مع تمييز الاسم المتقاعد عن الأداة المهجورة.
+
+     بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل»): كان الفحص يحذّر منذ
+     أسابيع أنّ «استماع إنجليزي 🎧» و«استماع عربي 🎧» مهجوران، وهما في
+     الحقيقة الاسمان القديمان لقسم الإملاء قبل أن يُسمّى «إملاء … ✍️»
+     في reading.html. فلا أحد يستطيع «فتحهما» أبدًا، والعدد يكبر كل يوم:
+     تحذيرٌ أبديّ لا يُسكته إصلاح، ويعوّد القارئ على تجاهل التحذيرات
+     فيطمر التحذير الحقيقيّ حين يأتي.
+
+     التمييز: اسمٌ لا يزال حيًّا يرد نصًّا في مصدر الموقع (اسم الاختبار
+     يُكتب حرفيًّا في الصفحة أو في label الدرس). جرّبناه على أسماء
+     القاعدة كلّها: ٣٤ اسمًا حيًّا وُجدت كلّها في المصدر، والمتقاعدان
+     وحدهما لم يوجدا. */
+  const srcAll = fs.readdirSync(ROOT)
+    .filter(x => x.endsWith('.html') || x.endsWith('.js'))
+    .map(x => { try { return fs.readFileSync(path.join(ROOT, x), 'utf8'); } catch(e){ return ''; } })
+    .join('\n');
+
   const last = {}, now = Date.now();
   rows.forEach(r => {
     const t = (r.meta && r.meta.test) || null;
     if (!t) return;
     if (!last[t] || r.created_at > last[t]) last[t] = r.created_at;
   });
+  const retired = [];
   Object.entries(last).forEach(([t, d]) => {
     const days = Math.floor((now - Date.parse(d)) / 86400000);
-    if (days >= STALE_DAYS)
+    if (days < STALE_DAYS) return;
+    if (srcAll.includes(t))
       issues.push({ sev:'تنبيه', msg:'«' + t + '» لم يفتحه أحدٌ منذ ' + days + ' يومًا' });
+    else
+      retired.push(t);                 /* اسمٌ لم يعد في الموقع — صفوفٌ تاريخية */
   });
+  if (retired.length)
+    issues.push({ sev:'معلومة', msg:'أسماءٌ متقاعدة (لم تعد في الموقع، صفوفها تاريخية فقط): ' +
+      retired.join('، ') });
 
   /* ٤) جلساتٌ مبتورة حقًّا.
      ننتبه: صفوف kind="activity" ليست اختبارات بل أحداثُ فتحِ درس،
