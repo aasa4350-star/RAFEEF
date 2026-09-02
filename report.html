@@ -260,6 +260,54 @@ function sessionsCardHtml(student){
     '</div>';
 }
 
+/* 📖 حفظ الكلمات — مجمّعة بحسب النوع الثلاثة.
+   بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حط لي كم كلمة راجع القديم وكم راجع
+   الجديد وكم احفظ جديد» ثم «ماطلع لي في التقرير». والسبب أنّ جلسات
+   حفظ الكلمات («كلمات إنجليزي 🔤» من تبويب المفردات في reading.html)
+   كانت تُحفظ بنوعها فعلًا (meta.mode: new/fresh/review) لكن تظهر في
+   «سجلّ الجلسات» أعلاه بلا تمييز نوعها، ومدفونةً بين بقيّة المواد —
+   فلا يرى الأب إجمالي كلمات كل نوع أبدًا. بطاقةٌ مستقلّة هنا تُجمّع
+   كل الجلسات المحفوظة بحسب mode وتُظهر عدد الكلمات ونسبة الصحّة لكل نوع. */
+var VOCAB_MODE = [["new","📚 حفظ جديد"], ["fresh","🆕 راجع الجديد"], ["review","🔁 راجع المحفوظ"]];
+function vocabByMode(student){
+  var rows = ALL.filter(function(r){
+    var m = r.meta;
+    return r.student===student && m && m.test==="كلمات إنجليزي 🔤" && typeof m.total==="number" && m.total>0;
+  });
+  var by = { "new":{w:0,c:0,n:0}, fresh:{w:0,c:0,n:0}, review:{w:0,c:0,n:0} };
+  var learned=0, vocTotal=0, untrusted=0;
+  rows.forEach(function(r){
+    var m=r.meta, mo=(m.mode==="new"||m.mode==="fresh")?m.mode:"review";
+    if(m.learned!=null && m.learned>learned) learned=m.learned;
+    if(m.vocTotal && m.vocTotal>vocTotal) vocTotal=m.vocTotal;
+    if(m.trusted===false){ untrusted++; return; }   // الجلسات غير الموثوقة لا تُحسب في العدّ
+    by[mo].w += m.total; by[mo].c += (m.correct||0); by[mo].n++;
+  });
+  return { rows:rows, by:by, learned:learned, vocTotal:vocTotal, untrusted:untrusted };
+}
+function vocabCardHtml(student){
+  var v = vocabByMode(student), by = v.by, learned = v.learned, vocTotal = v.vocTotal, untrusted = v.untrusted;
+  if(!v.rows.length)
+    return '<div class="card"><h2>📖 حفظ الكلمات (إنجليزي)</h2>'+
+      '<p class="note">لم يفتح تبويب «حفظ الكلمات» في صفحة القراءة بعد — القسم موجودٌ وشغّال، بس ما جُرِّب.</p></div>';
+
+  var lines = VOCAB_MODE.map(function(pair){
+    var k=pair[0], b=by[k];
+    if(!b.n) return "";
+    var p = pct(b.c,b.w);
+    return '<li><span class="pill '+cls(p)+'">'+p+'%</span>'+
+           '<span class="nm">'+pair[1]+
+             '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+b.n+' جلسة</span></span>'+
+           '<span class="frac">'+b.w+' كلمة<br>'+b.c+'/'+b.w+'</span></li>';
+  }).join("");
+
+  return '<div class="card"><h2>📖 حفظ الكلمات — حسب النوع</h2>'+
+    (learned ? '<p class="note">حفظ حتى الآن: <b>'+learned+(vocTotal?'/'+vocTotal:'')+' كلمة</b></p>' : '')+
+    '<ul class="sk">'+lines+'</ul>'+
+    (untrusted ? '<p class="note" style="color:var(--bad)">🚫 '+untrusted+' جلسة غير محتسبة (خرج من الصفحة أثناء الحل).</p>' : '')+
+    '</div>';
+}
+
 /* مؤشّر تكرار المادة المكتوبة (القطع): يوضّح أن نسبة القراءة قد تعكس الحفظ
    لا الفهم حين تتكرّر القطعة نفسها كثيرًا. */
 function repeatCardHtml(d){
@@ -438,6 +486,7 @@ function render(){
           : 'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.')+
       (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
       sc+
+      vocabCardHtml(current)+
       writingCardHtml(current)+
       talkCardHtml(current)+
       stretchCard;
@@ -470,6 +519,7 @@ function render(){
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
     sessionsCardHtml(current)+
+    vocabCardHtml(current)+
     repeatCardHtml(d)+
     writingCardHtml(current)+
     talkCardHtml(current)+
@@ -494,6 +544,17 @@ function render(){
         L.push("  - "+saDate(x.t)+" · "+x.name+": "+x.c+"/"+x.n+" ("+pct(x.c,x.n)+"%)"+
                (x.detailed ? "" : " [بلا تفصيل مهارات]"));
       });
+    }
+    var vv = vocabByMode(current);
+    if(vv.rows.length){
+      L.push("");
+      L.push("حفظ الكلمات — حسب النوع"+(vv.learned?" (حفظ "+vv.learned+(vv.vocTotal?"/"+vv.vocTotal:"")+" كلمة)":"")+":");
+      VOCAB_MODE.forEach(function(pair){
+        var b = vv.by[pair[0]];
+        if(!b.n) return;
+        L.push("  - "+pair[1]+": "+b.w+" كلمة عبر "+b.n+" جلسة — "+b.c+"/"+b.w+" ("+pct(b.c,b.w)+"%)");
+      });
+      if(vv.untrusted) L.push("  - 🚫 "+vv.untrusted+" جلسة غير محتسبة (خرج من الصفحة أثناء الحل)");
     }
     L.push("");
     L.push(single ? "كل المهارات (من الأضعف):" : "الأضعف:");
