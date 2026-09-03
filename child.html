@@ -76,6 +76,24 @@
 <div class="wrap" id="app"><p class="empty"><span class="spin"></span> جارٍ التحميل...</p></div>
 
 <script>
+/* talk.html صار يحفظ بعد كلّ جملة (كانت الجلسة تُحفظ عند الخروج وحده فتضيع
+   إن لم يوقظ الإغلاقُ الحدثَ) — فالجلسة الواحدة عدّة صفوف يجمعها meta.sid.
+   الصفوف القديمة بلا sid تبقى كلٌّ منها جلسةً كما كانت. */
+function groupTalk(rows){
+  var g={}, order=[];
+  rows.forEach(function(r,i){
+    /* الصفوف القديمة بلا sid: كلٌّ منها جلسةٌ مستقلّة. ونعتمد على الترتيب لا
+       على r.id، لأنّ report.html لا يجلب عمود id أصلًا (select=student,created_at,meta)
+       فكان r.id غير معرَّفٍ في كلّ الصفوف فتنهار الجلسات كلّها في واحدة. */
+    var k=(r.meta && r.meta.sid) || ("row:"+(r.id!=null?r.id:i));
+    if(!g[k]){ g[k]={ id:r.id, created_at:r.created_at, meta:{}, _turns:0 }; order.push(k); }
+    var s=g[k];
+    s._turns += (r.meta && r.meta.turns) || 0;
+    if(!s._seeded){ s._seeded=1; s.created_at=r.created_at;
+      var m=r.meta||{}; for(var kk in m){ if(Object.prototype.hasOwnProperty.call(m,kk)) s.meta[kk]=m[kk]; } }
+  });
+  return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; return s; });
+}
 const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 const META = {
@@ -327,7 +345,7 @@ async function main(){
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
     if(talkAll.length){
-      const tks=talkAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      const tks=groupTalk(talkAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1));
       const totTurns=tks.reduce((s,p)=>s+(p.meta.turns||0),0);
       const pronRows=tks.filter(p=> typeof p.meta.avgPron==="number");
       const avgPronAll=pronRows.length?Math.round(pronRows.reduce((s,p)=>s+p.meta.avgPron,0)/pronRows.length):null;
