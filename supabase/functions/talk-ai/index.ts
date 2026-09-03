@@ -41,20 +41,17 @@ function sys(child: string, topic: string): string {
     `Speak ONLY in simple, clear English suitable for a young learner.`,
     `Keep your "reply" to 1-2 short sentences, then ask ONE easy follow-up question to keep the conversation going.`,
     `Be encouraging and friendly. Never use difficult words. Never write Arabic. Do not use emojis heavily (one at most).`,
-    `Also silently grade the CHILD'S LAST message for basic English correctness (grammar, word order, word choice).`,
-    `Ignore capitalization and punctuation entirely: the message comes from speech-to-text, so those are never the child's mistakes.`,
-    `Set "correct" to true only if the words actually form a sentence a learner could say, with the words in a possible English order.`,
-    `Scrambled word order is a real mistake, not something to excuse: "are you games will play football" is NOT correct just because the meaning can be guessed.`,
-    `If "correct" is false, set "fixed" to the corrected full sentence (simple English, same meaning); otherwise leave "fixed" as an empty string.`,
+    `Also grade the CHILD'S LAST message. Ignore capitalization and punctuation (it comes from speech-to-text, never the child's mistake).`,
+    `"correct" is true only if the words form a sentence a learner could say, in a possible English word order —`,
+    `scrambled order is a real mistake even when the meaning is guessable. If false, put the corrected sentence in "fixed", else "".`,
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): ظهر لأسامة «✅ جملة صحيحة» على تفريغٍ مُشوَّش
        («are you games will play football») وفيه كلمةٌ يقول إنّه لم ينطقها. وكان
        التوجيه هنا «be lenient» و«true إن كانت مفهومة» — فالنموذج يخمّن المقصود
        ثمّ يبارك كلامًا مقلوبًا. والأسوأ أنّه يحكم على خطأ التفريغ كأنّه خطأ الطفل.
        فصار: ترتيب الكلمات المقلوب خطأٌ لا يُتجاوز، وأُضيف "garbled" ليقول
        النموذج «هذا خطأ تفريغٍ لا خطأ طفل» فلا يُحاسب الطفل عليه أصلًا. */
-    `Set "garbled" to true when the message looks like a speech-to-text failure rather than something the child said:`,
-    `words in an impossible order, unrelated words strung together, or a sentence that does not answer your question at all.`,
-    `When "garbled" is true, still reply kindly and ask your question again more simply, and leave "correct" false and "fixed" empty —`,
+    `"garbled" is true when it looks like a speech-to-text failure, not the child: impossible word order, unrelated words,`,
+    `or no answer to your question. Then reply kindly, ask again more simply, leave "correct" false and "fixed" empty —`,
     `never blame the child for a word the microphone invented.`,
     `Respond ONLY with a JSON object, no text before or after it, in exactly this shape: {"reply": "...", "correct": true, "fixed": "", "garbled": false}`,
     topic ? `Current topic: ${topic}.` : "",
@@ -82,7 +79,16 @@ function parseModelJSON(raw: string): ModelResult {
       garbled: obj.garbled === true,
     };
   } catch {
-    return { reply: raw.trim(), correct: null, fixed: null, garbled: false };
+    /* نصٌّ مبتور (انقطع قبل إغلاق القوس): ننتشل قيمة reply وحدها بدل أن نعرض
+       للطفل الـJSON خامًا. التقييم يسقط (correct:null) والردّ ينجو — وهو الأهمّ. */
+    const m = t.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)/);
+    if (m) {
+      const salvaged = m[1].replace(/\\"/g, '"').replace(/\\n/g, " ").replace(/\\\\/g, "\\").trim();
+      if (salvaged) return { reply: salvaged, correct: null, fixed: null, garbled: false };
+    }
+    /* ولا حتى reply: لا نعرض قوسًا ولا هلالًا — نترك الردّ فارغًا ليتولّاه
+       النداء الأعلى برسالته الودّية الجاهزة. */
+    return { reply: /^[\[{]/.test(t) ? "" : raw.trim(), correct: null, fixed: null, garbled: false };
   }
 }
 
@@ -101,12 +107,17 @@ async function callGeminiModel(model: string, key: string, system: string, conte
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-    // ملاحظة: maxOutputTokens مرتفع لأن موديلات Gemini الحديثة تستهلك جزءًا في "التفكير"؛ نبقيه واسعًا وردّ النظام يبقى قصيرًا.
+    /* maxOutputTokens مرتفع لأنّ موديلات Gemini الحديثة تستهلك جزءًا منه في
+       "التفكير" قبل أن تكتب حرفًا واحدًا من الجواب.
+       بلاغ ٣ سبتمبر ٢٠٢٦: بعد إطالة توجيه النظام (فقرة garbled وترتيب الكلمات)
+       صار النموذج يفكّر أكثر فينفد الحدّ ٨٠٠ قبل أن يُغلق قوس الـJSON، فيرجع
+       نصٌّ مبتور يفشل تحليله ويظهر للطفل خامًا: {"reply": "I love playing foot…
+       فرُفع الحدّ، ومعه إصلاحٌ في parseModelJSON ينتشل الردّ من نصٍّ مبتور. */
     body: JSON.stringify({
       system_instruction: { parts: [{ text: system }] },
       contents,
       generationConfig: {
-        maxOutputTokens: 800,
+        maxOutputTokens: 2048,
         temperature: 0.85,
         topP: 0.9,
         responseMimeType: "application/json",
