@@ -41,6 +41,7 @@ function sys(child: string, topic: string): string {
     `Speak ONLY in simple, clear English suitable for a young learner.`,
     `Keep your "reply" to 1-2 short sentences, then ask ONE easy follow-up question to keep the conversation going.`,
     `Be encouraging and friendly. Never use difficult words. Never write Arabic. Do not use emojis heavily (one at most).`,
+    `Your "reply" is ALWAYS conversation and ALWAYS ends with your question — never put a correction in it; corrections go in "fixed" only.`,
     `Also grade the CHILD'S LAST message. Ignore capitalization and punctuation (it comes from speech-to-text, never the child's mistake).`,
     `"correct" is true only if the words form a sentence a learner could say, in a possible English word order —`,
     `scrambled order is a real mistake even when the meaning is guessable. If false, put the corrected sentence in "fixed", else "".`,
@@ -235,6 +236,15 @@ Deno.serve(async (req: Request) => {
     if (!raw && lastErr) throw lastErr;
 
     let result: ModelResult = raw ? parseModelJSON(raw) : { reply: "", correct: null, fixed: null, garbled: false };
+    /* قيس عليه ٣ سبتمبر ٢٠٢٦: حين يغلط الطفل كان النموذج يضع التصحيح نفسه مكان
+       الردّ ويسكت («he go to school» ← الردّ: «He goes to school every day.»)،
+       فيتوقّف الحوار ويسمع الطفل معلّمًا يردّد جملته المصحّحة بلا سؤال — وهو
+       يرى التصحيح أصلًا في fixed. حارسٌ في الكود لا في التوجيه وحده، لأنّ
+       التوجيه رجاءٌ والنموذج قد يخالفه. */
+    const norm = (x: string) => String(x || "").toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+    if (result.fixed && norm(result.reply) === norm(result.fixed)) {
+      result.reply = "Good try! Can you tell me more?";
+    }
     if (!result.reply) result.reply = "That's nice! Can you tell me more?";
     return new Response(JSON.stringify(result), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
