@@ -124,7 +124,7 @@ function saveTalkSession(useBeacon){
   var turns = state.msgs.filter(function(m){ return m.role==="user"; }).length;
   var delta = turns - (state.savedTurns||0);
   if(!state.topic || delta<1) return;
-  var scores = state.pronScores||[];
+  var scores = (state.pronScores||[]).filter(function(v){ return typeof v==="number"; });
   var avgPron = scores.length ? Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length) : null;
   /* نسبة صحّة الجملة (نحو ومعنى) — انظر applyCorrectness أعلاه؛ نفس أسلوب
      avgPron (متوسّطٌ تراكميٌّ للجلسة كلّها حتى لحظة الحفظ، لا الدفعة فقط)
@@ -177,6 +177,11 @@ function tutorSpeak(text){
 }
 
 /* ===== يسمع الطفل بحرية: تفريغ + تقييم نطق غير مقيّد ===== */
+/* حدّا الثقة في تفريغ أزور (NBest[0].Confidence):
+   دون CONF_MIN لا نعرض التفريغ إطلاقًا ونُعيد السماع — أن نُلزم الطفل بكلامٍ
+   لم يقله أسوأ من أن نطلب منه الإعادة. وبين الحدّين نعرض الكلام ليكمل الحوار
+   لكن بلا درجة نطقٍ ولا حكمٍ على صحّة الجملة، لأنّهما محسوبان على التفريغ. */
+var CONF_MIN = 0.45, CONF_SURE = 0.70;
 var EN_NAME={saud:"Saud",osama:"Osama",rafeef:"Rafeef",hasan:"Hassan"};
 var PHRASES=["My name is","I am","I'm","I live in","I like","I don't like","I want to be",
  "I go to school","My favourite","My favorite","I have","I don't have","I play",
@@ -254,10 +259,23 @@ function listen(statusEl, btn, onDone, tries){
   var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} notHeard(); }, 22000);
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; clearTimeout(to);
-    var out={text:"",wordsHtml:"",pron:null};
+    var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false};
     try{
       if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
         out.text=result.text.trim();
+        /* بلاغ الأب (٣ سبتمبر ٢٠٢٦) بصورة شاشة أسامة: فُرِّغ كلامه
+           «are you games will play football» ويقول «أنا ما نطقت will»،
+           ومعها «نطقك ٩٨/١٠٠» و«✅ جملة صحيحة».
+           والسبب أنّ التقييم هنا بلا نصٍّ مرجعيّ (PronunciationAssessmentConfig("")),
+           فأزور تقيس نطقه على «ما ظنّت أنّه قاله» — قياسٌ دائريّ: أيّ تفريغٍ
+           تخرج به تُعطيه درجةً عالية، فتظهر ٩٨/١٠٠ على كلامٍ مُشوَّش.
+           فصرنا نقرأ ثقة أزور في التفريغ نفسه (NBest[0].Confidence):
+           دونها لا معنى لأيّ درجة، ولا يصحّ أن نُثبّت على الطفل كلامًا لم يقله. */
+        try{
+          var _j = JSON.parse(result.json || (result.properties && result.properties.getProperty(SDK.PropertyId.SpeechServiceResponse_JsonResult)) || "{}");
+          var _nb = (_j.NBest && _j.NBest[0]) || null;
+          if(_nb && typeof _nb.Confidence==="number") out.conf=_nb.Confidence;
+        }catch(e){}
         try{
           var r=SDK.PronunciationAssessmentResult.fromResult(result);
           if(typeof r.pronunciationScore==="number" && !isNaN(r.pronunciationScore)) out.pron=Math.round(r.pronunciationScore);
@@ -269,6 +287,12 @@ function listen(statusEl, btn, onDone, tries){
     try{rec.close();}catch(e){}
     /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
     if(!out.text){ notHeard(); return; }
+    /* ثقةٌ متدنّية = تفريغٌ لا يُعتمد عليه. لا نعرضه ولا نُقيّم عليه؛ نعامله
+       كأنّنا لم نسمع، فيُعاد تلقائيًّا. أفضل من أن نُلزم الطفل بكلامٍ لم يقله. */
+    if(out.conf!=null && out.conf < CONF_MIN){ notHeard(); return; }
+    /* ثقةٌ متوسّطة: نعرض التفريغ لأنّ الحوار يجب أن يستمرّ، لكن بلا درجة نطقٍ
+       ولا حكمٍ على صحّة الجملة — كلاهما مبنيٌّ على تفريغٍ مشكوكٍ فيه. */
+    if(out.conf!=null && out.conf < CONF_SURE){ out.shaky=true; out.pron=null; out.wordsHtml=""; }
     resetBtn();
     statusEl.textContent="";
     onDone(out);
@@ -309,7 +333,7 @@ var GENERIC=["Nice!","That's interesting!","Great job!","Well said!","Cool!","I 
 function reactTo(text){ var t=(" "+text+" ").toLowerCase(); for(var i=0;i<REACT.length;i++){ if(REACT[i][0].test(t)) return REACT[i][1]; } return GENERIC[Math.floor(Math.random()*GENERIC.length)]; }
 
 var app=document.getElementById("app");
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null};
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{}};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -327,7 +351,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={};
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -363,10 +387,16 @@ function addAI(text, speak){
   scrollDown();
 }
 function addMe(out){
-  if(out.pron!=null) state.pronScores.push(out.pron);
   var tid = ++state.turnSeq;
+  /* نحفظ موضع درجة هذا الدور في المصفوفة: إن تبيّن بعد ردّ الذكاء أنّ التفريغ
+     مُشوَّش سحبناها، فلا تُحتسب درجةٌ على كلامٍ ليس كلام الطفل. */
+  if(out.pron!=null){ state.turnPron[tid]=state.pronScores.length; state.pronScores.push(out.pron); }
+  if(out.shaky) state.shakyTurns[tid]=1;   // لا حكمَ على صحّة جملةٍ لم نتأكّد أنّنا سمعناها
   var body = out.wordsHtml ? ('<div class="en">'+out.wordsHtml+'</div>') : ('<div class="en">'+esc(out.text)+'</div>');
-  var sc = (out.pron!=null) ? ('<div class="sc">🗣️ نطقك: '+out.pron+'/100 · 🟢🟡🔴</div>') : '';
+  /* التفريغ المشكوك فيه يُقال للطفل صراحةً إنّه «ما سمعه الجهاز» لا حكمٌ عليه.
+     أسامة رأى كلامًا لم يقله ومعه ٩٨/١٠٠ فظنّ الموقع يكذب عليه — وكان محقًّا. */
+  if(out.shaky) body += '<div class="sc" style="color:var(--warn)">🎧 هذا اللي سمعه الجهاز، وما هو متأكّد منه — إن ما كان كلامك اضغط 🎤 وأعده أوضح.</div>';
+  var sc = (out.pron!=null) ? ('<div class="sc" id="sc-'+tid+'">🗣️ نطقك: '+out.pron+'/100 · 🟢🟡🔴</div>') : '';
   /* حاوية فارغة لتقييم «صحة الجملة» — تُملأ لاحقًا في applyCorrectness()
      حين يصل ردّ talk-ai (يصل مع الردّ نفسه لا بطلبٍ منفصل)؛ فارغة يعني
      ما وصل تقييمٌ بعد (لا زال يفكّر، أو رجع للردّ الاحتياطي بلا تقييم). */
@@ -381,8 +411,29 @@ function addMe(out){
    (نحو ومعنى) عبر نفس نموذج talk-ai — يُرجعه مع الردّ نفسه (انظر
    supabase/functions/talk-ai). هذي الدالة تملأ حاوية الجملة الموافقة
    بالنتيجة، وتُسجّلها في state.correctFlags ليُحسب متوسّطها عند الحفظ. */
+/* يوسم الدور بأنّ تفريغه غير موثوق، ويكتب للطفل السبب بصراحة.
+   يُنادى من مكانين: ثقةٌ متدنّية من أزور، أو garbled من talk-ai. */
+function markShaky(tid){
+  if(state.shakyTurns[tid]) return;
+  state.shakyTurns[tid]=1;
+  /* ٩٨/١٠٠ على كلامٍ مقلوب هو نفس ما اشتكى منه الأب: التقييم بلا نصٍّ مرجعيّ
+     يقيس النطق على ما ظنّته أزور، فإن كان الظنّ خطأً فالدرجة بلا معنى. */
+  var pi=state.turnPron[tid];
+  if(pi!=null) state.pronScores[pi]=null;
+  var sel=document.getElementById("sc-"+tid); if(sel) sel.parentNode.removeChild(sel);
+  var el=document.getElementById("cor-"+tid);
+  if(el){
+    el.className="cor";
+    el.style.color="var(--warn)";
+    el.innerHTML="🎧 التفريغ مو واضح — يمكن الجهاز ما سمعك صح. أعد جملتك أوضح ولا نحاسبك عليها.";
+    var c=document.getElementById("chat"); if(c) state.chatHtml=c.innerHTML;
+  }
+}
 function applyCorrectness(tid, correct, fixed){
   if(correct==null) return;   // لا تقييم (الردّ الاحتياطي، أو النموذج لم يلتزم بصيغة الإخراج)
+  /* تفريغٌ لم نتأكّد منه لا يُحكم على نحوه: الحكم سيكون على كلام الجهاز لا كلام
+     الطفل — وهو الذي أظهر «✅ جملة صحيحة» على «are you games will play football». */
+  if(state.shakyTurns && state.shakyTurns[tid]) return;
   state.correctFlags.push(!!correct);
   var el = document.getElementById("cor-"+tid);
   if(!el) return;
@@ -414,6 +465,9 @@ function aiTurn(childText, tid){
     body: JSON.stringify({ messages: state.msgs.slice(-14), child: name, topic: TOPICS[state.topic].t }) })
    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
    .then(function(d){ if(done)return; done=true; clearTimeout(tmo); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent=""; state.msgs.push({role:"model", content:reply}); addAI(reply, true);
+     /* garbled من talk-ai: النموذج نفسه يقول «هذا خطأ تفريغٍ لا خطأ الطفل».
+        نعامله كالثقة المتدنّية: لا حكمَ نحويًّا ولا حساب في نسبة صحّة الجملة. */
+     if(d && d.garbled === true){ markShaky(tid); }
      applyCorrectness(tid, (d && typeof d.correct==="boolean") ? d.correct : null, d && d.fixed); saveTalkSession(); })
    .catch(function(){ if(done)return; done=true; clearTimeout(tmo); if(st)st.textContent=""; replyThenAsk(childText); saveTalkSession(); });
 }

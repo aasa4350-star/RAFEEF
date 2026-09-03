@@ -41,18 +41,29 @@ function sys(child: string, topic: string): string {
     `Speak ONLY in simple, clear English suitable for a young learner.`,
     `Keep your "reply" to 1-2 short sentences, then ask ONE easy follow-up question to keep the conversation going.`,
     `Be encouraging and friendly. Never use difficult words. Never write Arabic. Do not use emojis heavily (one at most).`,
-    `Also silently grade the CHILD'S LAST message for basic English correctness (grammar, word order, word choice) —`,
-    `be lenient, as expected from a young learner speaking aloud, and ignore capitalization/punctuation since it comes from speech-to-text, not real writing mistakes.`,
-    `Set "correct" to true if the sentence is understandable and reasonably correct English for this age, false only if it has a real grammar mistake.`,
-    `If false, set "fixed" to the corrected full sentence (simple English, same meaning); otherwise leave "fixed" as an empty string.`,
-    `Respond ONLY with a JSON object, no text before or after it, in exactly this shape: {"reply": "...", "correct": true, "fixed": ""}`,
+    `Also silently grade the CHILD'S LAST message for basic English correctness (grammar, word order, word choice).`,
+    `Ignore capitalization and punctuation entirely: the message comes from speech-to-text, so those are never the child's mistakes.`,
+    `Set "correct" to true only if the words actually form a sentence a learner could say, with the words in a possible English order.`,
+    `Scrambled word order is a real mistake, not something to excuse: "are you games will play football" is NOT correct just because the meaning can be guessed.`,
+    `If "correct" is false, set "fixed" to the corrected full sentence (simple English, same meaning); otherwise leave "fixed" as an empty string.`,
+    /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): ظهر لأسامة «✅ جملة صحيحة» على تفريغٍ مُشوَّش
+       («are you games will play football») وفيه كلمةٌ يقول إنّه لم ينطقها. وكان
+       التوجيه هنا «be lenient» و«true إن كانت مفهومة» — فالنموذج يخمّن المقصود
+       ثمّ يبارك كلامًا مقلوبًا. والأسوأ أنّه يحكم على خطأ التفريغ كأنّه خطأ الطفل.
+       فصار: ترتيب الكلمات المقلوب خطأٌ لا يُتجاوز، وأُضيف "garbled" ليقول
+       النموذج «هذا خطأ تفريغٍ لا خطأ طفل» فلا يُحاسب الطفل عليه أصلًا. */
+    `Set "garbled" to true when the message looks like a speech-to-text failure rather than something the child said:`,
+    `words in an impossible order, unrelated words strung together, or a sentence that does not answer your question at all.`,
+    `When "garbled" is true, still reply kindly and ask your question again more simply, and leave "correct" false and "fixed" empty —`,
+    `never blame the child for a word the microphone invented.`,
+    `Respond ONLY with a JSON object, no text before or after it, in exactly this shape: {"reply": "...", "correct": true, "fixed": "", "garbled": false}`,
     topic ? `Current topic: ${topic}.` : "",
   ].filter(Boolean).join(" ");
 }
 
-type ModelResult = { reply: string; correct: boolean | null; fixed: string | null };
+type ModelResult = { reply: string; correct: boolean | null; fixed: string | null; garbled: boolean };
 
-/* استخراج {reply, correct, fixed} من نصّ النموذج الخام. بعض النماذج
+/* استخراج {reply, correct, fixed, garbled} من نصّ النموذج الخام. بعض النماذج
    تُغلّف الـJSON بأسوار ```json``` رغم التعليمات — نُزيلها. وإن فشل
    التحليل كليًّا (نموذجٌ لم يلتزم بالصيغة) نُرجع النصّ الخام كردٍّ
    عاديّ بلا تقييم (correct:null) بدل إفشال الطلب كلّه — فالردّ نفسه
@@ -68,9 +79,10 @@ function parseModelJSON(raw: string): ModelResult {
       reply,
       correct: typeof obj.correct === "boolean" ? obj.correct : null,
       fixed: (obj.fixed && String(obj.fixed).trim()) || null,
+      garbled: obj.garbled === true,
     };
   } catch {
-    return { reply: raw.trim(), correct: null, fixed: null };
+    return { reply: raw.trim(), correct: null, fixed: null, garbled: false };
   }
 }
 
@@ -103,6 +115,7 @@ async function callGeminiModel(model: string, key: string, system: string, conte
           properties: {
             reply: { type: "STRING" },
             correct: { type: "BOOLEAN" },
+            garbled: { type: "BOOLEAN" },
             fixed: { type: "STRING" },
           },
           required: ["reply", "correct"],
@@ -210,7 +223,7 @@ Deno.serve(async (req: Request) => {
     }
     if (!raw && lastErr) throw lastErr;
 
-    let result: ModelResult = raw ? parseModelJSON(raw) : { reply: "", correct: null, fixed: null };
+    let result: ModelResult = raw ? parseModelJSON(raw) : { reply: "", correct: null, fixed: null, garbled: false };
     if (!result.reply) result.reply = "That's nice! Can you tell me more?";
     return new Response(JSON.stringify(result), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
