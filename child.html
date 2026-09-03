@@ -310,7 +310,9 @@ async function main(){
       writingAll.forEach(p=>{ if(p.meta.bands){ wAggN++; WSUBS.forEach(s=>{ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
       const dc2=writingDrill.reduce((s,p)=>s+(p.meta.correct||0),0), dt2=writingDrill.reduce((s,p)=>s+(p.meta.total||0),0);
       html+=`<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">`+
-        `<li>📝 ${writingAll.length?`كتب <b>${writingAll.length}</b> فقرة`:`لسّا ما كتب فقرةً كاملة`}${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``}</li>`;
+        /* بلاغ الأب: «التعبير ما يطلع لي التاريخ والوقت» — الفقرات تحتها مؤرَّخة،
+           لكن من حلّ التدريب وحده بلا فقرة كان سطره رقمًا بلا زمن. */
+        `<li>📝 ${writingAll.length?`كتب <b>${writingAll.length}</b> فقرة`:`لسّا ما كتب فقرةً كاملة`}${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``}${(function(){ var L=writingAll.concat(writingDrill).map(p=>p.created_at).sort().pop(); return L?` · آخر مرة: <span class="cnt">${saTime(L)}</span>`:``; })()}</li>`;
       if(wAggN){
         const avgs=WSUBS.map(s=>({s, avg:wAgg[s[0]]/wAggN}));
         const weakestW=avgs.slice().sort((a,b)=>a.avg-b.avg)[0];

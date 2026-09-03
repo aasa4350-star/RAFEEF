@@ -334,8 +334,10 @@ async function loadReport(){
       var wAgg={}, wAggN=0;
       writingAll.forEach(function(p){ if(p.meta.bands){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
       var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
+      /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» */
+      var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
       html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
-        '<li>📝 '+(writingAll.length?('كتب <b>'+writingAll.length+'</b> فقرة'):'لسّا ما كتب فقرةً كاملة')+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+'</li>'+
+        '<li>📝 '+(writingAll.length?('كتب <b>'+writingAll.length+'</b> فقرة'):'لسّا ما كتب فقرةً كاملة')+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+(wLast?' · آخر مرة: <span class="cnt">'+saTime(wLast)+'</span>':'')+'</li>'+
         (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
         '</ul></div>';
     }
@@ -349,6 +351,8 @@ async function loadReport(){
       var avgCorrectAll=correctRows.length?Math.round(correctRows.reduce(function(s,p){return s+p.meta.avgCorrect;},0)/correctRows.length):null;
       html+='<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">'+
         '<li>💬 <b>'+tks.length+'</b> جلسة محادثة · <b>'+totTurns+'</b> جملة'+(avgPronAll!=null?' · متوسط النطق <b>'+avgPronAll+'%</b>':'')+(avgCorrectAll!=null?' · صحّة الجملة <b>'+avgCorrectAll+'%</b>':'')+'</li>'+
+        tks.slice(0,3).map(function(p){ var m=p.meta;
+          return '<li>'+(m.topic||"—")+' · <b>'+(m.turns||0)+'</b> جملة'+(typeof m.avgPron==="number"?' · نطق '+m.avgPron+'%':'')+(typeof m.avgCorrect==="number"?' · صحّة '+m.avgCorrect+'%':'')+' <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة

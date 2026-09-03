@@ -486,7 +486,9 @@ function talkCardHtml(student){
       var m=r.meta, p=(typeof m.avgPron==="number")?m.avgPron:null, pc=(typeof m.avgCorrect==="number")?m.avgCorrect:null;
       return '<li>'+(p!=null?'<span class="pill '+cls(p)+'">'+p+'%</span>':'<span class="pill" style="background:var(--bg)">—</span>')+
         '<span class="nm">'+esc(m.topic||"—")+
-          '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saDate(rowT(r))+' · '+(m.turns||0)+' جملة'+(m.secs?' · '+Math.round(m.secs/60)+' د':'')+(pc!=null?' · صحّة الجملة '+pc+'%':'')+'</span>'+
+          /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» — كان saDate
+             (يومًا بلا ساعة)، وهو لا يميّز جلستين في يومٍ واحد. */
+          '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saTime(rowT(r))+' · '+(m.turns||0)+' جملة'+(m.secs?' · '+Math.round(m.secs/60)+' د':'')+(pc!=null?' · صحّة الجملة '+pc+'%':'')+'</span>'+
         '</span></li>';
     }).join("")+'</ul>'+
     (rows.length>10 ? '<p class="note">وأقدم منها '+(rows.length-10)+' جلسة.</p>' : '')+

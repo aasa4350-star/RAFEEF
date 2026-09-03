@@ -329,7 +329,11 @@ if(Object.keys(otherMap).length){ out+=`<div class="weak"><div class="wt">📊 �
           var WSUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
           var wAgg={},wAggN=0; writingAll.forEach(function(p){ if(p.meta.bands){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
           var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
-          out+=`<div class="weak"><div class="wt">✍️ التعبير الإنجليزي:</div><ul><li>📝 ${writingAll.length?`كتب <b>${writingAll.length}</b> فقرة`:`لسّا ما كتب فقرةً كاملة`}${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pctOf(dc2,dt2)}%)`:``}</li>`;
+          /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» — قسم القراءة
+             فوقه يعرض وقت كلّ محاولة، وهذان القسمان كانا أرقامًا بلا زمن، فلا
+             يُعرف أهي من اليوم أم من شهر. */
+          var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
+          out+=`<div class="weak"><div class="wt">✍️ التعبير الإنجليزي:</div><ul><li>📝 ${writingAll.length?`كتب <b>${writingAll.length}</b> فقرة`:`لسّا ما كتب فقرةً كاملة`}${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pctOf(dc2,dt2)}%)`:``}${wLast?` · آخر مرة: <span class="cnt">${saTime(wLast)}</span>`:``}</li>`;
           if(wAggN){ out+=WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return `<li>${Math.round(avg*10)/10}/5 ${s[1]} <span class="cnt">${s[0]}</span></li>`; }).join(""); }
           out+=`</ul></div>`;
         }
@@ -340,7 +344,10 @@ if(Object.keys(otherMap).length){ out+=`<div class="weak"><div class="wt">📊 �
           var avgPronAll=pronRows.length?Math.round(pronRows.reduce(function(s,p){return s+p.meta.avgPron;},0)/pronRows.length):null;
           var correctRows=tks.filter(function(p){return typeof p.meta.avgCorrect==="number";});
           var avgCorrectAll=correctRows.length?Math.round(correctRows.reduce(function(s,p){return s+p.meta.avgCorrect;},0)/correctRows.length):null;
-          out+=`<div class="weak"><div class="wt">🗣️ المحادثة الإنجليزية:</div><ul><li>💬 <b>${tks.length}</b> جلسة · <b>${totTurns}</b> جملة${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}${avgCorrectAll!=null?` · صحّة الجملة <b>${avgCorrectAll}%</b>`:``}</li></ul></div>`;
+          out+=`<div class="weak"><div class="wt">🗣️ المحادثة الإنجليزية:</div><ul><li>💬 <b>${tks.length}</b> جلسة · <b>${totTurns}</b> جملة${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}${avgCorrectAll!=null?` · صحّة الجملة <b>${avgCorrectAll}%</b>`:``}</li>`+
+            tks.slice(0,3).map(function(p){ var m=p.meta;
+              return `<li>${m.topic||"—"} · <b>${m.turns||0}</b> جملة${typeof m.avgPron==="number"?` · نطق ${m.avgPron}%`:``}${typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:``} <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
+            `</ul></div>`;
         }
         return out; })()}
         ${(function(){ var acts=actBy[name]||[]; return acts.length
