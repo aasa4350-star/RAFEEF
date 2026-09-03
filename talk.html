@@ -167,14 +167,51 @@ function tutorSpeak(text){
 }
 
 /* ===== يسمع الطفل بحرية: تفريغ + تقييم نطق غير مقيّد ===== */
-var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
-function listen(statusEl, btn, onDone){
+var EN_NAME={saud:"Saud",osama:"Osama",rafeef:"Rafeef",hasan:"Hassan"};
+var PHRASES=["My name is","I am","I'm","I live in","I like","I don't like","I want to be",
+ "I go to school","My favourite","My favorite","I have","I don't have","I play",
+ "Yes I do","No I don't","Thank you","Nice to meet you",
+ "Mohammed","Aldohayem","Saudi Arabia","Riyadh","Jeddah","Makkah","Madinah",
+ "fourth grade","fifth grade","second intermediate","third intermediate",
+ "football","mathematics","science","English","Arabic","engineer","doctor","teacher","pilot"];
+var MIC_TAIL ='<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
+/* بلاغ الأب: «هذا حسن يتكلّم، أحيانًا يلقط وأحيانًا لا».
+   عيبان اثنان كانا وراء ذلك:
+
+   ١) حين ترجع أزور بلا كلامٍ مفهوم (NoMatch) كان الكود يمسح سطر الحالة
+      ثمّ ينادي onDone بنصٍّ فارغ، والمُنادي يخرج صامتًا. فالطفل يتكلّم
+      ويضغط، ثمّ لا يحدث شيءٌ إطلاقًا: لا ردّ ولا رسالة ولا سبب. وهذا هو
+      «أحيانًا لا» — ليس المايك، بل غياب أيّ خبر. وقد كانت reading.html
+      تعالج الحالة نفسها بإعادة محاولةٍ تلقائية ورسالةٍ واضحة، فنقلنا
+      الأسلوب نفسه إلى هنا.
+
+   ٢) مهلة الأمان عندنا ١٤ ثانية، وميزانية أزور نفسها ١٢ ثانية صمتًا
+      أوّليًّا + ٢٫٢ للفصل = ١٤٫٢ — أي إنّ مؤقّتنا يسبقها فيقطع الجلسة
+      ويقول «ما سمعتك» بينما الصوت التُقط فعلًا وهو في طريقه. صار صمت
+      البدء ٨ ثوانٍ (خبرٌ أسرع للطفل)، والفصل ٣ ثوانٍ (الأطفال يتوقّفون
+      وسط الجملة الإنجليزية)، ومهلتنا ٢٢ ثانية فلا تسابق أحدًا. */
+function listen(statusEl, btn, onDone, tries){
+  tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
   function resetBtn(){ if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; } }
+  /* لم أسمع كلامًا مفهومًا: نعيد المحاولة مرّةً تلقائيًّا ثمّ نُفصح عن السبب.
+     ولا نمسح السطر أبدًا — الصمت هو ما أتعب حسن. */
+  function notHeard(){
+    if(tries < 1){
+      statusEl.style.color="var(--muted)";
+      statusEl.innerHTML="🔁 ما وضح كلامك — أعيد السماع تلقائيًّا الآن، تكلّم مرّةً ثانية...";
+      setTimeout(function(){ listen(statusEl, btn, onDone, tries+1); }, 700);
+    } else {
+      statusEl.style.color="var(--bad)";
+      statusEl.innerHTML="⚠️ ما التقطتُ كلامك. قرّب المايك من فمك، وتكلّم بصوتٍ أعلى وبجملةٍ كاملة، "+
+        "ثمّ اضغط <b>🎤 اضغط وتكلّم</b> مرّةً ثانية.";
+      resetBtn();
+    }
+  }
   if(!cr){ statusEl.innerHTML="⚠️ لم يُضبط مفتاح Azure." + MIC_TAIL; resetBtn(); return; }
   /* كانت رسالة الانتظار تعود أبدًا إن لم تصل الأداة — انظر mic-help.js */
   if(!SDK){
-    MIC.waitSDK(statusEl, btn, function(){ listen(statusEl, btn, onDone); },
+    MIC.waitSDK(statusEl, btn, function(){ listen(statusEl, btn, onDone, tries); },
       function(){ statusEl.style.color="var(--bad)";
         statusEl.innerHTML="❌ ما قدرت أحمّل أداة تقييم النطق — غالبًا الإنترنت." + MIC_TAIL;
         resetBtn(); });
@@ -186,15 +223,25 @@ function listen(statusEl, btn, onDone){
     // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
     // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
     cfg.speechRecognitionLanguage="en-GB";
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"2200"); }catch(e){}
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
     audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
     rec=new SDK.SpeechRecognizer(cfg, audio);
     try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}
+    /* ترجيح العبارات المتوقّعة: التعرّف هنا حرٌّ بلا نصٍّ مرجعيّ، فيخطئ في
+       الأسماء العربية وبدايات الجُمل. في صورة الأب سمعت أزور «not your name
+       is mohammed hassan» بدل «my name is...». هذه القائمة ترجّح ما يُنتظر
+       فعلًا من طفلٍ يجيب عن هذه الأسئلة — ولا تمنع غيره. */
+    try{
+      var _pl=SDK.PhraseListGrammar.fromRecognizer(rec);
+      PHRASES.concat(EN_NAME[who] ? [EN_NAME[who]] : []).forEach(function(p){ _pl.addPhrase(p); });
+    }catch(e){}
   }catch(e){ statusEl.textContent="خطأ: "+(e.message||e); if(btn){btn.disabled=false;btn.classList.remove("rec");} return; }
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
-  statusEl.style.color="var(--muted)"; statusEl.textContent="🎙️ تكلّم الآن بالإنجليزي...";
+  statusEl.style.color="var(--muted)";
+  statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
   var fin=false;
-  var to=setTimeout(function(){ if(fin)return; fin=true; statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما سمعتك — قرّب المايك وتكلّم بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية."; resetBtn(); try{rec.close();}catch(e){} }, 14000);
+  /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور */
+  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} notHeard(); }, 22000);
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; clearTimeout(to);
     var out={text:"",wordsHtml:"",pron:null};
@@ -209,9 +256,11 @@ function listen(statusEl, btn, onDone){
         }catch(e){}
       }
     }catch(e){}
-    if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; }
-    statusEl.textContent="";
     try{rec.close();}catch(e){}
+    /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
+    if(!out.text){ notHeard(); return; }
+    resetBtn();
+    statusEl.textContent="";
     onDone(out);
   }, function(err){ if(fin)return; fin=true; clearTimeout(to); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} });
 }
@@ -333,7 +382,7 @@ function onMic(){
   var st=document.getElementById("st"), mic=document.getElementById("mic");
   mic.disabled=true;
   listen(st, mic, function(out){
-    if(!out.text){ return; } // الرسالة تظهر في الحالة
+    if(!out.text){ return; } // احتياط: listen لم تعد تنادينا بنصٍّ فارغ، بل تتولّى الرسالة والإعادة
     var tid = addMe(out);
     aiTurn(out.text, tid);
   });
