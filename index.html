@@ -240,6 +240,30 @@ function weakAreas(rows){
 
 async function load(){
   const status = document.getElementById("status");
+/* ===== حصّة أزور المجانية (F0: خمس ساعات صوت شهريًّا، مفتاحٌ واحد للأربعة) =====
+   سؤال الأب (٣ سبتمبر ٢٠٢٦): «أزور كم يعطي من ساعة في الشهر مجانية؟» — خمس،
+   لكنّه لم يكن يعرف كم استُهلك. صار النطق والمحادثة يخزّنان ثواني الصوت التي
+   تعدّها أزور نفسها (result.duration)، فنجمعها هنا للشهر الميلاديّ الجاري. */
+function azureQuotaHtml(rows){
+  var now=new Date(), ym=now.getUTCFullYear()+"-"+String(now.getUTCMonth()+1).padStart(2,"0");
+  var sec=0, n=0, byKid={};
+  (rows||[]).forEach(function(r){
+    var a=r.meta && r.meta.audioSec;
+    if(typeof a!=="number" || !a) return;
+    if(String(r.created_at).slice(0,7)!==ym) return;
+    sec+=a; n++; byKid[r.student]=(byKid[r.student]||0)+a;
+  });
+  if(!n) return "";
+  var LIMIT=5*3600, used=Math.min(100, Math.round(100*sec/LIMIT));
+  var col = used>=90?"var(--bad)":used>=60?"var(--warn)":"var(--good)";
+  var kids=Object.keys(byKid).sort(function(a,b){return byKid[b]-byKid[a];})
+    .map(function(k){ return k+" "+Math.round(byKid[k]/60)+"د"; }).join(" · ");
+  return `<div class="card"><div style="font-weight:800;margin-bottom:6px">🎛️ حصّة أزور المجانية هذا الشهر</div>
+    <div style="background:var(--bg);border-radius:99px;height:14px;overflow:hidden;border:1px solid var(--line)">
+      <div style="width:${used}%;height:100%;background:${col}"></div></div>
+    <div style="font-size:.88rem;color:var(--muted);margin-top:8px"><b style="color:${col}">${Math.round(sec/60)} دقيقة</b> من ٣٠٠ (${used}%) · ${n} تسجيلًا${kids?'<br>'+kids:''}</div>
+    ${used>=80?`<div style="font-size:.88rem;color:var(--bad);margin-top:6px"><b>قاربتم الحدّ.</b> أسهل حلّ: مفتاحٌ مجانيٌّ لكل ابن في azure-config.js فتصير ٢٠ ساعة بلا تكلفة.</div>`:``}</div>`;
+}
   const content = document.getElementById("content");
   status.innerHTML = '<span class="spin"></span> جارٍ التحميل...';
   try{
@@ -249,6 +273,9 @@ async function load(){
     if(!r.ok){ throw new Error("HTTP "+r.status); }
     let data = await r.json();
     data = Array.isArray(data)?data:[];
+    /* نسخةٌ كاملة قبل الفلترة: السطر أدناه يُسقط صفوف practice (ومنها النطق
+       والمحادثة)، وحساب حصّة أزور يحتاجها كلّها. */
+    const allRows = data.slice();
     // نفصل صفوف النشاط والاختبارات التجريبية عن اختبارات المدرسة
     /* نفس علّة child.html بالضبط (بلاغا الأب ١ سبتمبر ٢٠٢٦: قسم
        التعبير وقسم المحادثة ماطلعا له) موجودةٌ هنا أيضًا — وهذه
@@ -313,7 +340,7 @@ async function load(){
                ${weak.fixed.map(w=>`<li>${w.key} <span class="cnt">(×${w.n})</span></li>`).join("")}</ul>`
             : ``}
         </div>`}
-        ${(function(){ var pr=practiceBy[name]||[]; if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var HIDE_SUBJ={osama:["لغتي"]}; var hidden=HIDE_SUBJ[SLUG[name]]||[]; /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): احذف قسم لغتي حق أسامة — انظر شرحه الكامل في child.html */ var currMap={},otherMap={},vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[]; pr.forEach(function(p){ if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var t=(p.meta.test||""); var subj=t.split(" ")[0]; if(hidden.indexOf(subj)>-1) return; if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var avg=Math.round(arr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/arr.length); out+=`<div style="margin:4px 0 2px;font-weight:700">${SUBJ_EMOJI[subj]} ${subj} <span class="cnt">(المتوسط ${avg}%)</span></div><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=(p.meta.test||"").replace(subj+" ",""); return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")}</ul>`; }); out+=`</div>`; } /* بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل») — بعد إصلاح «قراءة» تفحّصنا
+        ${(function(){ var pr=practiceBy[name]||[]; if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var HIDE_SUBJ={osama:["لغتي"]}; var hidden=HIDE_SUBJ[SLUG[name]]||[]; /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): احذف قسم لغتي حق أسامة — انظر شرحه الكامل في child.html */ var currMap={},otherMap={},vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[],pronAll=[]; pr.forEach(function(p){ if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var t=(p.meta.test||""); var subj=t.split(" ")[0]; if(hidden.indexOf(subj)>-1) return; if(p.meta.kindPron===true){ pronAll.push(p); return; } if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var avg=Math.round(arr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/arr.length); out+=`<div style="margin:4px 0 2px;font-weight:700">${SUBJ_EMOJI[subj]} ${subj} <span class="cnt">(المتوسط ${avg}%)</span></div><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=(p.meta.test||"").replace(subj+" ",""); return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")}</ul>`; }); out+=`</div>`; } /* بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل») — بعد إصلاح «قراءة» تفحّصنا
    بقيّة otherMap فوجدنا نفس العلّة بالضبط في كل ما فيه: otherMap[t]=p كانت
    تحتفظ بمحاولةٍ واحدة فقط لكل اسم اختبار. حسنٌ وحده له ٢١ محاولة «قدرات
    لفظي» و١٩ «STEP إنجليزي» و١٩ «قدرات كمي» و١٥ «تحصيلي» وحتى ٢١ من كل نوع
@@ -339,6 +366,20 @@ if(Object.keys(otherMap).length){ out+=`<div class="weak"><div class="wt">📊 �
             out+=`<div style="margin:4px 0 2px;font-weight:700">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul>${arr.slice(0,5).map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")}</ul>`;
           });
           out+=`</div>`;
+        }
+        /* 🗣️ النطق — بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا
+           فما أتابع نطقهم». صار يُحفظ، وهذا عرضه: المتوسّط وآخر التقييمات. */
+        if(pronAll.length){
+          var prs=pronAll.slice().sort(function(a,b){return a.created_at<b.created_at?1:-1;});
+          var pv=function(p,k){ var v=p.meta[k]; return (typeof v==="number"&&!isNaN(v))?v:null; };
+          var pAvg=function(k,arr){ var a=(arr||prs).map(function(p){return pv(p,k);}).filter(function(v){return v!=null;});
+            return a.length?Math.round(a.reduce(function(x,y){return x+y;},0)/a.length):null; };
+          var aP=pAvg("pron"), aA=pAvg("acc"), aF=pAvg("flu"), aW=pAvg("wpm");
+          out+=`<div class="weak"><div class="wt">🗣️ النطق (قيّم نطقي):</div><ul>`+
+            `<li>🎙️ <b>${prs.length}</b> تقييم${aP!=null?` · متوسط النطق <b>${aP}%</b>`:``}${aA!=null?` · دقّة ${aA}%`:``}${aF!=null?` · طلاقة ${aF}%`:``}${aW!=null?` · <b>${aW}</b> كلمة/دقيقة`:``}</li>`+
+            prs.slice(0,3).map(function(p){ var m=p.meta;
+              return `<li>${m.pmode==="passage"?"قطعة":"كلمة"} · ${m.test||""} — <b>${pv(p,"pron")}%</b>${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``} <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
+            `</ul></div>`;
         }
         /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير» —
            الشرط كان writingAll.length فقط، فحلّ «تدريب بناء الجملة» وحده
@@ -382,7 +423,7 @@ if(Object.keys(otherMap).length){ out+=`<div class="weak"><div class="wt">📊 �
           </div></div>`:""}
         ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
       </div>`;
-    }).join("");
+    }).join("") + azureQuotaHtml(allRows);
   }catch(e){
     status.textContent = "";
     content.innerHTML = `<div class="card empty">⚠️ تعذّر تحميل النتائج (${e.message}).<br>

@@ -529,6 +529,86 @@ function stretchCardHtml(d){
          listHtml(items, true)+'</div>';
 }
 
+
+/* ===== 🗣️ النطق (من قسم «قيّم نطقي» في القراءة) =====
+   بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا فما أتابع نطقهم».
+   صار reading.html يحفظ كلّ تقييم (انظر savePron هناك)، وهنا نعرضه: المتوسّط،
+   والاتجاه، وسرعة القراءة كلمة/دقيقة — وهي مؤشّر طلاقةٍ لا تعطيه الدرجة وحدها. */
+function pronRows(student){
+  return ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kindPron===true; })
+            .sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); });
+}
+function pronCardHtml(student){
+  var rows = pronRows(student);
+  if(!rows.length)
+    return '<div class="card"><h2>🗣️ النطق</h2>'+
+      '<p class="note">ما جرّب «🎙️ قيّم نطقي» في صفحة القراءة بعد — وهو أنفع ما فيها: '+
+      'يسمع نطقه مقيَّمًا كلمةً كلمة بالألوان.</p></div>';
+  var val = function(r,k){ var v=r.meta[k]; return (typeof v==="number" && !isNaN(v)) ? v : null; };
+  var avg = function(k, rs){ var a=(rs||rows).map(function(r){ return val(r,k); }).filter(function(v){ return v!=null; });
+    return a.length ? Math.round(a.reduce(function(x,y){return x+y;},0)/a.length) : null; };
+  var passage = rows.filter(function(r){ return r.meta.pmode==="passage"; });
+  var avgPron=avg("pron"), avgAcc=avg("acc"), avgFlu=avg("flu");
+  var avgWpm = avg("wpm", passage.filter(function(r){ return val(r,"wpm"); }));
+  var cutoff = Date.now()-RECENT_DAYS*86400000;
+  var recent = rows.filter(function(r){ return new Date(r.created_at).getTime()>=cutoff; });
+  var older  = rows.filter(function(r){ return new Date(r.created_at).getTime()< cutoff; });
+  var trend = "";
+  if(recent.length>=2 && older.length>=2){
+    var ra=avg("pron",recent), oa=avg("pron",older), dd=ra-oa;
+    trend='<p class="note">اتجاه النطق آخر '+RECENT_DAYS+' أيام: '+oa+'% ← '+ra+'% ('+(dd>0?"+":"")+dd+' نقطة)</p>';
+  }
+  return '<div class="card"><h2>🗣️ النطق</h2>'+
+    '<div class="stats">'+
+      '<div class="stat"><div class="v">'+rows.length+'</div><div class="l">تقييم</div></div>'+
+      (avgPron!=null?'<div class="stat"><div class="v">'+avgPron+'%</div><div class="l">متوسّط النطق</div></div>':'')+
+      (avgAcc!=null?'<div class="stat"><div class="v">'+avgAcc+'%</div><div class="l">الدقّة</div></div>':'')+
+      (avgFlu!=null?'<div class="stat"><div class="v">'+avgFlu+'%</div><div class="l">الطلاقة</div></div>':'')+
+      (avgWpm!=null?'<div class="stat"><div class="v">'+avgWpm+'</div><div class="l">كلمة/دقيقة</div></div>':'')+
+    '</div>'+trend+
+    '<ul class="sk">'+rows.slice(0,10).map(function(r){
+      var m=r.meta, p=val(r,"pron");
+      return '<li>'+(p!=null?'<span class="pill '+cls(p)+'">'+p+'%</span>':'<span class="pill" style="background:var(--bg)">—</span>')+
+        '<span class="nm">'+(m.pmode==="passage"?"قطعة كاملة":"كلمة/جملة")+' · '+esc(String(m.test||""))+
+        '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saTime(r.created_at)+
+          (m.words?' · '+m.words+' كلمة':'')+(val(r,"wpm")?' · '+m.wpm+' كلمة/د':'')+
+          (val(r,"comp")!=null?' · اكتمال '+m.comp+'%':'')+'</span>'+
+        '</span></li>';
+    }).join("")+'</ul>'+
+    (rows.length>10?'<p class="note">وأقدم منها '+(rows.length-10)+' تقييمًا.</p>':'')+
+  '</div>';
+}
+
+/* ===== حصّة أزور المجانية (F0: خمس ساعات صوت شهريًّا، مفتاحٌ واحد للأربعة) =====
+   سؤال الأب: «أزور كم يعطي من ساعة في الشهر مجانية؟» — الجواب خمس، لكنّه لم
+   يكن يعرف كم استُهلك. صرنا نخزّن ثواني الصوت الفعليّة التي تعدّها أزور نفسها
+   (result.duration) في النطق والمحادثة، فنجمعها هنا لشهر الميلاديّ الجاري. */
+function azureQuotaHtml(){
+  var now=new Date(), ym=now.getUTCFullYear()+"-"+String(now.getUTCMonth()+1).padStart(2,"0");
+  var sec=0, n=0, byKid={};
+  ALL.forEach(function(r){
+    var a = r.meta && r.meta.audioSec;
+    if(typeof a!=="number" || !a) return;
+    if(String(r.created_at).slice(0,7)!==ym) return;
+    sec+=a; n++; byKid[r.student]=(byKid[r.student]||0)+a;
+  });
+  if(!n) return "";
+  var LIMIT=5*3600, pctUsed=Math.min(100, Math.round(100*sec/LIMIT));
+  var col = pctUsed>=90?"var(--bad)":pctUsed>=60?"var(--warn)":"var(--good)";
+  var kids = Object.keys(byKid).sort(function(a,b){ return byKid[b]-byKid[a]; })
+    .map(function(k){ return esc(k)+" "+Math.round(byKid[k]/60)+"د"; }).join(" · ");
+  return '<div class="card"><h2>🎛️ حصّة أزور المجانية هذا الشهر</h2>'+
+    '<p class="note" style="margin-top:0">الطبقة المجانية F0: <b>٥ ساعات صوت شهريًّا</b> لمفتاحٍ واحدٍ يشترك فيه الأربعة. '+
+    'المقياس من ثواني الصوت التي تعدّها أزور نفسها، لا بالتقدير.</p>'+
+    '<div style="background:var(--bg);border-radius:99px;height:14px;overflow:hidden;border:1px solid var(--line)">'+
+      '<div style="width:'+pctUsed+'%;height:100%;background:'+col+'"></div></div>'+
+    '<p class="note"><b style="color:'+col+'">'+Math.round(sec/60)+' دقيقة</b> من ٣٠٠ ('+pctUsed+'%) · '+n+' تسجيلًا'+
+    (kids?'<br>'+kids:'')+'</p>'+
+    (pctUsed>=80?'<p class="note" style="color:var(--bad)"><b>قاربتم الحدّ.</b> أسهل حلّ: مفتاحٌ مجانيٌّ لكلّ ابن '+
+      '(azure-config.js فيه خانةٌ لكلّ واحدٍ منهم) فتصير ٢٠ ساعة بلا تكلفة.</p>':'')+
+  '</div>';
+}
+
 function render(){
   var d = build(current), names = Object.keys(d.sk);
   var out = document.getElementById("out");
@@ -545,6 +625,8 @@ function render(){
       vocabCardHtml(current)+
       writingCardHtml(current)+
       talkCardHtml(current)+
+      pronCardHtml(current)+
+      azureQuotaHtml()+
       stretchCard;
     return;
   }
@@ -579,6 +661,8 @@ function render(){
     repeatCardHtml(d)+
     writingCardHtml(current)+
     talkCardHtml(current)+
+    pronCardHtml(current)+
+    azureQuotaHtml()+
     stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+
       '<p class="note">اضغط الزر، ثم الصق النصّ في المحادثة لنناقش مستواه.</p>'+

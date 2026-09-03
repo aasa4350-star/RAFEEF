@@ -322,6 +322,26 @@ function saveScore(test, correct, total, extra){
   }catch(e){}
 }
 
+/* ===== حفظ تقييم النطق =====
+   قبل هذا كان «قيّم نطقي» يعرض الدرجة للطفل ثمّ تضيع: لا في التقرير ولا في
+   قاعدة البيانات. فلا الأب يتابع تطوّر نطقهم — وهو أهمّ ما في القسم — ولا
+   نعرف كم استهلكنا من ساعات أزور المجانية الخمس.
+   نحفظ: الدرجة والدقّة والطلاقة والاكتمال، وعدد الكلمات، وثواني الصوت
+   الفعليّة (لقياس الحصّة)، وسرعة القراءة كلمة/دقيقة. */
+function savePron(isAr, d){
+  try{
+    if(typeof d.pron !== "number" || isNaN(d.pron)) return;
+    var wpm = (d.audioSec && d.words) ? Math.round(d.words*60/d.audioSec) : null;
+    saveScore(isAr ? "نطق عربي 🗣️" : "نطق إنجليزي 🗣️", 1, 1, {
+      kindPron:true, pmode:d.mode, pron:d.pron,
+      acc:(typeof d.acc==="number"?d.acc:null), flu:(typeof d.flu==="number"?d.flu:null),
+      comp:(typeof d.comp==="number"?d.comp:null),
+      words:d.words||0, refWords:d.refWords||0,
+      audioSec:d.audioSec||0, wpm:wpm
+    });
+  }catch(e){}
+}
+
 /* نوع سؤال الاستيعاب — مستخرج من تصنيف كتاب موهبة نفسه، ليصير التقرير
    على مستوى المهارة: هل ضعفه في فهم المعنى أم في الاستنتاج أم في التقاط المعلومة. */
 function compSkill(qt){
@@ -398,6 +418,10 @@ function azureConfigured(){ return !!azureCreds(); }
 function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var SDK = window.SpeechSDK;
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
+  /* ثواني الصوت الفعليّة كما تعدّها أزور (result.duration بوحدة ١٠٠ نانوثانية).
+     نجمعها لسببين: قياس استهلاك الحصّة المجانية (٥ ساعات شهريًّا) بدقّة،
+     وحساب سرعة القراءة (كلمة/دقيقة) وهي مؤشّر طلاقةٍ حقيقيّ. */
+  var _audioSec = 0;
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
@@ -431,6 +455,13 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
     // نطق الكلمة لحدها عند الضغط عليها — عشان يتعلّم الكلمات الغلط
     statusEl.querySelectorAll(".rword").forEach(function(sp){ sp.addEventListener("click", function(){ var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
+    /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — كانت النتيجة
+       تُعرض للطفل ثمّ تضيع، فلا الأب يرى مستوى نطقهم ولا نعرف كم استهلكنا من
+       حصّة أزور المجانية. صار كلّ تقييمٍ صفًّا مثل بقية الأقسام. */
+    savePron(isAr, {
+      mode:"passage", pron:pron, acc:acc, flu:flu, comp:comp,
+      words:allWords.length, refWords:refCount, audioSec:Math.round(_audioSec)
+    });
     if(onDone){ try{ onDone(pron, acc); }catch(e){} }
     _closeRec();
   }
@@ -489,6 +520,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
           if(ws.length){
             allWords = allWords.concat(ws);
             gotWords = true;
+            if(typeof result.duration === "number") _audioSec += result.duration/1e7;
             if(typeof r.accuracyScore==="number" || typeof r.fluencyScore==="number"){
               segs.push({ acc:r.accuracyScore, flu:r.fluencyScore, prn:r.pronunciationScore, n:(ws.length||1) });
             }
@@ -562,6 +594,12 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
             return '<span style="color:'+wc+'">'+w.Word+'</span>';
           }).join(' ');
         }catch(e){}
+        savePron(isAr, {
+          mode:"word", pron:pron, acc:acc, flu:flu, comp:null,
+          words:((r.detailResult&&r.detailResult.Words)||[]).length,
+          refWords:String(refText||"").trim().split(/\s+/).filter(Boolean).length,
+          audioSec:(typeof result.duration==="number") ? Math.round(result.duration/1e7) : null
+        });
         var face = pron>=80?"🌟":pron>=60?"👍":"💪";
         statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu +
           (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+

@@ -280,11 +280,15 @@ async function loadReport(){
     var HIDE_SUBJ = { osama: ["لغتي"] };
     var hidden = HIDE_SUBJ[who] || [];
     var currMap={}, otherMap={};
-    var vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[];
+    /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
+       باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
+       «الاختبارات التجريبية» وهو ليس اختبارًا بدرجةٍ من كذا. */
+    var vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[];
     practice.forEach(function(p){
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
+      if(p.meta.kindPron===true){ pronAll.push(p); return; }
       var t=(p.meta.test||""); var subj=t.split(" ")[0];
       if(hidden.indexOf(subj)>-1) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
@@ -342,6 +346,22 @@ async function loadReport(){
           '</ul>';
       });
       html+='</div>';
+    }
+    // 🗣️ النطق (قيّم نطقي) — بلاغ الأب ٣ سبتمبر ٢٠٢٦: كان لا يُحفظ فلا يُتابَع
+    if(pronAll.length){
+      var prs=pronAll.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
+      var pv=function(p,k){ var v=p.meta[k]; return (typeof v==="number"&&!isNaN(v))?v:null; };
+      var pAvg=function(k){ var a=prs.map(function(p){return pv(p,k);}).filter(function(v){return v!=null;});
+        return a.length?Math.round(a.reduce(function(x,y){return x+y;},0)/a.length):null; };
+      var aP=pAvg("pron"), aA=pAvg("acc"), aF=pAvg("flu"), aW=pAvg("wpm");
+      html+='<div class="sec-title"><span class="dot"></span> 🗣️ النطق</div><div class="card"><ul class="weak">'+
+        '<li>🎙️ <b>'+prs.length+'</b> تقييم'+(aP!=null?' · متوسط النطق <b>'+aP+'%</b>':'')+
+          (aA!=null?' · دقّة '+aA+'%':'')+(aF!=null?' · طلاقة '+aF+'%':'')+
+          (aW!=null?' · <b>'+aW+'</b> كلمة/دقيقة':'')+'</li>'+
+        prs.slice(0,3).map(function(p){ var m=p.meta;
+          return '<li>'+(m.pmode==="passage"?"قطعة":"كلمة")+' · '+(m.test||"")+' — <b>'+pv(p,"pron")+'%</b>'+
+            (pv(p,"comp")!=null?' · اكتمال '+m.comp+'%':'')+' <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+        '</ul></div>';
     }
     // ✍️ التعبير الإنجليزي
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير» —
