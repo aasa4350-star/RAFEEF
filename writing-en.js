@@ -635,6 +635,9 @@ function render(el, ctx){
   var pIdx = dayIdx % prompts.length;
   var items = genN(GENS[level]||GENS[1], 6);
 
+  /* «أسئلة جديدة» يُعيد رسم التدريب، فنفكّ مستمعي النسخة السابقة لئلّا
+     تتراكم ويُحفظ صفٌّ عن قائمةٍ لم تعد معروضة. */
+  var _drillLeaveHooked = null;
   var html = ''+
     '<div class="wsec"><b>✍️ التعبير</b> — '+
       (level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'
@@ -673,6 +676,22 @@ function render(el, ctx){
     });
     box.innerHTML=h;
     var correct=0, answered={}, total=list.length, saved=false;
+    /* نفس علّة الفقرة: التدريب لا يُحفظ إلّا باكتمال الستّة كلّها. من أجاب
+       أربعة ثمّ خرج لا يُسجَّل له شيء. نحفظ الجزئيّ عند المغادرة بثلاثة فأكثر
+       (نفس عتبة reading.html) موسومًا partial. */
+    function saveDrillPartial(){
+      if(saved) return;
+      var n=Object.keys(answered).length;
+      if(n<3) return;
+      saved=true;
+      ctx.save({ kind:"writing-drill", correct:correct, total:n, level:level, partial:true });
+    }
+    if(_drillLeaveHooked) document.removeEventListener("visibilitychange", _drillLeaveHooked.v),
+                          window.removeEventListener("pagehide", _drillLeaveHooked.p);
+    var _v=function(){ if(document.hidden) saveDrillPartial(); }, _p=function(){ saveDrillPartial(); };
+    _drillLeaveHooked={v:_v,p:_p};
+    document.addEventListener("visibilitychange", _v);
+    window.addEventListener("pagehide", _p);
     var sc=el.querySelector("#wscore"); sc.textContent="0 / "+total;
     box.querySelectorAll(".wq").forEach(function(qEl){
       var i=+qEl.getAttribute("data-i"), ans=list[i][2];
@@ -711,6 +730,34 @@ function render(el, ctx){
   }
   ta.addEventListener("input", refresh); refresh();
 
+  /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «رفيف حاولت التعبير اليوم» — وقاعدة البيانات
+     خاليةٌ من أيّ صفّ تعبيرٍ لها اليوم. والسبب أنّ الفقرة لا تُحفظ إلّا إن
+     ضغطت «قيّم نصّي»: الطفلة تكتب فقرتها كاملة، ثمّ تخرج، فيبقى نصّها في
+     متصفّحها وحده ولا يصل الأب شيء. والكتابة هي الجهد، لا ضغطة الزرّ.
+     فصرنا نُقيّم ونحفظ تلقائيًّا عند المغادرة (التقييم محلّيٌّ بالكامل، لا
+     يحتاج شبكة)، ونضع auto:true تمييزًا لها. ونحرس من التكرار بمقارنة النصّ
+     الأخير المحفوظ، فلا يتكرّر صفٌّ حفظته بنفسها بالزرّ. */
+  var _lastSaved = "";
+  var MIN_AUTO_WORDS = 8;
+  function _norm(x){ return String(x||"").replace(/\s+/g," ").trim(); }
+  function saveParagraph(g, auto){
+    var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
+    _lastSaved = _norm(ta.value);
+    ctx.save({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
+               bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
+               auto:(auto===true)||undefined,
+               text:ta.value.slice(0,1500) });
+  }
+  function autoSaveParagraph(){
+    var t=_norm(ta.value);
+    if(!t || t===_lastSaved) return;
+    var g=gradeWriting(ta.value, level, cef, prompts[pIdx]);
+    if(!g || g.words < MIN_AUTO_WORDS) return;   // كلمةٌ أو كلمتان ليست محاولة
+    saveParagraph(g, true);
+  }
+  document.addEventListener("visibilitychange", function(){ if(document.hidden) autoSaveParagraph(); });
+  window.addEventListener("pagehide", autoSaveParagraph);
+
   el.querySelector("#wcheck").addEventListener("click", function(){
     var g=gradeWriting(ta.value, level, cef, prompts[pIdx]);
     var feed=el.querySelector("#wfeed");
@@ -747,10 +794,7 @@ function render(el, ctx){
     }
     feed.innerHTML=h;
 
-    var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
-    ctx.save({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
-               bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
-               text:ta.value.slice(0,1500) });
+    saveParagraph(g, false);
   });
 }
 

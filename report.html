@@ -427,7 +427,10 @@ function writingCardHtml(student){
         '<span>'+esc(m.topic||"—")+'</span>'+
         '<span class="pill '+cls(p)+'" dir="ltr">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+
       '</div>'+
-      '<p class="note" style="margin:4px 0 6px">'+saTime(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+
+      /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «رفيف حاولت التعبير اليوم» ولم يُحفظ شيء —
+         صارت الفقرة تُحفظ تلقائيًّا عند الخروج. ونميّزها هنا: الطفلة كتبت لكنّها
+         لم ترَ تقييمها، وهذه معلومةٌ تنفع الأب (يذكّرها تضغط «قيّم» لتستفيد). */
+      '<p class="note" style="margin:4px 0 6px">'+saTime(rowT(r))+' · '+(m.words||0)+' كلمة · '+(m.sents||0)+' جملة'+(m.auto?' · <b style="color:var(--warn)">حُفظت تلقائيًّا</b> — خرجت قبل أن تضغط «قيّم»، فما شافت تقييمها':'')+
         (m.cefr? ' · هدف '+esc(m.cefr) : '')+
         (typeof m.pass==="boolean" ? (m.pass?' · ✅ اجتاز':' · ⚠️ لم يجتز') : '')+'</p>'+
       bandsHtml+

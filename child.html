@@ -358,7 +358,7 @@ async function main(){
       }
       html+=`</ul>`+
         writingAll.slice(0,3).map(p=>{ const m=p.meta;
-          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(p.created_at)}</span><div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(p.created_at)}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
         `</div>`;
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
