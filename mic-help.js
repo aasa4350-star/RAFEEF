@@ -93,5 +93,28 @@
     setTimeout(function(){ waitSDK(statusEl, btn, onReady, onGiveUp, waited+500); }, 500);
   }
 
-  g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK };
+  /* ===== إذن المايكروفون قبل بدء التعرّف =====
+     بلاغ الأب (٤ سبتمبر ٢٠٢٦) بصورة شاشة حسن على آيفون: نافذة سفاري
+     «Would Like to Access the Microphone» ظاهرة، وخلفها زرّ التسجيل أحمر
+     أي إنّ أزور بدأت تستمع فعلًا. فمهلة الصمت الأوّليّ (٨ ثوانٍ) تمشي
+     والطفل مشغولٌ بقراءة النافذة والضغط على Allow — ثمّ يتكلّم وقد ضاع
+     نصف وقته أو كلّه، فلا يُلتقط شيء ولا يُحفظ شيء.
+     العلّة أنّ أحدًا لم يكن يطلب الإذن صراحةً: أزور تطلبه ضمنًا حين تبدأ،
+     فيتسابق الطلب والعدّاد. فصرنا نطلبه أوّلًا ونبدأ بعده — فيأخذ الطفل
+     نافذة الاستماع كاملةً. وإن رُفض الإذن ظهر السبب الحقيقيّ (diagnose)
+     بدل «ما سمعتك» الغامضة.
+     ونحرّر المسار فورًا: إمساكه يُبقي مؤشّر المايك مضاءً ويزاحم أزور. */
+  function ensure(statusEl, onReady, onDenied){
+    if(g.__micGranted){ onReady(); return; }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ onReady(); return; }
+    if(statusEl){ statusEl.style.color="var(--muted)";
+      statusEl.innerHTML="🎤 اضغط <b>Allow</b> للسماح بالمايكروفون، وبعدها أستمع لك."; }
+    navigator.mediaDevices.getUserMedia({ audio:true }).then(function(st){
+      try{ st.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+      g.__micGranted = true;
+      onReady();
+    }).catch(function(){ onDenied(); });
+  }
+
+  g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK, ensure:ensure };
 })(window);

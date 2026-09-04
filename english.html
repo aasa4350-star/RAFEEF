@@ -128,6 +128,11 @@ function azureSpeak(text){
 function _paRun(refText, statusEl, btn, tries){
   tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
+  /* نطلب إذن المايك أوّلًا ثمّ نبدأ التعرّف: على آيفون كانت نافذة «Allow»
+     تظهر بعد أن تبدأ أزور، فتمشي مهلة الصمت الأوّليّ والطفل يقرأ النافذة
+     فيضيع وقته — بلاغ ٤ سبتمبر ٢٠٢٦، وانظر MIC.ensure في mic-help.js. */
+  MIC.ensure(statusEl, function(){ _go(); }, function(){ MIC.fail(statusEl, btn, { tail:MIC_TAIL }); });
+  function _go(){
   try{
     cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
@@ -179,6 +184,7 @@ function _paRun(refText, statusEl, btn, tries){
     _end();
     if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
   }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); MIC.fail(statusEl, btn, { tail:MIC_TAIL }); _end(); });
+  }
 }
 var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
 function azureAssess(refText, statusEl, btn){

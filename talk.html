@@ -239,6 +239,12 @@ function listen(statusEl, btn, onDone, tries){
     return;
   }
   try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
+  /* نطلب الإذن أوّلًا ثمّ نبدأ التعرّف — وإلّا سبق عدّادُ أزور نافذةَ الإذن
+     على آيفون فضاع وقت الطفل وهو يقرأ «Allow». انظر MIC.ensure في mic-help.js */
+  MIC.ensure(statusEl, function(){ _startRec(); }, function(){
+    MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn });
+  });
+  function _startRec(){
   try{
     cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
@@ -313,6 +319,7 @@ function listen(statusEl, btn, onDone, tries){
     statusEl.textContent="";
     onDone(out);
   }, function(err){ if(fin)return; fin=true; clearTimeout(to); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} });
+  }
 }
 
 /* ===== مواضيع الحوار ===== */

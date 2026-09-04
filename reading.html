@@ -543,8 +543,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   }
   function startRec(retry){
     try{ if(window.__ac && window.__ac.state==="suspended") window.__ac.resume(); }catch(e){}
-    _showListening(retry);
-    _cycle(0);
+    /* الإذن قبل الدورة الأولى فقط — بعدها MIC.ensure ترجع فورًا (العلم محفوظ) */
+    MIC.ensure(statusEl, function(){ _showListening(retry); _cycle(0); },
+               function(){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
+                           micFail(statusEl, btn, onFail); _closeRec(); });
   }
   _to = setTimeout(finish, 150000); // أمان عام: يوقف تلقائيًا بعد دقيقتين ونصف (يشمل الإعادات)
   startRec("");
@@ -553,6 +555,11 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
   if(longText){ return _paRunLong(refText, isAr, statusEl, btn, onDone, onFail); }
   tries = tries || 0;
   var SDK = window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
+  /* نطلب إذن المايك أوّلًا ثمّ نبدأ التعرّف: على آيفون كانت نافذة «Allow»
+     تظهر بعد أن تبدأ أزور، فتمشي مهلة الصمت الأوّليّ والطفل يقرأ النافذة
+     فيضيع وقته — بلاغ ٤ سبتمبر ٢٠٢٦، وانظر MIC.ensure في mic-help.js. */
+  MIC.ensure(statusEl, function(){ _go(); }, function(){ micFail(statusEl, btn, onFail); });
+  function _go(){
   try{
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
@@ -610,6 +617,7 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
     _end();
     if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
   }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); micFail(statusEl, btn, onFail); _end(); });
+  }
 }
 /* تشخيص المايكروفون في mic-help.js — مشتركٌ مع quiz وenglish وtalk.
    وهنا نُذيّل رسائله بما يخصّ هذه الصفحة: أنّ أسئلة الفهم فُتحت. */
