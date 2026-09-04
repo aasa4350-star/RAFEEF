@@ -319,7 +319,17 @@ async function loadReport(){
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
       var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
-        (vLearned>0?'<li>📚 حفظ: <b><span dir="ltr">'+vLearned+' / '+vTotal+'</span> كلمة</b> ('+lpct+'%)</li>':'')+
+        (function(){
+          /* طلب الأب (٤ سبتمبر ٢٠٢٦): «أهمّ شي قياسٌ حقيقيّ متوافق مع أفضل المعايير
+   الدولية». فصار قسم الكلمات يفرّق بين ما رآه الطفل وما يعرفه فعلًا:
+   «متقنة» = استرجعها صحيحةً بعد فاصل ٨ أيام فأكثر (معيار الاسترجاع
+   المؤجَّل في بحوث المفردات). نعرض الرقمين هنا، والقديم يبقى «شافها». */
+          var vKnown=0,vLearn2=0,hasK=false;
+          vocabAll.forEach(function(p){ if(typeof p.meta.known==="number"){ hasK=true; if(p.meta.known>vKnown)vKnown=p.meta.known; }
+                                        if(typeof p.meta.learning==="number" && p.meta.learning>vLearn2)vLearn2=p.meta.learning; });
+          if(hasK) return '<li>🟢 <b>يعرفها فعلًا: <span dir="ltr">'+vKnown+' / '+vTotal+'</span></b> · 🟡 قيد التثبيت '+vLearn2+' · ⚪ شافها '+vLearned+'</li>';
+          return vLearned>0 ? '<li>📚 شاف: <b><span dir="ltr">'+vLearned+' / '+vTotal+'</span> كلمة</b> ('+lpct+'%) <span class="cnt">— قياسٌ قديم</span></li>' : '';
+        })()+
         dayList+
         '<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>'+allC+'/'+allW+' ('+apct+'%)</b> · '+vocabT.length+' جلسة</li>'+
         (untrustedN?'<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني أثناء الحل): <b>'+untrustedN+'</b></li>':'')+

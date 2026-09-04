@@ -1302,6 +1302,46 @@ if(!META[who] || !DATA[who]){
   /* عدد الكلمات الراسخة (وصلت الصندوق الأخير) */
   function srMastered(pool){ var s=getSR(); return pool.filter(function(w){ var st=s[w[0]]; return st && st.b>=SR_DAYS.length-1; }).length; }
 
+  /* ═══ متى نقول إنّ الطفل «يعرف» الكلمة؟ ══════════════════════════════
+     طلب الأب (٤ سبتمبر ٢٠٢٦): «أهمّ شي قياسٌ حقيقيّ متوافق مع أفضل
+     المعايير الدولية». وكان العدّاد يعدّ ما رآه الطفل لا ما يعرفه:
+     setLearned(startIdx+total) تُنفَّذ بمجرّد إنهاء جلسة التقديم، فكلمةٌ
+     رآها قبل دقيقتين تُحسب «محفوظة».
+
+     والمعيار المستقرّ في بحوث المفردات أنّ الكلمة تُعدّ معروفةً إذا
+     استُرجعت صحيحةً بعد فاصلٍ زمنيّ (delayed retrieval)، لا في جلسة
+     تقديمها — لأنّ الاسترجاع الفوريّ يقيس الذاكرة العاملة لا الحفظ.
+     وهذا بالضبط ما يقيسه صندوق التكرار المتباعد عندنا: الصندوق ٤ يعني
+     أنّها نجت من فاصلٍ ثمانية أيام، لا من دقيقتين.
+
+     فصارت ثلاث حالاتٍ تُعرض منفصلةً بدل رقمٍ واحد يخلطها:
+       مُقدَّمة  — رآها (ما كان يُسمّى «محفوظة»)
+       قيد التثبيت — استرجعها لكن لم تثبت بعد
+       متقنة    — استرجعها صحيحةً بعد فاصلٍ ٨ أيام فأكثر ومرّتين فأكثر
+     والرقم الثالث وحده هو ما يستحقّ أن يُقال عنه «يعرفها». */
+  var KNOWN_BOX = 4;      /* الصندوق ٤ في SR_DAYS = فاصل ٨ أيام */
+  var KNOWN_MIN_HITS = 2; /* واسترجاعان صحيحان على الأقلّ */
+  function srKnown(pool){
+    var s=getSR();
+    return pool.filter(function(w){ var st=s[w[0]];
+      return st && (st.b||0)>=KNOWN_BOX && (st.c||0)>=KNOWN_MIN_HITS; }).length;
+  }
+  function srLearning(pool){
+    var s=getSR();
+    return pool.filter(function(w){ var st=s[w[0]];
+      return st && (st.c||0)>0 && !((st.b||0)>=KNOWN_BOX && (st.c||0)>=KNOWN_MIN_HITS); }).length;
+  }
+  /* تقدير CEFR من حجم المفردات المتقنة — أرقامٌ تقريبية من بحوث حجم
+     المفردات (A1≈٥٠٠ · A2≈١٠٠٠ · B1≈٢٠٠٠ · B2≈٣٢٥٠). نقولها تقديرًا لا
+     شهادةً، وبنكنا ٩١٠ كلمة فسقفه عند حدود A2. */
+  function cefrOfVocab(n){
+    if(n>=2000) return "B1";
+    if(n>=1000) return "A2";
+    if(n>=500)  return "A1+";
+    if(n>=250)  return "A1";
+    return "ما دون A1";
+  }
+
   /* ===== حجم جلسة المراجعة =====
      حقيقة حسابية لا مفرّ منها: طول اللفّة = المحفوظ ÷ حجم الجلسة. فعند ٣٠٠
      كلمة و١٠ في الجلسة لا ترجع الكلمة إلا بعد ٣٠ يومًا مهما كان الترتيب ذكيًّا.
@@ -1498,10 +1538,27 @@ if(!META[who] || !DATA[who]){
       return h;
     }
     var btn = function(m,txt){ var on=(vocMode===m); return '<button data-mode="'+m+'" style="flex:1;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+txt+'</button>'; };
+    /* ثلاثة أرقامٍ منفصلة بدل رقمٍ واحد يخلط الرؤية بالمعرفة — انظر srKnown */
+    var seen = VOCAB300.slice(0, learned);
+    var nKnown = srKnown(seen), nLearning = srLearning(seen);
+    var kPct = goal ? Math.round(nKnown/goal*100) : 0;
     var html = '<div class="block-title"><span class="dot"></span> حفظ الكلمات ✍️</div>'+
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
-        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت <span dir="ltr">'+learned+' / '+goal+'</span></span></div>'+
-        '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem">'+
+          '<span>📈 تقدّمك</span><span>تعرفها فعلًا: <span dir="ltr" style="color:var(--good)">'+nKnown+' / '+goal+'</span></span></div>'+
+        '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden;display:flex">'+
+          '<div style="height:100%;width:'+kPct+'%;background:var(--good)"></div>'+
+          '<div style="height:100%;width:'+(goal?Math.round(nLearning/goal*100):0)+'%;background:var(--warn)"></div>'+
+          '<div style="height:100%;width:'+(goal?Math.max(0,pct-kPct-Math.round(nLearning/goal*100)):0)+'%;background:var(--accent);opacity:.35"></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:.82rem;font-weight:700">'+
+          '<span style="color:var(--good)">🟢 متقنة '+nKnown+'</span>'+
+          '<span style="color:var(--warn)">🟡 قيد التثبيت '+nLearning+'</span>'+
+          '<span style="color:var(--muted)">⚪ شفتها '+learned+'</span>'+
+        '</div>'+
+        '<div style="font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.6;font-weight:400">'+
+          '«متقنة» = جاوبتها صح بعد <b>٨ أيام أو أكثر</b> من آخر مرة، مرّتين فأكثر — وهذا معيار الحفظ الحقيقي، '+
+          'لأن تذكّرها بعد دقيقتين يقيس الانتباه لا الحفظ.</div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
       (learned>0 ? '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("fresh","🆕 راجع الجديد")+'</div>' : '')+
@@ -1582,7 +1639,10 @@ if(!META[who] || !DATA[who]){
          ووسمُ trusted باقٍ في الصفّ كما هو، فيرى الأب في التقرير أنّ الجلسة
          فيها خروج ويحكم بنفسه — إخبارُ الأب أنفعُ من معاقبة الابن. */
       if(isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
-      if(!saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
+      if(!saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL,
+          /* الأرقام الثلاثة للتقرير: ما رآه · ما هو قيد التثبيت · ما يعرفه فعلًا */
+          known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())),
+          dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="⚠️ عدّادك تقدّم عادي، بس انتبه: خرجت من الصفحة "+aw.exits+" مرة أثناء الحل — لا تفتح تطبيقًا ثانيًا وأنت تذاكر.";
       } else if(isNew && advanced){
@@ -1596,7 +1656,9 @@ if(!META[who] || !DATA[who]){
       if(saved || isNew) return;
       var tn=Object.keys(tried).length; if(tn<3) return;
       saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
-      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
+      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL,
+        known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())),
+        dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
     }
     renderVocab._save = saveIfPartial; sec._leave = saveIfPartial;
     sec.querySelectorAll(".q").forEach(function(qEl){

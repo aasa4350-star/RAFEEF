@@ -284,7 +284,17 @@ async function main(){
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
       const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
-        (vLearned>0?`<li>📚 حفظ: <b><span dir="ltr">${vLearned} / ${vTotal}</span> كلمة</b> (${lpct}%)</li>`:``)+
+        (function(){
+          /* طلب الأب (٤ سبتمبر ٢٠٢٦): قياسٌ حقيقيّ بالمعايير الدولية.
+             «متقنة» = استرجعها صحيحةً بعد فاصل ٨ أيام فأكثر (الاسترجاع
+             المؤجَّل)، لا مجرّد أنّه رآها. انظر srKnown في reading.html. */
+          let vKnown=0, vLearn2=0, hasK=false;
+          vocabAll.forEach(p=>{ if(typeof p.meta.known==="number"){ hasK=true; if(p.meta.known>vKnown) vKnown=p.meta.known; }
+                                if(typeof p.meta.learning==="number" && p.meta.learning>vLearn2) vLearn2=p.meta.learning; });
+          if(hasK) return `<li>🟢 <b>يعرفها فعلًا: <span dir="ltr">${vKnown} / ${vTotal}</span></b> · 🟡 قيد التثبيت ${vLearn2} · ⚪ شافها ${vLearned}
+            <div style="font-size:.78rem;color:var(--muted);font-weight:400;margin-top:3px">«يعرفها» = جاوبها صح بعد ٨ أيام أو أكثر — معيار الاسترجاع المؤجَّل</div></li>`;
+          return vLearned>0 ? `<li>📚 شاف: <b><span dir="ltr">${vLearned} / ${vTotal}</span> كلمة</b> (${lpct}%) <span class="cnt">— قياسٌ قديم يعدّ ما رآه</span></li>` : ``;
+        })()+
         dayList+
         `<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
         (rW?`<li>🔁 راجع محفوظ: <b><span dir="ltr">${rC}/${rW}</span> كلمة</b> (${rpct}%)</li>`:``)+
