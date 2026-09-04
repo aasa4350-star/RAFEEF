@@ -133,7 +133,9 @@ function saveTalkSession(useBeacon){
   var avgCorrect = cf.length ? Math.round(100*cf.filter(Boolean).length/cf.length) : null;
   var secs = state.sessionStart ? Math.round((Date.now()-state.sessionStart)/1000) : null;
   var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
-    meta:{ kind:"talk", sid:state.sid, topic:TOPICS[state.topic].t, turns:delta, avgPron:avgPron, avgCorrect:avgCorrect, secs:secs, audioSec:(state.audioSec||0) } };
+    meta:{ kind:"talk", sid:state.sid, topic:TOPICS[state.topic].t, turns:delta, avgPron:avgPron, avgCorrect:avgCorrect, secs:secs, audioSec:(state.audioSec||0),
+      avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
+      minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns;   // نُثبّت العلامة فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
   try{
     if(useBeacon && navigator.sendBeacon){
@@ -177,11 +179,15 @@ function tutorSpeak(text){
 }
 
 /* ===== يسمع الطفل بحرية: تفريغ + تقييم نطق غير مقيّد ===== */
-/* حدّا الثقة في تفريغ أزور (NBest[0].Confidence):
-   دون CONF_MIN لا نعرض التفريغ إطلاقًا ونُعيد السماع — أن نُلزم الطفل بكلامٍ
-   لم يقله أسوأ من أن نطلب منه الإعادة. وبين الحدّين نعرض الكلام ليكمل الحوار
-   لكن بلا درجة نطقٍ ولا حكمٍ على صحّة الجملة، لأنّهما محسوبان على التفريغ. */
-var CONF_MIN = 0.45, CONF_SURE = 0.70;
+/* حدّ الثقة في تفريغ أزور (NBest[0].Confidence): دونه نعرض كلام الطفل ونحفظه
+   ونكمل الحوار، لكن بلا درجة نطقٍ ولا حكمٍ على صحّة الجملة — فكلاهما محسوبٌ
+   على التفريغ لا على الطفل. ولا يوجد حدٌّ نرمي عنده الدور: ذلك جرّبناه في ٣
+   سبتمبر فأسكت الأولاد (انظر الشرح عند موضع الاستعمال). */
+var CONF_SURE = 0.40;
+/* الحدّ منخفضٌ عمدًا: حجب الدرجة عن طفلٍ نطق صحيحًا خسارةٌ أيضًا (الدرجة هي
+   ما يشدّه للقسم)، والتفريغ المُشوَّش يمسكه garbled من talk-ai مستقلًّا عن
+   الثقة. ونحن نخزّن avgConf/minConf مع كلّ جلسة، فبعد أيّامٍ نضبط هذا الرقم
+   على توزيعٍ حقيقيٍّ من كلام أولادنا بدل التخمين. */
 var EN_NAME={saud:"Saud",osama:"Osama",rafeef:"Rafeef",hasan:"Hassan"};
 var PHRASES=["My name is","I am","I'm","I live in","I like","I don't like","I want to be",
  "I go to school","My favourite","My favorite","I have","I don't have","I play",
@@ -290,11 +296,18 @@ function listen(statusEl, btn, onDone, tries){
     try{rec.close();}catch(e){}
     /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
     if(!out.text){ notHeard(); return; }
-    /* ثقةٌ متدنّية = تفريغٌ لا يُعتمد عليه. لا نعرضه ولا نُقيّم عليه؛ نعامله
-       كأنّنا لم نسمع، فيُعاد تلقائيًّا. أفضل من أن نُلزم الطفل بكلامٍ لم يقله. */
-    if(out.conf!=null && out.conf < CONF_MIN){ notHeard(); return; }
-    /* ثقةٌ متوسّطة: نعرض التفريغ لأنّ الحوار يجب أن يستمرّ، لكن بلا درجة نطقٍ
-       ولا حكمٍ على صحّة الجملة — كلاهما مبنيٌّ على تفريغٍ مشكوكٍ فيه. */
+    /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حتى المحادثة يتكلّم ولا ينحفظ ثمّ يقول سجّل
+       مرّة أخرى» — وقاعدة البيانات خالية: صفر جلسة محادثة اليوم.
+       والسبب أنا: أضفتُ أمس بوّابةً ترمي التفريغ كلّه إن نزلت ثقة أزور عن
+       ٠٫٤٥ فتطلب الإعادة. وثقة أزور تنخفض طبيعيًّا في كلام الأطفال العرب
+       بالإنجليزية، فصار الطفل يتكلّم فلا يظهر شيء ولا يُحفظ شيء ويُطلب منه
+       أن يعيد بلا نهاية — وهي عين الشكوى التي بدأ منها هذا كلّه، ضاعفتُها
+       من حيث أردتُ علاجها.
+       والصواب أنّ الكفّتين غير متساويتين: أن نعرض تفريغًا فيه خطأ أهون
+       بكثيرٍ من أن نبتلع كلام الطفل ونطالبه بالإعادة. فلا نرمي دورًا أبدًا:
+       يُعرض ويُحفظ ويستمرّ الحوار. والثقة المتدنّية تمنع الدرجة والحكم
+       النحويّ فقط — لا الكلام نفسه. والتفريغ المُشوَّش يمسكه garbled من
+       talk-ai (مُختبَرٌ حيًّا) لا حجب الدور. */
     if(out.conf!=null && out.conf < CONF_SURE){ out.shaky=true; out.pron=null; out.wordsHtml=""; }
     resetBtn();
     statusEl.textContent="";
@@ -336,7 +349,7 @@ var GENERIC=["Nice!","That's interesting!","Great job!","Well said!","Cool!","I 
 function reactTo(text){ var t=(" "+text+" ").toLowerCase(); for(var i=0;i<REACT.length;i++){ if(REACT[i][0].test(t)) return REACT[i][1]; } return GENERIC[Math.floor(Math.random()*GENERIC.length)]; }
 
 var app=document.getElementById("app");
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0};
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[]};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -354,7 +367,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[];
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -395,6 +408,9 @@ function addMe(out){
      مُشوَّش سحبناها، فلا تُحتسب درجةٌ على كلامٍ ليس كلام الطفل. */
   if(out.pron!=null){ state.turnPron[tid]=state.pronScores.length; state.pronScores.push(out.pron); }
   state.audioSec = (state.audioSec||0) + (out.audioSec||0);
+  /* نجمع ثقة أزور الفعليّة لنضبط الحدّ لاحقًا على أرقامٍ حقيقية من كلام
+     أولادنا أنفسهم، لا على تخمينٍ مثل الذي أوقعنا في بلاغ ٤ سبتمبر. */
+  if(typeof out.conf==="number") state.confs.push(out.conf);
   if(out.shaky) state.shakyTurns[tid]=1;   // لا حكمَ على صحّة جملةٍ لم نتأكّد أنّنا سمعناها
   var body = out.wordsHtml ? ('<div class="en">'+out.wordsHtml+'</div>') : ('<div class="en">'+esc(out.text)+'</div>');
   /* التفريغ المشكوك فيه يُقال للطفل صراحةً إنّه «ما سمعه الجهاز» لا حكمٌ عليه.
