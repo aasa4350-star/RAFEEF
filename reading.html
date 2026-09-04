@@ -888,7 +888,7 @@ if(!META[who] || !DATA[who]){
     html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
-    var done={}, tried={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
+    var done={}, tried={}, revealed={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
     function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
@@ -903,7 +903,13 @@ if(!META[who] || !DATA[who]){
          speak في مسار الفشل)، فلا نخسر شيئًا ونكسب صوتًا بشريًّا وسطًا. */
       qEl.querySelector("[data-say]").addEventListener("click",function(){ sayDict(text,ar,"-10%"); });
       qEl.querySelector("[data-slow]").addEventListener("click",function(){ sayDict(text,ar,"-35%"); });
-      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'; });
+      /* نفس علّة قسم الكلمات (بلاغ ٤ سبتمبر ٢٠٢٦) — وهنا كانت أوسع: انظر
+         معالج «تحقّق» أدناه. والكشف قبل المحاولة لا يُحسب صحيحًا. */
+      qEl.querySelector("[data-show]").addEventListener("click",function(){
+        if(!tried[i]) revealed[i]=1;
+        fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'+
+          (revealed[i] ? '<div style="font-weight:600;font-size:.85rem;opacity:.85;margin-top:4px">👀 شفت الإجابة — عادي، بس ما نحسبها صح.</div>' : '');
+      });
       wireMic(qEl, text, ar);
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
       qEl.querySelector(".pchk").addEventListener("click",function(){
@@ -915,9 +921,26 @@ if(!META[who] || !DATA[who]){
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(text, ar, pfb2, azb); });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var ok = norm(inp.value,ar)===norm(text,ar);
-        if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; if(!done[i]){done[i]=1;correct++;} }
-        else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
-        tried[i]=1;
+        /* ═══ الدرجة = أوّل محاولة، والكشف لا يُحسب ══════════════════
+           بلاغ ٤ سبتمبر ٢٠٢٦ (تقرير حسن): إملاؤه ٩٥٪ وهو أعلى أرقامه.
+           والسبب أنّ هذا المعالج كان أكرم من أن يقيس: correct++ يقع في
+           أيّ محاولةٍ صحيحة، فيغلط الطفل، فتُعرض له «الصحيح: ...» في نفس
+           السطر، فينسخها ويضغط ثانيةً فتُحسب له. فالرقم كان يقيس النسخ.
+           وقسم الكلمات كان قد عولج بقاعدة «أوّل محاولة» في ٣١ أغسطس،
+           ونُسي الإملاء — فنُطبّق القاعدة نفسها هنا. */
+        var first = !tried[i];
+        if(first){
+          var scored = ok && !revealed[i];
+          tried[i]=1;
+          if(scored){ done[i]=1; correct++; }
+          if(ok && revealed[i]) { fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، جرّب اللي بعدها بنفسك.'; }
+          else if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; }
+          else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
+        } else if(ok){
+          fb.className="fb ok"; fb.textContent="✅ صحيح — بس أوّل محاولة هي الأساس في الدرجة.";
+        } else {
+          fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>';
+        }
         scoreEl.textContent=correct+" / "+total;
         maybeSave();
       });
@@ -1534,7 +1557,7 @@ if(!META[who] || !DATA[who]){
       '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button></div>';
     sec.innerHTML = html;
 
-    var done={}, tried={}, correct=0, saved=false, advanced=false, total=V.length;
+    var done={}, tried={}, revealed={}, correct=0, saved=false, advanced=false, total=V.length;
     var t0=Date.now(); var aw0=awaySnap(); // بداية توقيت الجلسة + رصد الخروج من الصفحة
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
     // تحذير مباشر أول ما يخرج ويرجع للصفحة
@@ -1579,7 +1602,19 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
-      qEl.querySelector("[data-show]").addEventListener("click",function(){ fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>'; });
+      /* ═══ كشفُ الإجابة قبل المحاولة لا يُحسب صحيحًا ═══════════════
+         بلاغ ٤ سبتمبر ٢٠٢٦ (تقرير حسن): دقّته ٩٩٪ حتى في الكلمات الجديدة
+         التي يراها لأوّل مرّة — وهذا مستحيل. والسبب أنّ «أظهر» كان يعرض
+         الكلمة ولا يُسجَّل شيئًا، فيقرؤها الطفل ثمّ يكتبها ويضغط «تحقّق»
+         فتُحسب «صحيحة من أوّل محاولة». فصار رقم «المحفوظ» يقيس النسخ لا
+         الحفظ — والأب يبني عليه قراراته.
+         ولا نمنع «أظهر»: أن يرى الطفل الكلمة التي لا يعرفها تعلُّمٌ نافع.
+         بل لا نعدّها معرفةً: تُسجَّل كأنّه لم يعرفها، فترجع إليه قريبًا. */
+      qEl.querySelector("[data-show]").addEventListener("click",function(){
+        if(!tried[i]) revealed[i]=1;
+        fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>'+
+          (revealed[i] ? '<div style="font-weight:600;font-size:.85rem;opacity:.85;margin-top:4px">👀 شفت الإجابة — عادي، بس ما نحسبها صح، وبترجع لك قريب عشان ترسخ.</div>' : '');
+      });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var enOk = norm(ein.value,false)===norm(word,false);
         /* ═══ الدرجة تعكس أوّل محاولة، لا آخرها ═══════════════════════
@@ -1597,10 +1632,13 @@ if(!META[who] || !DATA[who]){
            للتدريب — بس ما تُغيّر الدرجة ولا صندوق المراجعة. */
         var first = !tried[i];
         if(first){
-          tried[i]=1; markWeak(word, !enOk); srMark(word, enOk);
-          if(enOk){ done[i]=1; correct++; }
+          /* من كشف الإجابة قبل أن يحاول لا تُحسب له، ولو كتبها صحيحة */
+          var scored = enOk && !revealed[i];
+          tried[i]=1; markWeak(word, !scored); srMark(word, scored);
+          if(scored){ done[i]=1; correct++; }
           var nx=srNextTxt(word);
-          if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>'; }
+          if(enOk && revealed[i]){ fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، بترجع لك قريب وتعرفها بنفسك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
+          else if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>'; }
           else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best);
         } else if(enOk){
