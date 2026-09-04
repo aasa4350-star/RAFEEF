@@ -528,7 +528,20 @@ if(!NAMES[who]){
   function render(id){
     var c = CFG[id], sec = document.getElementById(id);
     var items = genN(c.gens, c.n);
-    var html = '<div class="intro">'+c.intro+'</div>';
+    var html = '';
+    /* 📚 اتعلّم أوّلًا: رابط شرح الدرس قبل الأسئلة.
+       طلب الأب (٤ سبتمبر ٢٠٢٦): «حط روابط يوتيوب على كل درس» في رياضيات
+       المدرسة. وكانت math4 وmath8 تعرضه أصلًا، وmath5 وmath9 لا — مع أنّ
+       نصّ البحث لكلّ درس موجودٌ عندهما في REMTOPICS[].yt ولم يكن يُستعمل
+       إلّا في قسم «علاجي». فنستعمل النصّ نفسه هنا بلا تكرار.
+       ورابط بحثٍ لا معرّف فيديو: الفيديو يُحذف أو يصير خاصًّا فينكسر الزرّ
+       صامتًا، والبحث لا ينكسر. */
+    var topic=null; for(var ti=0;ti<REMTOPICS.length;ti++){ if(REMTOPICS[ti].id===id){ topic=REMTOPICS[ti]; break; } }
+    if(topic){
+      html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الدرس من قناة عين، ثم ابدأ الحل تحت.'+
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الدرس</a></div></div>';
+    }
+    html += '<div class="intro">'+c.intro+'</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
       q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
@@ -537,6 +550,7 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
+    var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
     var answered={}, correct=0, total=items.length, saved=false;
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
@@ -651,7 +665,9 @@ if(!NAMES[who]){
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
 function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
-document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+/* فتحُ شرح الدرس ليس خروجًا: من ضغط «شاهد شرح الدرس» فقد ذهب للتعلّم
+   لا للتهرّب، فلا يُحسب عليه — وإلّا خرجه الحارس بعد فيديوين. */
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
 }
 </script>
 </body>

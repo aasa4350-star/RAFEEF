@@ -16,6 +16,7 @@ const data    = require('./data');
 const audio   = require('./audio');
 const think   = require('./think');
 const kangaroo= require('./kangaroo');
+const eduvid  = require('./eduvid');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -65,7 +66,16 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   });
   if (!kg.issues.length) console.log('  ✅ لا ملاحظات');
 
-  head('٦ · طبقة البيانات');
+  head('٦ · روابط شرح الدروس (رياضيات المدرسة)');
+  const ev = eduvid();
+  console.log('دروس: ' + ev.lessons + ' · فيها رابط شرح: ' + ev.linked);
+  ev.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!ev.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٧ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {
