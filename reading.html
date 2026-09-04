@@ -368,17 +368,35 @@ function _micActive(){
 document.addEventListener("focusin", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
 document.addEventListener("focusout", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
 function _awayOut(){ if(_micActive()){ window.__micGrace=Date.now()+9000; return; } if(AWAY.hiddenAt==null) AWAY.hiddenAt=Date.now(); }
-function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=2000) return; /* تجاهل الغياب القصير (ثانيتين أو أقل) */ if(_micActive()) return; /* رجع أثناء/بعد استخدام المايك مباشرة — لا يُحسب */ AWAY.exits++; if(AWAY.exits>=2){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
+/* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حسن على طول يطلّعني من الصفحة وأنا ما طلعت
+   أصلًا» في حفظ الكلمات. ثلاثة أسباب اجتمعت، كلّها إنذاراتٌ كاذبة:
+
+   ١) كنّا نعدّ blur/focus على النافذة خروجًا. وهما لا يعنيان مغادرة الصفحة:
+      يُطلقان عند لمس شريط العنوان، وظهور لوحة المفاتيح، وتشغيل الصوت،
+      وأيّ نافذة نظامٍ — ومنها نافذة إذن المايكروفون. وقسم الكلمات فيه
+      «🎤 انطق» و«🔊 اسمعها»، فالطفل يضغطهما فيُحسب عليه خروج!
+      والإشارة الصحيحة الوحيدة هي visibilitychange: تُطلَق فعلًا حين ينتقل
+      إلى تطبيقٍ آخر — وهو ما نريد منعه — ولا تُطلَق لنافذةٍ فوق الصفحة.
+
+   ٢) عتبة تجاهل الغياب ثانيتان فقط. إشعارٌ عابر أو مكالمةٌ واردة أو نظرةٌ
+      إلى الساعة تتجاوزها بسهولة، فتُحتسب «خروجًا» على طفلٍ لم يخرج.
+
+   ٣) والخروجان يقذفانه من الجلسة بشاشةٍ سوداء. وقذفُ طفلٍ مجتهدٍ بلا ذنب
+      أسوأ بكثيرٍ من احتساب جلسةٍ لطفلٍ غشّ: الأولى تُوقفه عن العمل كلّه،
+      والثانية يمسكها وسم trusted في التقرير على أيّة حال. */
+var AWAY_IGNORE_MS = 5000, AWAY_EJECT = 3;
+function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=AWAY_IGNORE_MS) return; /* غيابٌ قصير: إشعارٌ أو نظرةٌ عابرة، لا خروج */ if(_micActive()) return; /* رجع أثناء/بعد استخدام المايك مباشرة — لا يُحسب */ AWAY.exits++; if(AWAY.exits>=AWAY_EJECT){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
 function ejectSession(){
   if(document.getElementById("__eject")) return;
   var ov=document.createElement("div");
   ov.id="__eject";
   ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");
-  ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. عشان تكون النتيجة عادلة، لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';
+  ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>ثلاث مرات</b>. عشان تكون النتيجة عادلة، لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';
   (document.body||document.documentElement).appendChild(ov);
 }
 document.addEventListener("visibilitychange", function(){ if(document.hidden) _awayOut(); else _awayIn(); });
-window.addEventListener("blur", _awayOut); window.addEventListener("focus", _awayIn);
+/* لا نستمع لـ blur/focus — انظر الشرح أعلاه: تُطلقهما نوافذ النظام والصوت
+   ولوحة المفاتيح، فتصير إنذاراتٍ كاذبة على طفلٍ جالسٍ في مكانه. */
 function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
 var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';

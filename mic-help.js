@@ -109,11 +109,16 @@
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ onReady(); return; }
     if(statusEl){ statusEl.style.color="var(--muted)";
       statusEl.innerHTML="🎤 اضغط <b>Allow</b> للسماح بالمايكروفون، وبعدها أستمع لك."; }
+    /* نافذة الإذن نافذةُ نظامٍ فوق الصفحة، وصفحات الاختبار تعدّ الغياب خروجًا.
+       فنُمدّد مهلة السماح قبل الطلب وبعده لئلّا يُحسب على الطفل خروجٌ لم
+       يفعله لمجرّد أنّه سمح للمايكروفون — بلاغ ٤ سبتمبر ٢٠٢٦. */
+    g.__micGrace = Date.now() + 30000;
     navigator.mediaDevices.getUserMedia({ audio:true }).then(function(st){
       try{ st.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
       g.__micGranted = true;
+      g.__micGrace = Date.now() + 15000;
       onReady();
-    }).catch(function(){ onDenied(); });
+    }).catch(function(){ g.__micGrace = Date.now() + 15000; onDenied(); });
   }
 
   g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK, ensure:ensure };
