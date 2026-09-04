@@ -384,22 +384,25 @@ function _awayOut(){ if(_micActive()){ window.__micGrace=Date.now()+9000; return
    ٣) والخروجان يقذفانه من الجلسة بشاشةٍ سوداء. وقذفُ طفلٍ مجتهدٍ بلا ذنب
       أسوأ بكثيرٍ من احتساب جلسةٍ لطفلٍ غشّ: الأولى تُوقفه عن العمل كلّه،
       والثانية يمسكها وسم trusted في التقرير على أيّة حال. */
-var AWAY_IGNORE_MS = 5000, AWAY_EJECT = 3;
-function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=AWAY_IGNORE_MS) return; /* غيابٌ قصير: إشعارٌ أو نظرةٌ عابرة، لا خروج */ if(_micActive()) return; /* رجع أثناء/بعد استخدام المايك مباشرة — لا يُحسب */ AWAY.exits++; if(AWAY.exits>=AWAY_EJECT){ ejectSession(); } else if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
-function ejectSession(){
-  if(document.getElementById("__eject")) return;
-  var ov=document.createElement("div");
-  ov.id="__eject";
-  ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");
-  ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>ثلاث مرات</b>. عشان تكون النتيجة عادلة، لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';
-  (document.body||document.documentElement).appendChild(ov);
-}
+var AWAY_IGNORE_MS = 5000;   /* لا AWAY_EJECT هنا: هذه الصفحة لا تقذف أحدًا */
+/* بلاغ الأب (٤ سبتمبر ٢٠٢٦، بعد إصلاحٍ أوّل لم يكفِ): «حسن نفسه ما ضبط».
+   فأوقفتُ المطاردة وأزلتُ السبب من جذره: هذه الصفحة لا تقذف أحدًا بعد اليوم.
+
+   والسبب أنّ القذف هنا كان خطأً في أصله لا في عتبته: صفحة القراءة تمرينُ
+   حفظٍ ومراجعة، لا اختبارًا مصيريًّا. والقذف يشتري «عدالة» لا قيمة لها في
+   تمرينٍ حرّ، ويدفع ثمنها طفلٌ مجتهدٌ يُطرد من عمله بشاشةٍ سوداء. وأيًّا كان
+   الحدث الذي يُطلقه — قفلُ الشاشة، مكالمةٌ واردة، إشعار، نافذةُ نظام، أو ما
+   لم أهتدِ إليه بعدُ في آيفون حسن — فالنتيجة واحدة: يتوقّف عن الحفظ.
+   ويبقى العدّ ووسمُ trusted كما هما، فالأب يرى في التقرير أنّ الجلسة فيها
+   خروج، وهذا يكفي للإنصاف. والقذف باقٍ في quiz.html وحدها — فهي الاختبار. */
+function _awayIn(){ if(AWAY.hiddenAt!=null){ var dur=Date.now()-AWAY.hiddenAt; AWAY.total += dur; AWAY.hiddenAt=null; if(dur<=AWAY_IGNORE_MS) return; /* غيابٌ قصير: إشعارٌ أو نظرةٌ عابرة، لا خروج */ if(_micActive()) return; /* رجع أثناء/بعد استخدام المايك مباشرة — لا يُحسب */ AWAY.exits++; if(AWAY.onReturn){ try{ AWAY.onReturn(); }catch(e){} } } }
+/* ejectSession حُذفت من هذه الصفحة عمدًا — انظر الشرح أعلاه. */
 document.addEventListener("visibilitychange", function(){ if(document.hidden) _awayOut(); else _awayIn(); });
 /* لا نستمع لـ blur/focus — انظر الشرح أعلاه: تُطلقهما نوافذ النظام والصوت
    ولوحة المفاتيح، فتصير إنذاراتٍ كاذبة على طفلٍ جالسٍ في مكانه. */
 function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
-var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
+var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ انتبه: خرجت من الصفحة أثناء الحل، فهذه الجلسة قد لا تُحتسب. أكمل عادي — بس لا تفتح تطبيقًا ثانيًا وأنت تحل.</div>';
 function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
 // لو خرج من الصفحة أثناء أي قسم، نحفظ اللي سوّاه لين الآن (عشان لا يضيع تعبه)
 // لا نحفظ جزئيًا عند اختفاء الصفحة (فتح تطبيق/فيديو ثم الرجوع)، وإلا قُفل الحفظ على
@@ -1506,7 +1509,7 @@ if(!META[who] || !DATA[who]){
                             (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
                             ' اكتب الإنجليزي ثم «تحقّق».</p>';
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
-      '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ خرجت من الصفحة! هذه الجلسة صارت <u>غير محتسبة</u> — لا تفتح الواتساب أو أي تطبيق أثناء الاختبار.</div>';
+      '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ انتبه: خرجت من الصفحة أثناء الحل، فهذه الجلسة قد لا تُحتسب. أكمل عادي — بس لا تفتح تطبيقًا ثانيًا وأنت تحل.</div>';
     var dayBase = getDay().count;
     V.forEach(function(item,i){
       var arWord = item[1][0];
@@ -1543,15 +1546,22 @@ if(!META[who] || !DATA[who]){
          إشعارًا عابرًا. فصارت القاعدة كقاعدة صفحات الرياضيات: الأولى إنذار،
          والثانية تُلغي الجلسة. */
       var aw=awaySince(aw0); var trusted=(aw.exits<=1);
-      /* ⚠️ الترتيب هنا مقصود: نُقدّم العدّاد أوّلًا (إن كانت الجلسة موثوقة) ثم
-         نحفظ الرقم الحقيقيّ. كان الحفظ يسبق فحص الثقة فيُسجَّل في قاعدة
-         البيانات رقمٌ متقدّم حتى لو لم يُحتسب محلّيًّا، ثم يسحبه
-         syncLearnedFromDB (يأخذ الأعلى) متجاوزًا شرط الثقة — فتظهر للطفل
-         كلماتٌ «محفوظة» لم يدرسها قطّ، وهو ما اشتكت منه رفيف وحسن. */
-      if(trusted && isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
+      /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حسن عنده مشكلة في حفظ الكلمات» — وله
+         نصفان: كان يُقذف من الصفحة (عولج فوق)، وكان عدّاد المحفوظ لا يتقدّم
+         فيرى الكلمات نفسها في اليوم التالي.
+         وسبب النصف الثاني أنّنا كنّا نمنع تقدّم العدّاد عند «الخروج». لكنّ
+         حفظ الكلمات مذاكرةٌ لا امتحان، والوقفات فيه طويلة (يفكّر في الكلمة،
+         يكتبها، يعيد) — فيقفل الآيفون شاشته تلقائيًّا، وقفلُ الشاشة يُبلّغ
+         الصفحةَ بالاختفاء تمامًا كفتح تطبيقٍ آخر، ولا سبيل للتمييز بينهما.
+         فكنّا نعاقبه على أنّه فكّر طويلًا.
+         والقرار: العدّاد يتقدّم ما دام أجاب عن الكلمات — وهو عن التغطية لا
+         عن الدرجة، والغشُّ فيه يضرّ صاحبه (يقفز إلى كلماتٍ أصعب لا يعرفها).
+         ووسمُ trusted باقٍ في الصفّ كما هو، فيرى الأب في التقرير أنّ الجلسة
+         فيها خروج ويحكم بنفسه — إخبارُ الأب أنفعُ من معاقبة الابن. */
+      if(isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
       if(!saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
       if(!trusted){
-        doneMsg.className="fb no"; doneMsg.innerHTML="🚫 هذه الجلسة <b>غير محتسبة</b> — خرجت من الصفحة "+aw.exits+" مرة أثناء الحل. حاول من جديد بدون ما تفتح أي تطبيق ثاني.";
+        doneMsg.className="fb no"; doneMsg.innerHTML="⚠️ عدّادك تقدّم عادي، بس انتبه: خرجت من الصفحة "+aw.exits+" مرة أثناء الحل — لا تفتح تطبيقًا ثانيًا وأنت تذاكر.";
       } else if(isNew && advanced){
         doneMsg.className="fb ok"; doneMsg.innerHTML="✅ خلّصت اليوم! حفظت الآن <span dir=\"ltr\">"+getLearned()+" / "+vocGoal(getLearned())+"</span>. بكرة اضغط «تعلّم ١٠ جديدة» للي بعدها، ولا تنسى «راجع المحفوظ».";
       } else {
