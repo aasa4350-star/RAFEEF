@@ -217,6 +217,57 @@ var MIC_TAIL ='<div style="font-weight:400;font-size:.85rem;margin-top:6px">وت
       ويقول «ما سمعتك» بينما الصوت التُقط فعلًا وهو في طريقه. صار صمت
       البدء ٨ ثوانٍ (خبرٌ أسرع للطفل)، والفصل ٣ ثوانٍ (الأطفال يتوقّفون
       وسط الجملة الإنجليزية)، ومهلتنا ٢٢ ثانية فلا تسابق أحدًا. */
+/* ═══ مُتعرّفٌ واحد للمحادثة كلّها ═══
+   بلاغ الأب (٥ سبتمبر ٢٠٢٦) بصورتين: أسامة تعمل معه المحادثة، وسعود
+   «ما ضبط معه». والبيانات فصلت المسألة: خمس عشرة محاولةً مرتّبةً زمنيًّا
+   بين ١٣:٥٤ و١٣:٥٩ على جهازَي الولدين (Safari 18.7)، أوّلها ينجح ثمّ
+   سلسلةُ انقطاعاتٍ لا تُجيب فيها أزور إطلاقًا حتى تنقضي مهلة الأمان
+   (٢٢ ثانية)، ثمّ يتعافى بعضها. وهذه بصمةُ موردٍ يَنفَد ثمّ يُفرَج عنه
+   شيئًا فشيئًا — لا بصمةَ شبكةٍ ولا مايكٍ ولا صوتٍ خافت.
+
+   والمورد معروف: مكتبة أزور تُنشئ AudioContext جديدًا لكلّ مُتعرّف
+   (MicAudioSource.createAudioContext ← new AudioContext)، وسفاري يحدّ
+   عدد ما يُفتح منها في الصفحة الواحدة ولا يُحرّر المغلقة فورًا. وكنّا
+   نبني مُتعرّفًا جديدًا في كلّ دورٍ من الحوار، فيُستهلك الحدّ بعد
+   دورين أو ثلاثة، فلا يبدأ المُتعرّف أصلًا ولا يُنادي ردَّه — فلا خطأ
+   يظهر ولا جواب، إنّما صمتٌ حتى تنقضي مهلتنا.
+
+   فصار المُتعرّف واحدًا للصفحة كلّها: AudioContext واحد ومسارُ مايكٍ
+   واحد مهما طال الحوار. ونُعيد بناءه فقط إن تبدّل المسار أو وقع خطأ
+   يُفسده، ونُغلقه عند مغادرة الصفحة. */
+var _REC=null, _RECstream=null;
+function _dropRec(){
+  var r=_REC; _REC=null; _RECstream=null;
+  if(r){ try{ r.close(); }catch(e){} }
+}
+function _getRec(){
+  var SDK=window.SpeechSDK, cr=azureCreds();
+  if(!SDK || !cr) return null;
+  var st = MIC.stream();
+  /* المُتعرّف مربوطٌ بمسارٍ بعينه: إن أُغلق المسار وأُعيد فتحُه لزم بناؤه */
+  if(_REC && _RECstream === st) return _REC;
+  _dropRec();
+  var cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+  // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
+  // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
+  cfg.speechRecognitionLanguage="en-GB";
+  try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000");
+       cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
+  var rec=new SDK.SpeechRecognizer(cfg, MIC.audioConfig(SDK));
+  try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}
+  /* ترجيح العبارات المتوقّعة: التعرّف هنا حرٌّ بلا نصٍّ مرجعيّ، فيخطئ في
+     الأسماء العربية وبدايات الجُمل. في صورة الأب سمعت أزور «not your name
+     is mohammed hassan» بدل «my name is...». هذه القائمة ترجّح ما يُنتظر
+     فعلًا من طفلٍ يجيب عن هذه الأسئلة — ولا تمنع غيره. */
+  try{
+    var _pl=SDK.PhraseListGrammar.fromRecognizer(rec);
+    PHRASES.concat(EN_NAME[who] ? [EN_NAME[who]] : []).forEach(function(p){ _pl.addPhrase(p); });
+  }catch(e){}
+  _REC=rec; _RECstream=st;
+  return rec;
+}
+try{ window.addEventListener("pagehide", _dropRec); }catch(e){}
+
 function listen(statusEl, btn, onDone, tries){
   tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
@@ -286,31 +337,17 @@ function listen(statusEl, btn, onDone, tries){
   });
   function _startRec(){
   try{
-    cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
-    // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
-    // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
-    cfg.speechRecognitionLanguage="en-GB";
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
-    /* المايك يُفتح مرّةً واحدة ويُعاد استعماله في كلّ دور — فتحُه لكلّ
-       دورٍ كان هشًّا على سفاري/آيفون. انظر MIC.audioConfig في mic-help.js */
-    audio=MIC.audioConfig(SDK);
-    rec=new SDK.SpeechRecognizer(cfg, audio);
-    try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}
-    /* ترجيح العبارات المتوقّعة: التعرّف هنا حرٌّ بلا نصٍّ مرجعيّ، فيخطئ في
-       الأسماء العربية وبدايات الجُمل. في صورة الأب سمعت أزور «not your name
-       is mohammed hassan» بدل «my name is...». هذه القائمة ترجّح ما يُنتظر
-       فعلًا من طفلٍ يجيب عن هذه الأسئلة — ولا تمنع غيره. */
-    try{
-      var _pl=SDK.PhraseListGrammar.fromRecognizer(rec);
-      PHRASES.concat(EN_NAME[who] ? [EN_NAME[who]] : []).forEach(function(p){ _pl.addPhrase(p); });
-    }catch(e){}
+    /* المُتعرّف يُبنى مرّةً واحدة ويُعاد استعماله في كلّ دور — انظر
+       _getRec أدناه وسبب ذلك مشروحٌ عنده. */
+    rec = _getRec();
+    if(!rec) throw new Error("تعذّر تجهيز المُتعرّف");
   }catch(e){ statusEl.textContent="خطأ: "+(e.message||e); if(btn){btn.disabled=false;btn.classList.remove("rec");} return; }
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
   statusEl.style.color="var(--muted)";
   statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
   var fin=false;
   /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور */
-  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} MIC.releaseSoon(45000); notHeard({reason:"timeout",code:null,detail:"مهلة الأمان ٢٢ث انقضت بلا ردٍّ من أزور"}); }, 22000);
+  var to=setTimeout(function(){ if(fin)return; fin=true; _dropRec(); notHeard({reason:"timeout",code:null,detail:"مهلة الأمان ٢٢ث انقضت بلا ردٍّ من أزور"}); }, 22000);
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; clearTimeout(to);
     var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false,audioSec:0};
@@ -341,7 +378,8 @@ function listen(statusEl, btn, onDone, tries){
         }catch(e){}
       }
     }catch(e){}
-    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+    /* لا نُغلق: المُتعرّف والمسار يبقيان للدور التالي — الإغلاق لكلّ دورٍ
+       هو ما كان يستنفد حدّ AudioContext في سفاري */
     /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
     if(!out.text){ var _w=null; try{ _w=MIC.why(SDK, result, null); }catch(e){} notHeard(_w); return; }
     /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حتى المحادثة يتكلّم ولا ينحفظ ثمّ يقول سجّل
@@ -360,7 +398,7 @@ function listen(statusEl, btn, onDone, tries){
     resetBtn();
     statusEl.textContent="";
     onDone(out);
-  }, function(err){ if(fin)return; fin=true; clearTimeout(to); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
+  }, function(err){ if(fin)return; fin=true; clearTimeout(to); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); _dropRec(); });
   }
 }
 
@@ -403,6 +441,11 @@ function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
   saveTalkSession();
+  /* خرج من الحوار: نُغلق المُتعرّف والمايك معًا فلا يبقى مؤشّر التسجيل
+     مضاءً وهو يتصفّح المواضيع. ويُعاد بناؤهما عند أوّل دورٍ في الحوار
+     التالي — فتحةٌ واحدة لكلّ حوار لا لكلّ دور. */
+  _dropRec();
+  try{ MIC.release(); }catch(e){}
   state.topic=null;
   var cards=LIST.map(function(id){ var s=TOPICS[id]; return '<button class="scn'+(id==="free"?" free":"")+'" data-t="'+id+'"><span class="e">'+s.ico+'</span><span class="t">'+s.t+'</span></button>'; }).join("");
   app.innerHTML=

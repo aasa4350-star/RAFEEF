@@ -559,8 +559,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     if(_tries<2){ _tries++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; startRec("retry"); }, 900); return true; }
     return false;
   }
+  /* مُتعرّفٌ واحد لقراءة القطعة كلّها لا واحدٌ لكلّ دورة.
+     بلاغ ٥ سبتمبر ٢٠٢٦: مكتبة أزور تُنشئ AudioContext جديدًا لكلّ مُتعرّف،
+     وسفاري يحدّ عددها في الصفحة ولا يُحرّر المغلقة فورًا. وقراءةُ قطعةٍ
+     واحدة كانت تبني عشرة مُتعرّفاتٍ أو أكثر، فيُستنفد الحدّ فلا يبدأ
+     المُتعرّف ولا يُنادي ردَّه — صمتٌ حتى تنقضي مهلتنا، بلا خطأٍ يظهر.
+     فنبنيه مرّةً ونُعيد استعماله في كلّ دورة. */
   function _cycle(consecNoMatch){
     if(_fin || _userStopped) return;
+    if(rec){ _run(consecNoMatch); return; }
     var cfg, audio, pa, cr=azureCreds();
     try{
       cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
@@ -577,6 +584,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
       pa.applyTo(rec);
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
+    _run(consecNoMatch);
+  }
+  function _run(consecNoMatch){
+    if(_fin || _userStopped || !rec) return;
     rec.recognizeOnceAsync(function(result){
       if(_fin || _userStopped){ _closeRec(); return; }
       var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
@@ -597,8 +608,9 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
         }
       }catch(err){ _ex = err; }
       if(!gotWords){ try{ _lastWhy = MIC.why(SDK, result, null, _ex); }catch(e){} }
-      _closeRec();
-      if(_fin || _userStopped) return;
+      /* لا نُغلق المُتعرّف بين الدورات: إغلاقُه وإعادةُ بنائه في كلّ دورة
+         هو ما كان يستنفد حدّ AudioContext في سفاري. يبقى للدورة التالية. */
+      if(_fin || _userStopped){ _closeRec(); return; }
       var next = gotWords ? 0 : consecNoMatch+1;
       if(next >= MAX_CONSEC_NOMATCH){ if(!_retryOrFail()) finish(); return; }
       setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 150);
