@@ -495,8 +495,13 @@ function gradeWriting(text, level, targetOrCefr, prompt){
   var covered = pts.map(function(p){
     return { q:p.q, ok: any && p.k.some(function(k){ return hasWord(t,k); }) };
   });
+  /* النصّ يتبع الحالة: كان يقول «غطّيت: كذا» ومعه ⚠️ في الحالتين، فيقرأ
+     الطفل «غطّيت» ويرى علامة تحذير فلا يدري أغطّى أم لم يُغطِّ — وهو ممّا
+     شكوا منه (٥ سبتمبر ٢٠٢٦: «ما فهمنا الطريقة»). */
   var contentChecks = covered.map(function(c){
-    return {ok:c.ok, label:"غطّيت: "+c.q, hint:"أضف جملةً تجيب عن: "+c.q};
+    return {ok:c.ok,
+      label:(c.ok ? "غطّيت: " : "ما غطّيت: ")+c.q,
+      hint:"أضف جملةً تجيب عن: "+c.q};
   });
   contentChecks.push({ok: words.length>=cef.minWords,
     label:"الطول المطلوب لمستوى "+cef.name+": "+words.length+" من "+cef.minWords+" كلمة",
@@ -592,6 +597,31 @@ function gradeWriting(text, level, targetOrCefr, prompt){
 /* ===================== الواجهة ===================== */
 
 var CSS = ''+
+/* شرح الطريقة — بلاغ الأولاد (٥ سبتمبر ٢٠٢٦): «ما فهمنا الطريقة» */
+'.whow{background:var(--bg);border:1.5px solid var(--accent);border-radius:14px;padding:12px 14px;margin-bottom:13px}'+
+'.whow>summary{cursor:pointer;font-weight:800;font-size:1.02rem;list-style:none}'+
+'.whow>summary::-webkit-details-marker{display:none}'+
+'.whow>summary::before{content:"▸ ";color:var(--accent)}'+
+'.whow[open]>summary::before{content:"▾ "}'+
+'.whow h4{margin:13px 0 6px;font-size:.98rem}'+
+'.wstep{counter-reset:ws;margin:0;padding:0;list-style:none}'+
+'.wstep li{counter-increment:ws;position:relative;padding-inline-start:30px;margin-bottom:7px;line-height:1.75}'+
+'.wstep li::before{content:counter(ws);position:absolute;inset-inline-start:0;top:1px;width:21px;height:21px;'+
+  'border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}'+
+'.wcrit{border-collapse:collapse;width:100%;font-size:.9rem;margin-top:4px}'+
+'.wcrit td{border:1px solid var(--line);padding:6px 8px;vertical-align:top}'+
+'.wcrit td:first-child{font-weight:700;white-space:nowrap}'+
+'.wmodel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-top:6px;'+
+  'direction:ltr;text-align:left;line-height:2.05;font-size:.97rem}'+
+'.wmodel .m1{background:rgba(37,99,235,.16);border-radius:4px;padding:1px 3px}'+   /* جملة الموضوع */
+'.wmodel .m2{background:rgba(22,163,74,.16);border-radius:4px;padding:1px 3px}'+   /* أدوات الربط */
+'.wmodel .m3{background:rgba(217,119,6,.18);border-radius:4px;padding:1px 3px}'+   /* الخاتمة/الرأي */
+'.wkey{font-size:.85rem;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}'+
+'.wkey span{display:inline-flex;align-items:center;gap:5px}'+
+'.wkey i{width:13px;height:13px;border-radius:3px;display:inline-block}'+
+'.wphr{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}'+
+'.wphr code{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:3px 8px;'+
+  'font-size:.88rem;direction:ltr;unicode-bidi:isolate}'+
 '.wsec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}'+
 '.wen{direction:ltr;unicode-bidi:isolate;display:inline-block;text-align:left}'+
 '.wq .stem{font-weight:700;margin:5px 0 9px;font-size:1.05rem}'+
@@ -619,6 +649,117 @@ var CSS = ''+
 '@media (prefers-color-scheme:dark){.wb-ok{background:#3a2f14;color:#fbbf24}}'+
 '.wtag{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:.8rem;color:var(--muted);font-weight:700}';
 
+/* ═══════════ شرح الطريقة ═══════════
+   بلاغ الأب عن الأولاد (٥ سبتمبر ٢٠٢٦): «يبون شرحًا للتعبير، يقولون
+   ما فهمنا الطريقة».
+
+   وحين فتحنا القسم بأعينهم تبيّن أنّهم محقّون: يجد الطفل موضوعًا وثلاث
+   نقاطٍ وصندوقًا فارغًا يُطالبه بمئة كلمة، ولا يجد كيف يبدأ ولا ما
+   المقاييس الأربعة التي سيُحاسَب عليها — لا يعرفها إلّا بعد أن تُعطى
+   له درجاتها. فهي «صفحةٌ بيضاء» بلا طريق.
+
+   فهذا شرحٌ يُفتح قبل الكتابة، فيه أربعة أشياء:
+   ١) الطريقة خطوةً خطوة — ماذا يفعل بالضبط قبل أن يكتب حرفًا.
+   ٢) المقاييس الأربعة بلغةٍ يفهمها، وما يرفع كلًّا منها.
+   ٣) نموذجٌ محلولٌ مُلوَّن يرى فيه جملة الموضوع وأدوات الربط والخاتمة.
+   ٤) عباراتٌ جاهزة يبني عليها.
+
+   والنموذج على موضوعٍ **غير موضوع اليوم** عمدًا: لو كان عليه لنسخه
+   الطفل ولم يتعلّم. فالمطلوب أن يرى الطريقة لا أن يجد الجواب. */
+
+var HOWTO = {
+  1: {
+    steps: [
+      "اقرأ الموضوع والنقاط الثلاث تحته، واسأل نفسك: ماذا أعرف عن هذا؟",
+      "اكتب على ورقةٍ ثلاث كلماتٍ عربية — فكرةً لكلّ نقطة. لا تكتب جملًا بعد.",
+      "حوّل كلّ فكرةٍ إلى جملةٍ إنجليزية قصيرة تبدأ بحرفٍ كبير وتنتهي بنقطة.",
+      "اربط الجمل بـ and / but / because، وزد جملةً أو جملتين حتى تبلغ الطول المطلوب.",
+      "اقرأ ما كتبت بصوتٍ خافت: هل كلّ جملةٍ عن الموضوع نفسه؟ ثمّ اضغط «قيّم كتابتي»."
+    ],
+    topic: "My neighbour",
+    model: '<span class="m1">My neighbour is called Abu Khalid.</span> He is an old man <span class="m2">and</span> ' +
+           'he lives next to our house. He waters his small garden every morning <span class="m2">because</span> ' +
+           'he loves plants. Sometimes he gives us dates <span class="m2">and</span> he asks about my school. ' +
+           '<span class="m3">I like him because he is kind to everyone.</span>',
+    why: [
+      "الجملة الأولى تقول من هو مباشرةً — فلا يحتار القارئ.",
+      "كلّ الجمل عن الجار نفسه، ولا جملةَ عن شيءٍ آخر (هذه «الوحدة»).",
+      "أدوات الربط ثلاث: and وbecause — فلا تبدو الجمل مقطوعة.",
+      "الجملة الأخيرة رأيه هو، فأغلقت الفقرة ولم تنتهِ فجأة."
+    ],
+    phrases: ["My … is …", "He / She is …", "I like … because …", "and", "but", "because", "Every day I …", "I think …"]
+  },
+  2: {
+    steps: [
+      "اقرأ الموضوع والنقاط الثلاث، وحدّد: هل يطلب منك رأيًا، أم وصفًا، أم مقارنة؟",
+      "خطّط قبل أن تكتب: جملةُ موضوعٍ واحدة، ثمّ فكرةٌ لكلّ نقطة، ثمّ خاتمة. أربعة صفوفٍ على ورقة.",
+      "ابدأ بجملة الموضوع: جملةٌ واحدة تقول عمّ ستتكلّم، بلا تفصيل.",
+      "افرد لكلّ نقطةٍ جملتين: واحدةً تقولها وأخرى تُدلّل عليها بمثالٍ أو سبب.",
+      "رتّب بـ First / Also / However / Finally، واختم برأيك: In conclusion, I think …",
+      "راجع: طولٌ كافٍ؟ كلّ جملةٍ تخدم الموضوع؟ حروفٌ كبيرة ونقاط؟ ثمّ «قيّم كتابتي»."
+    ],
+    topic: "Living in a big city",
+    /* النموذج نفسه يجب أن يجتاز المقياس الذي نُحاسب به الطفل: قِسناه
+       بالمُقيّم فخرج ٧٦ كلمةً وخمس جملٍ دون هدف B1، فأُطيل إلى ١٠٦ كلمةٍ
+       وسبع جمل. فنموذجٌ يرسب في مقياسه لا يُعلّم الطريقة بل يُشكّك فيها. */
+    model: '<span class="m1">Living in a big city has both good and bad sides.</span> ' +
+           '<span class="m2">First,</span> cities offer better schools and hospitals, so families can find what they need quickly. ' +
+           '<span class="m2">In addition,</span> there are many jobs, <span class="m2">and</span> this helps young people start their lives after university. ' +
+           'Another advantage is that a big city has libraries, parks and sports clubs for everyone. ' +
+           '<span class="m2">However,</span> the traffic is heavy <span class="m2">and</span> the air is often polluted, ' +
+           '<span class="m2">because</span> there are too many cars. ' +
+           'Life is also more expensive, <span class="m2">so</span> some families cannot afford a good home. ' +
+           '<span class="m3">In conclusion, I think a big city is a good place to live if we solve the traffic problem.</span>',
+    why: [
+      "الجملة الأولى جملةُ موضوع: تُعلن أنّ للمدينة وجهين، فيعرف القارئ الخطّة من أوّل سطر.",
+      "الترتيب ظاهر: First ثمّ In addition ثمّ However ثمّ In conclusion — وهذا وحده يرفع «الترتيب والربط».",
+      "كلّ فكرةٍ معها سبب أو مثال (so families can find… / because there are too many cars) — وهذا يرفع «المحتوى».",
+      "الخاتمة رأيٌ فيه شرط، لا تكرارًا للجملة الأولى."
+    ],
+    phrases: ["First,", "Second,", "In addition,", "For example,", "However,", "On the other hand,",
+              "because", "so", "Finally,", "In conclusion, I think …"]
+  }
+};
+
+var CRITERIA = [
+  ["المحتوى<br><span class=\"wen\" style=\"font-weight:600;font-size:.82rem\">Content</span>",
+   "هل أجبتَ عن نقاط المهمّة الثلاث كلّها، وبلغتَ الطول المطلوب؟ نقطةٌ لم تُجب عنها = درجةٌ ناقصة، ولو كانت لغتك ممتازة."],
+  ["الترتيب والربط<br><span class=\"wen\" style=\"font-weight:600;font-size:.82rem\">Organisation</span>",
+   "هل تبدأ بجملةٍ تُقدّم الموضوع، وترتّب أفكارك، وتربط جملك بأدوات الربط، وتختم برأيٍ أو خلاصة؟"],
+  ["اللغة<br><span class=\"wen\" style=\"font-weight:600;font-size:.82rem\">Language</span>",
+   "الحروف الكبيرة، والنقاط والفواصل، والضمير I كبيرًا، وتنوّع الكلمات وأطوال الجمل بلا تكرارٍ مملّ."],
+  ["مناسبة الأسلوب<br><span class=\"wen\" style=\"font-weight:600;font-size:.82rem\">Communicative Achievement</span>",
+   "هل تكتب بأسلوب الكتابة لا بلغة الدردشة؟ جملٌ كاملة، بلا اختصارات المحادثة، وبلا كلماتٍ كلّها حروفٌ كبيرة."]
+];
+
+function howToHtml(level, cef){
+  var H = HOWTO[level] || HOWTO[1];
+  return '<details class="whow"><summary>📖 ما فهمت الطريقة؟ افتح هذا أوّلًا</summary>'+
+    '<h4>١ · الطريقة خطوةً خطوة</h4><ol class="wstep">'+
+      H.steps.map(function(s){ return '<li>'+s+'</li>'; }).join('')+'</ol>'+
+    '<h4>٢ · على أيّ شيءٍ تُحاسَب؟ أربعة مقاييس، كلٌّ من ٥</h4>'+
+      '<p style="font-size:.88rem;color:var(--muted);margin:0 0 5px">لا يكفي أن تكتب لغةً سليمة: '+
+      'من كتب لغةً ممتازة وترك نقطةً من نقاط المهمّة نزلت درجته في «المحتوى». والنجاح ٣ في كلٍّ منها.</p>'+
+      '<table class="wcrit"><tbody>'+
+      CRITERIA.map(function(c){ return '<tr><td>'+c[0]+'</td><td>'+c[1]+'</td></tr>'; }).join('')+
+      '</tbody></table>'+
+    '<h4>٣ · نموذجٌ محلول — موضوع <span class="wen">«'+H.topic+'»</span></h4>'+
+      '<p style="font-size:.88rem;color:var(--muted);margin:0 0 5px">موضوعه غير موضوعك اليوم عمدًا — '+
+      'المقصود أن ترى <b>الطريقة</b> لا أن تنسخ الجواب.</p>'+
+      '<div class="wmodel">'+H.model+'</div>'+
+      '<div class="wkey"><span><i style="background:rgba(37,99,235,.45)"></i> جملة الموضوع</span>'+
+        '<span><i style="background:rgba(22,163,74,.45)"></i> أدوات الربط</span>'+
+        '<span><i style="background:rgba(217,119,6,.5)"></i> الخاتمة أو الرأي</span></div>'+
+      '<div style="margin-top:8px"><b style="font-size:.93rem">لماذا نال هذا النموذج درجةً عالية؟</b>'+
+        '<ul style="margin:5px 0 0;padding-inline-start:20px;font-size:.91rem;line-height:1.8">'+
+        H.why.map(function(w){ return '<li>'+w+'</li>'; }).join('')+'</ul></div>'+
+    '<h4>٤ · عباراتٌ جاهزة تبني عليها</h4>'+
+      '<div class="wphr">'+H.phrases.map(function(p){ return '<code>'+p+'</code>'; }).join('')+'</div>'+
+      '<p style="font-size:.88rem;color:var(--muted);margin:8px 0 0">وتذكّر: الطول المطلوب لمستواك '+
+      '<b>'+cef.name+'</b> هو <b>'+cef.minWords+'</b> كلمة — والدرجة تنقص إن قصّرت عنه ولو كان ما كتبته سليمًا.</p>'+
+  '</details>';
+}
+
 function injectCss(){
   if(document.getElementById("wen-css")) return;
   var st=document.createElement("style"); st.id="wen-css"; st.textContent=CSS;
@@ -645,6 +786,8 @@ function render(el, ctx){
       '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح، ثمّ اكتب فقرتك — وتُحفظ لوالدك ليقرأها.</span>'+
       '<div style="margin-top:8px"><span class="wtag">📐 التقييم بمقاييس كامبردج الأربعة</span> '+
       '<span class="wtag">🎯 مستواك المستهدف: '+cef.name+'</span></div></div>'+
+    /* الشرح أوّل ما يقع عليه البصر، مطويًّا فلا يزحم من يعرف الطريقة */
+    howToHtml(level, cef)+
     '<div class="wsec"><b>الجزء الأول — تدريب</b><div id="wquiz"></div>'+
       /* dir="ltr" على الرقم وحده — بلاه ينعكس بصريًّا داخل السياق العربيّ
          («3 / 10» يظهر «10 / 3»)، وهو عيبٌ وقع في كل عدّادات الدرجة
@@ -798,5 +941,5 @@ function render(el, ctx){
   });
 }
 
-window.WritingEN = { render:render, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN };
+window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN };
 })();
