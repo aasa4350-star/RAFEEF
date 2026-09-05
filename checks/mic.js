@@ -18,6 +18,11 @@
    ٢) MIC.ensure لا توقف المسار الذي فتحته (وإلّا عادت الفتحة الثانية).
    ٣) mic-help.js يُصدّر ما تعتمد عليه الصفحات فعلًا.
    ٤) كلّ صفحةٍ تستعمل MIC تُحمّل mic-help.js.
+   ٥) إصدار أداة النطق مثبَّتٌ لا @latest، وواحدٌ في الصفحات كلّها:
+      @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
+      يصل أجهزة الأولاد الأربعة من تلقائه ويكسر التسجيل بلا أن نلمس
+      شيئًا — وهو أسوأ عطلٍ لأنّه بلا سببٍ ظاهر. وإصداران مختلفان
+      بين صفحتين أسوأ: يعمل قسمٌ ويُخفق آخر فيبدو العطل عشوائيًّا.
    ============================================================ */
 const fs = require('fs');
 const path = require('path');
@@ -27,10 +32,14 @@ const HELP = 'mic-help.js';
 /* الدوالّ التي تعتمد عليها الصفحات — إن سقطت واحدةٌ انكسر التسجيل صامتًا */
 const NEEDED = ['audioConfig', 'ensure', 'releaseSoon', 'stream', 'release'];
 
+/* وسمُ إصدار أداة النطق كما يظهر في وسم <script> */
+const SDK_RE = /microsoft-cognitiveservices-speech-sdk@([^/"']+)/g;
+
 module.exports = function mic() {
   const issues = [];
   const dir = ROOT();
   let pages = 0;
+  const sdkVersions = {};   /* الإصدار → الصفحات التي تحمله */
 
   /* ═══ mic-help.js نفسه ═══ */
   const helpPath = path.join(dir, HELP);
@@ -86,7 +95,23 @@ module.exports = function mic() {
     if (/MIC\.audioConfig/.test(src) && !/MIC\.releaseSoon|MIC\.release\b/.test(src)) {
       issues.push({ sev: 'تنبيه', msg: file + ' — يفتح المايك ولا يُغلقه (MIC.releaseSoon مفقود)' });
     }
+    /* ٥) إصدار أداة النطق */
+    SDK_RE.lastIndex = 0;
+    let v;
+    while ((v = SDK_RE.exec(src))) {
+      const ver = v[1];
+      (sdkVersions[ver] = sdkVersions[ver] || []).push(file);
+      if (!/^\d+\.\d+\.\d+$/.test(ver)) {
+        issues.push({ sev: 'خطأ', msg: file + ' — إصدار أداة النطق غير مثبَّت («' + ver + '»): أيّ تحديثٍ من مايكروسوفت يصل أجهزة الأولاد من تلقائه ويكسر التسجيل' });
+      }
+    }
   });
 
-  return { pages, issues };
+  const vers = Object.keys(sdkVersions);
+  if (vers.length > 1) {
+    issues.push({ sev: 'خطأ', msg: 'إصدارات أداة النطق مختلفة بين الصفحات — ' +
+      vers.map(v => v + ': ' + sdkVersions[v].join('، ')).join(' · ') + ' — فيعمل قسمٌ ويُخفق آخر بلا سببٍ ظاهر' });
+  }
+
+  return { pages, sdk: vers.join(', ') || '—', issues };
 };

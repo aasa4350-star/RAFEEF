@@ -78,7 +78,7 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
 
   head('٧ · مسار المايكروفون');
   const mc = mic();
-  console.log('صفحات النطق: ' + mc.pages);
+  console.log('صفحات النطق: ' + mc.pages + ' · إصدار أداة النطق: ' + mc.sdk);
   mc.issues.forEach(i => {
     console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
     i.sev === 'خطأ' ? errors++ : warns++;

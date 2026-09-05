@@ -9,7 +9,13 @@
 <script src="attempts-queue.js"></script>
 <script src="mic-help.js"></script>
 <script src="azure-config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+<!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
+     كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
+     يصل أجهزة الأولاد الأربعة من تلقائه ويكسر التسجيل بلا أن نلمس
+     شيئًا ولا نعرف السبب. والترقية الآن قرارٌ نتّخذه ونختبره.
+     1.51.0 هو ما كان @latest يخدمه يوم التثبيت (٥ سبتمبر ٢٠٢٦)
+     بايتًا ببايت، فالتثبيت لم يغيّر سلوكًا قائمًا. -->
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.51.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
 <style>
   :root{
     --accent:#7c3aed; --accent-deep:#5b21b6;
