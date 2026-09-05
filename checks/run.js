@@ -18,6 +18,7 @@ const think   = require('./think');
 const kangaroo= require('./kangaroo');
 const eduvid  = require('./eduvid');
 const mic     = require('./mic');
+const banks   = require('./banks');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -85,7 +86,16 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   });
   if (!mc.issues.length) console.log('  ✅ لا ملاحظات');
 
-  head('٨ · طبقة البيانات');
+  head('٨ · بنوك الأسئلة الثابتة');
+  const bk = banks();
+  console.log('أقسامٌ تُولّد من بنكٍ ثابت: ' + bk.checked + ' · أسوأ نسبةِ عرضٍ من البنك: ' + bk.worst + '٪');
+  bk.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!bk.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٩ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {
