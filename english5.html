@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الإنجليزي — الصف الرابع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="mic-help.js"></script>
+<script src="attempts-queue.js"></script>
+<script src="azure-config.js"></script>
+<!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
+     كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
+     يصل أجهزة الأولاد الأربعة من تلقائه ويكسر التسجيل بلا أن نلمس
+     شيئًا ولا نعرف السبب. والترقية الآن قرارٌ نتّخذه ونختبره.
+     1.51.0 هو ما كان @latest يخدمه يوم التثبيت (٥ سبتمبر ٢٠٢٦)
+     بايتًا ببايت، فالتثبيت لم يغيّر سلوكًا قائمًا. -->
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.51.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+<style>
+  :root{
+    --accent:#2563eb; --accent-deep:#1d4ed8;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec; --warn:#b45309;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;--warn:#fbbf24;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:110px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.06rem}
+  .stem .en{direction:ltr;unicode-bidi:isolate}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:left}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:220px;padding:10px 12px}
+  .explain .en{direction:ltr;unicode-bidi:isolate}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+  .say{background:var(--accent);color:#fff;border:0;padding:9px 13px;border-radius:11px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit}
+  .say.small{padding:8px 12px;font-size:.88rem}
+  .prow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;background:var(--bg);border-radius:10px;padding:10px 12px}
+  .prow .say{background:#0a7cff;border-color:#0a7cff}
+  .prow .listen{background:var(--accent)}
+  .prow .en{direction:ltr;unicode-bidi:isolate;font-weight:700}
+  .prow .pfb{font-weight:700;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"saud").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function opt(correct, others){ var o=[correct].concat(others); shuffle(o); return [o, o.indexOf(correct)]; }
+function en(s){ return '<span class="en">'+s+'</span>'; }
+// مشتّتات مميّزة من نفس القائمة (تستبعد القيمة الصحيحة وتحذف المكرّر)
+function dist(pool, item, idx, n){ var correct=item[idx], seen={}, o=[]; pool.forEach(function(x){ var v=x[idx]; if(v!==correct && !seen[v]){ seen[v]=1; o.push(v); } }); shuffle(o); return o.slice(0, n||2); }
+function normEN(s){ return String(s||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); }
+
+/* ===== النطق: استماع (متصفح) + تقييم عبر Azure ===== */
+function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
+function azureConfigured(){ return !!azureCreds(); }
+function azBtnHtml(){ return azureConfigured() ? '<button class="say small azbtn">🎙️ قيّم نطقي</button>' : ''; }
+function speakEN(text){
+  try{
+    speechSynthesis.cancel();
+    try{ speechSynthesis.resume(); }catch(e){} // Safari/iOS قد يعلّق المحرّك فيصير صامتًا — resume يفكّه
+    var u=new SpeechSynthesisUtterance(text); u.lang="en-US"; u.rate=0.9;
+    var cands=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang);});
+    var good=cands.filter(function(x){return /(natural|neural|enhanced|premium|samantha|daniel|karen|serena|aria|guy|jenny)/i.test(x.name);});
+    var v=good[0]||cands[0]; if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){ alert("المتصفح لا يدعم النطق. جرّب Chrome أو Safari."); }
+}
+try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
+// استماع بصوت Azure العصبي البشري (مبطّأ للأطفال)، ويرجع لصوت المتصفح فقط إذا تعذّر
+var _ttsSynth=null;
+function azureSpeak(text){
+  var cr=azureCreds();
+  if(!cr || !window.SpeechSDK){ speakEN(text); return; }
+  try{
+    var SDK=window.SpeechSDK;
+    if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
+    var sc=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    var synth=new SDK.SpeechSynthesizer(sc); _ttsSynth=synth;
+    var esc=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-GB"><voice name="en-GB-RyanNeural"><prosody rate="-15%">'+esc+'</prosody></voice></speak>';
+    synth.speakSsmlAsync(ssml, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; }, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speakEN(text); });
+  }catch(e){ speakEN(text); }
+}
+/* ═══ لماذا أخفق التسجيل — يُحفظ لا يُخمَّن ═══
+   انظر شرحه الكامل في mic-help.js (MIC.why). بلا هذا كان كلّ سببٍ —
+   شبكةً أو مفتاحًا أو حصّةً نفدت — يُعرض «ما وضح صوتك» ويذهب بلا أثر. */
+function saveMicFail(info){
+  try{
+    var e = (window.MIC && MIC.env) ? MIC.env() : {};
+    var meta = { kind:"micfail", sect:"word",
+      why:(info&&info.reason)||null, code:(info&&info.code)||null, detail:(info&&info.detail)||null,
+      res:(info&&info.res)||null, txt:(info&&info.txt), pa:(info&&info.pa),
+      br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online };
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body) }).catch(function(){});
+  }catch(err){}
+}
+function micFailMsg(info){
+  var c = (info && info.code) || "";
+  if(info && info.reason === "canceled"){
+    if(/Authentication|Forbidden/i.test(c)) return "❌ خدمة تقييم النطق رفضت الطلب (مفتاح الاشتراك). أخبر والدك — ما هي مشكلةٌ منك.";
+    if(/TooManyRequests/i.test(c))          return "❌ خدمة تقييم النطق مشغولة الآن. انتظر دقيقة ثمّ أعد المحاولة.";
+    if(/Connection|Timeout/i.test(c))       return "❌ انقطع الاتّصال بخدمة النطق. تأكّد من الإنترنت وأعد المحاولة — صوتك سليم.";
+    return "❌ خدمة تقييم النطق توقّفت" + (c ? " ("+c+")" : "") + ". أعد المحاولة، وإن تكرّر فأخبر والدك.";
+  }
+  return null;
+}
+
+function _paRun(refText, statusEl, btn, tries){
+  tries = tries || 0;
+  var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
+  /* نطلب إذن المايك أوّلًا ثمّ نبدأ التعرّف: على آيفون كانت نافذة «Allow»
+     تظهر بعد أن تبدأ أزور، فتمشي مهلة الصمت الأوّليّ والطفل يقرأ النافذة
+     فيضيع وقته — بلاغ ٤ سبتمبر ٢٠٢٦، وانظر MIC.ensure في mic-help.js. */
+  MIC.ensure(statusEl, function(){ _go(); }, function(){ MIC.fail(statusEl, btn, { tail:MIC_TAIL }); });
+  function _go(){
+  try{
+    cfg=SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
+    // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
+    // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
+    cfg.speechRecognitionLanguage="en-GB";
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
+    audio=MIC.audioConfig(SDK);   /* المايك المفتوح مرّةً واحدة — انظر mic-help.js */
+    rec=new SDK.SpeechRecognizer(cfg, audio);
+    pa=new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+    pa.applyTo(rec);
+  }catch(e){ statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn) btn.disabled=false; return; }
+  if(btn) btn.disabled=true;
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML=(tries>0?"🔁 مرة ثانية — ":"🎙️ ")+"اقرأ الآن بصوت واضح...";
+  var _fin=false;
+  window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
+  function _end(){ if(btn) btn.disabled=false; if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} MIC.releaseSoon(); }
+  // إعادة محاولة تلقائية واحدة عند عدم وضوح الصوت (الكلمات القصيرة تحتاج محاولتين أحيانًا)
+  function _retryOrFail(finalMsg){
+    if(tries<1){
+      statusEl.style.color="var(--muted)"; statusEl.innerHTML="🔁 ما وضح — نعيد المحاولة تلقائيًا، قُل الكلمة مرة ثانية بصوت واضح...";
+      setTimeout(function(){ _paRun(refText, statusEl, btn, tries+1); }, 700);
+    } else { statusEl.style.color="var(--bad)"; statusEl.innerHTML=finalMsg; }
+  }
+  var _to=setTimeout(function(){ if(_fin) return; _fin=true; _end(); _retryOrFail("⚠️ ما التقطتُ صوتك. قرّب المايك من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية."); }, 15000);
+  rec.recognizeOnceAsync(function(result){
+    if(_fin) return; _fin=true; clearTimeout(_to);
+    var outcome="nomatch";
+    try{
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        outcome="ok";
+        var r=SDK.PronunciationAssessmentResult.fromResult(result);
+        var pron=Math.round(r.pronunciationScore), acc=Math.round(r.accuracyScore), flu=Math.round(r.fluencyScore);
+        var col=pron>=80?"var(--good)":pron>=60?"var(--warn)":"var(--bad)";
+        var wordsHtml="";
+        try{
+          var ws=(r.detailResult&&r.detailResult.Words)||[];
+          wordsHtml = ws.map(function(w){
+            var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var et=a.ErrorType||"None";
+            var wc=(et==="Omission")?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)");
+            return '<span style="color:'+wc+'">'+w.Word+'</span>';
+          }).join(' ');
+        }catch(e){}
+        var face=pron>=80?"🌟":pron>=60?"👍":"💪";
+        statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+
+          (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-weight:700">'+wordsHtml+'</div>'+
+            '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 صحيح · 🟡 وسط · 🔴 راجعه</div>'):' ✅ ممتاز!');
+      }
+    }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
+    _end();
+    if(outcome==="nomatch"){
+      var _w=null; try{ _w=MIC.why(SDK, result, null); }catch(e){}
+      var _m=micFailMsg(_w);
+      /* الإلغاء لا يُعالَج بالإعادة: نقوله صراحةً ونحفظه */
+      if(_m){ statusEl.style.color="var(--bad)"; statusEl.innerHTML=_m; saveMicFail(_w); return; }
+      if(tries>=1) saveMicFail(_w);
+      _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
+    }
+  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL }); _end(); });
+  }
+}
+var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
+function azureAssess(refText, statusEl, btn){
+  var cr=azureCreds();
+  if(!cr){ statusEl.innerHTML="⚠️ لم يُضبط مفتاح Azure بعد." + MIC_TAIL; return; }
+  /* كانت «جرّب بعد ثانية» تعود أبدًا إن لم تصل الأداة — انظر mic-help.js */
+  if(!window.SpeechSDK){
+    MIC.waitSDK(statusEl, btn, function(){ azureAssess(refText, statusEl, btn); },
+      function(){ statusEl.style.color="var(--bad)";
+        statusEl.innerHTML="❌ ما قدرت أحمّل أداة تقييم النطق — غالبًا الإنترنت." + MIC_TAIL;
+        if(btn){ btn.disabled=false; } });
+    return;
+  }
+  if(btn) btn.disabled=true;
+  statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
+  try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){} // تنشيط الصوت على iOS
+  _paRun(refText, statusEl, btn); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
+}
+// استخراج الجملة/الكلمة الإنجليزية من السؤال، مع تعبئة الفراغ بالإجابة الصحيحة
+function enTarget(stemEl, ansText){
+  var parts=[]; try{ stemEl.querySelectorAll(".en").forEach(function(e){ parts.push(e.textContent); }); }catch(e){}
+  var t=parts.join(" ").trim();
+  var ansEn=/[A-Za-z]/.test(ansText||"");
+  if(!t){ return ansEn ? clean(ansText) : ""; }
+  if(/_{2,}|_/.test(t) && ansEn){ t=t.replace(/_{2,}|_/g, ansText); }
+  t=clean(t);
+  return /[A-Za-z]/.test(t) ? t : (ansEn ? clean(ansText) : "");
+  function clean(s){ return String(s).replace(/[«»"?؟]/g,"").replace(/\s+/g," ").trim(); }
+}
+
+/* ============ Welcome! ============
+   من «Scope and Sequence» ص3b: تعليم ago/calendar/date/early/how long/late/month،
+   وشهور السنة، والأعداد 101–1000. ونحو: How many/How long، ومراجعة الماضي البسيط
+   والتفضيل. */
+var MONTHS = [["January","يناير"],["February","فبراير"],["March","مارس"],["April","أبريل"],["May","مايو"],["June","يونيو"],
+  ["July","يوليو"],["August","أغسطس"],["September","سبتمبر"],["October","أكتوبر"],["November","نوفمبر"],["December","ديسمبر"]];
+var WVOC = [["ago","منذ / قبل"],["calendar","التقويم / الرزنامة"],["date","التاريخ"],["early","مبكّرًا"],
+  ["late","متأخّرًا"],["month","الشهر"],["year","السنة"],["time","الوقت"],["prepare","يُجهّز / يستعدّ"],
+  ["festival","مهرجان"],["mountain","جبل"],["rainbow","قوس قزح"],["snail","حلزون"],["comic book","قصّة مصوّرة"]];
+var NUM100 = [[101,"one hundred and one"],[115,"one hundred and fifteen"],[120,"one hundred and twenty"],
+  [200,"two hundred"],[250,"two hundred and fifty"],[340,"three hundred and forty"],[500,"five hundred"],
+  [612,"six hundred and twelve"],[700,"seven hundred"],[880,"eight hundred and eighty"],[1000,"one thousand"]];
+function gWVoc(){ var p=gp(WVOC); var o=opt(p[1], dist(WVOC,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gMonthAr(){ var p=gp(MONTHS); var o=opt(p[1], dist(MONTHS,p,1)); return ["ما الشهر "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gMonthOrder(){ var i=Math.floor(Math.random()*11); var p=MONTHS[i], nx=MONTHS[i+1];
+  var o=opt(nx[0], dist(MONTHS,nx,0)); return ["ما الشهر الذي يأتي بعد "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+nx[0])+" ("+p[1]+" ثمّ "+nx[1]+")."]; }
+function gNum(){ var p=gp(NUM100); var o=opt(p[1], dist(NUM100,p,1)); return ["اكتب العدد "+en("«"+p[0]+"»")+" بالكلمات:", o[0], o[1], en(p[0]+" = "+p[1])+"."]; }
+function gHowManyLong(){
+  var items=[["___ students are there in your class? — Twenty.","How many","How long"],
+             ["___ did you stay in Riyadh? — For three days.","How long","How many"],
+             ["___ books do you have? — Ten.","How many","How long"],
+             ["___ is the movie? — Two hours.","How long","How many"],
+             ["___ brothers do you have? — Two.","How many","How long"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"How much"]);
+  return ["أكمل السؤال: "+en(p[0]), o[0], o[1], en("How many")+" للعدد (أشياء تُعدّ)، و"+en("How long")+" للمدّة."]; }
+function gAgo(){
+  var items=[["I saw him two days ___.","ago","late"],["She came late, not ___.","early","ago"],["What's the ___ today? — The fifth of May.","date","calendar"],["We use a ___ to see the days and months.","calendar","festival"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"month"]);
+  return ["أكمل: "+en(p[0]), o[0], o[1], "الكلمة المناسبة: "+en(p[1])+"."]; }
+var WSUP = [["tall","the tallest","الأطول"],["big","the biggest","الأكبر"],["small","the smallest","الأصغر"],
+  ["long","the longest","الأطول (طولًا)"],["nice","the nicest","الألطف"],["happy","the happiest","الأسعد"],["good","the best","الأفضل"]];
+function gSup(){ var p=gp(WSUP); var o=opt(p[1], dist(WSUP,p,1)); return ["صيغة التفضيل (superlative) من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+")."]; }
+var WPAST = [["go","went"],["see","saw"],["eat","ate"],["take","took"],["come","came"],["make","made"],["prepare","prepared"],["climb","climbed"]];
+function gWPast(){ var p=gp(WPAST); var o=opt(p[1], [p[0]+"ed", p[0]+"s"].filter(function(x){return x!==p[1];}).concat(dist(WPAST,p,1)).slice(0,2));
+  return ["الماضي البسيط من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+"."]; }
+
+/* ============ Unit 1 — Personal Interests ============
+   صفاتٌ كثيرة، وسابقة un-، والمضارع البسيط مقابل الماضي البسيط،
+   وأفعال الحالة مقابل أفعال الحدث. */
+var ADJ_PI = [["amazing","مدهش"],["enormous","ضخم جدًّا"],["excellent","ممتاز"],["friendly","ودود"],["funny","مضحك"],
+  ["important","مهمّ"],["interesting","مشوّق"],["lovely","جميل / لطيف"],["lucky","محظوظ"],["noisy","مُزعج الصوت"],
+  ["popular","مشهور / محبوب"],["special","مميّز"],["wonderful","رائع"],["tidy","مرتّب"],["horrible","فظيع"],
+  ["messy","فوضويّ"],["excited","متحمّس"],["unusual","غير عاديّ"]];
+var UN_PAIR = [["friendly","unfriendly","ودود ↔ غير ودود"],["kind","unkind","لطيف ↔ قاسٍ"],
+  ["lucky","unlucky","محظوظ ↔ سيّئ الحظّ"],["tidy","untidy","مرتّب ↔ غير مرتّب"],["usual","unusual","معتاد ↔ غير معتاد"]];
+var PI_EXP = [["hobby","هواية"],["fair","معرض / مهرجان"],["origami","فنّ طيّ الورق"],["carving","النحت"],
+  ["believe","يعتقد / يصدّق"],["prefer","يفضّل"],["enjoy","يستمتع بـ"],["ride","يركب"]];
+function gAdjPI(){ var p=gp(ADJ_PI); var o=opt(p[1], dist(ADJ_PI,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gPIExp(){ var p=gp(PI_EXP); var o=opt(p[1], dist(PI_EXP,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gUn(){ var p=gp(UN_PAIR); var o=opt(p[1], dist(UN_PAIR,p,1)); return ["أضف السابقة "+en("un-")+" إلى "+en("«"+p[0]+"»")+" لتحصل على الضدّ:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). السابقة "+en("un-")+" تقلب المعنى إلى ضدّه."]; }
+function gUnMean(){ var p=gp(UN_PAIR); var o=opt("ضدّ "+p[2].split(" ↔ ")[0], ["نفس معنى "+p[2].split(" ↔ ")[0], "أشدّ من "+p[2].split(" ↔ ")[0]]);
+  return ["ماذا تفعل السابقة "+en("un-")+" في كلمة "+en("«"+p[1]+"»")+"؟", o[0], o[1], en("un-")+" سابقةُ نفيٍ تعطي الضدّ: "+en(p[1])+" = "+p[2].split(" ↔ ")[1]+"."]; }
+function gPresPast(){
+  var items=[["I ___ to the fair every year.","go","went","«every year» عادةٌ متكرّرة ⇐ مضارع بسيط."],
+             ["Yesterday, I ___ to the fair.","went","go","«Yesterday» زمنٌ ماضٍ ⇐ ماضٍ بسيط."],
+             ["She ___ origami every Friday.","makes","made","«every Friday» عادة ⇐ مضارع بسيط."],
+             ["Last week, we ___ a wonderful festival.","visited","visit","«Last week» ماضٍ ⇐ ماضٍ بسيط."],
+             ["He usually ___ his bike after school.","rides","rode","«usually» عادة ⇐ مضارع بسيط."],
+             ["Two days ago, they ___ a funny show.","watched","watch","«ago» ماضٍ ⇐ ماضٍ بسيط."]];
+  var p=gp(items); var o=opt(p[1],[p[2],p[1]+"ing"]);
+  return ["أكمل (مضارع بسيط أم ماضٍ بسيط؟): "+en(p[0]), o[0], o[1], p[3]]; }
+var STATE_V = [["like","حالة"],["love","حالة"],["want","حالة"],["know","حالة"],["believe","حالة"],["prefer","حالة"],["need","حالة"],
+  ["play","حدث"],["run","حدث"],["make","حدث"],["watch","حدث"],["ride","حدث"],["carve","حدث"]];
+function gStateAction(){ var p=gp(STATE_V); var o=opt(p[1]==="حالة"?"فعل حالة (State Verb)":"فعل حدث (Action Verb)",
+    [p[1]==="حالة"?"فعل حدث (Action Verb)":"فعل حالة (State Verb)","ليس فعلًا"]);
+  return [en("«"+p[0]+"»")+" — أهو فعل حالةٍ أم فعل حدث؟", o[0], o[1],
+    p[1]==="حالة" ? en(p[0])+" فعل حالة: يصف شعورًا أو رأيًا أو معرفة، فلا يُستعمل في المضارع المستمر عادةً (لا نقول "+en("I am liking")+")."
+                  : en(p[0])+" فعل حدث: يصف عملًا يُفعل، فيصحّ في المستمر ("+en("I am "+p[0]+"ing")+")."]; }
+function gStateProg(){
+  var items=[["My cousin ___ at the fair right now.","is playing","plays","حدثٌ يجري الآن ⇐ المستمرّ."],
+             ["I ___ this hobby very much.","like","am liking","فعل حالة ⇐ لا يأتي في المستمرّ."],
+             ["She ___ that origami is amazing.","believes","is believing","فعل حالة ⇐ لا يأتي في المستمرّ."],
+             ["They ___ their bikes at the moment.","are riding","ride","«at the moment» ⇐ المستمرّ."]];
+  var p=gp(items); var o=opt(p[1],[p[2],"was "+p[1].split(" ").pop()]);
+  return ["أكمل: "+en(p[0]), o[0], o[1], p[3]]; }
+
+/* ============ Unit 2 — House Designs ============
+   مفردات البيت والتصميم، والمستقبل بـ will، والفرق بين will وbe going to. */
+var HOUSE = [["architect","مهندس معماريّ"],["basement","قبو / سرداب"],["design","تصميم"],["entrance","مدخل"],
+  ["fridge","ثلّاجة"],["gate","بوّابة"],["key","مفتاح"],["layout","المخطّط / التوزيع"],["materials","موادّ البناء"],
+  ["measurements","القياسات"],["oven","فرن"],["screen","شاشة"],["shelf","رفّ"],["corner","ركن / زاوية"],
+  ["cushion","وسادة"],["stairs","درج"],["floor","الأرضيّة / الطابق"],["door","باب"]];
+var HOUSE_W = [["actually","في الحقيقة"],["else","غير ذلك / آخر"],["empty","فارغ"],["front","الأمام / الأماميّ"],
+  ["instead","بدلًا من ذلك"],["later","لاحقًا"],["of course","بالطبع"],["wonder","يتساءل"],["haunted","مسكون"],["flashlight","كشّاف / بطّارية"]];
+function gHouse(){ var p=gp(HOUSE); var o=opt(p[1], dist(HOUSE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gHouseW(){ var p=gp(HOUSE_W); var o=opt(p[1], dist(HOUSE_W,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gWill(){
+  var items=[["I ___ look for the key.","will","willing"],["We ___ come here again. (نفي)","won't","don't"],
+             ["I ___ tell my dad you don't like fish.","will","am"],["Don't worry — I ___ help you.","will","did"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"will to"]);
+  return ["أكمل (المستقبل بـ will): "+en(p[0]), o[0], o[1], "بعد "+en("will")+" يأتي الفعل مجرّدًا، ونفيه "+en("won't")+"."]; }
+function gWillGoing(){
+  var items=[["I ___ sleep at Luna's house tonight. (خطّةٌ مرتّبةٌ من قبل)","am going to","will","الخطّة المرتّبة سلفًا ⇐ "+en("be going to")+"."],
+             ["The bag is heavy! I ___ carry it for you. (قرارٌ في اللحظة)","will","am going to","القرار وقت الكلام ⇐ "+en("will")+"."],
+             ["Look at those clouds — it ___ rain. (دليلٌ أمامنا)","is going to","will","الدليل الظاهر ⇐ "+en("be going to")+"."],
+             ["We ___ visit the new house next Friday. (متّفقٌ عليه)","are going to","will","الاتّفاق السابق ⇐ "+en("be going to")+"."]];
+  var p=gp(items); var o=opt(p[1],[p[2],"went to"]);
+  return ["أكمل ("+en("will")+" أم "+en("be going to")+"؟): "+en(p[0]), o[0], o[1], p[3]]; }
+var VN_WORDS = [["design","يُصمّم","تصميم"],["screen","يفحص/يعرض","شاشة"],["phone","يتّصل","هاتف"],
+  ["key","يُدخل بالمفتاح","مفتاح"],["floor","يُذهل","أرضيّة"]];
+function gVerbNoun2(){ var p=gp(VN_WORDS); var o=opt("اسمًا وفعلًا معًا",["اسمًا فقط","فعلًا فقط"]);
+  return ["كلمة "+en("«"+p[0]+"»")+" — كيف تُستعمل في هذه الوحدة؟", o[0], o[1],
+    "بعض الكلمات تُستعمل اسمًا وفعلًا: "+en(p[0])+" اسمًا = "+p[2]+"، وفعلًا = "+p[1]+"."]; }
+
+/* ============ Unit 3 — Job Paths ============
+   المهن وأماكن العمل، وbe going to، وmay/might، وأسئلة الذيل. */
+var JOBS = [["actor","ممثّل"],["actress","ممثّلة"],["artist","فنّان"],["businessman","رجل أعمال"],["businesswoman","سيّدة أعمال"],
+  ["driver","سائق"],["engineer","مهندس"],["fashion designer","مصمّم أزياء"],["flight attendant","مضيف طيران"],
+  ["journalist","صحفيّ"],["manager","مدير"],["mechanic","ميكانيكيّ"],["photographer","مصوّر"],["pilot","طيّار"],
+  ["singer","مغنٍّ"],["waiter","نادل"]];
+var WORKPLACE = [["airport","مطار"],["factory","مصنع"],["gallery","معرض فنّيّ"],["office","مكتب"],["stage","خشبة المسرح"],
+  ["meeting","اجتماع"],["news","الأخبار"],["job","وظيفة"]];
+var JOB_MATCH = [["pilot","airport"],["mechanic","factory"],["artist","gallery"],["manager","office"],["singer","stage"]];
+function gJob(){ var p=gp(JOBS); var o=opt(p[1], dist(JOBS,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gPlace(){ var p=gp(WORKPLACE); var o=opt(p[1], dist(WORKPLACE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gJobPlace(){ var p=gp(JOB_MATCH); var o=opt(p[1], dist(JOB_MATCH,p,1)); return ["أين يعمل "+en("«a "+p[0]+"»")+" غالبًا؟", o[0], o[1], en("A "+p[0]+" works at the/a "+p[1])+"."]; }
+function gIst(){
+  var items=[["art","artist","فنّ ← فنّان"],["journal","journalist","صحيفة ← صحفيّ"],["science","scientist","علم ← عالِم"],["piano","pianist","بيانو ← عازف بيانو"]];
+  var p=gp(items); var o=opt(p[1],[p[0]+"er",p[0]+"or"]);
+  return ["أضف اللاحقة "+en("-ist")+" إلى "+en("«"+p[0]+"»")+" لتحصل على اسم صاحب المهنة:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). اللاحقة "+en("-ist")+" تصنع اسم من يعمل بالشيء."]; }
+function gGoingTo3(){
+  var items=[["I'm ___ going to work in an office. (نفي)","not","don't"],
+             ["She ___ going to be a pilot.","is","are"],
+             ["They ___ going to open a factory.","are","is"],
+             ["What ___ you going to be in the future?","are","do"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"was"]);
+  return ["أكمل ("+en("be going to")+"): "+en(p[0]), o[0], o[1], "الصيغة: "+en("am/is/are + going to + verb")+"، والنفي بإضافة "+en("not")+" بعد فعل الكون."]; }
+function gMayMight(){
+  var items=[["She ___ be a pilot because she likes flying. (احتمالٌ وارد)","may","will","الاحتمال غير المؤكّد ⇐ "+en("may/might")+"."],
+             ["Julian ___ not be a pilot because he's scared of planes. (احتمالٌ ضعيف)","might","will","الاحتمال الضعيف ⇐ "+en("might not")+"."],
+             ["I'm not sure. I ___ become an engineer.","might","am","عدم التأكّد ⇐ "+en("might")+"."]];
+  var p=gp(items); var o=opt(p[1],[p[2],"must"]);
+  return ["أكمل: "+en(p[0]), o[0], o[1], p[3]]; }
+function gTag(){
+  var items=[["This is a theater, ___?","isn't it","is it"],["I can come, ___?","can't I","can I"],
+             ["She is a journalist, ___?","isn't she","is she"],["They aren't waiters, ___?","are they","aren't they"],
+             ["You like this job, ___?","don't you","do you"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"isn't he"]);
+  return ["أكمل سؤال الذيل (Question tag): "+en(p[0]), o[0], o[1], "قاعدة الذيل: جملةٌ مثبتة ⇐ ذيلٌ منفيّ، وجملةٌ منفيّة ⇐ ذيلٌ مثبت. الصحيح: "+en(p[1])+"."]; }
+
+/* ============ Unit 4 — Glorious Food ============
+   مفردات الطبخ، وshould/had better للنصح، والشرط الصفريّ. */
+var FOOD_N = [["butter","زبدة"],["cookies","بسكويت"],["countertop","سطح المطبخ"],["flour","دقيق"],["honey","عسل"],
+  ["ingredients","المكوّنات"],["recipe","وصفة"],["snack","وجبة خفيفة"],["sugar","سكّر"],["topping","الطبقة العلويّة"],
+  ["yogurt","زبادي"],["dough","عجين"],["diet","نظام غذائيّ"],["dairy","منتجات الألبان"],["proteins","بروتينات"]];
+var FOOD_V = [["bake","يخبز"],["fetch","يُحضر / يجلب"],["cut","يقطع"],["measure","يقيس"],["mix","يخلط"],
+  ["pour","يصبّ"],["roll","يفرد بالنشّابة"],["stir","يُقلّب"],["taste","يتذوّق"],["smell","يشمّ"]];
+function gFoodN(){ var p=gp(FOOD_N); var o=opt(p[1], dist(FOOD_N,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gFoodV(){ var p=gp(FOOD_V); var o=opt(p[1], dist(FOOD_V,p,1)); return ["معنى الفعل "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gFoodStep(){
+  var items=[["___ the flour with a cup before you add it.","Measure","Taste"],["___ the eggs and the sugar together.","Mix","Bake"],
+             ["___ the milk into the bowl slowly.","Pour","Cut"],["___ the dough with a rolling pin.","Roll","Stir"],
+             ["___ the cookies in the oven for ten minutes.","Bake","Fetch"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"Smell"]);
+  return ["أكمل خطوة الوصفة: "+en(p[0]), o[0], o[1], "الفعل المناسب: "+en(p[1])+"."]; }
+function gShould(){
+  var items=[["You ___ get your ingredients ready first. (نصيحة)","should","must","النصيحة العادية ⇐ "+en("should")+"."],
+             ["You ___ not leave the cookies in the oven too long! (تحذيرٌ أقوى)","had better","should to","التحذير الشديد ⇐ "+en("had better not")+"."],
+             ["You ___ wash your hands before you cook.","should","shoulds","بعد "+en("should")+" يأتي الفعل مجرّدًا."],
+             ["We ___ better ask the chef first.","had","have","الصيغة "+en("had better")+" ثابتة."]];
+  var p=gp(items); var o=opt(p[1],[p[2],"will"]);
+  return ["أكمل (نصيحة أم تحذير؟): "+en(p[0]), o[0], o[1], p[3]]; }
+function gZeroCond(){
+  var items=[["We add more water ___ the sauce is too thick.","if","so"],
+             ["___ it doesn't taste great, I stir in more salt.","If","But"],
+             ["If you heat butter, it ___.","melts","melted"],
+             ["If you don't measure the flour, the cake ___ wrong.","goes","went"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"will"]);
+  return ["أكمل (الشرط الصفريّ): "+en(p[0]), o[0], o[1],
+    "الشرط الصفريّ لحقيقةٍ تتكرّر دائمًا: "+en("If + present simple, present simple")+" — الصحيح: "+en(p[1])+"."]; }
+function gSmells(){
+  var items=[["It ___ great! I want to eat now.","smells","smell"],["These cookies ___ delicious.","taste","tastes"],
+             ["The soup ___ too salty.","tastes","taste"]];
+  var p=gp(items); var o=opt(p[1],[p[2],"smelling"]);
+  return ["أكمل: "+en(p[0]), o[0], o[1], "أفعال الحواسّ ("+en("smell/taste")+") تتبع الفاعل: مفردٌ يأخذ "+en("s")+"، وجمعٌ بلا "+en("s")+"."]; }
+
+var UW = [gWVoc, gMonthAr, gMonthOrder, gNum, gHowManyLong, gAgo, gSup, gWPast];
+var U1 = [gAdjPI, gPIExp, gUn, gUnMean, gPresPast, gStateAction, gStateProg];
+var U2 = [gHouse, gHouseW, gWill, gWillGoing, gVerbNoun2];
+var U3 = [gJob, gPlace, gJobPlace, gIst, gGoingTo3, gMayMight, gTag];
+var U4 = [gFoodN, gFoodV, gFoodStep, gShould, gZeroCond, gSmells];
+var ALL = UW.concat(U1).concat(U2).concat(U3).concat(U4);
+
+/* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
+   يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a></div>'+
+    '<div class="unit">📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)</div>'+
+    '<div class="tabs" role="tablist">'+
+            '<button data-tab="w" aria-selected="true">W) Welcome</button>'+
+      '<button data-tab="u1" aria-selected="false">1) Personal Interests</button>'+
+      '<button data-tab="u2" aria-selected="false">2) House Designs</button>'+
+      '<button data-tab="u3" aria-selected="false">3) Job Paths</button>'+
+      '<button data-tab="u4" aria-selected="false">4) Glorious Food</button>'+
+      '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
+      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
+    '</div>'+
+    '<section class="panel" id="all"></section>'+
+    '<section class="panel active" id="w"></section>'+
+    '<section class="panel" id="u1"></section>'+
+    '<section class="panel" id="u2"></section>'+
+    '<section class="panel" id="u3"></section>'+
+    '<section class="panel" id="u4"></section>'+
+    '<section class="panel" id="rem"></section>'+
+    '<footer>English · Grade 5 · Welcome + Part 1 (Units 1–4) · مطابق لكتاب أسامة</footer>';
+
+  var CFG = {
+    all: {gens:ALL, n:15, intro:"اختبار شامل على Welcome والوحدات 1–4: مفردات وقواعد — <b>أسئلة جديدة كل مرة</b>.", label:"إنجليزي٥ — شامل"},
+    w:   {gens:UW,  n:10, intro:"<b>Welcome!</b> — التقويم والتاريخ (<span class=en>ago / early / late / month</span>)، شهور السنة، الأعداد <span class=en>101–1000</span>، وأسئلة <span class=en>How many / How long</span>، ومراجعة الماضي البسيط والتفضيل.", label:"إنجليزي٥ — Welcome"},
+    u1:  {gens:U1,  n:10, intro:"<b>Unit 1 — Personal Interests:</b> صفات الوصف (<span class=en>amazing, enormous, popular…</span>)، والسابقة <span class=en>un-</span>، والمضارع البسيط مقابل الماضي البسيط، وأفعال الحالة مقابل أفعال الحدث.", label:"إنجليزي٥ و1 — Personal Interests"},
+    u2:  {gens:U2,  n:10, intro:"<b>Unit 2 — House Designs:</b> مفردات البيت والتصميم (<span class=en>architect, layout, materials…</span>)، والمستقبل بـ<span class=en>will</span>، والفرق بين <span class=en>will</span> و<span class=en>be going to</span>.", label:"إنجليزي٥ و2 — House Designs"},
+    u3:  {gens:U3,  n:10, intro:"<b>Unit 3 — Job Paths:</b> المهن وأماكن العمل، واللاحقة <span class=en>-ist</span>، و<span class=en>be going to</span>، و<span class=en>may / might</span> للاحتمال، وأسئلة الذيل.", label:"إنجليزي٥ و3 — Job Paths"},
+    u4:  {gens:U4,  n:10, intro:"<b>Unit 4 — Glorious Food:</b> مفردات الطبخ والوصفات، والنصح بـ<span class=en>should</span> و<span class=en>had better</span>، والشرط الصفريّ (<span class=en>Zero conditional</span>).", label:"إنجليزي٥ و4 — Glorious Food"}
+  };
+
+  function render(id){
+    var c = CFG[id], sec = document.getElementById(id);
+    var items = genN(c.gens, c.n);
+    // 📚 اتعلّم أولًا: فيديو شرح الوحدة (من عين) قبل الأسئلة — مستثنى من كشف الخروج
+    var html = '';
+    var topic=null; for(var ti=0;ti<REMTOPICS.length;ti++){ if(REMTOPICS[ti].id===id){ topic=REMTOPICS[ti]; break; } }
+    if(topic){
+      html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الوحدة من قناة عين، ثم ابدأ الحل تحت.'+
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name)+' انجليزي')+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الوحدة</a></div></div>';
+    }
+    html += '<div class="intro">'+c.intro+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">Q'+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
+    var answered={}, correct=0, total=items.length, saved=false;
+    var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var __ok = (+btn.dataset.j===ans);
+          if(id==="all"){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          // صف القراءة: استمع + قيّم نطقي (يظهر بعد الإجابة كي لا يُكشف الجواب)
+          if(!qEl.querySelector(".prow")){
+            var ansText=items[i][1][ans];
+            var tgt=enTarget(qEl.querySelector(".stem"), ansText);
+            if(tgt){
+              var row=document.createElement("div"); row.className="prow";
+              row.innerHTML='🗣️ <span class="en"></span> <button class="say small listen">🔊 استمع</button>'+
+                '<input class="kmic" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
+                '<button class="say small kchk" style="background:#16a34a;border-color:#16a34a">✅ افحص النطق</button>'+
+                azBtnHtml()+'<span class="pfb"></span>';
+              row.querySelector(".en").textContent=tgt;
+              qEl.appendChild(row);
+              var fb=row.querySelector(".pfb");
+              row.querySelector(".listen").addEventListener("click",function(){ azureSpeak(tgt); });
+              var kin=row.querySelector(".kmic"), kchk=row.querySelector(".kchk");
+              if(kchk) kchk.addEventListener("click",function(){ var said=normEN(kin.value), t=normEN(tgt); var ok=said && (said===t || t.indexOf(said)>=0 || said.indexOf(t)>=0); fb.style.color=ok?"var(--good)":"var(--bad)"; fb.textContent=ok?" ✅ نطق صحيح!":" ❌ غير واضح، جرّب ثانية"; });
+              var az=row.querySelector(".azbtn"); if(az) az.addEventListener("click",function(){ azureAssess(tgt, fb, az); });
+            }
+          }
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+            if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  // ===== علاجي =====
+  var REM_PAGE="english5", REM_LABEL="الإنجليزي";
+  var REMTOPICS=[
+    {id:"w",  name:"W) Welcome", tip:"شهور السنة بالترتيب، والأعداد من 101 إلى 1000، والفرق بين How many (للعدد) وHow long (للمدّة)، ومراجعة الماضي البسيط وصيغة التفضيل the -est.", yt:"شرح How many How long والأعداد بالإنجليزي للأطفال"},
+    {id:"u1", name:"1) Personal Interests", tip:"الصفات (amazing/enormous/popular…)، والسابقة un- التي تقلب المعنى إلى ضدّه (friendly→unfriendly)، ومتى نستعمل المضارع البسيط (عادة) والماضي البسيط (انتهى)، وأفعال الحالة (like/know/believe) التي لا تأتي في المستمرّ.", yt:"شرح present simple vs past simple و state verbs"},
+    {id:"u2", name:"2) House Designs", tip:"مفردات البيت والتصميم، وwill للقرار في اللحظة والوعد، وbe going to للخطّة المرتّبة سلفًا أو الدليل الظاهر.", yt:"شرح الفرق بين will و be going to"},
+    {id:"u3", name:"3) Job Paths", tip:"أسماء المهن وأماكن العمل، واللاحقة -ist (art→artist)، وmay/might للاحتمال غير المؤكّد، وأسئلة الذيل: جملة مثبتة ⇐ ذيل منفيّ والعكس.", yt:"شرح question tags و may might بالإنجليزي"},
+    {id:"u4", name:"4) Glorious Food", tip:"أفعال الطبخ (measure/mix/pour/stir/bake)، وshould للنصيحة وhad better للتحذير الأقوى، والشرط الصفريّ للحقائق المتكرّرة: If + present, present.", yt:"شرح zero conditional و should had better"}
+  ];
+  var ALL_IDS = ["all"];
+
+  /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
+     بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «قسم علاجي ما حطّيت فيه دروس بعد
+     الاختبار». وسببه أنّ تسجيل نتيجة الدرس كان مشروطًا بألّا يكون
+     الاختبار شاملًا — فمن اختبر الشامل وحده لم يُسجَّل له درسٌ
+     واحد، فيجد «علاجي» فارغًا وقد اختبر لتوّه.
+
+     وهذا نقيض المقصود: الشامل هو الاختبار الوحيد الذي يمسح الدروس
+     كلّها، فهو أولى ما يُبنى عليه ترتيب الضعف.
+
+     ولكنّه اثنا عشر سؤالًا موزّعةً على الدروس، فنصيب الدرس سؤالان
+     أو ثلاثة — وهذا تقديرٌ لا حكم. فنُسجّله موسومًا بعدده،
+     ولا نطمس به نتيجةَ درسٍ اختُبر وحده، فالعشرة أصدق من الاثنين. */
+  /* المطابقة بالاسم أوّلًا، وبهُويّة الدالّة إن كانت مجهولة الاسم —
+     فبعض المولّدات تُصنع بمصنعٍ (bankGen) فتخرج بلا اسم، وكانت
+     تسقط كلّها من الحصر فيبقى «علاجي» فارغًا رغم الاختبار. */
+  function topicOfGen(name, fn){
+    if(!window.__g2t){
+      var m={}, pairs=[];
+      Object.keys(CFG).forEach(function(id){
+        if(ALL_IDS.indexOf(id)>-1 || id==="rem") return;
+        (CFG[id].gens||[]).forEach(function(g){ if(!g) return; if(g.name) m[g.name]=id; pairs.push([g,id]); });
+      });
+      window.__g2t=m; window.__g2tp=pairs;
+    }
+    if(name && window.__g2t[name]) return window.__g2t[name];
+    if(fn){ for(var i=0;i<window.__g2tp.length;i++) if(window.__g2tp[i][0]===fn) return window.__g2tp[i][1]; }
+    return null;
+  }
+  function saveTopicTallies(tally){
+    Object.keys(tally).forEach(function(tid){
+      var v=tally[tid]; if(!v.t) return;
+      var prev=null; try{ prev=JSON.parse(localStorage.getItem(remKey(tid))); }catch(e){}
+      /* نتيجةُ درسٍ اختُبر وحده لا تُطمَس بتقديرٍ من الشامل */
+      if(prev && typeof prev.pct==="number" && !prev.from) return;
+      try{ localStorage.setItem(remKey(tid), JSON.stringify(
+        { pct:Math.round(v.c/v.t*100), n:v.t, from:"all" })); }catch(e){}
+    });
+  }
+
+  function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
+  function renderRem(){
+    var sec=document.getElementById("rem");
+    var arr=REMTOPICS.map(function(t){ var s=null; try{ s=JSON.parse(localStorage.getItem(remKey(t.id))); }catch(e){} return {t:t, pct:(s&&typeof s.pct==="number")?s.pct:null, est:!!(s&&s.from==="all"), n:(s&&s.n)||null}; });
+    var done=arr.filter(function(x){return x.pct!=null;}).sort(function(a,b){return a.pct-b.pct;});
+    var html='<div class="intro">💪 <b>علاجي</b> — نرتّب الوحدات من الأضعف للأقوى ونركّز على ضعفك. (يتحدّث بعد ما تختبر كل وحدة.)</div>';
+    if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الوحدات. جرّب وحدات '+REM_LABEL+' ويرجع هنا يعرض أضعف وحدة مع نصيحة وزر مراجعة.</div>'; }
+    else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
+      html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
+    var un=arr.filter(function(x){return x.pct==null;});
+    if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 وحدات ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
+    html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
+    sec.innerHTML=html;
+    sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ var tb=document.querySelector('.tabs [data-tab="'+b.dataset.go+'"]'); if(tb) tb.click(); }); });
+    var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+  }
+  /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
+     اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
+  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"w"}}).dataset.tab);
+
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
+      document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+      var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
+      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+    });
+  });
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
+// ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
+(function(){var ex=0,h=null;
+// أثناء استخدام المايك (إملاء لوحة المفاتيح أو تقييم Azure) يخفي الآيفون الصفحة لحظة — لا نحسبها خروجًا
+function _isMicEl(t){ return !!(t && /(^|\s)(kmic|dinp|pinp)(\s|$)/.test(t.className||"")); }
+function _micActive(){ if(window.__paBusy>0) return true; if(_isMicEl(document.activeElement)) return true; if(window.__micGrace && Date.now()<window.__micGrace) return true; return false; }
+document.addEventListener("focusin", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+document.addEventListener("focusout", function(e){ if(_isMicEl(e.target)) window.__micGrace=Date.now()+9000; });
+function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
+function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+document.addEventListener("visibilitychange",function(){if(document.hidden){if(_micActive()){window.__micGrace=Date.now()+9000;h=null;return;}h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;if(_micActive())return;ex++;if(ex>=2)ejc();else tst();}});})();
+}
+</script>
+</body>
+</html>
