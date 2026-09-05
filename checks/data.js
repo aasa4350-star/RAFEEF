@@ -112,11 +112,13 @@ async function run(){
      ننتبه: صفوف kind="activity" ليست اختبارات بل أحداثُ فتحِ درس،
      وصفوف kind="talk" ملخّص جلسة محادثة (موضوع/عدد جمل/متوسط نطق)
      لا اختبار له اسمٌ أو درجة بصيغة {total,correct}، وصفوفُ «اختبر
-     نفسك» بالصيغة الأقدم تحمل per/paper بلا meta.test.
+     نفسك» بالصيغة الأقدم تحمل per/paper بلا meta.test، وصفوف
+     kind="micfail" تشخيصُ إخفاق تسجيلٍ لا جلسةَ اختبار — تُحفظ ليُعرف
+     سببُ تعطّل المايك بدل تخمينه (انظر MIC.why في mic-help.js).
      فالمبتور ما خلا من ذلك كلّه. */
   const stub = rows.filter(r => {
     const m = r.meta || {};
-    if (m.kind === 'activity' || m.kind === 'talk') return false;
+    if (m.kind === 'activity' || m.kind === 'talk' || m.kind === 'micfail') return false;
     return !(m.test || m.paper || m.per || m.total);
   }).length;
   if (stub) issues.push({ sev:'خطأ', msg:stub + ' جلسة بلا اسم اختبارٍ ولا نتيجة ولا تفصيل' });
@@ -135,7 +137,7 @@ async function run(){
     (Array.isArray(m.per) && m.per.length > 0);
   const mute = rows.filter(r => {
     const m = r.meta || {};
-    return m.kind !== 'activity' && m.kind !== 'talk' && !scorable(m);
+    return m.kind !== 'activity' && m.kind !== 'talk' && m.kind !== 'micfail' && !scorable(m);
   });
   if (mute.length){
     const by = {};

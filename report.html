@@ -596,7 +596,8 @@ function micFailCardHtml(student){
   var rows = micFailRows(student);
   if(!rows.length) return "";
   var SECT = { passage:"قراءة القطعة", word:"كلمة/جملة", talk:"المحادثة" };
-  var WHY  = { canceled:"ألغتها أزور", nomatch:"ما فهمت الكلام", error:"خطأ في الأداة", timeout:"انقضت المهلة بلا ردّ" };
+  var WHY  = { canceled:"ألغتها أزور", nomatch:"ما فهمت الكلام", error:"خطأ في الأداة",
+               timeout:"انقضت المهلة بلا ردّ", noassess:"سمعت الكلام ولم تُرجع تقييمًا" };
   var by = {};
   rows.forEach(function(r){ var k=(r.meta.sect||"?")+"|"+(r.meta.why||"?")+"|"+(r.meta.code||""); by[k]=(by[k]||0)+1; });
   var top = Object.keys(by).sort(function(a,b){ return by[b]-by[a]; }).slice(0,4);
@@ -617,6 +618,11 @@ function micFailCardHtml(student){
         '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saTime(r.created_at)+
           ' · '+esc(String(m.br||"?"))+(m.osv?' '+esc(String(m.osv)):'')+(m.inApp?' · داخل تطبيق ⚠️':'')+
           (m.online===false?' · بلا إنترنت':'')+
+          /* حالةُ نتيجة أزور وطولُ ما فهمته وهل فيها حقلُ تقييمٍ أصلًا —
+             بها يُفرَّق بين «لم تسمع» و«سمعت ولم تُقيّم» */
+          (m.res?' · حالة: <code>'+esc(String(m.res))+'</code>':'')+
+          (m.txt!=null?' · فهمت '+m.txt+' حرفًا':'')+
+          (m.pa!=null?' · حقل التقييم: '+(m.pa?'موجود':'مفقود ⚠️'):'')+
           (m.detail?'<br>'+esc(String(m.detail).slice(0,160)):'')+'</span>'+
         '</span></li>';
     }).join("")+'</ul>'+

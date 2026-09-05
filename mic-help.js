@@ -196,10 +196,24 @@
      (AuthenticationFailure، ConnectionFailure، Forbidden، TooManyRequests،
      ServiceTimeout...) وبأيّ تفصيل. ونضمّ إليه وصف الجهاز والمتصفّح،
      فيُحفظ صفًّا نقرؤه بدل أن نخمّن مرّةً رابعة. */
-  function why(SDK, result, err){
-    var o = { reason:null, code:null, detail:null };
+  /* ex: الاستثناء الذي وقع أثناء قراءة نتيجة التقييم (إن وقع).
+     أضيف بعد أن جاءت صفوف أسامة بسببٍ فارغ (٥ سبتمبر ٢٠٢٦): أزور تُرجع
+     «RecognizedSpeech» ومع ذلك لا نحصل على كلمات — فالسبب ليس صمتًا ولا
+     إلغاءً، بل شيءٌ في نتيجة التقييم نفسها. فنُسجّل حالة النتيجة كما
+     تُسمّيها أزور، وطول النصّ الذي فهمته، وهل في جوابها حقلُ تقييم نطقٍ
+     أصلًا، ونصّ الاستثناء إن وقع — فبهذه الأربعة يُعرف الموضع بلا تخمين. */
+  function why(SDK, result, err, ex){
+    var o = { reason:null, code:null, detail:null, res:null, txt:null, pa:null };
     try{
       var RR = SDK && SDK.ResultReason;
+      if(result){
+        /* اسم الحالة لا رقمها: enum تُولّد المفتاحين، فنأخذ غير الرقميّ */
+        if(RR){ for(var k in RR){ if(!/^\d+$/.test(k) && RR[k] === result.reason){ o.res = k; break; } } }
+        if(o.res == null && result.reason != null) o.res = "#"+result.reason;
+        if(typeof result.text === "string") o.txt = result.text.length;
+        if(typeof result.json === "string") o.pa = /PronunciationAssessment/.test(result.json);
+      }
+      if(ex){ o.detail = "تقييم: "+String((ex && (ex.message || ex)) || "").slice(0, 200); }
       if(result && RR){
         if(result.reason === RR.NoMatch){
           o.reason = "nomatch";
@@ -220,7 +234,10 @@
         }
       }
     }catch(e){}
-    if(err){ o.reason = "error"; o.detail = String((err && (err.message || err)) || "").slice(0, 300); }
+    if(err){ o.reason = "error"; o.detail = String((err && (err.message || err)) || "").slice(0, 300); return o; }
+    /* سمعت أزور كلامًا ولم نحصل على تقييم: حالةٌ ثالثة لا صمتٌ ولا إلغاء،
+       وكانت تُحفظ سببًا فارغًا فلا تدلّ على شيء. */
+    if(o.reason == null && o.res) o.reason = "noassess";
     return o;
   }
 

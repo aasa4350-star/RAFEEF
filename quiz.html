@@ -1271,6 +1271,7 @@ function saveMicFail(info){
     var e = (window.MIC && MIC.env) ? MIC.env() : {};
     var meta = { kind:"micfail", sect:"word",
       why:(info&&info.reason)||null, code:(info&&info.code)||null, detail:(info&&info.detail)||null,
+      res:(info&&info.res)||null, txt:(info&&info.txt), pa:(info&&info.pa),
       br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online };
     var body = { student:(STUDENTS[who]&&STUDENTS[who].name)||who, grade:(STUDENTS[who]&&STUDENTS[who].grade)||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }

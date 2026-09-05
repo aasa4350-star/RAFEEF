@@ -348,6 +348,7 @@ function saveMicFail(sect, info){
       why:(info && info.reason) || null,
       code:(info && info.code) || null,
       detail:(info && info.detail) || null,
+      res:(info && info.res) || null, txt:(info && info.txt), pa:(info && info.pa),
       br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online
     });
   }catch(err){}
@@ -578,7 +579,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
     rec.recognizeOnceAsync(function(result){
       if(_fin || _userStopped){ _closeRec(); return; }
-      var gotWords=false;
+      var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
       try{
         if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
           var r = SDK.PronunciationAssessmentResult.fromResult(result);
@@ -594,8 +595,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
             var cn = statusEl.querySelector("[data-readcnt]"); if(cn) cn.textContent = allWords.length;
           }
         }
-      }catch(err){}
-      if(!gotWords){ try{ _lastWhy = MIC.why(SDK, result, null); }catch(e){} }
+      }catch(err){ _ex = err; }
+      if(!gotWords){ try{ _lastWhy = MIC.why(SDK, result, null, _ex); }catch(e){} }
       _closeRec();
       if(_fin || _userStopped) return;
       var next = gotWords ? 0 : consecNoMatch+1;
