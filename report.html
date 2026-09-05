@@ -582,6 +582,47 @@ function pronCardHtml(student){
   '</div>';
 }
 
+/* ===== ⚠️ إخفاقات التسجيل =====
+   ثلاثة بلاغاتٍ متتالية عن تعطّل التسجيل، وخمّنتُ في اثنين فأخطأت، لأنّ
+   الموقع لم يكن يحفظ عن الإخفاق شيئًا: كلّ سببٍ يُعرض للطفل جملةً واحدة
+   («ما وضح صوتك») ثمّ يذهب بلا أثر. فصار يُحفظ بسببه كما تقوله أزور ومعه
+   وصف الجهاز — وهذا القسم يعرضه، فيُقرأ العطل بدل أن يُخمَّن.
+   ولا يظهر القسم أصلًا إن لم يقع إخفاق. */
+function micFailRows(student){
+  return ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="micfail"; })
+            .sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); });
+}
+function micFailCardHtml(student){
+  var rows = micFailRows(student);
+  if(!rows.length) return "";
+  var SECT = { passage:"قراءة القطعة", word:"كلمة/جملة", talk:"المحادثة" };
+  var WHY  = { canceled:"ألغتها أزور", nomatch:"ما فهمت الكلام", error:"خطأ في الأداة", timeout:"انقضت المهلة بلا ردّ" };
+  var by = {};
+  rows.forEach(function(r){ var k=(r.meta.sect||"?")+"|"+(r.meta.why||"?")+"|"+(r.meta.code||""); by[k]=(by[k]||0)+1; });
+  var top = Object.keys(by).sort(function(a,b){ return by[b]-by[a]; }).slice(0,4);
+  return '<div class="card"><h2>⚠️ إخفاقات التسجيل</h2>'+
+    '<p class="note">هذه ليست درجات — هي ما قالته خدمة النطق حين تعذّر التسجيل، '+
+    'محفوظةً ليُعرف سبب العطل بدل تخمينه.</p>'+
+    '<div class="stats"><div class="stat"><div class="v">'+rows.length+'</div><div class="l">إخفاق</div></div></div>'+
+    '<ul class="sk">'+top.map(function(k){
+      var p=k.split("|");
+      return '<li><span class="pill bad">'+by[k]+'</span><span class="nm">'+
+        (SECT[p[0]]||esc(p[0]))+' — '+(WHY[p[1]]||esc(p[1]))+(p[2]?' <code>'+esc(p[2])+'</code>':'')+'</span></li>';
+    }).join("")+'</ul>'+
+    '<ul class="sk">'+rows.slice(0,6).map(function(r){
+      var m=r.meta;
+      return '<li><span class="pill" style="background:var(--bg)">·</span><span class="nm">'+
+        (SECT[m.sect]||esc(String(m.sect||"")))+' · '+(WHY[m.why]||esc(String(m.why||"")))+
+        (m.code?' · <code>'+esc(String(m.code))+'</code>':'')+
+        '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saTime(r.created_at)+
+          ' · '+esc(String(m.br||"?"))+(m.osv?' '+esc(String(m.osv)):'')+(m.inApp?' · داخل تطبيق ⚠️':'')+
+          (m.online===false?' · بلا إنترنت':'')+
+          (m.detail?'<br>'+esc(String(m.detail).slice(0,160)):'')+'</span>'+
+        '</span></li>';
+    }).join("")+'</ul>'+
+  '</div>';
+}
+
 /* ===== حصّة أزور المجانية (F0: خمس ساعات صوت شهريًّا، مفتاحٌ واحد للأربعة) =====
    سؤال الأب: «أزور كم يعطي من ساعة في الشهر مجانية؟» — الجواب خمس، لكنّه لم
    يكن يعرف كم استُهلك. صرنا نخزّن ثواني الصوت الفعليّة التي تعدّها أزور نفسها
@@ -629,6 +670,7 @@ function render(){
       writingCardHtml(current)+
       talkCardHtml(current)+
       pronCardHtml(current)+
+      micFailCardHtml(current)+
       azureQuotaHtml()+
       stretchCard;
     return;
@@ -665,6 +707,7 @@ function render(){
     writingCardHtml(current)+
     talkCardHtml(current)+
     pronCardHtml(current)+
+    micFailCardHtml(current)+
     azureQuotaHtml()+
     stretchCard+
     '<div class="card"><h2>📋 نسخ التقرير</h2>'+

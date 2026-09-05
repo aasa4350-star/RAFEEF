@@ -131,6 +131,33 @@ function azureSpeak(text){
     synth.speakSsmlAsync(ssml, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; }, function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speakEN(text); });
   }catch(e){ speakEN(text); }
 }
+/* ═══ لماذا أخفق التسجيل — يُحفظ لا يُخمَّن ═══
+   انظر شرحه الكامل في mic-help.js (MIC.why). بلا هذا كان كلّ سببٍ —
+   شبكةً أو مفتاحًا أو حصّةً نفدت — يُعرض «ما وضح صوتك» ويذهب بلا أثر. */
+function saveMicFail(info){
+  try{
+    var e = (window.MIC && MIC.env) ? MIC.env() : {};
+    var meta = { kind:"micfail", sect:"word",
+      why:(info&&info.reason)||null, code:(info&&info.code)||null, detail:(info&&info.detail)||null,
+      br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online };
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body) }).catch(function(){});
+  }catch(err){}
+}
+function micFailMsg(info){
+  var c = (info && info.code) || "";
+  if(info && info.reason === "canceled"){
+    if(/Authentication|Forbidden/i.test(c)) return "❌ خدمة تقييم النطق رفضت الطلب (مفتاح الاشتراك). أخبر والدك — ما هي مشكلةٌ منك.";
+    if(/TooManyRequests/i.test(c))          return "❌ خدمة تقييم النطق مشغولة الآن. انتظر دقيقة ثمّ أعد المحاولة.";
+    if(/Connection|Timeout/i.test(c))       return "❌ انقطع الاتّصال بخدمة النطق. تأكّد من الإنترنت وأعد المحاولة — صوتك سليم.";
+    return "❌ خدمة تقييم النطق توقّفت" + (c ? " ("+c+")" : "") + ". أعد المحاولة، وإن تكرّر فأخبر والدك.";
+  }
+  return null;
+}
+
 function _paRun(refText, statusEl, btn, tries){
   tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
@@ -188,8 +215,15 @@ function _paRun(refText, statusEl, btn, tries){
       }
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();
-    if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
-  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); MIC.fail(statusEl, btn, { tail:MIC_TAIL }); _end(); });
+    if(outcome==="nomatch"){
+      var _w=null; try{ _w=MIC.why(SDK, result, null); }catch(e){}
+      var _m=micFailMsg(_w);
+      /* الإلغاء لا يُعالَج بالإعادة: نقوله صراحةً ونحفظه */
+      if(_m){ statusEl.style.color="var(--bad)"; statusEl.innerHTML=_m; saveMicFail(_w); return; }
+      if(tries>=1) saveMicFail(_w);
+      _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
+    }
+  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL }); _end(); });
   }
 }
 var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';

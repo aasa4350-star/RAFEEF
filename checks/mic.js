@@ -95,6 +95,11 @@ module.exports = function mic() {
     if (/MIC\.audioConfig/.test(src) && !/MIC\.releaseSoon|MIC\.release\b/.test(src)) {
       issues.push({ sev: 'تنبيه', msg: file + ' — يفتح المايك ولا يُغلقه (MIC.releaseSoon مفقود)' });
     }
+    /* ٦) سببُ الإخفاق يُقرأ لا يُخمَّن: صفحةٌ تُنشئ مُتعرّفًا ولا تسأل
+       أزور لماذا أخفقت تُعيدنا إلى التخمين الذي أضاع ثلاثة بلاغات. */
+    if (/new\s+SDK\.SpeechRecognizer|new\s+SpeechSDK\.SpeechRecognizer/.test(src) && !/MIC\.why/.test(src)) {
+      issues.push({ sev: 'خطأ', msg: file + ' — لا يقرأ سبب إخفاق أزور (MIC.why): كلّ سببٍ سيُعرض «ما وضح صوتك» ولن يبقى منه أثر' });
+    }
     /* ٥) إصدار أداة النطق */
     SDK_RE.lastIndex = 0;
     let v;

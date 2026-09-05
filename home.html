@@ -249,7 +249,7 @@ async function loadReport(){
      فتُخفّض enAvg/maAvg و«المستوى الحالي» زورًا كلّما كتب الابن فقرة
      أو تكلّم في talk.html. هذه هي الصفحة التي يفتحها الابن نفسه. */
   var practice=rows.filter(function(x){ return x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"); });
-  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
+  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
 
   var notes=[];
   try{ var nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}

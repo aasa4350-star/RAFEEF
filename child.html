@@ -179,7 +179,7 @@ async function main(){
      المستوى زورًا — وسعود فعلًا عنده جلسات محادثة حقيقية اليوم كانت
      تُحسب صفرًا في معدّله بصمت. */
   const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"));
-  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
+  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
      فجلسةُ خمسة أسئلة تُزحزح «المستوى الحالي» كأنّها ورقةٌ كاملة. */

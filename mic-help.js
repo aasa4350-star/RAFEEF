@@ -181,6 +181,62 @@
     }).catch(function(){ g.__micGrace = Date.now() + 15000; onDenied(); });
   }
 
+  /* ═══ لماذا أخفق التسجيل — كما تقوله أزور نفسها ═══
+     بلاغ الأب (٥ سبتمبر ٢٠٢٦): «الكلمات مضبوطة، لكن قراءة القطعة
+     والمحادثة ما ضبطت». وهذا ثالث بلاغٍ في المسألة نفسها، وقد خمّنتُ
+     مرّتين قبله فأخطأت: مرّةً في نوع التعرّف ومرّةً في عدد فتحات المايك.
+
+     وسببُ الخطأ أنّي لم أكن أملك خبرًا واحدًا عمّا جرى على أجهزتهم:
+     الموقع كلّه لم يكن فيه سطرٌ يقرأ سبب الإلغاء. فكلّ إخفاقٍ — سواءٌ
+     أكان انقطاع شبكةٍ أم رفض مصادقةٍ أم نفاد الحصّة أم مايكًا مشغولًا —
+     كان يُعرض على الطفل جملةً واحدة: «ما وضح الصوت، اقرأ أعلى». فيرفع
+     صوته ولا ينفع، ولا يبقى منه أثرٌ نعرف به ما جرى.
+
+     فصرنا نسأل أزور: NoMatch أم Canceled؟ وإن أُلغي فبأيّ رمز
+     (AuthenticationFailure، ConnectionFailure، Forbidden، TooManyRequests،
+     ServiceTimeout...) وبأيّ تفصيل. ونضمّ إليه وصف الجهاز والمتصفّح،
+     فيُحفظ صفًّا نقرؤه بدل أن نخمّن مرّةً رابعة. */
+  function why(SDK, result, err){
+    var o = { reason:null, code:null, detail:null };
+    try{
+      var RR = SDK && SDK.ResultReason;
+      if(result && RR){
+        if(result.reason === RR.NoMatch){
+          o.reason = "nomatch";
+          try{ var nd = SDK.NoMatchDetails.fromResult(result); o.code = String(nd.reason); }catch(e){}
+          return o;
+        }
+        if(result.reason === RR.Canceled){
+          o.reason = "canceled";
+          try{
+            var c = SDK.CancellationDetails.fromResult(result);
+            /* اسم الرمز أنفع من رقمه: Forbidden أوضح من 8 */
+            var names = SDK.CancellationErrorCode || {};
+            var ec = c.ErrorCode != null ? c.ErrorCode : c.errorCode;
+            o.code = (typeof ec === "number" && names[ec]) ? String(names[ec]) : (ec != null ? String(ec) : null);
+            o.detail = String(c.errorDetails || "").slice(0, 300);
+          }catch(e){}
+          return o;
+        }
+      }
+    }catch(e){}
+    if(err){ o.reason = "error"; o.detail = String((err && (err.message || err)) || "").slice(0, 300); }
+    return o;
+  }
+
+  /* وصفُ الجهاز — مختصرٌ بلا ما يُعرّف بشخصٍ، إنّما ما يُفسّر عطلًا */
+  function env(){
+    var ua = navigator.userAgent || "";
+    var ios = /iP(hone|od|ad)/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    var m = /OS (\d+)[_.](\d+)/.exec(ua);
+    var br = /CriOS/.test(ua) ? "chrome-ios" : /FxiOS/.test(ua) ? "firefox-ios" :
+             /EdgiOS/.test(ua) ? "edge-ios" : ios ? "safari" :
+             /Edg\//.test(ua) ? "edge" : /Chrome/.test(ua) ? "chrome" :
+             /Firefox/.test(ua) ? "firefox" : /Safari/.test(ua) ? "safari" : "other";
+    return { ios:ios, osv:(m ? m[1]+"."+m[2] : null), br:br,
+             inApp:inAppBrowser(), online:(navigator.onLine !== false) };
+  }
+
   /* مغادرة الصفحة تُغلق المايك — لا يُترك مفتوحًا بعد انتهاء الدرس */
   try{
     g.addEventListener("pagehide", release);
@@ -189,5 +245,5 @@
 
   g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
             ensure:ensure, stream:stream, release:release, releaseSoon:releaseSoon,
-            keep:keep, audioConfig:audioConfig };
+            keep:keep, audioConfig:audioConfig, why:why, env:env };
 })(window);

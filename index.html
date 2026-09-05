@@ -290,7 +290,7 @@ function azureQuotaHtml(rows){
     activity.forEach(a=>{ (actBy[a.student] = actBy[a.student]||[]).push(a); });
     const practiceBy = {};
     data.filter(row=> row.meta && (row.meta.kind==="practice"||row.meta.kind==="writing"||row.meta.kind==="writing-drill"||row.meta.kind==="talk")).forEach(p=>{ (practiceBy[p.student]=practiceBy[p.student]||[]).push(p); });
-    data = data.filter(row=> !(row.meta && (row.meta.kind==="activity"||row.meta.kind==="practice"||row.meta.kind==="writing"||row.meta.kind==="writing-drill"||row.meta.kind==="talk")));
+    data = data.filter(row=> !(row.meta && (row.meta.kind==="micfail"||row.meta.kind==="activity"||row.meta.kind==="practice"||row.meta.kind==="writing"||row.meta.kind==="writing-drill"||row.meta.kind==="talk")));
     status.textContent = `آخر تحديث: ${new Date().toLocaleString("en-GB",{timeZone:"Asia/Riyadh"})} (السعودية) · ${data.length} محاولة`;
     if(!data.length){
       content.innerHTML = `<div class="card empty">ما فيه نتائج بعد.<br>افتح رابط أي ابن من تحت وخلّه يحل الاختبار، وبتظهر نتيجته هنا تلقائيًا.</div>`;

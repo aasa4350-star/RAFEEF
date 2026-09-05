@@ -334,6 +334,36 @@ function saveScore(test, correct, total, extra){
    نعرف كم استهلكنا من ساعات أزور المجانية الخمس.
    نحفظ: الدرجة والدقّة والطلاقة والاكتمال، وعدد الكلمات، وثواني الصوت
    الفعليّة (لقياس الحصّة)، وسرعة القراءة كلمة/دقيقة. */
+/* ═══ لماذا أخفق التسجيل — يُحفظ لا يُخمَّن ═══
+   ثلاثة بلاغاتٍ متتالية عن التسجيل، وخمّنتُ في اثنين منها فأخطأت،
+   لأنّه لم يكن في الموقع خبرٌ واحدٌ عمّا يجري على أجهزتهم. فصار كلّ
+   إخفاقٍ يُحفظ بسببه كما تقوله أزور، ومعه وصف الجهاز.
+   ولا نحفظ الإخفاق الأوّل الذي تعقبه محاولةٌ ناجحة — إنّما الإخفاق
+   الذي وقف عنده الطفل فعلًا، لئلّا يمتلئ الجدول بضجيجٍ لا يدلّ. */
+function saveMicFail(sect, info){
+  try{
+    var e = (window.MIC && MIC.env) ? MIC.env() : {};
+    saveScore("تعذّر التسجيل ⚠️", 0, 0, {
+      kind:"micfail", sect:sect,
+      why:(info && info.reason) || null,
+      code:(info && info.code) || null,
+      detail:(info && info.detail) || null,
+      br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online
+    });
+  }catch(err){}
+}
+/* رسالةٌ صادقة: الإلغاء ليس «ما وضح صوتك». من انقطعت شبكته لا ينفعه
+   أن يرفع صوته، ومن نفدت حصّته لا ينفعه أن يعيد. */
+function micFailMsg(info){
+  var c = (info && info.code) || "";
+  if(info && info.reason === "canceled"){
+    if(/Authentication|Forbidden/i.test(c)) return "❌ خدمة تقييم النطق رفضت الطلب (مفتاح الاشتراك). أخبر والدك — ما هي مشكلةٌ منك.";
+    if(/TooManyRequests/i.test(c))          return "❌ خدمة تقييم النطق مشغولة الآن. انتظر دقيقة ثمّ أعد المحاولة.";
+    if(/Connection|Timeout/i.test(c))       return "❌ انقطع الاتّصال بخدمة النطق. تأكّد من الإنترنت وأعد المحاولة — صوتك سليم.";
+    return "❌ خدمة تقييم النطق توقّفت" + (c ? " ("+c+")" : "") + ". أعد المحاولة، وإن تكرّر فأخبر والدك.";
+  }
+  return null;   /* NoMatch حقيقيّ: تبقى الرسالة المعتادة */
+}
 function savePron(isAr, d){
   try{
     if(typeof d.pron !== "number" || isNaN(d.pron)) return;
@@ -449,6 +479,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
      نجمعها لسببين: قياس استهلاك الحصّة المجانية (٥ ساعات شهريًّا) بدقّة،
      وحساب سرعة القراءة (كلمة/دقيقة) وهي مؤشّر طلاقةٍ حقيقيّ. */
   var _audioSec = 0;
+  var _lastWhy = null;   /* آخر سببٍ قالته أزور — يُحفظ إن انتهت القراءة بلا كلمة */
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
@@ -456,7 +487,12 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
     if(btn){ btn.disabled=false; }
-    if(!allWords.length){ statusEl.style.color="var(--bad)"; statusEl.innerHTML="⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية." + KEEP_GOING; if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon(); return; }
+    if(!allWords.length){
+      statusEl.style.color="var(--bad)";
+      var _m = micFailMsg(_lastWhy);
+      statusEl.innerHTML = (_m || "⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية.") + KEEP_GOING;
+      saveMicFail("passage", _lastWhy);
+      if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon(); return; }
     var sum=0,n=0; allWords.forEach(function(w){ var a=w.PronunciationAssessment||{}; if(typeof a.AccuracyScore==="number" && (a.ErrorType||"None")!=="Insertion"){ sum+=a.AccuracyScore; n++; } });
     var wordAcc = n?Math.round(sum/n):0;
     // متوسّط مرجّح بعدد كلمات كل مقطع للدقّة/الطلاقة/النطق
@@ -559,6 +595,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
           }
         }
       }catch(err){}
+      if(!gotWords){ try{ _lastWhy = MIC.why(SDK, result, null); }catch(e){} }
       _closeRec();
       if(_fin || _userStopped) return;
       var next = gotWords ? 0 : consecNoMatch+1;
@@ -566,6 +603,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 150);
     }, function(err){
       if(_fin || _userStopped) return;
+      try{ _lastWhy = MIC.why(SDK, null, err); }catch(e){}
       _closeRec();
       if(_resumes < MAX_RESUMES){ _resumes++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
       if(!_retryOrFail()) finish();
@@ -645,8 +683,15 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
       }
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();
-    if(outcome==="nomatch") _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
-  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); micFail(statusEl, btn, onFail); _end(); });
+    if(outcome==="nomatch"){
+      var w=null; try{ w = MIC.why(SDK, result, null); }catch(e){}
+      var m = micFailMsg(w);
+      /* الإلغاء لا يُعالَج بالإعادة: نقولها صراحةً ونحفظها فورًا */
+      if(m){ statusEl.style.color="var(--bad)"; statusEl.innerHTML=m+KEEP_GOING; saveMicFail("word", w); if(onFail){ try{ onFail(); }catch(e){} } return; }
+      if(tries>=1) saveMicFail("word", w);
+      _retryOrFail("❌ ما وضح الصوت — اقرأ أعلى وأوضح واضغط «قيّم نطقي» ثانية.");
+    }
+  }, function(err){ if(_fin) return; _fin=true; clearTimeout(_to); var w=null; try{ w=MIC.why(SDK,null,err); }catch(e){} saveMicFail("word", w); micFail(statusEl, btn, onFail); _end(); });
   }
 }
 /* تشخيص المايكروفون في mic-help.js — مشتركٌ مع quiz وenglish وtalk.
