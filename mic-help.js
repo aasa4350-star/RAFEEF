@@ -103,23 +103,91 @@
      فيتسابق الطلب والعدّاد. فصرنا نطلبه أوّلًا ونبدأ بعده — فيأخذ الطفل
      نافذة الاستماع كاملةً. وإن رُفض الإذن ظهر السبب الحقيقيّ (diagnose)
      بدل «ما سمعتك» الغامضة.
-     ونحرّر المسار فورًا: إمساكه يُبقي مؤشّر المايك مضاءً ويزاحم أزور. */
+     ═══ فتحُ المايك مرّةً واحدة — بلاغ الأب (٥ سبتمبر ٢٠٢٦) ═══
+     «التسجيل عند أسامة متعطل». وهو تكرارٌ لبلاغ ٣١ أغسطس: «أسامة كلّ
+     الأقسام تقبل معه إلّا قراءة القطعة». وقد أعدنا يومها بناء قراءة
+     القطعة على دوراتٍ من recognizeOnceAsync فلم يُشفَ.
+
+     والعلّة الحقيقية أعمق: كانت كلّ دورةٍ تفتح المايكروفون من جديد
+     بـ AudioConfig.fromDefaultMicrophoneInput()، فقراءةُ قطعةٍ واحدة
+     تفتح المايك وتغلقه عشر مرّاتٍ أو أكثر. وهذا أشدّ ما يكون هشاشةً
+     على سفاري/آيفون. ولهذا كانت الكلمة المفردة تنجح معه (فتحٌ واحد)
+     وتفشل القطعة (فتحٌ متكرّر) — وهو الفرق الذي وصفه بنفسه.
+
+     ثمّ زدنا الطين بلّةً في ٢ سبتمبر: صارت ensure تفتح المايك لتأخذ
+     الإذن ثمّ **تغلقه فورًا**، فتفتحه أزور بعدها من جديد. ففتحتان
+     متعاقبتان قبل أن ينطق الطفل حرفًا، والأولى تستهلك إيماءة الضغط
+     التي يشترطها سفاري للثانية.
+
+     فصرنا نفتحه مرّةً واحدةً ونُمسك المسار حيًّا ونُسلّمه إلى أزور عبر
+     AudioConfig.fromStreamInput — والمكتبة لا تُغلق مسارًا سلّمناه لها
+     (تستعمل PcmRecorder(false)، بخلاف المايك الافتراضيّ)، فيبقى
+     صالحًا لكلّ الدورات. فلا فتح إلّا واحد مهما طالت القراءة.
+
+     ونحرّره حين ينتهي التقييم (بعد مهلةٍ قصيرة تكفي النقرات المتتابعة)
+     وعند مغادرة الصفحة، فلا يبقى مؤشّر المايك مضاءً بلا سبب. */
+  function streamAlive(){
+    var s = g.__micStream;
+    if(!s || !s.active) return false;
+    try{
+      var ts = s.getAudioTracks ? s.getAudioTracks() : s.getTracks();
+      for(var i=0;i<ts.length;i++){ if(ts[i].readyState === "live") return true; }
+    }catch(e){}
+    return false;
+  }
+  function stream(){ return streamAlive() ? g.__micStream : null; }
+  function release(){
+    if(_relTo){ clearTimeout(_relTo); _relTo = null; }
+    var s = g.__micStream; g.__micStream = null;
+    if(!s) return;
+    try{ s.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+  }
+  var _relTo = null;
+  /* تحريرٌ مؤجَّل: نقرتان متتابعتان على كلمتين تُعيدان استعمال المسار
+     نفسه بلا فتحٍ جديد، ثمّ يُغلق من تلقائه إن سكت الطفل. */
+  function releaseSoon(ms){
+    if(_relTo) clearTimeout(_relTo);
+    _relTo = setTimeout(function(){ _relTo = null; if(!g.__paBusy) release(); }, ms || 20000);
+  }
+  function keep(){ if(_relTo){ clearTimeout(_relTo); _relTo = null; } }
+
+  /* إعدادُ الصوت لأزور: مسارُنا الحيّ إن وُجد، وإلّا المايك الافتراضيّ
+     (وهو ما كان يُستعمل دائمًا قبل هذا الإصلاح) حتى لا ينكسر شيء. */
+  function audioConfig(SDK){
+    var s = stream();
+    if(s && SDK && SDK.AudioConfig && SDK.AudioConfig.fromStreamInput){
+      try{ return SDK.AudioConfig.fromStreamInput(s); }catch(e){}
+    }
+    return SDK.AudioConfig.fromDefaultMicrophoneInput();
+  }
+
   function ensure(statusEl, onReady, onDenied){
-    if(g.__micGranted){ onReady(); return; }
+    keep();
+    if(streamAlive()){ onReady(); return; }
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ onReady(); return; }
-    if(statusEl){ statusEl.style.color="var(--muted)";
+    /* لا نُظهر «اضغط Allow» إلّا في الطلب الأوّل — فبعد السماح مرّةً
+       يعود الطلب فوريًّا بلا نافذة، ورسالةٌ عن نافذةٍ لا تظهر تُربك. */
+    if(statusEl && !g.__micGranted){ statusEl.style.color="var(--muted)";
       statusEl.innerHTML="🎤 اضغط <b>Allow</b> للسماح بالمايكروفون، وبعدها أستمع لك."; }
     /* نافذة الإذن نافذةُ نظامٍ فوق الصفحة، وصفحات الاختبار تعدّ الغياب خروجًا.
        فنُمدّد مهلة السماح قبل الطلب وبعده لئلّا يُحسب على الطفل خروجٌ لم
        يفعله لمجرّد أنّه سمح للمايكروفون — بلاغ ٤ سبتمبر ٢٠٢٦. */
     g.__micGrace = Date.now() + 30000;
     navigator.mediaDevices.getUserMedia({ audio:true }).then(function(st){
-      try{ st.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+      g.__micStream = st;
       g.__micGranted = true;
       g.__micGrace = Date.now() + 15000;
       onReady();
     }).catch(function(){ g.__micGrace = Date.now() + 15000; onDenied(); });
   }
 
-  g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK, ensure:ensure };
+  /* مغادرة الصفحة تُغلق المايك — لا يُترك مفتوحًا بعد انتهاء الدرس */
+  try{
+    g.addEventListener("pagehide", release);
+    g.addEventListener("beforeunload", release);
+  }catch(e){}
+
+  g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
+            ensure:ensure, stream:stream, release:release, releaseSoon:releaseSoon,
+            keep:keep, audioConfig:audioConfig };
 })(window);

@@ -17,6 +17,7 @@ const audio   = require('./audio');
 const think   = require('./think');
 const kangaroo= require('./kangaroo');
 const eduvid  = require('./eduvid');
+const mic     = require('./mic');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -75,7 +76,16 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   });
   if (!ev.issues.length) console.log('  ✅ لا ملاحظات');
 
-  head('٧ · طبقة البيانات');
+  head('٧ · مسار المايكروفون');
+  const mc = mic();
+  console.log('صفحات النطق: ' + mc.pages);
+  mc.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!mc.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٨ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {

@@ -251,7 +251,9 @@ function listen(statusEl, btn, onDone, tries){
     // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
     cfg.speechRecognitionLanguage="en-GB";
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
-    audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
+    /* المايك يُفتح مرّةً واحدة ويُعاد استعماله في كلّ دور — فتحُه لكلّ
+       دورٍ كان هشًّا على سفاري/آيفون. انظر MIC.audioConfig في mic-help.js */
+    audio=MIC.audioConfig(SDK);
     rec=new SDK.SpeechRecognizer(cfg, audio);
     try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}
     /* ترجيح العبارات المتوقّعة: التعرّف هنا حرٌّ بلا نصٍّ مرجعيّ، فيخطئ في
@@ -268,7 +270,7 @@ function listen(statusEl, btn, onDone, tries){
   statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
   var fin=false;
   /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور */
-  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} notHeard(); }, 22000);
+  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} MIC.releaseSoon(45000); notHeard(); }, 22000);
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; clearTimeout(to);
     var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false,audioSec:0};
@@ -299,7 +301,7 @@ function listen(statusEl, btn, onDone, tries){
         }catch(e){}
       }
     }catch(e){}
-    try{rec.close();}catch(e){}
+    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
     /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
     if(!out.text){ notHeard(); return; }
     /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حتى المحادثة يتكلّم ولا ينحفظ ثمّ يقول سجّل
@@ -318,7 +320,7 @@ function listen(statusEl, btn, onDone, tries){
     resetBtn();
     statusEl.textContent="";
     onDone(out);
-  }, function(err){ if(fin)return; fin=true; clearTimeout(to); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} });
+  }, function(err){ if(fin)return; fin=true; clearTimeout(to); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
   }
 }
 

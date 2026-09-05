@@ -139,7 +139,7 @@ function _paRun(refText, statusEl, btn, tries){
     // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
     cfg.speechRecognitionLanguage="en-GB";
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
-    audio=SDK.AudioConfig.fromDefaultMicrophoneInput();
+    audio=MIC.audioConfig(SDK);   /* المايك المفتوح مرّةً واحدة — انظر mic-help.js */
     rec=new SDK.SpeechRecognizer(cfg, audio);
     pa=new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
     pa.applyTo(rec);
@@ -148,7 +148,7 @@ function _paRun(refText, statusEl, btn, tries){
   statusEl.style.color="var(--muted)"; statusEl.innerHTML=(tries>0?"🔁 مرة ثانية — ":"🎙️ ")+"اقرأ الآن بصوت واضح...";
   var _fin=false;
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء تقييم النطق
-  function _end(){ if(btn) btn.disabled=false; if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} }
+  function _end(){ if(btn) btn.disabled=false; if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; try{ rec.close(); }catch(e){} MIC.releaseSoon(); }
   // إعادة محاولة تلقائية واحدة عند عدم وضوح الصوت (الكلمات القصيرة تحتاج محاولتين أحيانًا)
   function _retryOrFail(finalMsg){
     if(tries<1){
