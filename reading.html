@@ -1347,6 +1347,31 @@ if(!META[who] || !DATA[who]){
     var box = Math.min(st.b||0, SR_DAYS.length-1);
     return (st.t + SR_DAYS[box]*SR_DAY_MS) - Date.now();
   }
+  /* ═══ الكلمة المعروضة تُسجَّل ولو لم يُجب عنها ═══
+     بلاغ الأب (٥ سبتمبر ٢٠٢٦): «حسن يبي يراجع ٣٠ كلمة ثمّ ٣٠ أخرى، بس
+     طلعت نفسها ما طلعت كلمات جديدة».
+
+     والعلّة أنّ الكلمة لا تتقدّم إلّا إذا ضغط «تحقّق» عليها (srMark)،
+     والاختيار مرتّبٌ بالفهرس ترتيبًا ثابتًا. فما تركه بلا إجابة يبقى
+     على حاله فيُختار هو بعينه في الجلسة التالية. والقياس أثبته: من
+     يستعرض بلا إجابةٍ يرى الخمس والعشرين نفسها إلى الأبد (تكرار ١٠٠٪)،
+     ومن يجيب عن ٤٠٪ يرى ٦٠٪ منها مكرّرةً في كلّ جلسة.
+
+     فصرنا نُسجّل زمن العرض (st.s) لكلّ كلمةٍ تُعرض، ونؤخّرها ساعاتٍ عن
+     الجلسة التالية ما دام في البنك غيرها. ولا يمسّ ذلك قياس الحفظ:
+     الصندوق (b) وعدد الإصابات (c) لا يتقدّمان إلّا بإجابةٍ صحيحة —
+     فالعرض ليس معرفة، وإنّما هو دورٌ أخذته الكلمة فلا تحتكر الطابور. */
+  var SHOWN_COOLDOWN_MS = 6*3600*1000;
+  function srShow(words){
+    if(!words || !words.length) return;
+    var s=getSR(), now=Date.now();
+    words.forEach(function(w){
+      var k=w[0]; var st=s[k] || {b:0,t:0,n:0,c:0};
+      st.s = now; s[k]=st;
+    });
+    setSR(s);
+  }
+  function shownRecently(st){ return (st && st.s && (Date.now()-st.s) < SHOWN_COOLDOWN_MS) ? 1 : 0; }
   function srMark(word, ok){
     var s=getSR(), st=s[word] || {b:0,t:0,n:0,c:0};
     st.n++;
@@ -1549,12 +1574,17 @@ if(!META[who] || !DATA[who]){
            البنك كاملًا في نحو خمسة وسبعين يومًا مع بقاء الأولويّة للمتأخّرات. */
         var dueL=[], newL=[], restL=[];
         pool.forEach(function(w,i){
-          var st = srs[w[0]], d = srDueIn(st), o = { w:w, weak:(wk[w[0]]?1:0), due:d, idx:i };
-          if(!st) newL.push(o); else if(d<=0) dueL.push(o); else restL.push(o);
+          var st = srs[w[0]], d = srDueIn(st);
+          /* seen: عُرضت عليه قبل ساعاتٍ قليلة — تُؤخَّر ما دام في البنك غيرها.
+             وهي مقدَّمةٌ على الفهرس في الترتيب لا على الضعف ولا على التأخّر:
+             فالكلمة الضعيفة أو المتأخّرة تبقى أولى ولو عُرضت. */
+          var o = { w:w, weak:(wk[w[0]]?1:0), due:d, seen:shownRecently(st), idx:i };
+          /* «لم تُراجَع قطّ» = بلا محاولةٍ سابقة (b/t)، والعرضُ وحده لا يُخرجها منها */
+          if(!st || !st.t) newL.push(o); else if(d<=0) dueL.push(o); else restL.push(o);
         });
-        function byPri(a,b){ return (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); }
+        function byPri(a,b){ return (b.weak-a.weak) || (a.seen-b.seen) || (a.due-b.due) || (a.idx-b.idx); }
         dueL.sort(byPri); restL.sort(byPri);
-        newL.sort(function(a,b){ return (b.weak-a.weak) || (a.idx-b.idx); });
+        newL.sort(function(a,b){ return (b.weak-a.weak) || (a.seen-b.seen) || (a.idx-b.idx); });
         rvSize = getRvSize(learned);
         var wantNew = Math.min(newL.length, Math.round(rvSize * NEW_SHARE));
         var wantDue = Math.min(dueL.length, rvSize - wantNew);
@@ -1579,6 +1609,8 @@ if(!META[who] || !DATA[who]){
         }
         /* العرض بترتيب الملف أيضًا (انظر التعليق أعلاه) */
         V = sel.sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
+        /* تُسجَّل بمجرّد عرضها — وإلّا عادت هي بعينها في الجلسة التالية */
+        srShow(V);
         dueNow = dueL.length + newL.length;
         masteredNow = srMastered(fullPool);
       } else { V=[]; }
