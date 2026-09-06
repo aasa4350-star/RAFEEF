@@ -291,8 +291,8 @@ function listen(statusEl, btn, onDone, tries){
     // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
     cfg.speechRecognitionLanguage="en-GB";
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
-    /* المايك يُفتح مرّةً واحدة ويُعاد استعماله في كلّ دور — فتحُه لكلّ
-       دورٍ كان هشًّا على سفاري/آيفون. انظر MIC.audioConfig في mic-help.js */
+    /* مسارٌ جديد لكلّ دور. جرّبنا العكس (مسارٌ واحدٌ مُمسَك يُعاد استعماله)
+       فمات الحوار من دوره الثاني على سفاري. انظر MIC.audioConfig في mic-help.js */
     audio=MIC.audioConfig(SDK);
     rec=new SDK.SpeechRecognizer(cfg, audio);
     try{ var pa=new SDK.PronunciationAssessmentConfig("", SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, false); pa.applyTo(rec); }catch(e){}

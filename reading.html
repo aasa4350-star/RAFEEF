@@ -570,8 +570,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
          الخدمة الدورة، حتى يقف الطفل عند النقطة ويتنفّس بلا انقطاعٍ عليه. */
       try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"15000");
            cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"4000"); }catch(e){}
-      /* مسارُ المايك المفتوح مرّةً واحدة — لا فتحٌ جديد لكلّ دورة.
-         انظر MIC.audioConfig في mic-help.js وبلاغ ٥ سبتمبر ٢٠٢٦. */
+      /* مسارٌ جديد لكلّ دورة. أمسكنا المسار مرّةً فماتت الدورة الثانية على
+         سفاري — انظر MIC.audioConfig في mic-help.js وبلاغ ٦ سبتمبر ٢٠٢٦. */
       audio = MIC.audioConfig(SDK);
       rec = new SDK.SpeechRecognizer(cfg, audio);
       pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
@@ -634,7 +634,7 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
     // القطعة الطويلة: نسمح بوقفات أطول بين الجمل (٤ث) ومهلة بدء أطول حتى لا يتقطّع
     try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, longText?"15000":"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, longText?"4000":"1500"); }catch(e){}
-    audio = MIC.audioConfig(SDK);   /* المسار المفتوح مرّةً واحدة — انظر mic-help.js */
+    audio = MIC.audioConfig(SDK);   /* مسارٌ جديد لكلّ تعرّف — انظر mic-help.js */
     rec = new SDK.SpeechRecognizer(cfg, audio);
     pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
     pa.applyTo(rec);

@@ -12,7 +12,7 @@
    لأنّها كانت تأخذ الإذن ثمّ توقف المسار فورًا.
 
    والدواء: فتحٌ واحد، ومسارٌ حيٌّ يُسلَّم لأزور عبر
-   AudioConfig.fromStreamInput. فيفحص هذا الملفّ أن يبقى كذلك:
+   مسارٍ جديدٍ لكلّ تعرّف. فيفحص هذا الملفّ أن يبقى كذلك:
 
    ١) لا صفحةَ تفتح المايك الافتراضيّ مباشرةً — كلّها عبر MIC.audioConfig.
    ٢) MIC.ensure لا توقف المسار الذي فتحته (وإلّا عادت الفتحة الثانية).
@@ -61,15 +61,23 @@ module.exports = function mic() {
   if (!em) {
     issues.push({ sev: 'تنبيه', msg: HELP + ' — تعذّرت قراءة جسم ensure، فلم يُفحص إمساك المسار' });
   } else {
-    if (/getTracks\(\)[\s\S]{0,80}\.stop\(\)/.test(em[0])) {
-      issues.push({ sev: 'خطأ', msg: HELP + ' — ensure توقف المسار الذي فتحته، فتفتحه أزور ثانيةً: فتحتان قبل أن ينطق الطفل' });
+    /* القاعدة انقلبت بالدليل (٦ سبتمبر ٢٠٢٦): كنّا نُمسك مسار المايك
+       ونُسلّمه لأزور مرّةً واحدة، فتبيّن من بيانات الأولاد أنّ ذلك يقطع
+       الحوار من دوره الثاني على سفاري — المسار المستعمَل في سياقٍ صوتيٍّ
+       أُغلق لا يُعطي صوتًا في سياقٍ جديد. فصار المطلوب عكسه:
+       مسارٌ جديد لكلّ تعرّف، وensure تُحرّر مسار الإذن فورًا. */
+    if (!/getTracks\(\)[\s\S]{0,80}\.stop\(\)/.test(em[0])) {
+      issues.push({ sev: 'خطأ', msg: HELP + ' — ensure لا تُحرّر مسار الإذن: إمساكُه يُصمت الدور الثاني في سفاري ويُبقي المؤشّر مضاءً' });
     }
-    if (!/__micStream\s*=\s*st/.test(em[0])) {
-      issues.push({ sev: 'خطأ', msg: HELP + ' — ensure لا تحفظ المسار في __micStream، فلا شيء يُعاد استعماله' });
+    if (/__micStream\s*=\s*st/.test(em[0])) {
+      issues.push({ sev: 'خطأ', msg: HELP + ' — ensure تُمسك المسار في __micStream: هذا ما قطع المحادثة من دورها الثاني' });
     }
   }
-  if (!/fromStreamInput/.test(help)) {
-    issues.push({ sev: 'خطأ', msg: HELP + ' — لا يستعمل AudioConfig.fromStreamInput، فكلّ دورةٍ تفتح المايك من جديد' });
+  if (/fromStreamInput/.test(help)) {
+    issues.push({ sev: 'خطأ', msg: HELP + ' — يُسلّم أزور مسارًا مُمسكًا (fromStreamInput): يعمل الدور الأوّل ويصمت ما بعده' });
+  }
+  if (!/fromDefaultMicrophoneInput/.test(help)) {
+    issues.push({ sev: 'خطأ', msg: HELP + ' — لا يفتح مسارًا جديدًا لكلّ تعرّف (fromDefaultMicrophoneInput)' });
   }
 
   /* ═══ الصفحات ═══ */
