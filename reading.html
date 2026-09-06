@@ -615,15 +615,18 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
          لكنّها كانت تُطبَّق أيضًا حين لا تفتح أزور جلسةً أصلًا: يقرأ
          الطفل القطعة كاملةً في الفراغ، ثمّ يُقال له بعد دقيقتين ونصف
          «ما التقطتُ صوتك بعد ثلاث محاولات» — وهي صورة الأب بعينها.
-         فإن لم تُفتح الجلسة خلال ٧ث فالمسار ميّت: نُغلق ونُعيد فورًا.
-         ودورتان ميّتتان تكفيان للحكم: لا نُطيل عليه ثمانيَ إعادات. */
+         فإن لم تُفتح الجلسة خلال ١٥ث فالمسار ميّت: نُغلق ونُعيد فورًا.
+         ودورتان ميّتتان تكفيان للحكم: لا نُطيل عليه ثمانيَ إعادات.
+         و«١٥ث» لا «٧ث»: صفوف ٦ سبتمبر أظهرت أنّ سبعًا تقطع اتّصالًا
+         سليمًا وهو في طريقه على شبكة الجوّال. ولا يُحسب إلّا غيابُ
+         الجلسة نفسها — فمتى فُتحت فالطفل يقرأ على راحته بلا عدّاد. */
       _cycTo = setTimeout(function(){
         if(_fin || _userStopped || _st.ss!=null) return;
         _dead++; _closeRec();
         if(_dead < 2){ window.__micGrace=Date.now()+9000;
           setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
         finish();
-      }, 7000);
+      }, 15000);
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
     rec.recognizeOnceAsync(function(result){
       if(_fin || _userStopped){ _closeRec(); return; }
@@ -1618,9 +1621,24 @@ if(!META[who] || !DATA[who]){
           /* «لم تُراجَع قطّ» = بلا محاولةٍ سابقة (b/t)، والعرضُ وحده لا يُخرجها منها */
           if(!st || !st.t) newL.push(o); else if(d<=0) dueL.push(o); else restL.push(o);
         });
-        function byPri(a,b){ return (b.weak-a.weak) || (a.seen-b.seen) || (a.due-b.due) || (a.idx-b.idx); }
+        /* ═══ «عُرضت للتوّ» تسبق «ضعيفة» ═══════════════════════════════
+           بلاغ الأب (٦ سبتمبر ٢٠٢٦): «لا زالت نفس المشكلة — بس صار
+           يغيّر ترتيب الكلمات ويغيّر أربع كلمات».
+
+           وكان الضعف مقدَّمًا على كلّ شيء، والكلمة لا تخرج من «الضعيفة»
+           إلّا بإجابةٍ صحيحة. فالكلمات التي يخطئ فيها حسنٌ دائمًا كانت
+           تتصدّر كلّ جلسةٍ يفتحها — اثنتان وعشرون كلمةً ضعيفة في جلسةٍ
+           سعتها خمسٌ وعشرون، فلا يتغيّر إلّا ثلاثٌ أو أربع. وهو ما وصفه
+           بالحرف. وقياسٌ بحالةٍ واقعيّة (عدّاد ٥١٠، ٢٦٠ مدروسة، ٢٢
+           ضعيفة) أعطى تكرارًا ٦٠٪ بين كلّ جلستين متتاليتين.
+
+           فقُدّمت مهلةُ العرض (٦ ساعات) على الضعف: ما عُرض قبل قليلٍ
+           يُؤجَّل ما دام في البنك غيرُه، والضعفُ يبقى مرجِّحًا داخل كلّ
+           فئة. فلا تضيع الكلمة الضعيفة — إنّما تعود في الجلسة التالية
+           بعد أن يرى ما لم يره. وهذا معنى «يراجع ٣٠ ثمّ ٣٠ أخرى». */
+        function byPri(a,b){ return (a.seen-b.seen) || (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); }
         dueL.sort(byPri); restL.sort(byPri);
-        newL.sort(function(a,b){ return (b.weak-a.weak) || (a.seen-b.seen) || (a.idx-b.idx); });
+        newL.sort(function(a,b){ return (a.seen-b.seen) || (b.weak-a.weak) || (a.idx-b.idx); });
         rvSize = getRvSize(learned);
         var wantNew = Math.min(newL.length, Math.round(rvSize * NEW_SHARE));
         var wantDue = Math.min(dueL.length, rvSize - wantNew);

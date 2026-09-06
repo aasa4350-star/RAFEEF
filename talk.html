@@ -323,7 +323,10 @@ function listen(statusEl, btn, onDone, tries){
     // لهجة التقييم تتبع لهجة الصوت الذي يسمعه الطفل (رايان بريطاني):
     // لو قيّمناه أمريكيًّا حُوسب على تقليد ما سمعه — car وwater وclass تختلف.
     cfg.speechRecognitionLanguage="en-GB";
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"8000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
+    /* ثماني ثوانٍ للصمت الأوّل كانت قصيرةً على طفل: صفُّ سعود يقول إنّه
+       بدأ الكلام بعد ١٨٫٦ ثانية — يقرأ السؤال ويفهمه ثمّ يركّب جوابه
+       بالإنجليزيّة. فنمنحه عشرين ثانيةً يفكّر فيها بلا أن تقطع عليه. */
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
     /* مسارٌ جديد لكلّ دور. جرّبنا العكس (مسارٌ واحدٌ مُمسَك يُعاد استعماله)
        فمات الحوار من دوره الثاني على سفاري. انظر MIC.audioConfig في mic-help.js */
     audio=MIC.audioConfig(SDK);
@@ -345,12 +348,13 @@ function listen(statusEl, btn, onDone, tries){
        واحدًا. فنُعلّم على كلّ مرحلةٍ بوقتها، ونحفظها مع الإخفاق. */
     _st.t0=Date.now();
     try{
-      rec.sessionStarted=function(){ _st.ss=Date.now()-_st.t0; };
+      rec.sessionStarted=function(){ _st.ss=Date.now()-_st.t0; if(_st.onLife) _st.onLife("ss"); };
       rec.sessionStopped=function(){ _st.sp=Date.now()-_st.t0; };
-      rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; };
-      rec.speechEndDetected=function(){ _st.se=Date.now()-_st.t0; };
+      rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; if(_st.onLife) _st.onLife("sd"); };
+      rec.speechEndDetected=function(){ _st.se=Date.now()-_st.t0; if(_st.onLife) _st.onLife("se"); };
       rec.recognizing=function(s,e){ _st.rz++; if(_st.rz1==null) _st.rz1=Date.now()-_st.t0;
-        try{ _st.part=((e&&e.result&&e.result.text)||"").slice(0,60); }catch(x){} };
+        try{ _st.part=((e&&e.result&&e.result.text)||"").slice(0,60); }catch(x){}
+        if(_st.onLife) _st.onLife("rz"); };
       rec.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
         try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){} };
     }catch(e){}
@@ -359,16 +363,47 @@ function listen(statusEl, btn, onDone, tries){
   statusEl.style.color="var(--muted)";
   statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
   var fin=false;
-  /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور.
-     ولا نُجمّد الطفل ٢٢ ثانيةً أمام شاشةٍ ساكنة إن كان الصوت لم يصل أزور
-     أصلًا: إن لم تُفتح الجلسة خلال ٧ث فالمسار ميّت، ولا فائدة من الانتظار. */
-  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} MIC.releaseSoon(45000);
-    notHeard({reason:"timeout",code:_stage(),detail:"مهلة الأمان ٢٢ث انقضت بلا ردٍّ من أزور — "+_stageAr()}); }, 22000);
-  var toEarly=setTimeout(function(){ if(fin || _st.ss!=null) return; fin=true; clearTimeout(to);
-    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
-    notHeard({reason:"nosession",code:_stage(),detail:"لم تُفتح جلسةُ أزور خلال ٧ث — الصوت لم يصل الخدمة"}); }, 7000);
+  /* ═══ المهلة تُقاس من آخر إشارةِ حياة، لا من لحظة الضغط ═══
+     بلاغ الأب (٦ سبتمبر ٢٠٢٦): «مرّة يضبط ومرّة لا». وصفّا سعود حسما
+     الأمر، وما كانت العلّة في المايك أصلًا:
+
+       ss=646 · sd=18623 · rz=4  →  قُتل عند ٢٢ث
+       ss=700 · sd=5700  · rz=2  →  قُتل عند ٢٢ث
+
+     أي أنّ جلسة أزور فُتحت في أقلّ من ثانية، وسمعت الطفل، وأرسلت
+     نتائجَ جزئيّة — ثمّ قتلتْها مهلةُ الأمان الثابتة (٢٢ث) وهي حيّة.
+     وسعودٌ بدأ يتكلّم بعد ١٨٫٦ ثانية: يقرأ السؤال، ويفكّر، ثمّ يجيب.
+     فأيّ طفلٍ يتأنّى قبل جوابه كنتُ أقتل تعرّفَه — ومن أجاب مسرعًا
+     نجح. وهذا بعينه «مرّة يضبط ومرّة لا».
+
+     فالمهلة الثابتة خطأٌ في أصلها: قياسُها يجب أن يكون من آخر شيءٍ
+     سمعناه من أزور لا من لحظة الضغط. فما دامت الخدمة تُرسل شيئًا
+     فهي حيّةٌ ولا يُقتل التعرّف مهما طال تفكيرُ الطفل. */
+  var to=null;
+  function _arm(ms, why){
+    if(to) clearTimeout(to);
+    to=setTimeout(function(){ if(fin)return; fin=true; to=null;
+      try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+      notHeard({ reason:(_st.ss==null?"nosession":"timeout"), code:_stage(),
+                 detail:why+" — "+_stageAr() }); }, ms);
+  }
+  /* لا جلسة: نمهلها ١٥ث. اتّصالٌ باردٌ على شبكةِ جوّالٍ قد يتأخّر،
+     و٧ ثوانٍ كانت تقطع اتّصالًا سليمًا وهو في طريقه. */
+  _arm(15000, "لم تُفتح جلسةُ أزور خلال ١٥ث");
+  /* وكلُّ إشارةٍ من أزور تُجدّد المهلة: فتحُ الجلسة، بدءُ الكلام،
+     وكلُّ نتيجةٍ جزئيّة. فالعدّاد يقيس صمتَ الخدمة لا صمتَ الطفل. */
+  _st.onLife=function(kind){
+    if(fin) return;
+    /* ٣٠ث بعد فتح الجلسة لا أكثر: أزور نفسها تُرجع «ما سمعت» بعد ٢٠ث
+       من الصمت الأوّل، فإن مضت ثلاثون بلا حرفٍ منها فهي ميّتة قطعًا.
+       وهذه المهلة لا تقطع تعرّفًا حيًّا أبدًا — أوّل ما يتكلّم الطفل
+       يصل speechStartDetected فتُجدَّد المهلة من جديد. */
+    if(kind==="ss")      _arm(30000, "فُتحت الجلسة ثمّ صمتت الخدمة ٣٠ث");
+    else if(kind==="sd") _arm(30000, "سمعت بدء الكلام ثمّ صمتت الخدمة ٣٠ث");
+    else                 _arm(25000, "وصلت نتائجُ جزئيّة ثمّ صمتت الخدمة ٢٥ث");
+  };
   rec.recognizeOnceAsync(function(result){
-    if(fin)return; fin=true; clearTimeout(to); clearTimeout(toEarly);
+    if(fin)return; fin=true; if(to){clearTimeout(to);to=null;}
     var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false,audioSec:0};
     try{
       if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
@@ -416,7 +451,7 @@ function listen(statusEl, btn, onDone, tries){
     resetBtn();
     statusEl.textContent="";
     onDone(out);
-  }, function(err){ if(fin)return; fin=true; clearTimeout(to); clearTimeout(toEarly); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
+  }, function(err){ if(fin)return; fin=true; if(to){clearTimeout(to);to=null;} var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
   }
 }
 
