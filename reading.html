@@ -507,7 +507,11 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       r.sessionStarted=function(){ _st.ss=Date.now()-_st.t0; _dead=0; };
       r.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; };
       r.recognizing=function(s,e){ _st.rz++; if(_st.rz1==null) _st.rz1=Date.now()-_st.t0;
-        try{ _st.part=((e&&e.result&&e.result.text)||"").slice(0,60); }catch(x){} };
+        var _t=""; try{ _t=(e&&e.result&&e.result.text)||""; }catch(x){}
+        _st.part=_t.slice(0,60);
+        /* آخر ما سمعته أزور يُعرض له وهو يقرأ — دليلٌ حيٌّ أنّ صوته يصل */
+        try{ var el=statusEl.querySelector("[data-livetxt]");
+          if(el && _t) el.textContent="👂 "+_t.slice(-70); }catch(x){} };
       r.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
         try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){} };
     }catch(e){}
@@ -566,7 +570,14 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   function _showListening(mode){
     statusEl.style.color="var(--muted)";
     var head = (mode==="resume") ? '' : (mode ? '🔄 نجرّب مرة ثانية — ' : '');
-    statusEl.innerHTML = head+'🎙️ اقرأ القطعة كاملة بصوت واضح على راحتك... (<b data-readcnt>'+allWords.length+'</b> كلمة) '+
+    /* ═══ يرى ما تسمعه أزور وهو يقرأ ═══
+       صفوف ٦ سبتمبر لقراءة القطعة تقول ss=1935 · sd=9676 · rz=17: أزور
+       سمعته وأرسلت سبع عشرة نتيجةً جزئيّة ثمّ تعلّقت. وكان يقرأ القطعة
+       كاملةً أمام شاشةٍ لا تتحرّك إلّا بعدّادٍ يقف على صفر، فلا يدري
+       أوصل صوته أم لا. وتسعةٌ من هذه الإخفاقات على حاسب حسن لا على
+       جوال — فليست علّة سفاري كما ظننتُ. */
+    statusEl.innerHTML = head+'🎙️ اقرأ القطعة كاملة بصوت واضح على راحتك... (<b data-readcnt>'+allWords.length+'</b> كلمة)'+
+      '<div data-livetxt class="en" style="font-weight:700;font-size:.92rem;color:var(--muted);margin:6px 0;min-height:1.2em"></div>'+
       '<button data-stopread class="say small" style="background:#dc2626;border-color:#dc2626;color:#fff;margin-top:6px">⏹️ خلّصت القراءة</button>';
     var sb = statusEl.querySelector("[data-stopread]"); if(sb) sb.addEventListener("click", function(){ _userStopped=true; finish(); });
   }
