@@ -225,7 +225,7 @@ function listen(statusEl, btn, onDone, tries){
      ومتى ألغت (cx). فإن أخفق الدور عرفنا من الأرقام أين وقف: لا جلسة =
      الصوت لم يخرج من الجهاز · جلسةٌ بلا كلام = المسار صامت · كلامٌ ثمّ
      انقطاع = شبكة. وهذه ثلاثة أعطالٍ كانت تُسجَّل سطرًا واحدًا. */
-  var _st={t0:0,ss:null,sp:null,sd:null,se:null,rz:0,rz1:null,part:null,cx:null,cxr:null,cxd:null,cn:null,dc:null,cnErr:null};
+  var _st={t0:0,ss:null,sp:null,sd:null,se:null,rz:0,rz1:null,part:null,cx:null,cxr:null,cxd:null,cn:null,dc:null,cnErr:null,full:"",usedPartial:null};
   var _conTries = 0;   /* مصافحاتُ القناة المُعادة صامتًا في هذا الدور */
   function _stage(){
     if(_st.ss==null) return "no-session";
@@ -258,7 +258,7 @@ function listen(statusEl, btn, onDone, tries){
         br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online, build:((window.MIC&&MIC.build)||null),
         stage:_stage(), ss:_st.ss, sd:_st.sd, rz:_st.rz, rz1:_st.rz1, part:_st.part,
         cx:_st.cx, cxr:_st.cxr, cxd:_st.cxd,
-        cn:_st.cn, dc:_st.dc, cnErr:_st.cnErr, conTries:_conTries };
+        cn:_st.cn, dc:_st.dc, cnErr:_st.cnErr, conTries:_conTries, usedPartial:_st.usedPartial };
       var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
       if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY2, body); return; }
       fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -329,7 +329,7 @@ function listen(statusEl, btn, onDone, tries){
     /* ثماني ثوانٍ للصمت الأوّل كانت قصيرةً على طفل: صفُّ سعود يقول إنّه
        بدأ الكلام بعد ١٨٫٦ ثانية — يقرأ السؤال ويفهمه ثمّ يركّب جوابه
        بالإنجليزيّة. فنمنحه عشرين ثانيةً يفكّر فيها بلا أن تقطع عليه. */
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"3000"); }catch(e){}
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
     /* مسارٌ جديد لكلّ دور. جرّبنا العكس (مسارٌ واحدٌ مُمسَك يُعاد استعماله)
        فمات الحوار من دوره الثاني على سفاري. انظر MIC.audioConfig في mic-help.js */
     audio=MIC.audioConfig(SDK);
@@ -372,7 +372,14 @@ function listen(statusEl, btn, onDone, tries){
       rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; if(_st.onLife) _st.onLife("sd"); };
       rec.speechEndDetected=function(){ _st.se=Date.now()-_st.t0; if(_st.onLife) _st.onLife("se"); };
       rec.recognizing=function(s,e){ _st.rz++; if(_st.rz1==null) _st.rz1=Date.now()-_st.t0;
-        try{ _st.part=((e&&e.result&&e.result.text)||"").slice(0,60); }catch(x){}
+        var _t=""; try{ _t=(e&&e.result&&e.result.text)||""; }catch(x){}
+        _st.part=_t.slice(0,60); if(_t) _st.full=_t;
+        /* ═══ يشوف كلامه وهو يتكلّم ═══
+           بلاغ الأب: «يتأخّر الردّ… سبّب لهم ملل». وصفوف سعود تقول
+           إنّ أزور كانت تسمعه وتُرسل خمس عشرة نتيجةً جزئيّة — ونحن
+           نُخفيها كلّها عنه، فيبقى أمام شاشةٍ ساكنةٍ لا تتحرّك ولا
+           يدري أوصل صوته أم لا. فنعرضها له أوّلًا بأوّل. */
+        if(_t && !fin) _live(_t);
         if(_st.onLife) _st.onLife("rz"); };
       rec.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
         try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){} };
@@ -381,6 +388,31 @@ function listen(statusEl, btn, onDone, tries){
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
   statusEl.style.color="var(--muted)";
   statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
+  /* نصُّه وهو يتكلّم، ومعه زرُّ «خلّصت» — فلا ينتظر أزور حتى تقتنع
+     بأنّه سكت. وهذا ما تفعله قراءةُ القطعة منذ أوّلها. */
+  function _live(t){
+    statusEl.style.color="var(--muted)";
+    statusEl.innerHTML='<span style="opacity:.75">🎙️ أسمعك:</span> '+
+      '<span class="en" style="font-weight:800">'+String(t).replace(/[<>&]/g,"")+'</span>'+
+      '<button data-stoptalk class="say small" style="display:block;margin:8px auto 0;background:#dc2626;'+
+      'border-color:#dc2626;color:#fff;font-family:inherit;border-radius:12px;padding:8px 14px;'+
+      'font-weight:800;cursor:pointer;border:1px solid">✅ خلّصت</button>';
+    var sb=statusEl.querySelector("[data-stoptalk]");
+    if(sb) sb.addEventListener("click", function(){ _usePartial("ضغط «خلّصت»"); });
+  }
+  /* ما سمعته أزور خيرٌ من لا شيء: صفوفُ سعود فيها سبع عشرة نتيجةً
+     جزئيّةً ثمّ لا نتيجة نهائيّة، فكنّا نقول له «ما التقطتُ كلامك»
+     وقد التقطناه كلّه. فنمضي بآخر ما سمعناه ونُكمل الحوار. */
+  function _usePartial(why){
+    if(fin) return; fin=true; if(to){clearTimeout(to);to=null;}
+    var txt=String(_st.full||"").trim();
+    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+    if(!txt){ notHeard({reason:"nomatch", code:_stage(), detail:why+" بلا نصّ"}); return; }
+    _st.usedPartial=why;
+    statusEl.textContent="";
+    if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; }
+    onDone({ text:txt, wordsHtml:"", pron:null, conf:null, shaky:true, audioSec:0 });
+  }
   var fin=false;
   /* ═══ المهلة تُقاس من آخر إشارةِ حياة، لا من لحظة الضغط ═══
      بلاغ الأب (٦ سبتمبر ٢٠٢٦): «مرّة يضبط ومرّة لا». وصفّا سعود حسما
@@ -401,7 +433,11 @@ function listen(statusEl, btn, onDone, tries){
   var to=null;
   function _arm(ms, why){
     if(to) clearTimeout(to);
-    to=setTimeout(function(){ if(fin)return; fin=true; to=null;
+    to=setTimeout(function(){ if(fin)return;
+      /* إن كانت أزور قد سمعته فعلًا (نتائجُ جزئيّة) فليس هذا إخفاقًا:
+         نمضي بما سمعناه بدل أن نقول له «ما التقطتُ كلامك» وقد التقطناه. */
+      if(_st.full && String(_st.full).trim()){ _usePartial("انقضت المهلة ومعنا نصٌّ جزئيّ"); return; }
+      fin=true; to=null;
       try{rec.close();}catch(e){}
       /* ═══ مصافحةٌ أخفقت ليست عطلًا نُخبر به الطفل ═══
          حين لا تُفتح الجلسة أصلًا فالغالب أنّها مصافحةُ شبكةٍ تعثّرت،
@@ -437,8 +473,11 @@ function listen(statusEl, btn, onDone, tries){
        وهذه المهلة لا تقطع تعرّفًا حيًّا أبدًا — أوّل ما يتكلّم الطفل
        يصل speechStartDetected فتُجدَّد المهلة من جديد. */
     if(kind==="ss")      _arm(30000, "فُتحت الجلسة ثمّ صمتت الخدمة ٣٠ث");
-    else if(kind==="sd") _arm(30000, "سمعت بدء الكلام ثمّ صمتت الخدمة ٣٠ث");
-    else                 _arm(25000, "وصلت نتائجُ جزئيّة ثمّ صمتت الخدمة ٢٥ث");
+    else if(kind==="sd") _arm(15000, "سمعت بدء الكلام ثمّ صمتت الخدمة ١٥ث");
+    /* ثماني ثوانٍ بعد آخر نتيجةٍ جزئيّة تكفي للحكم: الفاصلُ المضبوط
+       ثانيةٌ ونصف، فصمتُ ثمانٍ يعني أنّ أزور تعلّقت. ومعنا نصُّه
+       فنمضي به فورًا — لا ننتظر خمسًا وعشرين ثانيةً بلا فائدة. */
+    else                 _arm(8000,  "وصلت نتائجُ جزئيّة ثمّ صمتت الخدمة ٨ث");
   };
   rec.recognizeOnceAsync(function(result){
     if(fin)return; fin=true; if(to){clearTimeout(to);to=null;}
