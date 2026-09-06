@@ -518,6 +518,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   }
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
+  var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
   function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; } var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
@@ -661,9 +662,35 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       if(!gotWords){ try{ _lastWhy = MIC.why(SDK, result, null, _ex); }catch(e){} }
       _closeRec();
       if(_fin || _userStopped) return;
+      /* ═══ دورةٌ لم يصلها صوتٌ أصلًا ليست سكوتًا من الطفل ═══
+         بلاغ الأب (٦ سبتمبر ٢٠٢٦): «الحاسب بعض الأحيان يلقط وبعض
+         الأحيان لا». وصفوفُ حاسبه تُظهر التناوب بعينه:
+           rz=15 · rz=0 · rz=0 · rz=16 · rz=0
+         فدورةٌ تسمع وأخرى لا تسمع شيئًا إطلاقًا.
+
+         والقطعة تفتح المايك من جديد لكلّ دورة، والفاصل بينهما ١٥٠
+         جزءًا من الثانية — ولا يكفي ذلك ليُحرّر النظامُ المايك ثمّ
+         يُعيد فتحه، لا سيّما على حاسبٍ بمايكٍ خارجيّ. فتُفتح الدورة
+         التالية على مسارٍ ميّت.
+
+         وكان الأسوأ أنّ هذه الدورة الميّتة تُحسب «ما سمعتُ كلامًا»،
+         ودورتان منها تُنهيان القراءة كلّها. فالطفل يقرأ القطعة كاملةً
+         في مايكٍ مغلق ثمّ يُقال له «ما التقطتُ صوتك».
+
+         فصرنا نُفرّق: إن لم يصل الدورةَ صوتٌ قطّ (لا بدءُ كلام ولا
+         نتيجةٌ جزئيّة) فهي إخفاقُ فتحٍ لا سكوتُ طفل — نُمهل المايك
+         ونُعيد الدورة بلا أن نُحاسبه عليها. */
+      var noAudio = (_st.sd==null && !_st.rz);
+      if(!gotWords && noAudio && _deadAudio < 4){
+        _deadAudio++;
+        setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 700);
+        return;
+      }
+      if(gotWords) _deadAudio = 0;
       var next = gotWords ? 0 : consecNoMatch+1;
       if(next >= MAX_CONSEC_NOMATCH){ if(!_retryOrFail()) finish(); return; }
-      setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 150);
+      /* والفاصلُ بين الدورات أوسع: ١٥٠ج كانت تفتح على مسارٍ لم يُغلق بعد */
+      setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 450);
     }, function(err){
       if(_fin || _userStopped) return;
       try{ _lastWhy = MIC.why(SDK, null, err); }catch(e){}
