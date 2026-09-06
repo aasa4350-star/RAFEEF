@@ -225,7 +225,8 @@ function listen(statusEl, btn, onDone, tries){
      ومتى ألغت (cx). فإن أخفق الدور عرفنا من الأرقام أين وقف: لا جلسة =
      الصوت لم يخرج من الجهاز · جلسةٌ بلا كلام = المسار صامت · كلامٌ ثمّ
      انقطاع = شبكة. وهذه ثلاثة أعطالٍ كانت تُسجَّل سطرًا واحدًا. */
-  var _st={t0:0,ss:null,sp:null,sd:null,se:null,rz:0,rz1:null,part:null,cx:null,cxr:null,cxd:null};
+  var _st={t0:0,ss:null,sp:null,sd:null,se:null,rz:0,rz1:null,part:null,cx:null,cxr:null,cxd:null,cn:null,dc:null,cnErr:null};
+  var _conTries = 0;   /* مصافحاتُ القناة المُعادة صامتًا في هذا الدور */
   function _stage(){
     if(_st.ss==null) return "no-session";
     if(_st.rz===0 && _st.sd==null) return "session-no-audio";
@@ -256,7 +257,8 @@ function listen(statusEl, btn, onDone, tries){
       res:(info&&info.res)||null, txt:(info&&info.txt), pa:(info&&info.pa),
         br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online, build:((window.MIC&&MIC.build)||null),
         stage:_stage(), ss:_st.ss, sd:_st.sd, rz:_st.rz, rz1:_st.rz1, part:_st.part,
-        cx:_st.cx, cxr:_st.cxr, cxd:_st.cxd };
+        cx:_st.cx, cxr:_st.cxr, cxd:_st.cxd,
+        cn:_st.cn, dc:_st.dc, cnErr:_st.cnErr, conTries:_conTries };
       var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
       if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY2, body); return; }
       fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -276,8 +278,9 @@ function listen(statusEl, btn, onDone, tries){
        صوتُه الخدمةَ أصلًا فالعطل في الجهاز أو الشبكة لا في نطقه —
        ونقولها له صريحةً بدل أن يظنّ نفسه أخفق فيُعيد ويُعيد. */
     /* ولا نقولها من أوّل مرّة: انقطاعةٌ عابرةٌ في الشبكة تُصلحها إعادةٌ
-       واحدةٌ صامتة. فإن أخفقت الثانية أيضًا فهو عطلٌ حقيقيّ يستحقّ الإفصاح. */
-    if(tries >= 1){
+       واحدةٌ صامتة. فإن أخفقت الثانية أيضًا فهو عطلٌ حقيقيّ يستحقّ الإفصاح.
+       أمّا إن كانت القناة قد أُعيدت ثلاثًا (conDone) فقد كُفينا الإعادة. */
+    if(tries >= 1 || (info && info.conDone)){
       if(info && (info.reason === "nosession" || c === "no-session"))
         return "❌ ما وصل صوتك للخدمة — والعلّة في الاتّصال أو المايك، مب في كلامك. "+
                "أغلق التبويب وافتح الصفحة من جديد، وإن تكرّر فأخبر والدك.";
@@ -336,6 +339,22 @@ function listen(statusEl, btn, onDone, tries){
        الأسماء العربية وبدايات الجُمل. في صورة الأب سمعت أزور «not your name
        is mohammed hassan» بدل «my name is...». هذه القائمة ترجّح ما يُنتظر
        فعلًا من طفلٍ يجيب عن هذه الأسئلة — ولا تمنع غيره. */
+    /* ═══ نفتح القناة فورًا ولا ننتظر الصوت ═══
+       صفّا ١٤:١٠ (سعود وأسامة، بالنسخة الجديدة) يقولان ss=null: لم
+       تُفتح جلسةٌ مع أزور خلال خمس عشرة ثانية، وذلك في الدور الأوّل
+       نفسه — ومعه قول الأب «يتأخّر في الردّ». وهما عرَضٌ واحد:
+       مصافحةُ الشبكة إلى خوادم أزور (شرق أمريكا) بطيئةٌ من هنا،
+       والمكتبة لا تبدؤها إلّا حين يبدأ التعرّف.
+
+       فنبدؤها بأنفسنا لحظةَ إنشاء المُتعرّف، فتمضي مع تجهيز المايك
+       في وقتٍ واحدٍ بدل أن تتعاقبا. ونُصغي إلى connected/disconnected
+       فنعرف أهي القناة أم الصوت. */
+    try{
+      var _cn = SDK.Connection.fromRecognizer(rec);
+      _cn.connected    = function(){ _st.cn = Date.now()-_st.t0; };
+      _cn.disconnected = function(){ _st.dc = Date.now()-_st.t0; };
+      _cn.openConnection();
+    }catch(e){ _st.cnErr = String(e && (e.message||e)).slice(0,120); }
     try{
       var _pl=SDK.PhraseListGrammar.fromRecognizer(rec);
       PHRASES.concat(EN_NAME[who] ? [EN_NAME[who]] : []).forEach(function(p){ _pl.addPhrase(p); });
@@ -383,13 +402,32 @@ function listen(statusEl, btn, onDone, tries){
   function _arm(ms, why){
     if(to) clearTimeout(to);
     to=setTimeout(function(){ if(fin)return; fin=true; to=null;
-      try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+      try{rec.close();}catch(e){}
+      /* ═══ مصافحةٌ أخفقت ليست عطلًا نُخبر به الطفل ═══
+         حين لا تُفتح الجلسة أصلًا فالغالب أنّها مصافحةُ شبكةٍ تعثّرت،
+         ومحاولةٌ ثانيةٌ بقناةٍ جديدة تنجح غالبًا. وكنّا نُري الطفل
+         شاشةً حمراء تقول «أغلق التبويب» من أوّل تعثّر — وهي نصيحةٌ
+         لا تنفع، وتُفزعه، والعطل ليس منه ولا من جهازه. فنُعيد بصمتٍ
+         مرّتين، ولا نُفصح إلّا إن أخفقت الثلاث. */
+      if(_st.ss==null && _conTries<2){
+        _conTries++;
+        statusEl.style.color="var(--muted)";
+        statusEl.textContent="🔁 الاتّصال بطيء شوي — أعيد المحاولة، لا تسوّي شي...";
+        MIC.releaseSoon(45000);
+        setTimeout(function(){ _startRec(); }, 250);
+        return;
+      }
+      MIC.releaseSoon(45000);
+      /* conDone: استُنفدت محاولات القناة الثلاث. فلا تُعاد المحاولة
+         الصامتة الأخرى فوقها — وإلّا صارت ستّ محاولاتٍ وستّون ثانية
+         قبل أن يُقال للطفل شيء، وهو ما أظهره الاختبار. */
       notHeard({ reason:(_st.ss==null?"nosession":"timeout"), code:_stage(),
-                 detail:why+" — "+_stageAr() }); }, ms);
+                 conDone:(_st.ss==null),
+                 detail:why+" — "+_stageAr()+" · محاولات القناة: "+(_conTries+1) }); }, ms);
   }
-  /* لا جلسة: نمهلها ١٥ث. اتّصالٌ باردٌ على شبكةِ جوّالٍ قد يتأخّر،
-     و٧ ثوانٍ كانت تقطع اتّصالًا سليمًا وهو في طريقه. */
-  _arm(15000, "لم تُفتح جلسةُ أزور خلال ١٥ث");
+  /* عشر ثوانٍ للمصافحة، لأنّ ما بعدها إعادةٌ صامتةٌ لا إخفاق. وحين
+     تنجح تُفتح الجلسة في أقلّ من ثانية (ss=646 في صفوف سعود). */
+  _arm(10000, "لم تُفتح جلسةُ أزور خلال ١٠ث");
   /* وكلُّ إشارةٍ من أزور تُجدّد المهلة: فتحُ الجلسة، بدءُ الكلام،
      وكلُّ نتيجةٍ جزئيّة. فالعدّاد يقيس صمتَ الخدمة لا صمتَ الطفل. */
   _st.onLife=function(kind){
