@@ -1786,7 +1786,29 @@ if(!META[who] || !DATA[who]){
         known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())),
         dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
     }
-    renderVocab._save = saveIfPartial; sec._leave = saveIfPartial;
+    /* ═══ تبديلُ التبويب ليس نهايةَ الجلسة ═══════════════════════════
+       بلاغ الأب (٦ سبتمبر ٢٠٢٦): «هم يُتمّون الجلسة أصلًا» — ردًّا على
+       قولي إنّ أرقامهم تدلّ على أنّهم يتركونها. وكان محقًّا، والخلل في
+       التسجيل لا فيهم:
+
+       كان الحفظ الجزئي معلّقًا على _leave، وهي تقع عند **كلّ تبديل
+       تبويب** داخل الصفحة. فمن فتح مراجعةً من اثنتي عشرة كلمة، وأجاب
+       عن أربع، ثمّ عرّج على تبويب الإملاء وعاد وأتمّ الاثنتي عشرة —
+       يُسجَّل له «٤» ولا شيء بعدها، لأنّ الحفظ الجزئي يرفع saved
+       فيمنع حفظ النتيجة الكاملة. فيرى الأب في التقرير «٠/٤» لجلسةٍ
+       أتمّها ابنه، فيظنّ به التقصير وهو مجتهد.
+
+       والأدهى أنّ renderVocab._save لم يكن يُستدعى من أيّ مكان، فمغادرة
+       الصفحة كلّيًّا لم تكن تحفظ شيئًا أصلًا.
+
+       فصار تبديل التبويب لا يُنهي شيئًا (الطفل يعود غالبًا)، والحفظ
+       الجزئي عند مغادرة الصفحة وحدها — فلا تضيع محاولةٌ ولا تُبتر
+       جلسةٌ أُتمّت. */
+    renderVocab._save = saveIfPartial;
+    sec._leave = function(){};
+    if(renderVocab._hook) window.removeEventListener("pagehide", renderVocab._hook);
+    renderVocab._hook = function(){ saveIfPartial(); };
+    window.addEventListener("pagehide", renderVocab._hook);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
