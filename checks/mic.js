@@ -80,16 +80,41 @@ module.exports = function mic() {
     issues.push({ sev: 'خطأ', msg: HELP + ' — لا يفتح مسارًا جديدًا لكلّ تعرّف (fromDefaultMicrophoneInput)' });
   }
 
+  /* ٦) وسمُ النسخة: يُحفظ مع كلّ إخفاقٍ فنعرف أيّ نسخةٍ كانت تعمل
+     على جهاز الطفل ساعةَ العطل. بلا هذا نُصلح ثمّ يُختبر القديم
+     المخزَّن في المتصفّح فيُقال «ما ضبط» ونحن نُصلح ما أُصلح. */
+  const bm = /var\s+BUILD\s*=\s*["']([^"']+)["']/.exec(help);
+  if (!bm) {
+    issues.push({ sev: 'خطأ', msg: HELP + ' — بلا وسم نسخة (BUILD): لن نعرف أيّ نسخةٍ كانت تعمل ساعةَ العطل' });
+  } else if (!/build\s*:\s*BUILD/.test(help)) {
+    issues.push({ sev: 'خطأ', msg: HELP + ' — وسم النسخة غير مُصدَّر في MIC.build فلا يصل الجدول' });
+  }
+  const BUILD = bm ? bm[1] : null;
+
   /* ═══ الصفحات ═══ */
   fs.readdirSync(dir).filter(f => /\.html$/.test(f)).forEach(file => {
     const src = fs.readFileSync(path.join(dir, file), 'utf8');
     const usesMic = /\bMIC\./.test(src);
-    const loadsHelp = new RegExp('src\\s*=\\s*["\']' + HELP).test(src);
+    const tag = new RegExp('src\\s*=\\s*["\']' + HELP + '(\\?v=([^"\']*))?["\']').exec(src);
+    const loadsHelp = !!tag;
     if (!usesMic && !loadsHelp) return;
     pages++;
 
     if (usesMic && !loadsHelp) {
       issues.push({ sev: 'خطأ', msg: file + ' — يستعمل MIC ولا يُحمّل ' + HELP });
+    }
+    /* وسمُ النسخة في وسم <script> يجب أن يطابق BUILD: بدونه يبقى
+       المتصفّح على نسخته المخزَّنة ولو حُدّثت الصفحة، فيُختبر القديم. */
+    if (loadsHelp && BUILD) {
+      if (!tag[2]) {
+        issues.push({ sev: 'خطأ', msg: file + ' — يُحمّل ' + HELP + ' بلا ?v=' + BUILD + ': يبقى المتصفّح على نسخته المخزَّنة فيُختبر إصلاحٌ لم يصل' });
+      } else if (tag[2] !== BUILD) {
+        issues.push({ sev: 'خطأ', msg: file + ' — وسم النسخة «' + tag[2] + '» يخالف BUILD «' + BUILD + '»: صفحةٌ تأخذ الجديد وأخرى القديم' });
+      }
+    }
+    /* صفٌّ بلا وسم نسخةٍ يُعيدنا إلى التخمين — انظر أعلاه */
+    if (/kind\s*:\s*["']micfail["']/.test(src) && !/build\s*:\s*\(\(window\.MIC/.test(src)) {
+      issues.push({ sev: 'خطأ', msg: file + ' — يحفظ إخفاق المايك بلا وسم النسخة (build): لن نميّز عطلًا حقيقيًّا من نسخةٍ قديمةٍ مخزَّنة' });
     }
     /* الفتح المباشر: مسموحٌ داخل mic-help وحده (بديلُ الطوارئ) */
     if (/AudioConfig\.fromDefaultMicrophoneInput/.test(src)) {

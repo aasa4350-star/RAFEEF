@@ -20,6 +20,20 @@
    ============================================================ */
 (function(g){
 
+  /* ═══ وسمُ النسخة — لأنّي كنت أُصلح وأسأل ثمّ لا أدري ماذا جرّبوا ═══
+     صفحاتُ الموقع تُخزَّن في المتصفّح عشر دقائق (max-age=600)، وسفاري
+     على آيفون يُبقي التبويب المفتوح بنسخته القديمة أطول من ذلك بكثير.
+     فيصلح العطلُ في المستودع، ويفتح الطفل تبويبه القديم فيرى العطل
+     نفسه، فيقول الأب «ما ضبط» — وأنا أحسب أنّ الإصلاح أخفق فأشحن
+     إصلاحًا لعطلٍ لم يعد موجودًا. وهذا ما ضيّع علينا بلاغين.
+
+     فصار لكلّ نسخةٍ وسمٌ يُحفظ مع كلّ إخفاقٍ في الجدول: فإذا جاء
+     بلاغٌ نظرتُ إلى الوسم، فإن كان قديمًا فالمسألة تخزينٌ لا عطل —
+     يُغلق التبويب ويُفتح من جديد. ووسمُ الملفّ هذا هو نفسه المكتوب
+     في وسم <script> في الصفحات (mic-help.js?v=…)، فأيّ اختلافٍ
+     بينهما يوقفه المدقّق قبل الشحن. */
+  var BUILD = "20260906-2";
+
   function inAppBrowser(){
     var ua = navigator.userAgent || "";
     if(/FBAN|FBAV|Instagram|Line|Twitter|WhatsApp|Snapchat|MicroMessenger|OKApp/i.test(ua)) return true;
@@ -288,5 +302,5 @@
 
   g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
             ensure:ensure, stream:stream, release:release, releaseSoon:releaseSoon,
-            keep:keep, audioConfig:audioConfig, why:why, env:env };
+            keep:keep, audioConfig:audioConfig, why:why, env:env, build:BUILD };
 })(window);

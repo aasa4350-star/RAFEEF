@@ -8,7 +8,7 @@
 <title>الإنجليزي — الصف الرابع</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
-<script src="mic-help.js"></script>
+<script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
@@ -140,7 +140,7 @@ function saveMicFail(info){
     var meta = { kind:"micfail", sect:"word",
       why:(info&&info.reason)||null, code:(info&&info.code)||null, detail:(info&&info.detail)||null,
       res:(info&&info.res)||null, txt:(info&&info.txt), pa:(info&&info.pa),
-      br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online };
+      br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online, build:((window.MIC&&MIC.build)||null) };
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
-<script src="mic-help.js"></script>
+<script src="mic-help.js?v=20260906-2"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
      كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
@@ -220,6 +220,25 @@ var MIC_TAIL ='<div style="font-weight:400;font-size:.85rem;margin-top:6px">وت
 function listen(statusEl, btn, onDone, tries){
   tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
+  /* مراحل الدور بالمللي ثانية من لحظة الضغط: متى فُتحت جلسة أزور (ss)،
+     متى سمعت بدء كلام (sd)، كم نتيجةً جزئيّةً أرسلت (rz) وأوّلها (rz1)،
+     ومتى ألغت (cx). فإن أخفق الدور عرفنا من الأرقام أين وقف: لا جلسة =
+     الصوت لم يخرج من الجهاز · جلسةٌ بلا كلام = المسار صامت · كلامٌ ثمّ
+     انقطاع = شبكة. وهذه ثلاثة أعطالٍ كانت تُسجَّل سطرًا واحدًا. */
+  var _st={t0:0,ss:null,sp:null,sd:null,se:null,rz:0,rz1:null,part:null,cx:null,cxr:null,cxd:null};
+  function _stage(){
+    if(_st.ss==null) return "no-session";
+    if(_st.rz===0 && _st.sd==null) return "session-no-audio";
+    if(_st.cx!=null) return "canceled-after-speech";
+    return "speech-no-result";
+  }
+  function _stageAr(){
+    var s=_stage();
+    return s==="no-session" ? "لم تُفتح جلسةٌ مع أزور أصلًا"
+         : s==="session-no-audio" ? "فُتحت الجلسة ولم يصلها صوت"
+         : s==="canceled-after-speech" ? "سمعت كلامًا ثمّ أُلغيت"
+         : "سمعت كلامًا ولم تُرجع نتيجة";
+  }
   function resetBtn(){ if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; } }
   /* لم أسمع كلامًا مفهومًا: نعيد المحاولة مرّةً تلقائيًّا ثمّ نُفصح عن السبب.
      ولا نمسح السطر أبدًا — الصمت هو ما أتعب حسن. */
@@ -235,7 +254,9 @@ function listen(statusEl, btn, onDone, tries){
         why:(info&&info.reason)||null, code:(info&&info.code)||null,
         detail:(info&&info.detail)||null,
       res:(info&&info.res)||null, txt:(info&&info.txt), pa:(info&&info.pa),
-        br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online };
+        br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online, build:((window.MIC&&MIC.build)||null),
+        stage:_stage(), ss:_st.ss, sd:_st.sd, rz:_st.rz, rz1:_st.rz1, part:_st.part,
+        cx:_st.cx, cxr:_st.cxr, cxd:_st.cxd };
       var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
       if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY2, body); return; }
       fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -250,6 +271,18 @@ function listen(statusEl, btn, onDone, tries){
       if(/TooManyRequests/i.test(c))          return "❌ خدمة تقييم النطق مشغولة الآن. انتظر دقيقة ثمّ أعد المحاولة.";
       if(/Connection|Timeout/i.test(c))       return "❌ انقطع الاتّصال بخدمة النطق. تأكّد من الإنترنت وأعد المحاولة — كلامك سليم.";
       return "❌ خدمة تقييم النطق توقّفت" + (c ? " ("+c+")" : "") + ". أعد المحاولة، وإن تكرّر فأخبر والدك.";
+    }
+    /* «ما التقطتُ كلامك» ظلمٌ حين لا يكون الخلل في كلامه: إن لم يصل
+       صوتُه الخدمةَ أصلًا فالعطل في الجهاز أو الشبكة لا في نطقه —
+       ونقولها له صريحةً بدل أن يظنّ نفسه أخفق فيُعيد ويُعيد. */
+    /* ولا نقولها من أوّل مرّة: انقطاعةٌ عابرةٌ في الشبكة تُصلحها إعادةٌ
+       واحدةٌ صامتة. فإن أخفقت الثانية أيضًا فهو عطلٌ حقيقيّ يستحقّ الإفصاح. */
+    if(tries >= 1){
+      if(info && (info.reason === "nosession" || c === "no-session"))
+        return "❌ ما وصل صوتك للخدمة — والعلّة في الاتّصال أو المايك، مب في كلامك. "+
+               "أغلق التبويب وافتح الصفحة من جديد، وإن تكرّر فأخبر والدك.";
+      if(info && c === "session-no-audio")
+        return "❌ المايك ما أرسل صوتًا. أغلق التبويب وافتح الصفحة من جديد — كلامك سليم.";
     }
     return null;
   }
@@ -304,15 +337,38 @@ function listen(statusEl, btn, onDone, tries){
       var _pl=SDK.PhraseListGrammar.fromRecognizer(rec);
       PHRASES.concat(EN_NAME[who] ? [EN_NAME[who]] : []).forEach(function(p){ _pl.addPhrase(p); });
     }catch(e){}
+    /* ═══ أين مات الصوت بالضبط ═══
+       صفوف ٦ سبتمبر كلّها «مهلة ٢٢ث بلا ردٍّ من أزور» — وهذا أسوأ سببٍ
+       يمكن أن يُسجَّل: يقول إنّ شيئًا لم يعد، ولا يقول أين وقف. وبينها
+       فروقٌ حاسمة: هل فُتحت الجلسة مع أزور أصلًا؟ هل وصلها صوت؟ هل
+       سمعت كلامًا ثمّ انقطعت؟ ثلاثةُ أعطالٍ مختلفة كنّا نراها سطرًا
+       واحدًا. فنُعلّم على كلّ مرحلةٍ بوقتها، ونحفظها مع الإخفاق. */
+    _st.t0=Date.now();
+    try{
+      rec.sessionStarted=function(){ _st.ss=Date.now()-_st.t0; };
+      rec.sessionStopped=function(){ _st.sp=Date.now()-_st.t0; };
+      rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; };
+      rec.speechEndDetected=function(){ _st.se=Date.now()-_st.t0; };
+      rec.recognizing=function(s,e){ _st.rz++; if(_st.rz1==null) _st.rz1=Date.now()-_st.t0;
+        try{ _st.part=((e&&e.result&&e.result.text)||"").slice(0,60); }catch(x){} };
+      rec.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
+        try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){} };
+    }catch(e){}
   }catch(e){ statusEl.textContent="خطأ: "+(e.message||e); if(btn){btn.disabled=false;btn.classList.remove("rec");} return; }
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
   statusEl.style.color="var(--muted)";
   statusEl.textContent=(tries>0?"🔁 مرّة ثانية — ":"🎙️ ")+"تكلّم الآن بالإنجليزي...";
   var fin=false;
-  /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور */
-  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} MIC.releaseSoon(45000); notHeard({reason:"timeout",code:null,detail:"مهلة الأمان ٢٢ث انقضت بلا ردٍّ من أزور"}); }, 22000);
+  /* مهلة أمانٍ للتعليق فقط (شبكةٌ ماتت)، لا لسكوت الطفل — سكوته تتولّاه أزور.
+     ولا نُجمّد الطفل ٢٢ ثانيةً أمام شاشةٍ ساكنة إن كان الصوت لم يصل أزور
+     أصلًا: إن لم تُفتح الجلسة خلال ٧ث فالمسار ميّت، ولا فائدة من الانتظار. */
+  var to=setTimeout(function(){ if(fin)return; fin=true; try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+    notHeard({reason:"timeout",code:_stage(),detail:"مهلة الأمان ٢٢ث انقضت بلا ردٍّ من أزور — "+_stageAr()}); }, 22000);
+  var toEarly=setTimeout(function(){ if(fin || _st.ss!=null) return; fin=true; clearTimeout(to);
+    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
+    notHeard({reason:"nosession",code:_stage(),detail:"لم تُفتح جلسةُ أزور خلال ٧ث — الصوت لم يصل الخدمة"}); }, 7000);
   rec.recognizeOnceAsync(function(result){
-    if(fin)return; fin=true; clearTimeout(to);
+    if(fin)return; fin=true; clearTimeout(to); clearTimeout(toEarly);
     var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false,audioSec:0};
     try{
       if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
@@ -360,7 +416,7 @@ function listen(statusEl, btn, onDone, tries){
     resetBtn();
     statusEl.textContent="";
     onDone(out);
-  }, function(err){ if(fin)return; fin=true; clearTimeout(to); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
+  }, function(err){ if(fin)return; fin=true; clearTimeout(to); clearTimeout(toEarly); var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
   }
 }
 

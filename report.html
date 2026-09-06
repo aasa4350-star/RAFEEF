@@ -597,7 +597,13 @@ function micFailCardHtml(student){
   if(!rows.length) return "";
   var SECT = { passage:"قراءة القطعة", word:"كلمة/جملة", talk:"المحادثة" };
   var WHY  = { canceled:"ألغتها أزور", nomatch:"ما فهمت الكلام", error:"خطأ في الأداة",
-               timeout:"انقضت المهلة بلا ردّ", noassess:"سمعت الكلام ولم تُرجع تقييمًا" };
+               timeout:"انقضت المهلة بلا ردّ", noassess:"سمعت الكلام ولم تُرجع تقييمًا",
+               nosession:"ما فُتحت جلسةٌ مع أزور", noaudio:"جلسةٌ بلا صوت" };
+  /* أين وقف الصوت — الفرق بين ثلاثة أعطالٍ كانت كلّها تُكتب «انقضت المهلة» */
+  var STAGE = { "no-session":"الصوت ما خرج من الجهاز",
+                "session-no-audio":"فُتحت الجلسة ولم يصلها صوت",
+                "canceled-after-speech":"سمعت كلامًا ثمّ أُلغيت",
+                "speech-no-result":"سمعت كلامًا ولم تُرجع نتيجة" };
   var by = {};
   rows.forEach(function(r){ var k=(r.meta.sect||"?")+"|"+(r.meta.why||"?")+"|"+(r.meta.code||""); by[k]=(by[k]||0)+1; });
   var top = Object.keys(by).sort(function(a,b){ return by[b]-by[a]; }).slice(0,4);
@@ -623,6 +629,16 @@ function micFailCardHtml(student){
           (m.res?' · حالة: <code>'+esc(String(m.res))+'</code>':'')+
           (m.txt!=null?' · فهمت '+m.txt+' حرفًا':'')+
           (m.pa!=null?' · حقل التقييم: '+(m.pa?'موجود':'مفقود ⚠️'):'')+
+          /* المرحلة التي وقف عندها الصوت، ووسمُ النسخة التي كانت تعمل
+             على الجهاز — فإن كان الوسم قديمًا فالمسألة صفحةٌ مخزَّنة
+             في المتصفّح لا عطلٌ قائم. */
+          (m.stage?'<br>📍 '+esc(STAGE[m.stage]||String(m.stage)):'')+
+          (m.ss!=null?' · فتحُ الجلسة '+m.ss+'م.ث':'')+
+          (m.rz?' · '+m.rz+' نتيجةً جزئيّة':'')+
+          (m.part?' · سمعت «'+esc(String(m.part))+'»':'')+
+          (m.cxd?'<br>إلغاء: '+esc(String(m.cxd).slice(0,140)):'')+
+          (m.build?'<br><span style="opacity:.7">نسخة الموقع: <code>'+esc(String(m.build))+'</code></span>':
+                   '<br><span style="opacity:.7">نسخةٌ قديمة (بلا وسم) — صفحةٌ مخزَّنة في المتصفّح</span>')+
           (m.detail?'<br>'+esc(String(m.detail).slice(0,160)):'')+'</span>'+
         '</span></li>';
     }).join("")+'</ul>'+
