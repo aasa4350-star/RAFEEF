@@ -883,7 +883,36 @@ function gAngleDef(){
     o[0], o[1],
     "هذا تعريف الزاويتين ال"+it[1]+".", "angleDef"];
 }
-var G1=[gAngleFind, gAngleDef];
+/* زاويتان متجاورتان على مستقيم: مجموعهما ١٨٠° */
+function gLinearPair(){
+  var a=ri(20,160), b=180-a;
+  var o=zOpts(b,[a,90-a,360-a].filter(function(x){return x!==b && x>0;}));
+  return ["زاويتان متجاورتان على مستقيمٍ واحد، قياس إحداهما "+mn(fmt(a)+"°")+". أوجد الأخرى:",
+    o[0].map(function(x){return mn(x+"°");}), o[1],
+    "الزاويتان على استقامةٍ واحدة متكاملتان: ١٨٠ − "+fmt(a)+" = "+fmt(b)+"°.", "linearPair"];
+}
+/* عند قطع مستقيمين متوازيين بقاطع */
+function gParallelCut(){
+  var a=ri(30,150);
+  var kind=gp(["alt","corr","cointerior"]);
+  var ans = kind==="cointerior" ? 180-a : a;
+  var label = kind==="alt" ? "متبادلتان داخليًّا" : kind==="corr" ? "متناظرتان" : "داخليتان في جهةٍ واحدة";
+  var why  = kind==="cointerior"
+    ? "الداخليتان في جهةٍ واحدة متكاملتان: ١٨٠ − "+fmt(a)+" = "+fmt(ans)
+    : "ال"+label+" متطابقتان عند توازي المستقيمين: "+fmt(ans);
+  var o=zOpts(ans,[180-ans, 90-ans, ans+10].filter(function(x){return x!==ans && x>0;}));
+  return ["قُطع مستقيمان متوازيان بقاطع، فتكوّنت زاويتان "+label+"، قياس إحداهما "+mn(fmt(a)+"°")+". أوجد الأخرى:",
+    o[0].map(function(x){return mn(x+"°");}), o[1], why+"°.", "parallelCut"];
+}
+/* المتقابلتان بالرأس متطابقتان */
+function gVertical(){
+  var a=ri(25,155);
+  var o=zOpts(a,[180-a, 90-a, a+15].filter(function(x){return x!==a && x>0;}));
+  return ["تقاطع مستقيمان، فكانت إحدى الزوايا "+mn(fmt(a)+"°")+". أوجد قياس الزاوية المقابلة لها بالرأس:",
+    o[0].map(function(x){return mn(x+"°");}), o[1],
+    "الزاويتان المتقابلتان بالرأس متطابقتان، فقياسها "+fmt(a)+"°.", "vertical"];
+}
+var G1=[gAngleFind, gAngleDef, gLinearPair, gParallelCut, gVertical];
 
 /* ===== ٥-٢ استراتيجية حل المسألة: التبرير المنطقي (مجموع زوايا المثلث) ===== */
 function gTriangleAngleSum(){
@@ -917,7 +946,43 @@ function gPolygonOneAngle(){
     o[0].map(function(x){return mn(x+"°");}), o[1],
     "مجموع الزوايا الداخلية = (ن−٢)×١٨٠° = "+fmt(sum)+"°، ونقسمه على عدد الأضلاع "+fmt(n)+": "+fmt(sum)+" ÷ "+fmt(n)+" = "+fmt(one)+"°.", "polygonOneAngle"];
 }
-var G3=[gPolygonSum, gPolygonOneAngle];
+/* مجموع الزوايا الخارجية ٣٦٠° دائمًا مهما كان عدد الأضلاع */
+function gPolygonExtSum(){
+  var p=gp(POLY_NAMES);
+  var o=zOpts(360,[(p[0]-2)*180, 180, 720]);
+  return ["ما مجموع الزوايا الخارجية للمضلع "+p[1]+"؟",
+    o[0].map(function(x){return mn(x+"°");}), o[1],
+    "مجموع الزوايا الخارجية لأيّ مضلّعٍ محدّب = ٣٦٠° دائمًا، مهما كان عدد أضلاعه.", "polygonExtSum"];
+}
+/* الزاوية الخارجية الواحدة في المضلع المنتظم = ٣٦٠ ÷ ن */
+function gPolygonOneExt(){
+  var p=gp(POLY_NAMES), n=p[0];
+  if(360%n!==0) return null;
+  var e=360/n;
+  var o=zOpts(e,[e*2, 180-e, ((n-2)*180)/n]);
+  return ["أوجد قياس الزاوية الخارجية الواحدة في المضلع المنتظم "+p[1]+":",
+    o[0].map(function(x){return mn(x+"°");}), o[1],
+    "الزاوية الخارجية الواحدة = ٣٦٠° ÷ عدد الأضلاع = ٣٦٠ ÷ "+fmt(n)+" = "+fmt(e)+"°.", "polygonOneExt"];
+}
+/* من مجموع الزوايا الداخلية نُوجد عدد الأضلاع */
+function gPolygonSides(){
+  var p=gp(POLY_NAMES), n=p[0], sum=(n-2)*180;
+  var o=zOpts(n,[n+1,n-1,n+2]);
+  return ["مضلّعٌ مجموع زواياه الداخلية "+mn(fmt(sum)+"°")+". كم عدد أضلاعه؟",
+    o[0].map(mn), o[1],
+    "(ن−٢)×١٨٠ = "+fmt(sum)+" ⇐ ن−٢ = "+fmt(sum/180)+" ⇐ ن = "+fmt(n)+".", "polygonSides"];
+}
+/* من الزاوية الداخلية الواحدة في منتظمٍ نُوجد عدد الأضلاع */
+function gPolygonSidesFromAngle(){
+  var p=gp(POLY_NAMES), n=p[0], sum=(n-2)*180;
+  if(sum%n!==0) return null;
+  var one=sum/n;
+  var o=zOpts(n,[n+1,n-1,n+2]);
+  return ["مضلّعٌ منتظمٌ قياس زاويته الداخلية الواحدة "+mn(fmt(one)+"°")+". كم عدد أضلاعه؟",
+    o[0].map(mn), o[1],
+    "الزاوية الخارجية = ١٨٠ − "+fmt(one)+" = "+fmt(180-one)+"°، وعدد الأضلاع = ٣٦٠ ÷ "+fmt(180-one)+" = "+fmt(n)+".", "polygonSidesFromAngle"];
+}
+var G3=[gPolygonSum, gPolygonOneAngle, gPolygonExtSum, gPolygonOneExt, gPolygonSides, gPolygonSidesFromAngle];
 
 /* ===== ٥-٤ تطابق المضلعات ===== */
 function gCongruentFind(){
@@ -950,7 +1015,34 @@ function gRotAngle(){
     o[0].map(function(x){return mn(x+"°");}), o[1],
     "زاوية الدوران الأولى = ٣٦٠° ÷ عدد الأضلاع = ٣٦٠° ÷ "+mn(fmt(n))+" = "+mn(fmt(angle)+"°")+".", "rotAngle"];
 }
-var G5=[gSymmetryCount, gRotAngle];
+/* رتبة التماثل الدوراني: كم مرّةً يطابق الشكلُ نفسه في دورةٍ كاملة */
+function gRotOrder(){
+  var p=gp(REG_POLY), n=p[1];
+  var o=zOpts(n,[n+1,n-1,2*n]);
+  return ["كم مرّةً يتطابق "+p[0]+" مع نفسه في دورةٍ كاملة (٣٦٠°) حول مركزه؟",
+    o[0].map(mn), o[1],
+    "رتبة التماثل الدوراني للمضلع المنتظم = عدد أضلاعه = "+mn(fmt(n))+" مرّات.", "rotOrder"];
+}
+/* من زاوية الدوران نُوجد عدد الأضلاع */
+function gRotToSides(){
+  var p=gp(REG_POLY), n=p[1], a=360/n;
+  var o=zOpts(n,[n+1,n-1,n+2]);
+  return ["مضلّعٌ منتظمٌ أصغرُ زاوية دورانٍ تُطابقه مع نفسه "+mn(fmt(a)+"°")+". كم عدد أضلاعه؟",
+    o[0].map(mn), o[1],
+    "عدد الأضلاع = ٣٦٠° ÷ زاوية الدوران = ٣٦٠ ÷ "+fmt(a)+" = "+fmt(n)+".", "rotToSides"];
+}
+/* ثاني أصغر زاوية دورانٍ تُطابق الشكل = ضِعف الأولى.
+   وكانت صيغتُها الأولى سؤالَ «نعم/لا» بخيارين، وsOpts تلزم ثلاثة —
+   فأمسكها المدقّق قبل أن تصل رفيف. */
+function gRotSecond(){
+  var p=gp(REG_POLY), n=p[1], a1=360/n, a2=a1*2;
+  if(a2>=360) return null;
+  var o=zOpts(a2,[a1, a1*3, 360-a1].filter(function(x){return x!==a2 && x>0 && x<360;}));
+  return ["أصغرُ زاوية دورانٍ تُطابق "+p[0]+" مع نفسه هي "+mn(fmt(a1)+"°")+". فما ثاني أصغر زاوية تُطابقه؟",
+    o[0].map(function(x){return mn(x+"°");}), o[1],
+    "زوايا التطابق مضاعفاتُ الأولى: "+fmt(a1)+"° ثمّ "+fmt(a1)+" × ٢ = "+fmt(a2)+"°.", "rotSecond"];
+}
+var G5=[gSymmetryCount, gRotAngle, gRotOrder, gRotToSides, gRotSecond];
 
 /* ===== ٥-٦ الانعكاس ===== */
 function gReflectPoint(){
