@@ -375,14 +375,13 @@ async function main(){
     if(talkAll.length){
       const tks=groupTalk(talkAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1));
       const totTurns=tks.reduce((s,p)=>s+(p.meta.turns||0),0);
-      const pronRows=tks.filter(p=> typeof p.meta.avgPron==="number");
-      const avgPronAll=pronRows.length?Math.round(pronRows.reduce((s,p)=>s+p.meta.avgPron,0)/pronRows.length):null;
-      const correctRows=tks.filter(p=> typeof p.meta.avgCorrect==="number");
-      const avgCorrectAll=correctRows.length?Math.round(correctRows.reduce((s,p)=>s+p.meta.avgCorrect,0)/correctRows.length):null;
+      /* موزونٌ بعدد الجمل لا بعدد الجلسات، ونُظهر على كم جملةٍ بُنيت كلّ نسبة */
+      const pA=RR.talkAvg(tks,"avgPron","pronN"), cA=RR.talkAvg(tks,"avgCorrect","corrN");
+      const basis=a=> (a && a.n<totTurns) ? ` <span class="cnt">(من ${a.n} جملة)</span>` : ``;
       const topicCount={}; tks.forEach(p=>{ const tp=p.meta.topic||"—"; topicCount[tp]=(topicCount[tp]||0)+1; });
       const topTopic=Object.keys(topicCount).sort((a,b)=>topicCount[b]-topicCount[a])[0];
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">`+
-        `<li>💬 <b>${tks.length}</b> جلسة محادثة · <b>${totTurns}</b> جملة قالها${avgPronAll!=null?` · متوسط النطق <b>${avgPronAll}%</b>`:``}${avgCorrectAll!=null?` · صحّة الجملة <b>${avgCorrectAll}%</b>`:``}</li>`+
+        `<li>💬 <b>${tks.length}</b> جلسة محادثة · <b>${totTurns}</b> جملة قالها${pA?` · متوسط النطق <b>${pA.pct}%</b>${basis(pA)}`:``}${cA?` · صحّة الجملة <b>${cA.pct}%</b>${basis(cA)}`:``}</li>`+
         (topTopic?`<li>⭐ الموضوع الأكثر: <b>${topTopic}</b></li>`:``)+
         tks.slice(0,6).map(p=>{ const m=p.meta; const pr=typeof m.avgPron==="number"?`${m.avgPron}%`:"—";
           const col=typeof m.avgPron==="number"?(m.avgPron>=80?"var(--good)":m.avgPron>=50?"var(--warn)":"var(--bad)"):"var(--muted)";

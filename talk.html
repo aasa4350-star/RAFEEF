@@ -139,7 +139,12 @@ function saveTalkSession(useBeacon){
   var avgCorrect = cf.length ? Math.round(100*cf.filter(Boolean).length/cf.length) : null;
   var secs = state.sessionStart ? Math.round((Date.now()-state.sessionStart)/1000) : null;
   var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
-    meta:{ kind:"talk", sid:state.sid, topic:TOPICS[state.topic].t, turns:delta, avgPron:avgPron, avgCorrect:avgCorrect, secs:secs, audioSec:(state.audioSec||0),
+    /* pronN و corrN: عدد الجمل التي بُني عليها كلّ متوسّط. بدونهما كانت
+       التقارير تُساوي بين جلسةٍ فيها جملةٌ واحدة وجلسةٍ فيها أربع، فتظهر
+       النسبة أقلّ (أو أعلى) ممّا هي. وهما تراكميّان للجلسة كلّها مثل
+       المتوسّطين نفسيهما، لا للدفعة وحدها. */
+    meta:{ kind:"talk", sid:state.sid, topic:TOPICS[state.topic].t, turns:delta, avgPron:avgPron, avgCorrect:avgCorrect,
+      pronN:scores.length, corrN:cf.length, secs:secs, audioSec:(state.audioSec||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns;   // نُثبّت العلامة فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة

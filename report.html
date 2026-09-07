@@ -474,7 +474,7 @@ function talkCardHtml(student){
   var rowT=function(r){ return r.created_at; };
   rows.sort(function(a,b){ return String(rowT(b)).localeCompare(String(rowT(a))); });
   rows = groupTalk(rows);
-  var totTurns=0, pronRows=[], correctRows=[], topicCount={};
+  var totTurns=0, pronRows=[], topicCount={};
   rows.forEach(function(r){
     var m=r.meta;
     totTurns += (m.turns||0);
@@ -482,12 +482,15 @@ function talkCardHtml(student){
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «هل يطلع لي نسبة صحة الجملة؟» — لا، ما
        كان موجودًا؛ التقييم السابق صوتيٌّ بحت (نطق). أضيف تقييم صحّة
        الجملة (نحو ومعنى) عبر talk-ai (انظر meta.avgCorrect في talk.html)،
-       ويُجمَّع هنا بنفس أسلوب avgPron بالضبط. */
-    if(typeof m.avgCorrect==="number") correctRows.push({v:m.avgCorrect, t:rowT(r)});
+       ويُجمَّع أدناه بـRR.talkAvg مثل avgPron بالضبط. */
     var tp = m.topic||"—"; topicCount[tp]=(topicCount[tp]||0)+1;
   });
-  var avgPronAll = pronRows.length ? Math.round(pronRows.reduce(function(a,b){return a+b.v;},0)/pronRows.length) : null;
-  var avgCorrectAll = correctRows.length ? Math.round(correctRows.reduce(function(a,b){return a+b.v;},0)/correctRows.length) : null;
+  /* موزونٌ بعدد الجمل لا بعدد الجلسات (RR.talkAvg): جلسةٌ فيها جملةٌ واحدة
+     كانت تزن مثل جلسةٍ فيها أربع. وpronRows تبقى كما هي لحساب الاتّجاه. */
+  var pA = RR.talkAvg(rows, "avgPron", "pronN"), cA = RR.talkAvg(rows, "avgCorrect", "corrN");
+  var avgPronAll = pA ? pA.pct : null, avgCorrectAll = cA ? cA.pct : null;
+  /* وعلى كم جملةٍ بُنيت كلّ نسبة — فقد لا يكونان على العدد نفسه */
+  var basis = function(a){ return (a && a.n < totTurns) ? '<div class="l" style="font-size:.72rem;opacity:.75">من '+a.n+' جملة</div>' : ''; };
   var topTopic = Object.keys(topicCount).sort(function(a,b){ return topicCount[b]-topicCount[a]; })[0];
   var cutoff = Date.now()-RECENT_DAYS*86400000;
   var recentP = pronRows.filter(function(x){ return new Date(x.t).getTime()>=cutoff; });
@@ -503,8 +506,8 @@ function talkCardHtml(student){
     '<div class="stats">'+
       '<div class="stat"><div class="v">'+rows.length+'</div><div class="l">جلسة</div></div>'+
       '<div class="stat"><div class="v">'+totTurns+'</div><div class="l">جملة قالها</div></div>'+
-      (avgPronAll!=null ? '<div class="stat"><div class="v">'+avgPronAll+'%</div><div class="l">متوسّط النطق</div></div>' : '')+
-      (avgCorrectAll!=null ? '<div class="stat"><div class="v">'+avgCorrectAll+'%</div><div class="l">متوسّط صحّة الجملة</div></div>' : '')+
+      (avgPronAll!=null ? '<div class="stat"><div class="v">'+avgPronAll+'%</div><div class="l">متوسّط النطق</div>'+basis(pA)+'</div>' : '')+
+      (avgCorrectAll!=null ? '<div class="stat"><div class="v">'+avgCorrectAll+'%</div><div class="l">متوسّط صحّة الجملة</div>'+basis(cA)+'</div>' : '')+
       (topTopic ? '<div class="stat"><div class="v" style="font-size:1rem">'+esc(topTopic)+'</div><div class="l">الموضوع الأكثر</div></div>' : '')+
     '</div>'+trendHtml+
     '<ul class="sk">'+ rows.slice(0,10).map(function(r){
