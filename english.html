@@ -259,7 +259,10 @@ function enTarget(stemEl, ansText){
 /* ============ Unit 1 — Family Events ============ */
 var FAM = [["aunt","العمّة أو الخالة"],["uncle","العمّ أو الخال"],["cousin","ابن العمّ/الخال"],["son","الابن"],["daughter","الابنة"],["grandson","الحفيد"],["granddaughter","الحفيدة"],["parent","أحد الوالدين"],["grandparent","الجدّ أو الجدّة"],["husband","الزوج"],["wife","الزوجة"]];
 var ADJ1 = [["kind","لطيف"],["helpful","متعاون"],["chatty","كثير الكلام"],["lazy","كسول"],["strong","قويّ"],["weak","ضعيف"],["tired","متعب"]];
-var FREQ = [["always","دائمًا (100%)"],["usually","عادةً"],["often","غالبًا"],["sometimes","أحيانًا"],["never","أبدًا (0%)"]];
+var FREQ = [["always","دائمًا (100%)"],["usually","عادةً"],["often","غالبًا"],["sometimes","أحيانًا"],["never","أبدًا (0%)"],
+  /* توسعة (٧ سبتمبر ٢٠٢٦، طلب الأب «وسّع لسعود»): كان خمسةً فقط */
+  ["rarely","نادرًا"],["seldom","قلّما"],["every day","كلّ يوم"],["once a week","مرّةً في الأسبوع"],
+  ["twice a week","مرّتين في الأسبوع"],["every morning","كلّ صباح"],["at night","في الليل"],["on Fridays","أيّام الجمعة"]];
 var POSS = [["I","mine"],["you","yours"],["he","his"],["she","hers"],["we","ours"],["they","theirs"]];
 function gFam(){ var p=gp(FAM); var o=opt(p[1], dist(FAM,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
 function gAdj1(){ var p=gp(ADJ1); var o=opt(p[1], dist(ADJ1,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
@@ -271,7 +274,11 @@ function gWhose(){ var items=[["It's her bag. = It's ___.","hers"],["It's my pen
 
 /* ============ Unit 2 — Chores ============ */
 var CHORE = [["wash","the dishes"],["make","the bed"],["sweep","the floor"],["take out","the trash"],["set","the table"],["cut","the grass"],["feed","the animals"],["clear","the table"]];
-var TOOLS = [["broom","المكنسة"],["bucket","الدلو"],["dustpan","جاروف القمامة"]];
+var TOOLS = [["broom","المكنسة"],["bucket","الدلو"],["dustpan","جاروف القمامة"],
+  /* توسعة: كان ثلاثةً فقط */
+  ["mop","الممسحة"],["sponge","الإسفنجة"],["soap","الصابون"],["towel","المنشفة"],
+  ["vacuum cleaner","المكنسة الكهربائية"],["duster","منفضة الغبار"],["rubbish bin","سلّة المهملات"],
+  ["gloves","القفازات"],["brush","الفرشاة"],["water hose","خرطوم الماء"],["cloth","قطعة القماش"]];
 function gChoreV(){ var p=gp(CHORE); var o=opt(p[0], dist(CHORE,p,0)); return ["أكمل: "+en("___ "+p[1]), o[0], o[1], en(p[0]+" "+p[1])+"."]; }
 function gChoreO(){ var p=gp(CHORE); var o=opt(p[1], dist(CHORE,p,1)); return ["أكمل: "+en(p[0]+" ___"), o[0], o[1], en(p[0]+" "+p[1])+"."]; }
 function gTool(){ var p=gp(TOOLS); var o=opt(p[1], dist(TOOLS,p,1)); return ["معنى "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
@@ -290,7 +297,17 @@ function gPastQ(){ var items=[["Did you win the game? — Yes, I ___.","did","di
 var VERB4 = [["go shopping","يتسوّق"],["take photos","يلتقط صورًا"],["play board games","يلعب ألعاب الطاولة"],["hide","يختبئ"],["dress up","يتأنّق/يتنكّر"],["make a model","يصنع مجسّمًا"]];
 var IRR = [["go","went","goed"],["see","saw","seed"],["have","had","haved"],["run","ran","runned"],["write","wrote","writed"],["eat","ate","eated"],["take","took","taked"]];
 var ADV = [["quick","quickly"],["happy","happily"],["slow","slowly"],["loud","loudly"],["careful","carefully"],["bad","badly"],["lucky","luckily"]];
-var CONJ = [["I was tired, ___ I went to bed.","so","but","and","«so» = لذلك (نتيجة)."],["I like apples ___ bananas.","and","so","because","«and» = و (إضافة)."],["I stayed home ___ it rained.","because","and","but","«because» = لأنّ (سبب)."],["He is small ___ strong.","but","so","because","«but» = لكن (تضادّ)."],["Call me ___ you arrive.","when","but","so","«when» = عندما (زمن)."]];
+var CONJ = [["I was tired, ___ I went to bed.","so","but","and","«so» = لذلك (نتيجة)."],["I like apples ___ bananas.","and","so","because","«and» = و (إضافة)."],["I stayed home ___ it rained.","because","and","but","«because» = لأنّ (سبب)."],["He is small ___ strong.","but","so","because","«but» = لكن (تضادّ)."],["Call me ___ you arrive.","when","but","so","«when» = عندما (زمن)."],
+  /* توسعة: كان خمسةً فقط */
+  ["I was hungry, ___ I ate a sandwich.","so","but","because","«so» = لذلك (نتيجة)."],
+  ["She likes tea ___ she doesn't like coffee.","but","so","because","«but» = لكن (تضادّ)."],
+  ["We stayed inside ___ it was very hot.","because","but","and","«because» = لأنّ (سبب)."],
+  ["Wash your hands ___ you eat.","before","but","so","«before» = قبل أن (زمن)."],
+  ["I brush my teeth ___ I go to bed.","after","but","because","«after» = بعد أن (زمن)."],
+  ["He is young ___ very clever.","but","so","because","«but» = لكن (تضادّ)."],
+  ["Take an umbrella ___ it is raining.","because","but","and","«because» = لأنّ (سبب)."],
+  ["I like cats ___ dogs.","and","but","so","«and» = و (إضافة)."],
+  ["It was late, ___ we went home.","so","because","and","«so» = لذلك (نتيجة)."]];
 function gVerb4(){ var p=gp(VERB4); var o=opt(p[1], dist(VERB4,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
 function gIrr(){ var p=gp(IRR); var o=opt(p[1], [p[2], p[0]]); return ["الماضي الشاذّ من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+" (فعل شاذّ)."]; }
 function gAdv(){ var p=gp(ADV); var o=opt(p[1], [p[0], p[0]+"er"]); return ["حوّل "+en("«"+p[0]+"»")+" إلى ظرف (adverb):", o[0], o[1], en(p[0]+" → "+p[1])+" (نضيف ly)."]; }
@@ -313,7 +330,15 @@ function gVing(){ var p=gp(VBING); var o=opt(p[1],[p[2],p[3]]); return ["أكم�
 var COULD = [
   ["___ you swim when you were five? — Yes, I could.","Could","Can","Do","«Could» للقدرة في الماضي."],
   ["I ___ ride a horse when I was young.","couldn't","can't","didn't","«couldn't» = لم أستطع (ماضٍ)."],
-  ["She ___ read at the age of four.","could","can","will","«could» للقدرة في الماضي."]
+  ["She ___ read at the age of four.","could","can","will","«could» للقدرة في الماضي."],
+  /* توسعة: كان ثلاثةً فقط */
+  ["We ___ speak English when we were six.","could","can","must","«could» للقدرة في الماضي."],
+  ["He ___ climb the tree last year.","could","can","will","«could» للقدرة في الماضي."],
+  ["They ___ find the key yesterday.","couldn't","can't","aren't","«couldn't» = لم يستطيعوا (ماضٍ)."],
+  ["___ she play the piano when she was young?","Could","Can","Does","«Could» سؤال عن قدرة ماضية."],
+  ["I ___ swim last summer, but now I can.","couldn't","can't","won't","«couldn't» نفي القدرة في الماضي."],
+  ["My father ___ drive when he was eighteen.","could","can","should","«could» للقدرة في الماضي."],
+  ["___ you read before school? — No, I couldn't.","Could","Can","Do","«Could» للقدرة في الماضي."]
 ];
 function gCould(){ var p=gp(COULD); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (القدرة في الماضي): "+en(p[0]), o[0], o[1], p[4]]; }
 
@@ -325,14 +350,30 @@ var MODAL = [
   ["You are very sick. You ___ stay in bed.","must","shouldn't","mustn't","وجوب → must / have to."],
   ["You ___ look at screens now.","mustn't","should","have to","منع → mustn't."],
   ["You ___ wash your hands before eating.","have to","mustn't","shouldn't","وجوب → have to."],
-  ["You ___ play outside today.","shouldn't","must","have to","نصيحة بعدم الفعل → shouldn't."]
+  ["You ___ play outside today.","shouldn't","must","have to","نصيحة بعدم الفعل → shouldn't."],
+  /* توسعة: كان خمسةً فقط */
+  ["You ___ drink water every day.","should","mustn't","doesn't","نصيحة → should."],
+  ["We ___ touch the hot pan.","mustn't","should","have to","منع → mustn't."],
+  ["Students ___ wear the uniform.","have to","mustn't","shouldn't","وجوب → have to."],
+  ["You ___ eat too much sugar.","shouldn't","must","have to","نصيحة بعدم الفعل → shouldn't."],
+  ["He is ill. He ___ see a doctor.","must","mustn't","shouldn't","وجوب → must."],
+  ["You ___ run near the pool.","mustn't","should","have to","منع → mustn't."],
+  ["We ___ sleep early before the exam.","should","mustn't","don't have to","نصيحة → should."]
 ];
 function gModal(){ var p=gp(MODAL); var o=opt(p[1],[p[2],p[3]]); return ["أكمل: "+en(p[0]), o[0], o[1], p[4]]; }
 var INDEF = [
   ["I have ___ in my eye.","something","anything","nothing","«something» = شيء ما (إثبات)."],
   ["I don't see ___.","anything","something","everything","«anything» = أيّ شيء (نفي)."],
   ["___ hurts! It hurts all over.","Everything","Anything","Nothing","«Everything» = كل شيء."],
-  ["The box is empty. There is ___ in it.","nothing","something","anything","«nothing» = لا شيء."]
+  ["The box is empty. There is ___ in it.","nothing","something","anything","«nothing» = لا شيء."],
+  /* توسعة: كان أربعةً فقط */
+  ["I heard ___ behind the door.","something","anything","nothing","«something» = شيء ما (إثبات)."],
+  ["Is there ___ in the bag?","anything","something","nothing","«anything» في السؤال."],
+  ["She said ___ to me. She was silent.","nothing","something","everything","«nothing» = لا شيء."],
+  ["___ was ready before the guests came.","Everything","Anything","Nothing","«Everything» = كلّ شيء."],
+  ["He didn't buy ___ from the shop.","anything","something","everything","«anything» في النفي."],
+  ["There is ___ to eat in the fridge.","something","anything","nothing","«something» = شيء ما (إثبات)."],
+  ["I know ___ about this story.","nothing","something","anything","«nothing» = لا شيء."]
 ];
 function gIndef(){ var p=gp(INDEF); var o=opt(p[1],[p[2],p[3]]); return ["أكمل بالضمير المناسب: "+en(p[0]), o[0], o[1], p[4]]; }
 
@@ -343,14 +384,30 @@ var REL = [
   ["That's the vet ___ works in the zoo.","who","which","where","«who» للعاقل (الأشخاص)."],
   ["This is the tiger ___ makes me frightened.","that","who","where","«that/which» لغير العاقل."],
   ["This is the zoo ___ the pandas live.","where","who","which","«where» للمكان."],
-  ["She is the girl ___ bag is red.","whose","which","where","«whose» للملكية."]
+  ["She is the girl ___ bag is red.","whose","which","where","«whose» للملكية."],
+  /* توسعة: كان أربعةً فقط */
+  ["This is the book ___ I read last week.","which","who","where","«which» لغير العاقل."],
+  ["He is the doctor ___ helped my father.","who","which","where","«who» للعاقل."],
+  ["That is the school ___ my sister studies.","where","who","which","«where» للمكان."],
+  ["I met a boy ___ father is a pilot.","whose","which","where","«whose» للملكية."],
+  ["The cat ___ sleeps here is mine.","that","who","where","«that/which» لغير العاقل."],
+  ["This is the park ___ we play football.","where","who","which","«where» للمكان."],
+  ["She is the teacher ___ teaches us English.","who","which","where","«who» للعاقل."]
 ];
 function gRel(){ var p=gp(REL); var o=opt(p[1],[p[2],p[3]]); return ["أكمل بأداة الوصل: "+en(p[0]), o[0], o[1], p[4]]; }
 var COMP = [
   ["Cats walk ___ than horses.","more quietly","quietly","most quietly","الظرف الطويل: more + adverb + than."],
   ["A cheetah runs ___ than a cat.","faster","fast","fastest","المقارنة: fast → faster."],
   ["The lion is ___ animal in the group.","the strongest","stronger","strong","التفضيل: the + adj-est."],
-  ["Pandas are ___ than tigers.","friendlier","friendly","friendliest","المقارنة: friendly → friendlier."]
+  ["Pandas are ___ than tigers.","friendlier","friendly","friendliest","المقارنة: friendly → friendlier."],
+  /* توسعة: كان أربعةً فقط */
+  ["An elephant is ___ than a horse.","bigger","big","biggest","المقارنة: big → bigger."],
+  ["This is ___ book in the library.","the oldest","older","old","التفضيل: the + adj-est."],
+  ["A turtle moves ___ than a rabbit.","more slowly","slowly","most slowly","الظرف الطويل: more + adverb + than."],
+  ["Winter is ___ than summer.","colder","cold","coldest","المقارنة: cold → colder."],
+  ["He is ___ boy in the class.","the tallest","taller","tall","التفضيل: the + adj-est."],
+  ["She sings ___ than her sister.","more beautifully","beautifully","most beautifully","الظرف الطويل: more + adverb + than."],
+  ["Today is ___ day of the week.","the busiest","busier","busy","التفضيل: the + adj-est."]
 ];
 function gComp(){ var p=gp(COMP); var o=opt(p[1],[p[2],p[3]]); return ["أكمل (مقارنة/تفضيل): "+en(p[0]), o[0], o[1], p[4]]; }
 
