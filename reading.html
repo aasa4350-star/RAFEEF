@@ -1414,7 +1414,11 @@ if(!META[who] || !DATA[who]){
     if(_vocSynced) return; _vocSynced=true;
     try{
       var nm = (META[who] && META[who].name) || who;
-      fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(nm)+"&order=created_at.desc&limit=200",
+      /* نطلب صفوف الكلمات وحدها لا آخر مئتَي صفٍّ من كلّ شيء: الطفل قد
+         يحلّ اختباراتٍ كثيرةً بين جلستَي كلمات، فتخرج جلسات الكلمات من
+         النافذة فيعود العدّاد صفرًا على جهازٍ جديد — وهو ما لا يجوز. */
+      fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(nm)+
+            "&meta->>test=eq."+encodeURIComponent("كلمات إنجليزي 🔤")+"&order=created_at.desc&limit=400",
         { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
@@ -1428,8 +1432,15 @@ if(!META[who] || !DATA[who]){
         });
         if(maxL>getLearned()){
           setLearned(maxL);
-          var vp=document.getElementById("vocab");
-          if(vp && vp.classList.contains("active")) renderVocab();
+          /* ⚠️ كان الرسم مشروطًا بأن يكون تبويب الكلمات هو المفتوح، وهذا
+             شرطٌ لا يتحقّق أبدًا عند التحميل: التبويبات تُرسم كلّها مرّةً
+             واحدة والمفتوح افتراضًا هو «الإملاء»، وتبديل التبويب يبدّل
+             العرض ولا يُعيد الرسم. فيصل الرقمُ من قاعدة البيانات ويُحفظ
+             ثمّ لا يراه الطفل — يبقى أمامه «حفظت ٠» وهو حافظٌ مئاتٍ.
+             وهذا هو أصل شكوى الأب «لا تصفّر العدّاد»، ويقع على أيّ جهازٍ
+             جديدٍ أو متصفّحٍ جديد مهما كان الرقم المعروض.
+             والرسم على تبويبٍ مخفيّ لا ضرر فيه، فنرسم دائمًا. */
+          renderVocab();
         }
       }).catch(function(){});
     }catch(e){}
@@ -1777,36 +1788,27 @@ if(!META[who] || !DATA[who]){
       return h;
     }
     var btn = function(m,txt){ var on=(vocMode===m); return '<button data-mode="'+m+'" style="flex:1;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid var(--accent);'+(on?'background:var(--accent);color:#fff':'background:transparent;color:var(--accent)')+'">'+txt+'</button>'; };
-    /* ثلاثة أرقامٍ منفصلة بدل رقمٍ واحد يخلط الرؤية بالمعرفة — انظر srKnown */
-    var seen = VOCAB300.slice(0, learned);
-    var nKnown = srKnown(seen), nLearning = srLearning(seen);
-    /* صناديق التكرار تُحفظ في متصفّح الطفل وحده، بينما رقم «شافها» يُزامَن من
-       قاعدة البيانات. فإن فتح الصفحة على جهازٍ أو متصفّحٍ جديد ظهر «يعرفها ٠»
-       بجانب «شافها ٤٩٠» — وهذا يبدو خللًا وليس بخلل: لا دليل عندنا على تلك
-       الكلمات في هذا الجهاز. نقولها صراحةً بدل أن نترك صفرًا يُقلق. */
-    var _srN = Object.keys(getSR()).length;
-    var freshDevice = (_srN===0 && learned>0);
-    var kPct = goal ? Math.round(nKnown/goal*100) : 0;
+    /* ═══ إرجاع العدّاد الأصليّ — طلب الأب (٧ سبتمبر ٢٠٢٦) ═══
+       «رجّعه نفسه بالضبط، لا تكتب شافها ولا قيد التثبيت، لا تصفّر العدّاد،
+        رجّع كلماتهم لهم اللي حفظوها».
+
+       وكان الحقّ معه: صار العدّاد المعروض «تعرفها فعلًا» وهو مبنيٌّ على
+       صناديق التكرار المحفوظة في متصفّح الجهاز وحده، بينما «حفظت» يُزامَن
+       من قاعدة البيانات. فمن فتح الصفحة من جهازٍ آخر رأى صفرًا مكان مئاتٍ
+       حفظها. وهذا ما رأوه فعلًا يوم ٧ سبتمبر: رفيف ٠ مكان ٥٧٠، وأسامة ٠
+       مكان ٤١٠، وحسن ٤٢ مكان ٥١٠، وسعود ٤٨ مكان ١٦٨.
+
+       والأرقام لم تضع — «learned» سليمٌ في قاعدة البيانات لكلّ واحدٍ منهم،
+       وإنّما حُجب عن العرض. فرجع العرض كما كان بالضبط: «حفظت كذا / كذا»
+       وشريطٌ واحد، بلا لافتاتٍ ولا شرح.
+
+       وصناديق التكرار تبقى عاملةً في الخلف كما هي — هي التي ترتّب
+       المراجعة وتُقدّم الكلمة الضعيفة — لكنّها لا تحكم على العدّاد.
+       وأرقامها التفصيليّة مكانها تقرير الأب لا شاشة الطفل. */
     var html = '<div class="block-title"><span class="dot"></span> حفظ الكلمات ✍️</div>'+
       '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
-        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem">'+
-          '<span>📈 تقدّمك</span><span>تعرفها فعلًا: <span dir="ltr" style="color:var(--good)">'+nKnown+' / '+goal+'</span></span></div>'+
-        '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden;display:flex">'+
-          '<div style="height:100%;width:'+kPct+'%;background:var(--good)"></div>'+
-          '<div style="height:100%;width:'+(goal?Math.round(nLearning/goal*100):0)+'%;background:var(--warn)"></div>'+
-          '<div style="height:100%;width:'+(goal?Math.max(0,pct-kPct-Math.round(nLearning/goal*100)):0)+'%;background:var(--accent);opacity:.35"></div>'+
-        '</div>'+
-        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:.82rem;font-weight:700">'+
-          '<span style="color:var(--good)">🟢 متقنة '+nKnown+'</span>'+
-          '<span style="color:var(--warn)">🟡 قيد التثبيت '+nLearning+'</span>'+
-          '<span style="color:var(--muted)">⚪ شفتها '+learned+'</span>'+
-        '</div>'+
-        '<div style="font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.6;font-weight:400">'+
-          '«متقنة» = جاوبتها صح بعد <b>٨ أيام أو أكثر</b> من آخر مرة، مرّتين فأكثر — وهذا معيار الحفظ الحقيقي، '+
-          'لأن تذكّرها بعد دقيقتين يقيس الانتباه لا الحفظ.</div>'+
-        (freshDevice ? '<div style="background:var(--bg);border-radius:10px;padding:9px 11px;margin-top:8px;font-size:.82rem;line-height:1.7;font-weight:600">'+
-          'ℹ️ هذا جهازٌ أو متصفّحٌ جديد عليك: سجلّ مراجعتك محفوظٌ في الجهاز اللي كنت تذاكر عليه، '+
-          'فالعدّاد يبدأ من الصفر هنا. ارجع لنفس الجهاز، أو أكمل من هنا وبيرتفع مع المراجعة.</div>' : '')+
+        '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت <span dir="ltr">'+learned+' / '+goal+'</span></span></div>'+
+        '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
       (learned>0 ? '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("fresh","🆕 راجع الجديد")+'</div>' : '')+

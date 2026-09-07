@@ -60,6 +60,39 @@
        والوزن الأدقّ عدد الجمل المُقيَّمة فعلًا (pronN / corrN)، وقد
        أُضيفا إلى ما تحفظه talk.html من اليوم؛ وما قبلهما من صفوفٍ
        قديمةٍ يُوزن بعدد جمل الجلسة، وهو أقرب من المساواة بينها. */
+    /* ═══ خانات الكلمات الثلاث — طلب الأب (٧ سبتمبر ٢٠٢٦) ═══
+       «خلّه يبيّن عندي كم كلمة حفظها جديدة، وكم راجعها من القديم، وكم
+        راجعها من الجديد. يعني يصير عندي ثلاث خاناتٍ أشوفها».
+       وهي أنماط الجلسات الثلاثة نفسها في صفحة القراءة:
+         new    📚 كلماتٌ جديدة قُدّمت له أوّل مرّة
+         review 🔁 مراجعةٌ من المحفوظ القديم
+         fresh  🆕 مراجعةٌ لما حفظه حديثًا ولم يرسخ بعد
+       نعدّ الكلمات لا الجلسات، ونستبعد غير الموثوقة كبقيّة الأرقام.
+       والصفوف القديمة بلا mode تُحسب مراجعةً — فالمراجعة كانت الأصل قبل
+       أن تُفصل الأنماط، وعدّها «جديدًا» يضخّم رقم الحفظ بغير حقّ. */
+    VOCAB_MODES: [["new","📚","حفظ جديد"], ["review","🔁","راجع من القديم"], ["fresh","🆕","راجع من الجديد"]],
+    vocabModes: function(rows){
+      var B = { "new":{w:0,c:0,n:0}, review:{w:0,c:0,n:0}, fresh:{w:0,c:0,n:0} };
+      (rows || []).forEach(function(p){
+        var m = (p && p.meta) || {};
+        if (m.trusted === false) return;
+        var k = (m.mode === "new" || m.mode === "fresh") ? m.mode : "review";
+        B[k].w += (m.total || 0); B[k].c += (m.correct || 0); B[k].n++;
+      });
+      return B;
+    },
+    /* أعلى رقمِ حفظٍ سُجّل — تراكميّ لا يتراجع، ولا تُحتسب فيه جلسةٌ خرج منها */
+    vocabLearned: function(rows){
+      var L = 0, T = 0;
+      (rows || []).forEach(function(p){
+        var m = (p && p.meta) || {};
+        if (m.trusted === false) return;
+        if (typeof m.learned === "number" && m.learned > L) L = m.learned;
+        if (typeof m.vocTotal === "number" && m.vocTotal > T) T = m.vocTotal;
+      });
+      return { learned: L, total: Math.max(T, L) };
+    },
+
     talkAvg: function(sessions, field, nField){
       var sum = 0, w = 0, sess = 0;
       (sessions || []).forEach(function(s){

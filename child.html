@@ -79,6 +79,20 @@
 /* talk.html صار يحفظ بعد كلّ جملة (كانت الجلسة تُحفظ عند الخروج وحده فتضيع
    إن لم يوقظ الإغلاقُ الحدثَ) — فالجلسة الواحدة عدّة صفوف يجمعها meta.sid.
    الصفوف القديمة بلا sid تبقى كلٌّ منها جلسةً كما كانت. */
+/* الخانات الثلاث لحفظ الكلمات — الحساب في RR.vocabModes المشترك */
+function vocabBoxes(rows){
+  var B = RR.vocabModes(rows);
+  var box = function(k, ico, lbl){
+    var b = B[k]; if(!b.w) return '';
+    var p = Math.round(b.c / b.w * 100);
+    return '<div style="flex:1;min-width:128px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:9px 11px">'+
+      '<div style="font-size:.8rem;color:var(--muted);font-weight:700">'+ico+' '+lbl+'</div>'+
+      '<div style="font-weight:800;font-size:1.15rem" dir="ltr">'+b.w+'</div>'+
+      '<div style="font-size:.76rem;color:var(--muted)">كلمة · '+p+'% صحّ · '+b.n+' جلسة</div></div>';
+  };
+  var h = RR.VOCAB_MODES.map(function(m){ return box(m[0], m[1], m[2]); }).join('');
+  return h ? '</ul><div style="display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 10px">'+h+'</div><ul class="weak">' : '';
+}
 function groupTalk(rows){
   var g={}, order=[];
   rows.forEach(function(r,i){
@@ -284,17 +298,8 @@ async function main(){
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
       const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
-        (function(){
-          /* طلب الأب (٤ سبتمبر ٢٠٢٦): قياسٌ حقيقيّ بالمعايير الدولية.
-             «متقنة» = استرجعها صحيحةً بعد فاصل ٨ أيام فأكثر (الاسترجاع
-             المؤجَّل)، لا مجرّد أنّه رآها. انظر srKnown في reading.html. */
-          let vKnown=0, vLearn2=0, hasK=false;
-          vocabAll.forEach(p=>{ if(typeof p.meta.known==="number"){ hasK=true; if(p.meta.known>vKnown) vKnown=p.meta.known; }
-                                if(typeof p.meta.learning==="number" && p.meta.learning>vLearn2) vLearn2=p.meta.learning; });
-          if(hasK) return `<li>🟢 <b>يعرفها فعلًا: <span dir="ltr">${vKnown} / ${vTotal}</span></b> · 🟡 قيد التثبيت ${vLearn2} · ⚪ شافها ${vLearned}
-            <div style="font-size:.78rem;color:var(--muted);font-weight:400;margin-top:3px">«يعرفها» = جاوبها صح بعد ٨ أيام أو أكثر — معيار الاسترجاع المؤجَّل</div></li>`;
-          return vLearned>0 ? `<li>📚 شاف: <b><span dir="ltr">${vLearned} / ${vTotal}</span> كلمة</b> (${lpct}%) <span class="cnt">— قياسٌ قديم يعدّ ما رآه</span></li>` : ``;
-        })()+
+        (vLearned>0 ? `<li>📚 <b>حفظ: <span dir="ltr">${vLearned} / ${vTotal}</span> كلمة</b> (${lpct}%)</li>` : ``)+
+        vocabBoxes(vocabAll)+
         dayList+
         `<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>`+
         (rW?`<li>🔁 راجع محفوظ: <b><span dir="ltr">${rC}/${rW}</span> كلمة</b> (${rpct}%)</li>`:``)+

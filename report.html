@@ -311,8 +311,18 @@ function vocabCardHtml(student){
            '<span class="frac">'+b.w+' كلمة<br>'+b.c+'/'+b.w+'</span></li>';
   }).join("");
 
+  /* ═══ الخانات الثلاث — طلب الأب (٧ سبتمبر ٢٠٢٦) ═══
+     «كم كلمة حفظها جديدة، وكم راجعها من القديم، وكم راجعها من الجديد».
+     الأرقام هنا كلماتٌ لا جلسات، وتحتها نسبة الصحّة وعدد الجلسات. */
+  var boxes = RR.VOCAB_MODES.map(function(m){
+    var b = by[m[0]]; if(!b.w) return '';
+    return '<div class="stat"><div class="v">'+b.w+'</div><div class="l">'+m[1]+' '+m[2]+'</div>'+
+           '<div class="l" style="font-size:.72rem;opacity:.75">'+pct(b.c,b.w)+'% صحّ · '+b.n+' جلسة</div></div>';
+  }).join("");
+
   return '<div class="card"><h2>📖 حفظ الكلمات — حسب النوع</h2>'+
     (learned ? '<p class="note">حفظ حتى الآن: <b>'+learned+(vocTotal?'/'+vocTotal:'')+' كلمة</b></p>' : '')+
+    (boxes ? '<div class="stats">'+boxes+'</div>' : '')+
     '<ul class="sk">'+lines+'</ul>'+
     (untrusted ? '<p class="note" style="color:var(--bad)">🚫 '+untrusted+' جلسة غير محتسبة (خرج من الصفحة أثناء الحل).</p>' : '')+
     '</div>';
