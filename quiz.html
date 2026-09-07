@@ -1215,17 +1215,66 @@ var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
 var AUDIO_FIX = {"منى":"مُنى"};
 function stripTash(s){ return (s||"").replace(/[ً-ْٰ]/g,""); }
 function audioKey(s){ s = stripTash(s); for(var k in AUDIO_FIX){ s = s.split(k).join(AUDIO_FIX[k]); } return s; }
+/* ═══ «الإملاء غير بشريّ» — بلاغ الأب (٧ سبتمبر ٢٠٢٦) ═══
+   زرُّ «🐢 أبطأ» كان يمطّ المقطعَ المحفوظ إلى 0.7 بـplaybackRate، والمطّ
+   خوارزميٌّ (المتصفّح يُثبّت النبرة ويُمدّد الزمن) فيُكسب الكلامَ رنينًا
+   معدنيًّا. والحلّ كما في صفحة القراءة: نُعيد تركيبه عند أزور بالصوت نفسه
+   (ar-SA-HamedNeural) وبالسرعة المطلوبة — بطءٌ حقيقيّ بصوتٍ بشريّ. */
+var _ttsSynth = null;
+function azureSayAr(text, ratePct, onFail){
+  var cr = azureCreds();
+  if(!cr || !window.SpeechSDK){ onFail(); return; }
+  try{
+    var SDK = window.SpeechSDK;
+    try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
+    if(_ttsSynth){ try{ _ttsSynth.close(); }catch(e){} _ttsSynth=null; }
+    if(CUR_AUDIO){ try{ CUR_AUDIO.pause(); }catch(e){} }
+    var synth = new SDK.SpeechSynthesizer(SDK.SpeechConfig.fromSubscription(cr.key, cr.region));
+    _ttsSynth = synth;
+    var esc = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+    /* الصوت نفسه الذي وُلّدت به المقاطع المحفوظة — لئلّا يسمع صوتين في جلسة */
+    var ssml = '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-SA">'+
+               '<voice name="ar-SA-HamedNeural"><prosody rate="'+ratePct+'">'+esc+'</prosody></voice></speak>';
+    synth.speakSsmlAsync(ssml,
+      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; },
+      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; onFail(); });
+  }catch(e){ onFail(); }
+}
+/* والمانيفست يخزّن النصّ مشكولًا (٢٦١ مدخلًا كلّها مشكولة)، وكانت هذه
+   الصفحة تُجرّد الحركات ثمّ تبحث — فلا تجد شيئًا أبدًا، فتنزل إلى صوت
+   المتصفّح الآليّ في كلّ بند. فنبحث بالنصّ كما هو أوّلًا ثمّ بالمجرّد. */
+function arFile(text){
+  if(!(MANIFEST && MANIFEST.ar)) return null;
+  return MANIFEST.ar[text] || MANIFEST.ar[audioKey(text)] || null;
+}
 function speakAr(text, rate){
   if(!MANI_DONE){ MANI_P.then(function(){ speakAr(text, rate); }); return; }
-  var key = audioKey(text); // بدون حركات ليُقرأ أصح
-  if(MANIFEST && MANIFEST.ar && MANIFEST.ar[key]){
-    try{
-      if(CUR_AUDIO){ CUR_AUDIO.pause(); }
-      var a = new Audio("audio/" + MANIFEST.ar[key] + "?v=" + AUDIO_VER);
-      a.playbackRate = Math.max(0.5, rate || 1);
-      CUR_AUDIO = a; a.play(); return;
-    }catch(e){}
+  var key = audioKey(text); // بدون حركات — للصوت الآليّ البديل فقط
+  var have = !!arFile(text);
+  /* المقاطع مُوَلَّدةٌ أصلًا بـ-10%، فالسرعة العاديّة تُلبّى بتشغيلها كما هي.
+     والبطء المطلوب يُطلب من أزور، ولا نمطّ المقطع إلّا إذا سقط أزور. */
+  if(have && rate && rate < 1){
+    azureSayAr(text, Math.round((rate - 1) * 100 - 10) + "%", function(){ _playAr(text, rate); });
+    return;
   }
+  if(have){ _playAr(text, 1); return; }
+  azureSayAr(text, (rate && rate < 1 ? Math.round((rate - 1) * 100 - 10) : -10) + "%", function(){ _browserAr(key, rate); });
+}
+function _playAr(text, rt){
+  try{
+    if(CUR_AUDIO){ CUR_AUDIO.pause(); }
+    var a = new Audio("audio/" + arFile(text) + "?v=" + AUDIO_VER);
+    rt = Math.max(0.5, rt || 1);
+    /* لا نمسّ المقطع إلّا عند بطءٍ صريح، ونُثبّت النبرة صراحةً لسفاري */
+    if(rt !== 1){
+      try{ a.preservesPitch = true; a.webkitPreservesPitch = true; a.mozPreservesPitch = true; }catch(e){}
+      a.playbackRate = rt;
+    }
+    CUR_AUDIO = a; a.play(); return;
+  }catch(e){}
+  _browserAr(audioKey(text), rt);
+}
+function _browserAr(key, rate){
   try{
     speechSynthesis.cancel();
     try{ speechSynthesis.resume(); }catch(e){} // Safari/iOS قد يعلّق المحرّك فيصير صامتًا — resume يفكّه

@@ -839,7 +839,14 @@ function speak(text, rate, lang, onEnd){
     try{
       if(CUR_AUDIO){ CUR_AUDIO.pause(); }
       var a = new Audio("audio/" + file + "?v=" + AUDIO_VER);
-      a.playbackRate = Math.max(0.5, rate || 1);
+      var rt = Math.max(0.5, rate || 1);
+      /* لا نلمس المقطع إلّا عند طلب بطءٍ صريح — والمسّ يمطّ الزمن ويُكسبه
+         رنينًا. وحين نضطرّ نُثبّت النبرة صراحةً؛ فسفاري بلا هذه السطور
+         يُعيد التشكيل فتهبط النبرة مع السرعة، وهو أسوأ من المطّ. */
+      if(rt !== 1){
+        try{ a.preservesPitch = true; a.webkitPreservesPitch = true; a.mozPreservesPitch = true; }catch(e){}
+        a.playbackRate = rt;
+      }
       if(onEnd){ a.addEventListener("ended", onEnd); a.addEventListener("error", onEnd); }
       CUR_AUDIO = a; var pr=a.play(); if(pr&&pr.catch){ pr.catch(function(){ if(onEnd) onEnd(); }); } return;
     }catch(e){}
@@ -862,38 +869,41 @@ function speak(text, rate, lang, onEnd){
 /* نطق بند الإملاء: تسجيلٌ محفوظ إن وُجد، وإلّا Azure، وإلّا نطق المتصفّح.
    الترتيب مقصود: المحفوظ أوثق وأسرع ولا يحتاج شبكة، وAzure أحسن من
    نطق المتصفّح بكثير في العربية المشكولة. */
-/* ═══ «صوت الإنجليزي ما هو واضح لهم» — بلاغ الأب (٧ سبتمبر ٢٠٢٦) ═══
-   علّتان في هذا السطر وحده:
+/* ═══ «الإملاء لازال غير بشريّ، لكنّ القطعة بشريّ» — بلاغ الأب (٧ سبتمبر ٢٠٢٦) ═══
+   الفرق بين البابين في هذه الصفحة نفسها هو الجواب: القطعة تمرّ على أزور
+   فتُركَّب من جديدٍ بالسرعة المطلوبة، والإملاء يُشغّل مقطعًا محفوظًا ثمّ
+   يُبطّئه المتصفّح بـplaybackRate.
 
-   ١) زرُّ «🐢 أبطأ» كان لا يفعل شيئًا. فهو يُمرّر «-35%»، وكانت الدالّة
-      تتجاهل السرعة تمامًا متى وُجد تسجيلٌ محفوظ — وهو حال كلّ كلمات
-      الإملاء العربيّة، وأكثر الإنجليزيّة. فالطفل يضغط «أبطأ» فيسمع
-      الكلمة بالسرعة نفسها، فيظنّ الزرّ معطّلًا أو سمعه هو.
+   وقياسُنا على المتصفّح: preservesPitch = true افتراضًا، والنبرة تثبت عند
+   ٢٣٥ هرتز في السرعتين — فالمتصفّح لا يُعيد التشكيل بل يمطّ الزمن مطًّا
+   خوارزميًّا (phase vocoder)، وهذا المطّ هو الذي يُكسب الكلامَ رنينًا
+   معدنيًّا. فالصوت الأصل بشريٌّ، والمعالجةُ هي التي تنزع عنه بشريّته.
 
-   ٢) والإنجليزيّ كان يُشغَّل بسرعةٍ كاملة (1) بينما العربيّ بـ0.9 —
-      والإنجليزيّة لغةٌ ثانيةٌ عندهم، فهي أولى بالتمهّل لا العكس.
-
-   فصارت النسبة المئويّة تُترجم إلى سرعةِ تشغيلٍ حقيقيّة، ويُبطَّأ
-   الإنجليزيّ أكثر من العربيّ في الحالين. */
-function rateOf(pct, isAr){
+   والمقاطع المحفوظة مُوَلَّدةٌ أصلًا بـ-10% (tools/generate-audio.js)،
+   فطلبُ «استمع» يُلبّى بتشغيلها كما هي: صفرُ معالجة، وهو عين صوت القطعة.
+   وطلبُ «🐢 أبطأ» يُلبّى بإعادة التركيب عند أزور — بطءٌ حقيقيّ بصوتٍ
+   بشريّ. ولا نمطّ المقطع إلّا إذا سقط أزور، وحينها البطء أنفع من الرنين. */
+var CLIP_RATE = -10;                    /* السرعة المخبوزة في المقاطع المحفوظة */
+function pctOf(pct, isAr){
   var m = /(-?\d+)\s*%/.exec(String(pct || ""));
-  var r = m ? 1 + (parseInt(m[1], 10) / 100) : (isAr ? 0.9 : 0.85);
-  /* الإنجليزيّ لغةٌ ثانية: نطرح عُشرًا آخر، ولا ننزل تحت 0.6 فيتشوّه الصوت */
-  if(!isAr) r -= 0.05;
-  return Math.max(0.6, Math.min(1, r));
+  return m ? parseInt(m[1], 10) : (isAr ? -10 : -15);
 }
 function sayDict(text, isAr, ratePct){
   var lk = isAr ? "ar" : "en";
   var file = MANIFEST && MANIFEST[lk] && (MANIFEST[lk][text] || MANIFEST[lk][audioKey(text)]);
-  if(file){ speak(text, rateOf(ratePct, isAr), isAr ? "ar-SA" : "en-US"); return; }
-  azureTTS(text, isAr, ratePct);
+  var want = pctOf(ratePct, isAr);
+  /* المطلوبُ بسرعة التسجيل نفسها أو أسرع: المقطع كما وُلّد، بلا مطٍّ ولا معالجة */
+  if(file && want >= CLIP_RATE){ speak(text, 1, isAr ? "ar-SA" : "en-US"); return; }
+  /* أبطأ ممّا سُجّل: أزور يُعيد التركيب. وإن تعذّر، مطّ المقطع بقدر الفرق فقط */
+  azureTTS(text, isAr, ratePct, null, file ? Math.max(0.7, 1 + (want - CLIP_RATE) / 100) : 0.8);
 }
 
 // نطق عصبي بشري من Azure (مبطّأ للأطفال) للكلمة المفردة أو القطعة — يرجع لصوت المتصفح فقط إذا تعذّر Azure
 var _ttsSynth=null;
-function azureTTS(text, isAr, ratePct, onEnd){
+function azureTTS(text, isAr, ratePct, onEnd, fbRate){
   var cr=azureCreds(), lang=isAr?"ar-SA":"en-US";
-  if(!cr || !window.SpeechSDK){ speak(text, 0.8, lang, onEnd); return; }
+  fbRate = fbRate || 0.8;   /* سرعةُ الرجوع حين يتعذّر أزور */
+  if(!cr || !window.SpeechSDK){ speak(text, fbRate, lang, onEnd); return; }
   try{
     var SDK=window.SpeechSDK;
     try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){}
@@ -911,8 +921,8 @@ function azureTTS(text, isAr, ratePct, onEnd){
     var ssml='<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="'+vLang+'"><voice name="'+voice+'"><prosody rate="'+(ratePct||"-15%")+'">'+esc+'</prosody></voice></speak>';
     synth.speakSsmlAsync(ssml,
       function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; if(onEnd){ try{onEnd();}catch(e){} } },
-      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speak(text, 0.8, lang, onEnd); });
-  }catch(e){ speak(text, 0.8, lang, onEnd); }
+      function(){ try{ synth.close(); }catch(e){} if(_ttsSynth===synth)_ttsSynth=null; speak(text, fbRate, lang, onEnd); });
+  }catch(e){ speak(text, fbRate, lang, onEnd); }
 }
 var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // التعرّف على الكلام غير موثوق على آيفون/آيباد (قيد من آبل) — نخفي زر النطق هناك
