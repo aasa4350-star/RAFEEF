@@ -595,6 +595,31 @@ function skillOf(q){
 var SECS = { v:780, q:720, t:900, s:720 }; // ثواني كل قسم (مثل الاختبار الحقيقي)
 var TIMED = false; // الوضع المؤقّت اختياري
 function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
+/* ═══ «أسئلة جديدة» في التحصيلي وSTEP ═══
+   طلب الأب (٧ سبتمبر ٢٠٢٦): «أضف». كان الزرّ غائبًا عن هذين القسمين
+   (regen=false) فيلزم الطفلَ إعادةُ تحميل الصفحة كلّها ليأخذ اختبارًا
+   آخر — بخلاف اللفظي والكمي.
+
+   وخلطُ البنك وحده لا يكفي: بنكٌ ثابتٌ يُعطي في الجولة الثانية كثيرًا
+   ممّا أعطاه في الأولى (وهو ما قِسناه: ٤٠٪ و٣٢٪). فنُقدّم ما لم
+   يُعرَض بعدُ في هذه الزيارة، ولا نعود إلى المعروض إلّا إذا نفد
+   البنك — فيرى الطفل بنكه كلّه قبل أن يتكرّر عليه شيء. */
+var _shown = {};
+function freshPick(bank, n, key){
+  var seen = _shown[key] || (_shown[key] = {});
+  var fresh = [], rest = [];
+  bank.forEach(function(q, i){ (seen[i] ? rest : fresh).push(i); });
+  shuffle(fresh); shuffle(rest);
+  var idx = fresh.slice(0, n);
+  if(idx.length < n){
+    /* نفد الجديد: نبدأ دورةً جديدة ونُكمل ممّا سبق عرضه */
+    _shown[key] = {}; seen = _shown[key];
+    idx = idx.concat(rest.slice(0, n - idx.length));
+  }
+  idx.forEach(function(i){ seen[i] = 1; });
+  return idx.map(function(i){ return bank[i]; });
+}
+
 function renderSet(id, items, intro, regen, label){
   var sec = document.getElementById(id);
   items = items.map(shuffleQ);
@@ -698,9 +723,9 @@ function buildAll(){
   if(!VERBAL_ONLY){
     if(!YOUNG){
       renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
-      renderSet("t", shuffle(TAHSILI.slice()).slice(0,12), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري).", false, "تحصيلي");
+      renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
     }
-    renderSet("s", shuffle(STEP.slice()).slice(0,12), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم).", false, "STEP إنجليزي");
+    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
   }
 }
 var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
