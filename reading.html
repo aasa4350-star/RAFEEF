@@ -1066,7 +1066,30 @@ if(!META[who] || !DATA[who]){
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
     function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
-    sec._leave = savePartial;
+    /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
+       إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
+
+       العلّة نفسها التي أُصلحت لتبويب الكلمات يوم ٦ سبتمبر ولم تُنقل إلى
+       هذين التبويبين:
+
+       ١) الحفظ الجزئيّ كان معلّقًا على _leave، وهي تقع عند كلّ تبديل
+          تبويبٍ داخل الصفحة. فمن أجاب عن أربعٍ ثمّ عرّج على تبويبٍ آخر
+          وعاد وأتمّ الثمانية، يُسجَّل له «٤» ولا شيء بعدها، لأنّ الحفظ
+          الجزئيّ يرفع saved فيمنع حفظ النتيجة الكاملة.
+
+       ٢) والأهمّ: مغادرة الصفحة كلّيًّا لم تكن تحفظ شيئًا أصلًا. وحسن
+          كان ينتقل بين الصفحات (كانجرو، رياضيات، علوم، لغتي) — فكلّ ما
+          عمله في الإملاء والقراءة ضاع بلا أثر. وهذا سبب أنّ آخر قراءةٍ
+          إنجليزيّةٍ سُجّلت له كانت ٣ سبتمبر وآخر إملاءٍ ٢ سبتمبر، وهو
+          يفتحهما بعد ذلك.
+
+       فصار تبديلُ التبويب لا يُنهي شيئًا (الطفل يعود غالبًا)، والحفظُ
+       الجزئيّ عند مغادرة الصفحة وحدها. */
+    renderDict._save = savePartial;
+    sec._leave = function(){};
+    if(renderDict._hook) window.removeEventListener("pagehide", renderDict._hook);
+    renderDict._hook = function(){ savePartial(); };
+    window.addEventListener("pagehide", renderDict._hook);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
@@ -1335,7 +1358,14 @@ if(!META[who] || !DATA[who]){
        فلا تُقرأ نسبةٌ عاليةٌ ناتجةٌ عن الحفظ على أنّها فهم. */
     var _pid = passageId(passage);
     function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic}); }
-    sec._leave = savePartial;
+    /* نفس علّة الإملاء أعلاه: التبويب لا يُنهي الجلسة، والحفظ الجزئيّ
+       عند مغادرة الصفحة — وإلّا ضاعت قراءةُ الطفل كلّها إذا انتقل إلى
+       صفحةٍ أخرى (بلاغ الأب ٧ سبتمبر ٢٠٢٦). */
+    renderRead._save = savePartial;
+    sec._leave = function(){};
+    if(renderRead._hook) window.removeEventListener("pagehide", renderRead._hook);
+    renderRead._hook = function(){ savePartial(); };
+    window.addEventListener("pagehide", renderRead._hook);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
