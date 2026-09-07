@@ -54,6 +54,8 @@ module.exports = function banks() {
   const issues = [];
   const dir = process.env.BANKS_DIR || path.join(__dirname, '..');
   let checked = 0, worst = 0;
+  /* تفصيلُ كلّ قسمٍ ليُجاب سؤال الأب «كم نسبة التكرار؟» برقمٍ لا بوصف */
+  const rows = [];
 
   fs.readdirSync(dir).filter(f => /\.html$/.test(f)).forEach(file => {
     const src = fs.readFileSync(path.join(dir, file), 'utf8');
@@ -80,6 +82,7 @@ module.exports = function banks() {
 
       checked++;
       const pct = Math.round(100 * n / arr.length);
+      rows.push({ file: file, id: id, bank: bankName, bankN: arr.length, per: n, pct: pct });
       if (pct > worst) worst = pct;
       const where = file + ' · ' + id + ' (بنك ' + bankName + ')';
       if (pct >= ERR_AT) {
@@ -108,5 +111,6 @@ module.exports = function banks() {
     }
   });
 
-  return { checked, worst, issues };
+  rows.sort((a, b) => b.pct - a.pct);
+  return { checked, worst, rows, issues };
 };
