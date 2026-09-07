@@ -101,6 +101,81 @@ module.exports = function kangaroo() {
         ' سؤالًا مختلفًا فقط (الحدّ ' + MIN_SECTION + ')' });
   });
 
+  /* ٢ب) أسئلة عدّ المثلّثات: نعدّ من الرسم لا من القانون.
+
+     هذه الأسئلة وحدها كانت مصدر ٨٠–٩٠٪ من تكرار قسم الاستدلال الرياضي،
+     فوُسّعت (٧ سبتمبر ٢٠٢٦) إلى عائلتين: مروحةٌ من رأسٍ مع خطوطٍ موازية،
+     وشبكةٌ مثلّثيّة. والتوسيع يجرّ خطرًا: قانونُ عدٍّ خاطئ يُعلّم الطفل
+     طريقةً غلط، وهو أسوأ من التكرار نفسه. فلا نصدّق القانون: نحلّل الـSVG
+     الذي أنتجه المولّد إلى قطعٍ مستقيمة، ونعدّ المثلّثات بالحصر — كلّ ثلاث
+     قطعٍ تتقاطع مثنى مثنى في ثلاث نقاطٍ متمايزةٍ غير مستقيمة. فإن خالف
+     الحصرُ الجوابَ المعروض فالجواب خطأ.
+
+     والعتبات هنا مقصودة: إحداثيّات الرسم مقرّبةٌ لخانةٍ عشريّة، فطرف
+     الشعاع قد يقصّر عن القاعدة بجزءٍ من البكسل — نسمح بنصف بكسل عند
+     الأطراف، ونعدّ نقطتين متباعدتين أقلّ من بكسلٍ نقطةً واحدة، وإلّا
+     عُدّت ثلاثةُ خطوطٍ ملتقيةٍ في نقطةٍ مثلّثًا شعريًّا وهميًّا. */
+  const PAD = 0.5, SAME = 1.0, MIN_AREA = 2.0;
+  function segsOf(stem) {
+    const S = [];
+    const pg = /<polygon points="([^"]+)"/.exec(stem);
+    if (pg) {
+      const P = pg[1].trim().split(/\s+/).map(s => s.split(',').map(Number));
+      for (let i = 0; i < P.length; i++) S.push([P[i], P[(i + 1) % P.length]]);
+    }
+    for (const m of stem.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/g))
+      S.push([[+m[1], +m[2]], [+m[3], +m[4]]]);
+    return S;
+  }
+  function inter(a, b) {
+    const [p, p2] = a, [q, q2] = b;
+    const r = [p2[0] - p[0], p2[1] - p[1]], s = [q2[0] - q[0], q2[1] - q[1]];
+    const d = r[0] * s[1] - r[1] * s[0];
+    if (Math.abs(d) < 1e-9) return null;                  /* متوازيتان */
+    const t = ((q[0] - p[0]) * s[1] - (q[1] - p[1]) * s[0]) / d;
+    const u = ((q[0] - p[0]) * r[1] - (q[1] - p[1]) * r[0]) / d;
+    const lr = Math.hypot(r[0], r[1]), ls = Math.hypot(s[0], s[1]);
+    if (t < -PAD / lr || t > 1 + PAD / lr || u < -PAD / ls || u > 1 + PAD / ls) return null;
+    return [p[0] + t * r[0], p[1] + t * r[1]];
+  }
+  function countTri(S) {
+    let n = 0;
+    for (let i = 0; i < S.length; i++)
+      for (let j = i + 1; j < S.length; j++) {
+        const A = inter(S[i], S[j]); if (!A) continue;
+        for (let k = j + 1; k < S.length; k++) {
+          const B = inter(S[i], S[k]); if (!B) continue;
+          const C = inter(S[j], S[k]); if (!C) continue;
+          if (Math.hypot(A[0] - B[0], A[1] - B[1]) < SAME) continue;
+          if (Math.hypot(A[0] - C[0], A[1] - C[1]) < SAME) continue;
+          if (Math.hypot(B[0] - C[0], B[1] - C[1]) < SAME) continue;
+          if (Math.abs((B[0] - A[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (B[1] - A[1])) / 2 > MIN_AREA) n++;
+        }
+      }
+    return n;
+  }
+  let triSeen = 0, triForms = new Set(), triBad = 0;
+  ['saud', 'hasan'].forEach(who => {                      /* المستويان: ١ و٢ */
+    const c = build(who);
+    const gen = c.K.MATH_GENS.filter(f => f.name === 'gCountTri')[0];
+    if (!gen) { issues.push({ sev: 'خطأ', msg: 'لم أجد مولّد عدّ المثلّثات gCountTri' }); return; }
+    for (let i = 0; i < 400; i++) {
+      let q;
+      try { q = vm.runInContext('(function(f){return f(lvl);})', c.ctx, { timeout: 2000 })(gen); }
+      catch (e) { continue; }
+      if (!q) continue;
+      triSeen++; triForms.add(q[4]);
+      const real = countTri(segsOf(q[0])), shown = q[1][q[2]];
+      if (real !== shown && triBad++ < 4)
+        issues.push({ sev: 'خطأ', msg: 'عدّ المثلّثات (' + q[4] + ') — الجواب المعروض ' +
+          shown + ' والحصرُ من الرسم ' + real });
+    }
+  });
+  /* والسعة: خمس صورٍ فقط هي التي أنتجت التكرار أصلًا، فنمنع الرجوع إليها */
+  if (triSeen && triForms.size < 12)
+    issues.push({ sev: 'خطأ', msg: 'عدّ المثلّثات — ' + triForms.size +
+      ' صورةً مختلفةً فقط، وهي تُحجز لها حصّةٌ كبيرة من الجولة فتتكرّر' });
+
   /* ٣) الذاكرة يجب أن تبقى أصغر من البنك لكلّ طفل، وإلّا استُنفد البنك فسُمح بالتكرار */
   ['saud', 'osama', 'rafeef', 'hasan'].forEach(who => {
     const k = build(who).K;
