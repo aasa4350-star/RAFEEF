@@ -1,0 +1,92 @@
+name: deploy-talk-ai
+
+# ينشر دالّة المحادثة (supabase/functions/talk-ai) إلى Supabase.
+#
+# لماذا وُجد هذا الملفّ: صفحات الموقع تُنشر تلقائيًّا مع GitHub Pages،
+# أمّا دالّة المحادثة فتعيش على Supabase ولا تُنشر معها — فكان كلّ تعديلٍ
+# فيها يبقى في المستودع بلا أثر حتى يُنشر يدويًّا، فيُنسى. (٨ سبتمبر
+# ٢٠٢٦: تعديلُ ترتيب النماذج الذي يقصّر انتظار الطفل بقي غير منشور.)
+#
+# ينطلق تلقائيًّا حين تتغيّر الدالّة، ويمكن تشغيله باليد من تبويب
+# Actions ← deploy-talk-ai ← Run workflow.
+#
+# يحتاج سرًّا واحدًا في المستودع اسمه SUPABASE_ACCESS_TOKEN
+# (Settings ← Secrets and variables ← Actions ← New repository secret).
+#
+# ⚠️ لا نُمرّر --no-verify-jwt: قِيس في ٨ سبتمبر ٢٠٢٦ أنّ الدالّة المنشورة
+# تتحقّق من المفتاح فعلًا (ترويسةٌ عشوائيّة تُردّ بـ Invalid JWT، وغيابُ
+# الترويسة يُردّ بـ 401). فالنشر بلا تحقّقٍ يفتحها للعامّة، والنشر
+# الافتراضيّ يُبقيها كما هي.
+
+on:
+  push:
+    branches: [claude/children-tests-reviews-bq40n9]
+    paths:
+      - "supabase/functions/talk-ai/**"
+      - ".github/workflows/deploy-talk-ai.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-talk-ai
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: تأكّد من وجود المفتاح قبل أيّ شيء
+        run: |
+          if [ -z "${{ secrets.SUPABASE_ACCESS_TOKEN }}" ]; then
+            echo "::error::السرّ SUPABASE_ACCESS_TOKEN غير مضبوط في المستودع."
+            echo "أضِفه من: Settings ← Secrets and variables ← Actions ← New repository secret"
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: نشر الدالّة
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy talk-ai --project-ref kmopkxlhisrwxllagjbu
+
+      # لا نكتفي بأنّ الأمر نجح: ننادي الدالّة كما يناديها الطفل ونتأكّد
+      # أنّها ردّت ردًّا حقيقيًّا. فالنشر الذي يمرّ ثمّ تسقط الدالّة عنده
+      # أسوأ من نشرٍ يفشل صراحةً.
+      - name: تجربةُ الدالّة بعد النشر
+        run: |
+          set -e
+          EP="https://kmopkxlhisrwxllagjbu.supabase.co/functions/v1/talk-ai"
+          KEY="sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_"
+          BODY='{"messages":[{"role":"model","content":"How was your day?"},{"role":"user","content":"i played football today"}],"child":"حسن","topic":"My day"}'
+          echo "— نُنادي الدالّة كما يناديها الطفل —"
+          T0=$(date +%s%3N)
+          CODE=$(curl -s -o /tmp/out.json -w "%{http_code}" -X POST "$EP" \
+            -H "Content-Type: application/json" -H "Authorization: Bearer $KEY" -H "apikey: $KEY" \
+            -d "$BODY" --max-time 90)
+          MS=$(( $(date +%s%3N) - T0 ))
+          echo "HTTP $CODE · ${MS}ms"
+          head -c 400 /tmp/out.json; echo
+          if [ "$CODE" != "200" ]; then echo "::error::الدالّة لم تردّ ٢٠٠ بعد النشر"; exit 1; fi
+          if ! grep -q '"reply"' /tmp/out.json; then echo "::error::ردّت بلا حقل reply"; exit 1; fi
+          if [ "$MS" -gt 28000 ]; then
+            echo "::warning::الردّ استغرق ${MS}ms وهو فوق مهلة المتصفّح (٢٨ث) — سيرى الطفل ردًّا آليًّا"
+          fi
+          echo "✅ الدالّة تعمل بعد النشر"
+
+      # وأنّ التحقّق من المفتاح ما يزال قائمًا: النشر بإعدادٍ خاطئ يفتحها
+      # للعامّة بلا مفتاح، وهذا لا يظهر في اختبار النجاح أعلاه.
+      - name: تأكّد أنّ الدالّة ما زالت محميّةً بالمفتاح
+        run: |
+          EP="https://kmopkxlhisrwxllagjbu.supabase.co/functions/v1/talk-ai"
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$EP" \
+            -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"hi"}]}' --max-time 60)
+          echo "بلا ترويسة تفويض: HTTP $CODE"
+          if [ "$CODE" = "200" ]; then
+            echo "::error::الدالّة صارت مفتوحةً بلا مفتاح — نُشرت بإعداد --no-verify-jwt عن طريق الخطأ"
+            exit 1
+          fi
+          echo "✅ ما زالت تطلب المفتاح"
