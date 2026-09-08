@@ -497,6 +497,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     if(_st.ss==null) return "no-session";
     if(_st.rz===0 && _st.sd==null) return "session-no-audio";
     if(_st.cx!=null) return "canceled-after-speech";
+    /* سمعناه فعلًا وكتبنا كلامه، لكنّ النتيجة النهائيّة رجعت فارغة —
+       وهي حالٌ غير «لم تُرجع الخدمة تقييمًا» فتستحقّ اسمًا يخصّها،
+       حتى يُقاس أثر العلاج لا يُخلط بغيره. */
+    if(_st.part && String(_st.part).trim()) return "partial-no-result";
     return "speech-no-result";
   }
   function _hook(r){
@@ -519,6 +523,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
+  var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
+  var _heardAny=false;        /* هل سمعناه في أيّ دورة؟ يُغيّر ما نقوله له في النهاية */
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
   function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; } var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
@@ -528,7 +534,18 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     if(!allWords.length){
       statusEl.style.color="var(--bad)";
       var _m = micFailMsg(_lastWhy);
-      statusEl.innerHTML = (_m || "⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية.") + KEEP_GOING;
+      /* لا نقول «ما التقطتُ صوتك» لمن رأى كلامه مكتوبًا على الشاشة —
+         فذلك تكذيبٌ لعينه. نقول الحقّ: سمعناك، والعطل عندنا في التقييم
+         لا في صوتك ولا في قراءتك، وأسئلة الفهم مفتوحةٌ لك (تفتحها
+         onFail أدناه) فلا تضيع عليك القطعة. */
+      if(_heardAny){
+        statusEl.style.color="var(--warn)";
+        statusEl.innerHTML = "👂 سمعتك وأنت تقرأ — بس خدمة تقييم النطق ما رجّعت الدرجة هالمرّة. "+
+          "<b>قراءتك سليمة والعطل مو منك.</b> كمّل أسئلة الفهم عادي، "+
+          "ولو تبي درجة النطق جرّب <b>«🎙️ قيّم نطقي»</b> مرّةً ثانية." + KEEP_GOING;
+      } else {
+        statusEl.innerHTML = (_m || "⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية.") + KEEP_GOING;
+      }
       /* ولو لم تردّ أزور بحرفٍ فالمرحلة وحدها تدلّ — فلا يُحفظ صفٌّ أجوف */
       saveMicFail("passage", _lastWhy, _st, _stage());
       if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon(); return; }
@@ -686,7 +703,36 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
         setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 700);
         return;
       }
-      if(gotWords) _deadAudio = 0;
+      if(gotWords){ _deadAudio = 0; _partialOnly = 0; }   /* نجاحٌ يُصفّر العدّادين فلا تُحدّ قراءةٌ طويلة */
+
+      /* ═══ «تبين كتابة الكلام لكن ما يلقطه» — بلاغ الأب (٨ سبتمبر ٢٠٢٦)
+         عن أسامة وسعود ═══════════════════════════════════════════════
+
+         وصفوفهما تُصدّقه حرفًا بحرف. ثلاث دوراتٍ اليوم على سفاري
+         iOS 18.7:  ss=1.5ث · sd=2–3.7ث · rz=17–25 نتيجةً جزئيّة ·
+         part="nora"، "my f"، "day" — أي أنّ الصوت وصل، وأزور سمعت
+         كلماتٍ حقيقيّةً وكتبتها على الشاشة أمام الطفل. ثمّ:
+         res=null · txt=null · pa=null — رجع نداءُ النهاية بلا نتيجةٍ
+         أصلًا (result نفسه فارغ)، لا بإلغاءٍ ولا بخطأ.
+
+         وكان الكودُ يرمي كلَّ ما سُمع لأنّه يعلّق كلّ شيءٍ على النتيجة
+         النهائيّة وحدها: فالدورة تُحسب «ما سمعتُ كلامًا»، ودورتان
+         تُنهيان القراءة، فيُقال للطفل «ما التقطتُ صوتك» — وهو يرى
+         كلامه مكتوبًا أمامه. فيكذّب عينَه أو يكذّبنا، وكلاهما سيّئ.
+
+         فصار الحكم على ما سُمع لا على ما رجع: دورةٌ جاءت فيها نتائجُ
+         جزئيّةٌ فيها نصٌّ = الطفل تكلّم وسُمع، فلا تُعدّ صمتًا ولا
+         تُحاسَب عليه. ونحدّها بأربعٍ لئلّا ندور بلا نهاية إن ظلّت
+         النتائج تعود فارغة. */
+      var heardPartial = (!gotWords && _st.part && String(_st.part).trim().length > 0);
+      if(heardPartial){
+        _heardAny = true;
+        if(_partialOnly < 4){
+          _partialOnly++;
+          setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 450);
+          return;
+        }
+      }
       var next = gotWords ? 0 : consecNoMatch+1;
       if(next >= MAX_CONSEC_NOMATCH){ if(!_retryOrFail()) finish(); return; }
       /* والفاصلُ بين الدورات أوسع: ١٥٠ج كانت تفتح على مسارٍ لم يُغلق بعد */
