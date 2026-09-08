@@ -102,16 +102,19 @@ function groupTalk(rows){
        على r.id، لأنّ report.html لا يجلب عمود id أصلًا (select=student,created_at,meta)
        فكان r.id غير معرَّفٍ في كلّ الصفوف فتنهار الجلسات كلّها في واحدة. */
     var k=(r.meta && r.meta.sid) || ("row:"+(r.id!=null?r.id:i));
-    if(!g[k]){ g[k]={ id:r.id, created_at:r.created_at, meta:{}, _turns:0, _att:0, _unh:0 }; order.push(k); }
+    if(!g[k]){ g[k]={ id:r.id, created_at:r.created_at, meta:{}, _turns:0, _att:0, _unh:0, _aiN:0, _fbN:0, _aiMs:0 }; order.push(k); }
     var s=g[k];
     s._turns += (r.meta && r.meta.turns) || 0;
     /* att وunh دفعاتٌ كالجمل، فتُجمع على الجلسة لا تُؤخذ من أحدث صفٍّ وحده */
     s._att   += (r.meta && r.meta.att)   || 0;
     s._unh   += (r.meta && r.meta.unh)   || 0;
+    s._aiN   += (r.meta && r.meta.aiN)   || 0;
+    s._fbN   += (r.meta && r.meta.fbN)   || 0;
+    s._aiMs  += (r.meta && r.meta.aiMs)  || 0;
     if(!s._seeded){ s._seeded=1; s.created_at=r.created_at;
       var m=r.meta||{}; for(var kk in m){ if(Object.prototype.hasOwnProperty.call(m,kk)) s.meta[kk]=m[kk]; } }
   });
-  return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; s.meta.att=s._att; s.meta.unh=s._unh; return s; });
+  return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; s.meta.att=s._att; s.meta.unh=s._unh; s.meta.aiN=s._aiN; s.meta.fbN=s._fbN; s.meta.aiMs=s._aiMs; return s; });
 }
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"saud").toLowerCase();

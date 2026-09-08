@@ -106,6 +106,24 @@
         out.push("🔁 " + m.unh + " محاولة ما وضحت");
       return out;
     },
+    /* ═══ ذكاءٌ أم آليّ؟ — سؤال الأب (٨ سبتمبر ٢٠٢٦) ═══
+       «اللي يتكلّم معه ذكاء اصطناعيّ أو آليّ؟» والجواب: الاثنان. الأصل
+       نموذجٌ حقيقيّ يقرأ كلام الطفل ويردّ عليه ويحكم على نحو جملته؛ فإن
+       تأخّر فوق ٢٨ث أو سقط، نزل البرنامج إلى ردٍّ آليٍّ من قائمةٍ ثابتة.
+       ولم يكن أحدٌ يعرف النسبة — لا الأب ولا نحن — فصارت تُقاس وتُعرض:
+       aiN ردودُ النموذج · fbN الردودُ الآليّة · aiMs مجموع الانتظار. */
+    talkAiSplit: function(sessions){
+      var ai = 0, fb = 0, ms = 0;
+      (sessions || []).forEach(function(s){
+        var m = (s && s.meta) || {};
+        if (typeof m.aiN  === "number") ai += m.aiN;
+        if (typeof m.fbN  === "number") fb += m.fbN;
+        if (typeof m.aiMs === "number") ms += m.aiMs;
+      });
+      var n = ai + fb;
+      return n ? { ai:ai, fb:fb, total:n, pct:Math.round(ai*100/n),
+                   avgSec: ms ? Math.round(ms/n/100)/10 : null } : null;
+    },
     /* مجموع ما لم يُفهم في مجموعة جلسات — للسطر الأوّل (الخلاصة) */
     talkUnheard: function(sessions){
       var n = 0;

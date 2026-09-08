@@ -132,16 +132,19 @@ function groupTalk(rows){
        على r.id، لأنّ report.html لا يجلب عمود id أصلًا (select=student,created_at,meta)
        فكان r.id غير معرَّفٍ في كلّ الصفوف فتنهار الجلسات كلّها في واحدة. */
     var k=(r.meta && r.meta.sid) || ("row:"+(r.id!=null?r.id:i));
-    if(!g[k]){ g[k]={ id:r.id, created_at:r.created_at, meta:{}, _turns:0, _att:0, _unh:0 }; order.push(k); }
+    if(!g[k]){ g[k]={ id:r.id, created_at:r.created_at, meta:{}, _turns:0, _att:0, _unh:0, _aiN:0, _fbN:0, _aiMs:0 }; order.push(k); }
     var s=g[k];
     s._turns += (r.meta && r.meta.turns) || 0;
     /* att وunh دفعاتٌ كالجمل، فتُجمع على الجلسة لا تُؤخذ من أحدث صفٍّ وحده */
     s._att   += (r.meta && r.meta.att)   || 0;
     s._unh   += (r.meta && r.meta.unh)   || 0;
+    s._aiN   += (r.meta && r.meta.aiN)   || 0;
+    s._fbN   += (r.meta && r.meta.fbN)   || 0;
+    s._aiMs  += (r.meta && r.meta.aiMs)  || 0;
     if(!s._seeded){ s._seeded=1; s.created_at=r.created_at;
       var m=r.meta||{}; for(var kk in m){ if(Object.prototype.hasOwnProperty.call(m,kk)) s.meta[kk]=m[kk]; } }
   });
-  return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; s.meta.att=s._att; s.meta.unh=s._unh; return s; });
+  return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; s.meta.att=s._att; s.meta.unh=s._unh; s.meta.aiN=s._aiN; s.meta.fbN=s._fbN; s.meta.aiMs=s._aiMs; return s; });
 }
 const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
@@ -424,6 +427,11 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
           var unh=RR.talkUnheard(tks);
           out+=`<div class="weak"><div class="wt">🗣️ المحادثة الإنجليزية:</div><ul><li>💬 <b>${tks.length}</b> جلسة · <b>${totTurns}</b> جملة${pA?` · متوسط النطق <b>${pA.pct}%</b>${basis(pA)}`:``}${cA?` · صحّة الجملة <b>${cA.pct}%</b>${basis(cA)}`:``}</li>`+
             (unh?`<li>🔁 وتكلّم <b>${unh}</b> مرّة ولم يوضح كلامه فلم تُحسب — <span class="cnt">فرقُ ما يقوله وما يظهر هنا</span></li>`:``)+
+            (function(){ var sp=RR.talkAiSplit(tks); if(!sp) return ``;
+              /* مَن ردّ عليه فعلًا: النموذج أم القائمة الثابتة */
+              return `<li>🤖 ردود الذكاء الاصطناعيّ: <b>${sp.ai}</b> من ${sp.total} (${sp.pct}%)`+
+                (sp.fb?` · <span class="cnt">${sp.fb} ردًّا آليًّا جاهزًا</span>`:``)+
+                (sp.avgSec!=null?` · متوسط انتظار الرد ${sp.avgSec}ث`:``)+`</li>`; })()+
             tks.slice(0,3).map(function(p){ var m=p.meta; var ex=RR.talkLine(m);
               return `<li>${m.topic||"—"} · <b>${m.turns||0}</b> جملة${typeof m.avgPron==="number"?` · نطق ${m.avgPron}%`:``}${typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:``}${ex.length?` · ${ex.join(" · ")}`:``} <span class="cnt">${saTime(p.created_at)}</span></li>`; }).join("")+
             `</ul></div>`;

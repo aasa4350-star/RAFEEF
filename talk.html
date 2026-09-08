@@ -138,8 +138,11 @@ function saveTalkSession(useBeacon){
      ولم تُفهم — فيُرى الفرق بين «ما تكلّم» و«تكلّم ولم يُفهم». */
   var attD = (state.att||0) - (state.savedAtt||0);
   var unhD = (state.unh||0) - (state.savedUnh||0);
+  var aiD  = (state.aiN||0) - (state.savedAiN||0);
+  var fbD  = (state.fbN||0) - (state.savedFbN||0);
+  var msD  = (state.aiMs||0) - (state.savedAiMs||0);
   if(!state.topic) return;
-  if(delta<1 && attD<1 && unhD<1) return;
+  if(delta<1 && attD<1 && unhD<1 && aiD<1 && fbD<1) return;
   var scores = (state.pronScores||[]).filter(function(v){ return typeof v==="number"; });
   var avgPron = scores.length ? Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length) : null;
   /* نسبة صحّة الجملة (نحو ومعنى) — انظر applyCorrectness أعلاه؛ نفس أسلوب
@@ -157,10 +160,12 @@ function saveTalkSession(useBeacon){
       pronN:scores.length, corrN:cf.length,
       /* att: ضغطاتُ «تكلّم» في هذه الدفعة · unh: ما لم يُفهم منها */
       att:attD, unh:unhD,
+      /* aiN ردودُ النموذج · fbN الردودُ الآليّة · aiMs مجموع الانتظار */
+      aiN:aiD, fbN:fbD, aiMs:msD,
       secs:secs, audioSec:(state.audioSec||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
-  state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
+  state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0); state.savedAiN = (state.aiN||0); state.savedFbN = (state.fbN||0); state.savedAiMs = (state.aiMs||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
   try{
     if(useBeacon && navigator.sendBeacon){
       body.meta.at = new Date().toISOString();
@@ -593,7 +598,11 @@ var app=document.getElementById("app");
    ما طلع لي إلّا ٥ جمل». وكان التقرير عاجزًا عن تفسير ذلك: لا يعرض إلّا
    الجمل التي فُهمت، فالمحاولة التي لم تُفهم لا أثر لها البتّة. فصرنا
    نعدّها ونعرضها، ليُرى الفرق بين «ما تكلّم» و«تكلّم ولم يُفهم». */
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0};
+/* aiN: ردودٌ جاءت من النموذج فعلًا · fbN: ردودٌ آليّةٌ احتياطيّة ·
+   aiMs: مجموع زمن انتظار النموذج. سأل الأب (٨ سبتمبر ٢٠٢٦): «اللي يتكلّم
+   معه ذكاء اصطناعيّ أو آليّ؟» — والجواب: الاثنان، ولم يكن أحدٌ يعرف
+   النسبة. فصرنا نقيسها بدل أن نستنتجها. */
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -611,7 +620,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -724,16 +733,21 @@ function aiTurn(childText, tid){
      استغرقت نحو ١٠ ثوانٍ في القياس الفعليّ. رفعنا مهلة الانتظار هنا
      لتتّسع للسيناريو الأسوأ (محاولتا Gemini + OpenAI)، وإلّا استسلم
      العميل للردّ الآلي قبل أن تصل محاولات السيرفر لفرصتها الأخيرة. */
-  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; if(st)st.textContent=""; replyThenAsk(childText); }, 28000);
+  var _t0=Date.now();
+  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; if(st)st.textContent="";
+    state.fbN++; state.aiMs += (Date.now()-_t0); replyThenAsk(childText); saveTalkSession(); }, 28000);
   fetch(AI_ENDPOINT, { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPA_ANON,"apikey":SUPA_ANON},
     body: JSON.stringify({ messages: state.msgs.slice(-14), child: name, topic: TOPICS[state.topic].t }) })
    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-   .then(function(d){ if(done)return; done=true; clearTimeout(tmo); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent=""; state.msgs.push({role:"model", content:reply}); addAI(reply, true);
+   .then(function(d){ if(done)return; done=true; clearTimeout(tmo); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent="";
+     state.aiN++; state.aiMs += (Date.now()-_t0);
+     state.msgs.push({role:"model", content:reply}); addAI(reply, true);
      /* garbled من talk-ai: النموذج نفسه يقول «هذا خطأ تفريغٍ لا خطأ الطفل».
         نعامله كالثقة المتدنّية: لا حكمَ نحويًّا ولا حساب في نسبة صحّة الجملة. */
      if(d && d.garbled === true){ markShaky(tid); }
      applyCorrectness(tid, (d && typeof d.correct==="boolean") ? d.correct : null, d && d.fixed); saveTalkSession(); })
-   .catch(function(){ if(done)return; done=true; clearTimeout(tmo); if(st)st.textContent=""; replyThenAsk(childText); saveTalkSession(); });
+   .catch(function(){ if(done)return; done=true; clearTimeout(tmo); if(st)st.textContent="";
+     state.fbN++; state.aiMs += (Date.now()-_t0); replyThenAsk(childText); saveTalkSession(); });
 }
 function replyThenAsk(childText){
   var s=TOPICS[state.topic];
