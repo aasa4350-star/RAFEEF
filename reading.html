@@ -524,6 +524,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
+  var _maxRz=0;               /* أطول دورةٍ نجحت — للمقارنة بالفاشلة */
   var _heardAny=false;        /* هل سمعناه في أيّ دورة؟ يُغيّر ما نقوله له في النهاية */
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
@@ -631,7 +632,18 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
          جديدة نخمّنها. ٤ ثوانٍ سكوتٍ بين الجملة والتالية قبل أن تُنهي
          الخدمة الدورة، حتى يقف الطفل عند النقطة ويتنفّس بلا انقطاعٍ عليه. */
       try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"15000");
-           cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"4000"); }catch(e){}
+           /* ═══ ٨ سبتمبر ٢٠٢٦: أربع ثوانٍ كانت تُطيل الجملة فتُبطلها ═══
+              صفوف حسن اليوم: rz=٢٥ و٢٨ و٣٦ نتيجةً جزئيّةً بنصٍّ صحيح من
+              القطعة نفسها («renewable energy comes from na…»)، ثمّ نتيجةٌ
+              نهائيّةٌ فارغة. و recognizeOnceAsync تنتهي عند الصمت أو بعد
+              نحو خمس عشرة ثانيةً من الصوت — والطفل يقرأ قطعةً متّصلةً لا
+              يقف فيها أربع ثوانٍ، فتتجاوز الجملةُ الحدَّ فتُبطَل كلّها.
+              وكان الأربع مقصودًا «حتى يقف عند النقطة ويتنفّس»، لكنّه
+              انقلب عليه: أطال الجملة حتى ضاعت.
+              فصارت ١٥٠٠ — وهي قيمة المحادثة التي تعمل عندهم — فتُنهي
+              أزور عند وقفته الطبيعيّة في آخر الجملة وتُرجع نتيجةً مقيَّمة،
+              ثمّ تفتح الدورة التالية للجملة التي بعدها. */
+           cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
       /* مسارٌ جديد لكلّ دورة. أمسكنا المسار مرّةً فماتت الدورة الثانية على
          سفاري — انظر MIC.audioConfig في mic-help.js وبلاغ ٦ سبتمبر ٢٠٢٦. */
       audio = MIC.audioConfig(SDK);
@@ -672,6 +684,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
               segs.push({ acc:r.accuracyScore, flu:r.fluencyScore, prn:r.pronunciationScore, n:(ws.length||1) });
             }
             window.__micGrace=Date.now()+9000;
+            /* نُسجّل أطول دورةٍ نجحت (بعدد نتائجها الجزئيّة) لنقارنها بالفاشلة:
+               الفاشلة عند حسن كانت ٢٥–٣٦ جزئيّة، فإن بقيت الناجحة دونها بعد
+               تقصير الصمت عُرف أنّ العلاج أصاب موضعه لا أنّه صدفة. */
+            if(_st.rz > _maxRz) _maxRz = _st.rz;
             var cn = statusEl.querySelector("[data-readcnt]"); if(cn) cn.textContent = allWords.length;
           }
         }
@@ -768,7 +784,7 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
     cfg = SDK.SpeechConfig.fromSubscription(cr.key, cr.region);
     cfg.speechRecognitionLanguage = isAr ? "ar-SA" : "en-GB";  // تتبع لهجة رايان
     // القطعة الطويلة: نسمح بوقفات أطول بين الجمل (٤ث) ومهلة بدء أطول حتى لا يتقطّع
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, longText?"15000":"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, longText?"4000":"1500"); }catch(e){}
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, longText?"15000":"12000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1500"); }catch(e){}   /* القطعة الطويلة كذلك — انظر التعليل أعلاه */
     audio = MIC.audioConfig(SDK);   /* مسارٌ جديد لكلّ تعرّف — انظر mic-help.js */
     rec = new SDK.SpeechRecognizer(cfg, audio);
     pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
@@ -1434,7 +1450,7 @@ if(!META[who] || !DATA[who]){
             var qlb=qrow.querySelector("[data-qlisten]"); if(qlb) qlb.addEventListener("click",function(){ speak(qtext,1,ar?"ar-SA":"en-US"); });
             var qaz=qrow.querySelector(".azbtn"), qfb=qrow.querySelector(".pfb2"); if(qaz) qaz.addEventListener("click",function(){ azureAssess(qtext, ar, qfb, qaz); });
           }
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic}); }
+          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, maxRz:_maxRz, partOnly:_partialOnly}); }
         });
       });
     });
