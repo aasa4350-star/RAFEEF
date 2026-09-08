@@ -129,7 +129,17 @@ var SUPA_KEY2="sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 function saveTalkSession(useBeacon){
   var turns = state.msgs.filter(function(m){ return m.role==="user"; }).length;
   var delta = turns - (state.savedTurns||0);
-  if(!state.topic || delta<1) return;
+  /* ═══ جلسةٌ لم يُفهم فيها شيء كانت لا تترك أثرًا البتّة ═══
+     بلاغ الأب (٨ سبتمبر ٢٠٢٦): حسن دخل «يومي» و«تعارف» وتحدّث، ولم
+     يظهر في التقرير إلّا جمل «تعارف». والسبب أنّ الحفظ كان معلّقًا على
+     delta<1: فإن تكلّم ولم تفهمه أزور فلا جملة جديدة، فلا صفّ، فالجلسة
+     كأنّها لم تكن. فيقول الأب: أين ذهب وقته؟ ولا جواب عندنا.
+     فصرنا نحفظ متى وُجد جديدٌ من أيّ نوع: جملةٌ فُهمت، أو محاولةٌ ضُغطت
+     ولم تُفهم — فيُرى الفرق بين «ما تكلّم» و«تكلّم ولم يُفهم». */
+  var attD = (state.att||0) - (state.savedAtt||0);
+  var unhD = (state.unh||0) - (state.savedUnh||0);
+  if(!state.topic) return;
+  if(delta<1 && attD<1 && unhD<1) return;
   var scores = (state.pronScores||[]).filter(function(v){ return typeof v==="number"; });
   var avgPron = scores.length ? Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length) : null;
   /* نسبة صحّة الجملة (نحو ومعنى) — انظر applyCorrectness أعلاه؛ نفس أسلوب
@@ -144,10 +154,13 @@ function saveTalkSession(useBeacon){
        النسبة أقلّ (أو أعلى) ممّا هي. وهما تراكميّان للجلسة كلّها مثل
        المتوسّطين نفسيهما، لا للدفعة وحدها. */
     meta:{ kind:"talk", sid:state.sid, topic:TOPICS[state.topic].t, turns:delta, avgPron:avgPron, avgCorrect:avgCorrect,
-      pronN:scores.length, corrN:cf.length, secs:secs, audioSec:(state.audioSec||0),
+      pronN:scores.length, corrN:cf.length,
+      /* att: ضغطاتُ «تكلّم» في هذه الدفعة · unh: ما لم يُفهم منها */
+      att:attD, unh:unhD,
+      secs:secs, audioSec:(state.audioSec||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
-  state.savedTurns = turns;   // نُثبّت العلامة فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
+  state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
   try{
     if(useBeacon && navigator.sendBeacon){
       body.meta.at = new Date().toISOString();
@@ -224,6 +237,8 @@ var MIC_TAIL ='<div style="font-weight:400;font-size:.85rem;margin-top:6px">وت
       وسط الجملة الإنجليزية)، ومهلتنا ٢٢ ثانية فلا تسابق أحدًا. */
 function listen(statusEl, btn, onDone, tries){
   tries = tries || 0;
+  /* الضغطة الواحدة تُعدّ محاولةً واحدة — والإعادة التلقائيّة تمرّر tries+1 */
+  if(!tries) state.att = (state.att||0) + 1;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec;
   /* مراحل الدور بالمللي ثانية من لحظة الضغط: متى فُتحت جلسة أزور (ss)،
      متى سمعت بدء كلام (sd)، كم نتيجةً جزئيّةً أرسلت (rz) وأوّلها (rz1)،
@@ -307,6 +322,8 @@ function listen(statusEl, btn, onDone, tries){
       statusEl.style.color="var(--bad)";
       statusEl.innerHTML="⚠️ ما التقطتُ كلامك. قرّب المايك من فمك، وتكلّم بصوتٍ أعلى وبجملةٍ كاملة، "+
         "ثمّ اضغط <b>🎤 اضغط وتكلّم</b> مرّةً ثانية.";
+      state.unh = (state.unh||0) + 1;   /* تكلّم ولم يُفهم — يُعرض للأب */
+      saveTalkSession();                /* فلا تبقى الجلسة بلا أثرٍ إن لم تُفهم ولا جملة */
       resetBtn();
     }
   }
@@ -571,7 +588,12 @@ var GENERIC=["Nice!","That's interesting!","Great job!","Well said!","Cool!","I 
 function reactTo(text){ var t=(" "+text+" ").toLowerCase(); for(var i=0;i<REACT.length;i++){ if(REACT[i][0].test(t)) return REACT[i][1]; } return GENERIC[Math.floor(Math.random()*GENERIC.length)]; }
 
 var app=document.getElementById("app");
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[]};
+/* att: كم مرّةً ضغط «تكلّم» فعلًا · unh: كم مرّةً تكلّم ولم يُفهم كلامه.
+   بلاغ الأب (٨ سبتمبر ٢٠٢٦): «حسن يقول جلست ٨ دقايق وتحدّثت كثيرًا، لكن
+   ما طلع لي إلّا ٥ جمل». وكان التقرير عاجزًا عن تفسير ذلك: لا يعرض إلّا
+   الجمل التي فُهمت، فالمحاولة التي لم تُفهم لا أثر لها البتّة. فصرنا
+   نعدّها ونعرضها، ليُرى الفرق بين «ما تكلّم» و«تكلّم ولم يُفهم». */
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -589,7 +611,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[];
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);

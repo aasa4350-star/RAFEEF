@@ -93,6 +93,29 @@
       return { learned: L, total: Math.max(T, L) };
     },
 
+    /* ═══ وصفُ الجلسة كما يفهمه الأب ═══
+       بلاغه (٨ سبتمبر ٢٠٢٦): «يقول جلست ٨ دقايق وتحدّثت كثيرًا، وما طلع
+       لي إلّا ٥ جمل — ودّي توضيح أكثر». وكان التقرير يعرض الجمل المفهومة
+       وحدها، فلا يُفرّق بين من لم يتكلّم ومن تكلّم ولم يُفهم، ولا يُظهر
+       كم جلس أصلًا. فصار لكلّ جلسةٍ سطرُها: مدّتها، وكم ضغط، وكم لم يُفهم. */
+    talkLine: function(meta){
+      var m = meta || {}, out = [];
+      if (typeof m.secs === "number" && m.secs > 0)
+        out.push(m.secs >= 60 ? (Math.floor(m.secs/60) + " د " + (m.secs%60) + " ث") : (m.secs + " ث"));
+      if (typeof m.unh === "number" && m.unh > 0)
+        out.push("🔁 " + m.unh + " محاولة ما وضحت");
+      return out;
+    },
+    /* مجموع ما لم يُفهم في مجموعة جلسات — للسطر الأوّل (الخلاصة) */
+    talkUnheard: function(sessions){
+      var n = 0;
+      (sessions || []).forEach(function(s){
+        var v = s && s.meta && s.meta.unh;
+        if (typeof v === "number") n += v;
+      });
+      return n;
+    },
+
     talkAvg: function(sessions, field, nField){
       var sum = 0, w = 0, sess = 0;
       (sessions || []).forEach(function(s){
