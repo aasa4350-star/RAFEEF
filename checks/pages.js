@@ -149,6 +149,9 @@ function conflicts(banks){
   return out;
 }
 
+/* صفحاتٌ للاطّلاع لا للقياس: نتائجها لا تُحفظ ولا تدخل تقارير الأب */
+const PREVIEW_PAGES = ['chem10.html'];
+
 function run(){
   const issues = [];
   const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html')).sort();
@@ -166,6 +169,19 @@ function run(){
       catch(e){ issues.push({ sev:'خطأ', file:f, msg:'خطأ صياغة في كتلة #'+(i+1)+': '+e.message }); broken = true; }
     });
     if (broken) continue;
+
+    /* ١ب) الصفحات الاستطلاعيّة لا تُرسل شيئًا إلى قاعدة البيانات.
+       قرار الأب (٧ سبتمبر ٢٠٢٦) في الكيمياء: «لا تُدخلها في التقييم
+       لأنّها فوق مستواه... بس أبي يكون عنده تصوّر». وقُطعت من المنبع:
+       لا حفظ أصلًا، فيستحيل أن تظهر في تقييمٍ مهما تغيّرت التقارير.
+       وهذا الشرط يحرسه من الرجوع سهوًا — فمن يُعيد الحفظ يومًا سيرى
+       مستوى حسن ينخفض بمادّةٍ فوق صفّه ولا يدري لِمَ. */
+    if (PREVIEW_PAGES.indexOf(f) > -1) {
+      const body = inline.join('\n');
+      const saves = /AQ\.post\s*\(|fetch\s*\(\s*SUPA_URL|sendBeacon\s*\(/.test(body);
+      if (saves)
+        issues.push({ sev:'خطأ', file:f, msg:'صفحةٌ استطلاعيّةٌ لا يجوز أن تحفظ في قاعدة البيانات — أُعيد إرسالُ النتائج فتدخل التقييم' });
+    }
 
     /* ٢) تحميل الصفحة في بيئةٍ معزولة ثمّ فحص مولّداتها */
     const ctx = makeCtx();

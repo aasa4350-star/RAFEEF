@@ -62,26 +62,29 @@ function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
 var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
-/* صفحة الكيمياء من كتاب «كيمياء ١ — أوّل ثانوي مسارات» الذي أرسله الأب،
-   فيُسجَّل الصفّ لصاحب الكتاب أوّلَ ثانويّ لا ثالثَ متوسّط. وبقيّة
-   الصفحات على حالها حتى يُقرّر الأب نقل بقيّة المواد. */
-var CHEM_GRADE = { hasan:"أوّل ثانوي" };
-function gradeOf(w){ return CHEM_GRADE[w] || GRADES[w] || ""; }
+/* ═══ صفحةٌ استطلاعيّةٌ لا تدخل التقييم — قرار الأب (٧ سبتمبر ٢٠٢٦) ═══
+   «لا تُدخل مادّة الكيمياء في التقييم لأنّها فوق مستواه، هو لا يزال في
+    ثالث متوسّط، بس أبي يكون عنده تصوّر».
+
+   فحسن ثالث متوسّط كما كان في الموقع كلّه، والكيمياء بابٌ يفتحه ليتصوّر
+   ما سيدرسه لا ليُقاس به. */
+function gradeOf(w){ return GRADES[w] || ""; }
 var name = NAMES[who] || "الطالب";
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total){
-  try{
-    var body = { student:name, grade:gradeOf(who), en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
-    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
-    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
-    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
-      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
-      body: JSON.stringify(body)
-    });
-  }catch(e){}
-}
+/* ═══ لا تُحفَظ نتائج الكيمياء في قاعدة البيانات ═══
+   طلب الأب صريحٌ: لا تدخل الكيمياء التقييم. وكان يمكن أن نحفظها بوسمٍ
+   خاصٍّ ثمّ نستثنيها في التقارير الأربعة — لكنّ ذلك يترك بابًا: أيّ
+   تعديلٍ لاحقٍ في أيّ تقريرٍ قد يُدخلها سهوًا، فيرى الأبُ مستوى حسن
+   منخفضًا بمادّةٍ فوق صفّه ولا يدري السبب.
+
+   فالأحكم أن تُقطع من المنبع: هذه الصفحة لا ترسل شيئًا إلى قاعدة
+   البيانات أصلًا، فيستحيل أن تظهر في تقييمٍ مهما تغيّرت التقارير.
+   وتقدُّمه داخل الصفحة («علاجي» وترتيب الدروس من الأضعف) يبقى عاملًا
+   لأنّه محفوظٌ في متصفّحه لا في قاعدة البيانات.
+   ويحرس هذا checks/pages.js فيمنع رجوعَه سهوًا. */
+function saveScore(test, correct, total){ /* استطلاعيّةٌ عمدًا: لا حفظ */ }
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function en(s){ return '<span class="en">'+s+'</span>'; }
@@ -937,13 +940,17 @@ if(!NAMES[who]){
   app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=hasan</div>';
 } else {
   app.innerHTML =
-    '<header class="top"><p class="eyebrow">'+gradeOf(who)+' · الكيمياء</p><h1>⚗️ الكيمياء — '+name+'</h1></header>'+
+    '<header class="top"><p class="eyebrow">'+gradeOf(who)+' · استطلاع مادّة الكيمياء</p><h1>⚗️ الكيمياء — '+name+'</h1></header>'+
+    /* نقولها له صراحةً: هذه المادّة فوق صفّه، وهي للاطّلاع لا للدرجة —
+       فلا يظنّ نفسه مقصّرًا إن أخطأ فيها، ولا ينتظر ظهورها في تقريره. */
+    '<div class="unit" style="font-weight:600;line-height:1.8">👀 هذي المادّة من صفٍّ بعدك (أوّل ثانوي) — حطّيناها لك عشان تاخذ فكرة عنها من الآن. '+
+      '<b>ما تدخل في تقييمك ولا تظهر في تقريرك</b>، فجرّب وارتاح: الغلط هنا ما يضرّك.</div>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="science9.html?who='+who+'">🔬 العلوم</a><a href="math9.html?who='+who+'">🔢 الرياضيات</a></div>'+
     '<div class="chapsel" id="chapsel"></div>'+
     '<div class="unit" id="unit"></div>'+
     '<div class="tabs" role="tablist" id="tabs"></div>'+
     '<div id="panels"></div>'+
-    '<footer>الكيمياء · أوّل ثانوي مسارات · على ترتيب الكتاب · أسئلة جديدة كل مرة</footer>';
+    '<footer>الكيمياء · استطلاعُ مقرّر أوّل ثانوي · لا تدخل التقييم · أسئلة جديدة كل مرة</footer>';
 
   var CFG = {
     c11:{tab:"1 قصّة مادّتين", gens:C11G, n:10, intro:"<b>١-١ قصّة مادّتين:</b> الأوزون ومركّبات الكلوروفلوروكربون — كيف صارت مادّةٌ بدت مثاليّةً سببًا في ثقب الأوزون، ولماذا يُغيّر التركيبُ الخواصَّ.", label:"كيمياء ١ث — 1-1 قصّة مادّتين"},
