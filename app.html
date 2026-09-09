@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ثبّت التطبيق</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="app-install.js"></script>
+<style>
+  :root{
+    --accent:#4c6ef5; --accent-deep:#2b3fa0;
+    --bg:#f5f7fb; --card:#ffffff; --ink:#131a2b; --muted:#5c6577;
+    --line:#e5e9f2; --good:#15803d; --warn:#b45309;
+    --shadow:0 1px 2px rgba(19,26,43,.05),0 8px 24px rgba(19,26,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0a0f1a;--card:#121a2b;--ink:#e8edf7;--muted:#94a0b8;--line:#22304850;
+      --good:#4ade80;--warn:#fbbf24;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;
+    border-radius:22px;padding:24px;box-shadow:var(--shadow);text-align:center}
+  header.top h1{margin:0 0 6px;font-size:1.55rem;font-weight:800}
+  header.top p{margin:0;opacity:.93;font-size:.95rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px 18px 14px;box-shadow:var(--shadow);margin-top:16px}
+  .card h2{margin:0 0 10px;font-size:1.12rem;display:flex;align-items:center;gap:8px}
+  ol{margin:0;padding-inline-start:22px}
+  ol li{margin-bottom:8px}
+  .kids{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:6px}
+  .kid{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;
+    border-radius:16px;padding:12px 14px;font-weight:800;box-shadow:var(--shadow)}
+  .kid img{width:34px;height:34px;border-radius:9px;background:#fff2}
+  .kid small{display:block;font-weight:600;opacity:.9;font-size:.78rem}
+  .note{background:color-mix(in srgb, var(--warn) 12%, transparent);
+    border:1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+    border-radius:14px;padding:12px 14px;margin-top:12px;font-size:.93rem}
+  .muted{color:var(--muted);font-size:.9rem}
+  code{background:var(--line);padding:2px 6px;border-radius:6px;font-size:.88rem}
+  .back{display:inline-block;margin-top:18px;text-decoration:none;color:var(--accent);font-weight:800}
+  html.standalone .onlyweb{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>📱 ثبّت الموقع تطبيقًا</h1>
+    <p>أيقونة على شاشة الجوّال — يفتح بملء الشاشة بلا شريط متصفّح، ويتحدّث وحده</p>
+  </header>
+
+  <div class="card">
+    <h2>١ · افتح صفحة صاحب التطبيق</h2>
+    <p class="muted">لكلّ ولدٍ تطبيقُه بأيقونته ولونه، ويفتح على صفحته مباشرةً بلا اختيار.
+       ثبّت كلّ واحدٍ من جوّاله هو.</p>
+    <div class="kids">
+      <a class="kid" href="home.html?who=saud"   style="background:linear-gradient(135deg,#047857,#10b981)"><img src="icons/saud-192.png"   alt=""><span>سعود<small>رابع ابتدائي</small></span></a>
+      <a class="kid" href="home.html?who=osama"  style="background:linear-gradient(135deg,#c2410c,#f97316)"><img src="icons/osama-192.png"  alt=""><span>أسامة<small>خامس ابتدائي</small></span></a>
+      <a class="kid" href="home.html?who=rafeef" style="background:linear-gradient(135deg,#5b21b6,#8b5cf6)"><img src="icons/rafeef-192.png" alt=""><span>رفيف<small>ثاني متوسط</small></span></a>
+      <a class="kid" href="home.html?who=hasan"  style="background:linear-gradient(135deg,#0e7490,#06b6d4)"><img src="icons/hasan-192.png"  alt=""><span>حسن<small>ثالث متوسط</small></span></a>
+      <a class="kid" href="index.html"           style="background:linear-gradient(135deg,#2b3fa0,#4c6ef5)"><img src="icons/dad-192.png"    alt=""><span>المتابعة<small>لوحة الأب</small></span></a>
+    </div>
+  </div>
+
+  <div class="card onlyweb">
+    <h2>٢ · على الآيفون (سفاري)</h2>
+    <ol>
+      <li>افتح الصفحة في <b>سفاري</b> — لا يعمل التثبيت من داخل تطبيقٍ آخر (واتساب مثلًا).</li>
+      <li>اضغط زرّ <b>المشاركة</b> في الأسفل — مربّعٌ يخرج منه سهمٌ لأعلى.</li>
+      <li>انزل واختر <b>«إضافة إلى الشاشة الرئيسية»</b>.</li>
+      <li>يظهر الاسم والأيقونة — اضغط <b>«إضافة»</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card onlyweb">
+    <h2>٣ · على أندرويد (كروم)</h2>
+    <ol>
+      <li>اضغط النقاط الثلاث <b>⋮</b> أعلى المتصفّح.</li>
+      <li>اختر <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>ما الذي يتغيّر وما الذي لا يتغيّر</h2>
+    <p>هو <b>نفس الموقع</b> بنفس الصفحات والنتائج — لا نسخةَ ثانية ولا حساباتٌ جديدة.
+       الجديد أنّه يفتح من أيقونةٍ بملء الشاشة، ويبقى محفوظًا لحظةَ إغلاق المتصفّح.
+       وكلُّ تحديثٍ أنشره يصله فورًا: <b>لا يحتاج تحديثًا من متجر</b>.</p>
+    <div class="note">
+      <b>جرّبوا شيئين بعد التثبيت مباشرةً:</b>
+      <ol style="margin-top:6px">
+        <li><b>كلمة المرور</b> — قد يطلبها مرّةً واحدةً داخل التطبيق لأنّ التطبيق
+            المثبَّت له ذاكرتُه المستقلّة عن المتصفّح. الكلمات المحفوظة والنتائج
+            كلُّها في قاعدة البيانات فترجع وحدها.</li>
+        <li><b>المايكروفون</b> — افتح <b>المحادثة</b> واضغط 🎤 مرّةً. المفروض يطلب
+            الإذن ويشتغل. إن لم يعمل داخل التطبيق فأخبرني، ويبقى فتحُه من سفاري
+            حلًّا جاهزًا حتى أعالجه.</li>
+      </ol>
+    </div>
+  </div>
+
+  <a class="back" href="index.html">⬅ رجوع للوحة المتابعة</a>
+</div>
+</body>
+</html>
