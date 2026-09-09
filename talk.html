@@ -175,6 +175,8 @@ function saveTalkSession(useBeacon){
       /* aiN ردودُ النموذج · fbN الردودُ الآليّة · aiMs مجموع الانتظار */
       aiN:aiD, fbN:fbD, aiMs:msD,
       secs:secs, audioSec:(state.audioSec||0),
+      /* words: مجموع كلمات الطفل · cut: الأدوار التي رجعت بكلمتين أو أقلّ (بترٌ محتمل) */
+      words:(state.words||0), cut:(state.cut||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0); state.savedAiN = (state.aiN||0); state.savedFbN = (state.fbN||0); state.savedAiMs = (state.aiMs||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
@@ -368,7 +370,21 @@ function listen(statusEl, btn, onDone, tries){
     /* ثماني ثوانٍ للصمت الأوّل كانت قصيرةً على طفل: صفُّ سعود يقول إنّه
        بدأ الكلام بعد ١٨٫٦ ثانية — يقرأ السؤال ويفهمه ثمّ يركّب جوابه
        بالإنجليزيّة. فنمنحه عشرين ثانيةً يفكّر فيها بلا أن تقطع عليه. */
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
+    /* ═══ ثانيةٌ ونصفٌ من السكوت كانت تقطع جملة الطفل نصفَها ═══
+       بلاغ الأب (٩ سبتمبر ٢٠٢٦) بصورة شاشة: «وكلّهم يقولون يحطّ لنا كلامًا
+       ما قلناه» — وفي الصورة دوران كاملان: «I like.» ثمّ «I have.»، ويردّ
+       المعلّم «I'm not sure what you mean».
+       والصفوف تُصدّق الصورة: ثواني الصوت المُفرَّغ لسعود اليوم ثانيةٌ إلى
+       ثانيتين في كلّ دور، ولرفيف ثلاثٌ إلى ستّ. فالطفل لم يقل «I like»
+       ويسكت؛ قال «I like… (يفتّش عن الكلمة) …football»، وأُخذ منه شطرُ
+       جملته لأنّ فاصل الجملة عندنا ثانيةٌ ونصف — فما بعد الوقفة يسقط.
+       وهذا هو «الكلام الذي ما قلناه» بعينه: ليس اختلاقًا من أزور، بل بترٌ
+       منّا. ومعه تنهار الثقة (٠٫٠٨ عند سعود) لأنّ كلمتين بلا سياق، فيُوسَم
+       الدور مشكوكًا فيه فيضيع تقييمُه أيضًا — ثلاثة أعطالٍ من سببٍ واحد.
+       فأربع ثوانٍ: وقفةُ طفلٍ يركّب جملةً بلغةٍ ثانية تسعُها، ومَن خلّص
+       قبلها فأمامه زرُّ «✅ خلّصت» يُنهي دوره فورًا (موجودٌ منذ ٦ سبتمبر).
+       ولا نمدّها في القراءة والإملاء: هناك نصٌّ مرجعيٌّ يُقرأ متّصلًا. */
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"4000"); }catch(e){}
     /* مسارٌ جديد لكلّ دور. جرّبنا العكس (مسارٌ واحدٌ مُمسَك يُعاد استعماله)
        فمات الحوار من دوره الثاني على سفاري. انظر MIC.audioConfig في mic-help.js */
     audio=MIC.audioConfig(SDK);
@@ -614,7 +630,7 @@ var app=document.getElementById("app");
    aiMs: مجموع زمن انتظار النموذج. سأل الأب (٨ سبتمبر ٢٠٢٦): «اللي يتكلّم
    معه ذكاء اصطناعيّ أو آليّ؟» — والجواب: الاثنان، ولم يكن أحدٌ يعرف
    النسبة. فصرنا نقيسها بدل أن نستنتجها. */
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0};
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,words:0,cut:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -632,7 +648,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -680,6 +696,13 @@ function addMe(out){
      مُشوَّش سحبناها، فلا تُحتسب درجةٌ على كلامٍ ليس كلام الطفل. */
   if(out.pron!=null){ state.turnPron[tid]=state.pronScores.length; state.pronScores.push(out.pron); }
   state.audioSec = (state.audioSec||0) + (out.audioSec||0);
+  /* عدد الكلمات في كلّ دور، والأدوارُ التي لم تتجاوز كلمتين. بهما نقيس
+     البترَ نفسَه لا أثرَه: إن نزلت «الأدوار المبتورة» بعد تمديد الفاصل إلى
+     أربع ثوانٍ فقد أصبنا السبب، وإن بقيت فالعلّة في مكانٍ آخر ولا نُخادع
+     أنفسنا بأنّنا عالجناها. */
+  var _wc = String(out.text||"").trim().split(/\s+/).filter(Boolean).length;
+  state.words = (state.words||0) + _wc;
+  if(_wc > 0 && _wc <= 2) state.cut = (state.cut||0) + 1;
   /* نجمع ثقة أزور الفعليّة لنضبط الحدّ لاحقًا على أرقامٍ حقيقية من كلام
      أولادنا أنفسهم، لا على تخمينٍ مثل الذي أوقعنا في بلاغ ٤ سبتمبر. */
   if(typeof out.conf==="number") state.confs.push(out.conf);
