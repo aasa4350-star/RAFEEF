@@ -176,7 +176,7 @@ function saveTalkSession(useBeacon){
       aiN:aiD, fbN:fbD, aiMs:msD,
       secs:secs, audioSec:(state.audioSec||0),
       /* words: مجموع كلمات الطفل · cut: الأدوار التي رجعت بكلمتين أو أقلّ (بترٌ محتمل) */
-      words:(state.words||0), cut:(state.cut||0),
+      words:(state.words||0), cut:(state.cut||0), segs:(state.segN||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0); state.savedAiN = (state.aiN||0); state.savedFbN = (state.fbN||0); state.savedAiMs = (state.aiMs||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
@@ -381,10 +381,13 @@ function listen(statusEl, btn, onDone, tries){
        وهذا هو «الكلام الذي ما قلناه» بعينه: ليس اختلاقًا من أزور، بل بترٌ
        منّا. ومعه تنهار الثقة (٠٫٠٨ عند سعود) لأنّ كلمتين بلا سياق، فيُوسَم
        الدور مشكوكًا فيه فيضيع تقييمُه أيضًا — ثلاثة أعطالٍ من سببٍ واحد.
-       فأربع ثوانٍ: وقفةُ طفلٍ يركّب جملةً بلغةٍ ثانية تسعُها، ومَن خلّص
-       قبلها فأمامه زرُّ «✅ خلّصت» يُنهي دوره فورًا (موجودٌ منذ ٦ سبتمبر).
-       ولا نمدّها في القراءة والإملاء: هناك نصٌّ مرجعيٌّ يُقرأ متّصلًا. */
-    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"4000"); }catch(e){}
+       ومدَدتُ الفاصل أوّلًا إلى أربع ثوانٍ فكان علاجًا في الموضع الخطأ:
+       صارت الشاشة تقف صامتةً بعد كلامه فيضغط «خلّصت» فيضيع تقييمه —
+       «سيّئ جدًّا» كما قالت رفيف وحسن بعدها بساعة.
+       فالفاصل يبقى ثانيةً ونصفًا لأنّه يُعطي الجملة بسرعة، والوقفةُ
+       وسط الكلام تُعالَج في مكانها الصحيح: سماعٌ متّصلٌ يجمع الجُمل
+       ولا ينتهي بأوّلها (انظر SEGS و_armEnd أدناه). */
+    try{ cfg.setProperty(SDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,"20000"); cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
     /* مسارٌ جديد لكلّ دور. جرّبنا العكس (مسارٌ واحدٌ مُمسَك يُعاد استعماله)
        فمات الحوار من دوره الثاني على سفاري. انظر MIC.audioConfig في mic-help.js */
     audio=MIC.audioConfig(SDK);
@@ -424,20 +427,37 @@ function listen(statusEl, btn, onDone, tries){
     try{
       rec.sessionStarted=function(){ _st.ss=Date.now()-_st.t0; if(_st.onLife) _st.onLife("ss"); };
       rec.sessionStopped=function(){ _st.sp=Date.now()-_st.t0; };
-      rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; if(_st.onLife) _st.onLife("sd"); };
+      rec.speechStartDetected=function(){ _st.sd=Date.now()-_st.t0; _clrEnd(); if(_st.onLife) _st.onLife("sd"); };
       rec.speechEndDetected=function(){ _st.se=Date.now()-_st.t0; if(_st.onLife) _st.onLife("se"); };
       rec.recognizing=function(s,e){ _st.rz++; if(_st.rz1==null) _st.rz1=Date.now()-_st.t0;
         var _t=""; try{ _t=(e&&e.result&&e.result.text)||""; }catch(x){}
         _st.part=_t.slice(0,60); if(_t) _st.full=_t;
+        /* ما زال يتكلّم: نُلغي مهلة «انتهى دوره» */
+        if(_t) _clrEnd();
         /* ═══ يشوف كلامه وهو يتكلّم ═══
            بلاغ الأب: «يتأخّر الردّ… سبّب لهم ملل». وصفوف سعود تقول
            إنّ أزور كانت تسمعه وتُرسل خمس عشرة نتيجةً جزئيّة — ونحن
            نُخفيها كلّها عنه، فيبقى أمام شاشةٍ ساكنةٍ لا تتحرّك ولا
-           يدري أوصل صوته أم لا. فنعرضها له أوّلًا بأوّل. */
-        if(_t && !fin) _live(_t);
+           يدري أوصل صوته أم لا. فنعرضها له أوّلًا بأوّل.
+           ونُقدّم عليها ما اكتمل من جُمله، فيرى دورَه كاملًا لا آخرَ شطرٍ منه. */
+        if(_t && !fin) _live((_joined()+" "+_t).replace(/\s+/g," ").trim());
         if(_st.onLife) _st.onLife("rz"); };
+      /* كلُّ جملةٍ تكتمل تُضاف ولا تُنهي الدور: الطفل يقف ليفتّش عن الكلمة
+         ثمّ يُكمل، فنُمسك القطعتين ونصلهما. وهذا هو الفرق عن السماع بدفعةٍ
+         واحدة الذي كان يأخذ أوّل قطعةٍ ويرمي ما بعدها. */
+      rec.recognized=function(s,e){
+        if(fin) return;
+        var seg=_seg(e&&e.result);
+        if(!seg) return;              /* لا نصّ في هذه القطعة (صمت) — تُتجاهل */
+        SEGS.push(seg); _st.segN=SEGS.length; _st.full="";
+        _live(_joined());
+        if(!_stopping) _armEnd();     /* وقتُ انتظارٍ جديدٌ لعلّه يُكمل */
+        if(_st.onLife) _st.onLife("rz");
+      };
       rec.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
-        try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){} };
+        try{ _st.cxr=String(e&&e.reason); _st.cxd=String((e&&e.errorDetails)||"").slice(0,200); }catch(x){}
+        /* انقطعت الخدمة ومعنا جُملٌ مكتملة: نمضي بها بدل انتظار المهلة */
+        if(!fin && SEGS.length) _stopThen("انقطع الاتّصال ومعنا جُملٌ مكتملة"); };
     }catch(e){}
   }catch(e){ statusEl.textContent="خطأ: "+(e.message||e); if(btn){btn.disabled=false;btn.classList.remove("rec");} return; }
   if(btn){ btn.classList.add("rec"); btn.textContent="🔴 أستمع لك... تكلّم"; }
@@ -453,20 +473,125 @@ function listen(statusEl, btn, onDone, tries){
       'border-color:#dc2626;color:#fff;font-family:inherit;border-radius:12px;padding:8px 14px;'+
       'font-weight:800;cursor:pointer;border:1px solid">✅ خلّصت</button>';
     var sb=statusEl.querySelector("[data-stoptalk]");
-    if(sb) sb.addEventListener("click", function(){ _usePartial("ضغط «خلّصت»"); });
+    if(sb) sb.addEventListener("click", function(){ _stopThen("ضغط «خلّصت»"); });
   }
-  /* ما سمعته أزور خيرٌ من لا شيء: صفوفُ سعود فيها سبع عشرة نتيجةً
-     جزئيّةً ثمّ لا نتيجة نهائيّة، فكنّا نقول له «ما التقطتُ كلامك»
-     وقد التقطناه كلّه. فنمضي بآخر ما سمعناه ونُكمل الحوار. */
-  function _usePartial(why){
-    if(fin) return; fin=true; if(to){clearTimeout(to);to=null;}
-    var txt=String(_st.full||"").trim();
-    try{rec.close();}catch(e){} MIC.releaseSoon(45000);
-    if(!txt){ notHeard({reason:"nomatch", code:_stage(), detail:why+" بلا نصّ"}); return; }
-    _st.usedPartial=why;
+  /* ═══ لماذا صار السماعُ متّصلًا يُجمَع، لا دفعةً واحدة ═══
+     بلاغ الأب (٩ سبتمبر ٢٠٢٦): «رفيف وحسن جرّبوه يقولون سيّئ جدًّا» —
+     بعد ساعةٍ من تمديد فاصل الجملة إلى أربع ثوانٍ. وصفوف رفيف تقول
+     السبب: ثلاثةُ أدوارٍ متتاليةٍ كلُّها audio=0 وconf=null، أي أنّ
+     أدوارها الثلاثة خرجت من مسار «النصّ الجزئيّ» لا من نتيجةٍ نهائيّة.
+     لأنّها بعد ما خلّصت جملتها وقفت الشاشة أربع ثوانٍ بلا شيء، فضغطت
+     «✅ خلّصت» — وذلك الزرّ كان يمضي بالنصّ الجزئيّ: بلا درجة نطق،
+     وبلا حكمٍ على الجملة، ومعه تحذير «ما هو متأكّد منه» على كلامٍ
+     سليمٍ قالته. فصار كلُّ دورٍ لها بلا تقييم. عالجتُ البتر فخلقتُ
+     ما هو أسوأ منه، والعلّة أنّي عالجتُه في الموضع الخطأ.
+
+     والصواب أن نُصلح طريقة السماع نفسها: أزور تُنهي الجملة عند وقفةٍ
+     قصيرة (١٫٥ث) — وهذا جيّد، فهو يُعطينا النتيجة بسرعة — لكنّ الخطأ
+     كان أن نعتبر أوّل جملةٍ نهايةَ الدور. فنسمع سماعًا متّصلًا، ونجمع
+     كلّ جملةٍ تكتمل، ولا نُنهي الدور إلّا بسكوتٍ بعدها أو بضغطه هو.
+
+     فالثلاثة تُحلّ معًا:
+       · الوقفة وسط الجملة لا تبتر شيئًا — القطعتان تُوصلان.
+       · «خلّصت» صار يُوقف السماع فتصل النتيجة النهائيّة بدرجتها،
+         فلا يُعاقَب من استعجل بضياع تقييمه.
+       · ولا ينتظر أربع ثوانٍ صامتة: جملته تظهر بعد ثانيةٍ ونصف. */
+  var SEGS=[];              /* الجُمل المكتملة في هذا الدور */
+  var _stopping=false;      /* أرسلنا أمر الإيقاف وننتظر آخر جملة */
+  var _endT=null;
+  var TURN_END=2000;        /* سكوتٌ بعد آخر جملةٍ مكتملة ⇒ انتهى دوره */
+  function _clrEnd(){ if(_endT){ clearTimeout(_endT); _endT=null; } }
+  function _armEnd(){ _clrEnd(); _endT=setTimeout(function(){ _stopThen("سكت بعد آخر جملة"); }, TURN_END); }
+  function _joined(){ return SEGS.map(function(s){ return s.text; }).join(" ").replace(/\s+/g," ").trim(); }
+  /* تقرأ جملةً مكتملةً واحدة: نصُّها، وثقةُ أزور فيها، ودرجةُ نطقها. */
+  function _seg(result){
+    var seg=null;
+    try{
+      if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
+        seg={ text:result.text.trim(), conf:null, pron:null, html:"", sec:0, w:0 };
+        seg.w = seg.text.split(/\s+/).filter(Boolean).length;
+        /* ثواني الصوت كما تعدّها أزور — لقياس استهلاك الحصّة المجانية (٥ ساعات
+           شهريًّا) عبر الأولاد الأربعة والصفحات كلّها، لا بالتخمين. */
+        if(typeof result.duration==="number") seg.sec = Math.round(result.duration/1e7);
+        /* بلاغ الأب (٣ سبتمبر ٢٠٢٦) بصورة شاشة أسامة: فُرِّغ كلامه
+           «are you games will play football» ويقول «أنا ما نطقت will»،
+           ومعها «نطقك ٩٨/١٠٠» و«✅ جملة صحيحة».
+           والسبب أنّ التقييم هنا بلا نصٍّ مرجعيّ (PronunciationAssessmentConfig("")),
+           فأزور تقيس نطقه على «ما ظنّت أنّه قاله» — قياسٌ دائريّ: أيّ تفريغٍ
+           تخرج به تُعطيه درجةً عالية، فتظهر ٩٨/١٠٠ على كلامٍ مُشوَّش.
+           فصرنا نقرأ ثقة أزور في التفريغ نفسه (NBest[0].Confidence):
+           دونها لا معنى لأيّ درجة، ولا يصحّ أن نُثبّت على الطفل كلامًا لم يقله. */
+        try{
+          var _j = JSON.parse(result.json || (result.properties && result.properties.getProperty(SDK.PropertyId.SpeechServiceResponse_JsonResult)) || "{}");
+          var _nb = (_j.NBest && _j.NBest[0]) || null;
+          if(_nb && typeof _nb.Confidence==="number") seg.conf=_nb.Confidence;
+        }catch(e){}
+        try{
+          var r=SDK.PronunciationAssessmentResult.fromResult(result);
+          if(typeof r.pronunciationScore==="number" && !isNaN(r.pronunciationScore)) seg.pron=Math.round(r.pronunciationScore);
+          var ws=(r.detailResult&&r.detailResult.Words)||[];
+          if(ws.length){ seg.html=ws.map(function(w){ var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var wc=(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)"); return '<span style="color:'+wc+'">'+w.Word+'</span>'; }).join(' '); }
+        }catch(e){}
+      }
+    }catch(e){}
+    return seg;
+  }
+  /* نُوقف السماع ثمّ نُجمّع. ولا نُجمّع لحظةَ الإيقاف: من ضغط «خلّصت»
+     وهو يُنهي كلمته الأخيرة تكون جملتُه ما زالت عند أزور، فننتظرها
+     ثانيةً وجزءًا — ثمّ نمضي على كلّ حالٍ فلا يتعلّق الدور. */
+  function _stopThen(why){
+    if(fin || _stopping) return;
+    _stopping=true; _clrEnd();
+    var done=false;
+    function go(){ if(done) return; done=true; if(t){clearTimeout(t);t=null;} _assemble(why); }
+    var t=setTimeout(go, 1400);
+    try{ rec.stopContinuousRecognitionAsync(function(){ setTimeout(go, 200); }, go); }
+    catch(e){ go(); }
+  }
+  function _assemble(why){
+    if(fin) return; fin=true; _clrEnd(); if(to){ clearTimeout(to); to=null; }
+    _st.endWhy=why;
+    try{ rec.close(); }catch(e){}
+    MIC.releaseSoon(45000);
+    /* ما اكتملت جملةٌ واحدة: نمضي بالنصّ الجزئيّ إن وُجد (أهونُ من أن
+       نقول له «ما التقطتُ كلامك» وقد التقطناه). */
+    if(!SEGS.length){
+      var txt=String(_st.full||"").trim();
+      if(!txt){ var _w=null; try{ _w=MIC.why(SDK, null, null); }catch(e){} notHeard(_w||{reason:"nomatch", code:_stage(), detail:why+" بلا نصّ"}); return; }
+      _st.usedPartial=why;
+      resetBtn(); statusEl.textContent="";
+      onDone({ text:txt, wordsHtml:"", pron:null, conf:null, shaky:true, audioSec:0, segs:0 });
+      return;
+    }
+    var out={ text:_joined(), wordsHtml:"", pron:null, conf:null, shaky:false, audioSec:0, segs:SEGS.length };
+    var ps=0,pw=0,cs=0,cw=0, allHtml=true;
+    SEGS.forEach(function(s){
+      out.audioSec += s.sec;
+      var w=Math.max(1, s.w);
+      if(s.pron!=null){ ps+=s.pron*w; pw+=w; }
+      if(s.conf!=null){ cs+=s.conf*w; cw+=w; }
+      if(!s.html) allHtml=false;
+    });
+    if(pw) out.pron=Math.round(ps/pw);
+    if(cw) out.conf=cs/cw;
+    /* تلوينُ الكلمات إمّا للجملة كلّها أو لا شيء: نصفٌ ملوّنٌ ونصفٌ لا
+       يقرؤه الطفل حكمًا على النصف الباهت. */
+    if(allHtml) out.wordsHtml=SEGS.map(function(s){ return s.html; }).join(' ');
+    /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حتى المحادثة يتكلّم ولا ينحفظ ثمّ يقول سجّل
+       مرّة أخرى» — وقاعدة البيانات خالية: صفر جلسة محادثة اليوم.
+       والسبب أنا: أضفتُ أمس بوّابةً ترمي التفريغ كلّه إن نزلت ثقة أزور عن
+       ٠٫٤٥ فتطلب الإعادة. وثقة أزور تنخفض طبيعيًّا في كلام الأطفال العرب
+       بالإنجليزية، فصار الطفل يتكلّم فلا يظهر شيء ولا يُحفظ شيء ويُطلب منه
+       أن يعيد بلا نهاية — وهي عين الشكوى التي بدأ منها هذا كلّه، ضاعفتُها
+       من حيث أردتُ علاجها.
+       والصواب أنّ الكفّتين غير متساويتين: أن نعرض تفريغًا فيه خطأ أهون
+       بكثيرٍ من أن نبتلع كلام الطفل ونطالبه بالإعادة. فلا نرمي دورًا أبدًا:
+       يُعرض ويُحفظ ويستمرّ الحوار. والثقة المتدنّية تمنع الدرجة والحكم
+       النحويّ فقط — لا الكلام نفسه. */
+    if(out.conf!=null && out.conf < CONF_SURE){ out.shaky=true; out.pron=null; out.wordsHtml=""; }
+    resetBtn();
     statusEl.textContent="";
-    if(btn){ btn.disabled=false; btn.classList.remove("rec"); btn.textContent="🎤 اضغط وتكلّم"; }
-    onDone({ text:txt, wordsHtml:"", pron:null, conf:null, shaky:true, audioSec:0 });
+    onDone(out);
   }
   var fin=false;
   /* ═══ المهلة تُقاس من آخر إشارةِ حياة، لا من لحظة الضغط ═══
@@ -489,9 +614,10 @@ function listen(statusEl, btn, onDone, tries){
   function _arm(ms, why){
     if(to) clearTimeout(to);
     to=setTimeout(function(){ if(fin)return;
-      /* إن كانت أزور قد سمعته فعلًا (نتائجُ جزئيّة) فليس هذا إخفاقًا:
-         نمضي بما سمعناه بدل أن نقول له «ما التقطتُ كلامك» وقد التقطناه. */
-      if(_st.full && String(_st.full).trim()){ _usePartial("انقضت المهلة ومعنا نصٌّ جزئيّ"); return; }
+      /* إن كانت أزور قد سمعته فعلًا (جملةٌ مكتملةٌ أو نتيجةٌ جزئيّة) فليس
+         هذا إخفاقًا: نمضي بما سمعناه بدل أن نقول له «ما التقطتُ كلامك»
+         وقد التقطناه. */
+      if(SEGS.length || (_st.full && String(_st.full).trim())){ _stopThen("انقضت المهلة ومعنا كلامٌ سمعناه"); return; }
       fin=true; to=null;
       try{rec.close();}catch(e){}
       /* ═══ مصافحةٌ أخفقت ليست عطلًا نُخبر به الطفل ═══
@@ -534,56 +660,16 @@ function listen(statusEl, btn, onDone, tries){
        فنمضي به فورًا — لا ننتظر خمسًا وعشرين ثانيةً بلا فائدة. */
     else                 _arm(8000,  "وصلت نتائجُ جزئيّة ثمّ صمتت الخدمة ٨ث");
   };
-  rec.recognizeOnceAsync(function(result){
-    if(fin)return; fin=true; if(to){clearTimeout(to);to=null;}
-    var out={text:"",wordsHtml:"",pron:null,conf:null,shaky:false,audioSec:0};
-    try{
-      if(result && result.reason===SDK.ResultReason.RecognizedSpeech && (result.text||"").trim()){
-        out.text=result.text.trim();
-        /* ثواني الصوت كما تعدّها أزور — لقياس استهلاك الحصّة المجانية (٥ ساعات
-           شهريًّا) عبر الأولاد الأربعة والصفحات كلّها، لا بالتخمين. */
-        if(typeof result.duration==="number") out.audioSec = Math.round(result.duration/1e7);
-        /* بلاغ الأب (٣ سبتمبر ٢٠٢٦) بصورة شاشة أسامة: فُرِّغ كلامه
-           «are you games will play football» ويقول «أنا ما نطقت will»،
-           ومعها «نطقك ٩٨/١٠٠» و«✅ جملة صحيحة».
-           والسبب أنّ التقييم هنا بلا نصٍّ مرجعيّ (PronunciationAssessmentConfig("")),
-           فأزور تقيس نطقه على «ما ظنّت أنّه قاله» — قياسٌ دائريّ: أيّ تفريغٍ
-           تخرج به تُعطيه درجةً عالية، فتظهر ٩٨/١٠٠ على كلامٍ مُشوَّش.
-           فصرنا نقرأ ثقة أزور في التفريغ نفسه (NBest[0].Confidence):
-           دونها لا معنى لأيّ درجة، ولا يصحّ أن نُثبّت على الطفل كلامًا لم يقله. */
-        try{
-          var _j = JSON.parse(result.json || (result.properties && result.properties.getProperty(SDK.PropertyId.SpeechServiceResponse_JsonResult)) || "{}");
-          var _nb = (_j.NBest && _j.NBest[0]) || null;
-          if(_nb && typeof _nb.Confidence==="number") out.conf=_nb.Confidence;
-        }catch(e){}
-        try{
-          var r=SDK.PronunciationAssessmentResult.fromResult(result);
-          if(typeof r.pronunciationScore==="number" && !isNaN(r.pronunciationScore)) out.pron=Math.round(r.pronunciationScore);
-          var ws=(r.detailResult&&r.detailResult.Words)||[];
-          if(ws.length){ out.wordsHtml=ws.map(function(w){ var a=w.PronunciationAssessment||{}; var sc=(typeof a.AccuracyScore==="number")?a.AccuracyScore:100; var wc=(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)"); return '<span style="color:'+wc+'">'+w.Word+'</span>'; }).join(' '); }
-        }catch(e){}
-      }
-    }catch(e){}
+  /* نبدأ السماع المتّصل. ولا ينتهي الدور بأوّل جملة: انظر rec.recognized
+     و_armEnd أعلاه. وإن أخفق البدء نفسُه فهو عطلٌ يُقال صراحةً. */
+  function _startFail(err){
+    if(fin)return; fin=true; _clrEnd(); if(to){clearTimeout(to);to=null;}
+    var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){}
+    saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn });
     try{rec.close();}catch(e){} MIC.releaseSoon(45000);
-    /* لا نصّ = لم تفهم أزور شيئًا. لا نخرج صامتين: إمّا إعادةٌ تلقائية أو سببٌ واضح. */
-    if(!out.text){ var _w=null; try{ _w=MIC.why(SDK, result, null); }catch(e){} notHeard(_w); return; }
-    /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «حتى المحادثة يتكلّم ولا ينحفظ ثمّ يقول سجّل
-       مرّة أخرى» — وقاعدة البيانات خالية: صفر جلسة محادثة اليوم.
-       والسبب أنا: أضفتُ أمس بوّابةً ترمي التفريغ كلّه إن نزلت ثقة أزور عن
-       ٠٫٤٥ فتطلب الإعادة. وثقة أزور تنخفض طبيعيًّا في كلام الأطفال العرب
-       بالإنجليزية، فصار الطفل يتكلّم فلا يظهر شيء ولا يُحفظ شيء ويُطلب منه
-       أن يعيد بلا نهاية — وهي عين الشكوى التي بدأ منها هذا كلّه، ضاعفتُها
-       من حيث أردتُ علاجها.
-       والصواب أنّ الكفّتين غير متساويتين: أن نعرض تفريغًا فيه خطأ أهون
-       بكثيرٍ من أن نبتلع كلام الطفل ونطالبه بالإعادة. فلا نرمي دورًا أبدًا:
-       يُعرض ويُحفظ ويستمرّ الحوار. والثقة المتدنّية تمنع الدرجة والحكم
-       النحويّ فقط — لا الكلام نفسه. والتفريغ المُشوَّش يمسكه garbled من
-       talk-ai (مُختبَرٌ حيًّا) لا حجب الدور. */
-    if(out.conf!=null && out.conf < CONF_SURE){ out.shaky=true; out.pron=null; out.wordsHtml=""; }
-    resetBtn();
-    statusEl.textContent="";
-    onDone(out);
-  }, function(err){ if(fin)return; fin=true; if(to){clearTimeout(to);to=null;} var _w=null; try{ _w=MIC.why(SDK, null, err); }catch(e){} saveMicFail(_w); MIC.fail(statusEl, btn, { tail:MIC_TAIL, reset:resetBtn }); try{rec.close();}catch(e){} MIC.releaseSoon(45000); });
+  }
+  try{ rec.startContinuousRecognitionAsync(function(){}, _startFail); }
+  catch(e){ _startFail(e); }
   }
 }
 
@@ -630,7 +716,7 @@ var app=document.getElementById("app");
    aiMs: مجموع زمن انتظار النموذج. سأل الأب (٨ سبتمبر ٢٠٢٦): «اللي يتكلّم
    معه ذكاء اصطناعيّ أو آليّ؟» — والجواب: الاثنان، ولم يكن أحدٌ يعرف
    النسبة. فصرنا نقيسها بدل أن نستنتجها. */
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,words:0,cut:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0};
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,words:0,cut:0,segN:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -648,7 +734,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.segN=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -700,6 +786,7 @@ function addMe(out){
      البترَ نفسَه لا أثرَه: إن نزلت «الأدوار المبتورة» بعد تمديد الفاصل إلى
      أربع ثوانٍ فقد أصبنا السبب، وإن بقيت فالعلّة في مكانٍ آخر ولا نُخادع
      أنفسنا بأنّنا عالجناها. */
+  state.segN = (state.segN||0) + (out.segs||0);   /* كم جملةً مكتملةً جُمعت في الدور */
   var _wc = String(out.text||"").trim().split(/\s+/).filter(Boolean).length;
   state.words = (state.words||0) + _wc;
   if(_wc > 0 && _wc <= 2) state.cut = (state.cut||0) + 1;
