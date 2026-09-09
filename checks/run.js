@@ -19,6 +19,7 @@ const kangaroo= require('./kangaroo');
 const eduvid  = require('./eduvid');
 const mic     = require('./mic');
 const banks   = require('./banks');
+const azure   = require('./azure');
 
 const BAR = '─'.repeat(56);
 function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
@@ -95,7 +96,19 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   });
   if (!bk.issues.length) console.log('  ✅ لا ملاحظات');
 
-  head('٩ · طبقة البيانات');
+  head('٩ · خدمة النطق (أزور)');
+  const az = await azure();
+  console.log('المنطقة: ' + (az.region || '—') +
+    ' · الحالة: ' + (az.live === true ? 'تعمل' : az.live === false ? 'متوقّفة' : 'لم تُفحص') +
+    (az.used ? ' · استهلاك الشهر: ' + Math.round(az.used.sec / 60) + ' دقيقة من ٣٠٠ (' +
+      (az.used.sec / (5 * 3600) * 100).toFixed(1) + '٪)' : ''));
+  az.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : i.sev === 'تنبيه' ? '⚠️ ' : 'ℹ️ ') + ' ' + i.msg);
+    if (i.sev === 'خطأ') errors++; else if (i.sev === 'تنبيه') warns++;
+  });
+  if (!az.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('١٠ · طبقة البيانات');
   const d = await data();
   console.log('صفوف: ' + d.rows + ' · اختبارات مختلفة: ' + (d.tests || 0));
   d.issues.forEach(i => {
