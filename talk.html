@@ -56,9 +56,21 @@
   .b.me .bub{background:var(--good-bg);border:1px solid var(--good);border-bottom-left-radius:5px}
   .b .bub .en{font-size:1.12rem;font-weight:700}
   .b .bub .sc{font-size:.78rem;color:var(--muted);margin-top:5px;font-weight:600}
-  .b .bub .cor{font-size:.78rem;margin-top:5px;font-weight:600}
+  /* ═══ التصحيح هو زبدة الفائدة، فلا يكون أصغر ما في الشاشة ═══
+     طلب الأب (٩ سبتمبر ٢٠٢٦): «بعد ما يقول الولد الجملة تطلع له الجملة
+     الصحيحة يشوفها». وكانت تطلع فعلًا — لكن بخطٍّ ٠٫٧٨rem أصغر من نصّ
+     الحوار نفسه، فيمرّ عليها ولا ينتبه. فصارت صندوقًا واضحًا بخطٍّ
+     كخطّ الجملة، ومعه زرُّ سماعٍ لأنّه يتعلّم مخاطبةً لا قراءة. */
+  .b .bub .cor{font-size:.82rem;margin-top:7px;font-weight:700}
   .b .bub .cor.ok{color:var(--good)}
   .b .bub .cor.no{color:var(--warn,#b45309)}
+  .b .bub .cor.no{background:#fff7ed;border:1.5px solid var(--warn,#b45309);
+    border-radius:12px;padding:9px 11px;margin-top:9px}
+  @media (prefers-color-scheme:dark){ .b .bub .cor.no{background:#2a1c07} }
+  .b .bub .cor .fixen{display:block;font-size:1.12rem;font-weight:800;margin-top:4px;
+    direction:ltr;text-align:left;color:var(--ink)}
+  .b .bub .cor .saybtn{background:var(--warn,#b45309);color:#fff;border:0;border-radius:10px;
+    padding:7px 13px;margin-top:8px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit}
   .b .bub .rep{background:transparent;border:0;color:var(--accent);font-weight:800;cursor:pointer;font-size:.85rem;padding:4px 0 0;font-family:inherit}
   .thinking{color:var(--muted);font-style:normal}
 
@@ -647,6 +659,13 @@ function render(){
   app.querySelector("[data-skip]").addEventListener("click", nextTutor);
 }
 function scrollDown(){ var c=document.getElementById("chat"); if(c) window.scrollTo(0, document.body.scrollHeight); }
+/* تفويضٌ واحدٌ لزرّ «اسمعها»: يعمل مهما أُعيد بناء الحوار بـinnerHTML */
+document.addEventListener("click", function(ev){
+  var b = ev.target && ev.target.closest && ev.target.closest("[data-sayfix]");
+  if(!b) return;
+  var t = b.getAttribute("data-sayfix");
+  if(t) tutorSpeak(t);
+});
 
 function addAI(text, speak){
   state.lastAI=text;
@@ -711,7 +730,19 @@ function applyCorrectness(tid, correct, fixed){
   var el = document.getElementById("cor-"+tid);
   if(!el) return;
   el.className = "cor " + (correct ? "ok" : "no");
-  el.innerHTML = correct ? "✅ جملة صحيحة" : ("💡 الأصح: "+esc(fixed||""));
+  if(correct){
+    el.innerHTML = "✅ جملة صحيحة";
+  } else {
+    /* الجملة الصحيحة بخطٍّ كبيرٍ ومعها زرُّ سماع: يقرؤها ويسمعها ثمّ
+       يُعيدها بلسانه. والزرّ لا يُنطق إلّا بضغطه، فلا نُقاطعه بصوتٍ
+       مفاجئ وهو يقرأ ردّ المعلّم. */
+    var fx = String(fixed||"").trim();
+    /* النصّ في السمة لا في مستمعٍ مربوط: addAI تُعيد بناء الحوار كلّه
+       بـinnerHTML بعد قليل، فأيّ مستمعٍ نربطه هنا يُمحى معه. فنعتمد
+       تفويضًا واحدًا على حاوية الحوار (أسفله) يقرأ النصّ من السمة. */
+    el.innerHTML = "💡 الأصح:" + (fx ? '<span class="fixen">'+esc(fx)+'</span>' +
+      '<button type="button" class="saybtn" data-sayfix="'+esc(fx)+'">🔊 اسمعها</button>' : "");
+  }
   var c=document.getElementById("chat"); if(c) state.chatHtml = c.innerHTML;
 }
 
@@ -741,11 +772,20 @@ function aiTurn(childText, tid){
    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
    .then(function(d){ if(done)return; done=true; clearTimeout(tmo); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent="";
      state.aiN++; state.aiMs += (Date.now()-_t0);
-     state.msgs.push({role:"model", content:reply}); addAI(reply, true);
      /* garbled من talk-ai: النموذج نفسه يقول «هذا خطأ تفريغٍ لا خطأ الطفل».
         نعامله كالثقة المتدنّية: لا حكمَ نحويًّا ولا حساب في نسبة صحّة الجملة. */
      if(d && d.garbled === true){ markShaky(tid); }
-     applyCorrectness(tid, (d && typeof d.correct==="boolean") ? d.correct : null, d && d.fixed); saveTalkSession(); })
+     /* ═══ التصحيح قبل ردّ المعلّم لا بعده ═══
+        كان addAI يسبق، فيُضاف ردُّ المعلّم وتنزل الشاشة إلى أسفله، ثمّ
+        يُملأ التصحيح في فقاعة الطفل *فوق* — فيطلع التصحيح والولد ينظر
+        تحت. فصار يُملأ أوّلًا، وإن كانت الجملة غلطًا وقفنا الشاشة عنده
+        بدل القفز إلى القاع، فيراه ثمّ ينزل إلى السؤال التالي بنفسه. */
+     var _wrong = (d && d.correct === false);
+     applyCorrectness(tid, (d && typeof d.correct==="boolean") ? d.correct : null, d && d.fixed);
+     state.msgs.push({role:"model", content:reply}); addAI(reply, true);
+     if(_wrong){ try{ var _c=document.getElementById("cor-"+tid);
+       if(_c && _c.scrollIntoView) _c.scrollIntoView({block:"center", behavior:"smooth"}); }catch(e){} }
+     saveTalkSession(); })
    .catch(function(){ if(done)return; done=true; clearTimeout(tmo); if(st)st.textContent="";
      state.fbN++; state.aiMs += (Date.now()-_t0); replyThenAsk(childText); saveTalkSession(); });
 }
