@@ -945,13 +945,31 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
-// لو طلع من الصفحة (أو صغّر التطبيق) وهو في نص قسم، نحفظ اللي جاوبه
-// لا نحفظ جزئيًا عند اختفاء الصفحة (فتح فيديو علاجي ثم الرجوع)، وإلا قُفل الحفظ على
-// جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند تبديل القسم فعليًا.
+/* ═══ خروجٌ من الصفحة لا يُضيّع ما حلّه ═══════════════════════════════
+   بلاغ الأب (١٠ سبتمبر ٢٠٢٦): «رفيف تقول حلّت الرياضيات وتقوية التفكير
+   وستيب، وأنا ما طلع لي شي». وصفوفها تُصدّقها في «ستيب»: آخر ستيب لها
+   في ٥ سبتمبر، ولا شيء اليوم — مع أنّ «قدرات لفظي» و«كمي» من هذه
+   الصفحة نفسها حُفظا لها في ٩:٤٦ و٩:٤٩.
+
+   والعلّة أنّ هذه الصفحة لا تحفظ شيئًا عند الخروج منها: الحفظ الجزئيّ
+   معلّقٌ على تبديل القسم وحده. فمن حلّ نصف «ستيب» ثمّ أُقفلت شاشة
+   جوّاله أو خرج، ضاع كلّ ما حلّه. وفوقه: عدّاد الخروج يقذفه من الجلسة
+   بعد اختفاءين — ويقذفه بلا حفظٍ أصلًا.
+
+   وكان تعليقٌ هنا يقول إنّ الحفظ عند الاختفاء أُلغي عمدًا لأنّ فتح
+   الفيديو العلاجيّ ثمّ الرجوع كان يُقفل القسم على جزءٍ ناقص. وهو محقّ
+   في علّته، خطأٌ في دوائه: العلاج أن نُميّز الخروج الحقيقيّ من الاختفاء
+   العابر، لا أن نُلغي الحفظ. وpagehide لا يقع عند تبديل تطبيقٍ عابر —
+   إنّما عند مغادرة الصفحة أو التخلّص منها. فنحفظ عنده وحده. */
+function saveCurPanel(){
+  var cur = document.querySelector(".panel.active");
+  if(cur && typeof cur._leave === "function") cur._leave();
+}
+window.addEventListener("pagehide", saveCurPanel);
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
-function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
+function ejc(){if(document.getElementById("__eject"))return;try{saveCurPanel();}catch(e){}   /* لا نقذفه ونحن نُضيّع ما حلّه */var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
 document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
 </script>
 </body>
