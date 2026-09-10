@@ -2793,7 +2793,11 @@ if(!NAMES[who]){
           var __g = items[i].__g || "";
           var __sk = GEN_AR[__g] || __g || "—";
           var __s = SKILLS[__sk] || (SKILLS[__sk]={c:0,t:0}); __s.t++; if(__ok) __s.c++;
-          ITEMS.push({ g:__g, ok:(__ok?1:0), ms:__ms });
+          /* أيّ خيارٍ اختاره لا «أخطأ» فحسب: المشتّتات مصنوعةٌ لتُوافق
+             خطأً بعينه (اقسمْ قبل أن تطرح، أو اعكسْ الإشارة)، فمعرفةُ
+             المختار تُسمّي الخطأ بدل أن تصفه. وهو تحليل المشتّتات
+             المعروف في تحليل المفردات الاختبارية. */
+          ITEMS.push({ g:__g, ok:(__ok?1:0), ms:__ms, j:(+btn.dataset.j), a:ans });
           if(/^all/.test(id)){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
           if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
