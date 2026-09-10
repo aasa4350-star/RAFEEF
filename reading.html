@@ -1582,12 +1582,44 @@ if(!META[who] || !DATA[who]){
     setSR(s);
   }
   function shownRecently(st){ return (st && st.s && (Date.now()-st.s) < SHOWN_COOLDOWN_MS) ? 1 : 0; }
+  /* ═══ الكبوةُ لا تمحو تاريخ الكلمة ═══════════════════════════════
+     اعتراض الأولاد (١٠ سبتمبر ٢٠٢٦): «ليش تروح علينا كلها؟». وأصل
+     الاعتراض صحيحٌ وإن لم يكن موضعه ما ظنّوا: كلُّ كلمةٍ تُحسب وحدها
+     فعلًا، لكنّ الكلمة التي يغلط فيها كانت ترجع إلى الصندوق صفر — ولو
+     كان قد استرجعها صحيحةً عشر مرّاتٍ على مدى شهر. فتُمحى مراجعاتُها
+     كلُّها ويبدأ سلّمها من أوّله: يومٌ فيومان فأربعةٌ فثمانية، خمسة عشر
+     يومًا حتى تعود «متقنة». فشعورُهم أنّ شيئًا يضيع كان في محلّه.
+
+     وكلمةٌ لها تاريخٌ طويلٌ زلّ فيها مرّةً ليست ككلمةٍ لم يعرفها قطّ.
+     فصارت الكبوة تحفظ مكانها (st.p) قبل أن تُنزلها: ترجع إليه قريبًا
+     كما كانت — فالنسيان يستحقّ مراجعةً عاجلة — فإذا استرجعها صحيحةً
+     استأنفت من نصف مكانها القديم لا من أوّل السلّم.
+
+     ولا يُضخّم ذلك رقم «متقنة»: عتبتُها صندوقٌ رابعٌ فأعلى، أي فاصلُ
+     ثمانية أيّامٍ فأكثر — فالكلمة العائدة من كبوةٍ من الصندوق السادس
+     تستأنف عند الثالث (أربعة أيّام)، وتحتاج استرجاعًا صحيحًا آخر بعد
+     أربعة أيّامٍ لتستحقّ «متقنة» من جديد. تُختصر الطريق ولا يُلغى
+     الشرط. والكبوةُ الثانية تُقاس من المكان الجديد لا القديم، فمن يزلّ
+     مرارًا ينزل مرارًا. */
   function srMark(word, ok){
     var s=getSR(), st=s[word] || {b:0,t:0,n:0,c:0};
     st.n++;
-    if(ok){ st.c++; st.b = Math.min((st.b||0)+1, SR_DAYS.length-1); }
-    else  { st.b = 0; }                          // نسيها → ترجع بكرة
+    if(ok){
+      st.c++;
+      var next = Math.min((st.b||0)+1, SR_DAYS.length-1);
+      if(st.p){ next = Math.max(next, Math.min(Math.floor(st.p/2), SR_DAYS.length-1)); st.p = 0; }
+      st.b = next;
+    } else {
+      st.p = st.b || 0;                          // مكانها قبل الكبوة
+      st.b = 0;                                  // نسيها → ترجع بكرة
+    }
     st.t = Date.now(); s[word]=st; setSR(s);
+  }
+  /* ما يُقال للطفل حين يزلّ في كلمةٍ لها تاريخ: أنّها لم تضع. */
+  function srLapseTxt(word){
+    var st = getSR()[word];
+    if(!st || !st.p || st.p < 2) return "";
+    return "ما ضاعت — ترجع لك قريب وتكمل من مكانها، ما تبدأ من أوّلها.";
   }
   /* بعد الإجابة: متى ترجع هذه الكلمة؟ — يسأل حسن «متى أراجعهم»،
      فالجواب يُعرض على البطاقة نفسها بدل أن يبقى مخفيًّا في الكود. */
@@ -2090,7 +2122,9 @@ if(!META[who] || !DATA[who]){
           if(enOk && revealed[i] && isNew){ fb.className="fb ok"; fb.innerHTML='✅ صحيح — طبيعي تشوفها، هذي أوّل مرّة تمرّ عليك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           else if(enOk && revealed[i]){ fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، بترجع لك قريب وتعرفها بنفسك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           else if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>'; }
-          else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
+          else{ var lp=srLapseTxt(word);
+            fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':'')+
+              (lp?'<div style="font-weight:600;font-size:.85rem;opacity:.9;margin-top:4px">👍 '+lp+'</div>':''); }
           var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best);
         } else if(enOk){
           /* محاولةٌ لاحقة صحيحة: نُشجّعه، ونُصرّح أنّها للتدريب لا للدرجة */
