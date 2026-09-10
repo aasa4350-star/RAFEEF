@@ -265,6 +265,7 @@ async function loadReport(){
     var r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(name)+"&order=created_at.desc",
       {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
     rows=await r.json(); rows=Array.isArray(rows)?rows:[];
+    rows=RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
   }catch(e){}
   /* نفس علّة child.html وindex.html بالضبط (بلاغا الأب ١ سبتمبر ٢٠٢٦:
      قسم التعبير وقسم المحادثة ماطلعا له) — writing/writing-drill/talk

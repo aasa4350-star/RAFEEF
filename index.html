@@ -293,6 +293,8 @@ function azureQuotaHtml(rows){
     if(!r.ok){ throw new Error("HTTP "+r.status); }
     let data = await r.json();
     data = Array.isArray(data)?data:[];
+    /* المحاولات المستثناة تُسقط هنا مرّةً واحدةً قبل أيّ حساب — انظر RR.excluded */
+    data = RR.usable(data);
     /* نسخةٌ كاملة قبل الفلترة: السطر أدناه يُسقط صفوف practice (ومنها النطق
        والمحادثة)، وحساب حصّة أزور يحتاجها كلّها. */
     const allRows = data.slice();

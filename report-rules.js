@@ -30,10 +30,47 @@
     return isNaN(ms) ? Infinity : (Date.now() - ms);
   }
 
+  /* ═══ محاولاتٌ لا تدخل التقييم ولا التشخيص ═══════════════════════
+     طلب الأب (١٠ سبتمبر ٢٠٢٦): «الاختبار الشامل احذفه من التقييم —
+     اختبره أوّل بالغلط».
+
+     وحسنٌ فتح «رياضيات م٣ — شامل ف١» في ٢١ و٢٦ أغسطس، وهو اختبارُ
+     فصلٍ كاملٍ قبل أن يدرس منه درسًا واحدًا: ٥ من ١٢ مرّتين. فالرقم
+     لا يقيس ضعفًا، إنّما يقيس أنّه لم يُدرَّس بعد — ودخولُه المتوسّط
+     يخفض تشخيصه بما ليس منه.
+
+     والاستثناء بالمحاولة لا بالاختبار: مفتاح Supabase عندنا يُدخل
+     ويقرأ ولا يحذف، فالصفّان باقيان في القاعدة كما هما — وهذا أسلم
+     من محوهما. ولو أعاد حسنٌ الشامل بعد أن يدرس الفصل، احتُسبت
+     محاولتُه الجديدة كاملةً: المستثنى تاريخٌ محدّدٌ لا اسمُ اختبار. */
+  var SKIP = [
+    { student:"حسن", test:"رياضيات م٣ — شامل ف١", before:"2026-08-27" }
+  ];
+  function excluded(row){
+    if(!row) return false;
+    var m = row.meta || {};
+    var t = (m.at || row.created_at || "");
+    for(var i=0;i<SKIP.length;i++){
+      var k = SKIP[i];
+      if(k.student && row.student !== k.student) continue;
+      if(k.test    && m.test    !== k.test)      continue;
+      if(k.before  && !(t && t < k.before))      continue;
+      return true;
+    }
+    return false;
+  }
+
   g.RR = {
     FLAG_HOURS: FLAG_HOURS,
     VOCAB_DAYS: VOCAB_DAYS,
     ageMs: ageMs,
+
+    /* هل تُستثنى هذه المحاولة من التقييم والتشخيص؟ (انظر SKIP أعلاه) */
+    excluded: excluded,
+    /* تُطبَّق مرّةً واحدةً على الصفوف فور جلبها، قبل أيّ حساب */
+    usable: function(rows){
+      return (rows || []).filter(function(r){ return !excluded(r); });
+    },
 
     /* هل تُعرض ملاحظات هذه الجلسة؟ (خروج · سرعة · غير محتسبة) */
     freshFlag: function(row){ return ageMs(row) <= FLAG_HOURS * 3600e3; },

@@ -184,6 +184,7 @@ async function main(){
       {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
     rows=await r.json();
     rows=Array.isArray(rows)?rows:[];
+    rows=RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
   }catch(e){}
   // نفصل الاختبارات التجريبية والنشاط والتعبير والمحادثة عن اختبارات المدرسة
   /* بلاغ الأب (١ سبتمبر ٢٠٢٦): «أصلًا مايطلع لي في التقرير قسم

@@ -854,6 +854,7 @@ function fetchAll(){
       })
       .then(function(rows){
         if(!Array.isArray(rows)) rows = [];
+        rows = RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
         out = out.concat(rows);
         return rows.length < PAGE ? out : page(i+1);
       });
