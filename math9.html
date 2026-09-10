@@ -67,9 +67,11 @@ var name = NAMES[who] || "الطالب";
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total){
+function saveScore(test, correct, total, extra){
   try{
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    var meta = { kind:"practice", test:test, correct:correct, total:total };
+    if(extra) for(var k in extra) meta[k]=extra[k];
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -2513,6 +2515,141 @@ var ALLS5 = S1.concat(S2).concat(S3).concat(S4).concat(S5);
 
 
 
+/* ⟨⟨ خريطة الوصف — مولّدة بـ tools/gen-skill-labels.js، لا تُحرّر يدويًّا ⟩⟩ */
+var GEN_AR = {
+  g31ConvertToSI: "تحويل الصورة القياسية إلى صيغة الميل والمقطع",
+  g31IdSI: "أوجد الميل والمقطع الصادي معًا من صيغة الميل والمقطع",
+  g31LineTypes: "المستقيمان الأفقي والرأسي — مفهوم",
+  g31PlotPoint: "إيجاد نقطةٍ أخرى على المستقيم بالتعويض",
+  g31YIntPoint: "نقطة تقاطع المستقيم مع محور الصادات",
+  g32FromSlopePoint: "من الميل ونقطة، اكتب المعادلة بصيغة الميل والمقطع",
+  g32FromTwoPoints: "من نقطتين، اكتب المعادلة بصيغة الميل والمقطع",
+  g32Method: "منهجية كتابة معادلة الميل والمقطع — مفهوم",
+  g32Predict: "٣-٢: التنبّؤ من معادلة الميل والمقطع",
+  g32WriteFromWords: "٣-٢: كتابة المعادلة من جملةٍ كلاميّة",
+  g33ConvertToSI: "تحويل صيغة الميل ونقطة إلى صيغة الميل والمقطع",
+  g33ConvertToStandard: "تحويل صيغة الميل ونقطة إلى الصورة القياسية",
+  g33FromTwoPointsPS: "من نقطتين، اكتب صيغة الميل ونقطة مستعملًا النقطة الأولى",
+  g33PointSlopeForm: "من الميل ونقطة، اكتب صيغة الميل ونقطة",
+  g33WhenPS: "متى نستعمل صيغة الميل ونقطة — مفهوم",
+  g34Classify: "حدد العلاقة بين مستقيمين: متوازيان أم متعامدان أم لا شيء",
+  g34HorizVertConcept: "المستقيمات الأفقية والرأسية والتوازي والتعامد — مفهوم",
+  g34LineThroughParallel: "معادلة مستقيمٍ يمرّ بنقطةٍ ويوازي مستقيمًا معلومًا",
+  g34LineThroughPerp: "معادلة مستقيمٍ يمرّ بنقطةٍ ويعامد مستقيمًا معلومًا",
+  g34ParallelSlope: "ميل مستقيمٍ يوازي مستقيمًا معلومًا",
+  g34PerpSlope: "ميل مستقيمٍ يعامد مستقيمًا معلومًا (مقلوب بإشارةٍ معاكسة)",
+  g41AddSub: "حل متباينة بخطوةٍ واحدة بالجمع أو الطرح — الاتجاه لا يتغيّر أبدًا",
+  g41CheckSolution: "هل قيمةٌ معطاة تحقّق متباينةً بسيطة؟",
+  g41GraphConcept: "التمثيل البياني لحل المتباينة — دائرة مفرغة أو مظللة، واتجاه التظليل",
+  g41Phrase: "من عبارةٍ لفظية إلى متباينة (جمع/طرح + لا يزيد على/لا يقل عن)",
+  g41WordAtMost: "٤-١: متباينة «على الأكثر»",
+  g42Concept: "مفهوم: متى يُعكس اتجاه المتباينة",
+  g42FracCoeff: "معامل كسريّ: الضرب في المقلوب",
+  g42MulDivNeg: "الضرب أو القسمة في عددٍ سالب — يجب عكس الاتجاه",
+  g42MulDivPos: "الضرب أو القسمة في عددٍ موجب — الاتجاه لا يتغيّر",
+  g42WordAtLeast: "٤-٢: متباينة «على الأقلّ»",
+  g43Concept: "مفهوم: ترتيب خطوات حل المتباينات المتعددة الخطوات، والحالتان الخاصّتان",
+  g43Distribute: "متباينة تتضمن توزيعًا على قوس",
+  g43EmptyOrAll: "حالتان خاصّتان: المجموعة الخالية ومجموعة الأعداد الحقيقية كلّها",
+  g43MultiStep: "متباينة بخطوتين: ا س + ب op جـ",
+  g43WordMulti: "٤-٣: متباينة متعدّدة الخطوات (ميزانيّة)",
+  g44Classify: "مفهوم: متى نستعمل (و) ومتى نستعمل (أو)",
+  g44OrCompound: "متباينتان مربوطتان بـ(أو) — تُحلّان منفصلتين ويُجمع الحلّان باتحاد",
+  g44ReadCompound: "قراءة متباينة مركبة على الصورة المزدوجة وتفكيكها إلى متباينتين مربوطتين بـ(و)",
+  g44TwoSided: "متباينة مركبة بصيغة مزدوجة (بين طرفين) — حلّها بأداة (و) ضمنية",
+  g44WordAnd: "٤-٤: متباينة مركّبة — مدًى",
+  g45AbsGreater: "|تعبير| > ك أو ≥ ك — تتحول لمتباينة مركبة بـ(أو)، مع الحالة الخاصة (كل الأعداد الحقيقية)",
+  g45AbsLess: "|تعبير| < ك أو ≤ ك — تتحول لمتباينة مركبة بـ(و)، مع الحالة الخاصة (المجموعة الخالية)",
+  g45CheckWhichSat: "هل قيمةٌ معطاة تحقّق متباينة قيمة مطلقة؟",
+  g45Concept: "مفهوم: القيمة المطلقة وأداتا الربط، وحالتاها الخاصتان",
+  g45WordTolerance: "٤-٥: تفاوتٌ مسموح بالقيمة المطلقة",
+  g51ClassifySystem: "تصنيف النظام: متسق ومستقل / متسق وغير مستقل / غير متسق",
+  g51NumSolutions: "كم عدد حلول النظام؟ (صياغة عددية مكمّلة لمصطلحي متسق/مستقل)",
+  g51SlopeMeaning: "مفهوم: معنى حل النظام بيانيًّا وعلاقته بالميل والمقطع",
+  g51VerifySolution: "التحقق: هل نقطةٌ معطاة حلٌّ للنظام؟",
+  g51WriteSystem: "٥-١: كتابة نظام معادلتين من مسألة",
+  g52Method: "مفهوم: متى تكون طريقة التعويض أفضل خيار",
+  g52NoSolutionInf: "حالتان خاصتان في التعويض: لا حل / عدد لا نهائي من الحلول",
+  g52SolveForVar: "يجب حلّ إحدى المعادلتين لمتغيّرٍ أوّلًا (معامله 1) قبل التعويض",
+  g52SubstituteReady: "إحدى المعادلتين محلولةٌ مسبقًا لمتغيّر (ص = ...) — نعوّض مباشرة",
+  g52WordSub: "٥-٢: أسعارٌ وكمّيات — بالتعويض",
+  g53ElimAdd: "معاملا س متعاكسان — نجمع لحذف س",
+  g53ElimSub: "معاملا س متساويان — نطرح لحذف س",
+  g53WhichOp: "مفهوم: نجمع أم نطرح؟",
+  g53WhichVarElim: "مفهوم: أيّ متغيّرٍ يُحذف بالجمع في نظامٍ معطى",
+  g53WordElim: "٥-٣: مجموعٌ وفرق — بالحذف جمعًا أو طرحًا",
+  g54Concept: "مفهوم: الحذف بالضرب مقابل الحذف المباشر",
+  g54ElimMulBoth: "ضرب المعادلتين معًا لمعادلة معاملَي س",
+  g54ElimMulOne: "ضرب معادلةٍ واحدة فقط لمعادلة معاملَي س",
+  g54WhichMultipliers: "مفهوم: بأيّ عددٍ نضرب كل معادلة",
+  g54WordMul: "٥-٤: سرعةٌ وريح — بالحذف بالضرب",
+  g55ApplyWord: "٥-٥: تطبيقٌ على أنظمة المعادلات",
+  g55BestMethod: "اختيار أفضل طريقةٍ للحلّ",
+  g55PerimeterSystem: "هندسة: محيط مستطيل وعلاقة بين طوله وعرضه",
+  g55SumDiff: "مجموع عددين وفرقهما",
+  g55WordToSystem: "مفهوم: خطوات ترجمة مسألةٍ لفظية إلى نظام معادلتين",
+  gAbsEqNone: "ص39: قيمةٌ مطلقةٌ تساوي عددًا سالبًا ⇐ Ø",
+  gAbsEqTwo: "ص39 مثال 2: |س + a| = b ⇐ حالتان",
+  gAbsExpr: "ص41: حساب قيمة عبارةٍ فيها قيمٌ مطلقة",
+  gAbsReal: "ص42: موقفٌ حياتيّ — مدًى مسموح",
+  gAbsTerms9: "ص38–39: مفهوم القيمة المطلقة",
+  gAxisPoint: "نقطة على المحاور أو نقطة الأصل",
+  gClassifyEq: "معادلةٌ لها حلٌّ واحد / لا حلّ / متطابقة",
+  gCommonDiff: "أساس المتتابعة",
+  gConsecInt: "ص29: ثلاثة أعداد صحيحة متتالية",
+  gConsecOdd: "ص29 مثال 3: ثلاثة أعداد فردية متتالية",
+  gDiscreteCont: "٢-٢: دالّة متّصلة أم منفصلة",
+  gDomainRange: "المجال أو المدى لمجموعة أزواج مرتبة",
+  gEqOrderOps: "ص13 مثال 2: حلّ معادلة بترتيب العمليات",
+  gEqTerms9: "ص12–15: المصطلحات",
+  gEqTwoVars: "ص14 مثال 5: معادلة بمتغيّرين — التعويض",
+  gFuncCombo: "تركيب قيمتين: د(a) + د(b) أو د(a) − د(b)",
+  gFuncValueLin: "قيمة دالة خطّية",
+  gFuncValueQuad: "قيمة دالة غير خطّية (تربيعية)",
+  gIdentityOrNone: "ص14 مثال 4: متطابقة أم بلا حلّ",
+  gIndepDep: "٢-١: المتغيّر المستقلّ والتابع",
+  gIsArithmetic: "أيّ المتتابعات حسابية؟",
+  gIsFunction: "أيّ العلاقات تمثّل دالة؟ (واحدة فقط بلا تكرار في المجال)",
+  gIsLinear: "أيّ المعادلات خطّية؟ (واحدة فقط)",
+  gLinearTable: "هل الدالة خطّية؟ (ثبات معدّل التغيّر في جدول)",
+  gMissingCoord: "إيجاد إحداثيّ مجهول إذا عُلم الميل",
+  gMoneyMulti: "ص29 مثال 2: مسألة نقود متعدّدة الخطوات",
+  gMultiStep: "ص28 مثال 1: aس + b = c",
+  gMultiStepFrac: "ص28 مثال: (س − b) ÷ a = c",
+  gMultiStepNeg: "ص30 تمرين: c = aس − b مع مُعامِلٍ سالب",
+  gNextTerms: "الحدود الثلاثة التالية",
+  gNthTermEq: "معادلة الحد النوني",
+  gNthTermValue: "قيمة حدٍّ معيّن",
+  gOneStepAdd: "ص21 مثال 1: خاصيّة الجمع في المساواة",
+  gOneStepDiv: "ص21: خاصيّة الضرب في المساواة",
+  gOneStepMul: "ص21: خاصيّة القسمة في المساواة",
+  gOneStepReal: "ص22 مثال 3: مسألة من واقع الحياة",
+  gOneStepSub: "ص21 مثال 2",
+  gOneStepWord: "ص24: من جملةٍ كلامية إلى معادلة ثمّ حلّها",
+  gPerimeterEqual: "ص36: محيطا شكلين متساويان",
+  gPointOnLine: "أيّ زوجٍ مرتّبٍ يحقّق المعادلة؟",
+  gPropEquality: "ص21: تسمية الخاصيّة المستعملة",
+  gQuadrant: "الربع الذي تقع فيه نقطة",
+  gRateOfChange: "٢-٥: معدّل التغيّر من جدول",
+  gRoot: "جذر معادلة خطّية",
+  gSeqFunction: "المتتابعة كدالة: المجال",
+  gSlopeTwoPoints: "ميل المستقيم المارّ بنقطتين",
+  gSlopeType: "نوع الميل: موجب أو سالب أو صفر أو غير معرّف",
+  gSolutionSet: "ص15: مجموعة الحلّ من مجموعة تعويض",
+  gStandardForm: "الصورة القياسية من ص = م س + ب",
+  gStepsOrder9: "ص34: خطوات حلّ المعادلة",
+  gVarBothSides: "ص33 مثال 1: aس + b = cس + d",
+  gVarClassify: "ص34: متطابقة أم لا حلّ لها",
+  gVarParens: "ص34 مثال 2: أقواسٌ في الطرفين ⇐ خاصيّة التوزيع",
+  gVerticalTest: "اختبار الخط الرأسي — مفهوم",
+  gWhichTerm: "ما الحدّ الذي قيمته كذا؟",
+  gXIntercept: "المقطع السيني",
+  gYIntercept: "المقطع الصادي",
+  gZero: "صفر الدالة الخطّية",
+  gZeroContext: "٢-٢: صفر الدالّة في موقفٍ حياتيّ",
+  gZeroMeaning: "العلاقة بين الجذر والصفر والمقطع السيني — مفهوم"
+};
+/* ⟨⟨ نهاية الخريطة ⟩⟩ */
 /* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
    يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
@@ -2617,6 +2754,32 @@ if(!NAMES[who]){
     var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
     var answered={}, correct=0, total=items.length, saved=false;
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
+    /* ═══ ما نُسجّله عن كلّ سؤال، ولماذا ═══════════════════════════════
+       كانت الصفحة تحفظ الدرجة وحدها: ٣ من ١٠. فإذا سُئلت «أيّ نوعٍ
+       يسقط فيه حسن؟» لم يكن في الصفوف جوابٌ أصلًا — عشر جلساتٍ في درسٍ
+       واحد ولا أعرف أيّ سؤالٍ منها أخطأ. فصرنا نحفظ لكلّ سؤالٍ: مولّده
+       (أي نوعه، وGEN_AR يترجمه إلى وصفٍ عربيٍّ بصفحته من الكتاب)،
+       أصاب أم أخطأ، وكم مكث عليه بالمللي ثانية.
+
+       والزمن ليس زينة: في التقييمات منخفضة المخاطر (والموقع منها —
+       لا درجة مدرسيّة عليه) يُعرف «التخمين السريع» بأنّ زمن الإجابة
+       دون عتبة، فتُستبعد تلك الإجابات من تقدير المستوى لأنّها لا تقيسه
+       (Wise & Kong 2005 — response time effort). والطريقة المعياريّة
+       NT10 تجعل العتبة ١٠٪ من متوسّط زمن السؤال بحدٍّ أقصى عشر ثوانٍ،
+       وهي تحتاج تاريخًا لكلّ سؤال — وأسئلتنا تُولَّد جديدةً كلّ مرّة.
+       فنحفظ الأزمنة الخام هنا، وتُحسب العتبة المعياريّة من تاريخ الطفل
+       نفسه عند التحليل. ونُبقي في الصفحة عتبةً دنيا صريحة (ثلاث ثوانٍ)
+       لأنّ حلّ معادلةٍ متعدّدة الخطوات في أقلّ منها غيرُ ممكن.
+       (قِيس في ١٠ سبتمبر ٢٠٢٦: حسن حلّ ست مجموعاتٍ في ١٩–٦٠ ثانية
+       للعشرة أسئلة، ونتيجته فيها ٤٢٪ مقابل ٧١٪ حين تأنّى.) */
+    var RG_MS = 3000;
+    var t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
+    function meta(n){
+      return { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
+               /* كثرةُ التخمين السريع تُسقط الثقة بالجلسة كلّها — كما في كانجرو */
+               trusted: (fastN < Math.ceil(n/2)),
+               skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+    }
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];
@@ -2625,17 +2788,23 @@ if(!NAMES[who]){
           if(answered[i]) return; answered[i]=1;
           qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
           var __ok = (+btn.dataset.j===ans);
+          var __now=Date.now(), __ms=__now-lastTs; lastTs=__now;
+          if(__ms < RG_MS) fastN++;
+          var __g = items[i].__g || "";
+          var __sk = GEN_AR[__g] || __g || "—";
+          var __s = SKILLS[__sk] || (SKILLS[__sk]={c:0,t:0}); __s.t++; if(__ok) __s.c++;
+          ITEMS.push({ g:__g, ok:(__ok?1:0), ms:__ms });
           if(/^all/.test(id)){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
           if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total, meta(total));
             if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n, meta(n)); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }

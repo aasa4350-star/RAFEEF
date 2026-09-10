@@ -277,9 +277,34 @@ function run(){
     }
   }
 
+  issues.push(...skillLabels());
   issues.push(...conflicts(allBanks));
 
   return { issues, pageCount, genCount, fileCount: files.length, bankCount: allBanks.length };
+}
+
+/* كلُّ مولّدٍ في رياضيات ثالث متوسط له وصفٌ عربيٌّ في GEN_AR — وإلّا
+   ظهر في تشخيص الأب باسمه البرمجيّ (gConsecOdd) لا بوصفه. الخريطة
+   تُولَّد بـ tools/gen-skill-labels.js، وهذا يمسك مَن نسي أن يُعيد
+   توليدها بعد إضافة مولّدٍ جديد. */
+function skillLabels(){
+  const out = [];
+  const f = 'math9.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const mm = /var GEN_AR = \{([\s\S]*?)\n\};/.exec(src);
+  if (!mm){ out.push({ sev:'خطأ', file:f, msg:'خريطة GEN_AR غير موجودة — شغّل tools/gen-skill-labels.js' }); return out; }
+  const have = new Set();
+  for (const m of mm[1].matchAll(/^\s*(g[A-Za-z0-9_]+)\s*:/gm)) have.add(m[1]);
+  const used = new Set();
+  for (const m of src.matchAll(/^var [A-Z]+\d* = \[(.+)\];/gm))
+    m[1].split(',').forEach(x => { x = x.trim(); if (/^g[A-Za-z0-9_]+$/.test(x)) used.add(x); });
+  const missing = [...used].filter(g => !have.has(g));
+  if (missing.length)
+    out.push({ sev:'تنبيه', file:f, msg: missing.length + ' مولّدًا بلا وصفٍ عربيّ (' +
+      missing.slice(0,4).join(' ') + (missing.length>4?' …':'') + ') — شغّل tools/gen-skill-labels.js' });
+  return out;
 }
 
 module.exports = run;
