@@ -1957,6 +1957,10 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML = html;
 
     var done={}, tried={}, revealed={}, correct=0, saved=false, advanced=false, total=V.length;
+    /* كم كلمةً احتاج أن يراها قبل أن يكتبها. نعرضها بجانب الدرجة لأنّ
+       «١ / ١٢» وحدها تُقرأ إخفاقًا، وهي في الحقيقة: تذكّر واحدةً وتعلّم
+       إحدى عشرة — وهذا ثاني أفضل ما يقع في جلسة مراجعة. */
+    var seenN=0;
     var t0=Date.now(); var aw0=awaySnap(); // بداية توقيت الجلسة + رصد الخروج من الصفحة
     var scoreEl=sec.querySelector("[data-score]"), doneMsg=sec.querySelector("[data-donemsg]");
     // تحذير مباشر أول ما يخرج ويرجع للصفحة
@@ -2035,11 +2039,29 @@ if(!META[who] || !DATA[who]){
          فتُحسب «صحيحة من أوّل محاولة». فصار رقم «المحفوظ» يقيس النسخ لا
          الحفظ — والأب يبني عليه قراراته.
          ولا نمنع «أظهر»: أن يرى الطفل الكلمة التي لا يعرفها تعلُّمٌ نافع.
-         بل لا نعدّها معرفةً: تُسجَّل كأنّه لم يعرفها، فترجع إليه قريبًا. */
+         بل لا نعدّها معرفةً: تُسجَّل كأنّه لم يعرفها، فترجع إليه قريبًا.
+
+         ═══ إلّا في جلسة التقديم (isNew) ═══
+         اعتراض الأولاد (١٠ سبتمبر ٢٠٢٦): «ليش تروح علينا كلها؟». وهم
+         محقّون في جلسة الكلمات الجديدة: الكلمة تُعرض فيها لأوّل مرّة في
+         حياتهم، فلا سبيل لهم إلى معرفتها، والضغط على «أظهر» هو الطريق
+         الوحيد للتعلّم — لا حيلةٌ للتحايل. فكنّا نُصفّرهم على أنّهم
+         تعلّموا.
+         والقياس أثبته: قبل هذا الشرط (٤ سبتمبر ٧:١٨م) كانت درجاتهم
+         ١٠/١٠ و٢٥/٢٥، وبعده مباشرةً صارت ٠/١٠ و٠/١٥ و١/١٢ — عند
+         الأربعة جميعًا، ستّة أيّامٍ متّصلة. لم يتغيّر أطفالنا، تغيّرت
+         قاعدتُنا.
+         ولا يضيع بذلك قياسُ الحفظ: «متقنة» لا تُمنح إلّا لكلمةٍ نجت من
+         فاصل ثمانية أيّامٍ فأكثر (KNOWN_BOX) — وهي جلسةُ مراجعةٍ لا
+         تقديم. فالشرط هنا كان يحمي رقمًا لم يعد يقيس شيئًا، وثمنُه
+         درجةُ الطفل كلّها. ويبقى الشرط قائمًا في المراجعة، فهناك
+         الاسترجاع هو المقصود. */
       qEl.querySelector("[data-show]").addEventListener("click",function(){
         if(!tried[i]) revealed[i]=1;
         fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>'+
-          (revealed[i] ? '<div style="font-weight:600;font-size:.85rem;opacity:.85;margin-top:4px">👀 شفت الإجابة — عادي، بس ما نحسبها صح، وبترجع لك قريب عشان ترسخ.</div>' : '');
+          (revealed[i] ? '<div style="font-weight:600;font-size:.85rem;opacity:.85;margin-top:4px">'+
+            (isNew ? '👀 اقرأها وارجع اكتبها — تُحسب لك، وبترجع لك بكرة عشان ترسخ.'
+                   : '👀 شفت الإجابة — عادي، بس ما نحسبها صح، وبترجع لك قريب عشان ترسخ.')+'</div>' : '');
       });
       qEl.querySelector(".chk").addEventListener("click",function(){
         var enOk = norm(ein.value,false)===norm(word,false);
@@ -2058,12 +2080,15 @@ if(!META[who] || !DATA[who]){
            للتدريب — بس ما تُغيّر الدرجة ولا صندوق المراجعة. */
         var first = !tried[i];
         if(first){
-          /* من كشف الإجابة قبل أن يحاول لا تُحسب له، ولو كتبها صحيحة */
-          var scored = enOk && !revealed[i];
+          /* من كشف الإجابة قبل أن يحاول لا تُحسب له، ولو كتبها صحيحة —
+             إلّا في جلسة التقديم، فالكلمة تُعرض فيها لأوّل مرّة (انظر أعلاه) */
+          var scored = enOk && (isNew || !revealed[i]);
           tried[i]=1; markWeak(word, !scored); srMark(word, scored);
           if(scored){ done[i]=1; correct++; }
+          if(revealed[i] && !isNew) seenN++;
           var nx=srNextTxt(word);
-          if(enOk && revealed[i]){ fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، بترجع لك قريب وتعرفها بنفسك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
+          if(enOk && revealed[i] && isNew){ fb.className="fb ok"; fb.innerHTML='✅ صحيح — طبيعي تشوفها، هذي أوّل مرّة تمرّ عليك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
+          else if(enOk && revealed[i]){ fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، بترجع لك قريب وتعرفها بنفسك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           else if(enOk){ fb.className="fb ok"; fb.textContent="✅ ممتاز! صحيح"; if(nx) fb.innerHTML += ' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>'; }
           else{ fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
           var dc=bumpDay(); var bn=sec.querySelector("[data-daybanner]"); if(bn) bn.innerHTML=vocMotiv(dc,getDay().best);
@@ -2073,7 +2098,8 @@ if(!META[who] || !DATA[who]){
         } else {
           fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>';
         }
-        scoreEl.textContent=correct+" / "+total;
+        scoreEl.innerHTML = correct+" / "+total +
+          (seenN ? ' <span style="opacity:.8;font-weight:700;font-size:.85rem">· 👀 تعلّمت '+seenN+'</span>' : '');
         onComplete();
       });
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");
