@@ -98,7 +98,55 @@ function run(){
              ') — لا احتياط إن تعثّر Azure' });
   });
 
+  issues.push(...verCheck());
   return { issues, rows };
+}
+
+/* ═══ رقمُ النسخة يجب أن يتغيّر كلّما تغيّر صوت ═══════════════════
+   بلاغ الأب (١٢ سبتمبر ٢٠٢٦) عن صفحة أسامة: الصوت يقول شيئًا والمكتوب
+   شيءٌ آخر. وفحصُ المقاطع بالسماع كشف أربعةً منها تقول غير نصّها فعلًا،
+   لكنّ العلّة الأعمق أنّ إصلاحها وحده لا يصل الطفل: الصفحة تطلب الصوت
+   بعنوانٍ ثابتٍ فيه رقم نسخة (AUDIO_VER)، وكان مجمّدًا على "s4" منذ
+   ١٢ أغسطس بينما أُعيد توليد ثمانية مقاطعَ بعده. فمن حفظ جهازُه النسخة
+   القديمة بقي يسمعها شهرًا وهو لا يدري.
+
+   فالفحص يربط الرقم بمحتوى الصوت: بصمةٌ من المانيفست وأحجام الملفّات،
+   فإن تغيّر صوتٌ ولم يتغيّر الرقم ظهر الخطأ باسمه وبالقيمة الجديدة. */
+function audioSig(){
+  const crypto = require('crypto');
+  const man = path.join(ROOT, 'audio', 'manifest.json');
+  if (!fs.existsSync(man)) return null;
+  const h = crypto.createHash('sha1');
+  h.update(fs.readFileSync(man));
+  for (const lang of ['ar','en']){
+    const dir = path.join(ROOT, 'audio', lang);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).sort()){
+      const st = fs.statSync(path.join(dir, f));
+      h.update(f + ':' + st.size + ';');
+    }
+  }
+  return h.digest('hex').slice(0, 8);
+}
+function verCheck(){
+  const out = [];
+  const sig = audioSig();
+  if (!sig) return out;
+  for (const f of ['reading.html','quiz.html']){
+    const p = path.join(ROOT, f);
+    if (!fs.existsSync(p)) continue;
+    const src = fs.readFileSync(p, 'utf8');
+    const m = /var AUDIO_VER = "([^"]+)"/.exec(src);
+    if (!m){ out.push({ sev:'خطأ', msg: f + ' — لا يوجد AUDIO_VER' }); continue; }
+    const sm = /\/\* AUDIO_SIG: ([0-9a-f]{8}) \*\//.exec(src);
+    if (!sm){
+      out.push({ sev:'تنبيه', msg: f + ' — بلا بصمةِ صوت. أضِف بجانب AUDIO_VER: /* AUDIO_SIG: ' + sig + ' */' });
+    } else if (sm[1] !== sig){
+      out.push({ sev:'خطأ', msg: f + ' — تغيّر صوتٌ ولم يتغيّر AUDIO_VER (الآن "' + m[1] + '"): ' +
+        'ارفع الرقم وحدّث البصمة إلى ' + sig + ' — وإلّا بقيت الأجهزة على التسجيل القديم' });
+    }
+  }
+  return out;
 }
 
 module.exports = run;
