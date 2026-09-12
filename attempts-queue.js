@@ -95,11 +95,12 @@
       stamp(payload, id);
       enqueue(url, key, payload, id);   /* نكتب أوّلًا، قبل أن نحاول الإرسال */
       try{ if(onState) onState("pending"); }catch(e){}
+      var after = function(){ try{ if(AQ.nudge) AQ.nudge(); }catch(e){} };
       return send(url, key, payload).then(function(r){
-        if(r && r.ok){ removeById(id); try{ if(onState) onState("ok"); }catch(e){} return true; }
-        try{ if(onState) onState("queued"); }catch(e){} return false;
+        if(r && r.ok){ removeById(id); try{ if(onState) onState("ok"); }catch(e){} after(); return true; }
+        try{ if(onState) onState("queued"); }catch(e){} after(); return false;
       }).catch(function(){
-        try{ if(onState) onState("queued"); }catch(e){} return false;
+        try{ if(onState) onState("queued"); }catch(e){} after(); return false;
       });
     },
     pending: function(){ return read().length; },
@@ -126,8 +127,70 @@
   };
   window.AQ = AQ;
 
-  function tryFlush(){ try{ AQ.flush(); }catch(e){} }
+  /* ═══ لا ينتظر الطابور فتحةً قادمة ═══════════════════════════════
+     بلاغ الأب (١٢ سبتمبر ٢٠٢٦): «عندك مشكلة في تحديث ستيب وتحصيلي
+     وقدرات كمّي ولفظي وتقوية التفكير وإملاء إنجليزي — ما يطلع لي أنّهم
+     اختبروا، خصوصًا حسن».
+
+     وصفوف حسن تُصدّقه: حلّ الأربعة الساعة ١٩:٠٢–١٩:٠٤ ووصلت القاعدةَ
+     ١٩:٢٢ جميعًا في الثانية نفسها — أي أنّها فشلت ساعةَ الحلّ فبقيت في
+     طابور جهازه عشرين دقيقة، حتّى فتح صفحةً أخرى فانفلتت. ومن فتح
+     التقرير في تلك العشرين رآه كأنّه لم يختبر. وهو اختبر.
+
+     وكان الطابور لا يُعيد المحاولة إلّا عند تحميل صفحةٍ أو عودة اتّصال.
+     فالطفل الذي يجلس في الصفحة نفسها ساعةً لا تُعاد محاولةٌ واحدة طوال
+     جلوسه. فصرنا نُعيد المحاولة ما دام في الطابور شيء: بعد ١٥ ثانية،
+     ثمّ ٣٠، ثمّ ٦٠، ثمّ كلّ دقيقتين — وعند رجوع الطفل إلى الصفحة.
+
+     ونُري الطفلَ نفسَه ما لم يصل، فبيده أن يضغط «أرسلها الآن» وهو على
+     شبكةٍ سليمة، بدل أن يكتشف أبوه غيابها بعد ساعة. */
+  var STEPS = [15000, 30000, 60000, 120000], stepI = 0, timer = null, flushing = false;
+
+  function badge(){
+    var n = 0; try{ n = AQ.pending(); }catch(e){}
+    var el = document.getElementById("__aqbadge");
+    if(!n){ if(el) el.remove(); return; }
+    if(!document.body) return;
+    if(!el){
+      el = document.createElement("div");
+      el.id = "__aqbadge";
+      el.setAttribute("style", "position:fixed;inset-inline-start:10px;bottom:10px;z-index:2147483640;"+
+        "background:#b45309;color:#fff;border-radius:12px;padding:8px 12px;font:700 .82rem Tahoma,sans-serif;"+
+        "direction:rtl;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;max-width:76vw");
+      el.addEventListener("click", function(){ stepI = 0; tryFlush(); });
+      document.body.appendChild(el);
+    }
+    el.innerHTML = "📥 " + n + " نتيجة ما وصلت بعد — اضغط لإرسالها";
+  }
+
+  function schedule(){
+    if(timer) return;
+    var n = 0; try{ n = AQ.pending(); }catch(e){}
+    if(!n) return;
+    var wait = STEPS[Math.min(stepI, STEPS.length - 1)];
+    timer = setTimeout(function(){ timer = null; tryFlush(); }, wait);
+  }
+  function tryFlush(){
+    if(flushing) return;
+    flushing = true;
+    var before = 0; try{ before = AQ.pending(); }catch(e){}
+    var done = function(){
+      flushing = false;
+      var after = 0; try{ after = AQ.pending(); }catch(e){}
+      /* نجح شيء ⇐ نعود لأقصر انتظار، وإلّا تباعدنا */
+      if(after < before) stepI = 0; else stepI++;
+      badge();
+      if(after) schedule();
+    };
+    try{ AQ.flush().then(done, done); }catch(e){ done(); }
+  }
+
+  AQ.nudge = function(){ badge(); schedule(); };
+
   if(document.readyState === "complete") setTimeout(tryFlush, 800);
   else window.addEventListener("load", function(){ setTimeout(tryFlush, 800); });
-  window.addEventListener("online", tryFlush);
+  window.addEventListener("online", function(){ stepI = 0; tryFlush(); });
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden){ stepI = 0; tryFlush(); }
+  });
 })();

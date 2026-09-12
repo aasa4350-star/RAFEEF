@@ -300,8 +300,8 @@ async function main(){
       const isFlag=p=> fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2));
       const mIco=p=> p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖";
       const flagged=vocabWk.filter(isFlag), show=vocabWk.filter(p=>!isFlag(p)).slice(0,3).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
-      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(p.created_at)} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
-      const byDay={}; vocabT.forEach(p=>{ const f=saTime(p.created_at); const d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
+      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(RR.when(p))} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
+      const byDay={}; vocabT.forEach(p=>{ const f=saTime(RR.when(p)); const d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
       const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
       html+=`<div class="sec-title"><span class="dot"></span> 📖 حفظ الكلمات (إنجليزي)</div><div class="card"><ul class="weak">`+
@@ -331,7 +331,7 @@ async function main(){
         const arr=readByT[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
         const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
         html+=`<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul class="weak">`+
-          arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
+          arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
           `</ul>`;
       });
       html+=`</div>`;
@@ -347,7 +347,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ النطق</div><div class="card"><ul class="weak">`+
         `<li>🎙️ <b>${prs.length}</b> تقييم${aP!=null?` · متوسط النطق <b style="color:${col(aP)}">${aP}%</b>`:``}${aA!=null?` · دقّة ${aA}%`:``}${aF!=null?` · طلاقة ${aF}%`:``}${aW!=null?` · <b>${aW}</b> كلمة/دقيقة`:``}</li>`+
         prs.slice(0,6).map(p=>{ const m=p.meta, v=pv(p,"pron");
-          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${m.pmode==="passage"?"قطعة كاملة":"كلمة/جملة"} · ${m.test||""} <span class="cnt">${saTime(p.created_at)}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
+          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${m.pmode==="passage"?"قطعة كاملة":"كلمة/جملة"} · ${m.test||""} <span class="cnt">${saTime(RR.when(p))}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
         `</ul>${prs.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${prs.length-6} تقييمًا.</p>`:``}</div>`;
     }
     // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
@@ -380,7 +380,7 @@ async function main(){
       }
       html+=`</ul>`+
         writingAll.slice(0,3).map(p=>{ const m=p.meta;
-          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(p.created_at)}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(RR.when(p))}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
         `</div>`;
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
@@ -400,7 +400,7 @@ async function main(){
           const col=typeof m.avgPron==="number"?(m.avgPron>=80?"var(--good)":m.avgPron>=50?"var(--warn)":"var(--bad)"):"var(--muted)";
           const co=typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:"";
           const un=(typeof m.unh==="number"&&m.unh>0)?` · 🔁 ${m.unh} محاولة ما وضحت`:"";
-          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(p.created_at)} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}${un}</span></li>`; }).join("")+
+          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(RR.when(p))} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}${un}</span></li>`; }).join("")+
         `</ul>`+(tks.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${tks.length-6} جلسة.</p>`:``)+
         `</div>`;
     }
@@ -415,7 +415,7 @@ async function main(){
         const acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg}%</span></div><ul class="weak">`+
           arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=(p.meta.test||"").replace(subj+" ",""); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
-            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(p.created_at)}</span></li>`; }).join("")+
+            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(RR.when(p))}</span></li>`; }).join("")+
           `</ul></div>`;
       });
     }
@@ -431,7 +431,7 @@ async function main(){
           const arr=otherMap[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
           const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
           return `<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul class="weak">`+
-            arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(p.created_at)}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
+            arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
             `</ul>`; }).join("")+
         `</div>`;
     }
@@ -472,7 +472,7 @@ async function main(){
     rows.forEach((r,i)=>{
       const t=pct(r.en_correct+r.ma_correct,r.en_total+r.ma_total);
       const col=t>=80?"var(--good)":t>=50?"var(--warn)":"var(--bad)";
-      const dt=saTime(r.created_at);
+      const dt=saTime(RR.when(r));
       /* الناقصة تُعرض ولا يُقاس عليها: مقامها عدد ما أجاب لا عدد
          الأسئلة، فنسبتها ليست نسبة ورقةٍ كاملة ولا تُقارن بها. */
       const part=isPartial(r);
@@ -511,7 +511,7 @@ async function main(){
           return h;
         };
         html+=`<details ${pi===0?'open':''} class="card" style="margin-bottom:12px">
-          <summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج ${saTime(r.created_at)} — النتيجة ${tot}/${all} (${pc}%) · إنجليزي ${P.en_correct}/${P.en_total} · رياضيات ${P.ma_correct}/${P.ma_total}</summary>
+          <summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج ${saTime(RR.when(r))} — النتيجة ${tot}/${all} (${pc}%) · إنجليزي ${P.en_correct}/${P.en_total} · رياضيات ${P.ma_correct}/${P.ma_total}</summary>
           <div style="margin-top:8px">${secHtml("الإنجليزي",P.en,true)}${secHtml("الرياضيات",P.ma,false)}</div>
         </details>`;
       });

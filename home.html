@@ -386,7 +386,7 @@ async function loadReport(){
           (aW!=null?' · <b>'+aW+'</b> كلمة/دقيقة':'')+'</li>'+
         prs.slice(0,3).map(function(p){ var m=p.meta;
           return '<li>'+(m.pmode==="passage"?"قطعة":"كلمة")+' · '+(m.test||"")+' — <b>'+pv(p,"pron")+'%</b>'+
-            (pv(p,"comp")!=null?' · اكتمال '+m.comp+'%':'')+' <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+            (pv(p,"comp")!=null?' · اكتمال '+m.comp+'%':'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     // ✍️ التعبير الإنجليزي
@@ -416,7 +416,7 @@ async function loadReport(){
         '<li>💬 <b>'+tks.length+'</b> جلسة محادثة · <b>'+totTurns+'</b> جملة'+(pA?' · متوسط النطق <b>'+pA.pct+'%</b>'+basis(pA):'')+(cA?' · صحّة الجملة <b>'+cA.pct+'%</b>'+basis(cA):'')+'</li>'+
         (RR.talkUnheard(tks)?'<li>🔁 وتكلّم <b>'+RR.talkUnheard(tks)+'</b> مرّة ولم يوضح كلامه فلم تُحسب</li>':'')+
         tks.slice(0,3).map(function(p){ var m=p.meta; var ex=RR.talkLine(m);
-          return '<li>'+(m.topic||"—")+' · <b>'+(m.turns||0)+'</b> جملة'+(typeof m.avgPron==="number"?' · نطق '+m.avgPron+'%':'')+(typeof m.avgCorrect==="number"?' · صحّة '+m.avgCorrect+'%':'')+(ex.length?' · '+ex.join(' · '):'')+' <span class="cnt">'+saTime(p.created_at)+'</span></li>'; }).join("")+
+          return '<li>'+(m.topic||"—")+' · <b>'+(m.turns||0)+'</b> جملة'+(typeof m.avgPron==="number"?' · نطق '+m.avgPron+'%':'')+(typeof m.avgCorrect==="number"?' · صحّة '+m.avgCorrect+'%':'')+(ex.length?' · '+ex.join(' · '):'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
