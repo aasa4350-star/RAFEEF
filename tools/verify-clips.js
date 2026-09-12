@@ -41,6 +41,34 @@ const norm = s => String(s||'').toLowerCase()
    سليمةً، فلا تُحسب خطأً كي يبقى تنبيهُ الأداة ذا معنى. */
 const ARTIFACT = { star:'*', bee:'b', seven:'7', flower:'flour' };
 
+/* ═══ «لم يُفرَّغ» ليس تهمةً على المقطع ═══════════════════════════
+   في فحص ١٢ سبتمبر ٢٠٢٦ رجعت ثلاثة مقاطع بلا نصّ: gate وbread وshell.
+   وأُعيد سؤال أزور عنها ثلاث مرّاتٍ لكلٍّ منها فرجعت فارغةً كلَّها،
+   فبدا أنّها معطوبة. ثمّ قيس مستوى الصوت فيها فإذا هو كمستوى المقاطع
+   السليمة سواءً بسواء (ذروة −٤ دسيبل، ومتوسّط −٢٥) — أي أنّ الكلمة
+   منطوقةٌ فيها والطفل يسمعها، وإنّما المُفرّغ لم يجزم بكلمةٍ مفردةٍ
+   قصيرةٍ بلا سياق.
+
+   فصرنا نُفرّق بينهما: المقطع الصامت عيبٌ حقيقيّ (الطفل لا يسمع
+   شيئًا) فيُعدّ خطأً، والمقطع الذي فيه صوتٌ ولم يُفرَّغ حدُّ أداةٍ لا
+   عيبُ مقطع فيُذكر على حدة. وإلّا فقد التنبيهُ معناه وتُجوهل القائمة. */
+const SILENT_DB = -45;
+function peak(file){
+  /* ffmpeg يكتب القياس على stderr وينهي بنجاح، فنلتقطه من الحالتين */
+  let txt = '';
+  try{
+    txt = execFileSync('ffmpeg', ['-hide_banner','-i',file,'-af','volumedetect','-f','null','/dev/null'],
+      { encoding:'utf8', stdio:['ignore','pipe','pipe'] }) || '';
+  }catch(e){ txt = String((e && (e.stderr || e.stdout)) || ''); }
+  if(!/max_volume/.test(txt)){
+    try{ txt = execFileSync('sh', ['-c',
+      'ffmpeg -hide_banner -i ' + JSON.stringify(file) + ' -af volumedetect -f null /dev/null 2>&1'],
+      { encoding:'utf8' }) || ''; }catch(e){ txt = String((e && (e.stdout||e.stderr)) || ''); }
+  }
+  const m = /max_volume:\s*(-?[\d.]+) dB/.exec(txt);
+  return m ? parseFloat(m[1]) : NaN;
+}
+
 /* نسبة تشابه الكلمات — التفريغ قد يخطئ حرفًا في كلمةٍ طويلة وهذا مقبول،
    أمّا أن يقول كلمةً أخرى بالكلّيّة فذاك ما نبحث عنه. */
 function sim(a, b){
@@ -62,7 +90,7 @@ function sim(a, b){
   let tok = await token(c);
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'clips-'));
   const lang = LANG === 'ar' ? 'ar-SA' : 'en-US';
-  const bad = [], weak = [], gone = [];
+  const bad = [], weak = [], gone = [], mute = [];
   let done = 0;
 
   for(const key of keys){
@@ -88,7 +116,14 @@ function sim(a, b){
     }
     let score = sim(key, text);
     if(ARTIFACT[key] && norm(text) === norm(ARTIFACT[key])) score = 1;
-    if(!text) weak.push({ key, rel, heard:'(لم يُفرَّغ)' });
+    if(!text){
+      /* فارغٌ؟ نسأل الملفّ نفسه: أفيه صوتٌ أصلًا؟ (انظر شرح SILENT_DB) */
+      const db = peak(src);
+      if(isFinite(db) && db <= SILENT_DB)
+        bad.push({ key, rel, heard:'(صامت — ذروته ' + db + ' دسيبل)' });
+      else
+        mute.push({ key, rel, db });
+    }
     else if(score < 0.5) bad.push({ key, rel, heard:text, score });
     else if(score < 0.8) weak.push({ key, rel, heard:text, score });
     done++;
@@ -106,6 +141,12 @@ function sim(a, b){
   if(weak.length){
     console.log('\n⚠️ مقاطعُ التفريغ فيها مختلفٌ جزئيًّا ('+weak.length+') — تُراجَع بالأذن:');
     weak.forEach(w=>console.log('   «'+String(w.key).slice(0,60)+'» ← «'+String(w.heard).slice(0,60)+'»'));
+  }
+  if(mute.length){
+    console.log('\nℹ️ فيها صوتٌ ولم يُفرَّغ ('+mute.length+') — حدُّ الأداة لا عيبُ المقطع،');
+    console.log('   فالكلمة منطوقةٌ فيها بمستوًى سليم والطفل يسمعها:');
+    mute.forEach(w=>console.log('   «'+String(w.key).slice(0,60)+'» — ذروة الصوت '+
+      (isFinite(w.db) ? w.db+' دسيبل' : 'تعذّر قياسها')));
   }
   if(!bad.length && !gone.length) console.log('\n✅ كلّ مقطعٍ يقول نصَّه.');
   process.exit(bad.length || gone.length ? 1 : 0);
