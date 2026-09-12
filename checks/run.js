@@ -12,6 +12,7 @@
    ============================================================ */
 const pages   = require('./pages');
 const answers = require('./answers-en9');
+const answers8= require('./answers-en8');
 const data    = require('./data');
 const audio   = require('./audio');
 const think   = require('./think');
@@ -42,6 +43,12 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
   if (a.bad) a.lines.filter(l => l.includes('❌') || l.includes('⚠️')).forEach(l => console.log(l));
   console.log('  ' + (a.bad ? '❌ أخطاء: ' + a.bad : '✅ ' + a.ok + ' مولّدًا سليمًا'));
   errors += a.bad;
+
+  head('٢ب · صحّة إجابات الإنجليزي — ثاني متوسط');
+  const a8 = answers8();
+  if (a8.bad) a8.lines.filter(l => l.includes('❌') || l.includes('⚠️')).forEach(l => console.log(l));
+  console.log('  ' + (a8.bad ? '❌ أخطاء: ' + a8.bad : '✅ ' + a8.ok + ' مولّدًا سليمًا'));
+  errors += a8.bad;
 
   head('٣ · تغطية الصوت');
   const au = audio();

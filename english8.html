@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الإنجليزي — ثاني متوسط</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<style>
+  :root{
+    --accent:#7c3aed; --accent-deep:#5b21b6;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
+  .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
+  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+  .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .panel{display:none} .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow);font-size:.95rem}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .q .num{font-size:.8rem;color:var(--accent);font-weight:800}
+  .stem{font-weight:700;margin:5px 0 9px;font-size:1.1rem}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .opts{display:grid;gap:8px}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 15px;border-radius:12px;font-size:1.05rem;cursor:pointer;font-family:inherit;direction:ltr;text-align:left;line-height:1.6}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;text-align:left}
+  .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+  .explain.show{max-height:260px;padding:10px 12px}
+  .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
+  .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+function qs(k){ return new URLSearchParams(location.search).get(k); }
+var who = (qs("who")||"rafeef").toLowerCase();
+var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var name = NAMES[who] || "الطالب";
+
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+function saveScore(test, correct, total){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
+
+function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function en(s){ return '<span class="ltr">'+s+'</span>'; }
+/* ثلاثة خيارات متمايزة أو null — والمولّد يُعاد بدل عرض خيارين على الطفل */
+function eOpts(right, cands){
+  var o=[right], i;
+  for(i=0;i<cands.length && o.length<3;i++){ if(cands[i]!=null && o.indexOf(cands[i])<0) o.push(cands[i]); }
+  if(o.length<3) return null;
+  shuffle(o); return [o, o.indexOf(right)];
+}
+/* جملةٌ فيها فراغ: نعرضها كما في الكتاب بخطٍّ سفليّ */
+function blank(s){ return en(s.replace(/_/g, "_____")); }
+
+/* ============================================================
+   الإنجليزي — ثاني متوسط (منهج رفيف · Part 1: الوحدات ١–٨)
+
+   مبنيّ من كتابها نفسه: صفحة المحتويات وجدول Scope and Sequence —
+   فكلّ وحدةٍ هنا تُدرَّب على «الوظائف» و«القواعد» المذكورتين لها في
+   الجدول بالحرف، وبأرقام صفحاتها.
+
+   وما ليس في الصورتين لا نخترعه: نصوص القراءة (Let the Games Begin ·
+   Foods: Truth and Lies) ومفردات الوحدات وتمارين الكتاب ليست عندنا،
+   فلا أسئلة عليها حتى تصل صورُها. والمراجعتان هنا مراجعةُ قواعدَ
+   ولغة (Language Review) كما سمّاهما الجدول، لا أسئلةَ فهمٍ على
+   قطعةٍ لم نقرأها.
+   ============================================================ */
+
+/* ===================== الوحدة ١ — Are You Here on Vacation? (ص ٢–٩) ===================== */
+
+/* القاعدة: المضارع البسيط من الفعل be */
+var BE = [
+  { s:"I", be:"am" }, { s:"He", be:"is" }, { s:"She", be:"is" }, { s:"It", be:"is" },
+  { s:"We", be:"are" }, { s:"You", be:"are" }, { s:"They", be:"are" },
+  { s:"My brother", be:"is" }, { s:"My parents", be:"are" }, { s:"Sara", be:"is" },
+  { s:"Sara and Noura", be:"are" }, { s:"The students", be:"are" }, { s:"The book", be:"is" }
+];
+function u1Be(){
+  var x = gp(BE);
+  var o = eOpts(x.be, ["am","is","are"].filter(function(b){ return b!==x.be; }));
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s+" _ from Saudi Arabia."), o[0].map(en), o[1],
+    "الفعل <span class=ltr>be</span> يتبع الفاعل: <span class=ltr>I → am</span> · <span class=ltr>he/she/it</span> والمفرد <span class=ltr>→ is</span> · <span class=ltr>we/you/they</span> والجمع <span class=ltr>→ are</span>. وهنا الفاعل <span class=ltr>"+x.s+"</span> فالصواب <span class=ltr>"+x.be+"</span>.",
+    "u1be:"+x.s];
+}
+
+/* النفي والاختصار */
+function u1BeNeg(){
+  var x = gp(BE.filter(function(b){ return b.s!=="I"; }));
+  var right = x.be==="is" ? "isn't" : "aren't";
+  var o = eOpts(right, ["isn't","aren't","amn't"].filter(function(b){ return b!==right; }));
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s+" _ at school today."), o[0].map(en), o[1],
+    "نفي <span class=ltr>is</span> هو <span class=ltr>isn't</span>، ونفي <span class=ltr>are</span> هو <span class=ltr>aren't</span>. ولا يوجد في الإنجليزية اختصارٌ اسمه <span class=ltr>amn't</span> — يُقال <span class=ltr>I'm not</span>.",
+    "u1neg:"+x.s];
+}
+
+/* أدوات السؤال: how, what, when, where, who, why */
+var WHQ = [
+  { w:"Where", a:"In Riyadh.",            hint:"المكان" },
+  { w:"When",  a:"At seven o'clock.",     hint:"الوقت" },
+  { w:"Who",   a:"My cousin Noura.",      hint:"الشخص" },
+  { w:"Why",   a:"Because I like it.",    hint:"السبب" },
+  { w:"What",  a:"A notebook and a pen.", hint:"الشيء" },
+  { w:"How",   a:"By bus.",               hint:"الطريقة" },
+  { w:"Where", a:"At the airport.",       hint:"المكان" },
+  { w:"When",  a:"On Friday.",            hint:"الوقت" },
+  { w:"Why",   a:"Because it was late.",  hint:"السبب" },
+  { w:"How",   a:"Very well, thank you.", hint:"الحال" }
+];
+function u1Wh(){
+  var x = gp(WHQ);
+  var pool = ["Where","When","Who","Why","What","How"].filter(function(w){ return w!==x.w; });
+  shuffle(pool);
+  var o = eOpts(x.w, pool);
+  if(!o) return null;
+  return ["أيُّ أداةِ سؤالٍ تناسب هذا الجواب؟ "+en("— "+x.a), o[0].map(en), o[1],
+    "الجواب يدلّ على <b>"+x.hint+"</b>، وأداتُه <span class=ltr>"+x.w+"</span>.",
+    "u1wh:"+x.a];
+}
+
+/* حروف الجرّ المكانية */
+var PREP1 = [
+  { p:"in",       s:"The pen is _ the bag." },
+  { p:"on",       s:"The book is _ the table." },
+  { p:"under",    s:"The ball is _ the chair." },
+  { p:"next to",  s:"The bank is _ the hotel." },
+  { p:"between",  s:"The school is _ the park and the mall." },
+  { p:"behind",   s:"The garden is _ the house." },
+  { p:"in front of", s:"The car is _ the door." },
+  { p:"across from", s:"The mosque is _ the library." }
+];
+function u1Prep(){
+  var x = gp(PREP1);
+  var pool = PREP1.map(function(y){ return y.p; }).filter(function(p){ return p!==x.p; });
+  shuffle(pool);
+  var o = eOpts(x.p, pool);
+  if(!o) return null;
+  return ["اختاري حرف الجرّ المناسب: "+blank(x.s), o[0].map(en), o[1],
+    "<span class=ltr>in</span> داخل · <span class=ltr>on</span> فوق مُلامِسًا · <span class=ltr>under</span> تحت · <span class=ltr>next to</span> بجانب · <span class=ltr>between</span> بين اثنين · <span class=ltr>behind</span> خلف · <span class=ltr>in front of</span> أمام · <span class=ltr>across from</span> مقابل.",
+    "u1prep:"+x.p];
+}
+
+/* الوظائف: التحية والاعتذار والشكر والتعارف */
+var FUNC1 = [
+  { sit:"تقابلين شخصًا لأوّل مرّة",              r:"Nice to meet you.",       w:["See you later.","You're welcome."] },
+  { sit:"تودّعين صديقتك",                        r:"See you tomorrow!",       w:["Nice to meet you.","How do you do it?"] },
+  { sit:"أحدهم شكرك",                            r:"You're welcome.",         w:["I'm sorry.","Nice to meet you."] },
+  { sit:"تأخّرتِ عن الموعد وتعتذرين",            r:"I'm sorry I'm late.",     w:["Thank you very much.","See you later."] },
+  { sit:"تطلبين اسم شخصٍ بأدب",                  r:"What's your name?",       w:["Where are you from?","How old are you?"] },
+  { sit:"تسألين عن بلد شخصٍ",                    r:"Where are you from?",     w:["What's your name?","What time is it?"] },
+  { sit:"تعرّفين صديقتك على أختك",               r:"This is my sister, Sara.", w:["I'm fine, thanks.","See you soon."] },
+  { sit:"أحدهم قال لك شكرًا على هديّة",          r:"You're welcome.",         w:["Excuse me.","Good luck."] },
+  { sit:"تسألين عن الطريق إلى البنك",            r:"Excuse me, where is the bank?", w:["How are you today?","What's your name?"] },
+  { sit:"تشكرين شخصًا ساعدك",                    r:"Thank you for your help.", w:["I'm sorry.","See you later."] }
+];
+function u1Func(){
+  var x = gp(FUNC1);
+  var o = eOpts(x.r, x.w.slice());
+  if(!o) return null;
+  return ["ماذا تقولين حين "+x.sit+"؟", o[0].map(en), o[1],
+    "العبارة المناسبة هنا: <span class=ltr>"+x.r+"</span>.",
+    "u1f:"+x.sit];
+}
+
+/* إرشاد الطريق */
+var DIR1 = [
+  { r:"Go straight ahead.",     ar:"امشِ إلى الأمام مباشرةً" },
+  { r:"Turn left at the corner.", ar:"انعطف يسارًا عند الزاوية" },
+  { r:"Turn right after the bank.", ar:"انعطف يمينًا بعد البنك" },
+  { r:"It's on your left.",     ar:"هو على يسارك" },
+  { r:"It's on your right.",    ar:"هو على يمينك" }
+];
+function u1Dir(){
+  var x = gp(DIR1);
+  var pool = DIR1.filter(function(y){ return y.r!==x.r; }).map(function(y){ return y.r; });
+  shuffle(pool);
+  var o = eOpts(x.r, pool);
+  if(!o) return null;
+  return ["أيُّ جملةٍ معناها: <b>"+x.ar+"</b>؟", o[0].map(en), o[1],
+    "<span class=ltr>"+x.r+"</span> = "+x.ar+".",
+    "u1dir:"+x.r];
+}
+
+/* ===================== الوحدة ٢ — What Are They Making? (ص ١٠–١٧) ===================== */
+
+var PROG = [
+  { s:"I", be:"am" }, { s:"He", be:"is" }, { s:"She", be:"is" },
+  { s:"We", be:"are" }, { s:"They", be:"are" }, { s:"You", be:"are" },
+  { s:"My mother", be:"is" }, { s:"The children", be:"are" }
+];
+var VING = ["making a cake","cooking dinner","reading a book","playing football",
+            "watching TV","writing a letter","studying English","cleaning the room"];
+function u2Prog(){
+  var x = gp(PROG), v = gp(VING);
+  var o = eOpts(x.be, ["am","is","are"].filter(function(b){ return b!==x.be; }));
+  if(!o) return null;
+  return ["المضارع المستمر — اختاري الصحيح: "+blank(x.s+" _ "+v+" now."), o[0].map(en), o[1],
+    "المضارع المستمر = <span class=ltr>be + verb-ing</span>، و<span class=ltr>be</span> يتبع الفاعل. والفاعل <span class=ltr>"+x.s+"</span> يأخذ <span class=ltr>"+x.be+"</span>.",
+    "u2prog:"+x.s];
+}
+
+/* إملاء صيغة ing */
+var ING = [
+  { v:"make",  ing:"making",   why:"فعلٌ ينتهي بـe صامتة ⇐ تُحذف ثمّ نضيف ing" },
+  { v:"write", ing:"writing",  why:"فعلٌ ينتهي بـe صامتة ⇐ تُحذف ثمّ نضيف ing" },
+  { v:"run",   ing:"running",  why:"فعلٌ قصيرٌ ينتهي بحرفٍ ساكنٍ واحدٍ بعد حرف علّة ⇐ يُضاعف الساكن" },
+  { v:"sit",   ing:"sitting",  why:"فعلٌ قصيرٌ ينتهي بحرفٍ ساكنٍ واحدٍ بعد حرف علّة ⇐ يُضاعف الساكن" },
+  { v:"swim",  ing:"swimming", why:"فعلٌ قصيرٌ ينتهي بحرفٍ ساكنٍ واحدٍ بعد حرف علّة ⇐ يُضاعف الساكن" },
+  { v:"study", ing:"studying", why:"الياء تبقى كما هي مع ing — لا تتحوّل" },
+  { v:"play",  ing:"playing",  why:"نضيف ing بلا تغيير" },
+  { v:"cook",  ing:"cooking",  why:"نضيف ing بلا تغيير" },
+  { v:"take",  ing:"taking",   why:"فعلٌ ينتهي بـe صامتة ⇐ تُحذف ثمّ نضيف ing" },
+  { v:"stop",  ing:"stopping", why:"فعلٌ قصيرٌ ينتهي بحرفٍ ساكنٍ واحدٍ بعد حرف علّة ⇐ يُضاعف الساكن" }
+];
+function u2Ing(){
+  var x = gp(ING);
+  var wrong1 = x.v + "ing";                       /* بلا حذفٍ ولا مضاعفة */
+  var wrong2 = x.v.replace(/y$/,"i") + "ing";     /* تحويل الياء خطأً */
+  var cands = [wrong1, wrong2, x.v+"eing", x.v+"ning"].filter(function(w){ return w!==x.ing; });
+  var o = eOpts(x.ing, cands);
+  if(!o) return null;
+  return ["ما صيغة <span class=ltr>ing</span> للفعل "+en(x.v)+"؟", o[0].map(en), o[1],
+    x.why+" ⇐ <span class=ltr>"+x.ing+"</span>.",
+    "u2ing:"+x.v];
+}
+
+/* الأمر والنهي */
+var IMP = [
+  { r:"Open the door, please.",  neg:"Don't open the door." },
+  { r:"Close the window.",       neg:"Don't close the window." },
+  { r:"Listen carefully.",       neg:"Don't listen to that." },
+  { r:"Sit down, please.",       neg:"Don't sit here." },
+  { r:"Mix the flour and water.",neg:"Don't mix them." }
+];
+function u2Imper(){
+  var x = gp(IMP), useNeg = ri(0,1)===1;
+  var right = useNeg ? x.neg : x.r;
+  var base = right.replace(/^Don't /,"").replace(/[.,].*$/,"");
+  var bad1 = useNeg ? ("Not "+base+".") : ("You "+base.toLowerCase()+".");
+  var bad2 = useNeg ? ("No "+base+".")  : ("To "+base.toLowerCase()+".");
+  var o = eOpts(right, [bad1, bad2]);
+  if(!o) return null;
+  return [(useNeg ? "أيُّ صيغة <b>نهي</b> صحيحة؟" : "أيُّ صيغة <b>أمر</b> صحيحة؟"), o[0].map(en), o[1],
+    "الأمر يبدأ بالفعل مجرّدًا بلا فاعل: <span class=ltr>Open the door.</span> والنهي بـ<span class=ltr>Don't</span> + الفعل: <span class=ltr>Don't open the door.</span>",
+    "u2imp:"+right];
+}
+
+/* الاستحسان والاستهجان */
+var APPR = [
+  { r:"That's a great idea!",  ok:true },
+  { r:"I like it very much.",  ok:true },
+  { r:"That looks wonderful!", ok:true },
+  { r:"I don't like it.",      ok:false },
+  { r:"That's not a good idea.",ok:false },
+  { r:"I don't think so.",     ok:false }
+];
+function u2Appr(){
+  var wantOk = ri(0,1)===1;
+  var pool = APPR.filter(function(a){ return a.ok===wantOk; });
+  var right = gp(pool).r;
+  var others = APPR.filter(function(a){ return a.ok!==wantOk; }).map(function(a){ return a.r; });
+  shuffle(others);
+  var o = eOpts(right, others);
+  if(!o) return null;
+  return ["أيُّ عبارةٍ تُعبِّر عن <b>"+(wantOk?"الاستحسان":"عدم الاستحسان")+"</b>؟", o[0].map(en), o[1],
+    "عباراتُ الاستحسان: <span class=ltr>That's a great idea! · I like it. · That looks wonderful!</span><br>وعبارات عدمه: <span class=ltr>I don't like it. · That's not a good idea. · I don't think so.</span>",
+    "u2appr:"+right];
+}
+
+/* ===================== الوحدة ٣ — Who's Who (ص ١٨–٢٥) ===================== */
+
+var JOBS = [
+  { j:"a teacher",   d:"works in a school and helps students learn" },
+  { j:"a doctor",    d:"helps sick people in a hospital" },
+  { j:"a pilot",     d:"flies planes" },
+  { j:"an engineer", d:"designs machines and buildings" },
+  { j:"a nurse",     d:"takes care of patients in a hospital" },
+  { j:"a chef",      d:"cooks food in a restaurant" },
+  { j:"a farmer",    d:"grows plants and keeps animals" },
+  { j:"a dentist",   d:"takes care of people's teeth" },
+  { j:"a journalist",d:"writes news for a newspaper" },
+  { j:"a pharmacist",d:"gives people their medicine" }
+];
+function u3Job(){
+  var x = gp(JOBS);
+  var pool = JOBS.filter(function(y){ return y.j!==x.j; }).map(function(y){ return y.j; });
+  shuffle(pool);
+  var o = eOpts(x.j, pool);
+  if(!o) return null;
+  return ["مَن الذي "+en(x.d)+"؟", o[0].map(en), o[1],
+    "<span class=ltr>"+x.j.replace(/^an? /,"")+"</span> هو مَن <span class=ltr>"+x.d+"</span>.",
+    "u3job:"+x.j];
+}
+
+/* المضارع البسيط: الفعل مع الغائب المفرد */
+var PRES3 = [
+  { s:"He",          v:"work",  f:"works"   },
+  { s:"She",         v:"study", f:"studies" },
+  { s:"My father",   v:"teach", f:"teaches" },
+  { s:"The doctor",  v:"help",  f:"helps"   },
+  { s:"Sara",        v:"go",    f:"goes"    },
+  { s:"It",          v:"watch", f:"watches" },
+  { s:"My brother",  v:"fix",   f:"fixes"   },
+  { s:"The pilot",   v:"fly",   f:"flies"   }
+];
+function u3Pres(){
+  var x = gp(PRES3), plural = ri(0,1)===1;
+  var subj = plural ? "They" : x.s;
+  var right = plural ? x.v : x.f;
+  var o = eOpts(right, [plural ? x.f : x.v, x.v+"ing", "to "+x.v]);
+  if(!o) return null;
+  return ["المضارع البسيط — اختاري الصحيح: "+blank(subj+" _ every day."), o[0].map(en), o[1],
+    "في المضارع البسيط نضيف <span class=ltr>s</span> مع <span class=ltr>he/she/it</span> والمفرد فقط، ولا نضيفها مع <span class=ltr>I/we/you/they</span> والجمع. والفاعل هنا <span class=ltr>"+subj+"</span>.",
+    "u3pres:"+subj+":"+x.v];
+}
+
+/* أسئلة Wh في المضارع البسيط: do / does */
+function u3DoDoes(){
+  var singular = ri(0,1)===1;
+  var subj = singular ? gp(["he","she","your brother","Sara"]) : gp(["they","you","your parents","the students"]);
+  var right = singular ? "does" : "do";
+  var o = eOpts(right, [singular ? "do" : "does", "is", "are"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("Where _ "+subj+" live?"), o[0].map(en), o[1],
+    "في سؤال المضارع البسيط نستعمل <span class=ltr>does</span> مع المفرد الغائب و<span class=ltr>do</span> مع غيره، ويبقى الفعل بعدها <b>مجرّدًا</b>: <span class=ltr>Where does he live?</span>",
+    "u3dd:"+subj];
+}
+
+/* want + infinitive */
+var WANT = [
+  { v:"be",     rest:"a doctor in the future" },
+  { v:"become", rest:"an engineer" },
+  { v:"study",  rest:"medicine at university" },
+  { v:"travel", rest:"to London next summer" },
+  { v:"work",   rest:"in a hospital" },
+  { v:"learn",  rest:"French" },
+  { v:"visit",  rest:"my grandmother on Friday" }
+];
+function u3Want(){
+  var x = gp(WANT);
+  var o = eOpts("to "+x.v, [x.v+"ing", x.v, "for "+x.v]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("I want _ "+x.rest+"."), o[0].map(en), o[1],
+    "بعد الفعل <span class=ltr>want</span> يأتي المصدر بـ<span class=ltr>to</span>: <span class=ltr>want to + verb</span>.",
+    "u3want:"+x.v];
+}
+
+/* الضمائر الموصولة who / that / which */
+var REL = [
+  { s:"The man _ helped me is my uncle.",        r:"who",   why:"للأشخاص" },
+  { s:"The book _ I read was interesting.",      r:"which", why:"للأشياء" },
+  { s:"The woman _ teaches us is very kind.",    r:"who",   why:"للأشخاص" },
+  { s:"The car _ my father bought is new.",      r:"which", why:"للأشياء" },
+  { s:"The student _ won the prize is my friend.", r:"who", why:"للأشخاص" },
+  { s:"The house _ we live in is old.",          r:"which", why:"للأشياء" }
+];
+function u3Rel(){
+  var x = gp(REL);
+  var o = eOpts(x.r, [x.r==="who" ? "which" : "who", "what", "whose"]);
+  if(!o) return null;
+  return ["اختاري الضمير الموصول الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "<span class=ltr>who</span> للأشخاص، و<span class=ltr>which</span> للأشياء، و<span class=ltr>that</span> تصلح للاثنين. وهنا الموصوف "+x.why+" ⇐ <span class=ltr>"+x.r+"</span> (ويصحّ <span class=ltr>that</span> أيضًا).",
+    "u3rel:"+x.s];
+}
+
+/* ===================== الوحدة ٤ — Favorite Pastimes (ص ٢٦–٣٣) ===================== */
+
+/* ظروف التكرار ونسبها */
+var FREQ8 = [
+  { w:"always",    pct:"100%" },
+  { w:"usually",   pct:"about 90%" },
+  { w:"often",     pct:"about 70%" },
+  { w:"sometimes", pct:"about 40%" },
+  { w:"seldom",    pct:"about 10%" },
+  { w:"never",     pct:"0%" }
+];
+function u4FreqWord(){
+  var i = ri(0, FREQ8.length-1), x = FREQ8[i];
+  var pool = FREQ8.filter(function(f){ return f.w!==x.w; }).map(function(f){ return f.w; });
+  shuffle(pool);
+  var o = eOpts(x.w, pool);
+  if(!o) return null;
+  return ["أيُّ ظرفِ تكرارٍ يدلّ على "+en(x.pct)+" من الوقت؟", o[0].map(en), o[1],
+    "سُلَّم التكرار: "+FREQ8.map(function(f){ return "<span class=ltr>"+f.w+"</span> "+f.pct; }).join(" · ")+".",
+    "u4fw:"+x.w];
+}
+
+/* موضع ظرف التكرار: قبل الفعل العاديّ وبعد be */
+function u4FreqPos(){
+  var adv = gp(["always","usually","often","sometimes","never"]);
+  var withBe = ri(0,1)===1;
+  var right = withBe ? ("She is "+adv+" late.") : ("She "+adv+" walks to school.");
+  var bad1  = withBe ? ("She "+adv+" is late.") : ("She walks "+adv+" to school.");
+  var bad2  = withBe ? ("She is late "+adv+".") : (adv+" she walks to school.");
+  var o = eOpts(right, [bad1, bad2]);
+  if(!o) return null;
+  return ["أيُّ جملةٍ ترتيبها صحيح؟", o[0].map(en), o[1],
+    "ظرف التكرار يأتي <b>قبل</b> الفعل العاديّ: <span class=ltr>She always walks…</span>، و<b>بعد</b> الفعل <span class=ltr>be</span>: <span class=ltr>She is always late.</span>",
+    "u4fp:"+(withBe?"be":"v")+":"+adv];
+}
+
+/* عبارات التكرار: once a week … */
+var FREQEX = [
+  { n:1, e:"once a week" }, { n:2, e:"twice a week" }, { n:3, e:"three times a week" },
+  { n:4, e:"four times a month" }, { n:5, e:"five times a year" }
+];
+function u4FreqExpr(){
+  var x = gp(FREQEX);
+  var unit = x.e.split(" a ")[1];
+  var bad1 = x.n===1 ? ("one time a "+unit) : (x.n===2 ? ("two times a "+unit) : ("once a "+unit));
+  var bad2 = x.n+" a "+unit;
+  var o = eOpts(x.e, [bad1, bad2]);
+  if(!o) return null;
+  return ["كيف نقول إنّها تفعل ذلك <b>"+(x.n===1?"مرّةً":(x.n===2?"مرّتين":x.n+" مرّات"))+"</b> في الـ"+
+    (unit==="week"?"أسبوع":unit==="month"?"شهر":"سنة")+"؟", o[0].map(en), o[1],
+    "نقول <span class=ltr>once</span> للمرّة و<span class=ltr>twice</span> للمرّتين، وما فوقهما <span class=ltr>three times, four times…</span>",
+    "u4fe:"+x.e];
+}
+
+/* سؤال How often */
+var HOWOFTEN = [
+  { su:"you",          aux:"do",   v:"play tennis" },
+  { su:"she",          aux:"does", v:"visit her grandmother" },
+  { su:"they",         aux:"do",   v:"go to the club" },
+  { su:"he",           aux:"does", v:"read English books" },
+  { su:"your brother", aux:"does", v:"practice football" },
+  { su:"your friends", aux:"do",   v:"travel in summer" },
+  { su:"Sara",         aux:"does", v:"help at home" },
+  { su:"we",           aux:"do",   v:"eat out" }
+];
+function u4HowOften(){
+  var x = gp(HOWOFTEN);
+  var right = "How often "+x.aux+" "+x.su+" "+x.v+"?";
+  var o = eOpts(right, [
+    "How often "+x.su+" "+x.v+"?",
+    "How many often "+x.aux+" "+x.su+" "+x.v+"?",
+    "How often "+x.aux+" "+x.su+" "+x.v.replace(/^(\w+)/, function(w){ return w+"s"; })+"?"
+  ]);
+  if(!o) return null;
+  return ["أيُّ سؤالٍ صحيح للسؤال عن عدد المرّات؟", o[0].map(en), o[1],
+    "<span class=ltr>How often</span> + <span class=ltr>do/does</span> + الفاعل + الفعل <b>مجرّدًا</b>. والفاعل <span class=ltr>"+x.su+"</span> يأخذ <span class=ltr>"+x.aux+"</span>.",
+    "u4ho:"+x.su+":"+x.v];
+}
+
+/* know how to */
+var KNOWHOW = [
+  { v:"swim",           tail:" very well" },
+  { v:"cook",           tail:" Arabic food" },
+  { v:"drive",          tail:"" },
+  { v:"play the piano", tail:"" },
+  { v:"speak French",   tail:"" },
+  { v:"ride a horse",   tail:"" }
+];
+function u4KnowHow(){
+  var x = gp(KNOWHOW);
+  var o = eOpts("knows how to "+x.v, ["knows how "+x.v, "know how to "+x.v, "knows to "+x.v]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("My sister _"+x.tail+"."), o[0].map(en), o[1],
+    "التركيب: <span class=ltr>know how to + verb</span>. والفاعل مفردٌ غائب فيأخذ <span class=ltr>knows</span>.",
+    "u4kh:"+x.v];
+}
+
+/* الأفعال بعدها gerund أو infinitive */
+var GERINF = [
+  { v:"enjoy",   t:"ger" }, { v:"finish",  t:"ger" }, { v:"practice", t:"ger" },
+  { v:"mind",    t:"ger" }, { v:"avoid",   t:"ger" },
+  { v:"want",    t:"inf" }, { v:"decide",  t:"inf" }, { v:"hope",     t:"inf" },
+  { v:"need",    t:"inf" }, { v:"plan",    t:"inf" }
+];
+function u4GerInf(){
+  var x = gp(GERINF);
+  var right = x.t==="ger" ? "reading" : "to read";
+  var o = eOpts(right, [x.t==="ger" ? "to read" : "reading", "read", "reads"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("She "+x.v+"s _ every night."), o[0].map(en), o[1],
+    "بعد <span class=ltr>"+x.v+"</span> يأتي "+(x.t==="ger"
+      ? "الاسمُ الفعليّ <span class=ltr>verb-ing</span>. ومن أخواتها: <span class=ltr>enjoy · finish · practice · mind · avoid</span>."
+      : "المصدرُ بـ<span class=ltr>to</span>. ومن أخواتها: <span class=ltr>want · decide · hope · need · plan</span>.")+"",
+    "u4gi:"+x.v];
+}
+/* ===================== الوحدة ٥ — Is There Any Ice Cream? (ص ٤٠–٤٧) ===================== */
+
+var NOUNS = [
+  { n:"apple", c:true }, { n:"orange", c:true }, { n:"sandwich", c:true }, { n:"egg", c:true },
+  { n:"banana", c:true }, { n:"tomato", c:true },
+  { n:"rice", c:false }, { n:"milk", c:false }, { n:"bread", c:false }, { n:"water", c:false },
+  { n:"cheese", c:false }, { n:"sugar", c:false }, { n:"coffee", c:false }, { n:"meat", c:false }
+];
+function u5Count(){
+  var wantC = ri(0,1)===1;
+  var right = gp(NOUNS.filter(function(x){ return x.c===wantC; })).n;
+  var others = NOUNS.filter(function(x){ return x.c!==wantC; }).map(function(x){ return x.n; });
+  shuffle(others);
+  var o = eOpts(right, others);
+  if(!o) return null;
+  return ["أيُّ اسمٍ "+(wantC?"<b>معدود</b> (نستطيع عدّه: one, two…)":"<b>غير معدود</b> (لا نعدّه بالأرقام)")+"؟",
+    o[0].map(en), o[1],
+    "المعدود يُجمع ويُعدّ: <span class=ltr>an apple, two apples</span>. وغير المعدود لا يُجمع ولا يُعدّ: <span class=ltr>rice, milk, bread</span> — نعدّه بوحدةٍ مثل <span class=ltr>a glass of milk</span>.",
+    "u5c:"+right];
+}
+
+/* some / any */
+var SOMEANY = [
+  { s:"There is _ milk in the fridge.",     r:"some", t:"مثبتة" },
+  { s:"There isn't _ juice in the bottle.", r:"any",  t:"منفية" },
+  { s:"Is there _ ice cream?",              r:"any",  t:"استفهام" },
+  { s:"I have _ homework tonight.",         r:"some", t:"مثبتة" },
+  { s:"We don't have _ bread at home.",     r:"any",  t:"منفية" },
+  { s:"Do we need _ sugar?",                r:"any",  t:"استفهام" },
+  { s:"She bought _ apples at the market.", r:"some", t:"مثبتة" }
+];
+function u5SomeAny(){
+  var x = gp(SOMEANY);
+  var o = eOpts(x.r, [x.r==="some"?"any":"some", "much", "a"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "<span class=ltr>some</span> في الجملة المثبتة، و<span class=ltr>any</span> في المنفية والاستفهام. والجملة هنا <b>"+x.t+"</b>.",
+    "u5sa:"+x.s];
+}
+
+/* الوحدات (partitives) */
+var PART = [
+  { u:"a bottle of",  n:"water" },  { u:"a glass of",  n:"milk" },
+  { u:"a loaf of",    n:"bread" },  { u:"a slice of",  n:"cheese" },
+  { u:"a cup of",     n:"coffee" }, { u:"a bowl of",   n:"rice" },
+  { u:"a kilo of",    n:"meat" },   { u:"a piece of",  n:"cake" }
+];
+function u5Part(){
+  var x = gp(PART);
+  var pool = PART.filter(function(y){ return y.u!==x.u; }).map(function(y){ return y.u; });
+  shuffle(pool);
+  var o = eOpts(x.u, pool);
+  if(!o) return null;
+  return ["اختاري الوحدة المناسبة: "+blank("Please buy _ "+x.n+"."), o[0].map(en), o[1],
+    "الاسم غير المعدود يُقاس بوحدة: <span class=ltr>"+x.u+" "+x.n+"</span>.",
+    "u5p:"+x.n];
+}
+
+/* too / enough */
+var TOOEN = [
+  { s:"This tea is _ hot. I can't drink it.",       r:"too",    why:"«too + صفة» تعني زيادةً تمنع الفعل" },
+  { s:"He isn't old _ to drive a car.",             r:"enough", why:"«صفة + enough» تعني الكفاية، وتأتي بعد الصفة" },
+  { s:"The box is _ heavy for me to carry.",        r:"too",    why:"«too + صفة» تعني زيادةً تمنع الفعل" },
+  { s:"Is the room big _ for ten students?",        r:"enough", why:"«صفة + enough» تعني الكفاية، وتأتي بعد الصفة" },
+  { s:"It's _ late to go out now.",                 r:"too",    why:"«too + صفة» تعني زيادةً تمنع الفعل" }
+];
+function u5TooEnough(){
+  var x = gp(TOOEN);
+  var o = eOpts(x.r, [x.r==="too"?"enough":"too", "very", "so"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    x.why+". تذكّري: <span class=ltr>too + adjective</span> قبل الصفة، و<span class=ltr>adjective + enough</span> بعدها.",
+    "u5te:"+x.s];
+}
+
+/* would like — شيءٌ بعدها اسم، وفعلٌ بعدها to */
+var WLIKE = [
+  { k:"n", x:"a cup of tea" },   { k:"n", x:"some juice" },
+  { k:"n", x:"a glass of water" },{ k:"n", x:"some soup" },
+  { k:"n", x:"a piece of cake" },
+  { k:"v", x:"order now" },      { k:"v", x:"see the menu" },
+  { k:"v", x:"sit by the window" }, { k:"v", x:"pay by card" }
+];
+function u5WouldLike(){
+  var x = gp(WLIKE), ask = ri(0,1)===1;
+  var core = x.k==="n" ? x.x : ("to "+x.x);
+  var right = ask ? ("Would you like "+core+"?") : ("I'd like "+core+".");
+  var bad1 = ask ? ("Would you like "+(x.k==="n"?"to "+x.x:x.x)+"?")
+                 : ("I'd like "+(x.k==="n"?"to "+x.x:x.x)+".");
+  var bad2 = ask ? ("Would you liking "+core+"?") : ("I'd liking "+core+".");
+  var bad3 = ask ? ("Do you would like "+core+"?") : ("I would like to "+core+".");
+  var o = eOpts(right, [bad1, bad2, bad3]);
+  if(!o) return null;
+  return ["أيُّ جملةٍ صحيحة للتعبير عن الرغبة بأدب؟", o[0].map(en), o[1],
+    "<span class=ltr>would like</span> يتبعها <b>اسم</b> مباشرةً (<span class=ltr>would like some juice</span>)، أو <b>فعلٌ بـ</b><span class=ltr>to</span> (<span class=ltr>would like to order</span>) — ولا نجمع بينهما.",
+    "u5wl:"+x.k+":"+x.x+":"+(ask?"q":"s")];
+}
+
+/* ===================== الوحدة ٦ — What Was It Like? (ص ٤٨–٥٥) ===================== */
+
+var PASTBE = [
+  { s:"I", r:"was" }, { s:"He", r:"was" }, { s:"She", r:"was" }, { s:"It", r:"was" },
+  { s:"We", r:"were" }, { s:"You", r:"were" }, { s:"They", r:"were" },
+  { s:"The weather", r:"was" }, { s:"My friends", r:"were" }, { s:"The shops", r:"were" }
+];
+function u6PastBe(){
+  var x = gp(PASTBE);
+  var o = eOpts(x.r, [x.r==="was"?"were":"was", "is", "are"]);
+  if(!o) return null;
+  return ["الماضي من <span class=ltr>be</span> — اختاري الصحيح: "+blank(x.s+" _ at the beach yesterday."),
+    o[0].map(en), o[1],
+    "<span class=ltr>was</span> مع <span class=ltr>I/he/she/it</span> والمفرد، و<span class=ltr>were</span> مع <span class=ltr>we/you/they</span> والجمع.",
+    "u6pb:"+x.s];
+}
+
+/* الأفعال المنتظمة: إملاء ed */
+var PASTED = [
+  { v:"play",  p:"played",  why:"نضيف ed بلا تغيير" },
+  { v:"watch", p:"watched", why:"نضيف ed بلا تغيير" },
+  { v:"study", p:"studied", why:"ينتهي بـy قبلها ساكن ⇐ تتحوّل الياء إلى i ثمّ ed" },
+  { v:"carry", p:"carried", why:"ينتهي بـy قبلها ساكن ⇐ تتحوّل الياء إلى i ثمّ ed" },
+  { v:"like",  p:"liked",   why:"ينتهي بـe ⇐ نضيف d فقط" },
+  { v:"live",  p:"lived",   why:"ينتهي بـe ⇐ نضيف d فقط" },
+  { v:"stop",  p:"stopped", why:"فعلٌ قصيرٌ ينتهي بساكنٍ بعد حرف علّة ⇐ يُضاعف الساكن" },
+  { v:"plan",  p:"planned", why:"فعلٌ قصيرٌ ينتهي بساكنٍ بعد حرف علّة ⇐ يُضاعف الساكن" }
+];
+function u6PastReg(){
+  var x = gp(PASTED);
+  var cands = [x.v+"ed", x.v+"d", x.v.replace(/y$/,"i")+"ed", x.v+x.v.slice(-1)+"ed"]
+              .filter(function(c){ return c!==x.p; });
+  var o = eOpts(x.p, cands);
+  if(!o) return null;
+  return ["ما ماضي الفعل "+en(x.v)+"؟", o[0].map(en), o[1], x.why+" ⇐ <span class=ltr>"+x.p+"</span>.",
+    "u6pr:"+x.v];
+}
+
+/* الأفعال الشاذّة */
+var IRR = [
+  { v:"go", p:"went" }, { v:"eat", p:"ate" }, { v:"see", p:"saw" }, { v:"buy", p:"bought" },
+  { v:"take", p:"took" }, { v:"come", p:"came" }, { v:"write", p:"wrote" }, { v:"drink", p:"drank" },
+  { v:"give", p:"gave" }, { v:"make", p:"made" }, { v:"find", p:"found" }, { v:"meet", p:"met" }
+];
+function u6PastIrr(){
+  var x = gp(IRR);
+  var pool = IRR.filter(function(y){ return y.p!==x.p; }).map(function(y){ return y.p; });
+  shuffle(pool);
+  var o = eOpts(x.p, [x.v+"ed"].concat(pool));
+  if(!o) return null;
+  return ["ما ماضي الفعل الشاذّ "+en(x.v)+"؟", o[0].map(en), o[1],
+    "<span class=ltr>"+x.v+" → "+x.p+"</span>. والأفعال الشاذّة لا تأخذ <span class=ltr>ed</span> — تُحفظ حفظًا.",
+    "u6pi:"+x.v];
+}
+
+/* سؤال الماضي: did + مصدر */
+function u6PastQ(){
+  var x = gp(IRR);
+  var o = eOpts(x.v, [x.p, x.v+"ed", "to "+x.v]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("What did you _ yesterday?"), o[0].map(en), o[1],
+    "بعد <span class=ltr>did</span> يبقى الفعل <b>مجرّدًا</b> دائمًا، لأنّ <span class=ltr>did</span> حملت الماضي: <span class=ltr>Did you go?</span> لا <span class=ltr>Did you went?</span>",
+    "u6pq:"+x.v];
+}
+
+/* المُقوِّيات مع الصفات */
+function u6Intens(){
+  var adj = gp(["interesting","boring","expensive","beautiful","delicious","crowded"]);
+  var right = "It was really "+adj+".";
+  var o = eOpts(right, ["It was really "+adj+"ly.", "It really was be "+adj+".", "It was a really "+adj+"."]);
+  if(!o) return null;
+  return ["أيُّ جملةٍ صحيحة؟", o[0].map(en), o[1],
+    "المُقوِّيات <span class=ltr>very · really · quite · extremely</span> تأتي <b>قبل الصفة</b> مباشرةً: <span class=ltr>It was really "+adj+".</span>",
+    "u6in:"+adj];
+}
+
+/* ===================== الوحدة ٧ — What Happened? (ص ٥٦–٦٣) ===================== */
+
+function u7There(){
+  var plural = ri(0,1)===1;
+  var noun = plural ? gp(["many people","two cars","some children","a lot of books"])
+                    : gp(["a big tree","one student","an old house","a lot of traffic"]);
+  var right = plural ? "There were" : "There was";
+  var o = eOpts(right, [plural ? "There was" : "There were", "There is", "There are"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank("_ "+noun+" in the street."), o[0].map(en), o[1],
+    "<span class=ltr>There was</span> مع المفرد وغير المعدود، و<span class=ltr>There were</span> مع الجمع. والاسم هنا <b>"+(plural?"جمع":"مفرد")+"</b>.",
+    "u7t:"+noun];
+}
+
+/* ago */
+var AGO = [
+  { s:"I saw him two days _.",         r:"ago",   why:"«ago» تأتي بعد المدّة وتعني «قبل»" },
+  { s:"We traveled _ summer.",         r:"last",  why:"«last» تسبق الزمن: last summer / last week" },
+  { s:"She was born _ 2010.",          r:"in",    why:"«in» مع السنوات والشهور" },
+  { s:"They moved here three years _.",r:"ago",   why:"«ago» تأتي بعد المدّة وتعني «قبل»" },
+  { s:"He called me _ night.",         r:"last",  why:"«last» تسبق الزمن: last night" }
+];
+function u7Ago(){
+  var x = gp(AGO);
+  var o = eOpts(x.r, ["ago","last","in","before"].filter(function(w){ return w!==x.r; }));
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1], x.why+".", "u7a:"+x.s];
+}
+
+/* الضمائر غير المحدّدة */
+var INDEF = [
+  { s:"_ is at the door. I can hear him.",        r:"Someone",  t:"مثبتة ⇐ some-" },
+  { s:"I didn't see _ in the room.",              r:"anyone",   t:"منفية ⇐ any-" },
+  { s:"There is _ in the box. It's empty.",       r:"nothing",  t:"المعنى نفيٌ بلا أداة نفي ⇐ no-" },
+  { s:"Did you buy _ from the shop?",             r:"anything", t:"استفهام ⇐ any-" },
+  { s:"She said _ interesting yesterday.",        r:"something",t:"مثبتة ⇐ some-" },
+  { s:"_ knows the answer. We are all confused.", r:"No one",   t:"المعنى نفيٌ بلا أداة نفي ⇐ no-" }
+];
+function u7Indef(){
+  var x = gp(INDEF);
+  var pool = ["Someone","anyone","nothing","anything","something","No one"].filter(function(w){ return w!==x.r; });
+  shuffle(pool);
+  var o = eOpts(x.r, pool);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "القاعدة: <span class=ltr>some-</span> في المثبت، و<span class=ltr>any-</span> في المنفيّ والاستفهام، و<span class=ltr>no-</span> حين يكون المعنى نفيًا بلا أداة نفي. وهنا: "+x.t+".",
+    "u7i:"+x.s];
+}
+
+/* because / so */
+var BECSO = [
+  { s:"I stayed at home _ it was raining.",       r:"because", why:"ما بعدها <b>سبب</b>" },
+  { s:"It was raining, _ I stayed at home.",      r:"so",      why:"ما بعدها <b>نتيجة</b>" },
+  { s:"She was tired, _ she went to bed early.",  r:"so",      why:"ما بعدها <b>نتيجة</b>" },
+  { s:"He was happy _ he passed the exam.",       r:"because", why:"ما بعدها <b>سبب</b>" },
+  { s:"We were hungry, _ we ordered a pizza.",    r:"so",      why:"ما بعدها <b>نتيجة</b>" }
+];
+function u7BecSo(){
+  var x = gp(BECSO);
+  var o = eOpts(x.r, [x.r==="so"?"because":"so", "but", "or"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "<span class=ltr>because</span> يأتي قبل <b>السبب</b>، و<span class=ltr>so</span> قبل <b>النتيجة</b>. وهنا "+x.why+".",
+    "u7bs:"+x.s];
+}
+
+/* so / neither للموافقة */
+var SONEI = [
+  { s:"I like pizza.",            r:"So do I.",      why:"جملة مثبتة بفعلٍ عاديّ ⇐ So do I" },
+  { s:"I don't like coffee.",     r:"Neither do I.", why:"جملة منفية بفعلٍ عاديّ ⇐ Neither do I" },
+  { s:"I am tired.",              r:"So am I.",      why:"جملة مثبتة بـbe ⇐ So am I" },
+  { s:"I'm not hungry.",          r:"Neither am I.", why:"جملة منفية بـbe ⇐ Neither am I" },
+  { s:"I went to the park.",      r:"So did I.",     why:"جملة مثبتة في الماضي ⇐ So did I" },
+  { s:"I didn't watch the match.",r:"Neither did I.",why:"جملة منفية في الماضي ⇐ Neither did I" }
+];
+function u7SoNeither(){
+  var x = gp(SONEI);
+  var pool = SONEI.filter(function(y){ return y.r!==x.r; }).map(function(y){ return y.r; });
+  shuffle(pool);
+  var o = eOpts(x.r, pool);
+  if(!o) return null;
+  return ["كيف توافقينها؟ "+en("— "+x.s), o[0].map(en), o[1],
+    "للموافقة على <b>مثبت</b> نقول <span class=ltr>So + فعل مساعد + I</span>، وعلى <b>منفيّ</b> <span class=ltr>Neither + فعل مساعد + I</span>. وهنا: "+x.why+".",
+    "u7sn:"+x.s];
+}
+
+/* ===================== الوحدة ٨ — What's Wrong? (ص ٦٤–٧١) ===================== */
+
+var HEALTH = [
+  { sym:"I have a headache.",     adv:"You should take some medicine and rest." },
+  { sym:"I have a toothache.",    adv:"You should see a dentist." },
+  { sym:"I have a sore throat.",  adv:"You should drink warm water." },
+  { sym:"I have a fever.",        adv:"You should stay in bed." },
+  { sym:"I have a stomachache.",  adv:"You shouldn't eat heavy food." },
+  { sym:"I have a cough.",        adv:"You shouldn't drink cold water." }
+];
+function u8Advice(){
+  var x = gp(HEALTH);
+  var pool = HEALTH.filter(function(y){ return y.adv!==x.adv; }).map(function(y){ return y.adv; });
+  shuffle(pool);
+  var o = eOpts(x.adv, pool);
+  if(!o) return null;
+  return ["ما النصيحة المناسبة؟ "+en("— "+x.sym), o[0].map(en), o[1],
+    "النصيحة تُصاغ بـ<span class=ltr>should</span> للمستحسن و<span class=ltr>shouldn't</span> لما يُتجنّب، ويأتي بعدهما الفعل <b>مجرّدًا</b>.",
+    "u8adv:"+x.sym];
+}
+
+function u8Should(){
+  var v = gp(["rest","drink water","see a doctor","go to bed early","eat vegetables"]);
+  var right = "You should "+v+".";
+  var o = eOpts(right, ["You should to "+v+".", "You shoulds "+v+".", "You should "+v.split(" ")[0]+"ing."]);
+  if(!o) return null;
+  return ["أيُّ جملةٍ صحيحة؟", o[0].map(en), o[1],
+    "بعد <span class=ltr>should</span> يأتي الفعل مجرّدًا بلا <span class=ltr>to</span> وبلا <span class=ltr>s</span>.",
+    "u8sh:"+v];
+}
+
+/* جمل when */
+var WHEN8 = [
+  { s:"_ I have a headache, I take some medicine.", r:"When" },
+  { s:"I drink warm water _ I have a sore throat.", r:"when" },
+  { s:"_ she feels tired, she goes to bed early.",  r:"When" },
+  { s:"He stays at home _ he has a fever.",         r:"when" }
+];
+function u8When(){
+  var x = gp(WHEN8);
+  var o = eOpts(x.r, [x.r==="When"?"Because":"because", x.r==="When"?"So":"so", x.r==="When"?"But":"but"]);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "<span class=ltr>when</span> تربط بين حدثين يقع أحدهما وقت الآخر، وتصلح في أوّل الجملة أو وسطها — فإن جاءت أوّلًا وضعنا فاصلةً بين الجملتين.",
+    "u8wh:"+x.s];
+}
+
+/* ضمائر الفاعل والمفعول */
+var PRON8 = [
+  { s:"This is my brother. I see _ every day.", r:"him",  t:"مفعول" },
+  { s:"Sara is my friend. _ lives near us.",    r:"She",  t:"فاعل" },
+  { s:"These are my books. I like _ .",         r:"them", t:"مفعول" },
+  { s:"My parents are doctors. _ work hard.",   r:"They", t:"فاعل" },
+  { s:"Can you help _ ? I'm lost.",             r:"me",   t:"مفعول" },
+  { s:"The cat is hungry. _ wants food.",       r:"It",   t:"فاعل" }
+];
+function u8Pron(){
+  var x = gp(PRON8);
+  var pool = ["him","She","them","They","me","It","he","us"].filter(function(w){ return w!==x.r; });
+  shuffle(pool);
+  var o = eOpts(x.r, pool);
+  if(!o) return null;
+  return ["اختاري الضمير الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "ضمائر <b>الفاعل</b>: <span class=ltr>I, you, he, she, it, we, they</span> — وتأتي قبل الفعل.<br>وضمائر <b>المفعول</b>: <span class=ltr>me, you, him, her, it, us, them</span> — وتأتي بعد الفعل أو حرف الجرّ. وهنا المطلوب <b>"+x.t+"</b>.",
+    "u8pr:"+x.s];
+}
+
+/* الصفات والضمائر الملكية */
+var POSS8 = [
+  { s:"This is _ book. I bought it yesterday.", r:"my",    t:"صفة ملكية (يتبعها اسم)" },
+  { s:"This book is _ .",                       r:"mine",  t:"ضمير ملكية (لا يتبعه اسم)" },
+  { s:"Is this _ pen, Sara?",                   r:"your",  t:"صفة ملكية (يتبعها اسم)" },
+  { s:"The red car is _ , not ours.",           r:"theirs",t:"ضمير ملكية (لا يتبعه اسم)" },
+  { s:"She lost _ keys this morning.",          r:"her",   t:"صفة ملكية (يتبعها اسم)" },
+  { s:"That house is _ .",                      r:"ours",  t:"ضمير ملكية (لا يتبعه اسم)" }
+];
+function u8Poss(){
+  var x = gp(POSS8);
+  var pool = ["my","mine","your","theirs","her","ours","yours","hers"].filter(function(w){ return w!==x.r; });
+  shuffle(pool);
+  var o = eOpts(x.r, pool);
+  if(!o) return null;
+  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+    "<b>الصفة الملكية</b> يتبعها اسم: <span class=ltr>my book · her keys</span>.<br><b>وضمير الملكية</b> يقف وحده: <span class=ltr>mine · yours · hers · ours · theirs</span>. وهنا المطلوب "+x.t+".",
+    "u8po:"+x.s];
+}
+
+/* أجزاء الجسم */
+var BODY = [
+  { a:"الرأس", e:"head" }, { a:"اليد", e:"hand" }, { a:"الرِّجل", e:"leg" },
+  { a:"الأذن", e:"ear" },  { a:"العين", e:"eye" }, { a:"الأنف", e:"nose" },
+  { a:"الأسنان", e:"teeth" }, { a:"الظهر", e:"back" }, { a:"الحلق", e:"throat" },
+  { a:"المعدة", e:"stomach" }
+];
+function u8Body(){
+  var x = gp(BODY);
+  var pool = BODY.filter(function(y){ return y.e!==x.e; }).map(function(y){ return y.e; });
+  shuffle(pool);
+  var o = eOpts(x.e, pool);
+  if(!o) return null;
+  return ["ما معنى <b>"+x.a+"</b> بالإنجليزية؟", o[0].map(en), o[1],
+    "<span class=ltr>"+x.e+"</span> = "+x.a+".", "u8bd:"+x.e];
+}
+
+/* ===================== تجميع المولّدات ===================== */
+var U1 = [u1Be, u1BeNeg, u1Wh, u1Prep, u1Func, u1Dir];
+var U2 = [u2Prog, u2Ing, u2Imper, u2Appr, u1Prep];      /* حروف الجرّ مشتركةٌ بين ١ و٢ كما في الجدول */
+var U3 = [u3Job, u3Pres, u3DoDoes, u3Want, u3Rel];
+var U4 = [u4FreqWord, u4FreqPos, u4FreqExpr, u4HowOften, u4KnowHow, u4GerInf];
+var U5 = [u5Count, u5SomeAny, u5Part, u5TooEnough, u5WouldLike];
+var U6 = [u6PastBe, u6PastReg, u6PastIrr, u6PastQ, u6Intens];
+var U7 = [u7There, u7Ago, u7Indef, u7BecSo, u7SoNeither];
+var U8 = [u8Advice, u8Should, u8When, u8Pron, u8Poss, u8Body];
+var EXP1 = U1.concat(U2, U3, U4);
+var EXP2 = U5.concat(U6, U7, U8);
+/* الاسمان ALLU وALLU2 مقصودان: checks/pages.js يجمع المولّدات من
+   مصفوفاتٍ بهذه الأسماء، وإلّا رجع إلى تخمينها من أسماء الدوالّ
+   فالتقط دوالَّ مساعدةً مثل eOpts وعدّها مولّدًا لا يعمل. */
+var ALLU  = EXP1.slice();
+var ALLU2 = EXP2.slice();
+
+/* نَسِم كلّ سؤالٍ باسم مولّده لنعرف من أيّ وحدةٍ جاء */
+function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+
+var app = document.getElementById("app");
+if(!NAMES[who]){
+  app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابنة، مثل: ?who=rafeef</div>';
+} else {
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+(GRADES[who]||"")+' · الإنجليزي</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
+    '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a><a href="reading.html?who='+who+'">🔊 القراءة</a><a href="talk.html?who='+who+'">🗣️ المحادثة</a></div>'+
+    '<div class="chapsel" id="chapsel"></div>'+
+    '<div class="unit" id="unit"></div>'+
+    '<div class="tabs" role="tablist" id="tabs"></div>'+
+    '<div id="panels"></div>'+
+    '<footer>الإنجليزي · ثاني متوسط · مطابق لجدول <span class="ltr">Scope and Sequence</span> في كتابك · أسئلة جديدة كل مرة</footer>';
+
+  var CFG = {
+    all1:{tab:"اختبار شامل 📝", gens:ALLU, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>1–4</span>.", label:"إنجليزي م٢ — شامل و1-4"},
+    u1:{tab:"1 Vacation", gens:U1, n:10, intro:"<b><span class=ltr>Unit 1 — Are You Here on Vacation?</span> (ص <span class=ltr>2–9</span>):</b> التحية والتعارف والشكر والاعتذار وإرشاد الطريق · المضارع البسيط من <span class=ltr>be</span>، وأدوات السؤال <span class=ltr>how/what/when/where/who/why</span>، وحروف الجرّ المكانية.", label:"إنجليزي م٢ — Unit 1"},
+    u2:{tab:"2 Making", gens:U2, n:10, intro:"<b><span class=ltr>Unit 2 — What Are They Making?</span> (ص <span class=ltr>10–17</span>):</b> الاستحسان وعدمه، والحديث عمّا يجري الآن · المضارع المستمرّ وإملاء <span class=ltr>-ing</span>، وصيغة الأمر والنهي، وحروف الجرّ المكانية.", label:"إنجليزي م٢ — Unit 2"},
+    u3:{tab:"3 Who's Who", gens:U3, n:10, intro:"<b><span class=ltr>Unit 3 — Who's Who</span> (ص <span class=ltr>18–25</span>):</b> وصف المهن والأهداف المهنيّة · المضارع البسيط وأسئلته بـ<span class=ltr>do/does</span>، و<span class=ltr>want + to</span>، والضمائر الموصولة <span class=ltr>who/that/which</span>.", label:"إنجليزي م٢ — Unit 3"},
+    u4:{tab:"4 Pastimes", gens:U4, n:10, intro:"<b><span class=ltr>Unit 4 — Favorite Pastimes</span> (ص <span class=ltr>26–33</span>):</b> الروتين اليوميّ والهوايات والقدرات · <span class=ltr>How often</span>، وعبارات التكرار <span class=ltr>once a week</span>، وظروف التكرار ومواضعها، و<span class=ltr>know how to</span>، والأفعال بعدها <span class=ltr>gerund</span> أو <span class=ltr>infinitive</span>.", label:"إنجليزي م٢ — Unit 4"},
+    exp1:{tab:"مراجعة 1–4 ✅", gens:EXP1, n:10, intro:"<b><span class=ltr>Expansion — Units 1–4</span> (ص <span class=ltr>34–39</span>):</b> مراجعةُ لغةٍ على قواعد الوحدات الأربع كما في <span class=ltr>Language Review</span>.", label:"إنجليزي م٢ — مراجعة 1-4"},
+
+    all2:{tab:"اختبار شامل 📝", gens:ALLU2, n:12, intro:"<b>اختبار شامل</b> على الوحدات <span class=ltr>5–8</span>.", label:"إنجليزي م٢ — شامل و5-8"},
+    u5:{tab:"5 Ice Cream", gens:U5, n:10, intro:"<b><span class=ltr>Unit 5 — Is There Any Ice Cream?</span> (ص <span class=ltr>40–47</span>):</b> الحديث عن الطعام والطلب من القائمة والتفضيل بـ<span class=ltr>would like</span> · المعدود وغير المعدود، و<span class=ltr>some/any</span>، ووحدات الكمّية، و<span class=ltr>too/enough</span>.", label:"إنجليزي م٢ — Unit 5"},
+    u6:{tab:"6 What Was It", gens:U6, n:10, intro:"<b><span class=ltr>Unit 6 — What Was It Like?</span> (ص <span class=ltr>48–55</span>):</b> السؤال عن الماضي ووصفه وإبداء الرأي · الماضي من <span class=ltr>be</span>، والأفعال المنتظمة والشاذّة، والمُقوِّيات مع الصفات.", label:"إنجليزي م٢ — Unit 6"},
+    u7:{tab:"7 Happened", gens:U7, n:10, intro:"<b><span class=ltr>Unit 7 — What Happened?</span> (ص <span class=ltr>56–63</span>):</b> سرد حدثٍ والتعبير عن المشاعر والموافقة · <span class=ltr>There was/were</span>، و<span class=ltr>ago</span>، و<span class=ltr>someone/no one/nothing</span>، و<span class=ltr>because/so</span>، و<span class=ltr>so/neither</span>.", label:"إنجليزي م٢ — Unit 7"},
+    u8:{tab:"8 What's Wrong", gens:U8, n:10, intro:"<b><span class=ltr>Unit 8 — What's Wrong?</span> (ص <span class=ltr>64–71</span>):</b> الصحّة وأجزاء الجسم والأعراض والنصيحة · <span class=ltr>should/shouldn't</span>، وجمل <span class=ltr>when</span>، وضمائر الفاعل والمفعول والصفات والضمائر الملكية.", label:"إنجليزي م٢ — Unit 8"},
+    exp2:{tab:"مراجعة 5–8 ✅", gens:EXP2, n:10, intro:"<b><span class=ltr>Expansion — Units 5–8</span> (ص <span class=ltr>72–77</span>):</b> مراجعةُ لغةٍ على قواعد الوحدات الأربع كما في <span class=ltr>Language Review</span>.", label:"إنجليزي م٢ — مراجعة 5-8"}
+  };
+
+  var CHAPS = {
+    p1:{ name:"الوحدات 1–4", unit:'📘 كتابك · <span class="ltr">Part 1</span> · الوحدات <span class="ltr">1–4</span> ومراجعتها (ص <span class="ltr">2–39</span>)',
+         ids:["u1","u2","u3","u4","exp1","all1"] },
+    p2:{ name:"الوحدات 5–8", unit:'📘 كتابك · <span class="ltr">Part 1</span> · الوحدات <span class="ltr">5–8</span> ومراجعتها (ص <span class="ltr">40–77</span>)',
+         ids:["u5","u6","u7","u8","exp2","all2"] }
+  };
+  var ALL_IDS = ["all1","all2"];
+  var curCh = "p1", curId = "u1";
+
+  function panelOf(id){
+    var pan = document.getElementById("p_"+id);
+    if(!pan){ pan = document.createElement("section"); pan.className="panel"; pan.id="p_"+id; document.getElementById("panels").appendChild(pan); }
+    return pan;
+  }
+  function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
+
+  var REMTOPICS = [
+    {id:"u1", name:"Unit 1 — Vacation",   yt:"شرح verb to be and wh questions ثاني متوسط"},
+    {id:"u2", name:"Unit 2 — Making",     yt:"شرح present continuous and imperative ثاني متوسط"},
+    {id:"u3", name:"Unit 3 — Who's Who",  yt:"شرح simple present and relative pronouns ثاني متوسط"},
+    {id:"u4", name:"Unit 4 — Pastimes",   yt:"شرح adverbs of frequency and gerund infinitive ثاني متوسط"},
+    {id:"exp1",name:"مراجعة 1–4",         yt:"مراجعة انجليزي ثاني متوسط الوحدات الاولى"},
+    {id:"u5", name:"Unit 5 — Ice Cream",  yt:"شرح countable uncountable some any too enough ثاني متوسط"},
+    {id:"u6", name:"Unit 6 — What Was It",yt:"شرح simple past regular irregular verbs ثاني متوسط"},
+    {id:"u7", name:"Unit 7 — Happened",   yt:"شرح there was there were ago because so ثاني متوسط"},
+    {id:"u8", name:"Unit 8 — What's Wrong",yt:"شرح should pronouns possessive adjectives ثاني متوسط"},
+    {id:"exp2",name:"مراجعة 5–8",         yt:"مراجعة انجليزي ثاني متوسط الوحدات الخامسة للثامنة"}
+  ];
+  function ytLinkHtml(id){
+    var rt=null;
+    for(var i=0;i<REMTOPICS.length;i++){ if(REMTOPICS[i].id===id){ rt=REMTOPICS[i]; break; } }
+    if(!rt) return '';
+    return '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(rt.yt||rt.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح الدرس</a></div>';
+  }
+
+  function render(id){
+    var c = CFG[id], sec = panelOf(id);
+    var items = genN(c.gens, c.n);
+    var html = '<div class="intro">'+c.intro+ytLinkHtml(id)+'</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      html += '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
+      '<button class="reset">أسئلة جديدة 🔄</button>';
+    sec.innerHTML = html;
+    var answered={}, correct=0, total=items.length, saved=false;
+    var scoreEl = sec.querySelector("[data-score]");
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click",function(){
+          if(answered[i]) return; answered[i]=1;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          qEl.querySelector(".explain").classList.add("show");
+          scoreEl.textContent = correct+" / "+total;
+          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total); }
+        });
+      });
+    });
+    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); }
+    sec._leave=savePartial; sec._done=function(){ return saved; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+  }
+
+  function drawChap(){
+    var e=document.getElementById("chapsel");
+    e.innerHTML = Object.keys(CHAPS).map(function(c){
+      return '<button data-ch="'+c+'" aria-selected="'+(c===curCh?"true":"false")+'">'+CHAPS[c].name+'</button>';
+    }).join("");
+    e.querySelectorAll("[data-ch]").forEach(function(b){
+      b.addEventListener("click", function(){
+        leaveCur(); curCh=b.dataset.ch; curId=CHAPS[curCh].ids[0];
+        drawChap(); drawTabs(); showPanel(curId);
+      });
+    });
+    document.getElementById("unit").innerHTML = CHAPS[curCh].unit;
+  }
+  function drawTabs(){
+    var t=document.getElementById("tabs");
+    t.innerHTML = CHAPS[curCh].ids.map(function(id){
+      return '<button data-tab="'+id+'" aria-selected="'+(id===curId?"true":"false")+'">'+CFG[id].tab+'</button>';
+    }).join("");
+    t.querySelectorAll("[data-tab]").forEach(function(b){
+      b.addEventListener("click", function(){ leaveCur(); showPanel(b.dataset.tab); });
+    });
+  }
+  function showPanel(id){
+    curId = id;
+    document.querySelectorAll("#tabs [data-tab]").forEach(function(x){ x.setAttribute("aria-selected", x.dataset.tab===id ? "true":"false"); });
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var pan = panelOf(id); pan.classList.add("active");
+    if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+  }
+
+  drawChap(); drawTabs(); showPanel(curId);
+  /* الاختفاء والمغادرة كلاهما يحفظ ما حُلّ — انظر ما وقع لرفيف في ١٠ سبتمبر:
+     نصفُ قسمٍ محلولٌ ضاع لأنّ الحفظ كان معلّقًا على تبديل التبويب وحده. */
+  document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
+  window.addEventListener("pagehide", function(){ leaveCur(); });
+}
+
+</script>
+</body>
+</html>
