@@ -311,6 +311,11 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random
 // حفظ نتيجة التمرين في التقرير (Supabase) لتظهر في لوحة المتابعة
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+/* معرّف المحاولة — انظر شرحه في math8.html: الحفظ الجزئيّ لا يُقفل
+   الجلسة بعده، بل يُدخل صفًّا أكمل بالمعرّف نفسه، وقواعد العرض تُبقي
+   الأكمل (RR.usable). */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
 function saveScore(test, correct, total, extra){
   try{
     var nm = (META[who] && META[who].name) || who;
@@ -1155,10 +1160,10 @@ if(!META[who] || !DATA[who]){
     html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
-    var done={}, tried={}, revealed={}, correct=0, saved=false, total=items.length, scoreEl=sec.querySelector("[data-score]");
+    var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), total=items.length, scoreEl=sec.querySelector("[data-score]");
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function maybeSave(){ if(!saved && Object.keys(tried).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); } }
-    function savePartial(){ if(saved) return; var n=Object.keys(tried).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0)}); }
+    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId}); } }
+    function savePartial(){ var n=Object.keys(tried).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId}); }
     /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
        إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
 
@@ -1443,14 +1448,14 @@ if(!META[who] || !DATA[who]){
     });
     // قراءة القطعة عبر Azure فقط (🎙️ قيّم نطقي) — التسجيل المستمر يفتح الأسئلة بعد القراءة
     var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true, unlockNoMic); }); }
-    var ans={}, correct=0, saved=false, total=questions.length, scoreEl=sec.querySelector("[data-score]");
+    var ans={}, correct=0, saved=false, savedN=0, attId=newPid(), total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var skills={};   /* تسجيل تفصيلي حسب نوع سؤال الاستيعاب */
     function markComp(i, ok){ var g=compSkill(questions[i][0]); var s2=skills[g]||(skills[g]={c:0,t:0}); s2.t++; if(ok) s2.c++; }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     /* بصمة القطعة: بها يعرف التقرير كم مرّة تكرّرت هذه القطعة على الطفل،
        فلا تُقرأ نسبةٌ عاليةٌ ناتجةٌ عن الحفظ على أنّها فهم. */
     var _pid = passageId(passage);
-    function savePartial(){ if(saved) return; var n=Object.keys(ans).length; if(n<3) return; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic}); }
+    function savePartial(){ var n=Object.keys(ans).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId}); }
     /* نفس علّة الإملاء أعلاه: التبويب لا يُنهي الجلسة، والحفظ الجزئيّ
        عند مغادرة الصفحة — وإلّا ضاعت قراءةُ الطفل كلّها إذا انتقل إلى
        صفحةٍ أخرى (بلاغ الأب ٧ سبتمبر ٢٠٢٦). */
@@ -1481,7 +1486,7 @@ if(!META[who] || !DATA[who]){
             var qlb=qrow.querySelector("[data-qlisten]"); if(qlb) qlb.addEventListener("click",function(){ speak(qtext,1,ar?"ar-SA":"en-US"); });
             var qaz=qrow.querySelector(".azbtn"), qfb=qrow.querySelector(".pfb2"); if(qaz) qaz.addEventListener("click",function(){ azureAssess(qtext, ar, qfb, qaz); });
           }
-          if(!saved && Object.keys(ans).length===total){ saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, maxRz:_maxRz, partOnly:_partialOnly}); }
+          if(savedN<total && Object.keys(ans).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, maxRz:_maxRz, partOnly:_partialOnly, pid:attId}); }
         });
       });
     });
@@ -2072,7 +2077,7 @@ if(!META[who] || !DATA[who]){
       '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button></div>';
     sec.innerHTML = html;
 
-    var done={}, tried={}, revealed={}, correct=0, saved=false, advanced=false, total=V.length;
+    var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
     /* كم كلمةً احتاج أن يراها قبل أن يكتبها. نعرضها بجانب الدرجة لأنّ
        «١ / ١٢» وحدها تُقرأ إخفاقًا، وهي في الحقيقة: تذكّر واحدةً وتعلّم
        إحدى عشرة — وهذا ثاني أفضل ما يقع في جلسة مراجعة. */
@@ -2101,10 +2106,10 @@ if(!META[who] || !DATA[who]){
          ووسمُ trusted باقٍ في الصفّ كما هو، فيرى الأب في التقرير أنّ الجلسة
          فيها خروج ويحكم بنفسه — إخبارُ الأب أنفعُ من معاقبة الابن. */
       if(isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
-      if(!saved){ saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL,
+      if(savedN<total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL,
           /* الأرقام الثلاثة للتقرير: ما رآه · ما هو قيد التثبيت · ما يعرفه فعلًا */
           known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
-          dur:dur, away:aw.away, exits:aw.exits, trusted:trusted }); }
+          dur:dur, away:aw.away, exits:aw.exits, trusted:trusted, pid:attId }); }
       if(!trusted){
         doneMsg.className="fb no"; doneMsg.innerHTML="⚠️ عدّادك تقدّم عادي، بس انتبه: خرجت من الصفحة "+aw.exits+" مرة أثناء الحل — لا تفتح تطبيقًا ثانيًا وأنت تذاكر.";
       } else if(isNew && advanced){
@@ -2115,12 +2120,12 @@ if(!META[who] || !DATA[who]){
     }
     // حفظ جزئي للمراجعة: حتى لو ما كمّل كل المجموعة، نحفظ الكلمات اللي جاوبها
     function saveIfPartial(){
-      if(saved || isNew) return;
-      var tn=Object.keys(tried).length; if(tn<3) return;
-      saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
+      if(isNew) return;
+      var tn=Object.keys(tried).length; if(tn<3||tn<=savedN) return;
+      savedN=tn; saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
       saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL,
         known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
-        dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0) });
+        dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId });
     }
     /* ═══ تبديلُ التبويب ليس نهايةَ الجلسة ═══════════════════════════
        بلاغ الأب (٦ سبتمبر ٢٠٢٦): «هم يُتمّون الجلسة أصلًا» — ردًّا على

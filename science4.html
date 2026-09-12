@@ -62,9 +62,19 @@ var name = NAMES[who] || "الطالب";
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total){
+/* ═══ معرّف المحاولة ═══
+   بلاغ الأب (١٢ سبتمبر ٢٠٢٦): «رفيف تقول اليوم حلّت الرياضيات وفي التقرير
+   ما طلع». وكان الحفظ يُقفل بعد أوّل مرّة: إذا خرجت من الصفحة بعد أربعة
+   أسئلة حُفظت ١/٤ ورُفع العلم saved، ثمّ أكملت الدرس كلّه فلم يُحفظ شيء —
+   فيبقى في التقرير ربع الجلسة ويضيع ثلاثة أرباعها. ومفتاحنا يُدخل ولا
+   يُعدّل، فلا سبيل إلى تصحيح الصفّ القديم؛ فنُدخل صفًّا أكمل ونعطي
+   المحاولتين معرّفًا واحدًا (pid)، وقواعد العرض تُبقي الأكمل وتُسقط ما
+   دونه (RR.usable). فلا يضيع جهدُ الطفل ولا يُحسب مرّتين. */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+function saveScore(test, correct, total, pid){
   try{
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null } };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -524,7 +534,7 @@ if(!NAMES[who]){
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
     var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
-    var answered={}, correct=0, total=items.length, saved=false;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -539,12 +549,12 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid);
             if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }

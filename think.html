@@ -679,11 +679,16 @@ function buildSession(weak){
 }
 
 /* ═══ الحفظ — بنفس اصطلاح بقيّة الصفحات، وبتفصيل مهاراتٍ يقرأه التقرير ═══ */
-function saveScore(correct, total, skills){
+/* معرّف المحاولة — انظر شرحه في math8.html: الحفظ الجزئيّ لا يُقفل
+   الجلسة بعده، بل يُدخل صفًّا أكمل بالمعرّف نفسه، وقواعد العرض تُبقي
+   الأكمل (RR.usable). */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+function saveScore(correct, total, skills, pid){
   try{
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
       meta:{ kind:"practice", test:"تقوية التفكير 🧠", correct:correct, total:total,
-             skills:(skills||{}), targeted:true } };
+             skills:(skills||{}), targeted:true, pid:pid||null } };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
@@ -702,7 +707,7 @@ function renderLoading(){
 
 function render(weak, hasData){
   var items = buildSession(weak);
-  var answered = {}, correct = 0, saved = false;
+  var answered = {}, correct = 0, saved = false, savedN = 0, pid = newPid();
   var skillTally = {};
 
   var head =
@@ -759,14 +764,14 @@ function render(weak, hasData){
   function finishIfDone(){
     var n = Object.keys(answered).length;
     if(saved) return;
-    if(n === items.length){ saved = true; saveScore(correct, items.length, skillTally); }
+    if(n === items.length && savedN < n){ savedN = n; saved = true; saveScore(correct, items.length, skillTally, pid); }
   }
   /* حفظٌ جزئيّ إن غادر قبل أن يُكمل — كبقيّة صفحات الموقع، فلا يضيع جهده */
   function savePartial(){
-    if(saved) return;
+    /* لا يُقفل: من حُفظ له جزءٌ ثمّ أكمل، يُحفظ إكماله بالمعرّف نفسه */
     var n = Object.keys(answered).length;
-    if(n < MIN_ASK) return;
-    saved = true; saveScore(correct, n, skillTally);
+    if(n < MIN_ASK || n <= savedN) return;
+    savedN = n; saved = true; saveScore(correct, n, skillTally, pid);
   }
   document.addEventListener("visibilitychange", function(){ if(document.hidden) savePartial(); });
   window.addEventListener("pagehide", function(){ savePartial(); });

@@ -67,12 +67,17 @@ var YOUNG = (who==="saud" || who==="osama"); // الصغار: لفظي + STEP ف
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-function saveScore(test, correct, total, wrongs, skills){
+/* معرّف المحاولة — انظر شرحه في math8.html: الحفظ الجزئيّ لا يُقفل
+   الجلسة بعده، بل يُدخل صفًّا أكمل بالمعرّف نفسه، وقواعد العرض تُبقي
+   الأكمل (RR.usable). */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+function saveScore(test, correct, total, wrongs, skills, pid){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
     // نوسمهما stretch حتى يفصلهما تقرير المستوى ولا يحسبهما ضدّ الطالب.
     var stretch = /تحصيلي|STEP/i.test(test);
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch } };
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null } };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", {
@@ -662,10 +667,16 @@ function renderSet(id, items, intro, regen, label){
 
   // ===== المؤقّت =====
   var tb = sec.querySelector("[data-timer]");
-  var remaining = secsAll, tId = null, started = false, ended = false;
+  var remaining = secsAll, tId = null, started = false, ended = false, savedN = 0, pid = newPid();
   function finish(auto){
-    if(ended) return; ended = true;
+    /* ⚠️ كان الشرط «if(ended) return» — والحفظ الجزئيّ يرفع ended. فمن
+       حُفظ له جزءٌ ثمّ أكمل الأسئلة كلّها لم يُحفظ إكماله أبدًا، ويبقى
+       في التقرير ربعُ جلسته. الآن ended يمنع تكرار الكشف والمؤقّت،
+       ولا يمنع حفظ نتيجةٍ أكمل ممّا حُفظ. */
+    if(ended && savedN >= total) return;
     if(tId){ clearInterval(tId); tId = null; }
+    if(ended){ if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid); } return; }
+    ended = true;
     if(auto){
       sec.querySelectorAll(".q").forEach(function(qEl){
         var i = +qEl.dataset.i;
@@ -679,15 +690,16 @@ function renderSet(id, items, intro, regen, label){
       scoreEl.textContent = correct+" / "+total;
     }
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
-    if(label) saveScore(label, correct, total, wrongs, skills);
+    if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid); }
   }
   // حفظ جزئي: لو بدّل القسم أو طلع قبل ما يكمّل، نحفظ اللي جاوبه (عشان لا يضيع تعبه)
   function savePartial(){
     if(ended) return;
     var n = Object.keys(answered).length;
-    if(n<3 || !label) return;
+    if(n<3 || !label || n<=savedN) return;
+    savedN = n;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
-    saveScore(label, correct, n, wrongs, skills);
+    saveScore(label, correct, n, wrongs, skills, pid);
   }
   sec._leave = savePartial;
   sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };

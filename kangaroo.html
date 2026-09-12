@@ -84,6 +84,16 @@ var VIDEO_Q = {
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+/* ═══ معرّف المحاولة ═══
+   بلاغ الأب (١٢ سبتمبر ٢٠٢٦): «رفيف تقول اليوم حلّت الرياضيات وفي التقرير
+   ما طلع». وكان الحفظ يُقفل بعد أوّل مرّة: إذا خرجت من الصفحة بعد أربعة
+   أسئلة حُفظت ١/٤ ورُفع العلم saved، ثمّ أكملت الدرس كلّه فلم يُحفظ شيء —
+   فيبقى في التقرير ربع الجلسة ويضيع ثلاثة أرباعها. ومفتاحنا يُدخل ولا
+   يُعدّل، فلا سبيل إلى تصحيح الصفّ القديم؛ فنُدخل صفًّا أكمل ونعطي
+   المحاولتين معرّفًا واحدًا (pid)، وقواعد العرض تُبقي الأكمل وتُسقط ما
+   دونه (RR.usable). فلا يضيع جهدُ الطفل ولا يُحسب مرّتين. */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
 function saveScore(test, correct, total, extra){
   try{
     var meta = { kind:"practice", test:test, correct:correct, total:total };
@@ -1439,7 +1449,7 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
-    var answered={}, correct=0, total=items.length, saved=false;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
     var scoreEl = sec.querySelector("[data-score]");
     var t0=Date.now(), lastTs=t0, fast=0;
     /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة، ليعرف التقرير أين الضعف بالضبط */
@@ -1451,10 +1461,10 @@ if(!NAMES[who]){
       var fn=(items[i] && items[i]._fn);
       if(fn){ var r=srRound[fn] || (srRound[fn]={c:0,t:0}); r.t++; if(ok) r.c++; }
     }
-    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills}; }
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; srCommit(kind, srRound); saveScore(c.label, correct, n, meta(n)); }
+    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills, pid:pid}; }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
-    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && !saved){ saved=true; srCommit(kind, srRound); saveScore(c.label, correct, total, meta(total)); } }
+    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, total, meta(total)); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2], correctVal=items[i][1][ans];
       if(input){

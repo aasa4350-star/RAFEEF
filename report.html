@@ -867,7 +867,9 @@ function load(){
   st.style.display = "block"; st.textContent = "جارٍ التحميل...";
   fetchAll()
   .then(function(data){
-    ALL = Array.isArray(data) ? data : [];
+    /* الصفحات تُجلب واحدةً واحدة وRR.usable يُطبَّق على كلٍّ منها، فقد
+       يقع صفّا المحاولة الواحدة في صفحتين. فنُمرّر المجموع مرّةً أخيرة. */
+    ALL = RR.dedupe(Array.isArray(data) ? data : []);
     var withSkills = ALL.filter(function(r){ return r.meta && r.meta.skills; }).length;
     st.style.display = "none";
     if(!withSkills){

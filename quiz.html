@@ -2084,6 +2084,11 @@ if(!STUDENTS[who]){
   const RESULTS = { en:null, ma:null };
   let savedThisRound = false;
   let saveState = "pending"; // pending | ok | fail
+  /* معرّف الجولة: الصفّ الناقص والصفّ الكامل يحملانه معًا، فتُبقي قواعد
+     العرض الأكمل وتُسقط ما دونه (RR.usable) — وإلّا حُسبت الجلسة مرّتين. */
+  let __PIDN = 0;
+  const newPid = ()=> Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7);
+  let roundPid = newPid();
 
   function statusText(){
     return saveState==="ok" ? "✅ تم حفظ النتيجة تلقائيًا لوالدك"
@@ -2245,7 +2250,7 @@ if(!STUDENTS[who]){
       });
       }
     });
-    sec.querySelector(".reset").addEventListener("click",()=>{ build(id); renderResults(); });
+    sec.querySelector(".reset").addEventListener("click",()=>{ roundPid = newPid(); partialSaved = false; savedThisRound = false; build(id); renderResults(); });
   }
 
   function renderResults(){
@@ -2320,7 +2325,7 @@ if(!STUDENTS[who]){
         en_correct: en.correct, en_total: en.total,
         ma_correct: ma.correct, ma_total: ma.total,
         wrong: allWrong.map(a=>({subject:a[0], q:a[1].q, picked:a[1].picked, correct:a[1].correct})),
-        meta: { per, avg_sec: avg, total_sec: total, fast: fast, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0 && fast < Math.ceil(dts.length/2)),
+        meta: { pid: roundPid, per, avg_sec: avg, total_sec: total, fast: fast, away: awayNow().away, exits: awayNow().exits, trusted: (awayNow().exits===0 && fast < Math.ceil(dts.length/2)),
           skills: buildSkills(),
           paper: { date: new Date().toISOString(),
             en_correct: en.correct, en_total: en.total, ma_correct: ma.correct, ma_total: ma.total,
@@ -2393,7 +2398,7 @@ if(!STUDENTS[who]){
       ma_correct: tMa.c, ma_total: doneMa,
       wrong: [...tEn.wrong.map(w=>({subject:"إنجليزي", ...w})),
               ...tMa.wrong.map(w=>({subject:"رياضيات", ...w}))],
-      meta: { partial:true, per:per, skills:sk,
+      meta: { pid: roundPid, partial:true, per:per, skills:sk,
               away: awayNow().away, exits: awayNow().exits,
               asked: (en?en.total:0) + (ma?ma.total:0) }
     });

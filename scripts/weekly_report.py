@@ -140,6 +140,29 @@ def child_section(name, rows, now):
     return "\n".join(lines)
 
 
+def dedupe(rows):
+    """المحاولة الواحدة صفٌّ واحد: الحفظ الجزئيّ ثمّ الإكمال يُدخلان صفّين
+    بمعرّفٍ واحد (meta.pid)، فنُبقي الأكمل — كما تفعل RR.dedupe في المتصفّح.
+    والصفوف بلا pid تبقى كما هي."""
+    best, order = {}, []
+    for r in rows:
+        m = r.get("meta") or {}
+        pid = m.get("pid")
+        if not pid:
+            order.append(r)
+            continue
+        prev = best.get(pid)
+        if prev is None:
+            best[pid] = r
+            order.append(("__pid", pid))
+            continue
+        a = m.get("total") or 0
+        b = (prev.get("meta") or {}).get("total") or 0
+        if a > b or (a == b and parse_ts(r) and parse_ts(prev) and parse_ts(r) > parse_ts(prev)):
+            best[pid] = r
+    return [best[x[1]] if isinstance(x, tuple) else x for x in order]
+
+
 def main():
     try:
         with open(SRC, encoding="utf-8") as f:
@@ -149,6 +172,8 @@ def main():
         data = []
     if not isinstance(data, list):
         data = []
+
+    data = dedupe(data)
 
     now = datetime.datetime.now(datetime.timezone.utc)
     ksa = now + datetime.timedelta(hours=3)
