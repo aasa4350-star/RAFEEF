@@ -1095,6 +1095,37 @@ if(!META[who] || !DATA[who]){
     'كذا يتدرّب على <b>الكتابة والنطق</b> معاً.'+
     '</div>';
 
+  /* ═══ الإملاء يقول ما تعنيه الكلمة ═══════════════════════════════
+     سؤال الأب (١٢ سبتمبر ٢٠٢٦) عن صفحة سعود: «وش معنى كلمة grass؟» —
+     وهو سؤالٌ يكشف الخلل لا يطلب ترجمة: الطفل يسمع كلمةً ويكتبها، وإن
+     أخطأ رأى هجاءها الصحيح وحده. فيتدرّب على نقل الأصوات إلى حروف،
+     ولا يعرف ما كتب. والإملاء بلا معنًى نسخُ صوتٍ لا تعلُّمُ لغة.
+
+     والمعنى موجودٌ عندنا أصلًا — تسعمئة وأربعون كلمةً في بنك المفردات
+     نفسه الذي يذاكر منه — لكنّه كان محبوسًا في قسم الكلمات وحده. فلا
+     نخترع ترجمةً ولا نضيف بنكًا: نقرأ من البنك الموجود، وما لم نجده
+     لا نعرض له شيئًا (ولا نخمّن). */
+  function meaningOf(w){
+    var k = String(w||"").trim().toLowerCase();
+    if(!k || /\s/.test(k)) return "";          /* الجُمل لا تُترجم كلمةً */
+    try{
+      var mine = (typeof VOCAB!=="undefined" && VOCAB && VOCAB[who]) || [];
+      for(var i=0;i<mine.length;i++)
+        if(String(mine[i][0]).toLowerCase()===k) return mine[i][1][0];
+    }catch(e){}
+    try{
+      if(typeof VOCAB300!=="undefined" && VOCAB300)
+        for(var j=0;j<VOCAB300.length;j++)
+          if(String(VOCAB300[j][0]).toLowerCase()===k) return VOCAB300[j][1][0];
+    }catch(e){}
+    return "";
+  }
+  /* تُلحق بالهجاء الصحيح حيثما عُرض */
+  function meanTag(w){
+    var m = meaningOf(w);
+    return m ? ' <span style="font-weight:700;color:var(--muted)">— المعنى: '+m+'</span>' : '';
+  }
+
   function renderDict(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
@@ -1166,7 +1197,7 @@ if(!META[who] || !DATA[who]){
          معالج «تحقّق» أدناه. والكشف قبل المحاولة لا يُحسب صحيحًا. */
       qEl.querySelector("[data-show]").addEventListener("click",function(){
         if(!tried[i]) revealed[i]=1;
-        fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'+
+        fb.className="fb"; fb.innerHTML='الإجابة: <span class="corr">'+text+'</span>'+meanTag(text)+
           (revealed[i] ? '<div style="font-weight:600;font-size:.85rem;opacity:.85;margin-top:4px">👀 شفت الإجابة — عادي، بس ما نحسبها صح.</div>' : '');
       });
       wireMic(qEl, text, ar);
@@ -1192,13 +1223,13 @@ if(!META[who] || !DATA[who]){
           var scored = ok && !revealed[i];
           tried[i]=1;
           if(scored){ done[i]=1; correct++; }
-          if(ok && revealed[i]) { fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، جرّب اللي بعدها بنفسك.'; }
-          else if(ok){ fb.className="fb ok"; fb.textContent="✅ صحيح!"; }
-          else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'; }
+          if(ok && revealed[i]) { fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، جرّب اللي بعدها بنفسك.'+meanTag(text); }
+          else if(ok){ fb.className="fb ok"; fb.innerHTML="✅ صحيح!"+meanTag(text); }
+          else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'+meanTag(text); }
         } else if(ok){
-          fb.className="fb ok"; fb.textContent="✅ صحيح — بس أوّل محاولة هي الأساس في الدرجة.";
+          fb.className="fb ok"; fb.innerHTML="✅ صحيح — بس أوّل محاولة هي الأساس في الدرجة."+meanTag(text);
         } else {
-          fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>';
+          fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'+meanTag(text);
         }
         scoreEl.textContent=correct+" / "+total;
         maybeSave();
