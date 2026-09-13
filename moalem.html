@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الرخصة المهنية — صفحتي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="gate.js"></script>
+<style>
+  :root{
+    --accent:#b45309; --accent-deep:#78350f;
+    --bg:#f6f7fb; --card:#ffffff; --ink:#14202b; --muted:#5b6b78;
+    --line:#e4e9ee; --good:#15803d; --good-bg:#e7f6ec; --warn:#b45309; --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(20,32,43,.05),0 8px 24px rgba(20,32,43,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0b1016;--card:#141b25;--ink:#e7f0f5;--muted:#93a6b2;--line:#22323c60;
+      --good:#4ade80;--good-bg:#12321f;--warn:#fbbf24;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8}
+  .wrap{max-width:680px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;
+    border-radius:22px;padding:26px 22px;box-shadow:var(--shadow);text-align:center}
+  header.top .eyebrow{font-size:.84rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.6rem;font-weight:800}
+  header.top p.sub{margin:8px 0 0;font-size:.92rem;opacity:.92}
+  .subj{display:grid;gap:12px;margin:18px 0}
+  a.tile{display:block;text-decoration:none;color:var(--ink);background:var(--card);
+    border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+  a.tile .ico{font-size:1.9rem;line-height:1}
+  a.tile .nm{font-weight:800;font-size:1.12rem;margin-top:6px}
+  a.tile .ds{color:var(--muted);font-size:.9rem;margin-top:4px}
+  a.tile .go{color:var(--accent);font-weight:800;font-size:.88rem;margin-top:10px}
+  a.tile.hero{border-color:var(--accent);border-width:2px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;
+    box-shadow:var(--shadow);margin-bottom:14px}
+  .box h2{margin:0 0 10px;font-size:1.05rem;font-weight:800}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{text-align:right;padding:7px 4px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:700;font-size:.84rem}
+  td.n{font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-weight:800;font-size:.8rem}
+  .muted{color:var(--muted);font-size:.88rem}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--accent);
+    border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  button.rf{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 15px;
+    border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);font-size:.88rem}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:22px}
+  .en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">اختبارات المعلّمين</p>
+    <h1>🎓 صفحتي</h1>
+    <p class="sub">الرخصة المهنية · مسار التربية الخاصة — أسئلةٌ جديدة كلّ مرّة وشرحٌ لكلّ جواب</p>
+  </header>
+
+  <div class="subj">
+    <a class="tile hero" href="license.html">
+      <div class="ico">🎓</div>
+      <div class="nm">الرخصة المهنية — التربويّ العامّ</div>
+      <div class="ds">نظريات التعلّم · النموّ · بلوم · التخطيط والتدريس · التقويم · إدارة الصفّ · التربية الخاصة · الأخلاقيات</div>
+      <div class="go">١١٥ سؤالًا في ٨ محاور — ابدأ ←</div>
+    </a>
+    <a class="tile" href="khassa.html">
+      <div class="ico">🧩</div>
+      <div class="nm">التخصّصي — اضطراب التوحد</div>
+      <div class="ds">التعريف · الانتشار · النظريات · النواقل العصبية · الخصائص · التشخيص · الفروق والمتلازمات · مبادئ القياس</div>
+      <div class="go">١١٢ سؤالًا في ٨ محاور — ابدأ ←</div>
+    </a>
+  </div>
+
+  <div class="box">
+    <h2>📊 نتائجي <span class="muted" id="st"><span class="spin"></span></span></h2>
+    <div id="res"></div>
+    <div style="text-align:center;margin-top:10px"><button class="rf" id="rf">🔄 تحديث</button></div>
+  </div>
+
+  <footer>صفحةٌ مستقلّة — لا تظهر نتائجها مع نتائج الأبناء</footer>
+</div>
+
+<script>
+var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
+var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var ME = "التربية الخاصة";
+
+function pct(c,t){ return t? Math.round(c/t*100) : 0; }
+function col(p){ return p>=85?"var(--good)" : (p>=70?"#b45309" : "var(--bad)"); }
+function saTime(iso){
+  if(!iso) return "";
+  var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," ");
+  d=new Date(d.getTime()+3*3600*1000);
+  var p=function(n){return String(n).padStart(2,"0");};
+  return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes());
+}
+function when(r){ return (r&&r.meta&&r.meta.at) || (r&&r.created_at) || ""; }
+
+/* أسماء المحاور كما تُحفظ في meta.test — نجمع عليها لنعرف الأضعف */
+function load(){
+  var st=document.getElementById("st"), res=document.getElementById("res");
+  st.innerHTML='<span class="spin"></span>';
+  fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(ME)+"&order=created_at.desc",
+        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(function(rows){
+    rows = Array.isArray(rows)?rows:[];
+    var pr = rows.filter(function(r){ return r.meta && r.meta.kind==="practice" && r.meta.test; });
+    st.textContent = "· "+pr.length+" جلسة";
+    if(!pr.length){
+      res.innerHTML='<div class="muted">ما فيه نتائج بعد. افتح أيّ مادّةٍ فوق وحُلّ محورًا، وترجع نتيجتك هنا تلقائيًّا.</div>';
+      return;
+    }
+    /* نجمع لكلّ محورٍ آخرَ محاولةٍ ومتوسّطه */
+    var by={};
+    pr.forEach(function(p){
+      var k=p.meta.test, e=by[k]||(by[k]={n:0,c:0,t:0,last:null});
+      e.n++; e.c+=(p.meta.correct||0); e.t+=(p.meta.total||0);
+      if(!e.last || when(p)>when(e.last)) e.last=p;
+    });
+    var keys=Object.keys(by).sort(function(a,b){ return pct(by[a].c,by[a].t)-pct(by[b].c,by[b].t); });
+    var totC=0, totT=0; keys.forEach(function(k){ totC+=by[k].c; totT+=by[k].t; });
+    var overall=pct(totC,totT);
+
+    var h='<div style="text-align:center;margin-bottom:12px">'+
+      '<span class="pill" style="background:var(--bg);color:'+col(overall)+';border:1px solid '+col(overall)+'">'+
+      'المستوى العامّ '+overall+'% · '+totC+' من '+totT+' سؤال</span></div>';
+    h+='<table><tr><th>المحور</th><th>النسبة</th><th>جلسات</th><th>آخر مرّة</th></tr>';
+    keys.forEach(function(k){
+      var e=by[k], p=pct(e.c,e.t);
+      h+='<tr><td>'+k.replace(/^(رخصة مهنية|تربية خاصة) — /,"")+
+        ' <span class="muted">'+(/^رخصة/.test(k)?"🎓":"🧩")+'</span></td>'+
+        '<td class="n" style="color:'+col(p)+'">'+p+'%'+(p<70?" ⚠️":(p>=85?" ✅":""))+'</td>'+
+        '<td class="n">'+e.n+'</td>'+
+        '<td class="muted" style="white-space:nowrap">'+saTime(when(e.last)).slice(0,10)+'</td></tr>';
+    });
+    h+='</table>';
+    var weak=keys.filter(function(k){ return pct(by[k].c,by[k].t)<70; });
+    if(weak.length) h+='<div style="margin-top:10px;background:var(--bad-bg);border:1px solid var(--bad);'+
+      'border-radius:12px;padding:10px 12px;font-size:.9rem">⚠️ <b>ركّز على:</b> '+
+      weak.slice(0,3).map(function(k){ return k.replace(/^(رخصة مهنية|تربية خاصة) — /,""); }).join(" · ")+
+      '</div>';
+    res.innerHTML=h;
+  })
+  .catch(function(e){
+    st.textContent="";
+    res.innerHTML='<div class="muted">⚠️ تعذّر تحميل النتائج ('+e.message+'). تأكّد من الاتصال ثمّ اضغط تحديث.</div>';
+  });
+}
+document.getElementById("rf").addEventListener("click", load);
+load();
+</script>
+</body>
+</html>
