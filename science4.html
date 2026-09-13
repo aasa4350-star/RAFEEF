@@ -460,7 +460,11 @@ var FOOD = [
   ["في السلسلة: <b>نبات ← فأر ← أفعى ← نسر</b>، من <b>المفترس الأخير</b>؟",["النسر","الفأر","النبات"],
     "النسر في قمّة هذه السلسلة، يأكل ولا يأكله شيءٌ فيها — ويُسمّى المستهلك الأخير أو المفترس الأعلى."]
 ];
-function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
+/* البنك مكتوبٌ بشكلين: [سؤال، خيارات، شرح] وهو الأصل، و[سؤال، خيارات، 0، شرح]
+   كُتب في توسعةٍ لاحقة. كان الشرح يُقرأ من p[2] دائمًا، فظهر «0» شرحًا في
+   ٣٤ سؤالًا — والشرح هو موضع التعليم في السؤال. نقبل الشكلين. */
+function bankExpl(p){ return (typeof p[2] === "number") ? p[3] : p[2]; }
+function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), bankExpl(p)]; }; }
 var CELLSG=[bankGen(CELLS)], CLASG=[bankGen(CLASSIFY)], INVG=[bankGen(INVERT)], VERTG=[bankGen(VERT)], NUTRIG=[bankGen(NUTRI)], HEALTHG=[bankGen(HEALTH)], ECOG=[bankGen(ECO)], FOODG=[bankGen(FOOD)];
 /* نُعيد استعمال مولّدات الدروس نفسها لا نصنع نسخًا جديدة، فتُعرف
    هُويّة المولّد فيُعرف درسه — وبه يُغذّي الشاملُ «علاجي». */

@@ -93,6 +93,7 @@
     <a href="quiz.html?who=rafeef">📗 اختبار رفيف</a>
     <a href="quiz.html?who=osama">📙 اختبار أسامة</a>
     <a href="quiz.html?who=saud">📕 اختبار سعود</a>
+    <a href="khassa.html?who=khassa">🧩 التربية الخاصة</a>
   </div>
   <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)">
     <div style="font-weight:800;margin-bottom:8px">📚 منهج سعود (مطابق لكتبه)</div>
@@ -148,9 +149,9 @@ function groupTalk(rows){
 }
 const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-const ORDER = ["حسن","رفيف","أسامة","سعود"];
-const EMOJI = {"حسن":"📘","رفيف":"📗","أسامة":"📙","سعود":"📕"};
-const SLUG = {"حسن":"hasan","رفيف":"rafeef","أسامة":"osama","سعود":"saud"};
+const ORDER = ["حسن","رفيف","أسامة","سعود","التربية الخاصة"];
+const EMOJI = {"حسن":"📘","رفيف":"📗","أسامة":"📙","سعود":"📕","التربية الخاصة":"🧩"};
+const SLUG = {"حسن":"hasan","رفيف":"rafeef","أسامة":"osama","سعود":"saud","التربية الخاصة":"khassa"};
 
 function pillColor(p){
   if(p>=80) return "background:var(--good-bg);color:var(--good)";
@@ -314,19 +315,26 @@ function azureQuotaHtml(rows){
     data.filter(row=> row.meta && (row.meta.kind==="practice"||row.meta.kind==="writing"||row.meta.kind==="writing-drill"||row.meta.kind==="talk")).forEach(p=>{ (practiceBy[p.student]=practiceBy[p.student]||[]).push(p); });
     data = data.filter(row=> !(row.meta && (row.meta.kind==="micfail"||row.meta.kind==="activity"||row.meta.kind==="practice"||row.meta.kind==="writing"||row.meta.kind==="writing-drill"||row.meta.kind==="talk")));
     status.textContent = `آخر تحديث: ${new Date().toLocaleString("en-GB",{timeZone:"Asia/Riyadh"})} (السعودية) · ${data.length} محاولة`;
-    if(!data.length){
+    if(!data.length && !Object.keys(practiceBy).length){
       content.innerHTML = `<div class="card empty">ما فيه نتائج بعد.<br>افتح رابط أي ابن من تحت وخلّه يحل الاختبار، وبتظهر نتيجته هنا تلقائيًا.</div>`;
       return;
     }
     const byStudent = {};
     data.forEach(row=>{ (byStudent[row.student] = byStudent[row.student]||[]).push(row); });
+    /* البطاقات كانت تُبنى من صفوف «اختبر نفسك» وحدها، فمن ليس له إلّا صفوف
+       منهجٍ (kind:"practice") لا تظهر له بطاقةٌ أصلًا — وهذا حال «التربية
+       الخاصة» فليس لها اختبر نفسك. نضمّ من له نشاطٌ منهجيّ ولو بلا اختبار. */
+    Object.keys(practiceBy).forEach(n=>{ if(!byStudent[n]) byStudent[n] = []; });
     const names = ORDER.filter(n=>byStudent[n]).concat(Object.keys(byStudent).filter(n=>!ORDER.includes(n)));
     content.innerHTML = names.map(name=>{
       const rows = byStudent[name];
       const d = diagnose(name, rows);
       const weak = weakAreas(rows);
-      const beh = behavior(rows[0]);
-      const grade = rows[0].grade || "";
+      /* قد لا يكون له صفُّ «اختبر نفسك» أصلًا (كالتربية الخاصة)، فنأخذ
+         الرتبة من أوّل صفٍّ منهجيّ، ولا نحسب له «أسلوب الحلّ». */
+      const first = rows[0] || (practiceBy[name]||[])[0] || null;
+      const beh = rows[0] ? behavior(rows[0]) : null;
+      const grade = (first && first.grade) || "";
       const hist = rows.slice(0,8).map(x=>{
         const p = pctOf((x.en_correct+x.ma_correct),(x.en_total+x.ma_total));
         return `<span>${p}%</span>`;
@@ -334,16 +342,19 @@ function azureQuotaHtml(rows){
       return `<div class="card">
         <div class="chead">
           <div class="who">${EMOJI[name]||"👦"} ${name} <small>${grade}</small></div>
-          <div class="pill" style="${pillColor(d.overall)}">${d.overall}%</div>
+          ${rows.length? `<div class="pill" style="${pillColor(d.overall)}">${d.overall}%</div>`:``}
         </div>
-        <div class="grid2">
+        ${rows.length? `<div class="grid2">
           <div class="stat"><div class="lbl">الإنجليزي (متوسط)</div><div class="val">${d.enAvg}%</div>
             <div class="trend">${rows.length} محاولة</div></div>
           <div class="stat"><div class="lbl">الرياضيات (متوسط)</div><div class="val">${d.maAvg}%</div>
             <div class="trend">${rows.length} محاولة</div></div>
         </div>
-        <div class="diag ${d.good?'good':'warn'}">${d.html}</div>
-        ${autoRec(rows)}
+        <div class="diag ${d.good?'good':'warn'}">${d.html}</div>`
+        /* بلا صفوف «اختبر نفسك» تكون المتوسّطات NaN والتشخيص كلامًا لا معنى
+           له («الأضعف عنده الرياضيات» لمن لا يدرس رياضيات) — فنُسقطها. */
+        :``}
+        ${rows.length? autoRec(rows):``}
         ${beh? `<div class="behav ${beh.good?'ok':'no'}">
           <span class="be">${beh.emoji}</span>
           <span><b>أسلوب الحل (آخر محاولة):</b> ${beh.label}${beh.avg!=null? ` · متوسط ${beh.avg}ث/سؤال`:""}</span>
@@ -442,7 +453,7 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
         ${(function(){ var acts=actBy[name]||[]; return acts.length
           ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>{ var dur=(a.meta.event!=="video"&&a.meta.secs)?(" · ⏱️ "+(a.meta.secs>=60?(Math.floor(a.meta.secs/60)+"د "+(a.meta.secs%60)+"ث"):(a.meta.secs+"ث"))):""; return `<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}${dur}</span></li>`; }).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
-        <div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>
+        ${rows.length? `<div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>`:``}
         ${SLUG[name]==="saud"?`<div style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px">
           <div style="font-weight:800;font-size:.92rem;margin-bottom:8px">📚 المنهج الدراسي (مطابق لكتب سعود)</div>
           <div style="display:flex;gap:7px;flex-wrap:wrap">
