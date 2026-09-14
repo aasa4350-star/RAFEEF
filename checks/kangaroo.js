@@ -101,6 +101,65 @@ module.exports = function kangaroo() {
         ' سؤالًا مختلفًا فقط (الحدّ ' + MIN_SECTION + ')' });
   });
 
+  /* ٢ج) ما يراه الطفل فعلًا: نسبة التكرار عبر جولاتٍ متتابعة.
+
+     بلاغ الأب (١٥ سبتمبر ٢٠٢٦): «الاستدلال اللغوي مكرّر جدًّا». وكانت
+     سعة القسم ١٤٥٤ سؤالًا فتبدو وافية، فلم يُنبّه الفحص إلى شيء. لكنّ
+     السعة ليست ما يراه الطفل: المفتاح الذي يمنع التكرار كان يُعرّف
+     أسرة السؤال لا السؤال، فخمسةُ مفاتيح تحجب مئةً وثلاثين سؤالًا،
+     وتمتلئ ذاكرةُ الجولات بها بعد جولتين. والقياس بالمحاكاة أظهر أنّ
+     ٤٣٪ من السحبات كانت مكرّرة — وهذا ما أحسّه الأولاد.
+
+     فصار الفحص يقيس التجربة لا السعة: يُحاكي عشرين جولةً متتابعة
+     بقاعدة منع التكرار نفسها، ويُنبّه إن تجاوز التكرار الخُمس. */
+  const ROUNDS = 20, PER_ROUND = 14, MEM = 120, REPEAT_WARN = 20;
+  Object.keys(SECTIONS).forEach(name => {
+    const gens = K[name];
+    if (!gens || !gens.length) return;
+    let recent = [], seenEver = new Set(), shown = 0, repeats = 0;
+    for (let r = 0; r < ROUNDS; r++) {
+      const seen = {}; recent.forEach(k => seen[k] = 1);
+      const round = [];
+      let guard = 0;
+      while (round.length < PER_ROUND && guard < PER_ROUND * 60) {
+        guard++;
+        const f = gens[Math.floor(Math.random() * gens.length)];
+        let q;
+        try { q = vm.runInContext('(function(f){return f(lvl);})', ctx, { timeout: 2000 })(f); }
+        catch (e) { continue; }
+        if (!q) continue;
+        const k = q[4] || q[0];
+        if (seen[k] || seen[q[0]]) continue;
+        seen[k] = 1; seen[q[0]] = 1; round.push(q);
+      }
+      round.forEach(q => {
+        const k = q[4] || q[0];
+        shown++;
+        if (seenEver.has(k)) repeats++;
+        seenEver.add(k);
+      });
+      recent = round.map(q => q[4] || q[0]).concat(recent).slice(0, MEM);
+    }
+    /* التكرار سببان، وعلاجهما مختلف، فلا يصحّ خلطهما:
+       أ) بنكٌ أصغر من عدد السحبات — تكرارٌ حتميٌّ لا حيلة فيه إلّا توسيع
+          البنك. فنحسب أقلّ تكرارٍ ممكن (السحبات ناقص السعة) ونعُدّه أرضيّة.
+       ب) تكرارٌ فوق تلك الأرضيّة — وهذا خللٌ في مفتاح منع التكرار: القسم
+          يملك أسئلةً لم تُعرض وهو يُعيد المعروض. وهذا ما كان في الاستدلال
+          اللغويّ: السعة ٢٠٤٥ والسحبات ٢٨٠، فالأرضيّة صفر ومع ذلك تكرّر ٤٣٪. */
+    const pct = shown ? Math.round(repeats * 100 / shown) : 0;
+    const cap = caps[name] || 0;
+    const floorRep = Math.max(0, shown - cap);
+    const excessPct = shown ? Math.round((repeats - floorRep) * 100 / shown) : 0;
+    if (excessPct > REPEAT_WARN)
+      issues.push({ sev: 'خطأ', msg: SECTIONS[name] + ' — تكرارٌ زائدٌ عن الحتميّ: ' + pct +
+        '٪ من السحبات مكرّرة والسعة تسمح بـ' + Math.round(floorRep * 100 / shown) +
+        '٪ فقط. القسم يملك أسئلةً لم تُعرض وهو يُعيد المعروض — مفتاح منع التكرار أخشنُ من أسئلته.' });
+    else if (pct > REPEAT_WARN)
+      issues.push({ sev: 'تنبيه', msg: SECTIONS[name] + ' — بنكٌ أصغر من الحاجة: ' + cap +
+        ' سؤالًا مختلفًا، والطفل يسحب ' + shown + ' سحبة في ' + ROUNDS +
+        ' جولة، فيتكرّر ' + pct + '٪ حتمًا. وسِّع البنك إلى ' + shown + ' فأكثر.' });
+  });
+
   /* ٢ب) أسئلة عدّ المثلّثات: نعدّ من الرسم لا من القانون.
 
      هذه الأسئلة وحدها كانت مصدر ٨٠–٩٠٪ من تكرار قسم الاستدلال الرياضي،
