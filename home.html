@@ -315,8 +315,10 @@ async function loadReport(){
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
        «الاختبارات التجريبية» وهو ليس اختبارًا بدرجةٍ من كذا. */
-    var vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[];
+    var vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[];
     practice.forEach(function(p){
+      /* مواد فوق الصفّ تُعزل أوّلًا — تُعرض ولا تدخل أيّ متوسّط */
+      if(window.RR && RR.isPreview(p)){ prevAll.push(p); return; }
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
@@ -440,6 +442,21 @@ async function loadReport(){
             return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span></li>'; }).join("")+
           '</ul></div>';
       });
+    }
+    /* 🔭 مواد فوق الصفّ — يراها الطالب نفسه مفصولةً عن درجاته */
+    if(prevAll.length){
+      var prevBy={}; prevAll.forEach(function(p){ var t=(p.meta.test||""); (prevBy[t]=prevBy[t]||[]).push(p); });
+      var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬"};
+      html+='<div class="card"><div style="font-weight:800;margin-bottom:4px">🔭 مواد فوق صفّك — للاطّلاع</div>'+
+        '<div class="cnt" style="margin-bottom:8px">هذي من صفٍّ بعدك: تُعرض لك ولوالدك، وما تدخل في مستواك.</div>'+
+        Object.keys(prevBy).sort().map(function(t){
+          var arr=prevBy[t].slice().sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; });
+          var sj=t.split(" ")[0];
+          var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
+          return '<div style="font-weight:700;margin:4px 2px 2px">'+(PREV_ICO[sj]||"📘")+' '+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
+            arr.slice(0,3).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span></li>'; }).join("")+
+            '</ul>'; }).join("")+
+        '</div>';
     }
     // الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل») — نفس علّة «قراءة» بالضبط

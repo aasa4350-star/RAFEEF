@@ -68,22 +68,35 @@ var name = NAMES[who] || "الطالب";
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-/* ═══ لا تُحفَظ نتائج الأحياء في قاعدة البيانات ═══════════════════
-   نفس حكم الكيمياء وعلّته نفسها — قرار الأب (٧ سبتمبر ٢٠٢٦): «لا تُدخل
-   مادّة الكيمياء في التقييم لأنّها فوق مستواه، هو لا يزال في ثالث
-   متوسّط، بس أبي يكون عنده تصوّر».
+/* ═══ تُحفَظ النتيجة ولا تدخل التقييم ═══════════════════════════
+   طلب الأب (١٤ سبتمبر ٢٠٢٦): «ما أبيها تُحتسب الكيمياء والأحياء،
+   لكن أبي نتيجة اختباراتها تطلع لي في صفحتي».
 
-   وكتاب الأحياء الذي أرسله (١٤ سبتمبر ٢٠٢٦) أوّل ثانوي كذلك، وحسنٌ
-   ثالث متوسّط كما هو في الموقع كلّه. فلو دخلت درجاتُه فيها التقييمَ
-   لظهر مستواه منخفضًا بمادّةٍ من صفٍّ بعده.
+   وكان الحفظ مقطوعًا من المنبع (٧ سبتمبر) لئلّا تدخل التقييم. وذاك
+   قطعٌ زائدٌ على المطلوب: حرمه من رؤية ما يعمله ابنه. فالصواب أن
+   تُحفظ موسومةً بـ preview، وتُعرض له في قسمٍ مستقلٍّ ظاهرٍ أنّه
+   خارج التقييم.
 
-   والقطع من المنبع أحكم من الاستثناء في التقارير: هذه الصفحة لا ترسل
-   شيئًا إلى قاعدة البيانات أصلًا، فيستحيل أن تظهر في تقييمٍ مهما
-   تغيّرت التقارير لاحقًا. وتقدّمه داخل الصفحة («علاجي» وترتيب الدروس
-   من الأضعف) يبقى عاملًا لأنّه محفوظٌ في متصفّحه.
-   ويحرس هذا checks/pages.js فيمنع رجوعَه سهوًا.
-   فإن أراد الأب احتسابها يومًا، فالتعديل سطرٌ واحدٌ هنا. */
-function saveScore(test, correct, total){ /* استطلاعيّةٌ عمدًا: لا حفظ */ }
+   ووسمُ preview يُقرأ في report-rules.js (RR.isPreview) فتُستثنى من
+   المتوسّطات والتشخيص في الصفحات الأربع جميعًا. ويحرس checks/pages.js
+   أمرين: أنّها تحفظ فعلًا، وأنّ كلّ ما تحفظه موسومٌ بـ preview —
+   فلو سقط الوسم يومًا لوقف الفحصُ التحديثَ قبل أن يصل الأب.
+
+   والمحاولة صفٌّ واحدٌ ولو حُفظت مرّتين (meta.pid) — انظر math8.html. */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+function saveScore(test, correct, total, pid){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
+      meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null, preview:true } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function en(s){ return '<span class="en">'+s+'</span>'; }
@@ -1043,13 +1056,13 @@ if(!NAMES[who]){
     /* نقولها له صراحةً: هذه المادّة فوق صفّه، وهي للاطّلاع لا للدرجة —
        فلا يظنّ نفسه مقصّرًا إن أخطأ فيها، ولا ينتظر ظهورها في تقريره. */
     '<div class="unit" style="font-weight:600;line-height:1.8">👀 هذي المادّة من صفٍّ بعدك (أوّل ثانوي) — حطّيناها لك عشان تاخذ فكرة عنها من الآن. '+
-      '<b>ما تدخل في تقييمك ولا تظهر في تقريرك</b>، فجرّب وارتاح: الغلط هنا ما يضرّك.</div>'+
+      '<b>ما تدخل في تقييمك ولا تُنقص مستواك</b> — بس نتيجتك تطلع لوالدك في قسمٍ خاصّ. فجرّب وارتاح: الغلط هنا ما يضرّك.</div>'+
     '<div class="bar"><a href="chem10.html?who='+who+'">⚗️ الكيمياء</a><a href="science9.html?who='+who+'">🔬 العلوم</a><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>'+
     '<div class="chapsel" id="chapsel"></div>'+
     '<div class="unit" id="unit"></div>'+
     '<div class="tabs" role="tablist" id="tabs"></div>'+
     '<div id="panels"></div>'+
-    '<footer>الأحياء · استطلاعُ مقرّر أوّل ثانوي · لا تدخل التقييم · أسئلة جديدة كل مرة</footer>';
+    '<footer>الأحياء · استطلاعُ مقرّر أوّل ثانوي · خارج التقييم · نتيجتك تصل والدك · أسئلة جديدة كل مرة</footer>';
 
   var CFG = {
     b11:{tab:"1 مدخل إلى الأحياء", gens:B11G, n:10, intro:"<b>١-١ مدخل إلى علم الأحياء:</b> ما الحياة؟ صفات الكائن الحيّ الثماني، ومستويات التنظيم من الخليّة إلى الغلاف الحيويّ، والاتّزان الداخليّ والتكيّف.", label:"أحياء ١ث — 1-1 مدخل إلى علم الأحياء"},
@@ -1138,7 +1151,7 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
-    var answered={}, correct=0, total=items.length, saved=false, savedN=0;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -1153,13 +1166,13 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total);
+          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid);
             if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
     /* الحفظ الجزئيّ لا يُقفل الجلسة بعده — انظر شرحه في math8.html */
-    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }

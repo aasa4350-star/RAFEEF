@@ -265,8 +265,11 @@ async function main(){
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
        «الاختبارات التجريبية» وهو ليس اختبارًا بدرجةٍ من كذا. */
-    const vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[];
+    const vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[];
     practice.forEach(p=>{
+      /* مواد فوق الصفّ تُعزل أوّلًا فلا تختلط بالاختبارات التجريبية — طلب
+         الأب (١٤ سبتمبر ٢٠٢٦) أن يراها في قسمٍ يبيّن أنّها خارج التقييم */
+      if(RR.isPreview(p)){ prevAll.push(p); return; }
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
@@ -426,6 +429,28 @@ async function main(){
        كانت موجودةً في otherMap كلّه: يحتفظ بمحاولةٍ واحدة فقط لكل اسم
        اختبار، فتُخفى بقيّة محاولات قدرات/تحصيلي/STEP/كانجرو المتكرّرة —
        حسنٌ وحده له ٢١ محاولة «قدرات لفظي» ولم تكن تظهر منها إلا واحدة. */
+    /* 🔭 مواد فوق الصفّ — تُعرض ولا تُحتسب (RR.isPreview) */
+    if(prevAll.length){
+      const prevBy={}; prevAll.forEach(p=>{ const t=(p.meta.test||""); (prevBy[t]=prevBy[t]||[]).push(p); });
+      const prevSubj={};
+      Object.keys(prevBy).forEach(t=>{ const sj=t.split(" ")[0]; (prevSubj[sj]=prevSubj[sj]||[]).push(t); });
+      const PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬"};
+      html+=`<div class="sec-title"><span class="dot"></span> مواد فوق الصفّ — استطلاع، لا تدخل التقييم</div>
+        <div class="card">`+
+        Object.keys(prevSubj).sort().map(sj=>{
+          const names=prevSubj[sj].sort();
+          let all=[]; names.forEach(t=>{ all=all.concat(prevBy[t]); });
+          const avg=Math.round(all.reduce((x,p)=>x+pct(p.meta.correct,p.meta.total),0)/all.length);
+          return `<div style="font-weight:700;margin:4px 2px 2px">${PREV_ICO[sj]||"📘"} ${sj} <span class="cnt">(${all.length} جلسة · المتوسط ${avg}%)</span></div><ul class="weak">`+
+            names.map(t=>{
+              const arr=prevBy[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
+              const lesson=t.replace(/^\S+\s+\S+\s*—\s*/,"");   /* «أحياء ١ث — 1-1 …» ⇐ «1-1 …» */
+              return arr.slice(0,3).map(p=>{ const pc=pct(p.meta.correct,p.meta.total);
+                return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span></li>`; }).join("");
+            }).join("")+`</ul>`;
+        }).join("")+
+        `<p class="note" style="margin:6px 2px 0">هذي مقرّرات صفٍّ أعلى — تُعرض لتتابع اطّلاعه عليها، ولا تدخل في «المستوى» ولا في التشخيص.</p></div>`;
+    }
     if(Object.keys(otherMap).length){
       html+=`<div class="sec-title"><span class="dot"></span> الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)</div>
         <div class="card">`+

@@ -106,7 +106,9 @@ function isStretch(r){
 
 /* يجمع تفصيل المهارات لطالب واحد. يستبعد الجلسات غير الموثوقة (خروج/سرعة مريبة). */
 function build(student){
-  var rows = ALL.filter(function(r){ return r.student === student && r.meta && r.meta.skills; });
+  /* مواد فوق الصفّ تُعرض في سجلّ الجلسات ولا تدخل بطاقات المهارات ولا
+     المعدّل — طلب الأب (١٤ سبتمبر ٢٠٢٦). انظر RR.isPreview. */
+  var rows = ALL.filter(function(r){ return r.student === student && r.meta && r.meta.skills && !(window.RR && RR.isPreview(r)); });
   /* الاستبعاد من الحساب باقٍ كما هو — سببه لا يبطل بمرور يومين.
      الذي يسقط هو التنبيه: بعد ٤٨ ساعة لم يعُد فيه ما يُفعل.
      (طلب الأب، ٢٦ أغسطس ٢٠٢٦ — انظر report-rules.js) */
@@ -238,6 +240,7 @@ function sessionsOf(student){
       return { t: m.at || r.created_at,
                name: nameOf(m),
                c: s.c, n: s.t, detailed: !!m.skills,
+               preview: !!(window.RR && RR.isPreview(r)),
                trusted: m.trusted !== false };
     })
     .sort(function(a, b){ return String(b.t).localeCompare(String(a.t)); });
@@ -258,6 +261,7 @@ function sessionsCardHtml(student){
       var p = pct(x.c, x.n);
       return '<li><span class="pill '+cls(p)+'">'+p+'%</span>'+
              '<span class="nm">'+esc(x.name)+
+               (x.preview ? ' <span style="font-weight:700;font-size:.72rem;color:#b45309">🔭 فوق الصفّ · لا تُحتسب</span>' : '')+
                '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+
                  saDate(x.t)+
                  (x.detailed ? ' · بتفصيل مهارات' : '')+

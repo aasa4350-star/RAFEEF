@@ -73,18 +73,35 @@ var name = NAMES[who] || "الطالب";
 
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
-/* ═══ لا تُحفَظ نتائج الكيمياء في قاعدة البيانات ═══
-   طلب الأب صريحٌ: لا تدخل الكيمياء التقييم. وكان يمكن أن نحفظها بوسمٍ
-   خاصٍّ ثمّ نستثنيها في التقارير الأربعة — لكنّ ذلك يترك بابًا: أيّ
-   تعديلٍ لاحقٍ في أيّ تقريرٍ قد يُدخلها سهوًا، فيرى الأبُ مستوى حسن
-   منخفضًا بمادّةٍ فوق صفّه ولا يدري السبب.
+/* ═══ تُحفَظ النتيجة ولا تدخل التقييم ═══════════════════════════
+   طلب الأب (١٤ سبتمبر ٢٠٢٦): «ما أبيها تُحتسب الكيمياء والأحياء،
+   لكن أبي نتيجة اختباراتها تطلع لي في صفحتي».
 
-   فالأحكم أن تُقطع من المنبع: هذه الصفحة لا ترسل شيئًا إلى قاعدة
-   البيانات أصلًا، فيستحيل أن تظهر في تقييمٍ مهما تغيّرت التقارير.
-   وتقدُّمه داخل الصفحة («علاجي» وترتيب الدروس من الأضعف) يبقى عاملًا
-   لأنّه محفوظٌ في متصفّحه لا في قاعدة البيانات.
-   ويحرس هذا checks/pages.js فيمنع رجوعَه سهوًا. */
-function saveScore(test, correct, total){ /* استطلاعيّةٌ عمدًا: لا حفظ */ }
+   وكان الحفظ مقطوعًا من المنبع (٧ سبتمبر) لئلّا تدخل التقييم. وذاك
+   قطعٌ زائدٌ على المطلوب: حرمه من رؤية ما يعمله ابنه. فالصواب أن
+   تُحفظ موسومةً بـ preview، وتُعرض له في قسمٍ مستقلٍّ ظاهرٍ أنّه
+   خارج التقييم.
+
+   ووسمُ preview يُقرأ في report-rules.js (RR.isPreview) فتُستثنى من
+   المتوسّطات والتشخيص في الصفحات الأربع جميعًا. ويحرس checks/pages.js
+   أمرين: أنّها تحفظ فعلًا، وأنّ كلّ ما تحفظه موسومٌ بـ preview —
+   فلو سقط الوسم يومًا لوقف الفحصُ التحديثَ قبل أن يصل الأب.
+
+   والمحاولة صفٌّ واحدٌ ولو حُفظت مرّتين (meta.pid) — انظر math8.html. */
+var __PIDN = 0;
+function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+function saveScore(test, correct, total, pid){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
+      meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null, preview:true } };
+    /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body)
+    });
+  }catch(e){}
+}
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function en(s){ return '<span class="en">'+s+'</span>'; }
@@ -944,13 +961,13 @@ if(!NAMES[who]){
     /* نقولها له صراحةً: هذه المادّة فوق صفّه، وهي للاطّلاع لا للدرجة —
        فلا يظنّ نفسه مقصّرًا إن أخطأ فيها، ولا ينتظر ظهورها في تقريره. */
     '<div class="unit" style="font-weight:600;line-height:1.8">👀 هذي المادّة من صفٍّ بعدك (أوّل ثانوي) — حطّيناها لك عشان تاخذ فكرة عنها من الآن. '+
-      '<b>ما تدخل في تقييمك ولا تظهر في تقريرك</b>، فجرّب وارتاح: الغلط هنا ما يضرّك.</div>'+
+      '<b>ما تدخل في تقييمك ولا تُنقص مستواك</b> — بس نتيجتك تطلع لوالدك في قسمٍ خاصّ. فجرّب وارتاح: الغلط هنا ما يضرّك.</div>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="science9.html?who='+who+'">🔬 العلوم</a><a href="math9.html?who='+who+'">🔢 الرياضيات</a></div>'+
     '<div class="chapsel" id="chapsel"></div>'+
     '<div class="unit" id="unit"></div>'+
     '<div class="tabs" role="tablist" id="tabs"></div>'+
     '<div id="panels"></div>'+
-    '<footer>الكيمياء · استطلاعُ مقرّر أوّل ثانوي · لا تدخل التقييم · أسئلة جديدة كل مرة</footer>';
+    '<footer>الكيمياء · استطلاعُ مقرّر أوّل ثانوي · خارج التقييم · نتيجتك تصل والدك · أسئلة جديدة كل مرة</footer>';
 
   var CFG = {
     c11:{tab:"1 قصّة مادّتين", gens:C11G, n:10, intro:"<b>١-١ قصّة مادّتين:</b> الأوزون ومركّبات الكلوروفلوروكربون — كيف صارت مادّةٌ بدت مثاليّةً سببًا في ثقب الأوزون، ولماذا يُغيّر التركيبُ الخواصَّ.", label:"كيمياء ١ث — 1-1 قصّة مادّتين"},
@@ -1028,7 +1045,7 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
-    var answered={}, correct=0, total=items.length, saved=false;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -1043,12 +1060,13 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid);
             if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    /* الحفظ الجزئيّ لا يُقفل الجلسة بعده — انظر شرحه في math8.html */
+    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }
