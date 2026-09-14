@@ -150,7 +150,7 @@ function conflicts(banks){
 }
 
 /* صفحاتٌ للاطّلاع لا للقياس: نتائجها لا تُحفظ ولا تدخل تقارير الأب */
-const PREVIEW_PAGES = ['chem10.html'];
+const PREVIEW_PAGES = ['chem10.html', 'bio10.html'];
 
 function run(){
   const issues = [];
