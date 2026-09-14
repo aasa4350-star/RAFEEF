@@ -76,7 +76,10 @@ module.exports = function banks() {
         continue;
       }
       let arr;
-      try { arr = vm.runInNewContext('(' + lit + ')', { en: s => s }, { timeout: 5000 }); }
+      /* دوالّ العرض التي تستعملها البنوك داخل نصوص الأسئلة: en تعزل
+         النصّ اللاتينيّ، وfx تعزل الصيغة الرياضيّة (phys10). تُبدَّل
+         بدالّةٍ تُرجع نصّها كما هو، فالمعنيّ هنا حجم البنك لا شكله. */
+      try { arr = vm.runInNewContext('(' + lit + ')', { en: s => s, fx: s => s }, { timeout: 5000 }); }
       catch (e) { issues.push({ sev: 'تنبيه', msg: file + ' — بنك ' + bankName + ' لا يُقوَّم: ' + String(e.message).slice(0, 60) }); continue; }
       if (!Array.isArray(arr) || !arr.length) continue;
 

@@ -383,7 +383,7 @@ if(prevAll.length){
   var prevBy={}; prevAll.forEach(function(p){ var t=(p.meta.test||""); (prevBy[t]=prevBy[t]||[]).push(p); });
   var prevSubj={};
   Object.keys(prevBy).forEach(function(t){ var sj=t.split(" ")[0]; (prevSubj[sj]=prevSubj[sj]||[]).push(t); });
-  var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬"};
+  var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬","فيزياء":"🧲"};
   out+=`<div class="weak" style="border-inline-start:3px solid #b45309">
     <div class="wt">🔭 مواد فوق الصفّ <span class="cnt">(استطلاع — لا تدخل التقييم ولا تُنقص المستوى)</span></div>`;
   Object.keys(prevSubj).sort().forEach(function(sj){

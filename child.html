@@ -434,7 +434,7 @@ async function main(){
       const prevBy={}; prevAll.forEach(p=>{ const t=(p.meta.test||""); (prevBy[t]=prevBy[t]||[]).push(p); });
       const prevSubj={};
       Object.keys(prevBy).forEach(t=>{ const sj=t.split(" ")[0]; (prevSubj[sj]=prevSubj[sj]||[]).push(t); });
-      const PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬"};
+      const PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬","فيزياء":"🧲"};
       html+=`<div class="sec-title"><span class="dot"></span> مواد فوق الصفّ — استطلاع، لا تدخل التقييم</div>
         <div class="card">`+
         Object.keys(prevSubj).sort().map(sj=>{

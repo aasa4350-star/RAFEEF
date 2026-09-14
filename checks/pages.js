@@ -149,8 +149,9 @@ function conflicts(banks){
   return out;
 }
 
-/* صفحاتٌ للاطّلاع لا للقياس: نتائجها لا تُحفظ ولا تدخل تقارير الأب */
-const PREVIEW_PAGES = ['chem10.html', 'bio10.html'];
+/* موادّ فوق صفّ الطالب: تُحفظ نتائجها موسومةً preview فتُعرض للأب
+   في قسمٍ مستقلّ، ولا تدخل متوسّطًا ولا تشخيصًا (RR.isPreview) */
+const PREVIEW_PAGES = ['chem10.html', 'bio10.html', 'phys10.html'];
 
 function run(){
   const issues = [];

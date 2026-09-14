@@ -153,6 +153,8 @@ var SUBJECTS = {
     {href:"chem10.html", ico:"⚗️", nm:"الكيمياء", ds:"استطلاع مقرّر أوّل ثانوي — للاطّلاع، لا تدخل التقييم"},
     /* كتاب الأحياء الذي أرسله الأب (١٤ سبتمبر ٢٠٢٦): أحياء ١ — أوّل ثانوي */
     {href:"bio10.html", ico:"🧬", nm:"الأحياء", ds:"استطلاع مقرّر أوّل ثانوي — ثمانية فصول، لا تدخل التقييم"},
+    /* منهج الفيزياء ١ الذي بحثتُه من مصادر المنهج (١٤ سبتمبر ٢٠٢٦) */
+    {href:"phys10.html", ico:"🧲", nm:"الفيزياء", ds:"استطلاع مقرّر أوّل ثانوي — الفصول ١–٣، لا تدخل التقييم"},
     {href:"lughati9.html", ico:"📗", nm:"لغتي", ds:"مطابق للكتاب — الوحدة الأولى: حقوق وواجبات"},
     {href:"reading.html",  ico:"🔊", nm:"القراءة والاستماع", ds:"إملاء ومفردات"},
     {href:"talk.html",   ico:"🗣️", nm:"محادثة إنجليزية", ds:"تكلّم مثل الحياة — مطعم، مقهى، سوالف", wide:true},
@@ -446,7 +448,7 @@ async function loadReport(){
     /* 🔭 مواد فوق الصفّ — يراها الطالب نفسه مفصولةً عن درجاته */
     if(prevAll.length){
       var prevBy={}; prevAll.forEach(function(p){ var t=(p.meta.test||""); (prevBy[t]=prevBy[t]||[]).push(p); });
-      var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬"};
+      var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬","فيزياء":"🧲"};
       html+='<div class="card"><div style="font-weight:800;margin-bottom:4px">🔭 مواد فوق صفّك — للاطّلاع</div>'+
         '<div class="cnt" style="margin-bottom:8px">هذي من صفٍّ بعدك: تُعرض لك ولوالدك، وما تدخل في مستواك.</div>'+
         Object.keys(prevBy).sort().map(function(t){
