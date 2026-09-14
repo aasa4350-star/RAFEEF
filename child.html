@@ -259,8 +259,18 @@ async function main(){
        من صفٍّ دونه — ولو بقيت جلساتٌ قديمةٌ مسجَّلةً له فيها (سُجّلت
        عبر رابطٍ أُزيل الآن من math5.html). النطاق مُعرَّفٌ بالاسم لا
        بالابن وحده، ليتّسع بسهولةٍ لو تكرّر نظير هذا الموقف. */
-    const HIDE_SUBJ = { osama: ["لغتي"] };
-    const hidden = HIDE_SUBJ[who] || [];
+    /* ⚠️ كان الإخفاء بالمادّة كلّها: { osama: ["لغتي"] } — بلاغ الأب
+       (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ رابع
+       وأسامة صفّ خامس». وكان محقًّا: lughati.html مطابقٌ لكتاب رابع
+       ابتدائي، ولا يصحّ أن يظهر في منهج الخامس مادّةٌ من صفٍّ دونه.
+
+       ثمّ أرسل الأب (١٥ سبتمبر ٢٠٢٦) فهرس كتاب لغتي الخامس، فبُنيت
+       lughati5.html بوسم «لغتي خ٥». فلو بقي الإخفاء بالمادّة لأخفى
+       الجديدَ الصحيح مع القديم الخطأ. فصار الإخفاء بوسم الصفحة
+       القديمة وحدها («لغتي و١» من lughati.html)، فتبقى صفوف الرابع
+       مخفيّةً وتظهر صفوف الخامس. */
+    const HIDE_TESTS = { osama: [/^لغتي و١/] };
+    const hidden = HIDE_TESTS[who] || [];
     const currMap={}, otherMap={};
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
@@ -275,7 +285,7 @@ async function main(){
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
       const t=(p.meta.test||""); const subj=t.split(" ")[0];
-      if(hidden.indexOf(subj)>-1) return;
+      if(hidden.some(function(rx){ return rx.test(t); })) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }

@@ -177,6 +177,8 @@ var SUBJECTS = {
     {href:"quiz.html",   ico:"📝", nm:"اختبر نفسك", ds:"إنجليزي + رياضيات", hero:true},
     {href:"quran.html", ico:"📖", nm:"القرآن", ds:"مراجعة حفظ سورة ص"},
     {href:"english5.html", ico:"🔤", nm:"الإنجليزي", ds:"مطابق للكتاب — الفصل الأول كاملًا: Welcome والوحدات ١–٤"},
+    /* فهرس كتاب لغتي الخامس الذي أرسله الأب (١٥ سبتمبر ٢٠٢٦) */
+    {href:"lughati5.html", ico:"📗", nm:"لغتي", ds:"مطابق لكتابك — الوحدة الأولى: أخلاق وفضائل"},
     {href:"math5.html",  ico:"🔢", nm:"الرياضيات", ds:"مطابق للكتاب — ٦ فصول: العشرية، الضرب، القسمة، المعادلات، الكسور"},
     {href:"reading.html",  ico:"🔊", nm:"القراءة والاستماع", ds:"إملاء ومفردات"},
     {href:"talk.html",   ico:"🗣️", nm:"محادثة إنجليزية", ds:"تكلّم مثل الحياة — مطعم، مقهى، سوالف", wide:true},
@@ -311,8 +313,18 @@ async function loadReport(){
     var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2 && fresh(p))?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits && fresh(p)){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
     /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
        رابع وأسامة صفّ خامس». انظر الشرح الكامل في child.html. */
-    var HIDE_SUBJ = { osama: ["لغتي"] };
-    var hidden = HIDE_SUBJ[who] || [];
+    /* ⚠️ كان الإخفاء بالمادّة كلّها: { osama: ["لغتي"] } — بلاغ الأب
+       (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ رابع
+       وأسامة صفّ خامس». وكان محقًّا: lughati.html مطابقٌ لكتاب رابع
+       ابتدائي، ولا يصحّ أن يظهر في منهج الخامس مادّةٌ من صفٍّ دونه.
+
+       ثمّ أرسل الأب (١٥ سبتمبر ٢٠٢٦) فهرس كتاب لغتي الخامس، فبُنيت
+       lughati5.html بوسم «لغتي خ٥». فلو بقي الإخفاء بالمادّة لأخفى
+       الجديدَ الصحيح مع القديم الخطأ. فصار الإخفاء بوسم الصفحة
+       القديمة وحدها («لغتي و١» من lughati.html)، فتبقى صفوف الرابع
+       مخفيّةً وتظهر صفوف الخامس. */
+    var HIDE_TESTS = { osama: [/^لغتي و١/] };
+    var hidden = HIDE_TESTS[who] || [];
     var currMap={}, otherMap={};
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
@@ -326,7 +338,7 @@ async function loadReport(){
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
       var t=(p.meta.test||""); var subj=t.split(" ")[0];
-      if(hidden.indexOf(subj)>-1) return;
+      if(hidden.some(function(rx){ return rx.test(t); })) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }

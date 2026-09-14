@@ -76,11 +76,16 @@ module.exports = function banks() {
         continue;
       }
       let arr;
-      /* دوالّ العرض التي تستعملها البنوك داخل نصوص الأسئلة: en تعزل
-         النصّ اللاتينيّ، وfx تعزل الصيغة الرياضيّة (phys10). تُبدَّل
-         بدالّةٍ تُرجع نصّها كما هو، فالمعنيّ هنا حجم البنك لا شكله. */
-      try { arr = vm.runInNewContext('(' + lit + ')', { en: s => s, fx: s => s }, { timeout: 5000 }); }
-      catch (e) { issues.push({ sev: 'تنبيه', msg: file + ' — بنك ' + bankName + ' لا يُقوَّم: ' + String(e.message).slice(0, 60) }); continue; }
+      /* دوالّ العرض التي تستعملها البنوك داخل نصوص الأسئلة — تُبدَّل
+         بدالّةٍ تُرجع نصّها كما هو، فالمعنيّ هنا حجم البنك لا شكله:
+           en  عزل النصّ اللاتينيّ عن اتّجاه الصفحة
+           fx  عزل الصيغة الرياضيّة (phys10)
+           sh  إبراز الشاهد اللغويّ (lughati5)
+         ومن أضاف دالّةَ عرضٍ جديدةً في صفحةٍ فليُسجّلها هنا، وإلّا
+         سقط بنكُها من الفحص كلِّه بصمتٍ إلّا من هذا التنبيه. */
+      try { arr = vm.runInNewContext('(' + lit + ')', { en: s => s, fx: s => s, sh: s => s }, { timeout: 5000 }); }
+      catch (e) { issues.push({ sev: 'تنبيه', msg: file + ' — بنك ' + bankName + ' لا يُقوَّم: ' + String(e.message).slice(0, 60) +
+        (/is not defined/.test(e.message) ? ' (دالّةُ عرضٍ غير مسجّلة في checks/banks.js)' : '') }); continue; }
       if (!Array.isArray(arr) || !arr.length) continue;
 
       checked++;
