@@ -284,11 +284,11 @@ async function main(){
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
-      const t=(p.meta.test||""); const subj=t.split(" ")[0];
+      const t=(p.meta.test||""); const subj=RR.subjectOf(t);
       if(hidden.some(function(rx){ return rx.test(t); })) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
-      else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
+      else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
@@ -420,7 +420,7 @@ async function main(){
         `</div>`;
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
-    const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
+    const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
     if(Object.keys(bySubj).length){
       html+=`<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>`;
       ["لغتي","إنجليزي","رياضيات","علوم"].forEach(subj=>{
@@ -429,7 +429,7 @@ async function main(){
         const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
         const acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg}%</span></div><ul class="weak">`+
-          arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=(p.meta.test||"").replace(subj+" ",""); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+          arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=RR.lessonOf(p.meta.test); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(RR.when(p))}</span></li>`; }).join("")+
           `</ul></div>`;
       });

@@ -337,11 +337,11 @@ async function loadReport(){
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
-      var t=(p.meta.test||""); var subj=t.split(" ")[0];
+      var t=(p.meta.test||""); var subj=RR.subjectOf(t);
       if(hidden.some(function(rx){ return rx.test(t); })) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
-      else if(SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
+      else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
     if(vocabAll.length){
@@ -443,7 +443,7 @@ async function loadReport(){
         '</ul></div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
-    var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=t.split(" ")[0]; (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
+    var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
     if(Object.keys(bySubj).length){
       html+='<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>';
       ["لغتي","إنجليزي","رياضيات","علوم"].forEach(function(subj){
@@ -452,7 +452,7 @@ async function loadReport(){
         var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
         var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+avg+'%</span></div><ul class="weak">'+
-          arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=(p.meta.test||"").replace(subj+" ",""); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+          arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span></li>'; }).join("")+
           '</ul></div>';
       });
