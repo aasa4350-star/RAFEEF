@@ -482,14 +482,24 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
           ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>{ var dur=(a.meta.event!=="video"&&a.meta.secs)?(" · ⏱️ "+(a.meta.secs>=60?(Math.floor(a.meta.secs/60)+"د "+(a.meta.secs%60)+"ث"):(a.meta.secs+"ث"))):""; return `<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}${dur}</span></li>`; }).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
         ${rows.length? `<div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>`:``}
-        ${SLUG[name]==="saud"?`<div style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px">
-          <div style="font-weight:800;font-size:.92rem;margin-bottom:8px">📚 المنهج الدراسي (مطابق لكتب سعود)</div>
+        ${(function(){
+          /* اختصارات المنهج الدراسي تحت بطاقة كلّ ابن. كانت مكتوبةً لسعود
+             وحده ومكرّرةً بالاسم الصريح، فلمّا اكتملت كتب أسامة (لغتي
+             وعلوم الخامس، ١٥ سبتمبر ٢٠٢٦) صارت خريطةً باسم الابن،
+             فيُضاف ابنٌ بسطرٍ واحدٍ لا بنسخ الكتلة كلّها. */
+          const CURR = {
+            saud:  [["lughati.html","📗 لغتي"],["english.html","🇬🇧 إنجليزي"],["math4.html","🔢 رياضيات"],["science4.html","🧪 علوم"]],
+            osama: [["lughati5.html","📗 لغتي"],["english5.html","🔤 إنجليزي"],["math5.html","🔢 رياضيات"],["science5.html","🔬 علوم"]]
+          };
+          const slug = SLUG[name], links = CURR[slug];
+          if(!links) return "";
+          const st = 'text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 13px;border-radius:11px;font-weight:700;font-size:.88rem';
+          return `<div style="margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px">
+          <div style="font-weight:800;font-size:.92rem;margin-bottom:8px">📚 المنهج الدراسي (مطابق لكتب ${name})</div>
           <div style="display:flex;gap:7px;flex-wrap:wrap">
-            <a href="lughati.html?who=saud" style="text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 13px;border-radius:11px;font-weight:700;font-size:.88rem">📗 لغتي</a>
-            <a href="english.html?who=saud" style="text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 13px;border-radius:11px;font-weight:700;font-size:.88rem">🇬🇧 إنجليزي</a>
-            <a href="math4.html?who=saud" style="text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 13px;border-radius:11px;font-weight:700;font-size:.88rem">🔢 رياضيات</a>
-            <a href="science4.html?who=saud" style="text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 13px;border-radius:11px;font-weight:700;font-size:.88rem">🧪 علوم</a>
-          </div></div>`:""}
+            ${links.map(l=>`<a href="${l[0]}?who=${slug}" style="${st}">${l[1]}</a>`).join("")}
+          </div></div>`;
+        })()}
         ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
       </div>`;
     }).join("") + azureQuotaHtml(allRows);
