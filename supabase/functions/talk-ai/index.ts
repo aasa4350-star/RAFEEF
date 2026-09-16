@@ -51,8 +51,15 @@ function sys(child: string, topic: string): string {
        ثمّ يبارك كلامًا مقلوبًا. والأسوأ أنّه يحكم على خطأ التفريغ كأنّه خطأ الطفل.
        فصار: ترتيب الكلمات المقلوب خطأٌ لا يُتجاوز، وأُضيف "garbled" ليقول
        النموذج «هذا خطأ تفريغٍ لا خطأ طفل» فلا يُحاسب الطفل عليه أصلًا. */
-    `"garbled" is true when it looks like a speech-to-text failure, not the child: impossible word order, unrelated words,`,
-    `or no answer to your question. Then reply kindly, ask again more simply, leave "correct" false and "fixed" empty —`,
+    /* تضييق garbled (١٦ سبتمبر ٢٠٢٦): كان الشرط يشمل «أو لم يُجب عن سؤالك»،
+       وgarbled يُلغي حكمَ النحو ودرجةَ النطق معًا في talk.html. فالطفل الذي
+       يجيب جوابًا في غير موضوع السؤال — وهذا طبيعيٌّ جدًّا في هذه السنّ —
+       كانت جملته تُهدَر كاملةً وإن كانت سليمةً لغويًّا. والخروج عن السؤال
+       ليس خطأ ميكروفون. فحُذف الشرط، وبقي garbled لدلائل فشل التفريغ وحدها. */
+    `"garbled" is true ONLY when the words look like a speech-to-text failure rather than the child's own sentence:`,
+    `impossible word order, or words unrelated to each other that form no meaning at all.`,
+    `A clear sentence that simply answers something else, or changes the subject, is NOT garbled — grade it normally.`,
+    `When it IS garbled, reply kindly, ask again more simply, leave "correct" false and "fixed" empty —`,
     `never blame the child for a word the microphone invented.`,
     `Respond ONLY with a JSON object, no text before or after it, in exactly this shape: {"reply": "...", "correct": true, "fixed": "", "garbled": false}`,
     topic ? `Current topic: ${topic}.` : "",
