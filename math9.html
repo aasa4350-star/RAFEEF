@@ -164,14 +164,35 @@ function gEqOrderOps(){
 }
 
 /* ص15: مجموعة الحلّ من مجموعة تعويض */
+/* بلاغ حسن: كانت دائمًا «س + a = b» بعملية الجمع وحدها ومجموعة تعويضٍ
+   متتالية — فهو أعلى شكلٍ تكرارًا في الدرس. صارت العمليةُ تتغيّر (جمع/طرح/
+   ضرب/قسمة)، والمتغيّرُ يتغيّر، ومجموعةُ التعويض تتباعد أحيانًا فلا يخمّن
+   بالجار. */
 function gSolutionSet(){
-  var a = ri(2,15), x = ri(10,20), b = x+a;
-  var setv = [x-2,x-1,x,x+1,x+2];
-  var right = "{ "+x+" }";
-  var o = sOpts(right, ["{ "+(x+1)+" }", "{ "+(x-1)+" }", "{ "+b+" }"]);
-  return ["أوجد مجموعة الحلّ للمعادلة "+ax("س + "+a+" = "+b)+" إذا كانت مجموعة التعويض "+ax("{ "+setv.join(" ، ")+" }")+" :",
+  var v  = gp(VARS9);
+  var op = gp(["add","sub","mul","div"]);
+  var x, a, b, left;
+  if(op==="add"){ a=ri(2,15); x=ri(6,20); b=x+a; left=v+" + "+a; }
+  else if(op==="sub"){ a=ri(2,12); x=ri(a+4,25); b=x-a; left=v+" − "+a; }
+  else if(op==="mul"){ a=ri(2,9);  x=ri(2,12); b=x*a; left=a+v; }
+  else { a=ri(2,9); x=a*ri(2,10); b=x/a; left=v+" ÷ "+a; }
+
+  /* مجموعة التعويض: متتاليةٌ حول الحلّ، أو متباعدةٌ فلا ينفع التخمين بالجار */
+  var setv;
+  if(gp([0,1])) setv=[x-2,x-1,x,x+1,x+2];
+  else { var d=gp([3,4,5]); setv=[x-2*d, x-d, x, x+d, x+2*d]; }
+
+  var right = "{ "+fmt(x)+" }";
+  var wrongs = [ "{ "+fmt(setv[1])+" }", "{ "+fmt(setv[3])+" }", "{ "+fmt(b)+" }", "Ø" ];
+  var o = sOpts(right, wrongs);
+  var check = op==="add" ? (fmt(x)+" + "+a+" = "+fmt(b))
+            : op==="sub" ? (fmt(x)+" − "+a+" = "+fmt(b))
+            : op==="mul" ? (a+" × "+fmt(x)+" = "+fmt(b))
+            :              (fmt(x)+" ÷ "+a+" = "+fmt(b));
+  return ["أوجد مجموعة الحلّ للمعادلة "+ax(left+" = "+fmt(b))+" إذا كانت مجموعة التعويض "+ax("{ "+setv.map(fmt).join(" ، ")+" }")+" :",
     o[0].map(ax), o[1],
-    "نعوّض كلّ عنصر: العنصر الوحيد الذي يجعل الجملة صحيحة هو "+mn(x)+" لأنّ "+mn(x+" + "+a+" = "+b)+" ⇐ مجموعة الحلّ "+ax(right)+"."];
+    "نعوّض كلّ عنصرٍ من مجموعة التعويض، والعنصر الوحيد الذي يجعل الجملة صحيحة هو "+mn(fmt(x))+
+    " لأنّ "+mn(check)+" ⇐ مجموعة الحلّ "+ax(right)+"."];
 }
 
 /* ص14 مثال 4: متطابقة أم بلا حلّ */
@@ -324,22 +345,45 @@ function gMultiStepFrac(){
 }
 
 /* ص29 مثال 3: ثلاثة أعداد فردية متتالية */
-function gConsecOdd(){
-  var n = 2*ri(-15,15) + 1, S = 3*n + 6;
-  var o = zOpts(n, [S/3, n+2, n+4]);
-  return ["أوجد أصغر ثلاثة أعدادٍ صحيحةٍ فرديةٍ متتاليةٍ مجموعها "+mn(fmt(S))+" :",
+/* بلاغ حسن: كان هذا السؤال وأخوه لا يتغيّر فيهما إلّا رقمٌ واحد (المجموع)،
+   فالجملة نفسها تعود دائمًا. صار يتغيّر فيه: نوع الأعداد (صحيحة/فردية/زوجية)،
+   وعددها (ثلاثة/أربعة/خمسة)، والمطلوب (أصغرها/أكبرها/الأوسط) — فتتعدّد
+   الأشكال إلى أكثر من عشرين بدل شكلين، ويُطلب منه فهم التركيب لا حفظ الصيغة. */
+function gConsecFamily(){
+  var kind = gp(["int","odd","even"]);
+  var cnt  = gp([3,4,5]);
+  var step = (kind==="int") ? 1 : 2;
+  /* أصغر الأعداد: صحيحٌ أيًّا كان، أو فرديّ، أو زوجيّ */
+  var a = ri(-14,20);
+  if(kind==="odd")  a = 2*a + 1;
+  else if(kind==="even") a = 2*a;
+  var nums = [], i;
+  for(i=0;i<cnt;i++) nums.push(a + i*step);
+  var S = nums.reduce(function(x,y){ return x+y; }, 0);
+
+  var ask = gp(cnt%2 ? ["first","last","mid"] : ["first","last"]);
+  var idx = ask==="first" ? 0 : (ask==="last" ? cnt-1 : (cnt-1)/2);
+  var correct = nums[idx];
+
+  var nameK = {3:"ثلاثةِ",4:"أربعةِ",5:"خمسةِ"}[cnt];
+  var kindT = kind==="int" ? "صحيحةٍ متتالية" : (kind==="odd" ? "صحيحةٍ فرديةٍ متتالية" : "صحيحةٍ زوجيةٍ متتالية");
+  var askT  = ask==="first" ? "أصغرها" : (ask==="last" ? "أكبرها" : "الأوسط");
+
+  /* مشتّتات من أخطاء التفكير الشائعة: القسمة المباشرة، والانزلاق موضعًا */
+  var o = zOpts(correct, [Math.round(S/cnt), correct+step, correct-step, nums[0], nums[cnt-1]]);
+  var listT = nums.map(fmt).join(" و");
+  var expr  = "ن" + (cnt>1 ? (" + (ن + "+step+")") : "");
+  return ["مجموع "+nameK+" أعدادٍ "+kindT+" يساوي "+mn(fmt(S))+". فما "+askT+"؟",
     o[0], o[1],
-    "لتكن "+ax("ن")+" أصغرها، فالأعداد "+ax("ن")+" و"+ax("ن + 2")+" و"+ax("ن + 4")+" ⇐ "+ax("3ن + 6 = "+fmt(S))+" ⇐ "+ax("ن = "+fmt(n))+"."];
+    "لتكن "+ax("ن")+" أصغرها، فالأعداد "+ax("ن")+" ثمّ نزيد "+mn(step)+" كلّ مرّة ⇐ "+
+    ax(cnt+"ن + "+(step*cnt*(cnt-1)/2)+" = "+fmt(S))+" ⇐ "+ax("ن = "+fmt(a))+
+    ". فالأعداد "+mn(listT)+" و"+askT+" هو "+mn(fmt(correct))+"."];
 }
 
 /* ص29: ثلاثة أعداد صحيحة متتالية */
-function gConsecInt(){
-  var mid = ri(-20,25), S = 3*mid;
-  var o = zOpts(mid-1, [mid, mid+1, S]);
-  return ["أوجد أصغر ثلاثة أعدادٍ صحيحةٍ متتاليةٍ مجموعها "+mn(fmt(S))+" :",
-    o[0], o[1],
-    "لتكن "+ax("ن")+" أصغرها ⇐ "+ax("3ن + 3 = "+fmt(S))+" ⇐ "+ax("ن = "+fmt(mid-1))+" (والأعداد "+mn(fmt(mid-1))+" و"+mn(fmt(mid))+" و"+mn(fmt(mid+1))+")."];
-}
+/* دُمج في gConsecFamily أعلاه — يُبقى هذا وجهًا ثانيًا للأسرة نفسها
+   ليظلّ للدرس مولّدان كما كان، فلا يتغيّر وزنُ الموضوع في الجولة. */
+function gConsecInt(){ return gConsecFamily(); }
 
 /* ص29 مثال 2: مسألة نقود متعدّدة الخطوات */
 function gMoneyMulti(){
@@ -469,7 +513,7 @@ function gAbsTerms9(){
 
 var H1 = [gEqOrderOps, gSolutionSet, gIdentityOrNone, gEqTwoVars, gEqTerms9];
 var H2 = [gOneStepAdd, gOneStepSub, gOneStepMul, gOneStepDiv, gOneStepWord, gPropEquality, gOneStepReal];
-var H3 = [gMultiStep, gMultiStepNeg, gMultiStepFrac, gConsecOdd, gConsecInt, gMoneyMulti];
+var H3 = [gMultiStep, gMultiStepNeg, gMultiStepFrac, gConsecFamily, gConsecInt, gMoneyMulti];
 var H4 = [gVarBothSides, gVarParens, gVarClassify, gPerimeterEqual, gStepsOrder9];
 var H5 = [gAbsEqTwo, gAbsEqNone, gAbsExpr, gAbsReal, gAbsTerms9];
 /* ============================================================
@@ -2677,7 +2721,18 @@ var GEN_AR = {
 /* ⟨⟨ نهاية الخريطة ⟩⟩ */
 /* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
    يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
-function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
+/* seed: نصوصٌ نتفاداها (ذاكرة الجلسات السابقة) — انظر recentSeen أدناه */
+function genN(gens, n, seed){
+  var out=[], seen={}, t=0;
+  if(seed) Object.keys(seed).forEach(function(k){ seen[k]=1; });
+  while(out.length<n && t<n*30){
+    var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; }
+    t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1;
+    try{ q.__g=f.name||""; q.__gf=f; }catch(e){}
+    out.push(q);
+  }
+  return out;
+}
 
 var app = document.getElementById("app");
 if(!NAMES[who]){
@@ -2751,9 +2806,33 @@ if(!NAMES[who]){
   }
   function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
 
+  /* ══ بلاغ حسن (١٦ سبتمبر ٢٠٢٦): «يغيّر رقمًا واحدًا فقط أو يكرّر نفس السؤال» ══
+     القياس أثبته: genN كان يتفادى المكرّر داخل الجلسة وحدها، وقائمةُ المنع
+     تبدأ فارغةً كلّ جولة. وبنوك المفاهيم النصّية صغيرة (٤–٦ أسئلة للدرس)
+     فيعود السؤال بنصّه حرفيًّا كلّ جولةٍ أو جولتين — وُجد ١٠٤ سؤالًا ثابت
+     النصّ في ٢١ درسًا من ٢٥. فنحفظ نصوص آخر الأسئلة لكلّ درسٍ على حدة
+     ونتفاداها. والحدّ ٤٠ نصًّا — أوسعُ من ٢٠ في كانجرو لأنّ بنك المفاهيم
+     هنا أصغر، فيلزم مدًى أطول حتى يعود السؤال. */
+  var MEM_MAX = 40;
+  function memKey(id){ return "m9_recent_"+who+"_"+id; }
+  function memRead(id){ try{ var a=JSON.parse(localStorage.getItem(memKey(id))||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function memWrite(id, stems){
+    var out=[], s={};
+    stems.forEach(function(k){ if(k && !s[k]){ s[k]=1; out.push(k); } });
+    try{ localStorage.setItem(memKey(id), JSON.stringify(out.slice(0, MEM_MAX))); }catch(e){}
+  }
+
   function render(id){
     var c = CFG[id], sec = panelOf(id);
-    var items = genN(c.gens, c.n);
+    var recent = memRead(id), seed = {};
+    recent.forEach(function(k){ if(k) seed[k]=1; });
+    var items = genN(c.gens, c.n, seed);
+    /* لو قصرت الجولة لأنّ البنك صغير، نكمّلها بالسماح بالقديم — فلا تنقص الأسئلة */
+    if(items.length < c.n){
+      var s2={}; items.forEach(function(q){ if(q&&q[0]) s2[q[0]]=1; });
+      items = items.concat(genN(c.gens, c.n - items.length, s2));
+    }
+    memWrite(id, items.map(function(q){ return (q&&q[0])||""; }).concat(recent));
     var html = '';
     /* 📚 اتعلّم أوّلًا: رابط شرح الدرس قبل الأسئلة.
        طلب الأب (٤ سبتمبر ٢٠٢٦): «حط روابط يوتيوب على كل درس» في رياضيات
