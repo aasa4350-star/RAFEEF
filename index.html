@@ -474,7 +474,19 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
                 (sp.fb?` · <span class="cnt">${sp.fb} ردًّا آليًّا جاهزًا</span>`:``)+
                 (sp.avgSec!=null?` · متوسط انتظار الرد ${sp.avgSec}ث`:``)+`</li>`; })()+
             tks.slice(0,3).map(function(p){ var m=p.meta; var ex=RR.talkLine(m);
-              return `<li>${m.topic||"—"} · <b>${m.turns||0}</b> جملة${typeof m.avgPron==="number"?` · نطق ${m.avgPron}%`:``}${typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:``}${ex.length?` · ${ex.join(" · ")}`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`; }).join("")+
+              /* سؤال الأب (١٦ سبتمبر ٢٠٢٦): «وش معنى الصحّة 0؟ وهل هي فعلًا صفر؟»
+                 كان السطر يكتب «4 جملة · صحّة 0%» فيُقرأ «صفرٌ من أربع»، والحكم
+                 في الحقيقة على جملتين لا أربع: ما لم يتأكّد الجهاز أنّه سمعه لا
+                 يُحكم على نحوه (وهذا مقصود). والسطر المجموع يُظهر الأساس أصلًا
+                 (basis) أمّا سطر الجلسة فلا — فنُظهره فيه أيضًا، ونُنبّه أنّ
+                 جملةً واحدةً لا تعطي إلّا صفرًا أو مئةً فلا تُقرأ مستوًى. */
+              var bs=function(pctKey,nKey){
+                if(typeof m[pctKey]!=="number") return "";
+                var n=m[nKey];
+                if(typeof n!=="number" || n>=(m.turns||0)) return "";
+                return ` <span class="cnt">(من ${n} جملة${n===1?" — لا تُقرأ مستوًى":""})</span>`;
+              };
+              return `<li>${m.topic||"—"} · <b>${m.turns||0}</b> جملة${typeof m.avgPron==="number"?` · نطق ${m.avgPron}%${bs("avgPron","pronN")}`:``}${typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%${bs("avgCorrect","corrN")}`:``}${ex.length?` · ${ex.join(" · ")}`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`; }).join("")+
             `</ul></div>`;
         }
         return out; })()}

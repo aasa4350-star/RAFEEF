@@ -413,7 +413,10 @@ async function main(){
         (topTopic?`<li>⭐ الموضوع الأكثر: <b>${topTopic}</b></li>`:``)+
         tks.slice(0,6).map(p=>{ const m=p.meta; const pr=typeof m.avgPron==="number"?`${m.avgPron}%`:"—";
           const col=typeof m.avgPron==="number"?(m.avgPron>=80?"var(--good)":m.avgPron>=50?"var(--warn)":"var(--bad)"):"var(--muted)";
-          const co=typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%`:"";
+          /* الأساس مع النسبة — لا تُقرأ «صحّة 0%» صفرًا من كلّ جمل الجلسة،
+             فما لم يتأكّد الجهاز أنّه سمعه لا يُحكم على نحوه. انظر index.html */
+          const cn=m.corrN, cb=(typeof cn==="number"&&cn<(m.turns||0))?` من ${cn}${cn===1?" — لا تُقرأ مستوًى":""}`:"";
+          const co=typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%${cb}`:"";
           const un=(typeof m.unh==="number"&&m.unh>0)?` · 🔁 ${m.unh} محاولة ما وضحت`:"";
           return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(RR.when(p))} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}${un}</span></li>`; }).join("")+
         `</ul>`+(tks.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${tks.length-6} جلسة.</p>`:``)+
