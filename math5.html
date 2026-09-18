@@ -486,13 +486,201 @@ function gFracRound(){
           n+"/"+d+" ≈ "+(Math.round(v*100)/100)+"، فأقرب قيمة هي "+correct+"."];
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   الفصل الأول: القيمة المنزلية — بلاغ الأب (١٨ سبتمبر ٢٠٢٦): «أسامة
+   خامس، درس القيمة المنزلية ما هو موجود». وصحيح: كانت الصفحة تبدأ من
+   الكسور العشرية، ومولّداتها تغطّي منازل ما بعد الفاصلة وحدها — أمّا
+   منازل الأعداد الكاملة (آحاد… ملايين) والقيمة المنزلية والصيغ الثلاث
+   والمقارنة والتقريب فلم يكن لها أثر. هذه تسدّها.
+   ═══════════════════════════════════════════════════════════════════ */
+var PV_NAMES = ["الآحاد","العشرات","المئات","الألوف","عشرات الألوف","مئات الألوف","الملايين"];
+
+/* عددٌ عشوائيّ بعدد منازل محدّد، بلا أصفارٍ مضلّلة في المنزلة المسؤول عنها */
+function pvNum(digits){
+  var s = String(ri(1,9));
+  for(var i=1;i<digits;i++) s += String(ri(0,9));
+  return parseInt(s,10);
+}
+function pvDigitAt(n, place){ return Math.floor(Math.abs(n)/Math.pow(10,place)) % 10; }
+
+/* ١) في أيّ منزلةٍ يقع الرقم؟ */
+function gPvPlaceName(){
+  var d = ri(4,7), n = pvNum(d);
+  /* الرقم المتكرّر في منزلتين يجعل للسؤال جوابين صحيحين وواحدًا مقبولًا —
+     فنختار رقمًا لا يتكرّر في العدد. */
+  var uniq = [], i, j, g, times;
+  for(i=0;i<d;i++){
+    g = pvDigitAt(n,i); times = 0;
+    for(j=0;j<d;j++) if(pvDigitAt(n,j)===g) times++;
+    if(times===1) uniq.push(i);
+  }
+  if(!uniq.length) return null;
+  var place = gp(uniq), digit = pvDigitAt(n, place);
+  var correct = PV_NAMES[place];
+  var wrong = PV_NAMES.slice(0,d).filter(function(x){ return x!==correct; });
+  var arr = [correct].concat(shuffle(wrong).slice(0,2)); shuffle(arr);
+  return ["في العدد "+mn(fmt(n))+"، في أيّ منزلةٍ يقع الرقم "+mn(String(digit))+"؟",
+    arr, arr.indexOf(correct),
+    "نعدّ المنازل من اليمين: آحاد، عشرات، مئات، ألوف، عشرات ألوف، مئات ألوف، ملايين — فالرقم "+mn(String(digit))+" في منزلة "+correct+"."];
+}
+
+/* ٢) ما القيمة المنزلية للرقم؟ (الفرق بين الرقم وقيمته) */
+function gPvValue(){
+  var d = ri(4,7), n = pvNum(d);
+  /* لا نسأل عن رقمٍ ليس في العدد: نختار منزلةً رقمُها غير صفر. وكان الكود
+     يستبدل الصفر بواحدٍ فيسأل «القيمة المنزلية للرقم 1 في 2,062» ولا واحدَ
+     فيه — أمسكه الفحص المستقلّ. ونتجنّب تكرار الرقم في منزلتين فيصير
+     للسؤال جوابان صحيحان. */
+  var cand = [], i;
+  for(i=1;i<d;i++){
+    var g = pvDigitAt(n,i);
+    if(g===0) continue;
+    var times = 0, j;
+    for(j=0;j<d;j++) if(pvDigitAt(n,j)===g) times++;
+    if(times===1) cand.push(i);
+  }
+  if(!cand.length) return null;              /* genN يتخطّى null ويولّد غيره */
+  var place = gp(cand), digit = pvDigitAt(n, place);
+  var correct = digit * Math.pow(10,place);
+  var o = numOpts(correct, [digit, digit*Math.pow(10,place-1), digit*Math.pow(10,place+1), correct*10]);
+  return ["ما القيمة المنزلية للرقم "+mn(String(digit))+" في العدد "+mn(fmt(n))+"؟",
+    o[0], o[1],
+    "الرقم "+mn(String(digit))+" في منزلة "+PV_NAMES[place]+"، وقيمتها "+mn(fmt(Math.pow(10,place)))+
+    " ⇐ القيمة المنزلية = "+mn(String(digit)+" × "+fmt(Math.pow(10,place)))+" = "+mn(fmt(correct))+"."];
+}
+
+/* ٣) الفرق بين الرقم والقيمة المنزلية — مفهوميّ */
+function gPvConcept(){
+  var C = [
+    ["ما الفرق بين الرقم وقيمته المنزلية؟",
+     "الرقم ما نكتبه، وقيمته المنزلية تعتمد على موقعه في العدد",
+     ["لا فرق بينهما","القيمة المنزلية أصغر من الرقم دائمًا"]],
+    ["في العدد "+mn("5,500")+"، الرقم 5 مكتوبٌ مرّتين. فهل قيمتاهما متساويتان؟",
+     "لا، الأولى قيمتها "+mn("5,000")+" والثانية "+mn("500")+"",
+     ["نعم، لأنّ الرقم واحد","نعم، كلتاهما "+mn("5")]],
+    ["كلّما انتقلنا منزلةً واحدة إلى اليسار فإنّ قيمة المنزلة:",
+     "تتضاعف عشر مرّات",
+     ["تقلّ عشر مرّات","لا تتغيّر"]],
+    ["ما قيمة الصفر في منزلةٍ داخل العدد، مثل "+mn("4,058")+"؟",
+     "يحفظ المنزلة فارغةً فلا تنزاح بقيّة الأرقام",
+     ["لا فائدة منه ويمكن حذفه","يجعل العدد أصغر بواحد"]],
+    ["أيّ العددين أكبر: عددٌ من خمس منازل أم عددٌ من أربع منازل؟",
+     "ذو الخمس منازل دائمًا",
+     ["ذو الأربع منازل","يعتمد على أوّل رقمٍ فيهما"]]
+  ];
+  var c = gp(C), arr = [c[1]].concat(c[2]); shuffle(arr);
+  return [c[0], arr, arr.indexOf(c[1]),
+    "قيمة الرقم تتبع موقعه: كلّ منزلةٍ إلى اليسار تساوي عشرة أضعاف التي قبلها."];
+}
+
+/* ٤) الصيغة التحليلية ← القياسية */
+function gPvExpanded(){
+  var d = ri(3,5), n = pvNum(d);
+  var parts = [], i;
+  for(i=d-1;i>=0;i--){ var v = pvDigitAt(n,i)*Math.pow(10,i); if(v) parts.push(fmt(v)); }
+  var o = numOpts(n, [n+Math.pow(10,d-1), n-Math.pow(10,ri(0,d-1)), n*10]);
+  return ["اكتب بالصيغة القياسية: "+mn(parts.join(" + ")),
+    o[0], o[1],
+    "نجمع القيم: "+mn(parts.join(" + ")+" = "+fmt(n))+"."];
+}
+
+/* ٥) القياسية ← التحليلية */
+function gPvToExpanded(){
+  var d = ri(3,4), n = pvNum(d);
+  var parts = [], i;
+  for(i=d-1;i>=0;i--){ var v = pvDigitAt(n,i)*Math.pow(10,i); if(v) parts.push(fmt(v)); }
+  var correct = parts.join(" + ");
+  /* مشتّتات من أخطاء شائعة: كتابة الأرقام بلا قيمها، أو إقحام الصفر */
+  var w1 = [], w2 = [];
+  for(i=d-1;i>=0;i--){ var g=pvDigitAt(n,i); if(g) w1.push(String(g)); }
+  for(i=d-1;i>=0;i--){ w2.push(fmt(pvDigitAt(n,i)*Math.pow(10,i))); }
+  var cands = [correct, w1.join(" + "), w2.join(" + ")];
+  var arr = []; cands.forEach(function(x){ if(arr.indexOf(x)<0) arr.push(x); });
+  var k = 0;
+  while(arr.length<3){ k++; arr.push(parts.slice(0,Math.max(1,parts.length-k)).join(" + ")); }
+  arr = arr.slice(0,3); shuffle(arr);
+  return ["اكتب العدد "+mn(fmt(n))+" بالصيغة التحليلية:",
+    arr.map(mn), arr.indexOf(correct),
+    "نكتب قيمة كلّ رقمٍ بحسب منزلته ثمّ نجمعها: "+mn(correct)+"."];
+}
+
+/* ٦) مقارنة عددين كاملين */
+function gPvCompare(){
+  var d = ri(4,6);
+  var a = pvNum(d), b;
+  /* نجعلهما متقاربين أحيانًا فيلزم النظر إلى المنازل لا إلى الطول */
+  if(gp([0,1])) b = pvNum(d);
+  else { b = a + gp([-1,1])*Math.pow(10,ri(0,d-2))*ri(1,9); if(b<=0) b = a+1; }
+  if(a===b) b = a+1;
+  var correct = a>b ? ">" : "<";
+  var arr = [">","<","="]; 
+  return ["أيّ الإشارة الصحيحة: "+mn(fmt(a)+" ⬚ "+fmt(b))+"؟",
+    arr, arr.indexOf(correct),
+    "نقارن من أكبر منزلةٍ إلى أصغرها حتى نجد اختلافًا: "+mn(fmt(a)+" "+correct+" "+fmt(b))+"."];
+}
+
+/* ٧) ترتيب ثلاثة أعداد */
+function gPvOrder(){
+  var d = ri(4,6), seen = {}, v = [];
+  while(v.length<3){ var x = pvNum(d); if(!seen[x]){ seen[x]=1; v.push(x); } }
+  var want = gp(["أكبر","أصغر"]);
+  var correct = want==="أكبر" ? Math.max.apply(null,v) : Math.min.apply(null,v);
+  var arr = v.slice().map(fmt); shuffle(arr);
+  return ["أيّ الأعداد "+want+"؟ "+mn(v.map(fmt).join(" ، ")),
+    arr.map(mn), arr.indexOf(fmt(correct)),
+    "نقارن من أكبر منزلةٍ إلى أصغرها، فـ"+want+"ها هو "+mn(fmt(correct))+"."];
+}
+
+/* ٨) تقريب عددٍ كامل */
+function gPvRound(){
+  var to = gp([10,100,1000,10000]);
+  var names = {10:"أقرب عشرة",100:"أقرب مئة",1000:"أقرب ألف",10000:"أقرب عشرة آلاف"};
+  var d = (to>=10000) ? ri(6,7) : ri(4,6);
+  var n = pvNum(d);
+  var correct = Math.round(n/to)*to;
+  var o = numOpts(correct, [Math.floor(n/to)*to, Math.ceil(n/to)*to, correct+to, correct-to]);
+  var digit = pvDigitAt(n, String(to).length-2);
+  return ["قرّب العدد "+mn(fmt(n))+" إلى "+names[to]+":",
+    o[0], o[1],
+    "ننظر إلى الرقم الذي يلي منزلة التقريب وهو "+mn(String(digit))+
+    (digit>=5 ? " وهو 5 فأكثر فنزيد منزلة التقريب واحدًا" : " وهو أقلّ من 5 فتبقى منزلة التقريب كما هي")+
+    " ونُصفّر ما بعدها ⇐ "+mn(fmt(correct))+"."];
+}
+
+/* ٩) منازل الكسر العشري حتى الأجزاء من ألف (الفصل الأوّل يقف عند المئة) */
+function gPvDecThousandth(){
+  /* أرقامٌ متمايزة بعد الفاصلة، وإلّا صار للسؤال أكثر من منزلةٍ صحيحة */
+  var w = ri(1,99), a = ri(1,9), b = ri(1,9), c = ri(1,9);
+  if(a===b || b===c || a===c) return null;
+  var num = w + "." + a + b + c;
+  var pick = gp([[a,"الأجزاء من عشرة",0.1],[b,"الأجزاء من مئة",0.01],[c,"الأجزاء من ألف",0.001]]);
+  var wrong = ["الأجزاء من عشرة","الأجزاء من مئة","الأجزاء من ألف","الآحاد"].filter(function(x){ return x!==pick[1]; });
+  var arr = [pick[1]].concat(shuffle(wrong).slice(0,2)); shuffle(arr);
+  return ["في العدد "+mn(num)+"، في أيّ منزلةٍ يقع الرقم "+mn(String(pick[0]))+"؟",
+    arr, arr.indexOf(pick[1]),
+    "بعد الفاصلة: الأولى الأجزاء من عشرة، ثمّ الأجزاء من مئة، ثمّ الأجزاء من ألف — فالرقم "+mn(String(pick[0]))+" في منزلة "+pick[1]+"."];
+}
+
+/* ١٠) نمط الضرب في عشرة — انزياح المنزلة */
+function gPvTimesTen(){
+  var base = ri(2,99), k = gp([10,100,1000]);
+  var correct = base*k;
+  var o = numOpts(correct, [base*(k/10), base*k*10, base+k]);
+  return ["احسب: "+mn(fmt(base)+" × "+fmt(k)),
+    o[0], o[1],
+    "الضرب في "+mn(fmt(k))+" يُزيح كلّ رقمٍ "+(k===10?"منزلةً واحدة":(k===100?"منزلتين":"ثلاث منازل"))+
+    " إلى اليسار ونُكمل بالأصفار ⇐ "+mn(fmt(correct))+"."];
+}
+
+var PV = [gPvPlaceName,gPvValue,gPvConcept,gPvExpanded,gPvToExpanded,gPvCompare,gPvOrder,gPvRound,gPvDecThousandth,gPvTimesTen];
 var F1 = [gDecPlace,gDecPlaceName,gDecCompare,gDecOrder,gFracToDec,gDecWords];
 var F2 = [gDecAdd,gDecSub,gDecRoundWhole,gDecRoundTenth,gDecEstimate];
 var F3 = [gDistProp,gMulPattern,gMulEstimate,gMul1,gMul2,gMulWord];
 var F4 = [gDivPattern,gDivEstimate,gDiv1,gDivRemainder,gDiv2,gDivWord];
 var F5 = [gExprAddSub,gExprMulDiv,gEqAddSub,gEqMulDiv,gOrderOps,gFuncTable];
 var F6 = [gFracSimplify,gImproperToMixed,gMixedToImproper,gFracCompare,gFracRound];
-var ALL = F1.concat(F2).concat(F3).concat(F4).concat(F5).concat(F6);
+var ALL = PV.concat(F1).concat(F2).concat(F3).concat(F4).concat(F5).concat(F6);
 
 var app = document.getElementById("app");
 if(!NAMES[who]){
@@ -506,17 +694,19 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>'+
     '<div class="unit">📘 مطابق لكتاب الرياضيات — الخامس الابتدائي</div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="f1" aria-selected="true">1) الكسور العشرية</button>'+
-      '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
-      '<button data-tab="f3" aria-selected="false">3) الضرب</button>'+
-      '<button data-tab="f4" aria-selected="false">4) القسمة</button>'+
-      '<button data-tab="f5" aria-selected="false">5) العبارات والمعادلات</button>'+
-      '<button data-tab="f6" aria-selected="false">6) الكسور الاعتيادية</button>'+
+            '<button data-tab="pv" aria-selected="true">1) القيمة المنزلية</button>'+
+      '<button data-tab="f1" aria-selected="false">2) الكسور العشرية</button>'+
+      '<button data-tab="f2" aria-selected="false">3) الجمع والطرح</button>'+
+      '<button data-tab="f3" aria-selected="false">4) الضرب</button>'+
+      '<button data-tab="f4" aria-selected="false">5) القسمة</button>'+
+      '<button data-tab="f5" aria-selected="false">6) العبارات والمعادلات</button>'+
+      '<button data-tab="f6" aria-selected="false">7) الكسور الاعتيادية</button>'+
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel active" id="f1"></section>'+
+    '<section class="panel active" id="pv"></section>'+
+    '<section class="panel" id="f1"></section>'+
     '<section class="panel" id="f2"></section>'+
     '<section class="panel" id="f3"></section>'+
     '<section class="panel" id="f4"></section>'+
@@ -526,13 +716,14 @@ if(!NAMES[who]){
     '<footer>الرياضيات · الصف الخامس الابتدائي · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
 
   var CFG = {
-    all: {gens:ALL, n:15, intro:"اختبار شامل على الفصول الستة — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
-    f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — الكسور العشرية:</b> منازل الكسر العشري، القراءة، المقارنة والترتيب، وتحويل الكسر الاعتيادي إلى عشري.", label:"رياضيات ف1 — الكسور العشرية"},
-    f2:  {gens:F2,  n:10, intro:"<b>الفصل 2 — الجمع والطرح:</b> جمع وطرح الكسور العشرية، والتقريب، وتقدير النواتج.", label:"رياضيات ف2 — جمع وطرح عشري"},
-    f3:  {gens:F3,  n:10, intro:"<b>الفصل 3 — الضرب:</b> أنماط الضرب، خاصية التوزيع، تقدير النواتج، والضرب في رقم ورقمين.", label:"رياضيات ف3 — الضرب"},
-    f4:  {gens:F4,  n:10, intro:"<b>الفصل 4 — القسمة:</b> أنماط القسمة، التقدير بالأعداد المتوافقة، القسمة على رقم ورقمين، وباقي القسمة.", label:"رياضيات ف4 — القسمة"},
-    f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — العبارات الجبرية والمعادلات:</b> كتابة العبارات، حلّ المعادلات، ترتيب العمليات، وجداول الدوال.", label:"رياضيات ف5 — العبارات والمعادلات"},
-    f6:  {gens:F6,  n:10, intro:"<b>الفصل 6 — الكسور الاعتيادية:</b> التبسيط، الأعداد الكسرية، الكسور غير العادية، المقارنة والتقريب.", label:"رياضيات ف6 — الكسور الاعتيادية"}
+    all: {gens:ALL, n:15, intro:"اختبار شامل على الفصول السبعة — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
+    pv:  {gens:PV,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> منازل الأعداد الكاملة (آحاد… ملايين)، القيمة المنزلية، الصيغتان التحليلية والقياسية، المقارنة والترتيب، والتقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
+    f1:  {gens:F1,  n:10, intro:"<b>الفصل 2 — الكسور العشرية:</b> منازل الكسر العشري، القراءة، المقارنة والترتيب، وتحويل الكسر الاعتيادي إلى عشري.", label:"رياضيات ف1 — الكسور العشرية"},
+    f2:  {gens:F2,  n:10, intro:"<b>الفصل 3 — الجمع والطرح:</b> جمع وطرح الكسور العشرية، والتقريب، وتقدير النواتج.", label:"رياضيات ف2 — جمع وطرح عشري"},
+    f3:  {gens:F3,  n:10, intro:"<b>الفصل 4 — الضرب:</b> أنماط الضرب، خاصية التوزيع، تقدير النواتج، والضرب في رقم ورقمين.", label:"رياضيات ف3 — الضرب"},
+    f4:  {gens:F4,  n:10, intro:"<b>الفصل 5 — القسمة:</b> أنماط القسمة، التقدير بالأعداد المتوافقة، القسمة على رقم ورقمين، وباقي القسمة.", label:"رياضيات ف4 — القسمة"},
+    f5:  {gens:F5,  n:10, intro:"<b>الفصل 6 — العبارات الجبرية والمعادلات:</b> كتابة العبارات، حلّ المعادلات، ترتيب العمليات، وجداول الدوال.", label:"رياضيات ف5 — العبارات والمعادلات"},
+    f6:  {gens:F6,  n:10, intro:"<b>الفصل 7 — الكسور الاعتيادية:</b> التبسيط، الأعداد الكسرية، الكسور غير العادية، المقارنة والتقريب.", label:"رياضيات ف6 — الكسور الاعتيادية"}
   };
 
   function render(id){
@@ -589,12 +780,13 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="math5", REM_LABEL="الرياضيات";
   var REMTOPICS=[
-    {id:"f1", name:"1) الكسور العشرية", tip:"بعد الفاصلة: أول منزلة «أجزاء من عشرة» (0.1)، والثانية «أجزاء من مئة» (0.01). وللمقارنة قارن المنازل من اليسار: الآحاد ثم الأعشار ثم الأجزاء من مئة.", yt:"شرح القيمة المنزلية للكسور العشرية خامس ابتدائي"},
-    {id:"f2", name:"2) الجمع والطرح", tip:"رتّب الفاصلة تحت الفاصلة قبل ما تجمع أو تطرح، وأكمل الفراغات بأصفار. وللتقريب انظر للمنزلة التي بعد المطلوبة: 5 فأكثر ⟵ زِد واحدًا، أقل من 5 ⟵ اترك العدد.", yt:"شرح جمع وطرح الكسور العشرية خامس ابتدائي"},
-    {id:"f3", name:"3) الضرب", tip:"خاصية التوزيع: فكّك العدد لعشرات وآحاد ثم اضرب كلًّا على حدة واجمع، مثل 7×24 = (7×20)+(7×4). وللضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار.", yt:"شرح خاصية التوزيع والضرب خامس ابتدائي رياضيات"},
-    {id:"f4", name:"4) القسمة", tip:"للتقدير استعمل «الأعداد المتوافقة»: غيّر المقسوم لأقرب عدد يقبل القسمة بسهولة، مثل 187 ÷ 9 ← 180 ÷ 9 = 20. وباقي القسمة دائمًا أصغر من المقسوم عليه.", yt:"شرح القسمة وتقدير ناتج القسمة خامس ابتدائي"},
-    {id:"f5", name:"5) العبارات والمعادلات", tip:"ترتيب العمليات: الأقواس ⟵ الضرب والقسمة ⟵ الجمع والطرح. ولحلّ المعادلة اعكس العملية على الطرفين: س + 7 = 19 ← س = 19 − 7.", yt:"شرح العبارات الجبرية والمعادلات خامس ابتدائي"},
-    {id:"f6", name:"6) الكسور الاعتيادية", tip:"للتبسيط اقسم البسط والمقام على القاسم المشترك الأكبر. ولتحويل عدد كسري لكسر غير عادي: (العدد الصحيح × المقام) + البسط، والمقام ما يتغيّر.", yt:"شرح تبسيط الكسور والأعداد الكسرية خامس ابتدائي"},
+    {id:"pv", name:"1) القيمة المنزلية", tip:"عُدّ المنازل من <b>اليمين</b>: آحاد، عشرات، مئات، ألوف، عشرات ألوف، مئات ألوف، ملايين. وفرّق بين <b>الرقم</b> وقيمته: في 5,500 الخمسة الأولى قيمتها 5,000 والثانية 500. وفي التقريب انظر إلى الرقم <b>الذي يلي</b> منزلة التقريب: 5 فأكثر تزيد، وأقلّ تبقى، ثمّ صفّر ما بعدها.", yt:"شرح القيمة المنزلية خامس ابتدائي رياضيات"},
+    {id:"f1", name:"2) الكسور العشرية", tip:"بعد الفاصلة: أول منزلة «أجزاء من عشرة» (0.1)، والثانية «أجزاء من مئة» (0.01). وللمقارنة قارن المنازل من اليسار: الآحاد ثم الأعشار ثم الأجزاء من مئة.", yt:"شرح القيمة المنزلية للكسور العشرية خامس ابتدائي"},
+    {id:"f2", name:"3) الجمع والطرح", tip:"رتّب الفاصلة تحت الفاصلة قبل ما تجمع أو تطرح، وأكمل الفراغات بأصفار. وللتقريب انظر للمنزلة التي بعد المطلوبة: 5 فأكثر ⟵ زِد واحدًا، أقل من 5 ⟵ اترك العدد.", yt:"شرح جمع وطرح الكسور العشرية خامس ابتدائي"},
+    {id:"f3", name:"4) الضرب", tip:"خاصية التوزيع: فكّك العدد لعشرات وآحاد ثم اضرب كلًّا على حدة واجمع، مثل 7×24 = (7×20)+(7×4). وللضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار.", yt:"شرح خاصية التوزيع والضرب خامس ابتدائي رياضيات"},
+    {id:"f4", name:"5) القسمة", tip:"للتقدير استعمل «الأعداد المتوافقة»: غيّر المقسوم لأقرب عدد يقبل القسمة بسهولة، مثل 187 ÷ 9 ← 180 ÷ 9 = 20. وباقي القسمة دائمًا أصغر من المقسوم عليه.", yt:"شرح القسمة وتقدير ناتج القسمة خامس ابتدائي"},
+    {id:"f5", name:"6) العبارات والمعادلات", tip:"ترتيب العمليات: الأقواس ⟵ الضرب والقسمة ⟵ الجمع والطرح. ولحلّ المعادلة اعكس العملية على الطرفين: س + 7 = 19 ← س = 19 − 7.", yt:"شرح العبارات الجبرية والمعادلات خامس ابتدائي"},
+    {id:"f6", name:"7) الكسور الاعتيادية", tip:"للتبسيط اقسم البسط والمقام على القاسم المشترك الأكبر. ولتحويل عدد كسري لكسر غير عادي: (العدد الصحيح × المقام) + البسط، والمقام ما يتغيّر.", yt:"شرح تبسيط الكسور والأعداد الكسرية خامس ابتدائي"},
     {id:"fw", name:"مسائل كلامية 🧠", tip:"لا تبدأ بالحساب — ابدأ بالسؤال: أيّ عمليّة؟ ابحث عن الكلمة الدالّة: «في كلّ» ⟵ ضرب · «بالتساوي على» ⟵ قسمة · «بقي / بكم يزيد» ⟵ طرح · «أُضيف / صار» ⟵ جمع. ثم احسب.", yt:"شرح حل المسائل الكلامية خامس ابتدائي رياضيات"}
   ];
   var ALL_IDS = ["all"];
