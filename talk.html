@@ -180,7 +180,7 @@ function saveTalkSession(useBeacon){
       skNoV:((state.skNoV||0)-(state.savedSkNoV||0)),
       secs:secs, audioSec:(state.audioSec||0),
       /* words: مجموع كلمات الطفل · cut: الأدوار التي رجعت بكلمتين أو أقلّ (بترٌ محتمل) */
-      words:(state.words||0), cut:(state.cut||0), segs:(state.segN||0),
+      words:(state.words||0), cut:(state.cut||0), segs:(state.segN||0), partN:(state.partN||0),
       avgConf:(state.confs.length? Math.round(100*state.confs.reduce(function(a,b){return a+b;},0)/state.confs.length)/100 : null),
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0); state.savedAiN = (state.aiN||0); state.savedFbN = (state.fbN||0); state.savedAiMs = (state.aiMs||0); state.savedSkGarb=(state.skGarb||0); state.savedSkConf=(state.skConf||0); state.savedSkNoV=(state.skNoV||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
@@ -456,6 +456,7 @@ function listen(statusEl, btn, onDone, tries){
         SEGS.push(seg); _st.segN=SEGS.length; _st.full="";
         _live(_joined());
         if(!_stopping) _armEnd();     /* وقتُ انتظارٍ جديدٌ لعلّه يُكمل */
+        else if(_flush) _flush();     /* كنّا نوقف السماع ننتظر هذه بالضبط — وصلت فنمضي */
         if(_st.onLife) _st.onLife("rz");
       };
       rec.canceled=function(s,e){ _st.cx=Date.now()-_st.t0;
@@ -540,17 +541,53 @@ function listen(statusEl, btn, onDone, tries){
     }catch(e){}
     return seg;
   }
-  /* نُوقف السماع ثمّ نُجمّع. ولا نُجمّع لحظةَ الإيقاف: من ضغط «خلّصت»
-     وهو يُنهي كلمته الأخيرة تكون جملتُه ما زالت عند أزور، فننتظرها
-     ثانيةً وجزءًا — ثمّ نمضي على كلّ حالٍ فلا يتعلّق الدور. */
+  /* ═══ «خلّصت» كان يقتل النتيجة النهائيّة قبل أن تصل ═══
+     بلاغ الأب (٢١ سبتمبر ٢٠٢٦): «أحيانًا يلقط الصوت على طول وأحيانًا لا».
+     والجدول يُصدّقه: من أربعٍ وثمانين جلسةً عشرٌ فقط وصلتها جملةٌ مكتملة،
+     وبقيّتها segs=0 و audioSec=0 و avgPron=null — أي أنّ الدور مضى
+     بالنصّ الجزئيّ، مع تحذير «ما هو متأكّد منه» على كلامٍ سليم، وبلا
+     درجة نطقٍ ولا حكمٍ على الجملة.
+
+     والسبب توقيتٌ يستحيل أن يُوفَّق:
+       · أزور لا تُصدر النتيجة النهائيّة إلّا بعد ١٫٥ث من السكوت
+         (Speech_SegmentationSilenceTimeoutMs — نضبطها نحن).
+       · وكنّا عند الإيقاف ننتظرها ٢٠٠ مللي ثانيةٍ بعد نجاح أمر الإيقاف،
+         ونجاحُ الأمر سريعٌ (١٢٠ مللي في القياس).
+     فمن ضغط «✅ خلّصت» أُغلق تعرّفُه بعد ثلث ثانيةٍ من ضغطه، والنتيجة
+     النهائيّة في الطريق بعدُ — فتضيع حتمًا. ومن سكت وانتظر وصلته
+     النتيجة فأخذ درجته. وهذا بعينه «مرّة يلقط ومرّة لا»: ليس المايك،
+     بل هل ضغط الطفلُ الزرَّ أم صبر.
+
+     فصارت المهلة تتبع ما ينقصنا: إن كانت معنا جملةٌ مكتملةٌ أصلًا فلا
+     شيء ننتظره فنمضي بعد الإيقاف، وإن لم تكن فنحن ننتظر النتيجة نفسها
+     فلا يقطع انتظارَها نجاحُ أمر الإيقاف — بل تُنهيه هي حين تصل، أو
+     مهلةٌ أطول من فاصل الجملة. */
+  var _flush=null;          /* تُنهي الانتظار فور وصول النتيجة النهائيّة */
   function _stopThen(why){
     if(fin || _stopping) return;
     _stopping=true; _clrEnd();
-    var done=false;
-    function go(){ if(done) return; done=true; if(t){clearTimeout(t);t=null;} _assemble(why); }
-    var t=setTimeout(go, 1400);
-    try{ rec.stopContinuousRecognitionAsync(function(){ setTimeout(go, 200); }, go); }
-    catch(e){ go(); }
+    var wt=null, ended=false;
+    /* الخطوة الثانية: نُوقف السماع ثمّ نُجمّع. */
+    function finish(){
+      if(ended) return; ended=true; _flush=null;
+      if(wt){ clearTimeout(wt); wt=null; }
+      var done=false;
+      function go(){ if(done) return; done=true; if(st){clearTimeout(st);st=null;} _assemble(why); }
+      var st=setTimeout(go, 1200);
+      try{ rec.stopContinuousRecognitionAsync(function(){ setTimeout(go, 200); }, go); }
+      catch(e){ go(); }
+    }
+    /* الخطوة الأولى — وهي الجديدة: إن لم تصلنا جملةٌ مكتملةٌ بعدُ فنحن
+       ننتظرها هي، فلا نُوقف السماع قبلها. وكنّا نُوقفه فورًا ثمّ ننتظر
+       ٢٠٠ مللي ثانيةٍ لعلّها تلحق — ولا تلحق أبدًا. */
+    if(!SEGS.length){
+      statusEl.style.color="var(--muted)";
+      statusEl.innerHTML='<span style="opacity:.75">⏳ لحظة — أجمع كلامك...</span>';
+      _flush=finish;                       /* وصلت النتيجة ⇐ نمضي فورًا */
+      wt=setTimeout(finish, 2000);         /* تعلّقت الخدمة ⇐ نمضي بالجزئيّ كما كنّا */
+      return;
+    }
+    finish();
   }
   function _assemble(why){
     if(fin) return; fin=true; _clrEnd(); if(to){ clearTimeout(to); to=null; }
@@ -727,7 +764,7 @@ var app=document.getElementById("app");
      skGarb — النموذج قال «هذا خطأ تفريغٍ لا خطأ الطفل» (garbled)
      skConf — ثقة أزور في التفريغ أدنى من CONF_SURE
      skNoV  — النموذج ردّ ولم يُعطِ حكمًا صالحًا (correct ليست منطقيّة) */
-var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,words:0,cut:0,segN:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0,skGarb:0,skConf:0,skNoV:0,savedSkGarb:0,savedSkConf:0,savedSkNoV:0};
+var state={topic:null,qi:0,chatHtml:"",msgs:[],pronScores:[],correctFlags:[],turnSeq:0,sessionStart:null,savedTurns:0,sid:null,shakyTurns:{},turnPron:{},audioSec:0,words:0,cut:0,segN:0,partN:0,confs:[],att:0,unh:0,savedAtt:0,savedUnh:0,aiN:0,fbN:0,aiMs:0,savedAiN:0,savedFbN:0,savedAiMs:0,skGarb:0,skConf:0,skNoV:0,savedSkGarb:0,savedSkConf:0,savedSkNoV:0};
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
 function renderHome(){
@@ -745,7 +782,7 @@ function renderHome(){
 
 function startTopic(id){
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
-  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.segN=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0; state.skGarb=0; state.skConf=0; state.skNoV=0; state.savedSkGarb=0; state.savedSkConf=0; state.savedSkNoV=0;
+  state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.segN=0; state.partN=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0; state.skGarb=0; state.skConf=0; state.skNoV=0; state.savedSkGarb=0; state.savedSkConf=0; state.savedSkNoV=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
      الواحدة عدّة صفوف. التقارير تجمعها بهذا المعرّف فيبقى عدد الجلسات صحيحًا. */
   state.sid = String(Date.now())+"_"+Math.random().toString(36).slice(2,8);
@@ -798,6 +835,10 @@ function addMe(out){
      أربع ثوانٍ فقد أصبنا السبب، وإن بقيت فالعلّة في مكانٍ آخر ولا نُخادع
      أنفسنا بأنّنا عالجناها. */
   state.segN = (state.segN||0) + (out.segs||0);   /* كم جملةً مكتملةً جُمعت في الدور */
+  /* partN: أدوارٌ مضت بالنصّ الجزئيّ بلا نتيجةٍ نهائيّة — بلا درجة نطقٍ
+     ولا حكمٍ على الجملة. كانت هي الغالبة (٧٤ جلسةً من ٨٤ بلا جملةٍ
+     مكتملةٍ واحدة) ولم يكن في الجدول ما يُظهرها رقمًا يُتابَع. */
+  if(String(out.text||"").trim() && !(out.segs||0)) state.partN = (state.partN||0) + 1;
   var _wc = String(out.text||"").trim().split(/\s+/).filter(Boolean).length;
   state.words = (state.words||0) + _wc;
   if(_wc > 0 && _wc <= 2) state.cut = (state.cut||0) + 1;
