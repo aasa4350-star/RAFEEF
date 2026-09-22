@@ -797,7 +797,35 @@ function renderHome(){
   app.querySelectorAll("[data-t]").forEach(function(b){ b.addEventListener("click",function(){ startTopic(b.getAttribute("data-t")); }); });
 }
 
+/* ═══ لماذا «التعارف ما يضبط» وبقيّةُ الأقسام زينة ═══
+   بلاغ الأب (٢٢ سبتمبر ٢٠٢٦) عن حسن وسعود وأسامة: «قسم التعارف ما
+   يضبط أو يتأخّر في الردّ، لكن الأقسام الثانية زينة».
+
+   والجدول يقول إنّ العيب ليس في التعارف: هو أوّلُ موضوعٍ يُفتح في ٤٨
+   قعدةً من ٦١ (٧٩٪)، فيتحمّل وحده كلفةَ البدء الباردة كلّها، وتأتي
+   بقيّةُ المواضيع بعده وكلُّ شيءٍ دافئ:
+     أوّلُ ردٍّ في الجلسة : وسيط ٦٫٩ث · أبطأ ٢٢٫٤ث
+     ما بعده من الردود  : وسيط ٣٫٦ث · أبطأ ١٧٫٤ث
+   بل إنّ نسبة الجلسات التي تنتهي بلا دورٍ واحد في التعارف ٨٪، وهي في
+   الهوايات ١٣٪ وفي الأكل ٢٠٪ وفي الدردشة الحرّة ٢٥٪. ووسيطُ أوّل ردٍّ
+   في التعارف (٦٫٢ث) أقلُّ من العائلة (٨٫٤ث) والمدرسة (١٧٫٦ث). فالعلّة
+   في الترتيب لا في القسم، ولو بدؤوا بغيره لاشتكوا منه.
+
+   فنُسخّن ما يمكن تسخينه لحظةَ اختيار الموضوع — والطفل حينها يسمع سؤال
+   الافتتاح، فتمضي الكلفة في وقتٍ لا ينتظر فيه أحد:
+     · دالّةُ الردّ تُوقَظ بطلب OPTIONS، وهي تردّ عليه فورًا (سطر 221 من
+       index.ts) بلا استدعاء نموذجٍ ولا كلفةِ حصّة.
+     · وإذنُ المايك يُطلب الآن لا عند ضغط 🎤، فلا تلتهم نافذةُ «Allow»
+       وقتَ إنصات أزور. وهي تبقى فتحةً واحدةً في عمر الصفحة كما كانت
+       (MIC.ensure يحرسها بـ__micGranted) — نقدّمها لا نُكرّرها. */
+function warmUp(){
+  try{ fetch(AI_ENDPOINT, { method:"OPTIONS", headers:{ "apikey":SUPA_ANON } }).catch(function(){}); }catch(e){}
+  try{ if(window.MIC && MIC.ensure) MIC.ensure(null, function(){}, function(){}); }catch(e){}
+}
+
 function startTopic(id){
+  /* أوّلُ ما نفعله، فإيماءةُ الضغط ما زالت حيّةً ويقبلها سفاري */
+  warmUp();
   saveTalkSession(); // لو كان في جلسةٍ سابقة جارية، سجّلها قبل بدء جلسة جديدة
   state.topic=id; state.qi=0; state.chatHtml=""; state.msgs=[]; state.pronScores=[]; state.correctFlags=[]; state.turnSeq=0; state.sessionStart=Date.now(); state.savedTurns=0; state.shakyTurns={}; state.turnPron={}; state.audioSec=0; state.words=0; state.cut=0; state.segN=0; state.partN=0; state.confs=[]; state.att=0; state.unh=0; state.savedAtt=0; state.savedUnh=0; state.aiN=0; state.fbN=0; state.aiMs=0; state.savedAiN=0; state.savedFbN=0; state.savedAiMs=0; state.skGarb=0; state.skConf=0; state.skNoV=0; state.savedSkGarb=0; state.savedSkConf=0; state.savedSkNoV=0;
   /* معرّف الجلسة: صرنا نحفظ بعد كلّ جملة (لا عند الخروج وحده)، فتصير الجلسة
@@ -944,12 +972,17 @@ function aiTurn(childText, tid){
      لتتّسع للسيناريو الأسوأ (محاولتا Gemini + OpenAI)، وإلّا استسلم
      العميل للردّ الآلي قبل أن تصل محاولات السيرفر لفرصتها الأخيرة. */
   var _t0=Date.now();
-  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; if(st)st.textContent="";
+  /* سطرٌ ساكنٌ ثماني عشرة ثانيةً يُقرأ عطلًا. ووسيطُ أوّل ردٍّ ٦٫٩ث وأبطؤه
+     ٢٢٫٤ث، فنُخبره أنّنا ما زلنا معه بدل أن يظنّ الشاشة ماتت ويُعيد. */
+  var _tk=[ setTimeout(function(){ if(!done&&st) st.textContent="🤔 لحظة… الردّ في الطريق"; }, 5000),
+            setTimeout(function(){ if(!done&&st) st.textContent="⏳ الشبكة بطيئة شوي — لا تعيد، أنا أنتظر معك"; }, 12000) ];
+  function _clrTk(){ _tk.forEach(function(t){ clearTimeout(t); }); }
+  var done=false, tmo=setTimeout(function(){ if(done)return; done=true; _clrTk(); if(st)st.textContent="";
     state.fbN++; state.aiMs += (Date.now()-_t0); replyThenAsk(childText); saveTalkSession(); }, 28000);
   fetch(AI_ENDPOINT, { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPA_ANON,"apikey":SUPA_ANON},
     body: JSON.stringify({ messages: state.msgs.slice(-14), child: name, topic: TOPICS[state.topic].t }) })
    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-   .then(function(d){ if(done)return; done=true; clearTimeout(tmo); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent="";
+   .then(function(d){ if(done)return; done=true; clearTimeout(tmo); _clrTk(); var reply=(d&&d.reply||"").trim(); if(!reply) throw 0; if(st)st.textContent="";
      state.aiN++; state.aiMs += (Date.now()-_t0);
      /* garbled من talk-ai: النموذج نفسه يقول «هذا خطأ تفريغٍ لا خطأ الطفل».
         نعامله كالثقة المتدنّية: لا حكمَ نحويًّا ولا حساب في نسبة صحّة الجملة. */
@@ -966,7 +999,7 @@ function aiTurn(childText, tid){
      if(_wrong){ try{ var _c=document.getElementById("cor-"+tid);
        if(_c && _c.scrollIntoView) _c.scrollIntoView({block:"center", behavior:"smooth"}); }catch(e){} }
      saveTalkSession(); })
-   .catch(function(){ if(done)return; done=true; clearTimeout(tmo); if(st)st.textContent="";
+   .catch(function(){ if(done)return; done=true; clearTimeout(tmo); _clrTk(); if(st)st.textContent="";
      state.fbN++; state.aiMs += (Date.now()-_t0); replyThenAsk(childText); saveTalkSession(); });
 }
 function replyThenAsk(childText){
