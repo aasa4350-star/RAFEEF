@@ -438,6 +438,9 @@ function listen(statusEl, btn, onDone, tries){
         _st.part=_t.slice(0,60); if(_t) _st.full=_t;
         /* ما زال يتكلّم: نُلغي مهلة «انتهى دوره» */
         if(_t) _clrEnd();
+        /* وإن كنّا ننتظر نتيجته النهائيّة فهذه علامةُ أنّه لم يسكت بعد —
+           فنُمدّد الانتظار. انظر _waitMore في _stopThen. */
+        if(_t && _stopping && _waitMore) _waitMore();
         /* ═══ يشوف كلامه وهو يتكلّم ═══
            بلاغ الأب: «يتأخّر الردّ… سبّب لهم ملل». وصفوف سعود تقول
            إنّ أزور كانت تسمعه وتُرسل خمس عشرة نتيجةً جزئيّة — ونحن
@@ -563,14 +566,16 @@ function listen(statusEl, btn, onDone, tries){
      فلا يقطع انتظارَها نجاحُ أمر الإيقاف — بل تُنهيه هي حين تصل، أو
      مهلةٌ أطول من فاصل الجملة. */
   var _flush=null;          /* تُنهي الانتظار فور وصول النتيجة النهائيّة */
+  var _waitMore=null;       /* يُمدّد الانتظار ما دام الطفل يتكلّم */
   function _stopThen(why){
     if(fin || _stopping) return;
     _stopping=true; _clrEnd();
-    var wt=null, ended=false;
+    var wt=null, hard=null, ended=false;
     /* الخطوة الثانية: نُوقف السماع ثمّ نُجمّع. */
     function finish(){
-      if(ended) return; ended=true; _flush=null;
+      if(ended) return; ended=true; _flush=null; _waitMore=null;
       if(wt){ clearTimeout(wt); wt=null; }
+      if(hard){ clearTimeout(hard); hard=null; }
       var done=false;
       function go(){ if(done) return; done=true; if(st){clearTimeout(st);st=null;} _assemble(why); }
       var st=setTimeout(go, 1200);
@@ -584,7 +589,19 @@ function listen(statusEl, btn, onDone, tries){
       statusEl.style.color="var(--muted)";
       statusEl.innerHTML='<span style="opacity:.75">⏳ لحظة — أجمع كلامك...</span>';
       _flush=finish;                       /* وصلت النتيجة ⇐ نمضي فورًا */
-      wt=setTimeout(finish, 2000);         /* تعلّقت الخدمة ⇐ نمضي بالجزئيّ كما كنّا */
+      /* ═══ المهلة تُقاس من آخر ما سمعناه لا من لحظة الضغط ═══
+         بعد شحن الإصلاح الأوّل (٢١ سبتمبر) ارتفعت الأدوار التي وصلتها
+         نتيجةٌ نهائيّة من قريبِ الصفر إلى ٤٨٪ — ثمّ وقف العدّاد. وصفوف
+         أسامة تقول لماذا: جلسةٌ فيها ٣١ كلمةً وستّةُ أدوارٍ كلّها جزئيّة.
+         فهو يضغط «خلّصت» وهو ما زال يتكلّم، فتستمرّ أزور تُرسل نتائجَ
+         جزئيّة، وفاصلُ الجملة عندها ١٫٥ث من السكوت — فإن قِسنا مهلتنا
+         من لحظة الضغط انقضت قبل أن يسكت هو أصلًا.
+         فصار كلُّ نتيجةٍ جزئيّةٍ تُجدّد المهلة: ننتظر ١٫٩ث بعد آخر ما
+         سمعناه (أطولَ من فاصل أزور فتُدركنا نتيجتُها)، وسقفٌ مطلقٌ سبعُ
+         ثوانٍ فلا يتعلّق الدور مهما طال. */
+      _waitMore=function(){ if(ended) return; if(wt) clearTimeout(wt); wt=setTimeout(finish, 1900); };
+      _waitMore();
+      hard=setTimeout(finish, 7000);
       return;
     }
     finish();
