@@ -91,8 +91,8 @@
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who=(qs("who")||"saud").toLowerCase();
-var NAMES={saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"};
-var GRADES={saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
+var NAMES={saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن",fahad:"فهد"};
+var GRADES={saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط",fahad:"ثالث ثانوي"};
 var name=NAMES[who]||"الطالب";
 
 /* ===== تسجيل جلسة المحادثة (بلاغ الأب ١ سبتمبر ٢٠٢٦: «كيف أتابع
@@ -740,9 +740,46 @@ var TOPICS={
   school:{ico:"🏫",t:"المدرسة",open:"Let's talk about school. Do you like school?",qs:["What is your favorite subject?","Who is your favorite teacher?","What do you do at break time?","Is English easy for you?"]},
   food:{ico:"🍕",t:"الأكل",open:"Let's talk about food. What is your favorite food?",qs:["Do you like fruit?","What do you eat for breakfast?","Can you cook anything?","Do you like sweets?"]},
   day:{ico:"🌤️",t:"يومي",open:"Tell me about your day. What time do you wake up?",qs:["What do you do in the morning?","How do you go to school?","What do you do after school?","What time do you sleep?"]},
-  dream:{ico:"🌟",t:"أحلامي",open:"Let's dream big! What do you want to be in the future?",qs:["Why do you want that?","Where do you want to travel?","What is your biggest wish?","What makes you happy?"]}
+  dream:{ico:"🌟",t:"أحلامي",open:"Let's dream big! What do you want to be in the future?",qs:["Why do you want that?","Where do you want to travel?","What is your biggest wish?","What makes you happy?"]},
+
+  /* ═══ مواضيعُ من هو على أبواب الجامعة والعمل ═══
+     طلبُ الأب (٢٣ سبتمبر ٢٠٢٦): «أضف في المحادثة قسم التوظيف أو
+     العمل أو شيءٍ من هذا القبيل». وفهد ثالثُ ثانويّ، فمواضيعُ
+     «الهوايات» و«الأكل» دون مستواه لغةً وسنًّا. وهذه الثلاثةُ
+     مقصورةٌ عليه (LIST_OF أدناه) فلا تظهر لسعودٍ مقابلةُ عمل. */
+  work:{ico:"💼",t:"العمل والتوظيف",
+    open:"Good morning. Thank you for coming. Could you tell me a little about yourself?",
+    qs:["What are your strongest skills?",
+        "Why do you want to work in this field?",
+        "Tell me about a time you solved a difficult problem.",
+        "What is your biggest weakness, and how do you work on it?",
+        "Where do you see yourself in five years?",
+        "Do you prefer working alone or in a team? Why?",
+        "How do you handle pressure and deadlines?",
+        "Do you have any questions for me?"]},
+  uni:{ico:"🎓",t:"الجامعة والتخصّص",
+    open:"So, you are finishing high school. Which major are you planning to study?",
+    qs:["Why did you choose that major?",
+        "Which university would you like to join, and why?",
+        "What subjects are you strongest in?",
+        "How are you preparing for the entrance exams?",
+        "Would you study abroad if you had the chance?",
+        "What career do you want after you graduate?",
+        "What worries you most about university life?"]},
+  daily:{ico:"🧾",t:"مواقف الحياة",
+    open:"Hello! I work at the reception desk. How can I help you today?",
+    qs:["Could you describe the problem in detail, please?",
+        "Have you tried contacting anyone about it before?",
+        "What solution would you like us to offer?",
+        "Could you give me your contact information?",
+        "Is there anything else I can help you with?",
+        "How would you rate the service you received?"]}
 };
-var LIST=["free","meet","family","hobby","school","food","day","dream"];
+var LIST_ALL=["free","meet","family","hobby","school","food","day","dream"];
+/* فهد في مرحلةٍ أخرى: نُبقي الدردشةَ الحرّة والتعارف، ونُبدِل مواضيعَ
+   الأطفال بمواضيع الجامعة والعمل ومواقف الحياة. */
+var LIST_FAHAD=["free","work","uni","daily","meet","school","day","dream"];
+var LIST=(who==="fahad") ? LIST_FAHAD : LIST_ALL;
 
 // ردود المعلّم حسب كلمات الطفل
 var REACT=[

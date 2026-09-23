@@ -772,7 +772,9 @@ app.innerHTML =
   '<header class="top"><p class="eyebrow">'+HEAD_EYE+'</p><h1>'+HEAD_TTL+name+'</h1></header>'+
   /* «اختبر نفسك» (quiz.html) إنجليزيٌّ ورياضيّاتُ منهجٍ مدرسيّ ولا يعرف
      فهد، فيحفظ محاولاته باسم «الطالب» فتتلف البيانات. فلا نعرضه له. */
-  (NO_GAT ? '' : '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>')+
+  (NO_GAT
+     ? '<div class="bar"><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a><a href="talk.html?who='+who+'">🗣️ محادثة إنجليزية</a></div>'
+     : '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>')+
   (VERBAL_ONLY ? '' : '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>')+
   '<div class="tabs" role="tablist">'+
     TABS.map(function(t,i){ return '<button data-tab="'+t[0]+'" aria-selected="'+(i===0?'true':'false')+'">'+t[1]+'</button>'; }).join('')+
