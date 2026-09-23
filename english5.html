@@ -272,17 +272,22 @@ function enTarget(stemEl, ansText){
    والتفضيل. */
 var MONTHS = [["January","يناير"],["February","فبراير"],["March","مارس"],["April","أبريل"],["May","مايو"],["June","يونيو"],
   ["July","يوليو"],["August","أغسطس"],["September","سبتمبر"],["October","أكتوبر"],["November","نوفمبر"],["December","ديسمبر"]];
-var WVOC = [["ago","منذ / قبل"],["calendar","التقويم / الرزنامة"],["date","التاريخ"],["early","مبكّرًا"],
-  ["late","متأخّرًا"],["month","الشهر"],["year","السنة"],["time","الوقت"],["prepare","يُجهّز / يستعدّ"],
-  ["festival","مهرجان"],["mountain","جبل"],["rainbow","قوس قزح"],["snail","حلزون"],["comic book","قصّة مصوّرة"]];
+var WVOC = [["ago","منذ / قبل","in the past, before now"],["calendar","التقويم / الرزنامة","it shows the days and months of a year"],["date","التاريخ","the day, month and year of something"],["early","مبكّرًا","before the usual time"],
+  ["late","متأخّرًا","after the usual time"],["month","الشهر","one of the twelve parts of a year"],["year","السنة","twelve months"],["time","الوقت","you read it on a clock"],["prepare","يُجهّز / يستعدّ","to get something ready"],
+  ["festival","مهرجان","a special day or week of celebration"],["mountain","جبل","very high land with a top"],["rainbow","قوس قزح","colours in the sky after rain"],["snail","حلزون","a small slow animal that carries its shell"],["comic book","قصّة مصوّرة","a book that tells a story in pictures"]];
 var NUM100 = [[101,"one hundred and one"],[115,"one hundred and fifteen"],[120,"one hundred and twenty"],
   [200,"two hundred"],[250,"two hundred and fifty"],[340,"three hundred and forty"],[500,"five hundred"],
   [612,"six hundred and twelve"],[700,"seven hundred"],[880,"eight hundred and eighty"],[1000,"one thousand"]];
-function gWVoc(){ var p=gp(WVOC); var o=opt(p[1], dist(WVOC,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gMonthAr(){ var p=gp(MONTHS); var o=opt(p[1], dist(MONTHS,p,1)); return ["ما الشهر "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+function gWVoc(){ var p=gp(WVOC); var o=opt(p[0], dist(WVOC,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+/* كانت تسأل عن اسم الشهر بالعربيّة. صارت تسأل عن ترتيبه في السنة،
+   فتبقى معرفةُ التقويم مطلوبةً والسؤالُ كلُّه بالإنجليزيّة. */
+function gMonthAr(){ var i=Math.floor(Math.random()*MONTHS.length); var p=MONTHS[i];
+  var o=opt(p[0], MONTHS.filter(function(x){return x!==p;}).map(function(x){return x[0];}).sort(function(){return Math.random()-0.5;}).slice(0,2));
+  var ord=["first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth","eleventh","twelfth"][i];
+  return ["Which month is the <b>"+ord+"</b> month of the year?", o[0].map(en), o[1], en(p[0])+" is month number "+(i+1)+"."]; }
 function gMonthOrder(){ var i=Math.floor(Math.random()*11); var p=MONTHS[i], nx=MONTHS[i+1];
-  var o=opt(nx[0], dist(MONTHS,nx,0)); return ["ما الشهر الذي يأتي بعد "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+nx[0])+" ("+p[1]+" ثمّ "+nx[1]+")."]; }
-function gNum(){ var p=gp(NUM100); var o=opt(p[1], dist(NUM100,p,1)); return ["اكتب العدد "+en("«"+p[0]+"»")+" بالكلمات:", o[0], o[1], en(p[0]+" = "+p[1])+"."]; }
+  var o=opt(nx[0], dist(MONTHS,nx,0)); return ["Which month comes after "+en("«"+p[0]+"»")+"?", o[0], o[1], en(p[0]+" → "+nx[0])+" ("+p[1]+" ثمّ "+nx[1]+")."]; }
+function gNum(){ var p=gp(NUM100); var o=opt(p[1], dist(NUM100,p,1)); return ["Write the number "+en("«"+p[0]+"»")+" in words:", o[0], o[1], en(p[0]+" = "+p[1])+"."]; }
 function gHowManyLong(){
   var items=[["___ students are there in your class? — Twenty.","How many","How long"],
              ["___ did you stay in Riyadh? — For three days.","How long","How many"],
@@ -290,34 +295,35 @@ function gHowManyLong(){
              ["___ is the movie? — Two hours.","How long","How many"],
              ["___ brothers do you have? — Two.","How many","How long"]];
   var p=gp(items); var o=opt(p[1],[p[2],"How much"]);
-  return ["أكمل السؤال: "+en(p[0]), o[0], o[1], en("How many")+" للعدد (أشياء تُعدّ)، و"+en("How long")+" للمدّة."]; }
+  return ["Complete the question: "+en(p[0]), o[0], o[1], en("How many")+" للعدد (أشياء تُعدّ)، و"+en("How long")+" للمدّة."]; }
 function gAgo(){
   var items=[["I saw him two days ___.","ago","late"],["She came late, not ___.","early","ago"],["What's the ___ today? — The fifth of May.","date","calendar"],["We use a ___ to see the days and months.","calendar","festival"]];
   var p=gp(items); var o=opt(p[1],[p[2],"month"]);
-  return ["أكمل: "+en(p[0]), o[0], o[1], "الكلمة المناسبة: "+en(p[1])+"."]; }
+  return ["Complete: "+en(p[0]), o[0], o[1], "الكلمة المناسبة: "+en(p[1])+"."]; }
 var WSUP = [["tall","the tallest","الأطول"],["big","the biggest","الأكبر"],["small","the smallest","الأصغر"],
   ["long","the longest","الأطول (طولًا)"],["nice","the nicest","الألطف"],["happy","the happiest","الأسعد"],["good","the best","الأفضل"]];
-function gSup(){ var p=gp(WSUP); var o=opt(p[1], dist(WSUP,p,1)); return ["صيغة التفضيل (superlative) من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+")."]; }
+function gSup(){ var p=gp(WSUP); var o=opt(p[1], dist(WSUP,p,1)); return ["Superlative of "+en("«"+p[0]+"»")+"?", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+")."]; }
 var WPAST = [["go","went"],["see","saw"],["eat","ate"],["take","took"],["come","came"],["make","made"],["prepare","prepared"],["climb","climbed"]];
 function gWPast(){ var p=gp(WPAST); var o=opt(p[1], [p[0]+"ed", p[0]+"s"].filter(function(x){return x!==p[1];}).concat(dist(WPAST,p,1)).slice(0,2));
-  return ["الماضي البسيط من "+en("«"+p[0]+"»")+"؟", o[0], o[1], en(p[0]+" → "+p[1])+"."]; }
+  return ["Simple Past of "+en("«"+p[0]+"»")+"?", o[0], o[1], en(p[0]+" → "+p[1])+"."]; }
 
 /* ============ Unit 1 — Personal Interests ============
    صفاتٌ كثيرة، وسابقة un-، والمضارع البسيط مقابل الماضي البسيط،
    وأفعال الحالة مقابل أفعال الحدث. */
-var ADJ_PI = [["amazing","مدهش"],["enormous","ضخم جدًّا"],["excellent","ممتاز"],["friendly","ودود"],["funny","مضحك"],
-  ["important","مهمّ"],["interesting","مشوّق"],["lovely","جميل / لطيف"],["lucky","محظوظ"],["noisy","مُزعج الصوت"],
-  ["popular","مشهور / محبوب"],["special","مميّز"],["wonderful","رائع"],["tidy","مرتّب"],["horrible","فظيع"],
-  ["messy","فوضويّ"],["excited","متحمّس"],["unusual","غير عاديّ"]];
+var ADJ_PI = [["amazing","مدهش","so good that it surprises you"],["enormous","ضخم جدًّا","very, very big"],["excellent","ممتاز","extremely good"],["friendly","ودود","kind and easy to talk to"],["funny","مضحك","it makes you laugh"],
+  ["important","مهمّ","it matters a lot"],["interesting","مشوّق","it makes you want to know more"],["lovely","جميل / لطيف","very nice and pleasant"],["lucky","محظوظ","good things happen to you by chance"],["noisy","مُزعج الصوت","it makes a lot of sound"],
+  ["popular","مشهور / محبوب","many people like it"],["special","مميّز","not ordinary, different in a good way"],["wonderful","رائع","very good indeed"],["tidy","مرتّب","everything is in its right place"],["horrible","فظيع","very bad or unpleasant"],
+  ["messy","فوضويّ","nothing is in its right place"],["excited","متحمّس","very happy about something coming"],["unusual","غير عاديّ","not normal, not common"]];
 var UN_PAIR = [["friendly","unfriendly","ودود ↔ غير ودود"],["kind","unkind","لطيف ↔ قاسٍ"],
   ["lucky","unlucky","محظوظ ↔ سيّئ الحظّ"],["tidy","untidy","مرتّب ↔ غير مرتّب"],["usual","unusual","معتاد ↔ غير معتاد"]];
-var PI_EXP = [["hobby","هواية"],["fair","معرض / مهرجان"],["origami","فنّ طيّ الورق"],["carving","النحت"],
-  ["believe","يعتقد / يصدّق"],["prefer","يفضّل"],["enjoy","يستمتع بـ"],["ride","يركب"]];
-function gAdjPI(){ var p=gp(ADJ_PI); var o=opt(p[1], dist(ADJ_PI,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gPIExp(){ var p=gp(PI_EXP); var o=opt(p[1], dist(PI_EXP,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gUn(){ var p=gp(UN_PAIR); var o=opt(p[1], dist(UN_PAIR,p,1)); return ["أضف السابقة "+en("un-")+" إلى "+en("«"+p[0]+"»")+" لتحصل على الضدّ:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). السابقة "+en("un-")+" تقلب المعنى إلى ضدّه."]; }
-function gUnMean(){ var p=gp(UN_PAIR); var o=opt("ضدّ "+p[2].split(" ↔ ")[0], ["نفس معنى "+p[2].split(" ↔ ")[0], "أشدّ من "+p[2].split(" ↔ ")[0]]);
-  return ["ماذا تفعل السابقة "+en("un-")+" في كلمة "+en("«"+p[1]+"»")+"؟", o[0], o[1], en("un-")+" سابقةُ نفيٍ تعطي الضدّ: "+en(p[1])+" = "+p[2].split(" ↔ ")[1]+"."]; }
+var PI_EXP = [["hobby","هواية","something you enjoy doing in your free time"],["fair","معرض / مهرجان","a big event with games, food and shows"],["origami","فنّ طيّ الورق","the art of folding paper into shapes"],["carving","النحت","cutting wood or stone into a shape"],
+  ["believe","يعتقد / يصدّق","to think something is true"],["prefer","يفضّل","to like one thing more than another"],["enjoy","يستمتع بـ","to get pleasure from something"],["ride","يركب","to sit on a bike or a horse and move"]];
+function gAdjPI(){ var p=gp(ADJ_PI); var o=opt(p[0], dist(ADJ_PI,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gPIExp(){ var p=gp(PI_EXP); var o=opt(p[0], dist(PI_EXP,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gUn(){ var p=gp(UN_PAIR); var o=opt(p[1], dist(UN_PAIR,p,1)); return ["Add the prefix "+en("un-")+" to "+en("«"+p[0]+"»")+" to make the opposite:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). السابقة "+en("un-")+" تقلب المعنى إلى ضدّه."]; }
+function gUnMean(){ var p=gp(UN_PAIR); var _w=p[0];   /* الكلمة الأصل بالإنجليزيّة لا ترجمتها */
+  var o=opt("the opposite of "+_w, ["the same as "+_w, "stronger than "+_w]);
+  return ["What does the prefix "+en("un-")+" do in "+en("«"+p[1]+"»")+"?", o[0], o[1], en("un-")+" سابقةُ نفيٍ تعطي الضدّ: "+en(p[1])+" = "+p[2].split(" ↔ ")[1]+"."]; }
 function gPresPast(){
   var items=[["I ___ to the fair every year.","go","went","«every year» عادةٌ متكرّرة ⇐ مضارع بسيط."],
              ["Yesterday, I ___ to the fair.","went","go","«Yesterday» زمنٌ ماضٍ ⇐ ماضٍ بسيط."],
@@ -326,12 +332,12 @@ function gPresPast(){
              ["He usually ___ his bike after school.","rides","rode","«usually» عادة ⇐ مضارع بسيط."],
              ["Two days ago, they ___ a funny show.","watched","watch","«ago» ماضٍ ⇐ ماضٍ بسيط."]];
   var p=gp(items); var o=opt(p[1],[p[2],p[1]+"ing"]);
-  return ["أكمل (مضارع بسيط أم ماضٍ بسيط؟): "+en(p[0]), o[0], o[1], p[3]]; }
+  return ["Complete (Simple Present or Simple Past?): "+en(p[0]), o[0], o[1], p[3]]; }
 var STATE_V = [["like","حالة"],["love","حالة"],["want","حالة"],["know","حالة"],["believe","حالة"],["prefer","حالة"],["need","حالة"],
   ["play","حدث"],["run","حدث"],["make","حدث"],["watch","حدث"],["ride","حدث"],["carve","حدث"]];
-function gStateAction(){ var p=gp(STATE_V); var o=opt(p[1]==="حالة"?"فعل حالة (State Verb)":"فعل حدث (Action Verb)",
-    [p[1]==="حالة"?"فعل حدث (Action Verb)":"فعل حالة (State Verb)","ليس فعلًا"]);
-  return [en("«"+p[0]+"»")+" — أهو فعل حالةٍ أم فعل حدث؟", o[0], o[1],
+function gStateAction(){ var p=gp(STATE_V); var o=opt(p[1]==="حالة"?"a State Verb":"an Action Verb",
+    [p[1]==="حالة"?"an Action Verb":"a State Verb","not a verb"]);
+  return [en("«"+p[0]+"»")+" — is it a state verb or an action verb?", o[0], o[1],
     p[1]==="حالة" ? en(p[0])+" فعل حالة: يصف شعورًا أو رأيًا أو معرفة، فلا يُستعمل في المضارع المستمر عادةً (لا نقول "+en("I am liking")+")."
                   : en(p[0])+" فعل حدث: يصف عملًا يُفعل، فيصحّ في المستمر ("+en("I am "+p[0]+"ing")+")."]; }
 function gStateProg(){
@@ -340,107 +346,107 @@ function gStateProg(){
              ["She ___ that origami is amazing.","believes","is believing","فعل حالة ⇐ لا يأتي في المستمرّ."],
              ["They ___ their bikes at the moment.","are riding","ride","«at the moment» ⇐ المستمرّ."]];
   var p=gp(items); var o=opt(p[1],[p[2],"was "+p[1].split(" ").pop()]);
-  return ["أكمل: "+en(p[0]), o[0], o[1], p[3]]; }
+  return ["Complete: "+en(p[0]), o[0], o[1], p[3]]; }
 
 /* ============ Unit 2 — House Designs ============
    مفردات البيت والتصميم، والمستقبل بـ will، والفرق بين will وbe going to. */
-var HOUSE = [["architect","مهندس معماريّ"],["basement","قبو / سرداب"],["design","تصميم"],["entrance","مدخل"],
-  ["fridge","ثلّاجة"],["gate","بوّابة"],["key","مفتاح"],["layout","المخطّط / التوزيع"],["materials","موادّ البناء"],
-  ["measurements","القياسات"],["oven","فرن"],["screen","شاشة"],["shelf","رفّ"],["corner","ركن / زاوية"],
-  ["cushion","وسادة"],["stairs","درج"],["floor","الأرضيّة / الطابق"],["door","باب"]];
-var HOUSE_W = [["actually","في الحقيقة"],["else","غير ذلك / آخر"],["empty","فارغ"],["front","الأمام / الأماميّ"],
-  ["instead","بدلًا من ذلك"],["later","لاحقًا"],["of course","بالطبع"],["wonder","يتساءل"],["haunted","مسكون"],["flashlight","كشّاف / بطّارية"]];
-function gHouse(){ var p=gp(HOUSE); var o=opt(p[1], dist(HOUSE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gHouseW(){ var p=gp(HOUSE_W); var o=opt(p[1], dist(HOUSE_W,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+var HOUSE = [["architect","مهندس معماريّ","the person who designs buildings"],["basement","قبو / سرداب","the room under the ground floor"],["design","تصميم","the plan for how something will look"],["entrance","مدخل","the way into a building"],
+  ["fridge","ثلّاجة","it keeps food cold"],["gate","بوّابة","a door in a wall or fence outside"],["key","مفتاح","you use it to open a lock"],["layout","المخطّط / التوزيع","how the rooms are arranged"],["materials","موادّ البناء","wood, stone and glass used to build"],
+  ["measurements","القياسات","the length, width and height in numbers"],["oven","فرن","you bake food inside it"],["screen","شاشة","you look at pictures on it"],["shelf","رفّ","a flat board on a wall for books"],["corner","ركن / زاوية","where two walls meet"],
+  ["cushion","وسادة","a soft bag you sit or lean on"],["stairs","درج","steps that take you up a floor"],["floor","الأرضيّة / الطابق","you walk on it inside a room"],["door","باب","you open it to go into a room"]];
+var HOUSE_W = [["actually","في الحقيقة","in fact, really"],["else","غير ذلك / آخر","other, different from this"],["empty","فارغ","with nothing inside"],["front","الأمام / الأماميّ","the part that faces forward"],
+  ["instead","بدلًا من ذلك","in place of something else"],["later","لاحقًا","after this time"],["of course","بالطبع","certainly, without doubt"],["wonder","يتساءل","to want to know, to ask yourself"],["haunted","مسكون","people say ghosts are in it"],["flashlight","كشّاف / بطّارية","a small lamp you hold in your hand"]];
+function gHouse(){ var p=gp(HOUSE); var o=opt(p[0], dist(HOUSE,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gHouseW(){ var p=gp(HOUSE_W); var o=opt(p[0], dist(HOUSE_W,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
 function gWill(){
-  var items=[["I ___ look for the key.","will","willing"],["We ___ come here again. (نفي)","won't","don't"],
+  var items=[["I ___ look for the key.","will","willing"],["We ___ come here again. (negative)","won't","don't"],
              ["I ___ tell my dad you don't like fish.","will","am"],["Don't worry — I ___ help you.","will","did"]];
   var p=gp(items); var o=opt(p[1],[p[2],"will to"]);
-  return ["أكمل (المستقبل بـ will): "+en(p[0]), o[0], o[1], "بعد "+en("will")+" يأتي الفعل مجرّدًا، ونفيه "+en("won't")+"."]; }
+  return ["Complete (future with will): "+en(p[0]), o[0], o[1], "بعد "+en("will")+" يأتي الفعل مجرّدًا، ونفيه "+en("won't")+"."]; }
 function gWillGoing(){
-  var items=[["I ___ sleep at Luna's house tonight. (خطّةٌ مرتّبةٌ من قبل)","am going to","will","الخطّة المرتّبة سلفًا ⇐ "+en("be going to")+"."],
-             ["The bag is heavy! I ___ carry it for you. (قرارٌ في اللحظة)","will","am going to","القرار وقت الكلام ⇐ "+en("will")+"."],
-             ["Look at those clouds — it ___ rain. (دليلٌ أمامنا)","is going to","will","الدليل الظاهر ⇐ "+en("be going to")+"."],
-             ["We ___ visit the new house next Friday. (متّفقٌ عليه)","are going to","will","الاتّفاق السابق ⇐ "+en("be going to")+"."]];
+  var items=[["I ___ sleep at Luna's house tonight. (a plan made before)","am going to","will","الخطّة المرتّبة سلفًا ⇐ "+en("be going to")+"."],
+             ["The bag is heavy! I ___ carry it for you. (decision right now)","will","am going to","القرار وقت الكلام ⇐ "+en("will")+"."],
+             ["Look at those clouds — it ___ rain. (we can see the proof)","is going to","will","الدليل الظاهر ⇐ "+en("be going to")+"."],
+             ["We ___ visit the new house next Friday. (already agreed)","are going to","will","الاتّفاق السابق ⇐ "+en("be going to")+"."]];
   var p=gp(items); var o=opt(p[1],[p[2],"went to"]);
-  return ["أكمل ("+en("will")+" أم "+en("be going to")+"؟): "+en(p[0]), o[0], o[1], p[3]]; }
+  return ["Complete ("+en("will")+" or "+en("be going to")+"?): "+en(p[0]), o[0], o[1], p[3]]; }
 var VN_WORDS = [["design","يُصمّم","تصميم"],["screen","يفحص/يعرض","شاشة"],["phone","يتّصل","هاتف"],
   ["key","يُدخل بالمفتاح","مفتاح"],["floor","يُذهل","أرضيّة"]];
-function gVerbNoun2(){ var p=gp(VN_WORDS); var o=opt("اسمًا وفعلًا معًا",["اسمًا فقط","فعلًا فقط"]);
-  return ["كلمة "+en("«"+p[0]+"»")+" — كيف تُستعمل في هذه الوحدة؟", o[0], o[1],
+function gVerbNoun2(){ var p=gp(VN_WORDS); var o=opt("both a noun and a verb",["only a noun","only a verb"]);
+  return ["The word "+en("«"+p[0]+"»")+" — how is it used in this unit?", o[0], o[1],
     "بعض الكلمات تُستعمل اسمًا وفعلًا: "+en(p[0])+" اسمًا = "+p[2]+"، وفعلًا = "+p[1]+"."]; }
 
 /* ============ Unit 3 — Job Paths ============
    المهن وأماكن العمل، وbe going to، وmay/might، وأسئلة الذيل. */
-var JOBS = [["actor","ممثّل"],["actress","ممثّلة"],["artist","فنّان"],["businessman","رجل أعمال"],["businesswoman","سيّدة أعمال"],
-  ["driver","سائق"],["engineer","مهندس"],["fashion designer","مصمّم أزياء"],["flight attendant","مضيف طيران"],
-  ["journalist","صحفيّ"],["manager","مدير"],["mechanic","ميكانيكيّ"],["photographer","مصوّر"],["pilot","طيّار"],
-  ["singer","مغنٍّ"],["waiter","نادل"]];
-var WORKPLACE = [["airport","مطار"],["factory","مصنع"],["gallery","معرض فنّيّ"],["office","مكتب"],["stage","خشبة المسرح"],
-  ["meeting","اجتماع"],["news","الأخبار"],["job","وظيفة"]];
+var JOBS = [["actor","ممثّل","a man who plays a part in a film"],["actress","ممثّلة","a woman who plays a part in a film"],["artist","فنّان","a person who paints or draws"],["businessman","رجل أعمال","a man who runs a company"],["businesswoman","سيّدة أعمال","a woman who runs a company"],
+  ["driver","سائق","a person who drives a car or bus"],["engineer","مهندس","a person who designs machines or bridges"],["fashion designer","مصمّم أزياء","a person who designs clothes"],["flight attendant","مضيف طيران","a person who helps travellers on a plane"],
+  ["journalist","صحفيّ","a person who writes the news"],["manager","مدير","a person in charge of a team"],["mechanic","ميكانيكيّ","a person who repairs cars"],["photographer","مصوّر","a person who takes photos"],["pilot","طيّار","a person who flies a plane"],
+  ["singer","مغنٍّ","a person who sings"],["waiter","نادل","a person who serves food in a restaurant"]];
+var WORKPLACE = [["airport","مطار","planes take off and land here"],["factory","مصنع","things are made here in large numbers"],["gallery","معرض فنّيّ","paintings are shown here"],["office","مكتب","people work at desks here"],["stage","خشبة المسرح","actors and singers perform on it"],
+  ["meeting","اجتماع","people come together to talk about work"],["news","الأخبار","reports about what is happening now"],["job","وظيفة","the work a person does for money"]];
 var JOB_MATCH = [["pilot","airport"],["mechanic","factory"],["artist","gallery"],["manager","office"],["singer","stage"]];
-function gJob(){ var p=gp(JOBS); var o=opt(p[1], dist(JOBS,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gPlace(){ var p=gp(WORKPLACE); var o=opt(p[1], dist(WORKPLACE,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gJobPlace(){ var p=gp(JOB_MATCH); var o=opt(p[1], dist(JOB_MATCH,p,1)); return ["أين يعمل "+en("«a "+p[0]+"»")+" غالبًا؟", o[0], o[1], en("A "+p[0]+" works at the/a "+p[1])+"."]; }
+function gJob(){ var p=gp(JOBS); var o=opt(p[0], dist(JOBS,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gPlace(){ var p=gp(WORKPLACE); var o=opt(p[0], dist(WORKPLACE,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gJobPlace(){ var p=gp(JOB_MATCH); var o=opt(p[1], dist(JOB_MATCH,p,1)); return ["Where does "+en("«a "+p[0]+"»")+" usually work?", o[0], o[1], en("A "+p[0]+" works at the/a "+p[1])+"."]; }
 function gIst(){
   var items=[["art","artist","فنّ ← فنّان"],["journal","journalist","صحيفة ← صحفيّ"],["science","scientist","علم ← عالِم"],["piano","pianist","بيانو ← عازف بيانو"]];
   var p=gp(items); var o=opt(p[1],[p[0]+"er",p[0]+"or"]);
-  return ["أضف اللاحقة "+en("-ist")+" إلى "+en("«"+p[0]+"»")+" لتحصل على اسم صاحب المهنة:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). اللاحقة "+en("-ist")+" تصنع اسم من يعمل بالشيء."]; }
+  return ["Add the suffix "+en("-ist")+" to "+en("«"+p[0]+"»")+" to make the job name:", o[0], o[1], en(p[0]+" → "+p[1])+" ("+p[2]+"). اللاحقة "+en("-ist")+" تصنع اسم من يعمل بالشيء."]; }
 function gGoingTo3(){
-  var items=[["I'm ___ going to work in an office. (نفي)","not","don't"],
+  var items=[["I'm ___ going to work in an office. (negative)","not","don't"],
              ["She ___ going to be a pilot.","is","are"],
              ["They ___ going to open a factory.","are","is"],
              ["What ___ you going to be in the future?","are","do"]];
   var p=gp(items); var o=opt(p[1],[p[2],"was"]);
-  return ["أكمل ("+en("be going to")+"): "+en(p[0]), o[0], o[1], "الصيغة: "+en("am/is/are + going to + verb")+"، والنفي بإضافة "+en("not")+" بعد فعل الكون."]; }
+  return ["Complete ("+en("be going to")+"): "+en(p[0]), o[0], o[1], "الصيغة: "+en("am/is/are + going to + verb")+"، والنفي بإضافة "+en("not")+" بعد فعل الكون."]; }
 function gMayMight(){
-  var items=[["She ___ be a pilot because she likes flying. (احتمالٌ وارد)","may","will","الاحتمال غير المؤكّد ⇐ "+en("may/might")+"."],
-             ["Julian ___ not be a pilot because he's scared of planes. (احتمالٌ ضعيف)","might","will","الاحتمال الضعيف ⇐ "+en("might not")+"."],
+  var items=[["She ___ be a pilot because she likes flying. (possible)","may","will","الاحتمال غير المؤكّد ⇐ "+en("may/might")+"."],
+             ["Julian ___ not be a pilot because he's scared of planes. (not likely)","might","will","الاحتمال الضعيف ⇐ "+en("might not")+"."],
              ["I'm not sure. I ___ become an engineer.","might","am","عدم التأكّد ⇐ "+en("might")+"."]];
   var p=gp(items); var o=opt(p[1],[p[2],"must"]);
-  return ["أكمل: "+en(p[0]), o[0], o[1], p[3]]; }
+  return ["Complete: "+en(p[0]), o[0], o[1], p[3]]; }
 function gTag(){
   var items=[["This is a theater, ___?","isn't it","is it"],["I can come, ___?","can't I","can I"],
              ["She is a journalist, ___?","isn't she","is she"],["They aren't waiters, ___?","are they","aren't they"],
              ["You like this job, ___?","don't you","do you"]];
   var p=gp(items); var o=opt(p[1],[p[2],"isn't he"]);
-  return ["أكمل سؤال الذيل (Question tag): "+en(p[0]), o[0], o[1], "قاعدة الذيل: جملةٌ مثبتة ⇐ ذيلٌ منفيّ، وجملةٌ منفيّة ⇐ ذيلٌ مثبت. الصحيح: "+en(p[1])+"."]; }
+  return ["Complete the question tag: "+en(p[0]), o[0], o[1], "قاعدة الذيل: جملةٌ مثبتة ⇐ ذيلٌ منفيّ، وجملةٌ منفيّة ⇐ ذيلٌ مثبت. الصحيح: "+en(p[1])+"."]; }
 
 /* ============ Unit 4 — Glorious Food ============
    مفردات الطبخ، وshould/had better للنصح، والشرط الصفريّ. */
-var FOOD_N = [["butter","زبدة"],["cookies","بسكويت"],["countertop","سطح المطبخ"],["flour","دقيق"],["honey","عسل"],
-  ["ingredients","المكوّنات"],["recipe","وصفة"],["snack","وجبة خفيفة"],["sugar","سكّر"],["topping","الطبقة العلويّة"],
-  ["yogurt","زبادي"],["dough","عجين"],["diet","نظام غذائيّ"],["dairy","منتجات الألبان"],["proteins","بروتينات"]];
-var FOOD_V = [["bake","يخبز"],["fetch","يُحضر / يجلب"],["cut","يقطع"],["measure","يقيس"],["mix","يخلط"],
-  ["pour","يصبّ"],["roll","يفرد بالنشّابة"],["stir","يُقلّب"],["taste","يتذوّق"],["smell","يشمّ"]];
-function gFoodN(){ var p=gp(FOOD_N); var o=opt(p[1], dist(FOOD_N,p,1)); return ["معنى "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
-function gFoodV(){ var p=gp(FOOD_V); var o=opt(p[1], dist(FOOD_V,p,1)); return ["معنى الفعل "+en("«"+p[0]+"»")+" بالعربي؟", o[0], o[1], en(p[0])+" = "+p[1]+"."]; }
+var FOOD_N = [["butter","زبدة","a soft yellow food made from milk"],["cookies","بسكويت","small sweet biscuits"],["countertop","سطح المطبخ","the flat surface you work on in a kitchen"],["flour","دقيق","white powder from wheat, used for bread"],["honey","عسل","a sweet food made by bees"],
+  ["ingredients","المكوّنات","all the things you need to make a dish"],["recipe","وصفة","the steps for cooking a dish"],["snack","وجبة خفيفة","a small amount of food between meals"],["sugar","سكّر","it makes food sweet"],["topping","الطبقة العلويّة","what you put on top of food"],
+  ["yogurt","زبادي","a thick food made from milk"],["dough","عجين","flour and water mixed before baking"],["diet","نظام غذائيّ","the food a person usually eats"],["dairy","منتجات الألبان","milk, cheese and yogurt as a group"],["proteins","بروتينات","food like meat and eggs that build the body"]];
+var FOOD_V = [["bake","يخبز","to cook food in an oven"],["fetch","يُحضر / يجلب","to go and bring something back"],["cut","يقطع","to divide something with a knife"],["measure","يقيس","to find out how much or how long"],["mix","يخلط","to put things together and stir them"],
+  ["pour","يصبّ","to make a liquid flow from a jug"],["roll","يفرد بالنشّابة","to flatten dough with a pin"],["stir","يُقلّب","to move food round with a spoon"],["taste","يتذوّق","to try food with your tongue"],["smell","يشمّ","to use your nose"]];
+function gFoodN(){ var p=gp(FOOD_N); var o=opt(p[0], dist(FOOD_N,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
+function gFoodV(){ var p=gp(FOOD_V); var o=opt(p[0], dist(FOOD_V,p,0)); return ["Which verb means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
 function gFoodStep(){
   var items=[["___ the flour with a cup before you add it.","Measure","Taste"],["___ the eggs and the sugar together.","Mix","Bake"],
              ["___ the milk into the bowl slowly.","Pour","Cut"],["___ the dough with a rolling pin.","Roll","Stir"],
              ["___ the cookies in the oven for ten minutes.","Bake","Fetch"]];
   var p=gp(items); var o=opt(p[1],[p[2],"Smell"]);
-  return ["أكمل خطوة الوصفة: "+en(p[0]), o[0], o[1], "الفعل المناسب: "+en(p[1])+"."]; }
+  return ["Complete the recipe step: "+en(p[0]), o[0], o[1], "الفعل المناسب: "+en(p[1])+"."]; }
 function gShould(){
-  var items=[["You ___ get your ingredients ready first. (نصيحة)","should","must","النصيحة العادية ⇐ "+en("should")+"."],
-             ["You ___ not leave the cookies in the oven too long! (تحذيرٌ أقوى)","had better","should to","التحذير الشديد ⇐ "+en("had better not")+"."],
+  var items=[["You ___ get your ingredients ready first. (advice)","should","must","النصيحة العادية ⇐ "+en("should")+"."],
+             ["You ___ not leave the cookies in the oven too long! (stronger warning)","had better","should to","التحذير الشديد ⇐ "+en("had better not")+"."],
              ["You ___ wash your hands before you cook.","should","shoulds","بعد "+en("should")+" يأتي الفعل مجرّدًا."],
              ["We ___ better ask the chef first.","had","have","الصيغة "+en("had better")+" ثابتة."]];
   var p=gp(items); var o=opt(p[1],[p[2],"will"]);
-  return ["أكمل (نصيحة أم تحذير؟): "+en(p[0]), o[0], o[1], p[3]]; }
+  return ["Complete (advice or warning?): "+en(p[0]), o[0], o[1], p[3]]; }
 function gZeroCond(){
   var items=[["We add more water ___ the sauce is too thick.","if","so"],
              ["___ it doesn't taste great, I stir in more salt.","If","But"],
              ["If you heat butter, it ___.","melts","melted"],
              ["If you don't measure the flour, the cake ___ wrong.","goes","went"]];
   var p=gp(items); var o=opt(p[1],[p[2],"will"]);
-  return ["أكمل (الشرط الصفريّ): "+en(p[0]), o[0], o[1],
+  return ["Complete (Zero Conditional): "+en(p[0]), o[0], o[1],
     "الشرط الصفريّ لحقيقةٍ تتكرّر دائمًا: "+en("If + present simple, present simple")+" — الصحيح: "+en(p[1])+"."]; }
 function gSmells(){
   var items=[["It ___ great! I want to eat now.","smells","smell"],["These cookies ___ delicious.","taste","tastes"],
              ["The soup ___ too salty.","tastes","taste"]];
   var p=gp(items); var o=opt(p[1],[p[2],"smelling"]);
-  return ["أكمل: "+en(p[0]), o[0], o[1], "أفعال الحواسّ ("+en("smell/taste")+") تتبع الفاعل: مفردٌ يأخذ "+en("s")+"، وجمعٌ بلا "+en("s")+"."]; }
+  return ["Complete: "+en(p[0]), o[0], o[1], "أفعال الحواسّ ("+en("smell/taste")+") تتبع الفاعل: مفردٌ يأخذ "+en("s")+"، وجمعٌ بلا "+en("s")+"."]; }
 
 var UW = [gWVoc, gMonthAr, gMonthOrder, gNum, gHowManyLong, gAgo, gSup, gWPast];
 var U1 = [gAdjPI, gPIExp, gUn, gUnMean, gPresPast, gStateAction, gStateProg];

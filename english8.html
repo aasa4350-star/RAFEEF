@@ -129,7 +129,7 @@ function u1Be(){
   var x = gp(BE);
   var o = eOpts(x.be, ["am","is","are"].filter(function(b){ return b!==x.be; }));
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s+" _ from Saudi Arabia."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s+" _ from Saudi Arabia."), o[0].map(en), o[1],
     "الفعل <span class=ltr>be</span> يتبع الفاعل: <span class=ltr>I → am</span> · <span class=ltr>he/she/it</span> والمفرد <span class=ltr>→ is</span> · <span class=ltr>we/you/they</span> والجمع <span class=ltr>→ are</span>. وهنا الفاعل <span class=ltr>"+x.s+"</span> فالصواب <span class=ltr>"+x.be+"</span>.",
     "u1be:"+x.s];
 }
@@ -140,7 +140,7 @@ function u1BeNeg(){
   var right = x.be==="is" ? "isn't" : "aren't";
   var o = eOpts(right, ["isn't","aren't","amn't"].filter(function(b){ return b!==right; }));
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s+" _ at school today."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s+" _ at school today."), o[0].map(en), o[1],
     "نفي <span class=ltr>is</span> هو <span class=ltr>isn't</span>، ونفي <span class=ltr>are</span> هو <span class=ltr>aren't</span>. ولا يوجد في الإنجليزية اختصارٌ اسمه <span class=ltr>amn't</span> — يُقال <span class=ltr>I'm not</span>.",
     "u1neg:"+x.s];
 }
@@ -164,7 +164,7 @@ function u1Wh(){
   shuffle(pool);
   var o = eOpts(x.w, pool);
   if(!o) return null;
-  return ["أيُّ أداةِ سؤالٍ تناسب هذا الجواب؟ "+en("— "+x.a), o[0].map(en), o[1],
+  return ["Which question word fits this answer? "+en("— "+x.a), o[0].map(en), o[1],
     "الجواب يدلّ على <b>"+x.hint+"</b>، وأداتُه <span class=ltr>"+x.w+"</span>.",
     "u1wh:"+x.a];
 }
@@ -186,40 +186,40 @@ function u1Prep(){
   shuffle(pool);
   var o = eOpts(x.p, pool);
   if(!o) return null;
-  return ["اختاري حرف الجرّ المناسب: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct preposition: "+blank(x.s), o[0].map(en), o[1],
     "<span class=ltr>in</span> داخل · <span class=ltr>on</span> فوق مُلامِسًا · <span class=ltr>under</span> تحت · <span class=ltr>next to</span> بجانب · <span class=ltr>between</span> بين اثنين · <span class=ltr>behind</span> خلف · <span class=ltr>in front of</span> أمام · <span class=ltr>across from</span> مقابل.",
     "u1prep:"+x.p];
 }
 
 /* الوظائف: التحية والاعتذار والشكر والتعارف */
 var FUNC1 = [
-  { sit:"تقابلين شخصًا لأوّل مرّة",              r:"Nice to meet you.",       w:["See you later.","You're welcome."] },
-  { sit:"تودّعين صديقتك",                        r:"See you tomorrow!",       w:["Nice to meet you.","How do you do it?"] },
-  { sit:"أحدهم شكرك",                            r:"You're welcome.",         w:["I'm sorry.","Nice to meet you."] },
-  { sit:"تأخّرتِ عن الموعد وتعتذرين",            r:"I'm sorry I'm late.",     w:["Thank you very much.","See you later."] },
-  { sit:"تطلبين اسم شخصٍ بأدب",                  r:"What's your name?",       w:["Where are you from?","How old are you?"] },
-  { sit:"تسألين عن بلد شخصٍ",                    r:"Where are you from?",     w:["What's your name?","What time is it?"] },
-  { sit:"تعرّفين صديقتك على أختك",               r:"This is my sister, Sara.", w:["I'm fine, thanks.","See you soon."] },
-  { sit:"أحدهم قال لك شكرًا على هديّة",          r:"You're welcome.",         w:["Excuse me.","Good luck."] },
-  { sit:"تسألين عن الطريق إلى البنك",            r:"Excuse me, where is the bank?", w:["How are you today?","What's your name?"] },
-  { sit:"تشكرين شخصًا ساعدك",                    r:"Thank you for your help.", w:["I'm sorry.","See you later."] }
+  { sit:"you meet someone for the first time",              r:"Nice to meet you.",       w:["See you later.","You're welcome."] },
+  { sit:"you say goodbye to your friend",                        r:"See you tomorrow!",       w:["Nice to meet you.","How do you do it?"] },
+  { sit:"someone thanks you",                            r:"You're welcome.",         w:["I'm sorry.","Nice to meet you."] },
+  { sit:"you are late and you apologise",            r:"I'm sorry I'm late.",     w:["Thank you very much.","See you later."] },
+  { sit:"you politely ask for someone's name",                  r:"What's your name?",       w:["Where are you from?","How old are you?"] },
+  { sit:"you ask where someone is from",                    r:"Where are you from?",     w:["What's your name?","What time is it?"] },
+  { sit:"you introduce your sister to your friend",               r:"This is my sister, Sara.", w:["I'm fine, thanks.","See you soon."] },
+  { sit:"someone thanks you for a gift",          r:"You're welcome.",         w:["Excuse me.","Good luck."] },
+  { sit:"you ask the way to the bank",            r:"Excuse me, where is the bank?", w:["How are you today?","What's your name?"] },
+  { sit:"you thank someone who helped you",                    r:"Thank you for your help.", w:["I'm sorry.","See you later."] }
 ];
 function u1Func(){
   var x = gp(FUNC1);
   var o = eOpts(x.r, x.w.slice());
   if(!o) return null;
-  return ["ماذا تقولين حين "+x.sit+"؟", o[0].map(en), o[1],
+  return ["What do you say when "+x.sit+"?", o[0].map(en), o[1],
     "العبارة المناسبة هنا: <span class=ltr>"+x.r+"</span>.",
     "u1f:"+x.sit];
 }
 
 /* إرشاد الطريق */
 var DIR1 = [
-  { r:"Go straight ahead.",     ar:"امشِ إلى الأمام مباشرةً" },
-  { r:"Turn left at the corner.", ar:"انعطف يسارًا عند الزاوية" },
-  { r:"Turn right after the bank.", ar:"انعطف يمينًا بعد البنك" },
-  { r:"It's on your left.",     ar:"هو على يسارك" },
-  { r:"It's on your right.",    ar:"هو على يمينك" }
+  { r:"Go straight ahead.",     ar:"Do not turn — keep walking forward." },
+  { r:"Turn left at the corner.", ar:"At the corner, change direction to the left." },
+  { r:"Turn right after the bank.", ar:"Pass the bank, then change direction to the right." },
+  { r:"It's on your left.",     ar:"The place is on the left side of the person you are talking to." },
+  { r:"It's on your right.",    ar:"The place is on the right side of the person you are talking to." }
 ];
 function u1Dir(){
   var x = gp(DIR1);
@@ -227,7 +227,7 @@ function u1Dir(){
   shuffle(pool);
   var o = eOpts(x.r, pool);
   if(!o) return null;
-  return ["أيُّ جملةٍ معناها: <b>"+x.ar+"</b>؟", o[0].map(en), o[1],
+  return ["Which sentence says this? <b>"+x.ar+"</b>", o[0].map(en), o[1],
     "<span class=ltr>"+x.r+"</span> = "+x.ar+".",
     "u1dir:"+x.r];
 }
@@ -245,7 +245,7 @@ function u2Prog(){
   var x = gp(PROG), v = gp(VING);
   var o = eOpts(x.be, ["am","is","are"].filter(function(b){ return b!==x.be; }));
   if(!o) return null;
-  return ["المضارع المستمر — اختاري الصحيح: "+blank(x.s+" _ "+v+" now."), o[0].map(en), o[1],
+  return ["Present Continuous — choose the correct one: "+blank(x.s+" _ "+v+" now."), o[0].map(en), o[1],
     "المضارع المستمر = <span class=ltr>be + verb-ing</span>، و<span class=ltr>be</span> يتبع الفاعل. والفاعل <span class=ltr>"+x.s+"</span> يأخذ <span class=ltr>"+x.be+"</span>.",
     "u2prog:"+x.s];
 }
@@ -270,7 +270,7 @@ function u2Ing(){
   var cands = [wrong1, wrong2, x.v+"eing", x.v+"ning"].filter(function(w){ return w!==x.ing; });
   var o = eOpts(x.ing, cands);
   if(!o) return null;
-  return ["ما صيغة <span class=ltr>ing</span> للفعل "+en(x.v)+"؟", o[0].map(en), o[1],
+  return ["What is the <span class=ltr>ing</span> form of "+en(x.v)+"?", o[0].map(en), o[1],
     x.why+" ⇐ <span class=ltr>"+x.ing+"</span>.",
     "u2ing:"+x.v];
 }
@@ -291,7 +291,7 @@ function u2Imper(){
   var bad2 = useNeg ? ("No "+base+".")  : ("To "+base.toLowerCase()+".");
   var o = eOpts(right, [bad1, bad2]);
   if(!o) return null;
-  return [(useNeg ? "أيُّ صيغة <b>نهي</b> صحيحة؟" : "أيُّ صيغة <b>أمر</b> صحيحة؟"), o[0].map(en), o[1],
+  return [(useNeg ? "Which is a correct <b>negative imperative</b>?" : "Which is a correct <b>imperative</b>?"), o[0].map(en), o[1],
     "الأمر يبدأ بالفعل مجرّدًا بلا فاعل: <span class=ltr>Open the door.</span> والنهي بـ<span class=ltr>Don't</span> + الفعل: <span class=ltr>Don't open the door.</span>",
     "u2imp:"+right];
 }
@@ -313,7 +313,7 @@ function u2Appr(){
   shuffle(others);
   var o = eOpts(right, others);
   if(!o) return null;
-  return ["أيُّ عبارةٍ تُعبِّر عن <b>"+(wantOk?"الاستحسان":"عدم الاستحسان")+"</b>؟", o[0].map(en), o[1],
+  return ["Which phrase expresses <b>"+(wantOk?"approval":"disapproval")+"</b>?", o[0].map(en), o[1],
     "عباراتُ الاستحسان: <span class=ltr>That's a great idea! · I like it. · That looks wonderful!</span><br>وعبارات عدمه: <span class=ltr>I don't like it. · That's not a good idea. · I don't think so.</span>",
     "u2appr:"+right];
 }
@@ -338,7 +338,7 @@ function u3Job(){
   shuffle(pool);
   var o = eOpts(x.j, pool);
   if(!o) return null;
-  return ["مَن الذي "+en(x.d)+"؟", o[0].map(en), o[1],
+  return ["Who "+en(x.d)+"?", o[0].map(en), o[1],
     "<span class=ltr>"+x.j.replace(/^an? /,"")+"</span> هو مَن <span class=ltr>"+x.d+"</span>.",
     "u3job:"+x.j];
 }
@@ -360,7 +360,7 @@ function u3Pres(){
   var right = plural ? x.v : x.f;
   var o = eOpts(right, [plural ? x.f : x.v, x.v+"ing", "to "+x.v]);
   if(!o) return null;
-  return ["المضارع البسيط — اختاري الصحيح: "+blank(subj+" _ every day."), o[0].map(en), o[1],
+  return ["Simple Present — choose the correct one: "+blank(subj+" _ every day."), o[0].map(en), o[1],
     "في المضارع البسيط نضيف <span class=ltr>s</span> مع <span class=ltr>he/she/it</span> والمفرد فقط، ولا نضيفها مع <span class=ltr>I/we/you/they</span> والجمع. والفاعل هنا <span class=ltr>"+subj+"</span>.",
     "u3pres:"+subj+":"+x.v];
 }
@@ -372,7 +372,7 @@ function u3DoDoes(){
   var right = singular ? "does" : "do";
   var o = eOpts(right, [singular ? "do" : "does", "is", "are"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("Where _ "+subj+" live?"), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("Where _ "+subj+" live?"), o[0].map(en), o[1],
     "في سؤال المضارع البسيط نستعمل <span class=ltr>does</span> مع المفرد الغائب و<span class=ltr>do</span> مع غيره، ويبقى الفعل بعدها <b>مجرّدًا</b>: <span class=ltr>Where does he live?</span>",
     "u3dd:"+subj];
 }
@@ -391,7 +391,7 @@ function u3Want(){
   var x = gp(WANT);
   var o = eOpts("to "+x.v, [x.v+"ing", x.v, "for "+x.v]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("I want _ "+x.rest+"."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("I want _ "+x.rest+"."), o[0].map(en), o[1],
     "بعد الفعل <span class=ltr>want</span> يأتي المصدر بـ<span class=ltr>to</span>: <span class=ltr>want to + verb</span>.",
     "u3want:"+x.v];
 }
@@ -409,7 +409,7 @@ function u3Rel(){
   var x = gp(REL);
   var o = eOpts(x.r, [x.r==="who" ? "which" : "who", "what", "whose"]);
   if(!o) return null;
-  return ["اختاري الضمير الموصول الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct relative pronoun: "+blank(x.s), o[0].map(en), o[1],
     "<span class=ltr>who</span> للأشخاص، و<span class=ltr>which</span> للأشياء، و<span class=ltr>that</span> تصلح للاثنين. وهنا الموصوف "+x.why+" ⇐ <span class=ltr>"+x.r+"</span> (ويصحّ <span class=ltr>that</span> أيضًا).",
     "u3rel:"+x.s];
 }
@@ -431,7 +431,7 @@ function u4FreqWord(){
   shuffle(pool);
   var o = eOpts(x.w, pool);
   if(!o) return null;
-  return ["أيُّ ظرفِ تكرارٍ يدلّ على "+en(x.pct)+" من الوقت؟", o[0].map(en), o[1],
+  return ["Which adverb of frequency means "+en(x.pct)+" of the time?", o[0].map(en), o[1],
     "سُلَّم التكرار: "+FREQ8.map(function(f){ return "<span class=ltr>"+f.w+"</span> "+f.pct; }).join(" · ")+".",
     "u4fw:"+x.w];
 }
@@ -445,7 +445,7 @@ function u4FreqPos(){
   var bad2  = withBe ? ("She is late "+adv+".") : (adv+" she walks to school.");
   var o = eOpts(right, [bad1, bad2]);
   if(!o) return null;
-  return ["أيُّ جملةٍ ترتيبها صحيح؟", o[0].map(en), o[1],
+  return ["Which sentence has the correct word order?", o[0].map(en), o[1],
     "ظرف التكرار يأتي <b>قبل</b> الفعل العاديّ: <span class=ltr>She always walks…</span>، و<b>بعد</b> الفعل <span class=ltr>be</span>: <span class=ltr>She is always late.</span>",
     "u4fp:"+(withBe?"be":"v")+":"+adv];
 }
@@ -462,8 +462,8 @@ function u4FreqExpr(){
   var bad2 = x.n+" a "+unit;
   var o = eOpts(x.e, [bad1, bad2]);
   if(!o) return null;
-  return ["كيف نقول إنّها تفعل ذلك <b>"+(x.n===1?"مرّةً":(x.n===2?"مرّتين":x.n+" مرّات"))+"</b> في الـ"+
-    (unit==="week"?"أسبوع":unit==="month"?"شهر":"سنة")+"؟", o[0].map(en), o[1],
+  return ["How do we say she does it <b>"+(x.n===1?"once":(x.n===2?"twice":x.n+" times"))+"</b> a "+
+    (unit==="week"?"week":unit==="month"?"month":"year")+"?", o[0].map(en), o[1],
     "نقول <span class=ltr>once</span> للمرّة و<span class=ltr>twice</span> للمرّتين، وما فوقهما <span class=ltr>three times, four times…</span>",
     "u4fe:"+x.e];
 }
@@ -488,7 +488,7 @@ function u4HowOften(){
     "How often "+x.aux+" "+x.su+" "+x.v.replace(/^(\w+)/, function(w){ return w+"s"; })+"?"
   ]);
   if(!o) return null;
-  return ["أيُّ سؤالٍ صحيح للسؤال عن عدد المرّات؟", o[0].map(en), o[1],
+  return ["Which question correctly asks about how often?", o[0].map(en), o[1],
     "<span class=ltr>How often</span> + <span class=ltr>do/does</span> + الفاعل + الفعل <b>مجرّدًا</b>. والفاعل <span class=ltr>"+x.su+"</span> يأخذ <span class=ltr>"+x.aux+"</span>.",
     "u4ho:"+x.su+":"+x.v];
 }
@@ -506,7 +506,7 @@ function u4KnowHow(){
   var x = gp(KNOWHOW);
   var o = eOpts("knows how to "+x.v, ["knows how "+x.v, "know how to "+x.v, "knows to "+x.v]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("My sister _"+x.tail+"."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("My sister _"+x.tail+"."), o[0].map(en), o[1],
     "التركيب: <span class=ltr>know how to + verb</span>. والفاعل مفردٌ غائب فيأخذ <span class=ltr>knows</span>.",
     "u4kh:"+x.v];
 }
@@ -523,7 +523,7 @@ function u4GerInf(){
   var right = x.t==="ger" ? "reading" : "to read";
   var o = eOpts(right, [x.t==="ger" ? "to read" : "reading", "read", "reads"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("She "+x.v+"s _ every night."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("She "+x.v+"s _ every night."), o[0].map(en), o[1],
     "بعد <span class=ltr>"+x.v+"</span> يأتي "+(x.t==="ger"
       ? "الاسمُ الفعليّ <span class=ltr>verb-ing</span>. ومن أخواتها: <span class=ltr>enjoy · finish · practice · mind · avoid</span>."
       : "المصدرُ بـ<span class=ltr>to</span>. ومن أخواتها: <span class=ltr>want · decide · hope · need · plan</span>.")+"",
@@ -544,7 +544,7 @@ function u5Count(){
   shuffle(others);
   var o = eOpts(right, others);
   if(!o) return null;
-  return ["أيُّ اسمٍ "+(wantC?"<b>معدود</b> (نستطيع عدّه: one, two…)":"<b>غير معدود</b> (لا نعدّه بالأرقام)")+"؟",
+  return ["Which noun is "+(wantC?"<b>countable</b> (we can count it: one, two…)":"<b>uncountable</b> (we cannot count it with numbers)")+"?",
     o[0].map(en), o[1],
     "المعدود يُجمع ويُعدّ: <span class=ltr>an apple, two apples</span>. وغير المعدود لا يُجمع ولا يُعدّ: <span class=ltr>rice, milk, bread</span> — نعدّه بوحدةٍ مثل <span class=ltr>a glass of milk</span>.",
     "u5c:"+right];
@@ -564,7 +564,7 @@ function u5SomeAny(){
   var x = gp(SOMEANY);
   var o = eOpts(x.r, [x.r==="some"?"any":"some", "much", "a"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     "<span class=ltr>some</span> في الجملة المثبتة، و<span class=ltr>any</span> في المنفية والاستفهام. والجملة هنا <b>"+x.t+"</b>.",
     "u5sa:"+x.s];
 }
@@ -582,7 +582,7 @@ function u5Part(){
   shuffle(pool);
   var o = eOpts(x.u, pool);
   if(!o) return null;
-  return ["اختاري الوحدة المناسبة: "+blank("Please buy _ "+x.n+"."), o[0].map(en), o[1],
+  return ["Choose the correct container word: "+blank("Please buy _ "+x.n+"."), o[0].map(en), o[1],
     "الاسم غير المعدود يُقاس بوحدة: <span class=ltr>"+x.u+" "+x.n+"</span>.",
     "u5p:"+x.n];
 }
@@ -599,7 +599,7 @@ function u5TooEnough(){
   var x = gp(TOOEN);
   var o = eOpts(x.r, [x.r==="too"?"enough":"too", "very", "so"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     x.why+". تذكّري: <span class=ltr>too + adjective</span> قبل الصفة، و<span class=ltr>adjective + enough</span> بعدها.",
     "u5te:"+x.s];
 }
@@ -622,7 +622,7 @@ function u5WouldLike(){
   var bad3 = ask ? ("Do you would like "+core+"?") : ("I would like to "+core+".");
   var o = eOpts(right, [bad1, bad2, bad3]);
   if(!o) return null;
-  return ["أيُّ جملةٍ صحيحة للتعبير عن الرغبة بأدب؟", o[0].map(en), o[1],
+  return ["Which sentence politely expresses a wish?", o[0].map(en), o[1],
     "<span class=ltr>would like</span> يتبعها <b>اسم</b> مباشرةً (<span class=ltr>would like some juice</span>)، أو <b>فعلٌ بـ</b><span class=ltr>to</span> (<span class=ltr>would like to order</span>) — ولا نجمع بينهما.",
     "u5wl:"+x.k+":"+x.x+":"+(ask?"q":"s")];
 }
@@ -638,7 +638,7 @@ function u6PastBe(){
   var x = gp(PASTBE);
   var o = eOpts(x.r, [x.r==="was"?"were":"was", "is", "are"]);
   if(!o) return null;
-  return ["الماضي من <span class=ltr>be</span> — اختاري الصحيح: "+blank(x.s+" _ at the beach yesterday."),
+  return ["Past of <span class=ltr>be</span> — choose the correct one: "+blank(x.s+" _ at the beach yesterday."),
     o[0].map(en), o[1],
     "<span class=ltr>was</span> مع <span class=ltr>I/he/she/it</span> والمفرد، و<span class=ltr>were</span> مع <span class=ltr>we/you/they</span> والجمع.",
     "u6pb:"+x.s];
@@ -661,7 +661,7 @@ function u6PastReg(){
               .filter(function(c){ return c!==x.p; });
   var o = eOpts(x.p, cands);
   if(!o) return null;
-  return ["ما ماضي الفعل "+en(x.v)+"؟", o[0].map(en), o[1], x.why+" ⇐ <span class=ltr>"+x.p+"</span>.",
+  return ["What is the past of "+en(x.v)+"?", o[0].map(en), o[1], x.why+" ⇐ <span class=ltr>"+x.p+"</span>.",
     "u6pr:"+x.v];
 }
 
@@ -677,7 +677,7 @@ function u6PastIrr(){
   shuffle(pool);
   var o = eOpts(x.p, [x.v+"ed"].concat(pool));
   if(!o) return null;
-  return ["ما ماضي الفعل الشاذّ "+en(x.v)+"؟", o[0].map(en), o[1],
+  return ["What is the irregular past of "+en(x.v)+"?", o[0].map(en), o[1],
     "<span class=ltr>"+x.v+" → "+x.p+"</span>. والأفعال الشاذّة لا تأخذ <span class=ltr>ed</span> — تُحفظ حفظًا.",
     "u6pi:"+x.v];
 }
@@ -687,7 +687,7 @@ function u6PastQ(){
   var x = gp(IRR);
   var o = eOpts(x.v, [x.p, x.v+"ed", "to "+x.v]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("What did you _ yesterday?"), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("What did you _ yesterday?"), o[0].map(en), o[1],
     "بعد <span class=ltr>did</span> يبقى الفعل <b>مجرّدًا</b> دائمًا، لأنّ <span class=ltr>did</span> حملت الماضي: <span class=ltr>Did you go?</span> لا <span class=ltr>Did you went?</span>",
     "u6pq:"+x.v];
 }
@@ -698,7 +698,7 @@ function u6Intens(){
   var right = "It was really "+adj+".";
   var o = eOpts(right, ["It was really "+adj+"ly.", "It really was be "+adj+".", "It was a really "+adj+"."]);
   if(!o) return null;
-  return ["أيُّ جملةٍ صحيحة؟", o[0].map(en), o[1],
+  return ["Which sentence is correct?", o[0].map(en), o[1],
     "المُقوِّيات <span class=ltr>very · really · quite · extremely</span> تأتي <b>قبل الصفة</b> مباشرةً: <span class=ltr>It was really "+adj+".</span>",
     "u6in:"+adj];
 }
@@ -712,7 +712,7 @@ function u7There(){
   var right = plural ? "There were" : "There was";
   var o = eOpts(right, [plural ? "There was" : "There were", "There is", "There are"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank("_ "+noun+" in the street."), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank("_ "+noun+" in the street."), o[0].map(en), o[1],
     "<span class=ltr>There was</span> مع المفرد وغير المعدود، و<span class=ltr>There were</span> مع الجمع. والاسم هنا <b>"+(plural?"جمع":"مفرد")+"</b>.",
     "u7t:"+noun];
 }
@@ -729,7 +729,7 @@ function u7Ago(){
   var x = gp(AGO);
   var o = eOpts(x.r, ["ago","last","in","before"].filter(function(w){ return w!==x.r; }));
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1], x.why+".", "u7a:"+x.s];
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1], x.why+".", "u7a:"+x.s];
 }
 
 /* الضمائر غير المحدّدة */
@@ -747,7 +747,7 @@ function u7Indef(){
   shuffle(pool);
   var o = eOpts(x.r, pool);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     "القاعدة: <span class=ltr>some-</span> في المثبت، و<span class=ltr>any-</span> في المنفيّ والاستفهام، و<span class=ltr>no-</span> حين يكون المعنى نفيًا بلا أداة نفي. وهنا: "+x.t+".",
     "u7i:"+x.s];
 }
@@ -764,7 +764,7 @@ function u7BecSo(){
   var x = gp(BECSO);
   var o = eOpts(x.r, [x.r==="so"?"because":"so", "but", "or"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     "<span class=ltr>because</span> يأتي قبل <b>السبب</b>، و<span class=ltr>so</span> قبل <b>النتيجة</b>. وهنا "+x.why+".",
     "u7bs:"+x.s];
 }
@@ -784,7 +784,7 @@ function u7SoNeither(){
   shuffle(pool);
   var o = eOpts(x.r, pool);
   if(!o) return null;
-  return ["كيف توافقينها؟ "+en("— "+x.s), o[0].map(en), o[1],
+  return ["How do you agree with her? "+en("— "+x.s), o[0].map(en), o[1],
     "للموافقة على <b>مثبت</b> نقول <span class=ltr>So + فعل مساعد + I</span>، وعلى <b>منفيّ</b> <span class=ltr>Neither + فعل مساعد + I</span>. وهنا: "+x.why+".",
     "u7sn:"+x.s];
 }
@@ -805,7 +805,7 @@ function u8Advice(){
   shuffle(pool);
   var o = eOpts(x.adv, pool);
   if(!o) return null;
-  return ["ما النصيحة المناسبة؟ "+en("— "+x.sym), o[0].map(en), o[1],
+  return ["What is the right advice? "+en("— "+x.sym), o[0].map(en), o[1],
     "النصيحة تُصاغ بـ<span class=ltr>should</span> للمستحسن و<span class=ltr>shouldn't</span> لما يُتجنّب، ويأتي بعدهما الفعل <b>مجرّدًا</b>.",
     "u8adv:"+x.sym];
 }
@@ -815,7 +815,7 @@ function u8Should(){
   var right = "You should "+v+".";
   var o = eOpts(right, ["You should to "+v+".", "You shoulds "+v+".", "You should "+v.split(" ")[0]+"ing."]);
   if(!o) return null;
-  return ["أيُّ جملةٍ صحيحة؟", o[0].map(en), o[1],
+  return ["Which sentence is correct?", o[0].map(en), o[1],
     "بعد <span class=ltr>should</span> يأتي الفعل مجرّدًا بلا <span class=ltr>to</span> وبلا <span class=ltr>s</span>.",
     "u8sh:"+v];
 }
@@ -831,7 +831,7 @@ function u8When(){
   var x = gp(WHEN8);
   var o = eOpts(x.r, [x.r==="When"?"Because":"because", x.r==="When"?"So":"so", x.r==="When"?"But":"but"]);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     "<span class=ltr>when</span> تربط بين حدثين يقع أحدهما وقت الآخر، وتصلح في أوّل الجملة أو وسطها — فإن جاءت أوّلًا وضعنا فاصلةً بين الجملتين.",
     "u8wh:"+x.s];
 }
@@ -851,7 +851,7 @@ function u8Pron(){
   shuffle(pool);
   var o = eOpts(x.r, pool);
   if(!o) return null;
-  return ["اختاري الضمير الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct pronoun: "+blank(x.s), o[0].map(en), o[1],
     "ضمائر <b>الفاعل</b>: <span class=ltr>I, you, he, she, it, we, they</span> — وتأتي قبل الفعل.<br>وضمائر <b>المفعول</b>: <span class=ltr>me, you, him, her, it, us, them</span> — وتأتي بعد الفعل أو حرف الجرّ. وهنا المطلوب <b>"+x.t+"</b>.",
     "u8pr:"+x.s];
 }
@@ -871,17 +871,17 @@ function u8Poss(){
   shuffle(pool);
   var o = eOpts(x.r, pool);
   if(!o) return null;
-  return ["اختاري الصحيح: "+blank(x.s), o[0].map(en), o[1],
+  return ["Choose the correct one: "+blank(x.s), o[0].map(en), o[1],
     "<b>الصفة الملكية</b> يتبعها اسم: <span class=ltr>my book · her keys</span>.<br><b>وضمير الملكية</b> يقف وحده: <span class=ltr>mine · yours · hers · ours · theirs</span>. وهنا المطلوب "+x.t+".",
     "u8po:"+x.s];
 }
 
 /* أجزاء الجسم */
 var BODY = [
-  { a:"الرأس", e:"head" }, { a:"اليد", e:"hand" }, { a:"الرِّجل", e:"leg" },
-  { a:"الأذن", e:"ear" },  { a:"العين", e:"eye" }, { a:"الأنف", e:"nose" },
-  { a:"الأسنان", e:"teeth" }, { a:"الظهر", e:"back" }, { a:"الحلق", e:"throat" },
-  { a:"المعدة", e:"stomach" }
+  { a:"is on top of your body and holds your brain", e:"head" }, { a:"do you write and hold things with", e:"hand" }, { a:"do you walk and run with", e:"leg" },
+  { a:"do you hear with", e:"ear" },  { a:"do you see with", e:"eye" }, { a:"do you smell with", e:"nose" },
+  { a:"do you bite and chew with", e:"teeth" }, { a:"is behind you, from your neck to your waist", e:"back" }, { a:"hurts when it is hard to swallow", e:"throat" },
+  { a:"hurts when you eat too much", e:"stomach" }
 ];
 function u8Body(){
   var x = gp(BODY);
@@ -889,7 +889,7 @@ function u8Body(){
   shuffle(pool);
   var o = eOpts(x.e, pool);
   if(!o) return null;
-  return ["ما معنى <b>"+x.a+"</b> بالإنجليزية؟", o[0].map(en), o[1],
+  return ["Which part of the body "+x.a+"?", o[0].map(en), o[1],
     "<span class=ltr>"+x.e+"</span> = "+x.a+".", "u8bd:"+x.e];
 }
 

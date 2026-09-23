@@ -90,7 +90,7 @@ check('u2Imper',(t,a,o,q)=>{
 check('u2Appr',(t,a)=>{
   const POS=["That's a great idea!","I like it very much.","That looks wonderful!"];
   const NEG=["I don't like it.","That's not a good idea.","I don't think so."];
-  const wantPos=t.includes('الاستحسان')&&!t.includes('عدم الاستحسان');
+  const wantPos=t.includes('approval')&&!t.includes('disapproval');
   return (wantPos ? POS.includes(a) : NEG.includes(a)) || 'لا يطابق المطلوب'; });
 
 say('### الوحدة 3 — Who\'s Who');
@@ -127,7 +127,7 @@ say('### الوحدة 4 — Favorite Pastimes');
 const FREQ_PCT = { '100%':'always','about 90%':'usually','about 70%':'often',
                    'about 40%':'sometimes','about 10%':'seldom','0%':'never' };
 check('u4FreqWord',(t,a)=>{
-  const m=t.match(/على\s*(\S+(?:\s*\S+)?)\s*من الوقت/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/means\s*(\S+(?:\s*\S+)?)\s*of the time/); if(!m) return 'قراءة: '+t;
   const key=m[1].replace(/\s+/g,' ').trim();
   const w=FREQ_PCT[key]; return w?(w===a||'متوقّع '+w):'نسبة غير معروفة: '+key; });
 check('u4FreqPos',(t,a,o,q)=>{
@@ -150,7 +150,7 @@ say('### الوحدة 5 — Is There Any Ice Cream?');
 const COUNTABLE=['apple','orange','sandwich','egg','banana','tomato'];
 const UNCOUNT=['rice','milk','bread','water','cheese','sugar','coffee','meat'];
 check('u5Count',(t,a)=>{
-  const wantC=t.includes('معدود')&&!t.includes('غير معدود');
+  const wantC=t.includes('countable')&&!t.includes('uncountable');
   return (wantC ? COUNTABLE.includes(a) : UNCOUNT.includes(a)) || 'لا يطابق المطلوب'; });
 check('u5SomeAny',(t,a,o,q)=>{
   const s=q[4].slice('u5sa:'.length);
@@ -247,11 +247,15 @@ const PO_OF={ 'This is _ book. I bought it yesterday.':'my',
   'That house is _ .':'ours' };
 check('u8Poss',(t,a,o,q)=>{ const s=q[4].slice('u8po:'.length); const w=PO_OF[s];
   return w?(w===a||'متوقّع '+w):'جملة غير معروفة'; });
-const BODY_OF={ 'الرأس':'head','اليد':'hand','الرِّجل':'leg','الأذن':'ear','العين':'eye',
-  'الأنف':'nose','الأسنان':'teeth','الظهر':'back','الحلق':'throat','المعدة':'stomach' };
+/* صار السؤال دليلًا إنجليزيًّا بدل الكلمة العربيّة (٢٣ سبتمبر ٢٠٢٦) */
+const BODY_OF={ 'is on top of your body and holds your brain':'head',
+  'do you write and hold things with':'hand', 'do you walk and run with':'leg',
+  'do you hear with':'ear', 'do you see with':'eye', 'do you smell with':'nose',
+  'do you bite and chew with':'teeth', 'is behind you, from your neck to your waist':'back',
+  'hurts when it is hard to swallow':'throat', 'hurts when you eat too much':'stomach' };
 check('u8Body',(t,a)=>{
-  const m=t.match(/ما معنى\s+(\S+)\s+بالإنجليزية/); if(!m) return 'قراءة: '+t;
-  const w=BODY_OF[m[1]]; return w?(w===a||'متوقّع '+w):'كلمة غير معروفة: '+m[1]; });
+  const m=t.match(/Which part of the body\s+(.+?)\?$/); if(!m) return 'قراءة: '+t;
+  const w=BODY_OF[m[1]]; return w?(w===a||'متوقّع '+w):'دليل غير معروف: '+m[1]; });
 
 module.exports = function(){ return { ok, bad, checked:seen, lines:LINES }; };
 if(DIRECT){

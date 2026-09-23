@@ -55,15 +55,17 @@ const PCT={'100%':0,'50%–99%':1,'20%–49%':2,'1%–19%':3,'0%':4};
 
 say('### Unit 1 — Lifestyles');
 check('u1Freq',(t,a,opts)=>{
-  const m=t.match(/على\s*(\S+)\s*من الوقت/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Which word means\s*(\S+)\s*of the time/); if(!m) return 'قراءة: '+t;
   const band=PCT[m[1]]; if(band===undefined) return 'نسبة غير معروفة: '+m[1];
   return only(opts,a,o=>BAND[o]===band,'ينتمي للنطاق '+m[1]);});
 check('u1FreqCompare',(t,a,opts)=>{
-  const m=t.match(/(أكثر|أقلّ) تكرارًا:\s*(.+?)\s*أم\s*(.+?)\s*؟/); if(!m) return 'قراءة: '+t;
+  /* «or» فاصلةٌ خطرةٌ لا تشبه «أم»: كلمة normally تحوي or في وسطها،
+     فبلا حدود كلماتٍ ينقسم الطرف الأوّل عند حرفٍ داخل الكلمة. */
+  const m=t.match(/Which is (more|less) frequent:\s*(.+?)\s+or\s+(.+?)\s*\?/); if(!m) return 'قراءة: '+t;
   const w1=m[2].trim(), w2=m[3].trim();
   if(BAND[w1]===undefined||BAND[w2]===undefined) return 'كلمة غير معروفة';
   if(BAND[w1]===BAND[w2]) return 'من النطاق نفسه — غامض';
-  const e = (m[1]==='أكثر') ? (BAND[w1]<BAND[w2]?w1:w2) : (BAND[w1]>BAND[w2]?w1:w2);
+  const e = (m[1]==='more') ? (BAND[w1]<BAND[w2]?w1:w2) : (BAND[w1]>BAND[w2]?w1:w2);
   return e===a||('متوقّع '+e);});
 check('u1Place',(t,a,opts)=>{
   const ADVS=['always','usually','often','sometimes','seldom','rarely','never','hardly ever'];
@@ -91,7 +93,7 @@ const HOWQ={'How often':/times a day|Three times|hardly ever eats|rarely takes|H
             'How long':/about 2 hours every night|About seven hours/};
 check('u1HowQ',(t,a,opts)=>{
   /* نتحقّق من القاعدة: much لكمّية (time/money) · long لمدّة · often لعدد مرّات */
-  const stem=(t.match(/أكمل السؤال:\s*(.+?)\s*الإجابة/)||[])[1]||'';
+  const stem=(t.match(/Complete the question:\s*(.+?)\s*Answer/)||[])[1]||'';
   if(!stem) return 'قراءة: '+t;
   let e;
   if(/^___ (time|money)\b/.test(stem)) e='How much';
@@ -105,7 +107,7 @@ check('u1People',(t,a,opts)=>{
     Josh:['is an Internet addict','seldom spends less than three hours a day on the computer','often checks his cell phone'],
     Noura:['wants to be an artist','paints for at least two hours every evening','always does her homework after school'],
     Martin:['works very hard','always takes work home from the office','rarely takes a vacation']};
-  const m=t.match(/الوحدة\s*(.+?)\s*؟/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Which person in the unit\s*(.+?)\s*\?/); if(!m) return 'قراءة: '+t;
   const fact=m[1].trim();
   const owners=Object.keys(P).filter(k=>P[k].some(f=>f===fact));
   if(owners.length!==1) return 'الحقيقة تعود لـ'+owners.length+' شخص';
@@ -135,7 +137,7 @@ check('u2PrepTime',(t,a)=>{
   const e=TIME[m[1]]; if(!e) return 'زمن غير معروف: '+m[1];
   return e===a||('متوقّع '+e);});
 check('u2PastTime',(t,a)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const s=m[1];
   /* القاعدة: ago تأتي بعد المدّة · last قبلها · yesterday وحدها */
   let e;
@@ -170,7 +172,7 @@ check('u3GoingWill',(t,a,opts)=>{
   const w=opts.filter(good);
   if(w.length<1) return 'لا خيار سليم';
   /* نتحقّق من المطابقة الدلالية: already decided/have tickets ⟵ going to · maybe/probably/perhaps ⟵ will */
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة';
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة';
   const s=m[1];
   if(/already decided|have our tickets/.test(s)) return /going to/.test(a)||('متوقّع going to في: '+s);
   if(/Maybe|probably|Perhaps|not sure/.test(s)) return /will|won't/.test(a)||('متوقّع will في: '+s);
@@ -217,7 +219,7 @@ check('u3Infinitive',(t,a,opts)=>{
     if(!opts.every(o=>PURPSET.has(o))) return 'خيارٌ خارج القائمة: ['+opts.join(' | ')+']';
     return e===a||('متوقّع '+e);
   }
-  m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   /* الشكل: to + مصدر مجرّد فقط */
   const good=opts.filter(o=>/^to [a-z]+$/.test(o) && !/ing$/.test(o) &&
     !['to caught','to bought'].includes(o));
@@ -356,13 +358,13 @@ factCheck('u3Adnan',{
 /* أدوات التقوية: تسبق الصفة/الظرف مباشرة · quite قبل أداة التعريف مع المفرد */
 const INTENS=['very','quite','really','pretty','so','extremely'];
 check('u3Intensifier',(t,a,opts)=>{
-  if(/أيُّ الجمل صحيحة/.test(t)){
+  if(/Which sentence is correct/.test(t)){
     /* الصحيحة: quite a ADJ N — أو — a/an INTENS ADJ N */
     const good=opts.filter(o=>/^(It has|It's|She is)\s+(quite (a|an) [a-z]+ [a-z]+|(a|an) (very|extremely|really|pretty|so) [a-z]+ [a-z]+)\.$/.test(o));
     if(good.length!==1) return 'عدد الصحيحات '+good.length+' ['+opts.join(' ‖ ')+']';
     return good[0]===a||('متوقّع '+good[0]);
   }
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   /* الخيار الصحيح كلمةٌ واحدة من أدوات التقوية */
   const good=opts.filter(o=>INTENS.includes(o));
   if(good.length!==1) return 'عدد أدوات التقوية المفردة '+good.length+' ['+opts.join(' ‖ ')+']';
@@ -372,7 +374,7 @@ check('u3Intensifier',(t,a,opts)=>{
 
 /* الجمل الزمنية: لا صيغة مستقبل ولا مستمرّ داخلها */
 check('u3TimeClause',(t,a,opts)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   if(!/\b(after|as soon as|before|until|when|while|After|As soon as|Before|Until|When|While)\b/.test(m[1]))
     return 'لا أداة زمنية في الجملة';
   const good=opts.filter(o=>!/^will |^is |^are |^am |going to/.test(o));
@@ -402,7 +404,7 @@ const MATCH={
  "He won't go out with his friends":'until he finishes his homework'};
 const MATCHVALS=new Set(Object.values(MATCH));
 check('u3Match',(t,a,opts)=>{
-  const m=t.match(/العبارة الزمنية المناسبة:\s*(.+?)\s*___/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/right time phrase:\s*(.+?)\s*___/); if(!m) return 'قراءة: '+t;
   const e=MATCH[m[1]]; if(!e) return 'عبارة غير معروفة: '+m[1];
   if(!opts.every(o=>MATCHVALS.has(o))) return 'خيارٌ خارج قائمة الكتاب: ['+opts.join(' | ')+']';
   /* المشتّتان لا بدّ أن يكونا جوابَي بندَين آخرَين */
@@ -505,7 +507,7 @@ function clozeCheck(fnName, arrName, N=1500){
   const MAP={}, WRONG={};
   arr.forEach(r=>{ MAP[S(r[0])]=S(r[1]); WRONG[S(r[0])]=r[2].map(S); });
   check(fnName,(t,a,opts)=>{
-    const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+    const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
     const e=MAP[S(m[1])]; if(e===undefined) return 'جملة غير معروفة: '+m[1];
     if(opts.some(o=>CHOPPED(o))) return 'خيارٌ مقطوع';
     const allowed=new Set([e,...WRONG[S(m[1])]]);
@@ -632,7 +634,7 @@ clozeCheck('u6Article','U6_ART');
 say('\n### Expansion 4–6 (ص 68–73)');
 check('ex2Same',(t,a,opts)=>{
   const arr=vm.runInContext('EX2_SAME',ctx);
-  const m=t.match(/المعنى نفسه؟\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/same meaning\?\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const hit=arr.find(r=>S(r[0])===S(m[1])); if(!hit) return 'جملة غير معروفة: '+m[1];
   const allowed=new Set([S(hit[1]),...hit[2].map(S)]);
   if(opts.some(o=>!allowed.has(o))) return 'خيارٌ ليس من القائمة';
@@ -664,7 +666,7 @@ function famTail(tl){
   return 'do';
 }
 check('u7Tags',(t,a,opts)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+?)\s*,\s*___\s*\?$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+?)\s*,\s*___\s*\?$/); if(!m) return 'قراءة: '+t;
   const st=m[1];
   const neg=/\b(isn't|aren't|wasn't|weren't|don't|doesn't|didn't|haven't|hasn't|won't)\b/i.test(st);
   const fam=famOf(st);
@@ -695,7 +697,7 @@ dataCheck('u8License','U8_LIC');
 clozeCheck('u8CauseResult','U8_CAUSE');
 check('u8Report',(t,a,opts)=>{
   const arr=vm.runInContext('U8_REP',ctx);
-  const m=t.match(/الطلب أو الأمر:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Report the request or command:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const hit=arr.find(r=>S(r[0])===S(m[1])); if(!hit) return 'بند غير معروف: '+m[1];
   /* الصحيحة وحدها: ask/tell + مفعول + (not) to + مصدر، بلا "told to" ولا "said + مفعول" */
   const good=opts.filter(o=>{
@@ -714,7 +716,7 @@ clozeCheck('u9PastProg','U9_PROG');
 vocabCheck('u9Adjectives','U9_ADJ');
 check('u9City',(t,a,opts)=>{
   const arr=vm.runInContext('U9_CITY',ctx);
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const hit=arr.find(r=>S(r[0])===S(m[1])); if(!hit) return 'جملة غير معروفة: '+m[1];
   const allowed=new Set([S(hit[1]),...hit[2].map(S)]);
   if(opts.some(o=>!allowed.has(o))) return 'خيارٌ ليس من القائمة';
@@ -728,7 +730,7 @@ vocabCheck('u9YunusVocab','U9_YV');
 say('\n### إتمام الوحدة 7 (ص 77–83)');
 /* السؤال المنفيّ: المساعد مختصرًا مع n't وحده، بلا "not" منفصلة وبلا فاعلٍ مكرّر */
 check('u7NegQ',(t,a,opts)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const subj=(m[1].match(/___\s+(\w+)/)||[])[1];
   const good=opts.filter(o=>{
     if(/\bnot\b/.test(o)) return false;                 /* Is not / Are not / Did not */
@@ -756,11 +758,11 @@ function listCheck(fnName, arrName, stemRe, N=1500){
     return S(hit[1])===a||('متوقّع '+S(hit[1]));
   },N);
 }
-listCheck('u7Situation','U7_SITU',/يناسب هذا الموقف؟\s*(.+)$/);
+listCheck('u7Situation','U7_SITU',/negative question fits this situation\?\s*(.+)$/);
 /* be able to في الماضي: الصحيح وحده ماضٍ ويوافق نفيَ الموقف أو إثباته */
 check('u7AbleCtx',(t,a,opts)=>{
   const arr=vm.runInContext('U7_ABLE2',ctx);
-  const m=t.match(/الصحيحة لهذا الموقف:\s*(.+)$/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/correct sentence for this situation:\s*(.+)$/); if(!m) return 'قراءة: '+t;
   const hit=arr.find(r=>S(r[0])===S(m[1])); if(!hit) return 'موقف غير معروف: '+m[1];
   const past=opts.filter(o=>/\b(was|were|wasn't|weren't)\b/.test(o));
   if(past.length!==2) return 'عدد الصيغ الماضية '+past.length+' (المتوقّع مثبتة ومنفيّة)';
@@ -859,7 +861,7 @@ check('u1AllBothPos',(t,a,opts)=>{
   return only(opts,a,good,'موضع صحيح');});
 check('u1Cohesion',(t,a)=>{
   const R={'they':'Teenagers','it':null,'them':'young people','their':'Teenagers'};
-  const m=t.match(/ما مرجع\s*(\S+)\s*؟/); if(!m) return 'قراءة: '+t;
+  const m=t.match(/What does\s*(\S+)\s*refer to\?/); if(!m) return 'قراءة: '+t;
   const p=m[1];
   if(p==='it'){ return /Football|Playing a team sport/.test(a)||('متوقّع Football أو Playing a team sport'); }
   const e=R[p]; if(!e) return 'ضمير غير معروف: '+p;
@@ -867,7 +869,7 @@ check('u1Cohesion',(t,a)=>{
 
 say('### إضافات الوحدة 2');
 check('u2PastQ',(t,a,opts)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة';
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة';
   const s=m[1];
   if(/^___ you live/.test(s))            return a==='Did'||'متوقّع Did';
   if(/did (they|she) ___/.test(s))       return /^(live|wear)$/.test(a)||('متوقّع مصدر، جاء '+a);
@@ -877,7 +879,7 @@ check('u2PastQ',(t,a,opts)=>{
   if(/No, he ___/.test(s))               return a==="didn't"||"متوقّع didn't";
   return true;});
 check('u2Born',(t,a)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة';
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة';
   const s=m[1];
   const plural=/^(The twins|His parents|Linda and Jenny)/.test(s);
   const e=plural?'were':'was';
@@ -907,7 +909,7 @@ check('u2QuickCheck',(t,a)=>{
 
 say('### إتمام الوحدة 2');
 check('u2UsedTo',(t,a,opts)=>{
-  const m=t.match(/أكمل الجملة:\s*(.+)$/); if(!m) return 'قراءة';
+  const m=t.match(/Complete the sentence:\s*(.+)$/); if(!m) return 'قراءة';
   const s2=m[1];
   /* لا يجوز أبدًا: didn't used to · did used to · using to */
   if(/didn't used to|did used to|using to/.test(a)) return 'صيغة خاطئة معلَّمة: '+a;

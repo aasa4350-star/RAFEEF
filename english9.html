@@ -173,7 +173,7 @@ function u1Freq(){
   shuffle(others);
   var o=eOpts(right,[gp(others[0].words), gp(others[1].words)]);
   if(!o) return null;
-  return ["أيُّ كلمةٍ تدلّ على "+en(FREQ[i].pct)+" من الوقت؟",o[0].map(en),o[1],
+  return ["Which word means "+en(FREQ[i].pct)+" of the time?",o[0].map(en),o[1],
     "جدول التكرار في الكتاب (ص <span class=ltr>4</span>): "+
     FREQ.map(function(f){ return en(f.pct)+" ← "+en(f.words.slice(0,3).join(", ")); }).join(" · ")+".",
     "u1f:"+FREQ[i].band+":"+right];
@@ -189,7 +189,7 @@ function u1FreqCompare(){
   var right = more ? wHi : wLo;
   var o=eOpts(right,[more?wLo:wHi, "the same"]);
   if(!o) return null;
-  return ["أيُّهما "+(more?"<b>أكثر</b>":"<b>أقلّ</b>")+" تكرارًا: "+en(wHi)+" أم "+en(wLo)+" ؟",
+  return ["Which is "+(more?"<b>more</b>":"<b>less</b>")+" frequent: "+en(wHi)+" or "+en(wLo)+"?",
     o[0].map(en),o[1],
     en(wHi)+" = "+en(FREQ[hi].pct)+" و"+en(wLo)+" = "+en(FREQ[lo].pct)+".",
     "u1fc:"+hi+"-"+lo+(more?"m":"l")];
@@ -231,7 +231,7 @@ function u1Place(){
   }
   var o=eOpts(right,[w1,w2]);
   if(!o) return null;
-  return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1],why+" (الوحدة <span class=ltr>1</span>، ص <span class=ltr>4</span>).",
+  return ["Which sentence is correct?",o[0].map(en),o[1],why+" (الوحدة <span class=ltr>1</span>، ص <span class=ltr>4</span>).",
     "u1p:"+mode+":"+s+v];
 }
 
@@ -251,7 +251,7 @@ function u1HowQ(){
   var q=gp(U1_HOWQ);
   var o=eOpts(q[1], shuffle(["How often","How much","How long"].filter(function(x){return x!==q[1];})));
   if(!o) return null;
-  return ["أكمل السؤال:<br>"+en(q[0])+"<br><span style='color:var(--muted)'>الإجابة: "+en(q[2])+"</span>",
+  return ["Complete the question:<br>"+en(q[0])+"<br><span style='color:var(--muted)'>Answer: "+en(q[2])+"</span>",
     o[0].map(en),o[1],
     en("How often")+" لعدد المرّات · "+en("How much")+" لكمّيةٍ غير معدودة (وقت/مال) · "+
     en("How long")+" لطول المدّة.",
@@ -273,7 +273,7 @@ function u1People(){
   var fact=gp([p[1],p[2],p[3]]);
   var o=eOpts(p[0],[others[0][0], others[1][0]]);
   if(!o) return null;
-  return ["مَن مِن أشخاص الوحدة "+en(fact)+" ؟",o[0].map(en),o[1],
+  return ["Which person in the unit "+en(fact)+"?",o[0].map(en),o[1],
     en(p[0]+" "+p[1]+". "+p[0]+" "+p[2]+".")+" (ص <span class=ltr>2–3</span>)",
     "u1pe:"+p[0]+fact];
 }
@@ -314,7 +314,7 @@ function u2PrepPlace(){
   var p=gp(U2_PLACE);
   var o=eOpts(p[1], shuffle(["in","on","at"].filter(function(x){return x!==p[1];})));
   if(!o) return null;
-  return ["أكمل بحرف الجرّ الصحيح:<br>"+en("He lives ___ "+p[0]+"."),o[0].map(en),o[1],
+  return ["Complete with the correct preposition:<br>"+en("He lives ___ "+p[0]+"."),o[0].map(en),o[1],
     en("in")+" للمدن والدول والعالم · "+en("on")+" لـ"+en("Earth")+" والجزر والطوابق · "+
     en("at")+" لـ"+en("school / home / work / the airport")+
     " ← "+en("in Jeddah · on Earth · at school")+" (ص <span class=ltr>20</span>).",
@@ -331,7 +331,7 @@ function u2PrepTime(){
   var p=gp(U2_TIME);
   var o=eOpts(p[1], shuffle(["in","on","at"].filter(function(x){return x!==p[1];})));
   if(!o) return null;
-  return ["أكمل بحرف الجرّ الصحيح:<br>"+en("It happened ___ "+p[0]+"."),o[0].map(en),o[1],
+  return ["Complete with the correct preposition:<br>"+en("It happened ___ "+p[0]+"."),o[0].map(en),o[1],
     en("on")+" لليوم والتاريخ · "+en("at")+" للساعة و"+en("noon")+" و"+en("night")+" · "+
     en("in")+" للشهر والسنة والفصل والقرن (ص <span class=ltr>20</span>).",
     "u2pt:"+p[0]];
@@ -352,7 +352,7 @@ function u2PastTime(){
   var c=gp(C);
   var o=eOpts(c[1], c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     en("last")+" تسبق المدّة ("+en("last night, last week")+") · "+
     en("ago")+" تأتي <b>بعدها</b> ("+en("two days ago")+") · "+
     en("yesterday")+" وحدها أو مع "+en("morning/evening")+" (ص <span class=ltr>21</span>).",
@@ -362,23 +362,23 @@ function u2PastTime(){
 /* جمل when و used to (ص ٢١) */
 function u2When(){
   var C=[
-    ["أيُّ الجمل صحيحة؟","When I was a child, I used to play with my toys all day.",
+    ["Which sentence is correct?","When I was a child, I used to play with my toys all day.",
      ["When I was a child, I use to play with my toys all day.",
       "When I am a child, I used to play with my toys all day."]],
-    ["أيُّ الجمل صحيحة؟","They didn't go to school when they were four years old.",
+    ["Which sentence is correct?","They didn't go to school when they were four years old.",
      ["They didn't went to school when they were four years old.",
       "They didn't go to school when they are four years old."]],
-    ["أيُّ الجمل صحيحة؟","I was raised in Abha. Then my family moved to Riyadh when I was twelve.",
+    ["Which sentence is correct?","I was raised in Abha. Then my family moved to Riyadh when I was twelve.",
      ["I was raised in Abha. Then my family moves to Riyadh when I was twelve.",
       "I was raise in Abha. Then my family moved to Riyadh when I was twelve."]],
-    ["أيُّ الجمل صحيحة؟","He learned to read before he went to school.",
+    ["Which sentence is correct?","He learned to read before he went to school.",
      ["He learned to read before he goes to school.",
       "He learn to read before he went to school."]]
   ];
   var c=gp(C);
   var o=eOpts(c[1], c[2]);
   if(!o) return null;
-  return [c[0]+"<br><span style='color:var(--muted);font-size:.9rem'>(جمل "+en("when")+" و"+en("used to")+" — ص <span class=ltr>21</span>)</span>",
+  return [c[0]+"<br><span style='color:var(--muted);font-size:.9rem'>("+en("when")+" and "+en("used to")+" — p. <span class=ltr>21</span>)</span>",
     o[0].map(en),o[1],
     "في الحديث عن الماضي: الفعل بعد "+en("when")+" في الماضي أيضًا، و"+en("used to")+
     " تُكتب هكذا دائمًا (لا "+en("use to")+")، وبعد "+en("didn't")+" يأتي المصدر بلا تصريف.",
@@ -420,7 +420,7 @@ function u3PresProg(){
   var c=gp(C);
   var o=eOpts(c[1], c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "المضارع المستمر = "+en("be + verb-ing")+" ، ويُستعمل لما يحدث <b>الآن</b> أو لترتيبٍ <b>مؤكّد في المستقبل</b>. "+
     "وكلمات مثل "+en("tonight, tomorrow, next week")+" تدلّ على المستقبل (ص <span class=ltr>24</span>).",
     "u3pp:"+c[0]];
@@ -439,7 +439,7 @@ function u3GoingWill(){
   var c=gp(C);
   var o=eOpts(c[1], c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     en("be going to")+" لخطّةٍ <b>مقرّرة</b> · "+en("will")+" مع "+en("maybe/probably/perhaps")+
     " لخطّةٍ <b>غير مؤكّدة</b> (ص <span class=ltr>24</span>).",
     "u3gw:"+c[0]];
@@ -529,7 +529,7 @@ function u3Infinitive(){
   var c=gp(F);
   var o2=eOpts(c[1],c[2]);
   if(!o2) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o2[0].map(en),o2[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o2[0].map(en),o2[1],
     "بعد "+en("to")+" يأتي الفعل <b>مجرّدًا</b> بلا "+en("-ing")+" وبلا ماضٍ: "+
     en(c[1])+" — ولا نقول "+en("for")+" + فعل (ص <span class=ltr>24</span>).",
     "u3ip:form:"+c[0]];
@@ -814,7 +814,7 @@ function u3Intensifier(){
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
   var isPick = c[0].indexOf("Which sentence")===0;
-  return [isPick ? "أيُّ الجمل صحيحة؟" : ("أكمل الجملة:<br>"+en(c[0])),o[0].map(en),o[1],
+  return [isPick ? "Which sentence is correct?" : ("Complete the sentence:<br>"+en(c[0])),o[0].map(en),o[1],
     "أدوات التقوية "+en("very, quite, really, pretty, so, extremely")+" تأتي <b>قبل الصفة أو الظرف</b> مباشرة. "+
     "ومع الاسم المفرد: "+en("quite")+" <b>قبل</b> أداة التعريف ("+en("quite a large campus")+")، "+
     "وبقيّتها <b>بعدها</b> ("+en("a very large campus")+") — ص <span class=ltr>30</span>.",
@@ -836,7 +836,7 @@ function u3TimeClause(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "الجملة الزمنية تبدأ بـ "+en("after, as soon as, before, until, when, while")+
     " ، و<b>لا نستعمل صيغة المستقبل داخلها</b> بل المضارع، حتى لو كان الكلام عن المستقبل: "+
     en("They'll go skiing when they are on vacation.")+" (ص <span class=ltr>31</span>).",
@@ -862,7 +862,7 @@ function u3TimeComma(){
   var c=gp(C);
   var o=eOpts(c[0],c[1]);
   if(!o) return null;
-  return ["أيُّ الجمل صحيحة في علامات الترقيم؟",o[0].map(en),o[1],
+  return ["Which sentence has the correct punctuation?",o[0].map(en),o[1],
     "نضع <b>فاصلة</b> بعد الجملة الزمنية إذا جاءت في <b>أوّل</b> الجملة: "+
     en("As soon as we arrive, we're going straight to the hotel.")+
     " ولا فاصلة إذا جاءت في آخرها (ص <span class=ltr>31</span>).",
@@ -896,7 +896,7 @@ function u3Match(){
   var m=gp(U3_MATCH);
   var o=eOpts(m[1],m[2]);
   if(!o) return null;
-  return ["أكمل الجملة بالعبارة الزمنية المناسبة:<br>"+en(m[0]+" ___ ."),o[0].map(en),o[1],
+  return ["Complete with the right time phrase:<br>"+en(m[0]+" ___ ."),o[0].map(en),o[1],
     en(m[0]+" "+m[1]+".")+" — من تمرين المطابقة في الوحدة <span class=ltr>3</span> (ص <span class=ltr>31</span>).",
     "u3mt:"+m[0]];
 }
@@ -936,7 +936,7 @@ function u3London(){
   var c=gp(U3_LONDON);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل بحرف الحركة المناسب:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete with the correct preposition of movement:<br>"+en(c[0]),o[0].map(en),o[1],
     en(c[1])+" هو الصواب — من فقرة "+en("Imad and Jasem in London")+" في الوحدة <span class=ltr>3</span> "+
     "(ص <span class=ltr>31</span>). و"+en("check into")+" = يسجّل الدخول للفندق، و"+en("check out of")+
     " = يسجّل الخروج منه.",
@@ -961,7 +961,7 @@ function exTigers(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "من فقرة "+en("Siberian Tigers")+" في مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>32</span>): "+
     en(c[1])+". وبعد "+en("can")+" و"+en("will")+" يأتي الفعل <b>مجرّدًا</b>، والفاعل الجمع يأخذ "+
     en("are / live")+" لا "+en("is / lives")+".",
@@ -1010,7 +1010,7 @@ function exAskQ(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["اكتب السؤال المناسب للجزء الذي تحته خطّ:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Write the question for the underlined part:<br>"+en(c[0]),o[0].map(en),o[1],
     "في السؤال نُقدّم الفعل المساعد على الفاعل: "+en("What are you…?")+" لا "+en("What you are…?")+
     " ، ويأتي بعده الفعل بالصيغة الصحيحة — من مراجعة الوحدات <span class=ltr>1–3</span> (ص <span class=ltr>32</span>).",
     "exaq:"+c[1]];
@@ -1031,7 +1031,7 @@ function clozeGen(list, note, key){
   return function(){
     var c=gp(list), o=eOpts(c[1],c[2]);
     if(!o) return null;
-    return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1], note, key+":"+c[0]];
+    return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1], note, key+":"+c[0]];
   };
 }
 /* معنى كلمة: [الكلمة, المعنى, [مشتّتان]] */
@@ -1048,7 +1048,7 @@ function pickGen(list, note, key){
   return function(){
     var c=gp(list), o=eOpts(c[0],c[1]);
     if(!o) return null;
-    return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1], note, key+":"+c[0]];
+    return ["Which sentence is correct?",o[0].map(en),o[1], note, key+":"+c[0]];
   };
 }
 
@@ -1640,19 +1640,19 @@ var u5FxVocab = vocabGen(U5_FXV,
 
 /* مرجع الضمائر في القطعة (ص ٥٦ ركن الكتابة) */
 var U5_REF = [
-  ["\"These techniques form the art of special effects.\"<br>ما مرجع "+
-   "<span class=ltr>These</span> ؟","The techniques filmmakers have used to amaze viewers",
+  ["\"These techniques form the art of special effects.\"<br>What does "+
+   "<span class=ltr>These</span> refer to?","The techniques filmmakers have used to amaze viewers",
    ["The Lumière brothers","The films of 1895"]],
-  ["\"The film contained many revolutionary innovations for its time.\"<br>ما مرجع "+
-   "<span class=ltr>its</span> ؟","King Kong",["Star Wars","The Empire State Building"]],
-  ["\"They made many improvements in effects technology.\"<br>ما مرجع "+
-   "<span class=ltr>They</span> ؟","The special effects crew of Star Wars",
+  ["\"The film contained many revolutionary innovations for its time.\"<br>What does "+
+   "<span class=ltr>its</span> refer to?","King Kong",["Star Wars","The Empire State Building"]],
+  ["\"They made many improvements in effects technology.\"<br>What does "+
+   "<span class=ltr>They</span> refer to?","The special effects crew of Star Wars",
    ["The Lumière brothers","The audience in the café"]],
-  ["\"You'll see them on the screen soon!\"<br>ما مرجع "+
-   "<span class=ltr>them</span> ؟","The amazing visual effects of the future",
+  ["\"You'll see them on the screen soon!\"<br>What does "+
+   "<span class=ltr>them</span> refer to?","The amazing visual effects of the future",
    ["The old black-and-white films","The Lumière brothers"]],
-  ["\"Filmmakers have used tricks like this.\"<br>ما مرجع "+
-   "<span class=ltr>this</span> ؟","The \"stop trick\"",
+  ["\"Filmmakers have used tricks like this.\"<br>What does "+
+   "<span class=ltr>this</span> refer to?","The \"stop trick\"",
    ["The computer-controlled camera","The miniature of King Kong"]]
 ];
 function u5Ref(){
@@ -1980,7 +1980,7 @@ var EX2_SAME = [
 function ex2Same(){
   var c=gp(EX2_SAME), o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أيُّ الجمل تحمل المعنى نفسه؟<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Which sentence has the same meaning?<br>"+en(c[0]),o[0].map(en),o[1],
     en(c[0])+" = "+en(c[1])+" — من مراجعة الوحدات <span class=ltr>4–6</span> (ص <span class=ltr>68</span>).",
     "ex2sm:"+c[0]];
 }
@@ -2102,25 +2102,25 @@ var u7Tags = clozeGen(U7_TAG,
 
 /* الإجابة على أسئلة الذيل (ص ٧٦ ملاحظة) */
 var U7_ANS = [
-  ["A: You're from Riyadh, aren't you?<br>B: (نعم، أنا منها)","Yes, I am.",
+  ["A: You're from Riyadh, aren't you?<br>B: (Yes — I am.)","Yes, I am.",
    ["No, I am.","Yes, I'm not."]],
-  ["A: You aren't from Riyadh, are you?<br>B: (لا، أنا من جدّة)","No, I'm not. I'm from Jeddah.",
+  ["A: You aren't from Riyadh, are you?<br>B: (No — I am from Jeddah.)","No, I'm not. I'm from Jeddah.",
    ["Yes, I'm not. I'm from Jeddah.","No, I am. I'm from Jeddah."]],
-  ["A: Andrew doesn't have a brother, does he?<br>B: (بلى، ستيف أخوه التوأم)","Yes, he does.",
+  ["A: Andrew doesn't have a brother, does he?<br>B: (Yes — Steve is his twin brother.)","Yes, he does.",
    ["No, he does.","Yes, he doesn't."]],
-  ["A: John is organizing a garage sale, isn't he?<br>B: (نعم)","Yes, he is.",
+  ["A: John is organizing a garage sale, isn't he?<br>B: (Yes.)","Yes, he is.",
    ["No, he is.","Yes, he isn't."]],
-  ["A: The lawn mower runs on electricity, doesn't it?<br>B: (نعم، وله ريموت)","Yes, it does.",
+  ["A: The lawn mower runs on electricity, doesn't it?<br>B: (Yes — and it has a remote control.)","Yes, it does.",
    ["No, it does.","Yes, it doesn't."]],
-  ["A: The elderly couple need a new lamp, don't they?<br>B: (نعم)","Yes, they do.",
+  ["A: The elderly couple need a new lamp, don't they?<br>B: (Yes.)","Yes, they do.",
    ["No, they do.","Yes, they don't."]],
-  ["A: There aren't any plants for sale, are there?<br>B: (لا، ما فيه)","No, there aren't.",
+  ["A: There aren't any plants for sale, are there?<br>B: (No — there are none.)","No, there aren't.",
    ["Yes, there aren't.","No, there are."]]
 ];
 function u7Answer(){
   var a=gp(U7_ANS), o=eOpts(a[1],a[2]);
   if(!o) return null;
-  return ["اختر الجواب الصحيح:<br>"+a[0],o[0].map(en),o[1],
+  return ["Choose the correct answer:<br>"+a[0],o[0].map(en),o[1],
     "الجواب يوافق <b>الحقيقة</b> لا صيغة السؤال: إن كان الأمر واقعًا فـ <span class=ltr>Yes + مثبت</span>، "+
     "وإن لم يكن فـ <span class=ltr>No + منفيّ</span>. ولا يجتمع <span class=ltr>Yes</span> مع نفيٍ أبدًا "+
     "(ص <span class=ltr>76</span>).",
@@ -2341,7 +2341,7 @@ var U8_REP = [
 function u8Report(){
   var r=gp(U8_REP), o=eOpts(r[1],r[2]);
   if(!o) return null;
-  return ["انقل الطلب أو الأمر:<br>"+en(r[0]),o[0].map(en),o[1],
+  return ["Report the request or command:<br>"+en(r[0]),o[0].map(en),o[1],
     "الصيغة: <span class=ltr>ask / tell + مفعول + to + مصدر</span> ، وفي النفي "+
     "<span class=ltr>not to</span> <b>قبل</b> <span class=ltr>to</span> لا بعدها. "+
     "ولا نقول <span class=ltr>told to somebody</span> ولا <span class=ltr>said somebody</span> "+
@@ -2452,7 +2452,7 @@ var U9_CITY = [
 function u9City(){
   var c=gp(U9_CITY), o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     en(c[0].replace("___",c[1]))+" — من <span class=ltr>Impressions of a City</span> في الوحدة "+
     "<span class=ltr>9</span> (ص <span class=ltr>94–95</span>).",
     "u9ct:"+c[0]];
@@ -2614,7 +2614,7 @@ var U7_SITU = [
 function u7Situation(){
   var s=gp(U7_SITU), o=eOpts(s[1],s[2]);
   if(!o) return null;
-  return ["أيُّ سؤالٍ منفيّ يناسب هذا الموقف؟<br>"+en(s[0]),o[0].map(en),o[1],
+  return ["Which negative question fits this situation?<br>"+en(s[0]),o[0].map(en),o[1],
     "الموقف يقتضي "+en(s[1])+" — والسؤال المنفيّ هنا للتأكّد أو للدهشة "+
     "(ص <span class=ltr>77</span>).",
     "u7si:"+s[0]];
@@ -2639,7 +2639,7 @@ var U7_ABLE2 = [
 function u7AbleCtx(){
   var a=gp(U7_ABLE2), o=eOpts(a[1],a[2]);
   if(!o) return null;
-  return ["اختر الجملة الصحيحة لهذا الموقف:<br>"+en(a[0]),o[0].map(en),o[1],
+  return ["Choose the correct sentence for this situation:<br>"+en(a[0]),o[0].map(en),o[1],
     en(a[1])+" — والموقف <b>ماضٍ</b> فنستعمل "+en("was/were able to")+" لا "+
     en("am/is/are able to")+" (ص <span class=ltr>77</span>).",
     "u7ac:"+a[0]];
@@ -2747,35 +2747,35 @@ var u7TwinsVocab = vocabGen(U7_TV,
 
 /* ترتيب فقرات المصادفة (ص ٨٢ تمرين A) */
 var U7_ORDER = [
-  ["ما الفقرة التي تبدأ بها القصّة؟",
+  ["Which paragraph begins the story?",
    "I arrived here in Chicago two months ago as an exchange student.",
    ["One afternoon, I was walking around the campus looking for a place to eat lunch.",
     "The three of us went for lunch that afternoon."]],
-  ["ما الذي يأتي بعد فقرة الوصول إلى شيكاغو؟",
+  ["Which paragraph comes after the arrival in Chicago?",
    "One afternoon, I was walking around the campus looking for a place to eat lunch.",
    ["The three of us went for lunch that afternoon.",
     "\"Well, I live in Chicago and I'm studying economics here at the college.\""]],
-  ["بعد أن سمع صوتًا مألوفًا، ماذا حدث؟",
+  ["After he heard a familiar voice, what happened?",
    "It took me a second to realize who it was — it was my cousin, Mike.",
    ["The three of us went for lunch that afternoon.",
     "I arrived here in Chicago two months ago as an exchange student."]],
-  ["ماذا قال شون حين عرف ابن عمّه؟",
+  ["What did Sean say when he recognised his cousin?",
    "\"Mike, what are you doing here in Chicago?\"",
    ["\"Well, I live in Chicago and I'm studying economics here at the college.\"",
     "I arrived here in Chicago two months ago as an exchange student."]],
-  ["ما الفقرة التي تُختم بها القصّة؟",
+  ["Which paragraph ends the story?",
    "The three of us went for lunch that afternoon, and Mike and I did a lot of catching up.",
    ["One afternoon, I was walking around the campus looking for a place to eat lunch.",
     "I arrived here in Chicago two months ago as an exchange student."]],
-  ["كم مضى على شون في شيكاغو حين وقعت المصادفة؟","Two months",
+  ["How long had Sean been in Chicago when the coincidence happened?","Two months",
    ["Five years","Two years"]],
-  ["كم مضى على شون بلا رؤية ابن عمّه مايك؟","Five years",
+  ["How long had it been since Sean last saw his cousin Mike?","Five years",
    ["Two months","Nineteen years"]],
-  ["لماذا انتقلت أسرة مايك؟","They had moved to the United States",
+  ["Why did Mike's family move?","They had moved to the United States",
    ["They had moved to Ireland","They had moved to Chicago for the beach"]],
-  ["من الذي كان مع مايك؟","Lee, a student in one of Sean's classes",
+  ["Who was with Mike?","Lee, a student in one of Sean's classes",
    ["Bobby, a student from New York","Ted, a student from Chicago"]],
-  ["ماذا يدرس مايك في شيكاغو؟","Economics",["Medicine","Engineering"]]
+  ["What does Mike study in Chicago?","Economics",["Medicine","Engineering"]]
 ];
 function u7Order(){
   var c=gp(U7_ORDER), o=eOpts(c[1],c[2]);
@@ -3074,8 +3074,8 @@ function u1Survey(){
     opts  = ["Both","Neither","All"];
     why = en("Both")+" و"+en("Neither")+" لشخصين أو شيئين. و"+en("Neither")+
           " تعني «ولا واحد» ويأتي بعدها فعلٌ <b>مفرد</b>: "+en("Neither of them is a vegetarian.");
-    return ["من استبيان الكتاب: <b>Noura</b> = "+en(a)+" · <b>Maha</b> = "+en(b)+
-            "<br>أكمل: "+en("___ of them "+r[0]+"."),
+    return ["From the book's survey: <b>Noura</b> = "+en(a)+" · <b>Maha</b> = "+en(b)+
+            "<br>Complete: "+en("___ of them "+r[0]+"."),
       opts.map(en), opts.indexOf(right), why+" (ص <span class=ltr>11</span>)",
       "u1s2:"+r[0]];
   }
@@ -3084,8 +3084,8 @@ function u1Survey(){
   opts  = ["All","None","Not all"];
   why = en("All")+" و"+en("None")+" لثلاثةٍ فأكثر: "+en("All")+" إذا انطبق على الجميع، و"+
         en("None")+" إذا لم ينطبق على أحد، و"+en("Not all")+" إذا انطبق على بعضهم.";
-  return ["من استبيان الكتاب: <b>Noura</b> = "+en(r[1])+" · <b>Maha</b> = "+en(r[2])+
-          " · <b>Badria</b> = "+en(r[3])+"<br>أكمل: "+en("___ of them "+r[0]+"."),
+  return ["From the book's survey: <b>Noura</b> = "+en(r[1])+" · <b>Maha</b> = "+en(r[2])+
+          " · <b>Badria</b> = "+en(r[3])+"<br>Complete: "+en("___ of them "+r[0]+"."),
     opts.map(en), opts.indexOf(right), why+" (ص <span class=ltr>11</span>)",
     "u1s3:"+r[0]];
 }
@@ -3105,7 +3105,7 @@ function u1AllBothVerb(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "بعد "+en("Neither")+" يأتي فعلٌ <b>مفرد</b> ("+en("is / teaches")+")، أمّا "+
     en("Both / All / None")+" فيأتي بعدها فعلٌ <b>جمع</b> ("+en("are / teach")+") — كما في الكتاب ص <span class=ltr>11</span>.",
     "u1ab:"+c[0]];
@@ -3124,7 +3124,7 @@ function u1AllBothPos(){
   var c=gp(C);
   var o=eOpts(c[0],c[1]);
   if(!o) return null;
-  return ["أيُّ الجمل صحيحة؟",o[0].map(en),o[1],
+  return ["Which sentence is correct?",o[0].map(en),o[1],
     en("All")+" و"+en("Both")+" تأتيان <b>بعد</b> الفعل المساعد ("+en("be, can, do")+") و<b>قبل</b> الفعل الرئيس: "+
     en(c[0])+" (ص <span class=ltr>11</span>).",
     "u1abp:"+c[0]];
@@ -3133,15 +3133,15 @@ function u1AllBothPos(){
 /* الترابط: مرجع الضمير (Writing Corner ص ١٠) */
 function u1Cohesion(){
   var C=[
-    ["Teenagers who play a sport say they often become friends with their teammates.<br>ما مرجع "+en("they")+" ؟",
+    ["Teenagers who play a sport say they often become friends with their teammates.<br>What does "+en("they")+" refer to?",
      "Teenagers",["a sport","teammates"]],
-    ["Football is popular because it is fun. It has simple rules.<br>ما مرجع "+en("it")+" ؟",
+    ["Football is popular because it is fun. It has simple rules.<br>What does "+en("it")+" refer to?",
      "Football",["rules","people"]],
-    ["Playing a team sport is beneficial because it keeps young people in shape.<br>ما مرجع "+en("it")+" ؟",
+    ["Playing a team sport is beneficial because it keeps young people in shape.<br>What does "+en("it")+" refer to?",
      "Playing a team sport",["young people","shape"]],
-    ["Playing a team sport teaches them about cooperation.<br>ما مرجع "+en("them")+" ؟",
+    ["Playing a team sport teaches them about cooperation.<br>What does "+en("them")+" refer to?",
      "young people",["a team sport","cooperation"]],
-    ["Teenagers who play a sport become friends with their teammates.<br>ما مرجع "+en("their")+" ؟",
+    ["Teenagers who play a sport become friends with their teammates.<br>What does "+en("their")+" refer to?",
      "Teenagers",["a sport","friends"]]
   ];
   var c=gp(C);
@@ -3169,7 +3169,7 @@ function u2PastQ(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "في الماضي البسيط: "+en("Did")+" للسؤال، وبعدها يأتي <b>المصدر</b> ("+en("Did you live…?")+")، "+
     "وكذلك بعد "+en("didn't")+" ("+en("didn't work")+"). أمّا في الإثبات فالفعل في الماضي ("+en("wore")+
     ") — ص <span class=ltr>14</span>.",
@@ -3190,7 +3190,7 @@ function u2Born(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     "المبني للمجهول في الماضي = "+en("was/were + past participle")+". "+
     en("was")+" مع المفرد و"+en("were")+" مع الجمع. وعبارات شائعة في سِيَر الناس: "+
     en("be born, be raised, be married, be called, be educated")+" (ص <span class=ltr>14</span>).",
@@ -3260,7 +3260,7 @@ function u2UsedTo(){
   var c=gp(C);
   var o=eOpts(c[1],c[2]);
   if(!o) return null;
-  return ["أكمل الجملة:<br>"+en(c[0]),o[0].map(en),o[1],
+  return ["Complete the sentence:<br>"+en(c[0]),o[0].map(en),o[1],
     en("used to")+" للعادات والأحوال في الماضي. وفي الإثبات نكتبها "+en("used to")+
     " ، أمّا بعد "+en("didn't")+" و"+en("did")+" فتصير "+en("use to")+" <b>بلا</b> "+en("d")+
     " : "+en("I didn't use to play. · Did you use to play?")+" (ص <span class=ltr>14</span>).",
