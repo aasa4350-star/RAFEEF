@@ -329,9 +329,171 @@ function gWordOp(){
     "الكلمات الدالّة في الجملة تدلّ على <b>"+c[1]+"</b>."];
 }
 
+/* ═══ قسم «البيانات» كان احتمالًا في ثوب بيانات ═══
+   سأل الأب (٢٣ سبتمبر ٢٠٢٦) بصورة شاشة سعود: «درس البيانات — شيّك على
+   الدرس هل هو مطابقٌ للموضوع؟» وكان محقًّا، والقياس حسم الأمر:
+
+     سعةُ القسم ١٩٠ سؤالًا — منها ١٦٨ احتمال (٨٨٪) و٢٢ بيانات.
+     وفي جولة الثمانية: ٥٫٧ أسئلة احتمالٍ في المتوسّط، و٦٪ من الجولات
+     احتمالٌ خالصٌ بلا سؤال بياناتٍ واحد — وهي التي صوّرها الأب.
+
+   والسبب أنّ مولّدَي الاحتمال المحسوبَين (gLikely وgCertain) لا ينفدان
+   فيغلبان بنكَي البيانات الثابتين. والأدهى أنّ الاثنين والعشرين سؤالًا
+   «البياناتيّة» كلَّها تعريفاتٌ («ما المدى؟») ولا يعرض واحدٌ منها
+   بياناتٍ ليقرأها الطفل — وقراءةُ الجدول والتمثيل هي مهارةُ الدرس
+   نفسِها في الكتاب.
+
+   فأُضيفت خمسةُ مولّداتٍ محسوبةٍ تعرض بياناتٍ حقيقيّةً ويُقرأ منها،
+   وأُعيد وزنُ القسم فصار الاحتمال ربعَه لا ثلاثةَ أرباعه. */
+
+var DKID = ["أحمد","سارة","خالد","نورة","فهد","ليلى","سعد","ريم"];
+var DFRUIT = ["التفاح","الموز","البرتقال","العنب","التمر"];
+var DSPORT = ["كرة القدم","السباحة","الجري","كرة السلة"];
+var DDAY = ["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء"];
+
+/* جدولٌ صغيرٌ يُرسم داخل السؤال — الأعداد تتغيّر في كلّ مرّة */
+function dTable(head, rows){
+  var h = '<table style="border-collapse:collapse;margin:10px auto;font-size:.95rem">'+
+    '<tr><th style="border:1px solid var(--line);padding:5px 12px">'+head[0]+'</th>'+
+    '<th style="border:1px solid var(--line);padding:5px 12px">'+head[1]+'</th></tr>';
+  rows.forEach(function(r){
+    h += '<tr><td style="border:1px solid var(--line);padding:5px 12px;text-align:center">'+r[0]+'</td>'+
+         '<td style="border:1px solid var(--line);padding:5px 12px;text-align:center">'+r[1]+'</td></tr>';
+  });
+  return h+'</table>';
+}
+/* إشاراتُ العدّ: كلّ خمسٍ أربعةٌ قائمةٌ وخامسةٌ مائلةٌ عليها */
+function tallyOf(n){
+  var out='', full=Math.floor(n/5), rest=n%5, i;
+  for(i=0;i<full;i++) out+='<span style="letter-spacing:1px">卌</span> ';
+  for(i=0;i<rest;i++) out+='|';
+  return '<span class="en" style="font-size:1.15rem">'+out.trim()+'</span>';
+}
+/* أعمدةٌ أفقيّةٌ بطولٍ يتناسب مع القيمة */
+function dBars(rows){
+  var max=0; rows.forEach(function(r){ if(r[1]>max) max=r[1]; });
+  var h='<div style="margin:10px 0">';
+  rows.forEach(function(r){
+    h += '<div style="display:flex;align-items:center;gap:8px;margin:4px 0">'+
+      '<span style="min-width:74px;font-size:.9rem">'+r[0]+'</span>'+
+      '<span style="height:14px;border-radius:4px;background:var(--accent);width:'+
+        Math.round(r[1]/max*62)+'%"></span></div>';
+  });
+  return h+'<div style="font-size:.8rem;color:var(--muted);text-align:center">كلّ عمودٍ يمثّل العدد المكتوب في الجدول</div></div>';
+}
+
+/* ١) قراءة جدول: المجموع، أو الفرق، أو الأكثر */
+function gTableRead(){
+  var items = shuffle(gp([DFRUIT, DSPORT]).slice()).slice(0,4);
+  var v = items.map(function(){ return ri(2,14); });
+  var i;
+  for(i=1;i<v.length;i++) while(v.indexOf(v[i])<i) v[i]=ri(2,14);   /* قيمٌ متمايزة */
+  var rows = items.map(function(x,k){ return [x, mn(v[k])]; });
+  var tbl = dTable(["النوع","عدد الطلاب"], rows);
+  var t = gp([0,1,2]), o, ans;
+  if(t===0){
+    ans = v.reduce(function(a,b){ return a+b; }, 0);
+    o = numOpts(ans, [ans+1, ans-2, ans+3]); if(!o) return null;
+    return ["يبيّن الجدولُ ما يفضّله طلابُ الصفّ:"+tbl+"كم طالبًا في الجدول كلِّه؟",
+      o[0], o[1], "نجمع الأعداد: "+mn(v.join(" + ")+" = "+ans)+"."];
+  }
+  if(t===1){
+    var mx=Math.max.apply(null,v), mnv=Math.min.apply(null,v);
+    ans = mx-mnv;
+    o = numOpts(ans, [mx, mnv, ans+1]); if(!o) return null;
+    return ["يبيّن الجدولُ ما يفضّله طلابُ الصفّ:"+tbl+"كم يزيد الأكثرُ على الأقلّ؟",
+      o[0], o[1], "الأكثر "+mn(mx)+" والأقلّ "+mn(mnv)+" ⇐ "+mn(mx+" − "+mnv+" = "+ans)+"."];
+  }
+  var top = items[v.indexOf(Math.max.apply(null,v))];
+  var oo = gPick3(top, items.filter(function(x){ return x!==top; })[0],
+                       items.filter(function(x){ return x!==top; })[1]);
+  return ["يبيّن الجدولُ ما يفضّله طلابُ الصفّ:"+tbl+"أيُّ نوعٍ فضّله أكبرُ عدد؟",
+    oo[0], oo[1], "أكبرُ عددٍ في الجدول "+mn(Math.max.apply(null,v))+" ⇐ "+top+"."];
+}
+
+/* ٢) إشاراتُ العدّ: يقرأ الطفل الإشارات لا يحفظ تعريفها */
+function gTallyRead(){
+  var items = shuffle(DFRUIT.slice()).slice(0,3);
+  var v = [ri(3,9), ri(11,19), ri(6,14)];
+  var rows = items.map(function(x,k){ return [x, tallyOf(v[k])]; });
+  var tbl = dTable(["النوع","إشارات العدّ"], rows);
+  var k = ri(0,2), ans = v[k];
+  var o = numOpts(ans, [ans+1, ans-1, ans+5]); if(!o) return null;
+  return ["استعمل إشاراتِ العدّ (كلُّ <span class=\"en\">卌</span> تعني خمسة):"+tbl+
+    "كم عددُ «"+items[k]+"»؟", o[0], o[1],
+    "كلّ <span class=\"en\">卌</span> = خمسة، فالمجموع "+mn(ans)+"."];
+}
+
+/* ٣) قراءة التمثيل بالأعمدة */
+function gBarRead(){
+  var days = DDAY.slice(0,4);
+  var v = [ri(2,9), ri(2,9), ri(2,9), ri(2,9)];
+  var i; for(i=1;i<v.length;i++) while(v.indexOf(v[i])<i) v[i]=ri(2,9);
+  var rows = days.map(function(d,k){ return [d, v[k]]; });
+  var chart = dBars(rows) + dTable(["اليوم","عدد الكتب"], days.map(function(d,k){ return [d, mn(v[k])]; }));
+  var t = gp([0,1]);
+  if(t===0){
+    var lowD = days[v.indexOf(Math.min.apply(null,v))];
+    var other = days.filter(function(d){ return d!==lowD; });
+    var oo = gPick3(lowD, other[0], other[1]);
+    return ["يبيّن التمثيلُ بالأعمدة عددَ الكتب المقروءة كلَّ يوم:"+chart+
+      "في أيِّ يومٍ قُرئ أقلُّ عددٍ من الكتب؟", oo[0], oo[1],
+      "أقصرُ عمودٍ هو الأقلّ: "+mn(Math.min.apply(null,v))+" ⇐ "+lowD+"."];
+  }
+  var a=ri(0,3), b=ri(0,3); while(b===a) b=ri(0,3);
+  var ans = Math.abs(v[a]-v[b]);
+  var o = numOpts(ans, [ans+1, v[a], v[b]]); if(!o) return null;
+  return ["يبيّن التمثيلُ بالأعمدة عددَ الكتب المقروءة كلَّ يوم:"+chart+
+    "كم يفرق يومُ "+days[a]+" عن يومِ "+days[b]+"؟", o[0], o[1],
+    mn(Math.max(v[a],v[b])+" − "+Math.min(v[a],v[b])+" = "+ans)+"."];
+}
+
+/* ٤) التمثيل بالصور ومفتاحه — مهارةٌ في الكتاب لا يغطّيها البنك الثابت */
+function gPicto(){
+  var key = gp([2,5,10]);
+  var items = shuffle(DSPORT.slice()).slice(0,3);
+  var c = [ri(2,6), ri(2,6), ri(2,6)];
+  var i; for(i=1;i<c.length;i++) while(c.indexOf(c[i])<i) c[i]=ri(2,6);
+  var rows = items.map(function(x,k){
+    return [x, '<span class="en" style="font-size:1.1rem">'+new Array(c[k]+1).join("🙂")+'</span>']; });
+  var tbl = dTable(["الرياضة","الطلاب"], rows);
+  var k = ri(0,2), ans = c[k]*key;
+  var o = numOpts(ans, [c[k], ans+key, ans-key]); if(!o) return null;
+  return ["تمثيلٌ بالصور، والمفتاح: كلُّ <span class=\"en\">🙂</span> يمثّل "+mn(key)+" من الطلاب."+tbl+
+    "كم طالبًا يفضّل «"+items[k]+"»؟", o[0], o[1],
+    "عدد الصور "+mn(c[k])+" × "+mn(key)+" = "+mn(ans)+"."];
+}
+
+/* ٥) المنوال والوسيط والمدى محسوبةً لا محفوظةً في ثلاثة أمثلة */
+function gStatCalc(){
+  var n = gp([5,5,7]);
+  var d = [], i;
+  for(i=0;i<n;i++) d.push(ri(1,20));
+  /* نضمن منوالًا واحدًا لا أكثر */
+  var m = d[ri(0,n-1)]; d[ri(0,n-1)] = m; d[ri(0,n-1)] = m;
+  var cnt={}, best=null, bestN=0, tie=false;
+  d.forEach(function(x){ cnt[x]=(cnt[x]||0)+1; });
+  Object.keys(cnt).forEach(function(x){
+    if(cnt[x]>bestN){ bestN=cnt[x]; best=+x; tie=false; } else if(cnt[x]===bestN) tie=true; });
+  if(tie || bestN<2) return null;
+  var sorted = d.slice().sort(function(a,b){ return a-b; });
+  var shown = '<div style="margin:8px 0;text-align:center">'+mn(d.join("، "))+'</div>';
+  var t = gp([0,1,2]), ans, why;
+  if(t===0){ ans=best; why="الأكثرُ تكرارًا هو "+mn(best)+" (تكرّر "+mn(bestN)+" مرّات)."; }
+  else if(t===1){ ans=sorted[sorted.length-1]-sorted[0];
+    why="المدى = أكبر − أصغر = "+mn(sorted[sorted.length-1]+" − "+sorted[0]+" = "+ans)+"."; }
+  else { ans=sorted[(sorted.length-1)/2];
+    why="نرتّبها: "+mn(sorted.join("، "))+" فالوسطى هي "+mn(ans)+"."; }
+  var name = t===0 ? "المنوال" : (t===1 ? "المدى" : "الوسيط");
+  var o = numOpts(ans, [ans+1, ans-1, sorted[0], sorted[sorted.length-1]]); if(!o) return null;
+  return ["هذه درجاتُ مجموعةٍ من الطلاب:"+shown+"ما "+name+"؟", o[0], o[1], why];
+}
+
 var F1 = [gPlaceValue, gPlaceName, gCompare, gOrder, gRound];
 var F2 = [gComm, gPropName, gEstimate, gAdd, gSub];
-var F3 = [gProb, gDataR, gLikely, gCertain];
+/* الوزن مقصود: ستّةُ مداخلَ للبيانات ومدخلان للاحتمال، فيصير الاحتمال
+   ربعَ القسم — وهو جزءٌ من الفصل لا موضوعُه. */
+var F3 = [gTableRead, gTallyRead, gBarRead, gPicto, gStatCalc, gDataR, gProb, gLikely, gCertain];
 var F4 = [gPattern, gMissing, gMissingMult, gRule];
 var F5 = [gMult10, gMultEst, gMult1, gMultiples];
 var F6 = [gMultTens, gMult2Est, gMult2];
@@ -376,7 +538,7 @@ if(!NAMES[who]){
     all: {gens:ALL, n:15, intro:"اختبار شامل: القيمة المنزلية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
     f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> القيمة والمنزلة، المقارنة، الترتيب، التقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
     f2:  {gens:F2,  n:10, intro:"<b>الفصل 2 — الجمع والطرح:</b> خصائص الجمع، التقدير، الجمع، الطرح.", label:"رياضيات ف2 — الجمع والطرح"},
-    f3:  {gens:F3,  n:8,  intro:"<b>الفصل 3 — تنظيم البيانات:</b> الجداول والتمثيل، والاحتمال (مؤكّد/ممكن/مستحيل).", label:"رياضيات ف3 — البيانات"},
+    f3:  {gens:F3,  n:8,  intro:"<b>الفصل 3 — تنظيم البيانات:</b> قراءة الجداول وإشارات العدّ، والتمثيل بالأعمدة وبالصور، والمنوال والوسيط والمدى — ثمّ الاحتمال (مؤكّد/ممكن/مستحيل).", label:"رياضيات ف3 — البيانات"},
     f4:  {gens:F4,  n:10, intro:"<b>الفصل 4 — الأنماط والجبر:</b> إكمال الأنماط، إيجاد العدد المجهول، قاعدة الدالة.", label:"رياضيات ف4 — الأنماط والجبر"},
     f5:  {gens:F5,  n:10, intro:"<b>الفصل 5 — الضرب في رقم:</b> الضرب في مضاعفات 10/100/1000، التقدير، الضرب، المضاعفات.", label:"رياضيات ف5 — الضرب × رقم"},
     f6:  {gens:F6,  n:9,  intro:"<b>الفصل 6 — الضرب في رقمين:</b> الضرب في مضاعفات العشرة، تقدير حاصل الضرب، الضرب في عدد من رقمين.", label:"رياضيات ف6 — الضرب × رقمين"},
@@ -433,7 +595,7 @@ if(!NAMES[who]){
   var REMTOPICS=[
     {id:"f1", name:"1) القيمة المنزلية", tip:"القيمة المنزلية = الرقم × قيمة منزلته. تذكّر ترتيب المنازل: آحاد، عشرات، مئات، ألوف… وقارن الأعداد من أعلى منزلة.", yt:"شرح القيمة المنزلية رابع ابتدائي رياضيات"},
     {id:"f2", name:"2) الجمع والطرح", tip:"في التقدير قرّب كل عدد لأقرب ألف ثم اجمع/اطرح. وخصائص الجمع: الإبدال، التجميع، والعنصر المحايد (0).", yt:"شرح الجمع والطرح رابع ابتدائي رياضيات"},
-    {id:"f3", name:"3) البيانات", tip:"الحدث المؤكّد يحدث دائمًا، والمستحيل لا يحدث، والممكن قد يحدث. والتمثيل بالخطوط للتغيّر عبر الزمن.", yt:"شرح تمثيل البيانات رابع ابتدائي رياضيات"},
+    {id:"f3", name:"3) البيانات", tip:"اقرأ الجدول أوّلًا ثمّ أجب: كلُّ <span class=\"en\">卌</span> في إشارات العدّ تعني خمسة. وفي التمثيل بالأعمدة أطولُ عمودٍ هو الأكثر وأقصرُه الأقلّ. وفي التمثيل بالصور اضرب عددَ الصور في المفتاح. والمنوال أكثرُ عددٍ تكرارًا، والوسيط العددُ الأوسط بعد الترتيب، والمدى = أكبر − أصغر. وفي الاحتمال: المؤكّد يحدث دائمًا، والمستحيل لا يحدث أبدًا، والممكن قد يحدث وقد لا يحدث.", yt:"شرح تمثيل البيانات رابع ابتدائي رياضيات"},
     {id:"f4", name:"4) الأنماط والجبر", tip:"اكتشف قاعدة النمط (نزيد/نضرب بمقدار ثابت). ولإيجاد المجهول اعكس العملية (⬚+7=17 ← 17−7).", yt:"شرح الأنماط والجبر رابع ابتدائي رياضيات"},
     {id:"f5", name:"5) الضرب × رقم", tip:"للضرب في 10/100/1000 اضرب الأرقام ثم أضف الأصفار. وللتقدير قرّب لأقرب عشرة.", yt:"شرح الضرب في عدد من رقم واحد رابع ابتدائي"},
     {id:"f6", name:"6) الضرب × رقمين", tip:"قدّر بتقريب كل عدد لأقرب عشرة. ثم اضرب خطوة خطوة (الآحاد ثم العشرات).", yt:"شرح الضرب في عدد من رقمين رابع ابتدائي"},
