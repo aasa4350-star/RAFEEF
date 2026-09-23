@@ -697,26 +697,34 @@ try{ if(window.STEP_BANK && window.STEP_BANK.length) STEP = STEP.concat(window.S
 
 var app = document.getElementById("app");
 var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (مناسبة لعمره)
+/* NO_GAT — بلا قدرات (لا لفظي ولا كمي). طلبُ الأب (٢٣ سبتمبر ٢٠٢٦):
+   «احذف قدرات فهد». فيبقى له التحصيليُّ وSTEP والعلاجيُّ والنماذج. */
+var NO_GAT = (who==="fahad");
+
+/* التبويباتُ تُبنى من قائمةٍ لا بنصٍّ ثابت: كان «لفظي» مفتوحًا دائمًا
+   بالنصّ (class="panel active")، فحذفُه وحدَه يترك الصفحة بلا تبويبٍ
+   مفتوح. والآن أوّلُ متاحٍ هو المفتوح، أيًّا كان. */
+var TABS = [];
+if(!NO_GAT) TABS.push(["v","قدرات — لفظي 📖"]);
+if(!VERBAL_ONLY){
+  if(!YOUNG && !NO_GAT) TABS.push(["q","قدرات — كمي 🔢"]);
+  if(!YOUNG) TABS.push(["t","تحصيلي 🧪"]);
+  TABS.push(["s","STEP إنجليزي 🌍"]);
+  TABS.push(["rem","علاجي 💪"]);
+  TABS.push(["o","نماذج رسمية 🏛️"]);
+}
+var HEAD_EYE = VERBAL_ONLY ? 'تدريب لفظي' : (NO_GAT ? 'تحصيلي وSTEP · بأسلوب قياس' : 'اختبارات تجريبية · بأسلوب قياس');
+var HEAD_TTL = VERBAL_ONLY ? '📖 قدرات لفظي — ' : (NO_GAT ? '🧪 تحصيلي وSTEP — ' : '📊 قدرات وتحصيلي — ');
 app.innerHTML =
-  '<header class="top"><p class="eyebrow">'+(VERBAL_ONLY?'تدريب لفظي':'اختبارات تجريبية · بأسلوب قياس')+'</p><h1>'+(VERBAL_ONLY?'📖 قدرات لفظي — ':'📊 قدرات وتحصيلي — ')+name+'</h1></header>'+
-  '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>'+
+  '<header class="top"><p class="eyebrow">'+HEAD_EYE+'</p><h1>'+HEAD_TTL+name+'</h1></header>'+
+  /* «اختبر نفسك» (quiz.html) إنجليزيٌّ ورياضيّاتُ منهجٍ مدرسيّ ولا يعرف
+     فهد، فيحفظ محاولاته باسم «الطالب» فتتلف البيانات. فلا نعرضه له. */
+  (NO_GAT ? '' : '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a></div>')+
   (VERBAL_ONLY ? '' : '<label style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;font-weight:700"><input type="checkbox" id="timedToggle" style="width:20px;height:20px;accent-color:var(--accent)"> ⏱️ وضع المؤقّت (مثل الاختبار الحقيقي) — <span style="color:var(--muted);font-weight:400">مطفأ = تدريب بدون ضغط وقت</span></label>')+
   '<div class="tabs" role="tablist">'+
-    '<button data-tab="v" aria-selected="true">قدرات — لفظي 📖</button>'+
-    (VERBAL_ONLY ? '' : (
-      (YOUNG ? '' : '<button data-tab="q" aria-selected="false">قدرات — كمي 🔢</button>'+
-      '<button data-tab="t" aria-selected="false">تحصيلي 🧪</button>')+
-      '<button data-tab="s" aria-selected="false">STEP إنجليزي 🌍</button>'+
-      '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
-      '<button data-tab="o" aria-selected="false">نماذج رسمية 🏛️</button>'))+
+    TABS.map(function(t,i){ return '<button data-tab="'+t[0]+'" aria-selected="'+(i===0?'true':'false')+'">'+t[1]+'</button>'; }).join('')+
   '</div>'+
-  '<section class="panel active" id="v"></section>'+
-  (VERBAL_ONLY ? '' : (
-    (YOUNG ? '' : '<section class="panel" id="q"></section>'+
-    '<section class="panel" id="t"></section>')+
-    '<section class="panel" id="s"></section>'+
-    '<section class="panel" id="rem"></section>'+
-    '<section class="panel" id="o"></section>'))+
+  TABS.map(function(t,i){ return '<section class="panel'+(i===0?' active':'')+'" id="'+t[0]+'"></section>'; }).join('')+
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
 function shuffleQ(q){
@@ -867,10 +875,12 @@ function renderSet(id, items, intro, regen, label){
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
-  renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
+  if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
   if(!VERBAL_ONLY){
-    if(!YOUNG){
+    if(!YOUNG && !NO_GAT){
       renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
+    }
+    if(!YOUNG){
       renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
     }
     var sN = STEP.length;
@@ -1055,7 +1065,7 @@ function lessonCard(s, stat, open){
 }
 async function renderRemedial(){
   var sec = document.getElementById("rem");
-  sec.innerHTML = '<div class="intro">⏳ نحلّل نتائجك من آخر اختبارات القدرات والتحصيلي وSTEP...</div>';
+  sec.innerHTML = '<div class="intro">⏳ نحلّل نتائجك من آخر اختبارات '+(NO_GAT?'التحصيلي وSTEP':'القدرات والتحصيلي وSTEP')+'...</div>';
   var rows=[];
   try{
     var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+"&order=created_at.desc&limit=40",
@@ -1093,7 +1103,7 @@ async function renderRemedial(){
 
   var html='';
   if(weak.length){
-    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> '+(SENIOR?'(القدرات والتحصيلي وSTEP)':'(في مستوى صفّك — القدرات الكمي)')+'. شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
+    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> '+(NO_GAT?'(التحصيلي وSTEP)':SENIOR?'(القدرات والتحصيلي وSTEP)':'(في مستوى صفّك — القدرات الكمي)')+'. شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
     weak.forEach(function(o){ html += lessonCard(o.s, o.st, true); });
   } else if(inLevelData){
     html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪'+(SENIOR?'':' في مستوى صفّك')+'. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).'+(SENIOR?'':'<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span>')+'</div>';
@@ -1107,7 +1117,9 @@ async function renderRemedial(){
   // مكتبة كل الدروس — مطويّة، اختيارية (والتحصيلي/STEP فوق المستوى، للتعوّد فقط)
   var lib='';
   var _ov = SENIOR ? "" : " (فوق المستوى — اختياري)";
-  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"+_ov]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"+_ov],["STEP","🌍 STEP إنجليزي"+_ov]];
+  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"+_ov]]
+             : NO_GAT ? [["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]]
+             : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"+_ov],["STEP","🌍 STEP إنجليزي"+_ov]];
   groups.forEach(function(g){
     lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
     SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });
