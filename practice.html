@@ -57,6 +57,7 @@
 <div class="wrap" id="app"></div>
 <script src="practice-bank.js"></script>
 <script src="step-bank.js"></script>
+<script src="tahsili-math.js"></script>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
@@ -695,6 +696,58 @@ try{
    وشرحُ سببِ إعادةِ صياغةِ الثلاثمئة كلّها في رأس step-bank.js. */
 try{ if(window.STEP_BANK && window.STEP_BANK.length) STEP = STEP.concat(window.STEP_BANK); }catch(e){}
 
+/* ═══ التحصيليّ — نِسَبٌ متغيّرة كلَّ جلسة ═══
+   بلاغُ الأب (٢٣ سبتمبر ٢٠٢٦) من تجربته هو في الاختبار: «نِسَبُ كلّ
+   مادّة على حسب حظّك… الفترة الأولى جاني أغلبه رياضيات وكيمياء
+   والثانية أحياء وكيمياء… غير معلوم وعلى حسب النموذج الي يجيك».
+   فبناءُ محاكٍ بنسبةٍ ثابتةٍ خطأٌ من أصله: يُعلّم الطالبَ أن يتوقّع
+   شكلًا واحدًا فيأتيه غيرُه. والصوابُ أن تكون المواد الأربعُ قويّةً
+   بالتساوي، وأن تأتيه الجلسةُ بنسبةٍ مختلفةٍ في كلِّ مرّة.
+   وقِسنا البنكَ القديم فكان عكسَ ذلك تمامًا: رياضيات ٣٧ (٤٤٪)
+   وكيمياء ١٧ وأحياء ١٧ وفيزياء ١٤ (١٦٪) — أضعفُ ما فيه الفيزياء. */
+var TSUBJ = {"فيزياء":[], "كيمياء":[], "أحياء":[], "رياضيات":[]};
+try{
+  TAHSILI.forEach(function(q){
+    var m=/^<b>(.*?):<\/b>/.exec(q[0]);
+    if(m && TSUBJ[m[1]]) TSUBJ[m[1]].push(q);
+  });
+}catch(e){}
+
+/* أسئلةُ رياضيّاتٍ مولَّدة، موزّعةٌ على دروس الكتاب السبعةَ عشرَ */
+function mathGen(n){
+  var TM = window.TAHSILI_MATH;
+  if(!TM || !TM.topics || !TM.topics.length) return freshPick(TSUBJ["رياضيات"], n, "t_ر");
+  var tops = shuffle(TM.topics.slice()), out = [], seen = {}, tries = 0;
+  while(out.length < n && tries < n*80){
+    tries++;
+    var t = tops[out.length % tops.length];
+    var q = null;
+    try{ q = gp(t.gens)(); }catch(e){}
+    if(!q || seen[q[0]]) continue;
+    seen[q[0]] = 1;
+    /* الوسمُ هو ما تقرؤه skillOf لتسمية المهارة في التقرير والعلاجيّ */
+    out.push(['<b>رياضيات — '+t.name+':</b> '+q[0], q[1], q[2], q[3]]);
+  }
+  return out;
+}
+function tahsiliMix(n){
+  var subs = ["رياضيات","فيزياء","كيمياء","أحياء"];
+  var w = [ri(1,6), ri(1,6), ri(1,6), ri(1,6)];      /* وزنُ كلِّ مادّةٍ يتغيّر كلَّ جلسة */
+  var cnt = [1,1,1,1];                                /* ولا تغيب مادّةٌ بالكامل */
+  var tot = w[0]+w[1]+w[2]+w[3], i, k;
+  for(i=0; i<n-4; i++){
+    var r = Math.random()*tot, acc = 0;
+    for(k=0; k<4; k++){ acc += w[k]; if(r <= acc) break; }
+    cnt[Math.min(k,3)]++;
+  }
+  var out = mathGen(cnt[0]);
+  for(i=1; i<4; i++){
+    var pool = TSUBJ[subs[i]] || [];
+    if(pool.length) out = out.concat(freshPick(pool, Math.min(cnt[i], pool.length), "t_"+subs[i]));
+  }
+  return shuffle(out);
+}
+
 var app = document.getElementById("app");
 var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (مناسبة لعمره)
 /* NO_GAT — بلا قدرات (لا لفظي ولا كمي). طلبُ الأب (٢٣ سبتمبر ٢٠٢٦):
@@ -881,7 +934,14 @@ function buildAll(){
       renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
     }
     if(!YOUNG){
-      renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
+      if(SENIOR){
+        var tN = (window.TAHSILI_MATH ? window.TAHSILI_MATH.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
+        renderSet("t", tahsiliMix(12),
+          "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وفيزياء وكيمياء وأحياء — و<b>نسبة كل مادة تتغيّر كل جلسة</b>، لأن نسب التحصيلي غير ثابتة وتختلف باختلاف النموذج. والرياضيات <b>مولَّدة</b> من "+tN+" مولّدًا على دروس الكتاب الـ١٧، فأرقامها جديدة كل مرة.",
+          function(){ return tahsiliMix(12); }, "تحصيلي");
+      } else {
+        renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
+      }
     }
     var sN = STEP.length;
     renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة.", function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
@@ -991,6 +1051,25 @@ var SKILLS = [
    الطالب في المبني للمجهول وحده ظهر له اسمٌ عامٌّ لا يدلّه على شيء.
    فنُولِّد درسًا لكلّ موضوع، بشرحه وفيديوه وجولته — ويظلّ درسُ
    «Grammar» القديم لأسئلة البنك الأوّل الموسومةِ باسمٍ عامّ. */
+/* ═══ التحصيليّ — درسٌ علاجيٌّ لكلِّ درسٍ من دروس الكتاب السبعةَ عشرَ ═══
+   keys تُطابِق اسمَ المهارة حرفًا بحرف كما تكتبها mathGen، فلا يكفي
+   درسُ «رياضيات» الواحدُ القديم: لو ضعف فهد في القطوع المخروطيّة
+   وحدها ظهر له اسمٌ عامٌّ لا يدلّه على شيء. */
+if(window.TAHSILI_MATH){ (function(){
+  window.TAHSILI_MATH.topics.forEach(function(t){
+    var key = "رياضيات — " + t.name;
+    SKILLS.push({ group:"تحصيلي", name:"رياضيات — "+t.name,
+      rx:new RegExp(t.name.slice(0,12).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")),
+      yt:t.yt, keys:[key], lesson:t.lesson,
+      gen:function(){
+        var q=null, tr=0;
+        while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
+        if(!q) return null;
+        return ['<b>رياضيات — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
+      } });
+  });
+})(); }
+
 if(window.STEP_BANK){ (function(){
   var SB = window.STEP_BANK;
   [
