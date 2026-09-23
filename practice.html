@@ -40,7 +40,7 @@
   .stem{font-weight:700;margin:6px 0 10px;font-size:1.05rem}
   .stem.ltr{direction:ltr;text-align:left}
   .opts{display:grid;gap:8px}
-  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit;text-align:right}
+  .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit;text-align:start}
   .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
   .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
   .explain{margin-top:10px;font-size:.92rem;color:var(--muted);display:none}
@@ -56,13 +56,18 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="practice-bank.js"></script>
+<script src="step-bank.js"></script>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
-var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
-var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي"};
+var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود",fahad:"فهد"};
+var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي",fahad:"ثالث ثانوي"};
 var name = NAMES[who] || "الطالب";
 var YOUNG = (who==="saud" || who==="osama"); // الصغار: لفظي + STEP فقط (بدون كمي/تحصيلي)
+/* فهد: ثالث ثانوي — مسار علمي. التحصيلي وSTEP والقدرات كلّها في
+   مستواه لا «فوق المستوى»، فتُحسب عليه وتدخل كشفَ الضعف والقسم
+   العلاجيّ. وهو الفرق الوحيد الذي يستدعيه وجودُه في هذه الصفحة. */
+var SENIOR = (who==="fahad");
 
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
@@ -76,7 +81,7 @@ function saveScore(test, correct, total, wrongs, skills, pid){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
     // نوسمهما stretch حتى يفصلهما تقرير المستوى ولا يحسبهما ضدّ الطالب.
-    var stretch = /تحصيلي|STEP/i.test(test);
+    var stretch = !SENIOR && /تحصيلي|STEP/i.test(test);
     var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null } };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
@@ -683,6 +688,13 @@ try{
   }
 }catch(e){}
 
+/* ═══ بنك قواعد STEP — ٣٠٠ سؤال (step-bank.js) ═══
+   طلب الأب (٢٣ سبتمبر ٢٠٢٦): «أبدأ بستيب» لفهد (ثالث ثانوي).
+   كان قسم STEP ٩٨ سؤالًا ثابتًا، فيراها الطالب كلّها في ثماني جولات.
+   صار البنك ٣٩٨ — أي ثلاث وثلاثون جولةً قبل أن يتكرّر عليه شيء.
+   وشرحُ سببِ إعادةِ صياغةِ الثلاثمئة كلّها في رأس step-bank.js. */
+try{ if(window.STEP_BANK && window.STEP_BANK.length) STEP = STEP.concat(window.STEP_BANK); }catch(e){}
+
 var app = document.getElementById("app");
 var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (مناسبة لعمره)
 app.innerHTML =
@@ -757,8 +769,8 @@ function renderSet(id, items, intro, regen, label){
   if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
   items.forEach(function(q,i){
     html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
-      '<div class="stem">'+q[0]+'</div><div class="opts">';
-    q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+      '<div class="stem" dir="auto">'+q[0]+'</div><div class="opts">';
+    q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" dir="auto">'+o+'</button>'; });
     html += '</div><div class="explain">'+q[3]+'</div></div>';
   });
   html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>';
@@ -861,7 +873,8 @@ function buildAll(){
       renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");
       renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
     }
-    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء (متقدّم) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
+    var sN = STEP.length;
+    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة.", function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
   }
 }
 var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
@@ -962,11 +975,59 @@ var SKILLS = [
    gen:function(){ return pickBank(STEP,/Error|Reading/); }}
 ];
 
+/* ═══ STEP — دروس القواعد الخمسة عشر (بنك step-bank.js) ═══
+   بنكُ الثلاثمئة يُسمّي مهاراته «:Grammar — <الموضوع>»، وkeys تُطابِق
+   الاسمَ حرفًا بحرف، فلا يكفي درسُ «Grammar» الواحد القديم: لو ضعف
+   الطالب في المبني للمجهول وحده ظهر له اسمٌ عامٌّ لا يدلّه على شيء.
+   فنُولِّد درسًا لكلّ موضوع، بشرحه وفيديوه وجولته — ويظلّ درسُ
+   «Grammar» القديم لأسئلة البنك الأوّل الموسومةِ باسمٍ عامّ. */
+if(window.STEP_BANK){ (function(){
+  var SB = window.STEP_BANK;
+  [
+   ["Present Tenses","أزمنة المضارع","شرح ازمنة المضارع present simple continuous perfect",
+    "المضارع البسيط للعادة والحقيقة (every day, usually). والمستمرّ لما يجري الآن (now, look!, this month). والتامّ لأثرٍ باقٍ في الحاضر (since, for, yet, already, this week). والتامّ المستمرّ لإبراز المدّة (How long…؟)."],
+   ["Past Tenses","أزمنة الماضي","شرح ازمنة الماضي past simple continuous perfect",
+    "الماضي البسيط لحدثٍ منتهٍ (yesterday, ago). والمستمرّ لفعلٍ كان جاريًا قطعه غيره (while, at 8 p.m.). والتامّ had + p.p. لما سبق حدثًا ماضيًا (before, by the time). والتامّ المستمرّ لمدّةٍ سبقته."],
+   ["For / Since / Used to","‏for / since و‏used to","شرح for since used to be used to get used to",
+    "‏for + مدّة (two hours)، وsince + نقطةُ بداية (2019, March). و‏used to + مصدرٌ مجرّد = عادةٌ ماضية. و‏be/get used to + اسمٍ أو v-ing = التعوّد — وهذا أكثرُ ما يُخطئ فيه الطلّاب."],
+   ["Time Connectors","روابط الزمن","شرح روابط الزمن when while until before after as soon as once",
+    "‏while مع فعلٍ جارٍ، وwhen للحظة، وuntil = إلى أن، وbefore/after للترتيب، وas soon as/once = فورَ أن. ولا نضع will بعد هذه الروابط."],
+   ["If Conditions","الجمل الشرطية","شرح الجمل الشرطية zero first second third conditional",
+    "الصفريّ: if + مضارع، مضارع (حقيقة). الأوّل: if + مضارع، will (احتمالٌ واقعيّ). الثاني: if + ماضٍ/were، would (فرضٌ مخالفٌ للحاضر). الثالث: if + had p.p.، would have p.p. (ماضٍ فائت). والمختلط: شرطٌ ماضٍ ونتيجةٌ حاضرة."],
+   ["Relative Clauses","جمل الوصل","شرح جمل الوصل who whom whose which that where when",
+    "‏who للعاقل فاعلًا، وwhom مفعولًا، وwhose للملكيّة، وwhich لغير العاقل، وwhere للمكان، وwhen للزمان، وwhy بعد reason. وبعد only والتفضيل نستخدم that. وبين فاصلتين لا تصحّ that."],
+   ["Pronouns","الضمائر","شرح الضمائر pronouns object possessive reflexive english",
+    "بعد حروف الجرّ والأفعال نضع ضميرَ المفعول (me, him, us). وضمائرُ الملكيّة المستقلّة لا يتبعها اسم (mine, hers, ours). والانعكاسيّة (myself, herself) إذا كان الفاعلُ والمفعولُ واحدًا. و‏its ملكيّة و‏it's = it is."],
+   ["Countable / Uncountable","المعدود وغير المعدود","شرح المعدود وغير المعدود countable uncountable much many",
+    "غيرُ المعدود لا يُجمَع ولا يقبل a: information, advice, evidence, feedback, equipment, patience, time. معه: much, a little, a great deal of. ومع الجمعِ المعدود: many, a few, several, too many."],
+   ["Comparative / Superlative","المقارنة والتفضيل","شرح المقارنة والتفضيل comparative superlative adjectives",
+    "الصفةُ القصيرة تأخذ er/est، والطويلة more/most. و‏than علامةُ المقارنة، و‏the + in/of علامةُ التفضيل. شواذّ: good→better→best، bad→worse→worst. و‏as … as تلزمها الصفةُ المجرّدة، وصيغةُ التناسب: the more … the more."],
+   ["Verb + to / ing / base","الفعل الثاني","شرح الفعل الثاني to infinitive gerund bare infinitive",
+    "‏to + مصدر بعد: decide, hope, agree, refuse, plan, want, seem, allow sb. و‏v-ing بعد: enjoy, avoid, mind, practice, suggest, keep. ومصدرٌ مجرّدٌ بعد: make sb, let sb. ومصيدةٌ: stop to (توقّف لكي) ≠ stop v-ing (توقّف عن)، وforget to ≠ forget v-ing."],
+   ["Modal Auxiliaries","الأفعال الناقصة","شرح الافعال الناقصة modals must should may might can could",
+    "‏must إلزامٌ أو استنتاجٌ شبهُ يقينيّ، وshould نصيحة، وmay/might احتمال، وcan/could قدرةٌ أو استئذان. ومصيدةٌ ثابتة: mustn't = محرَّم، وdon't have to = لا لزوم. و‏should have + p.p. لومٌ على ما لم يُفعَل، و‏can't have + p.p. استحالةٌ في الماضي."],
+   ["Prepositions / Articles","حروف الجر وأدوات التعريف","شرح حروف الجر in on at وادوات التعريف a an the",
+    "‏at للساعةِ والنقطةِ المحدّدة، وon لليومِ والسطح، وin للشهرِ والسنةِ والمدينةِ والداخل. و‏at night شاذّة. و‏a قبل الصوت الساكن وan قبل المتحرّك (an hour, an unusual). و‏the مع الفريدِ وأسماءِ الأنهارِ والبحار."],
+   ["Passive Voice","المبني للمجهول","شرح المبني للمجهول passive voice all tenses",
+    "القاعدة: be بزمنِ الجملة + التصريفُ الثالث. مضارع is done، ماضٍ was done، مستمرّ is being done، تامّ has been done، ماضٍ تامّ had been done، مستقبل will be done، وبعد الناقص modal + be done."],
+   ["Capitalization / Punctuation","الحروف الكبيرة والترقيم","شرح capitalization punctuation rules commas apostrophe",
+    "بحرفٍ كبير: أوّلُ الجملة وI والأسماءُ والمدنُ والدولُ واللغاتُ والشهورُ وأيّامُ الأسبوع — لا أسماءُ المواد العامّة. وفاصلةٌ بعد العبارةِ الاستهلاليّة وقبل but/and الرابطةِ لجملتين وحول المعترضة. وملكيّةُ المفرد 's وملكيّةُ الجمع s'."],
+   ["Word Order / Error ID","ترتيب الجملة واكتشاف الخطأ","شرح ترتيب الجملة word order adverb position english",
+    "الترتيب: فاعل + فعل + مفعول + مكان + زمان. وظرفُ التكرار (always, usually, never) قبل الفعلِ الرئيس وبعد المساعدِ وبعد be. ولا يُفصَل الفعلُ عن مفعوله بحال. وفي اكتشاف الخطأ: افحص تطابقَ الفعلِ مع الفاعل، ثمّ الزمن، ثمّ حرفَ الجرّ، ثمّ المعدود."]
+  ].forEach(function(t){
+    var key = "Grammar — " + t[0];
+    SKILLS.push({ group:"STEP", name:"قواعد — "+t[1]+" ("+t[0]+")",
+      rx:new RegExp(t[0].replace(/[^A-Za-z ]/g,".")), yt:t[2], keys:[key],
+      lesson:t[3],
+      gen:function(){ var f=SB.filter(function(q){ return q[0].indexOf(key+":")>=0; }); return (f.length?gp(f):gp(SB)).slice(); } });
+  });
+})(); }
+
 function skillItems(s, n){ var out=[], seen={}, t=0; n=n||3; while(out.length<n && t<40){ var q; try{ q=s.gen(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
 function renderMini(box, items){
   items = items.map(shuffleQ);
   var h="";
-  items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem">'+q[0]+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'">'+o+'</button>'; }); h+='</div><div class="explain">'+q[3]+'</div></div>'; });
+  items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem" dir="auto">'+q[0]+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'" dir="auto">'+o+'</button>'; }); h+='</div><div class="explain">'+q[3]+'</div></div>'; });
   box.innerHTML=h;
   box.querySelectorAll(".q").forEach(function(qEl){ var i=+qEl.dataset.i, ans=items[i][2];
     qEl.querySelectorAll(".opts button").forEach(function(btn){ btn.addEventListener("click",function(){
@@ -1013,7 +1074,7 @@ async function renderRemedial(){
   function topicStat(s){ var c=0,t=0; (s.keys||[]).forEach(function(k){ if(agg[k]){ c+=agg[k].c; t+=agg[k].t; } }); return {c:c,t:t}; }
   // التحصيلي وSTEP فوق المستوى (ثانوي) ولا تدخل تقييم الأبناء — فلا نطلقها كـ«ضعف»،
   // نبقيها في المكتبة الاختيارية فقط. كشف الضعف يقتصر على المهارات في مستوى الصفّ (كمي).
-  var STRETCH_GROUPS = {"تحصيلي":1,"STEP":1};
+  var STRETCH_GROUPS = SENIOR ? {} : {"تحصيلي":1,"STEP":1};
   var WEAK=0.5, MINQ=3;
   var weak = SKILLS.map(function(s){ return {s:s, st:topicStat(s)}; })
     .filter(function(o){ return !STRETCH_GROUPS[o.s.group] && o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
@@ -1032,12 +1093,12 @@ async function renderRemedial(){
 
   var html='';
   if(weak.length){
-    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> (في مستوى صفّك — القدرات الكمي). شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
+    html += '<div class="intro">🎯 <b>مهاراتك تحت ٥٠٪ فقط</b> '+(SENIOR?'(القدرات والتحصيلي وSTEP)':'(في مستوى صفّك — القدرات الكمي)')+'. شاهد الفيديو ثم حُلّ الجولة تحتها. <b>لما ترفع نسبتها فوق ٥٠٪ تختفي من هنا تلقائيًا ✅</b></div>';
     weak.forEach(function(o){ html += lessonCard(o.s, o.st, true); });
   } else if(inLevelData){
-    html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪ في مستوى صفّك. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span></div>';
+    html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪'+(SENIOR?'':' في مستوى صفّك')+'. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).'+(SENIOR?'':'<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span>')+'</div>';
   } else {
-    html += '<div class="intro">لسّا ما فيه بيانات كافية في القدرات الكمي. اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
+    html += '<div class="intro">لسّا ما فيه بيانات كافية'+(SENIOR?'':' في القدرات الكمي')+'. اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
   }
   if(weakStretch.length){
     html += '<div class="intro" style="margin-top:14px">🚀 <b>فوق المستوى — تحصيلي/STEP تحت ٥٠٪</b> (لا تُحسب ضعفًا في مستوى صفّك، لكنها فرصة تهيئة مبكرة). شاهد الفيديو ثم حُلّ الجولة تحتها.</div>';
@@ -1045,7 +1106,8 @@ async function renderRemedial(){
   }
   // مكتبة كل الدروس — مطويّة، اختيارية (والتحصيلي/STEP فوق المستوى، للتعوّد فقط)
   var lib='';
-  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي (فوق المستوى — اختياري)"]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي (فوق المستوى — اختياري)"],["STEP","🌍 STEP إنجليزي (فوق المستوى — اختياري)"]];
+  var _ov = SENIOR ? "" : " (فوق المستوى — اختياري)";
+  var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"+_ov]] : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"+_ov],["STEP","🌍 STEP إنجليزي"+_ov]];
   groups.forEach(function(g){
     lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
     SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });

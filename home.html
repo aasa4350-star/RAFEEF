@@ -118,13 +118,18 @@ function groupTalk(rows){
 }
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"saud").toLowerCase();
-var NAMES  = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن",khassa:"التربية الخاصة"};
-var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط",khassa:"اختبار كفايات — مسار التوحد"};
+var NAMES  = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن",fahad:"فهد",khassa:"التربية الخاصة"};
+var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط",fahad:"ثالث ثانوي — مسار علمي",khassa:"اختبار كفايات — مسار التوحد"};
 var name = NAMES[who] || who;
 var grade = GRADES[who] || "";
 
 // ===== روابط المواد =====
 var SUBJECTS = {
+  /* فهد — ثالث ثانوي، مسار علمي. طلبُ الأب (٢٣ سبتمبر ٢٠٢٦): تحصيلي
+     وقدرات وستيب فقط، لا مناهجَ مدرسيّة. وبدأنا بستيب بأمره. */
+  fahad: [
+    {href:"practice.html", ico:"📊", nm:"قدرات · تحصيلي · STEP", ds:"‏STEP جاهز — بنك القواعد ٣٠٠ سؤال في ١٥ موضوعًا، بشرحٍ عربيّ لكلّ سؤال وقسمٍ علاجيّ لكلّ موضوع", hero:true, wide:true}
+  ],
   /* طالبٌ خامس ليس ابنًا: مادّة التربية الخاصة (اضطراب التوحد) لاختبار كفايات */
   khassa: [
     {href:"license.html", ico:"🎓", nm:"الرخصة المهنية — التربويّ العامّ", ds:"نظريات التعلّم · بلوم · التقويم · إدارة الصفّ · التخطيط · الأخلاقيات", hero:true, wide:true},
