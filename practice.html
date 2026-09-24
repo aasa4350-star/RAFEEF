@@ -819,6 +819,18 @@ if(!VERBAL_ONLY){
   TABS.push(["rem","علاجي 💪"]);
   TABS.push(["o","نماذج رسمية 🏛️"]);
 }
+/* أوزانُ أقسامِ ستيب كما أرسلها الأب (٢٤ سبتمبر ٢٠٢٦): «هذي من تجارب
+   الطلاب الي اختبرو» — فهي نقلُ طلبةٍ اختبروا، لا صفحةً رسميّةً قرأتُها
+   (الشبكةُ محجوبةٌ عن جهازي). ولذا يُنسَب النقلُ في العرضِ ولا يُقال إنّه
+   معتمَد. وفائدتُها أنّها تدلّ فهدًا على موضعِ جهده: فهمُ المقروءِ وحدَه
+   أربعةُ أمثالِ التحليلِ الكتابيّ. */
+var STEP_W = [["فهم المقروء",40],["التراكيب النحوية",30],["فهم المسموع",20],["التحليل الكتابي",10]];
+function stepWeightsHtml(){
+  return '<div style="margin-top:8px;font-size:.9rem;line-height:1.9">'+
+    '<b>توزيع أسئلة ستيب</b> (بحسب ما نقله طلبةٌ اختبروا — لا صفحةً رسميّة): '+
+    STEP_W.map(function(w){ return w[0]+' <b>'+w[1]+'%</b>'; }).join(' · ')+
+    '<br><span style="color:var(--muted)">فركّز على الأثقل: فهمُ المقروء وحده أربعةُ أمثالِ التحليل الكتابيّ.</span></div>';
+}
 var HEAD_EYE = VERBAL_ONLY ? 'تدريب لفظي' : (NO_GAT ? 'تحصيلي وSTEP · بأسلوب قياس' : 'اختبارات تجريبية · بأسلوب قياس');
 var HEAD_TTL = VERBAL_ONLY ? '📖 قدرات لفظي — ' : (NO_GAT ? '🧪 تحصيلي وSTEP — ' : '📊 قدرات وتحصيلي — ');
 app.innerHTML =
@@ -1002,7 +1014,7 @@ function buildAll(){
       }
     }
     var sN = STEP.length;
-    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة.", function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
+    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
   }
 }
 var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
