@@ -67,6 +67,7 @@
 <script src="tahsili-chem.js"></script>
 <script src="tahsili-bio.js"></script>
 <script src="tahsili-phys.js"></script>
+<script src="writing-en.js"></script>
 <script>
 /* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
    سؤال رفيف (٢٤ سبتمبر ٢٠٢٦) عن «1/5»: «هل الخمسة فوق أو الواحد؟».
@@ -112,6 +113,21 @@ function saveScore(test, correct, total, wrongs, skills, pid){
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
       body: JSON.stringify(body)
     });
+  }catch(e){}
+}
+
+/* حافظُ التعبير: meta.kind = "writing" أو "writing-drill" — وهما الوسمان
+   اللذان يفرزهما index.html وchild.html وreport.html إلى قسمِ «✍️ التعبير
+   الإنجليزي». فلا نمرّه على saveScore لأنّها تَسِم كلَّ شيءٍ practice. */
+function saveWriting(m){
+  try{
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0,
+                 wrong:[], meta:Object.assign({ at:new Date().toISOString() }, m) };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY,
+                "Content-Type":"application/json", "Prefer":"return=minimal" },
+      body: JSON.stringify(body) });
   }catch(e){}
 }
 
@@ -784,6 +800,11 @@ var VERBAL_ONLY = (who==="saud"); // سعود: قدرات لفظي فقط (من�
 /* NO_GAT — بلا قدرات (لا لفظي ولا كمي). طلبُ الأب (٢٣ سبتمبر ٢٠٢٦):
    «احذف قدرات فهد». فيبقى له التحصيليُّ وSTEP والعلاجيُّ والنماذج. */
 var NO_GAT = (who==="fahad");
+/* WRITING — قسمُ التعبير. طلبُ الأب (٢٤ سبتمبر ٢٠٢٦): «حط قسم تعبير
+   لفهد». وهو موجودٌ للآخرين في تبويبِ «التعبير ✍️» داخل quiz.html،
+   وفهدٌ لا اختبارَ مدرسيًّا له، فمُرْكَبُه هنا في صفحةِ تدريبه.
+   ومستواه ٣ (أكاديميّ) لا ١ ولا ٢ — فهما جملةٌ وفقرةٌ لمن دونه. */
+var WRITING = (who==="fahad");
 
 /* التبويباتُ تُبنى من قائمةٍ لا بنصٍّ ثابت: كان «لفظي» مفتوحًا دائمًا
    بالنصّ (class="panel active")، فحذفُه وحدَه يترك الصفحة بلا تبويبٍ
@@ -794,6 +815,7 @@ if(!VERBAL_ONLY){
   if(!YOUNG && !NO_GAT) TABS.push(["q","قدرات — كمي 🔢"]);
   if(!YOUNG) TABS.push(["t","تحصيلي 🧪"]);
   TABS.push(["s","STEP إنجليزي 🌍"]);
+  if(WRITING) TABS.push(["w","تعبير ✍️"]);
   TABS.push(["rem","علاجي 💪"]);
   TABS.push(["o","نماذج رسمية 🏛️"]);
 }
@@ -1002,6 +1024,23 @@ if(document.getElementById("o")) (function(){
     link("https://mustaqbalhum.etec.gov.sa/","👪 «مستقبلهم» لأولياء الأمور","متابعة رحلة الأبناء التعليمية والاستعداد للاختبارات.")+
     '<p class="intro" style="background:transparent;border:0;color:var(--muted)">ملاحظة: الأقسام الأخرى في هذي الصفحة تدريبية من إعداد المعلّم بنمط قياس، وهذي الروابط هي المصدر الرسمي.</p>';
 })();
+
+/* ═══ قسم التعبير ✍️ (writing-en.js) — يُبنى عند أوّل فتحٍ للتبويب ═══
+   المستوى ٣ أكاديميّ، والهدف B2 (نهايةُ الثاني عشر في المنهج السعوديّ).
+   والجزءُ الأوّلُ تدريبٌ مصحَّحٌ آليًّا على نمطِ «التحليل الكتابيّ» في ستيب
+   (تمييزُ الخطأ، وأفضلُ صياغة، وترتيبُ الفقرة)، والثاني كتابةُ مقالٍ
+   حقيقيٍّ يُصحَّح بمقاييسِ كامبردج الأربعةِ ويُحفَظ بنصِّه ليقرأه الأب. */
+var writingBuilt = false;
+function renderWriting(){
+  var sec = document.getElementById("w");
+  if(!sec || writingBuilt) return;
+  if(!window.WritingEN){
+    sec.innerHTML = '<div class="intro">تعذّر تحميل قسم التعبير. حدّث الصفحة.</div>';
+    return;
+  }
+  writingBuilt = true;
+  WritingEN.render(sec, { who:who, name:name, level:3, cefr:"B2", save:saveWriting });
+}
 
 // ===== قسم علاجي — يشرح نقاط ضعف القدرات الكمي والتحصيلي وSTEP + فيديو + تدريب =====
 function pickBank(arr, rx){ var f = arr.filter(function(x){ return rx.test(x[0]+" "+(x[3]||"")); }); return (f.length?gp(f):gp(arr)).slice(); }
@@ -1312,6 +1351,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     pan.classList.add("active");
     if(typeof pan._reopen === "function") pan._reopen(); // لو كان محفوظ جزئيًا، ابدأه من جديد
     if(b.dataset.tab==="rem"){ renderRemedial(); }
+    if(b.dataset.tab==="w"){ renderWriting(); }
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
@@ -1336,11 +1376,13 @@ function saveCurPanel(){
   if(cur && typeof cur._leave === "function") cur._leave();
 }
 window.addEventListener("pagehide", saveCurPanel);
+if(document.querySelector("#w.panel.active")) renderWriting();
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
 function ejc(){if(document.getElementById("__eject"))return;try{saveCurPanel();}catch(e){}   /* لا نقذفه ونحن نُضيّع ما حلّه */var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
-document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+function inWriting(){var p=document.querySelector(".panel.active");return !!(p&&p.id==="w");}
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;if(inWriting())return;ex++;if(ex>=2)ejc();else tst();}});})();
 </script>
 </body>
 </html>

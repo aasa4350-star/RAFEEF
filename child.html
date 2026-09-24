@@ -284,6 +284,24 @@ async function main(){
        القسمُ من practice.html، وبقيت محاولةٌ قديمةٌ مسجَّلةٌ قبل الحذف
        تظهر في التقرير — فطلب (٢٤ سبتمبر) «شل قدرات فهد من تقريري».
        والإخفاءُ بالوسم لا بالابن وحده، على سَنَنِ ما سبق. */
+    /* سطرُ التعبير كان يقول «كتب 1 فقرة · تدريب بناء الجملة» لكلِّ أحد.
+       وفهدٌ يكتب مقالًا لا فقرةً، وتدريبُه «التحليلُ الكتابيّ» لا بناءُ الجملة
+       (المستوى ٣، طلبُ الأب ٢٤ سبتمبر ٢٠٢٦: «حط قسم تعبير لفهد»). والعددُ
+       في العربيّة أربعُ حالاتٍ لا حالة. فصار السطرُ يقرأ meta.level ويُصرِّف. */
+    function wLevelOf(a, b){
+      var L = 1;
+      a.concat(b).forEach(function(p){ var v = (p.meta && p.meta.level) || 1; if(v > L) L = v; });
+      return L;
+    }
+    function wCount(n, lvl){
+      var A = lvl >= 3 ? ["مقالًا واحدًا","مقالين","مقالات","مقالًا"]
+                       : ["فقرةً واحدة","فقرتين","فقرات","فقرةً"];
+      if(n === 1) return A[0];
+      if(n === 2) return A[1];
+      return n + " " + ((n >= 3 && n <= 10) ? A[2] : A[3]);
+    }
+    function wNone(lvl){ return lvl >= 3 ? "لسّا ما كتب مقالًا كاملًا" : "لسّا ما كتب فقرةً كاملة"; }
+    function wDrill(lvl){ return lvl >= 3 ? "تدريب التحليل الكتابيّ" : "تدريب بناء الجملة"; }
     const HIDE_TESTS = { osama: [/^لغتي و١/], fahad: [/^قدرات/] };
     /* عنوانُ قسمِ «التجريبية» كان يعدّ الأنواعَ الأربعةَ نصًّا ثابتًا، فيرى
        الأبُ كلمةَ «قدرات» في تقريرِ فهدٍ وليس له قدراتٌ أصلًا. فصار العنوانُ
@@ -418,7 +436,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">`+
         /* بلاغ الأب: «التعبير ما يطلع لي التاريخ والوقت» — الفقرات تحتها مؤرَّخة،
            لكن من حلّ التدريب وحده بلا فقرة كان سطره رقمًا بلا زمن. */
-        `<li>📝 ${writingAll.length?`كتب <b>${writingAll.length}</b> فقرة`:`لسّا ما كتب فقرةً كاملة`}${dt2?` · تدريب بناء الجملة: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``}${(function(){ var L=writingAll.concat(writingDrill).map(p=>p.created_at).sort().pop(); return L?` · آخر مرة: <span class="cnt">${saTime(L)}</span>`:``; })()}</li>`;
+        `<li>📝 ${(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?`كتب <b>${wCount(writingAll.length,L)}</b>`:wNone(L))+(dt2?` · ${wDrill(L)}: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``); })()}${(function(){ var L=writingAll.concat(writingDrill).map(p=>p.created_at).sort().pop(); return L?` · آخر مرة: <span class="cnt">${saTime(L)}</span>`:``; })()}</li>`;
       if(wAggN){
         const avgs=WSUBS.map(s=>({s, avg:wAgg[s[0]]/wAggN}));
         const weakestW=avgs.slice().sort((a,b)=>a.avg-b.avg)[0];

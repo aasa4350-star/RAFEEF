@@ -319,6 +319,47 @@ var PROMPTS = {
       {q:"Explain its effect on people", k:["because","effect","affects","people","health","late","dangerous","difficult","hard","time","accident"]},
       {q:"Suggest a solution", k:["solution","solve","should","could","government","build","more","recycle","fine","fines","bus","metro","plant","clean"]}
     ]}
+  ],
+  /* المستوى ٣ — موضوعاتُ مقالٍ برأيٍ ودليلٍ ورأيٍ مضادّ، على نمطِ ما يُطلَب
+     من طالبِ الثالثِ الثانويِّ في الكتابةِ الأكاديميّة. وثالثُ النقاطِ في
+     كلِّ موضوعٍ هو الحجّةُ المضادّةُ وردُّها — وهو ما يفرِّق المقالَ الناضجَ
+     عن الفقرةِ المدرسيّة. */
+  3: [
+    {t:"Should university education be free for everyone?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","essay"]},
+      {q:"Support it with reasons and evidence", k:["because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that"]}
+    ]},
+    {t:"Do social media platforms do more harm than good to young people?", h:"Take one side. Give two arguments with examples, concede one point to the other side, then conclude.", points:[
+      {q:"State your position clearly", k:["harm","harmful","benefit","beneficial","more","than","believe","argue","opinion","view","agree","disagree","should"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","sleep","attention","anxiety","connect","news","learn","first","second"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others"]}
+    ]},
+    {t:"Is online learning as effective as learning in a classroom?", h:"Compare the two fairly, then state which you prefer and why.", points:[
+      {q:"Compare the two clearly", k:["online","classroom","school","both","while","whereas","compared","comparison","than","similar","different","difference"]},
+      {q:"Give concrete advantages or drawbacks", k:["because","for example","for instance","such as","flexible","flexibility","discipline","interaction","teacher","internet","cost","time","travel","distraction","evidence","research"]},
+      {q:"State and justify your preference", k:["prefer","believe","opinion","view","think","conclusion","overall","therefore","consequently","to sum up","in my view"]}
+    ]},
+    {t:"Should students choose a major they love or one with better job prospects?", h:"Weigh both, take a position, and defend it with reasons and an example.", points:[
+      {q:"Set out both sides of the choice", k:["major","majors","passion","love","interest","job","jobs","market","salary","career","prospects","both","while","whereas"]},
+      {q:"Defend your position with reasons", k:["because","reason","first","second","for example","for instance","such as","evidence","therefore","consequently","succeed","motivation","skills","demand"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some people","others"]}
+    ]},
+    {t:"Should driving be banned in city centres?", h:"State your position, give two reasons with evidence, answer an objection, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","shouldn't","banned","ban","must","agree","disagree","believe","opinion","view","argue"]},
+      {q:"Give reasons with evidence", k:["because","reason","traffic","pollution","air","noise","health","accidents","public transport","bus","metro","for example","for instance","research","studies","evidence","therefore"]},
+      {q:"Answer an objection", k:["however","although","while","whereas","shops","businesses","elderly","disabled","admittedly","it is true that","on the other hand","nevertheless","critics","some"]}
+    ]},
+    {t:"Is reading books still important in the age of short videos?", h:"Argue one side. Use two reasons and an example, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["reading","books","videos","still","important","believe","argue","opinion","view","agree","disagree","should"]},
+      {q:"Give reasons and an example", k:["because","vocabulary","concentration","attention","depth","knowledge","imagination","for example","for instance","such as","research","studies","shows","evidence","therefore","first","second"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","quick","convenient","some","others","critics"]}
+    ]},
+    {t:"Should high school students be required to do voluntary work?", h:"State your position, support it, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","shouldn't","required","requirement","compulsory","must","agree","disagree","believe","opinion","view","argue"]},
+      {q:"Support it with reasons and an example", k:["because","reason","responsibility","skills","community","experience","confidence","for example","for instance","such as","evidence","research","therefore","first","second"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","study","time","exams","pressure","admittedly","it is true that","on the other hand","nevertheless","critics","some","others"]}
+    ]}
   ]
 };
 
@@ -333,7 +374,13 @@ var CEFR = {
        say:"سلسلة جُمل مربوطة بأدوات بسيطة: and / but / because — وهو نصّ وصف CEFR للمستوى A2"},
   B1: {name:"A2+ نحو B1", minWords:100, minSent:6, minConn:3, needSeq:true,
        conn:["and","but","because","so","however","therefore","for example","in addition","first","then","finally","although","also"],
-       say:"نصّ مترابط: مقدّمة ثم أفكار مرتّبة ثم خاتمة، بأدوات ربط متنوّعة"}
+       say:"نصّ مترابط: مقدّمة ثم أفكار مرتّبة ثم خاتمة، بأدوات ربط متنوّعة"},
+  /* فهدٌ ثالثُ ثانويّ، ونهايةُ الثاني عشر في المنهج السعوديّ B2 — فهذا هدفُه */
+  B2: {name:"B1+ نحو B2", minWords:150, minSent:8, minConn:4, needSeq:true,
+       conn:["however","therefore","consequently","furthermore","in addition","moreover","nevertheless","in contrast",
+             "for example","for instance","although","while","whereas","as a result","first","then","finally",
+             "in conclusion","because","and","but","so"],
+       say:"مقالٌ قصيرٌ ذو أطروحةٍ: مقدّمةٌ تُعلِن الموقف، ثمّ حجّةٌ بدليلٍ لكلِّ فقرة، ثمّ خاتمةٌ تُحكِمه — بأدواتٍ أكاديميّةٍ وتسجيلٍ رسميّ"}
 };
 
 
@@ -438,9 +485,276 @@ function wConnector2(){
     "wn:"+p[0]];
 }
 
+/* ═════════ المستوى ٣ — أكاديميّ (فهد: ثالث ثانويّ، متقدّمٌ لستيب) ═════════
+   طلبُ الأب (٢٤ سبتمبر ٢٠٢٦): «حط قسم تعبير لفهد». والمستويان ١ و٢
+   جملةٌ وفقرةٌ لطلبةِ الابتدائيِّ والمتوسّط، فلا يصلحان لمن يتقدّم لستيب.
+   فهذا مستوًى ثالثٌ أكاديميّ: أطروحةٌ ومقالٌ وتسجيلٌ رسميٌّ وتحليلٌ كتابيّ.
+
+   وأُنبِّه على أمرٍ في ستيب: قسمُ الكتابةِ فيه — «التحليل الكتابيّ» —
+   اختيارٌ من متعدّدٍ لا مقالٌ يُكتَب: تمييزُ الخطأ، وأفضلُ صياغة، وترتيبُ
+   الفقرة. فالجزءُ الأوّلُ (التدريب) هو الأقربُ إلى صورةِ الاختبار،
+   والجزءُ الثاني (كتابةُ مقالٍ حقيقيّ) يبني اللغةَ نفسَها. وهذا ما أعرفه
+   عن صيغةِ الاختبار ولا أقدر أن أتحقّق منه من هنا (قياسٌ محجوبٌ عن جهازي)
+   فليصحّح الأبُ إن كان غيرَ ذلك. */
+
+/* [الموضوع, أطروحةٌ تصلح للمقال, تفصيلةٌ ضيّقة, خارجٌ عن الموضوع] */
+var TOPIC_SENT3 = [
+  ["studying abroad",
+   "Studying abroad develops a student's independence, language skills and career prospects.",
+   "My cousin paid about forty thousand riyals for his first year in Manchester.",
+   "The new stadium in our city can hold sixty thousand people."],
+  ["social media and students",
+   "Although social media keeps students connected, it can seriously damage their study habits.",
+   "I opened my first account when I was thirteen years old.",
+   "My father prefers tea to coffee in the morning."],
+  ["online learning",
+   "Online learning offers real flexibility, but it demands far more self-discipline than a classroom does.",
+   "My laptop battery lasts about four hours without charging.",
+   "Football is the most popular sport in the world."],
+  ["choosing a university major",
+   "Students should choose a major that suits both their own abilities and the needs of the job market.",
+   "The application deadline last year was the fifteenth of May.",
+   "Camels can survive for several days without drinking water."],
+  ["part-time work for students",
+   "A part-time job teaches students responsibility, although it can take time away from their studies.",
+   "I worked eighteen hours a week in a small bookshop.",
+   "The Red Sea is famous for its coral reefs."],
+  ["public transport",
+   "Investing in public transport reduces traffic, pollution and the daily cost of travel.",
+   "A single bus ticket in my city costs three riyals.",
+   "My sister is learning to play the piano."],
+  ["reading books",
+   "Reading full books builds vocabulary and concentration in a way that short videos cannot.",
+   "I finished a four-hundred-page novel in six days.",
+   "Our school has two computer laboratories."],
+  ["learning a second language",
+   "Learning a second language sharpens memory, opens career doors and deepens cultural understanding.",
+   "I study English for about forty minutes every evening.",
+   "The desert becomes very cold at night."],
+  ["exams and learning",
+   "Exams measure only part of what a student has really learned.",
+   "Our final exam lasted two hours and ten minutes.",
+   "Dates are harvested in late summer."],
+  ["volunteering",
+   "Volunteering benefits the community and gives young people skills that no classroom teaches.",
+   "I volunteered for six Saturdays at a book fair.",
+   "The airport is thirty kilometres from the city centre."]
+];
+
+/* [الرسميّة الصحيحة, عامّيّةٌ أو دردشة, عامّيّةٌ أو دردشة] */
+var REGISTER3 = [
+  ["The results of the study were not entirely convincing.",
+   "The results of the study were kind of weak, to be honest.",
+   "The study's results? Not great at all."],
+  ["The evidence suggests that the policy had little effect.",
+   "It looks like the policy didn't really do anything.",
+   "Basically the policy was a total flop."],
+  ["A considerable number of participants withdrew from the programme.",
+   "Loads of people just dropped out of the programme.",
+   "Tons of them quit, which was pretty bad."],
+  ["This report examines the causes of traffic congestion in the capital.",
+   "In this report I'm gonna talk about why traffic is so awful downtown.",
+   "So, traffic downtown — let me tell you, it's a nightmare."],
+  ["The findings should be interpreted with caution.",
+   "Don't take these findings too seriously, guys.",
+   "You probably shouldn't trust this stuff much."],
+  ["Further research is required before any conclusion can be drawn.",
+   "We need way more research before we can say anything for sure.",
+   "Honestly nobody really knows yet, so whatever."]
+];
+
+/* [جملةٌ تامّة (الصحيح), شبهُ جملةٍ, شبهُ جملةٍ] */
+var FRAGMENT3 = [
+  ["Many students struggle with academic writing in their first year.",
+   "Because many students struggle with academic writing in their first year.",
+   "Struggling with academic writing in their very first year."],
+  ["The committee published its report in March.",
+   "Although the committee published its report in March.",
+   "The committee, having published its report in March."],
+  ["Renewable energy has become much cheaper.",
+   "Since renewable energy has become much cheaper.",
+   "Renewable energy becoming much cheaper every year."],
+  ["The researchers repeated the experiment twice.",
+   "After the researchers repeated the experiment twice.",
+   "The researchers repeating the experiment twice in one week."],
+  ["Reading improves a student's vocabulary.",
+   "Which improves a student's vocabulary.",
+   "Improving a student's vocabulary week after week."]
+];
+
+/* [الأوجزُ والأوضح (الصحيح), مُطوَّلة, مُطوَّلة] */
+var WORDY3 = [
+  ["The committee postponed the meeting.",
+   "The committee made the decision that the meeting would be postponed until a later time.",
+   "It was decided by the committee that the meeting should be postponed to a later date."],
+  ["We must reduce waste.",
+   "It is absolutely necessary that we must take steps in order to reduce the amount of waste.",
+   "There is a need for the reduction of the amount of waste that is produced by us."],
+  ["The results surprised the researchers.",
+   "The results were surprising in nature to the researchers who conducted the study.",
+   "It came as a surprise to the researchers that the results were what they were."],
+  ["Few students finished on time.",
+   "There were only a very small number of students who managed to finish at the right time.",
+   "The number of students finishing in a timely manner was a rather small one."],
+  ["The policy failed.",
+   "The policy was unsuccessful in achieving the goals that it had originally set out to achieve.",
+   "It turned out to be the case that the policy did not succeed in any real way."]
+];
+
+/* [الجملةُ الأولى, الثانية بالفراغ, الأداةُ الصحيحة, خطأ, خطأ] */
+var CONN3 = [
+  ["The experiment was repeated three times.","___ , the results remained inconsistent.","However","Therefore","For example"],
+  ["Tuition fees have risen sharply.","___ , fewer families can afford private universities.","Consequently","Nevertheless","In contrast"],
+  ["Many species are disappearing quickly.","___ , the Arabian leopard is now extremely rare.","For example","Therefore","However"],
+  ["Solar energy is clean and renewable.","___ , the price of panels has fallen sharply.","Furthermore","However","In contrast"],
+  ["The government raised the fuel tax.","___ , car use in the capital fell by a fifth.","As a result","Although","For example"],
+  ["The book is long and detailed.","___ , it is written in very simple language.","However","Therefore","As a result"],
+  ["Students need practice to write well.","___ , they should write something every week.","Therefore","However","In contrast"],
+  ["The plan looked simple on paper.","___ , it proved difficult to apply.","Nevertheless","Therefore","In addition"],
+  ["The first study used a very small sample.","___ , the second one surveyed ten thousand people.","In contrast","Therefore","For example"],
+  ["Reading widely improves vocabulary.","___ , it strengthens a student's general knowledge.","In addition","However","Instead"]
+];
+
+/* [الصحيحةُ نحويًّا, خطأٌ شائع, خطأٌ شائع] */
+var GRAM3 = [
+  ["The number of students has increased steadily.",
+   "The number of students have increased steadily.",
+   "The number of students are increasing steadily."],
+  ["Neither of the two answers is correct.",
+   "Neither of the two answers are correct.",
+   "Neither of the two answers were correct."],
+  ["Each of the students was given a separate room.",
+   "Each of the students were given a separate room.",
+   "Each of the students have been given a separate room."],
+  ["Hardly had he finished speaking when the bell rang.",
+   "Hardly he had finished speaking when the bell rang.",
+   "Hardly had he finished speaking than the bell rang."],
+  ["If I had known, I would have told you.",
+   "If I would have known, I would have told you.",
+   "If I had known, I would told you."],
+  ["She denied taking the money.",
+   "She denied to take the money.",
+   "She denied take the money."],
+  ["He suggested that we leave early.",
+   "He suggested us to leave early.",
+   "He suggested we leaving early."],
+  ["There are fewer cars on the road today.",
+   "There are less cars on the road today.",
+   "There is fewer cars on the road today."],
+  ["I look forward to hearing from you.",
+   "I look forward to hear from you.",
+   "I look forward hearing from you."],
+  ["Most of the information was useful.",
+   "Most of the informations were useful.",
+   "Most of the information were useful."],
+  ["He is used to working long hours.",
+   "He is used to work long hours.",
+   "He used to working long hours."],
+  ["The committee has reached a decision.",
+   "The committee has reach a decision.",
+   "The committee have reach a decision."]
+];
+
+/* ثلاثُ جملٍ أكاديميّةٍ مرتّبةٍ: أطروحةٌ ← دليلٌ ← خاتمة */
+var SEQ3 = [
+  ["First, the researchers collected data from four hundred families.",
+   "Then, they compared the answers with the results of an earlier survey.",
+   "Finally, they concluded that household income was the strongest factor."],
+  ["First, the city widened two of its main roads.",
+   "Then, it added three new bus routes to the eastern districts.",
+   "Finally, traffic during the morning rush hour fell by almost a fifth."],
+  ["First, I read the question carefully and underlined its key terms.",
+   "Then, I planned three paragraphs, one for each of my main points.",
+   "Finally, I reread my essay and corrected the errors I had missed."],
+  ["First, the company tested the new design in a single branch.",
+   "Then, it trained the staff of every other branch to use it.",
+   "Finally, the design was introduced across the whole country."],
+  ["First, the school surveyed its students about their reading habits.",
+   "Then, it opened the library for an extra hour each afternoon.",
+   "Finally, borrowing rose by more than a third within one term."]
+];
+
+/* ─────────── مولّدات المستوى الثالث ─────────── */
+
+/* الأطروحة (thesis statement) — أعمّ من جملة الموضوع في المستوى الثاني */
+function wThesis(){
+  var p=gp(TOPIC_SENT3);
+  var o=pick3(p[1],[p[2],p[3]]); if(!o) return null;
+  return ["أيُّ جملةٍ تصلح <b>أطروحةً</b> (Thesis Statement) لمقالٍ عن «"+p[0]+"»؟",
+    o[0].map(en),o[1],
+    "الأطروحةُ تُعلِن موقفَ المقالِ كلِّه وتُلمِّح إلى محاورِه. أمّا الجملةُ التي تذكر رقمًا أو واقعةً واحدةً فهي دليلٌ داخلَ فقرةٍ لا أطروحة، والبعيدةُ عن الموضوعِ لا موضعَ لها.",
+    "w3t:"+p[0]];
+}
+/* الجملة الخارجة عن موضوع المقال */
+function wOffTopic3(){
+  var p=gp(TOPIC_SENT3);
+  var o=pick3(p[3],[p[1],p[2]]); if(!o) return null;
+  return ["مقالٌ عن «"+p[0]+"». أيُّ جملةٍ <b>لا تنتمي</b> إليه؟",
+    o[0].map(en),o[1],
+    "وحدةُ الموضوعِ شرطٌ في المقالِ كما في الفقرة: كلُّ جملةٍ تخدم الأطروحة. والدليلُ الضيّقُ ينتمي إليه وإن كان جزئيًّا، والجملةُ الغريبةُ لا تنتمي البتّة.",
+    "w3x:"+p[0]];
+}
+/* التسجيل الرسميّ (register) — عمادُ الكتابة الأكاديميّة */
+function wRegister(){
+  var p=gp(REGISTER3);
+  var o=pick3(p[0],[p[1],p[2]]); if(!o) return null;
+  return ["أيُّ جملةٍ تناسب <b>الكتابةَ الأكاديميّةَ الرسميّة</b>؟",
+    o[0].map(en),o[1],
+    "الأكاديميُّ يتجنّب المختصراتِ ولغةَ الحديثِ ("+en("kind of / gonna / loads of / to be honest")+") والخِطابَ المباشرَ للقارئ، ويستعمل صيغًا محتاطةً مثل "+en("suggests / may / appears to")+".",
+    "w3g:"+p[0].slice(0,18)];
+}
+/* شبه الجملة (fragment) — أشهرُ ما يُسأل عنه في التحليل الكتابيّ */
+function wFragment(){
+  var p=gp(FRAGMENT3);
+  var o=pick3(p[0],[p[1],p[2]]); if(!o) return null;
+  return ["أيُّ ما يلي <b>جملةٌ تامّة</b> لا شبهَ جملةٍ (fragment) ؟",
+    o[0].map(en),o[1],
+    "الجملةُ التامّةُ فيها فاعلٌ وفعلٌ مُصرَّفٌ وتستقلّ بمعناها. وما بدأ بأداةِ ربطٍ تابعةٍ ("+en("Because / Although / Since / Which")+") أو كان فعلُه "+en("-ing")+" وحدَه فهو شبهُ جملةٍ يحتاج تكملة.",
+    "w3f:"+p[0].slice(0,18)];
+}
+/* الإيجاز (conciseness) — «أفضل صياغة» */
+function wWordy(){
+  var p=gp(WORDY3);
+  var o=pick3(p[0],[p[1],p[2]]); if(!o) return null;
+  return ["أيُّ صياغةٍ <b>أوجزُ وأوضح</b> بالمعنى نفسِه؟",
+    o[0].map(en),o[1],
+    "الأكاديميُّ موجَزٌ لا مُطوَّل: تُحذف الحشوُ مثل "+en("made the decision that / it is necessary that / in nature / in a timely manner")+" ويُستعمل الفعلُ المباشرُ والمبنيُّ للمعلوم.",
+    "w3w:"+p[0].slice(0,18)];
+}
+/* أدوات الربط الأكاديميّة */
+function wConnector3(){
+  var p=gp(CONN3);
+  var o=pick3(p[2],[p[3],p[4]]); if(!o) return null;
+  return ["اختر الأداةَ المناسبة:<br>"+en(p[0])+"<br>"+en(p[1]),
+    o[0].map(en),o[1],
+    "للتضادّ: "+en("However / Nevertheless / In contrast")+" · وللنتيجة: "+en("Therefore / Consequently / As a result")+" · وللإضافة: "+en("Furthermore / In addition / Moreover")+" · وللتمثيل: "+en("For example / For instance")+".",
+    "w3n:"+p[0].slice(0,18)];
+}
+/* الصحّة النحويّة — أخطاءٌ شائعةٌ في قسم التراكيب */
+function wGrammar3(){
+  var p=gp(GRAM3);
+  var o=pick3(p[0],[p[1],p[2]]); if(!o) return null;
+  return ["أيُّ جملةٍ <b>صحيحةٌ نحويًّا</b>؟",
+    o[0].map(en),o[1],
+    "الصحيح: "+en(p[0])+"<br>وأشهرُ ما يُختبَر: مطابقةُ الفعلِ لفاعلٍ بعيدٍ ("+en("the number of … has")+")، و"+en("each / neither")+" مفردان، و"+en("information")+" لا يُجمَع، و"+en("fewer")+" للمعدودِ و"+en("less")+" لغيرِه، وبعد "+en("deny / suggest / look forward to")+" صيغةُ "+en("-ing")+" أو "+en("that")+".",
+    "w3r:"+p[0].slice(0,18)];
+}
+/* ترتيب فقرة أكاديميّة */
+function wOrderPara3(){
+  var p=gp(SEQ3);
+  var correct=p.join(" ");
+  var w1=[p[1],p[0],p[2]].join(" ");
+  var w2=[p[2],p[1],p[0]].join(" ");
+  var o=pick3(correct,[w1,w2]); if(!o) return null;
+  return ["رتّب جُملَ الفقرةِ ترتيبًا منطقيًّا:",o[0].map(en),o[1],
+    "الفقرةُ الأكاديميّةُ تسير: خطوةٌ أولى ← ثمّ ما بُني عليها ← ثمّ النتيجةُ أو الخاتمة. وعلاماتُ التسلسلِ "+en("First / Then / Finally")+" تدلّك، والنتيجةُ لا تتقدّم سببَها.",
+    "w3p:"+p[0].slice(0,18)];
+}
+
 var GENS = {
   1: [wOrder,wCapital,wCapitalI,wConnect,wTopicSentence,wOrderPara],
-  2: [wTopicSentence,wOffTopic,wOrderPara,wRunOn,wConnector2,wConnect]
+  2: [wTopicSentence,wOffTopic,wOrderPara,wRunOn,wConnector2,wConnect],
+  3: [wThesis,wOffTopic3,wRegister,wFragment,wWordy,wConnector3,wGrammar3,wOrderPara3,wRunOn]
 };
 
 function genN(gens,n){
@@ -719,6 +1033,40 @@ var HOWTO = {
     phrases: ["First,", "Second,", "In addition,", "For example,", "However,", "On the other hand,",
               "because", "so", "Finally,", "In conclusion, I think …"]
   }
+  ,3: {
+    steps: [
+      "اقرأ الموضوع وحدّد موقفَك قبل أن تكتب حرفًا: أنا معَه أو ضدَّه، ولماذا؟",
+      "اكتب على ورقةٍ أطروحةً واحدةً (Thesis) تُعلِن موقفَك وتُلمِّح إلى حجّتين.",
+      "لكلِّ حجّةٍ فقرةٌ: جملةٌ تُعلِنها، ثمّ دليلٌ أو مثالٌ يسندها، ثمّ جملةٌ تربطها بالأطروحة.",
+      "أضِف الرأيَ المضادَّ ثمّ ردَّه (It is true that… / However…) — فهذا وحدَه ما يفرّق المقالَ الناضجَ عن الفقرةِ المدرسيّة.",
+      "اختم بخلاصةٍ لا تكرارًا: In conclusion… تُحكِم موقفَك بكلماتٍ جديدة.",
+      "راجِع التسجيلَ الرسميّ: لا مختصراتٍ ولا لغةَ حديثٍ، واحذف الحشوَ، واحتَط بـ suggests / may / appears to."
+    ],
+    topic: "Should schools teach financial skills?",
+    /* النموذجُ نفسُه يجتاز المقياسَ الذي يُحاسَب به الطالب — قِسناه بالمُقيِّم
+       على هدف B2 فخرج ١٥١ كلمةً وثماني جملٍ وثمانيَ أدواتِ ربطٍ ونطاقًا كاملًا
+       في الترتيبِ واللغةِ والأسلوب. فنموذجٌ يرسب في مقياسه يُشكّك في المقياسِ
+       لا يُعلّم الطريقة — وهذه القاعدةُ نفسُها طُبِّقت على نموذجِ المستوى الثاني. */
+    model: '<span class="m1">Schools should teach basic financial skills to every student before graduation.</span> ' +
+           '<span class="m2">First,</span> young people today make real financial decisions far earlier than their parents did. ' +
+           'A student who opens a bank account at eighteen without understanding debt can lose years of income to a single mistake. ' +
+           '<span class="m2">Furthermore,</span> financial ability is not a talent but a skill, <span class="m2">and</span> building skills is exactly why schools exist. ' +
+           '<span class="m2">For example,</span> one term on budgeting, saving and simple contracts would reach every student in the country at almost no cost. ' +
+           'It is true that the timetable is already crowded, <span class="m2">and</span> teachers cannot add a new subject every year. ' +
+           '<span class="m2">However,</span> this objection confuses adding hours with using them well, <span class="m2">because</span> a mathematics term spent on real household budgets would teach both subjects at once. ' +
+           '<span class="m3">In conclusion, a school that prepares its students for examinations but not for their own money has finished only half of its work.</span>',
+    why: [
+      "الجملةُ الأولى أطروحةٌ لا وصفٌ: تُعلِن الموقفَ في سطرٍ واحدٍ فيعرف القارئُ الخطّةَ قبل أن يقرأ.",
+      "لكلِّ حجّةٍ دليلٌ ملموس: «يفقد سنواتِ دخلٍ بخطأٍ واحد» و«فصلٌ دراسيٌّ بلا كلفةٍ تقريبًا» — وهذا يرفع «المحتوى» لا اللغةَ وحدها.",
+      "الرأيُ المضادُّ مذكورٌ ثمّ مردودٌ (It is true that… However…) — وهو ما يميّز المقالَ عن الخطبة، وعليه مدارُ «مناسبة الأسلوب».",
+      "أدواتُ الربطِ أكاديميّةٌ متنوّعة: First / Furthermore / For example / However / because / In conclusion.",
+      "الخاتمةُ حكمٌ جديدٌ لا إعادةُ الأطروحةِ بلفظٍ آخر — «أنهى نصفَ عملِه» صورةٌ تُحكِم المقالَ ولم تُقَل قبلَها."
+    ],
+    phrases: ["This essay argues that …", "First,", "Secondly,", "Furthermore,", "In addition,",
+              "For example,", "For instance,", "However,", "Nevertheless,", "In contrast,",
+              "Therefore,", "Consequently,", "As a result,", "It is true that … However, …",
+              "Admittedly, …", "The evidence suggests that …", "In conclusion, …"]
+  }
 };
 
 var CRITERIA = [
@@ -781,9 +1129,12 @@ function render(el, ctx){
   var _drillLeaveHooked = null;
   var html = ''+
     '<div class="wsec"><b>✍️ التعبير</b> — '+
-      (level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'
-                : 'بناء الجملة: الترتيب، الحرف الكبير، النقطة، وأدوات الربط.')+
-      '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح، ثمّ اكتب فقرتك — وتُحفظ لوالدك ليقرأها.</span>'+
+      (level>=3 ? 'بناء المقال: الأطروحة، والحجّة بدليل، والرأي المضادّ وردّه، والتسجيل الرسميّ.'
+       : level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'
+                  : 'بناء الجملة: الترتيب، الحرف الكبير، النقطة، وأدوات الربط.')+
+      '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح'+
+      (level>=3 ? ' على نمط «التحليل الكتابيّ» في ستيب، ثمّ اكتب مقالك' : '، ثمّ اكتب فقرتك')+
+      ' — و'+(level>=3?'يُحفَظ':'تُحفظ')+' لوالدك ليقرأه'+(level>=3?'':'ا')+'.</span>'+
       '<div style="margin-top:8px"><span class="wtag">📐 التقييم بمقاييس كامبردج الأربعة</span> '+
       '<span class="wtag">🎯 مستواك المستهدف: '+cef.name+'</span></div></div>'+
     /* الشرح أوّل ما يقع عليه البصر، مطويًّا فلا يزحم من يعرف الطريقة */
@@ -794,7 +1145,7 @@ function render(el, ctx){
          على الموقع، هنا وفي كل صفحات الاختبارات. */
       '<div style="text-align:center;font-weight:800;margin-top:10px"><span id="wscore" dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="wbtn ghost" id="wnew">تدريب جديد 🔄</button></div>'+
-    '<div class="wsec"><b>الجزء الثاني — اكتب فقرتك</b>'+
+    '<div class="wsec"><b>الجزء الثاني — '+(level>=3?'اكتب مقالك':'اكتب فقرتك')+'</b>'+
       '<div style="margin:8px 0 4px;font-size:1.05rem"><b>'+en(prompts[pIdx].t)+'</b></div>'+
       '<div style="color:var(--muted);font-size:.92rem;margin-bottom:6px">'+en(prompts[pIdx].h)+'</div>'+
       '<div style="background:var(--bg);border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:.9rem">'+
@@ -904,7 +1255,7 @@ function render(el, ctx){
   el.querySelector("#wcheck").addEventListener("click", function(){
     var g=gradeWriting(ta.value, level, cef, prompts[pIdx]);
     var feed=el.querySelector("#wfeed");
-    if(g.words===0){ feed.innerHTML='<div style="color:var(--bad);font-weight:700;margin-top:10px">اكتب فقرتك أولًا ✍️</div>'; return; }
+    if(g.words===0){ feed.innerHTML='<div style="color:var(--bad);font-weight:700;margin-top:10px">اكتب '+(level>=3?'مقالك':'فقرتك')+' أولًا ✍️</div>'; return; }
 
     var bcls=function(b){ return b>=4?"wb-hi":(b>=3?"wb-ok":"wb-lo"); };
     var h='<div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">'+

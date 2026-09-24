@@ -118,6 +118,22 @@ function groupTalk(rows){
 }
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"saud").toLowerCase();
+/* سطرُ التعبير: فهدٌ يكتب مقالًا لا فقرةً وتدريبُه «التحليلُ الكتابيّ»
+   (المستوى ٣) — والعددُ في العربيّة أربعُ حالات. فيُقرأ meta.level ويُصرَّف. */
+function wLevelOf(a, b){
+  var L = 1;
+  a.concat(b).forEach(function(p){ var v = (p.meta && p.meta.level) || 1; if(v > L) L = v; });
+  return L;
+}
+function wCount(n, lvl){
+  var A = lvl >= 3 ? ["مقالًا واحدًا","مقالين","مقالات","مقالًا"]
+                   : ["فقرةً واحدة","فقرتين","فقرات","فقرةً"];
+  if(n === 1) return A[0];
+  if(n === 2) return A[1];
+  return n + " " + ((n >= 3 && n <= 10) ? A[2] : A[3]);
+}
+function wNone(lvl){ return lvl >= 3 ? "لسّا ما كتب مقالًا كاملًا" : "لسّا ما كتب فقرةً كاملة"; }
+function wDrill(lvl){ return lvl >= 3 ? "تدريب التحليل الكتابيّ" : "تدريب بناء الجملة"; }
 var NAMES  = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن",fahad:"فهد",khassa:"التربية الخاصة"};
 var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط",fahad:"ثالث ثانوي — مسار علمي",khassa:"اختبار كفايات — مسار التوحد"};
 var name = NAMES[who] || who;
@@ -438,7 +454,7 @@ async function loadReport(){
       /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» */
       var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
       html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
-        '<li>📝 '+(writingAll.length?('كتب <b>'+writingAll.length+'</b> فقرة'):'لسّا ما كتب فقرةً كاملة')+(dt2?' · تدريب بناء الجملة: <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':'')+(wLast?' · آخر مرة: <span class="cnt">'+saTime(wLast)+'</span>':'')+'</li>'+
+        '<li>📝 '+(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?('كتب <b>'+wCount(writingAll.length,L)+'</b>'):wNone(L))+(dt2?' · '+wDrill(L)+': <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':''); })()+(wLast?' · آخر مرة: <span class="cnt">'+saTime(wLast)+'</span>':'')+'</li>'+
         (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
         '</ul></div>';
     }
