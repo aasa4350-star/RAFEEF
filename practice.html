@@ -60,6 +60,7 @@
 <script src="tahsili-math.js"></script>
 <script src="tahsili-chem.js"></script>
 <script src="tahsili-bio.js"></script>
+<script src="tahsili-phys.js"></script>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
@@ -735,6 +736,7 @@ function subjGen(n, subj, TM, fallbackPool){
 function mathGen(n){ return subjGen(n, "رياضيات", window.TAHSILI_MATH, TSUBJ["رياضيات"]); }
 function chemGen(n){ return subjGen(n, "كيمياء",  window.TAHSILI_CHEM, TSUBJ["كيمياء"]); }
 function bioGen(n){  return subjGen(n, "أحياء",   window.TAHSILI_BIO,  TSUBJ["أحياء"]);  }
+function physGen(n){ return subjGen(n, "فيزياء", window.TAHSILI_PHYS, TSUBJ["فيزياء"]); }
 function tahsiliMix(n){
   var subs = ["رياضيات","فيزياء","كيمياء","أحياء"];
   var w = [ri(1,6), ri(1,6), ri(1,6), ri(1,6)];      /* وزنُ كلِّ مادّةٍ يتغيّر كلَّ جلسة */
@@ -746,12 +748,13 @@ function tahsiliMix(n){
     cnt[Math.min(k,3)]++;
   }
   /* ما له مولّداتٌ يُسحَب منها (لا نهائيّ)، وما ليس له يُسحَب من
-     بنكه الثابت. الكيمياءُ صارت مولَّدةً بعد وصول كتابها. */
+     بنكه الثابت. والكتبُ الأربعةُ كلُّها وصلت فالموادُّ كلُّها مولَّدة. */
   var out = mathGen(cnt[0]);
   var fixed = [];                           /* ما لم يصل كتابُه بعد */
+  if(window.TAHSILI_PHYS) out = out.concat(physGen(cnt[1])); else fixed.push(1);
   if(window.TAHSILI_CHEM) out = out.concat(chemGen(cnt[2])); else fixed.push(2);
   if(window.TAHSILI_BIO)  out = out.concat(bioGen(cnt[3]));  else fixed.push(3);
-  fixed.concat([1]).forEach(function(i){     /* الفيزياء (1) ما زالت بنكًا ثابتًا */
+  fixed.forEach(function(i){
     var pool = TSUBJ[subs[i]] || [];
     if(pool.length) out = out.concat(freshPick(pool, Math.min(cnt[i], pool.length), "t_"+subs[i]));
   });
@@ -950,8 +953,9 @@ function buildAll(){
         var tN = (window.TAHSILI_MATH ? window.TAHSILI_MATH.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
         var cN = (window.TAHSILI_CHEM ? window.TAHSILI_CHEM.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
         var bN = (window.TAHSILI_BIO  ? window.TAHSILI_BIO.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
+        var pN = (window.TAHSILI_PHYS ? window.TAHSILI_PHYS.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
         renderSet("t", tahsiliMix(12),
-          "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وفيزياء وكيمياء وأحياء — و<b>نسبة كل مادة تتغيّر كل جلسة</b>، لأن نسب التحصيلي غير ثابتة وتختلف باختلاف النموذج. والرياضيات <b>مولَّدة</b> من "+tN+" مولّدًا، والكيمياء من "+cN+"، والأحياء من "+bN+" — على دروس كتبك نفسها، فأسئلتها جديدة كل مرة. (الفيزياء لسّا بنك ثابت — ناقص كتابها.)",
+          "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وفيزياء وكيمياء وأحياء — و<b>نسبة كل مادة تتغيّر كل جلسة</b>، لأن نسب التحصيلي غير ثابتة وتختلف باختلاف النموذج. والموادّ الأربع كلها <b>مولَّدة</b> على دروس كتبك نفسها: رياضيات "+tN+" مولّدًا، وفيزياء "+pN+"، وكيمياء "+cN+"، وأحياء "+bN+" — فأسئلتها جديدة كل مرة.",
           function(){ return tahsiliMix(12); }, "تحصيلي");
       } else {
         renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
@@ -1095,6 +1099,21 @@ if(window.TAHSILI_BIO){ (function(){
         while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
         if(!q) return null;
         return ['<b>أحياء — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
+      } });
+  });
+})(); }
+
+if(window.TAHSILI_PHYS){ (function(){
+  window.TAHSILI_PHYS.topics.forEach(function(t){
+    var key = "فيزياء — " + t.name;
+    SKILLS.push({ group:"تحصيلي", name:"فيزياء — "+t.name,
+      rx:new RegExp(t.name.slice(0,10).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")),
+      yt:t.yt, keys:[key], lesson:t.lesson,
+      gen:function(){
+        var q=null, tr=0;
+        while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
+        if(!q) return null;
+        return ['<b>فيزياء — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
       } });
   });
 })(); }
