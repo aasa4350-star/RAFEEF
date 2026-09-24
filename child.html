@@ -131,6 +131,11 @@ const META = {
   khassa:{name:"التربية الخاصة",grade:"اختبار كفايات — مسار التوحد",emoji:"🧩",accent:"#7c3aed",deep:"#5b21b6"}
 };
 function qs(k){ return new URLSearchParams(location.search).get(k); }
+/* من لا اختبارَ مدرسيًّا له أصلًا. طلبُ الأب (٢٤ سبتمبر ٢٠٢٦): «فهد
+   ما يحتاج الاختبار المدرسي» — وquiz.html إنجليزيٌّ ورياضيّاتٌ للمراحل
+   الأصغر، وفهدٌ ثالثُ ثانويٍّ مسارُه التحصيليُّ وستيب. والتربيةُ الخاصّةُ
+   كذلك: طالبةُ رخصةٍ مهنيّةٍ لا تلميذةَ مدرسة. */
+const NO_QUIZ = { fahad:1, khassa:1 };
 const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
@@ -240,10 +245,10 @@ async function main(){
     <div class="bar">
       <button onclick="location.reload()">🔄 تحديث</button>
       <a href="home.html?who=${who}">🏠 الصفحة الرئيسية</a>
-      <a href="quiz.html?who=${who}">📝 اختبر نفسك</a>
+      ${NO_QUIZ[who]?``:`<a href="quiz.html?who=${who}">📝 اختبر نفسك</a>`}
       <a href="reading.html?who=${who}">🔊 استماع وقراءة</a>
       <a href="talk.html?who=${who}">🗣️ محادثة إنجليزية</a>
-      ${who==="saud"?`<a href="practice.html?who=${who}">📖 قدرات لفظي</a>`:`<a href="quiz.html?who=${who}&set=2">🔄 مجموعة 2</a><a href="practice.html?who=${who}">📊 ${who==="fahad"?"تحصيلي وSTEP":"قدرات وتحصيلي"}</a>`}<!-- عنوانُ الرابطِ يسمّي ما في الصفحةِ فعلًا: فهدٌ لا قدراتَ له بعد حذفِها -->
+      ${who==="saud"?`<a href="practice.html?who=${who}">📖 قدرات لفظي</a>`:`${NO_QUIZ[who]?``:`<a href="quiz.html?who=${who}&set=2">🔄 مجموعة 2</a>`}<a href="practice.html?who=${who}">📊 ${who==="fahad"?"تحصيلي وSTEP":"قدرات وتحصيلي"}</a>`}<!-- عنوانُ الرابطِ يسمّي ما في الصفحةِ فعلًا: فهدٌ لا قدراتَ له بعد حذفِها -->
     </div>
     ${who==="saud"?`<div class="sec-title"><span class="dot"></span> 📚 المنهج الدراسي (مطابق لكتب سعود)</div>
     <div class="bar">
@@ -291,8 +296,9 @@ async function main(){
         if(!hit) rest = true;
       });
       out = order.filter(function(k){ return out.indexOf(k) >= 0; });
+      if(!out.length) return "";            /* لا نكتب «(...)» وحدها كما وقع للرخصة المهنيّة */
       if(rest) out.push("...");
-      return out.length ? " (" + out.join("/") + ")" : "";
+      return " (" + out.join("/") + ")";
     }
     const hidden = HIDE_TESTS[who] || [];
     const currMap={}, otherMap={};

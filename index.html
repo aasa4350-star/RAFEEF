@@ -254,6 +254,11 @@ const WEAK_DAYS = 30;
    قديمةٌ مسجَّلةٌ قبل الحذف تظهر في التقرير، فطلب (٢٤ سبتمبر) «شل قدرات
    فهد من تقريري». وتُطبَّق في موضعٍ واحدٍ يقرأه سطرُ الخلاصةِ وجسمُ
    البطاقةِ جميعًا، لئلّا يعدَّ السطرُ نشاطًا لا يراه من يفتح. */
+/* من لا اختبارَ مدرسيًّا له أصلًا. طلبُ الأب (٢٤ سبتمبر ٢٠٢٦): «فهد
+   ما يحتاج الاختبار المدرسي» — وquiz.html إنجليزيٌّ ورياضيّاتٌ للمراحل
+   الأصغر، وفهدٌ ثالثُ ثانويٍّ مسارُه التحصيليُّ وستيب. والتربيةُ الخاصّةُ
+   كذلك: طالبةُ رخصةٍ مهنيّةٍ لا تلميذةَ مدرسة. */
+const NO_QUIZ = { fahad:1, khassa:1 };
 const HIDE_TESTS = { osama:[/^لغتي و١/], fahad:[/^قدرات/] };
 /* عنوانُ قسمِ «التجريبية» كان يعدّ الأنواعَ الأربعةَ نصًّا ثابتًا، فيرى
    الأبُ كلمةَ «قدرات» في تقريرِ فهدٍ وليس له قدراتٌ أصلًا. فصار العنوانُ
@@ -266,8 +271,9 @@ function kindsLabel(names){
     if(!hit) rest = true;
   });
   out = order.filter(function(k){ return out.indexOf(k) >= 0; });
+  if(!out.length) return "";            /* لا نكتب «(...)» وحدها كما وقع للرخصة المهنيّة */
   if(rest) out.push("...");
-  return out.length ? " (" + out.join("/") + ")" : "";
+  return " (" + out.join("/") + ")";
 }
 function hiddenFor(slug){ return HIDE_TESTS[slug] || []; }
 function shownPractice(slug, arr){
@@ -436,8 +442,10 @@ function azureQuotaHtml(rows){
           <span class="be">${beh.emoji}</span>
           <span><b>أسلوب الحل (آخر محاولة):</b> ${beh.label}${beh.avg!=null? ` · متوسط ${beh.avg}ث/سؤال`:""}</span>
         </div>`: ""}
-        ${!weak.attempts
-          ? `<div class="weak"><div class="wt">ما حلّ أي اختبار خلال آخر ${weak.days} يوم</div></div>`
+        ${NO_QUIZ[SLUG[name]]
+          ? ``
+          : !weak.attempts
+          ? `<div class="weak"><div class="wt">ما حلّ أي اختبار خلال آخر ${arDays(weak.days)}</div></div>`
           : (!weak.list.length && !weak.fixed.length)
           ? `<div class="weak"><div class="wt">ما فيه أخطاء متكررة خلال آخر ${weak.days} يوم 🎉</div></div>`
           : `<div class="weak">
