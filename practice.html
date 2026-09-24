@@ -51,6 +51,12 @@
   .timer.done{background:var(--muted)}
   .reset{margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
+  /* الكسرُ المرصوف — انظر تعليل frx() */
+  .fr{display:inline-flex;align-items:center;gap:0;direction:ltr;unicode-bidi:isolate;vertical-align:middle;margin:0 3px}
+  .fr .frs{margin-inline-end:2px}
+  .fr .frb{display:inline-flex;flex-direction:column;align-items:center;line-height:1.18;font-size:.92em}
+  .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
+  .fr .frd{padding:0 5px}
 </style>
 </head>
 <body>
@@ -62,6 +68,18 @@
 <script src="tahsili-bio.js"></script>
 <script src="tahsili-phys.js"></script>
 <script>
+/* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
+   سؤال رفيف (٢٤ سبتمبر ٢٠٢٦) عن «1/5»: «هل الخمسة فوق أو الواحد؟».
+   وهي محقّة، والكتابُ يرسمه مرصوفًا. والتطبيق هنا مقصورٌ على نصّ
+   السؤال وخياراته وشرحه — لا على سطر النتيجة، فـ«8/10» فيه درجةٌ لا
+   كسرٌ يُرصَف. */
+function frx(s){
+  return String(s).replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
+    function(m, sg, n, dg, d){
+      return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
+        '<span class="frb"><span class="frn">'+n+'</span>'+
+        '<span class="frd">'+(dg?'−':'')+d+'</span></span></span>'; });
+}
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود",fahad:"فهد"};
@@ -845,9 +863,9 @@ function renderSet(id, items, intro, regen, label){
   if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
   items.forEach(function(q,i){
     html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
-      '<div class="stem" dir="auto">'+q[0]+'</div><div class="opts">';
-    q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" dir="auto">'+o+'</button>'; });
-    html += '</div><div class="explain">'+q[3]+'</div></div>';
+      '<div class="stem" dir="auto">'+frx(q[0])+'</div><div class="opts">';
+    q[1].forEach(function(o,j){ html += '<button data-j="'+j+'" dir="auto">'+frx(o)+'</button>'; });
+    html += '</div><div class="explain">'+frx(q[3])+'</div></div>';
   });
   html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>';
   if(regen) html += '<button class="reset">أسئلة جديدة 🔄</button>';
@@ -1179,7 +1197,7 @@ function skillItems(s, n){ var out=[], seen={}, t=0; n=n||3; while(out.length<n 
 function renderMini(box, items){
   items = items.map(shuffleQ);
   var h="";
-  items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem" dir="auto">'+q[0]+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'" dir="auto">'+o+'</button>'; }); h+='</div><div class="explain">'+q[3]+'</div></div>'; });
+  items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem" dir="auto">'+frx(q[0])+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'" dir="auto">'+frx(o)+'</button>'; }); h+='</div><div class="explain">'+frx(q[3])+'</div></div>'; });
   box.innerHTML=h;
   box.querySelectorAll(".q").forEach(function(qEl){ var i=+qEl.dataset.i, ans=items[i][2];
     qEl.querySelectorAll(".opts button").forEach(function(btn){ btn.addEventListener("click",function(){

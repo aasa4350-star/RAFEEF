@@ -54,6 +54,12 @@
   .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
   .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+  /* الكسرُ المرصوف — انظر تعليل mn() */
+  .fr{display:inline-flex;align-items:center;gap:0;direction:ltr;unicode-bidi:isolate;vertical-align:middle;margin:0 3px}
+  .fr .frs{margin-inline-end:2px}
+  .fr .frb{display:inline-flex;flex-direction:column;align-items:center;line-height:1.18;font-size:.92em}
+  .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
+  .fr .frd{padding:0 5px}
 </style>
 </head>
 <body>
@@ -95,7 +101,22 @@ function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<0 ? "\u2212" : "")+s; } // فاصلة آلاف + إشارة سالب رياضية
-function mn(s){ return '<span class="en">'+s+'</span>'; }
+/* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
+   سؤال رفيف (٢٤ سبتمبر ٢٠٢٦) عن «1/5» في درس القسمة: «هل الخمسة فوق
+   أو الواحد؟ المفروض تحطّ الخمسة فوق والواحد تحت عشان أفهم».
+   وهي محقّة: الكسرُ في سطرٍ واحدٍ داخل صفحةٍ تُقرأ من اليمين يلتبس فيه
+   البسطُ بالمقام، والكتابُ نفسُه يرسمه مرصوفًا. فصار كلُّ كسرٍ يمرّ
+   بـmn() يُرسم مرصوفًا — في نصّ السؤال والخيارات والشرح معًا، وبلا
+   تعديل مولّدٍ واحدٍ من مئةٍ وخمسة. */
+var FR_RE = /(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g;
+function mn(s){
+  var t = String(s).replace(FR_RE, function(m, sg, n, dg, d){
+    return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
+      '<span class="frb"><span class="frn">'+n+'</span>'+
+      '<span class="frd">'+(dg?'−':'')+d+'</span></span></span>';
+  });
+  return '<span class="en">'+t+'</span>';
+}
 // خيارات رقمية مميّزة: الصحيح + مشتّتات
 function numOpts(correct, cands){
   /* لا بدّ من ثلاثة خيارات متمايزة. المشتّتات المقترحة قد تتصادم مع الجواب

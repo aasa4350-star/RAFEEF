@@ -109,12 +109,30 @@
   .picker{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
   .picker a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);
     padding:14px 18px;border-radius:14px;font-weight:700;box-shadow:var(--shadow)}
+  /* الكسرُ المرصوف — انظر تعليل frx() */
+  .fr{display:inline-flex;align-items:center;gap:0;direction:ltr;unicode-bidi:isolate;vertical-align:middle;margin:0 3px}
+  .fr .frs{margin-inline-end:2px}
+  .fr .frb{display:inline-flex;flex-direction:column;align-items:center;line-height:1.18;font-size:.92em}
+  .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
+  .fr .frd{padding:0 5px}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
 
 <script>
+/* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
+   سؤال رفيف (٢٤ سبتمبر ٢٠٢٦) عن «1/5»: «هل الخمسة فوق أو الواحد؟».
+   وهي محقّة، والكتابُ يرسمه مرصوفًا. والتطبيق هنا مقصورٌ على نصّ
+   السؤال وخياراته وشرحه — لا على سطر النتيجة، فـ«8/10» فيه درجةٌ لا
+   كسرٌ يُرصَف. */
+function frx(s){
+  return String(s).replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
+    function(m, sg, n, dg, d){
+      return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
+        '<span class="frb"><span class="frn">'+n+'</span>'+
+        '<span class="frd">'+(dg?'−':'')+d+'</span></span></span>'; });
+}
 const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
 const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 
@@ -2187,15 +2205,15 @@ if(!STUDENTS[who]){
     d.quiz.forEach((q,i)=>{
       var useInput = false; // خيارات للجميع (٤ في كانجرو، ٣ هنا) + كشف الإجابة السريعة يكفي للتخمين
       html += `<div class="q" data-i="${i}" ${useInput?'data-input="1"':''}><div class="num">سؤال ${i+1}${q.rev?` <span class="revb">🔁 سبق أن أخطأت فيه</span>`:``}</div>
-        <div class="stem ${isEn?'ltr':''}">${q[0]}</div>`;
+        <div class="stem ${isEn?'ltr':''}">${frx(q[0])}</div>`;
       if(useInput){
         html += `<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="nans" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;font-weight:700;font-family:inherit;text-align:center;background:transparent;color:var(--ink)"><button class="nchk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>`;
       } else {
         html += `<div class="opts">`;
-        q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
+        q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${frx(o)}</button>`; });
         html += `</div>`;
       }
-      html += `<div class="explain" ${(id==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
+      html += `<div class="explain" ${(id==="ma")?'dir="ltr"':''}>${frx(q[3])}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${d.quiz.length}</span>
       <div class="track"><div class="fill" data-fill></div></div></div>
@@ -2507,9 +2525,9 @@ if(!STUDENTS[who]){
     h += '<div class="block-title"><span class="dot"></span> أسئلة اللغة العربية</div>';
     arq.forEach(function(q,i){
       h += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
-        '<div class="stem">'+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+o+'</button>'; });
-      h += '</div><div class="explain">'+q[3]+'</div></div>';
+        '<div class="stem">'+frx(q[0])+'</div><div class="opts">';
+      q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+frx(o)+'</button>'; });
+      h += '</div><div class="explain">'+frx(q[3])+'</div></div>';
     });
     h += '<div class="scorebar"><span class="txt" data-ars dir="ltr">0 / '+arq.length+'</span>'+
          '<div class="track"><div class="fill" data-arf></div></div></div>'+
@@ -2708,9 +2726,9 @@ if(!STUDENTS[who]){
     items.forEach((q,i)=>{
       const isEn = q[4]==="en";
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
-        `<div class="stem ${isEn?'ltr':''}">${q[0]}</div><div class="opts">`;
-      q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${o}</button>`; });
-      html += `</div><div class="explain" ${(q[4]==="ma")?'dir="ltr"':''}>${q[3]}</div></div>`;
+        `<div class="stem ${isEn?'ltr':''}">${frx(q[0])}</div><div class="opts">`;
+      q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${frx(o)}</button>`; });
+      html += `</div><div class="explain" ${(q[4]==="ma")?'dir="ltr"':''}>${frx(q[3])}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${items.length}</span>`+
       `<div class="track"><div class="fill" data-fill></div></div></div>`+
