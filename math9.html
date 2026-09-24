@@ -109,6 +109,45 @@ function fmt(n){ var s = Number(Math.abs(n)).toLocaleString('en-US'); return (n<
    بـmn() يُرسم مرصوفًا — في نصّ السؤال والخيارات والشرح معًا، وبلا
    تعديل مولّدٍ واحدٍ من مئةٍ وخمسة. */
 var FR_RE = /(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g;
+/* ═══ العمليةُ الحسابيّةُ وطرفاها في اتّجاهٍ واحد ═══
+   بلاغ رفيف (٢٤ سبتمبر ٢٠٢٦) بصورة شاشة: أجابت «صفر» عن مسألة
+   «−14/9 − 14/9» فحُسبت خطأً، والصوابُ −28/9 — وقالت: «المفترض
+   إجابتي صح». وكانت محقّةً في قراءتها لا في حسابها:
+
+   كلُّ طرفٍ كان يُغلَّف وحده في مقطعٍ يساريِّ الاتّجاه (mn)، والعلامةُ
+   بينهما نصٌّ في سياقٍ عربيٍّ يمينيّ. فإشارةُ السالب في الطرف الأوّل
+   تُرسم على حافّته اليسرى — أي ملاصقةً لعلامة الطرح — فتظهر شرطتان
+   متجاورتان في الوسط، ويبقى الكسرُ الأوّل بلا إشارةٍ ظاهرةٍ بجانبه.
+   فتقرأ العينُ «14/9 − 14/9» وجوابُها صفرٌ فعلًا.
+
+   فنجمع الطرفين والعلامة في مقطعٍ واحدٍ يساريِّ الاتّجاه بعد العرض،
+   فتلتصق كلُّ إشارةٍ بعددها وتُقرأ العبارةُ كما تُكتب في الكتاب.
+   والعلاجُ هنا لا في المولّدات، فالعيبُ في العرض لا في السؤال —
+   وهو يشمل كلَّ مسائل العمليّات في الصفحة دفعةً واحدة. */
+function mergeMath(root){
+  if(!root || !root.querySelectorAll) return;
+  var OPS = /^\s*(−|-|\+|×|÷|=|<|>|≤|≥|≠)\s*$/;
+  var boxes = root.querySelectorAll(".stem, .explain, .opts button");
+  for(var b=0; b<boxes.length; b++){
+    var el = boxes[b], again = true, guard = 0;
+    while(again && guard++ < 60){
+      again = false;
+      var kids = el.childNodes;
+      for(var i=0; i+2 < kids.length+0; i++){
+        var a=kids[i], m=kids[i+1], c=kids[i+2];
+        if(!a || !m || !c) break;
+        if(a.nodeType===1 && a.className && String(a.className).indexOf("en")>-1 &&
+           m.nodeType===3 && OPS.test(m.nodeValue) &&
+           c.nodeType===1 && c.className && String(c.className).indexOf("en")>-1){
+          a.appendChild(document.createTextNode(" "+m.nodeValue.replace(/\s+/g," ").trim()+" "));
+          while(c.firstChild) a.appendChild(c.firstChild);
+          el.removeChild(c); el.removeChild(m);
+          again = true; break;
+        }
+      }
+    }
+  }
+}
 function mn(s){
   var t = String(s).replace(FR_RE, function(m, sg, n, dg, d){
     return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
@@ -145,7 +184,23 @@ function sup(n){ return String(n).split("").map(function(d){ return SUP[+d]; }).
 function pw(b,e){ return mn(b+sup(e)); }
 function tmz(n, sing, plur){ return (n>=3 && n<=10) ? plur : sing; }
 function ryl(n){ return tmz(n,"ريالًا","ريالات"); }
-function ax(s){ return '<span class="ax">'+s+'</span>'; }   /* عبارة جبرية بحروف عربية: عزل RTL */
+/* عبارة جبرية بحروف عربية: عزل RTL.
+   ═══ «+ −5» تُكتب «− 5» ═══
+   ظهر بالمسح (٢٤ سبتمبر ٢٠٢٦، على هامش بلاغ رفيف عن تجاور
+   الإشارتين) أنّ ستّةً وأربعين مولّدًا هنا تبني الحدَّ الثابت
+   بعلامةٍ مستقلّةٍ عن إشارته، فتخرج «د(س) = −2س + −5» و«−2س + −4ص».
+   وهي كتابةٌ لا يكتبها الكتاب ولا تُقرأ. فتُختصر الإشارتان عند
+   العرض: + − ⇐ −  و  − − ⇐ +.
+   وهو آمنٌ في هذه الصفحة وحدها لأنّها جبرٌ خالص — لا سؤال فيها
+   عن «ناتج» عمليةٍ على عددين مُوقَّعين يكون تجاورُ الإشارتين هو
+   المقصود منه (صفر سؤالٍ من هذا النوع بالعدّ). وفي صفحة رفيف
+   العكس: هناك تُقوَّس الإشارة ولا تُختصر. */
+function ax(s){
+  var t = String(s).replace(/([+−])\s*−\s*/g, function(m, op){ return (op==="+") ? "− " : "+ "; })
+    /* الضربُ والقسمة لا تُختصر إشارتهما، فتُقوَّس: «× −3» ⇐ «× (−3)» */
+    .replace(/([×÷])\s*−\s*(\d+(?:[.,]\d+)?|[سص])/g, "$1 (−$2)");
+  return '<span class="ax">'+t+'</span>';
+}
 function pz(n){ return n<0 ? "("+fmt(n)+")" : fmt(n); }
 /* خيارات لأعداد صحيحة (تسمح بالسالب) */
 function zOpts(correct, cands){
@@ -2875,7 +2930,7 @@ if(!NAMES[who]){
     });
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
-    sec.innerHTML = html;
+    sec.innerHTML = html; mergeMath(sec);
     var ev=sec.querySelector("[data-eduvid]"); if(ev) ev.addEventListener("click",function(){ window.__eduExempt=true; });
     var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
@@ -3022,7 +3077,7 @@ if(!NAMES[who]){
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
     html+='<div style="text-align:center;margin-top:10px"><button data-remreset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير سجل العلاجي</button></div>';
-    sec.innerHTML=html;
+    sec.innerHTML=html; mergeMath(sec);
     sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
