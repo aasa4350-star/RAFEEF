@@ -118,6 +118,9 @@ function mn(s){
 function ax(s){ return '<span class="ax">'+s+'</span>'; }
 function nz(a,b){ var v=ri(a,b); return v===0 ? (Math.random()<0.5?1:-1)*ri(1,b) : v; }
 function gcdi(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ var t=b; b=a%b; a=t; } return a||1; }
+/* عاملُ المقياس ومعدّلُ التغيّر يُكتبان كسرًا، فإن كان المقامُ واحدًا فهو
+   عددٌ صحيحٌ يُكتب وحده: «3» لا «3/1» — انظر بلاغ رفيف عن المقلوب. */
+function rat(n,d){ return (Number(d)===1) ? String(n) : (n+"/"+d); }
 /* كسر مبسّط بإشارةٍ رياضية، أو عدد صحيح، أو «غير معرّف» */
 function fracStr(n,d){
   if(d===0) return "غير معرّف";
@@ -277,8 +280,17 @@ var N3=[gMulFrac, gMulSignOnly];
 
 /* ===== ١-٤ قسمة الأعداد النسبية ===== */
 function gDivFrac(){
-  var d1=ri(2,9), n1=ri(1,d1-1)*(Math.random()<0.4?-1:1);
-  var d2=ri(2,9), n2=ri(1,d2-1)*(Math.random()<0.4?-1:1);
+  /* كسرانِ في أبسط صورةٍ ومختلفان — وإلّا خرج «4/6 ÷ 4/6» وهو سؤالٌ
+     جوابُه ١ بلا عمل، أو كسرٌ غيرُ مختصرٍ يلبس على الطفل كما في بلاغ
+     رفيف عن المقلوب. */
+  var d1, n1, d2, n2, t=0;
+  do{ d1=ri(2,9); n1=ri(1,d1-1); t++; } while(gcdi(n1,d1)!==1 && t<80);
+  if(gcdi(n1,d1)!==1) return null;
+  t=0;
+  do{ d2=ri(2,9); n2=ri(1,d2-1); t++; } while((gcdi(n2,d2)!==1 || (n2===n1 && d2===d1)) && t<80);
+  if(gcdi(n2,d2)!==1 || (n2===n1 && d2===d1)) return null;
+  if(Math.random()<0.4) n1=-n1;
+  if(Math.random()<0.4) n2=-n2;
   var rn=n1*d2, rd=d1*n2;
   if(rd===0) return null;
   var correct=fracStr(rn,rd);
@@ -287,13 +299,26 @@ function gDivFrac(){
   var o=sOpts3(correct,[wrong1,wrong2],[fracStr(rn, rd+1)]);
   if(!o) return null;
   var f1=(n1<0?"−"+Math.abs(n1):n1)+"/"+d1, f2=(n2<0?"−"+Math.abs(n2):n2)+"/"+d2;
-  var recip=(n2<0?"−":"")+d2+"/"+Math.abs(n2);
+  /* مقلوبُ 1/3 يُكتب «3» لا «3/1» — المقامُ الواحد لا يُرسم */
+  var recip=(n2<0?"−":"")+(Math.abs(n2)===1 ? String(d2) : (d2+"/"+Math.abs(n2)));
   return ["أوجد ناتج "+mn(f1)+" ÷ "+mn(f2)+" في أبسط صورة:",
     o[0].map(mn), o[1],
     "نضرب الكسر الأول في مقلوب الثاني: "+mn(f1)+" × "+mn(recip)+" = "+mn(correct)+".", "divFrac"];
 }
+/* ═══ الكسر يُولَّد مختصرًا، وإلّا اختفى القلبُ من الجواب ═══
+   بلاغ رفيف (٢٤ سبتمبر ٢٠٢٦) بصورة شاشة: «غلط السؤال هذا، المفروض
+   الـ4 فوق». وكان السؤال «ما مقلوب −2/4؟» وجوابه المعلَّم «−2».
+   والجواب صحيحٌ حسابًا، لكنّها محقّةٌ في اعتراضها: الكسر ٢/٤ غيرُ
+   مختصر، فمقلوبُه ٤/٢ يختصره fracStr إلى ٢ — فيرى الطفلُ في درسٍ
+   موضوعُه «اقلب البسط والمقام» جوابًا لا يظهر فيه قلبٌ ولا مقام،
+   ومعه مشتّتٌ هو «−1/2» (وهو الكسرُ الأصلُ مختصرًا) فيزيد اللبس.
+   فصار الكسر يُولَّد في أبسط صورةٍ كما في الكتاب: مقلوب −3/8 هو
+   −8/3، والقلبُ ظاهرٌ للعين. */
 function gReciprocal(){
-  var d=ri(2,9), n=ri(1,d-1)*(Math.random()<0.4?-1:1);
+  var d, n, t=0;
+  do{ d=ri(2,9); n=ri(1,d-1); t++; } while(gcdi(n,d)!==1 && t<80);
+  if(gcdi(n,d)!==1) return null;
+  if(Math.random()<0.4) n=-n;
   var correct=fracStr(d*(n<0?-1:1), Math.abs(n));
   var wrong1=fracStr(-d*(n<0?-1:1), Math.abs(n));
   var wrong2=fracStr(n,d);
@@ -655,7 +680,7 @@ function gRateChange(){
   if(!o) return null;
   return ["تغيّرت قيمة كمّيةٍ من "+mn(fmt(y1))+" إلى "+mn(fmt(y2))+" بينما تغيّر الزمن من "+mn(fmt(x1))+" إلى "+mn(fmt(x2))+". أوجد معدّل التغيّر:",
     o[0].map(mn), o[1],
-    "معدّل التغيّر = التغيّر في الكمّية ÷ التغيّر في الزمن = ("+mn(fmt(y2)+" − "+fmt(y1))+") ÷ ("+mn(fmt(x2)+" − "+fmt(x1))+") = "+mn(fmt(dy)+"/"+fmt(dx))+" = "+mn(rate)+".", "rateChange"];
+    "معدّل التغيّر = التغيّر في الكمّية ÷ التغيّر في الزمن = ("+mn(fmt(y2)+" − "+fmt(y1))+") ÷ ("+mn(fmt(x2)+" − "+fmt(x1))+") = "+mn(rat(fmt(dy),Math.abs(dx)))+" = "+mn(rate)+".", "rateChange"];
 }
 var T2=[gRateChange];
 
@@ -708,9 +733,9 @@ function gSimilarFindSide(){
   var baseSide=scaleD*ri(2,8);
   var correspSide=baseSide*scaleN/scaleD;
   var o=zOpts(correspSide,[correspSide+scaleN, correspSide-scaleN, baseSide]);
-  return ["مضلعان متشابهان، عامل المقياس بينهما "+mn(scaleN+"/"+scaleD)+". طول أحد أضلاع المضلع الأول "+mn(fmt(baseSide))+" وحدة. ما طول الضلع المناظر له في المضلع الثاني؟",
+  return ["مضلعان متشابهان، عامل المقياس بينهما "+mn(rat(scaleN,scaleD))+". طول أحد أضلاع المضلع الأول "+mn(fmt(baseSide))+" وحدة. ما طول الضلع المناظر له في المضلع الثاني؟",
     o[0].map(mn), o[1],
-    "الضلع المناظر = عامل المقياس × الضلع الأصلي = "+mn(scaleN+"/"+scaleD)+" × "+mn(fmt(baseSide))+" = "+mn(fmt(correspSide))+".", "similarFindSide"];
+    "الضلع المناظر = عامل المقياس × الضلع الأصلي = "+mn(rat(scaleN,scaleD))+" × "+mn(fmt(baseSide))+" = "+mn(fmt(correspSide))+".", "similarFindSide"];
 }
 function gSimilarPerimeterRatio(){
   var scaleN=ri(2,6), scaleD=ri(2,6); if(scaleN===scaleD) scaleD=scaleN+1;
@@ -718,9 +743,9 @@ function gSimilarPerimeterRatio(){
   var per1=scaleD*ri(3,10);
   var per2=per1*scaleN/scaleD;
   var o=zOpts(per2,[per2+scaleN,per2-scaleN,per1]);
-  return ["مضلعان متشابهان عامل المقياس بينهما "+mn(scaleN+"/"+scaleD)+"، ومحيط الأول "+mn(fmt(per1))+" وحدة. أوجد محيط الثاني:",
+  return ["مضلعان متشابهان عامل المقياس بينهما "+mn(rat(scaleN,scaleD))+"، ومحيط الأول "+mn(fmt(per1))+" وحدة. أوجد محيط الثاني:",
     o[0].map(mn), o[1],
-    "نسبة محيطَي المضلعين المتشابهين تساوي عامل المقياس نفسه: محيط الثاني = "+mn(scaleN+"/"+scaleD)+" × "+mn(fmt(per1))+" = "+mn(fmt(per2))+".", "similarPerimeterRatio"];
+    "نسبة محيطَي المضلعين المتشابهين تساوي عامل المقياس نفسه: محيط الثاني = "+mn(rat(scaleN,scaleD))+" × "+mn(fmt(per1))+" = "+mn(fmt(per2))+".", "similarPerimeterRatio"];
 }
 var T6=[gSimilarFindSide, gSimilarPerimeterRatio];
 
@@ -735,9 +760,9 @@ function gDilationImage(){
   var wrong1="("+(x+fn)+"، "+(y+fn)+")";
   var o=sOpts3(correct,[wrong1],["("+(ix+1)+"، "+iy+")", "("+ix+"، "+(iy+1)+")"]);
   if(!o) return null;
-  return ["نقطة إحداثياها "+mn("("+x+"، "+y+")")+"، أُجري لها تمدّدٌ مركزه نقطة الأصل وعامل مقياسه "+mn(fn+"/"+fd)+". أوجد إحداثيَّي الصورة:",
+  return ["نقطة إحداثياها "+mn("("+x+"، "+y+")")+"، أُجري لها تمدّدٌ مركزه نقطة الأصل وعامل مقياسه "+mn(rat(fn,fd))+". أوجد إحداثيَّي الصورة:",
     o[0].map(mn), o[1],
-    "لإيجاد الصورة نضرب كل إحداثي في عامل المقياس: ("+mn(fn+"/"+fd+" × "+x)+"، "+mn(fn+"/"+fd+" × "+y)+") = "+mn(correct)+" — "+(isEnlarge?"تكبير":"تصغير")+".", "dilationImage"];
+    "لإيجاد الصورة نضرب كل إحداثي في عامل المقياس: ("+mn(rat(fn,fd)+" × "+x)+"، "+mn(rat(fn,fd)+" × "+y)+") = "+mn(correct)+" — "+(isEnlarge?"تكبير":"تصغير")+".", "dilationImage"];
 }
 var T7=[gDilationImage];
 
@@ -748,7 +773,7 @@ function gIndirectMeasure(){
   var o=zOpts(oh,[oh+k,oh-k,os]);
   return ["يبلغ طول شخصٍ "+mn(fmt(ph))+" مترًا، وطول ظله "+mn(fmt(ps))+" مترًا في الوقت نفسه الذي كان طول ظل عمود إنارةٍ فيه "+mn(fmt(os))+" مترًا. أوجد ارتفاع العمود:",
     o[0].map(mn), o[1],
-    "المثلثان متشابهان (تقدير الظل): طول الشخص ÷ طول ظله = ارتفاع العمود ÷ طول ظل العمود ⟵ "+mn(fmt(ph)+"/"+fmt(ps))+" = ارتفاع العمود ÷ "+mn(fmt(os))+" ⟵ ارتفاع العمود = "+mn(fmt(ph))+" × "+mn(fmt(os))+" ÷ "+mn(fmt(ps))+" = "+mn(fmt(oh))+" مترًا.", "indirectMeasure"];
+    "المثلثان متشابهان (تقدير الظل): طول الشخص ÷ طول ظله = ارتفاع العمود ÷ طول ظل العمود ⟵ "+mn(rat(fmt(ph),ps))+" = ارتفاع العمود ÷ "+mn(fmt(os))+" ⟵ ارتفاع العمود = "+mn(fmt(ph))+" × "+mn(fmt(os))+" ÷ "+mn(fmt(ps))+" = "+mn(fmt(oh))+" مترًا.", "indirectMeasure"];
 }
 var T8=[gIndirectMeasure];
 
