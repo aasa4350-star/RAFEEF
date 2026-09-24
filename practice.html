@@ -59,6 +59,7 @@
 <script src="step-bank.js"></script>
 <script src="tahsili-math.js"></script>
 <script src="tahsili-chem.js"></script>
+<script src="tahsili-bio.js"></script>
 <script>
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();
@@ -733,6 +734,7 @@ function subjGen(n, subj, TM, fallbackPool){
 }
 function mathGen(n){ return subjGen(n, "رياضيات", window.TAHSILI_MATH, TSUBJ["رياضيات"]); }
 function chemGen(n){ return subjGen(n, "كيمياء",  window.TAHSILI_CHEM, TSUBJ["كيمياء"]); }
+function bioGen(n){  return subjGen(n, "أحياء",   window.TAHSILI_BIO,  TSUBJ["أحياء"]);  }
 function tahsiliMix(n){
   var subs = ["رياضيات","فيزياء","كيمياء","أحياء"];
   var w = [ri(1,6), ri(1,6), ri(1,6), ri(1,6)];      /* وزنُ كلِّ مادّةٍ يتغيّر كلَّ جلسة */
@@ -746,8 +748,10 @@ function tahsiliMix(n){
   /* ما له مولّداتٌ يُسحَب منها (لا نهائيّ)، وما ليس له يُسحَب من
      بنكه الثابت. الكيمياءُ صارت مولَّدةً بعد وصول كتابها. */
   var out = mathGen(cnt[0]);
-  if(window.TAHSILI_CHEM) out = out.concat(chemGen(cnt[2]));
-  [1,3].concat(window.TAHSILI_CHEM ? [] : [2]).forEach(function(i){
+  var fixed = [];                           /* ما لم يصل كتابُه بعد */
+  if(window.TAHSILI_CHEM) out = out.concat(chemGen(cnt[2])); else fixed.push(2);
+  if(window.TAHSILI_BIO)  out = out.concat(bioGen(cnt[3]));  else fixed.push(3);
+  fixed.concat([1]).forEach(function(i){     /* الفيزياء (1) ما زالت بنكًا ثابتًا */
     var pool = TSUBJ[subs[i]] || [];
     if(pool.length) out = out.concat(freshPick(pool, Math.min(cnt[i], pool.length), "t_"+subs[i]));
   });
@@ -945,8 +949,9 @@ function buildAll(){
       if(SENIOR){
         var tN = (window.TAHSILI_MATH ? window.TAHSILI_MATH.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
         var cN = (window.TAHSILI_CHEM ? window.TAHSILI_CHEM.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
+        var bN = (window.TAHSILI_BIO  ? window.TAHSILI_BIO.topics.reduce(function(a,t){ return a+t.gens.length; },0) : 0);
         renderSet("t", tahsiliMix(12),
-          "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وفيزياء وكيمياء وأحياء — و<b>نسبة كل مادة تتغيّر كل جلسة</b>، لأن نسب التحصيلي غير ثابتة وتختلف باختلاف النموذج. والرياضيات <b>مولَّدة</b> من "+tN+" مولّدًا على دروس كتابك الـ١٧، والكيمياء من "+cN+" مولّدًا على ١٣ موضوعًا — فأرقامها جديدة كل مرة.",
+          "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وفيزياء وكيمياء وأحياء — و<b>نسبة كل مادة تتغيّر كل جلسة</b>، لأن نسب التحصيلي غير ثابتة وتختلف باختلاف النموذج. والرياضيات <b>مولَّدة</b> من "+tN+" مولّدًا، والكيمياء من "+cN+"، والأحياء من "+bN+" — على دروس كتبك نفسها، فأسئلتها جديدة كل مرة. (الفيزياء لسّا بنك ثابت — ناقص كتابها.)",
           function(){ return tahsiliMix(12); }, "تحصيلي");
       } else {
         renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
@@ -1075,6 +1080,21 @@ if(window.TAHSILI_MATH){ (function(){
         while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
         if(!q) return null;
         return ['<b>رياضيات — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
+      } });
+  });
+})(); }
+
+if(window.TAHSILI_BIO){ (function(){
+  window.TAHSILI_BIO.topics.forEach(function(t){
+    var key = "أحياء — " + t.name;
+    SKILLS.push({ group:"تحصيلي", name:"أحياء — "+t.name,
+      rx:new RegExp(t.name.slice(0,10).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")),
+      yt:t.yt, keys:[key], lesson:t.lesson,
+      gen:function(){
+        var q=null, tr=0;
+        while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
+        if(!q) return null;
+        return ['<b>أحياء — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
       } });
   });
 })(); }
