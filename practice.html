@@ -67,6 +67,7 @@
 <script src="tahsili-chem.js"></script>
 <script src="tahsili-bio.js"></script>
 <script src="tahsili-phys.js"></script>
+<script src="step-reading.js"></script>
 <script src="writing-en.js"></script>
 <script>
 /* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
@@ -831,6 +832,63 @@ function stepWeightsHtml(){
     STEP_W.map(function(w){ return w[0]+' <b>'+w[1]+'%</b>'; }).join(' · ')+
     '<br><span style="color:var(--muted)">فركّز على الأثقل: فهمُ المقروء وحده أربعةُ أمثالِ التحليل الكتابيّ.</span></div>';
 }
+/* ═══ نموذجُ ستيب الموزون ═══════════════════════════════════════════
+   طلبُ الأب (٢٤ سبتمبر ٢٠٢٦) بعد أن أرسل الأوزان: «أوزّنه مثل الاختبار».
+   والمسموعُ (٢٠٪) يحتاج صوتًا ولا صوتَ في هذه الصفحة، فتدريبُه في
+   reading.html ويُحال إليه بنصٍّ ظاهر. فتُوزَّع أوزانُ الثلاثةِ الباقية
+   على نفسِ نسبِها بعد إسقاطِ المسموع: ٤٠ و٣٠ و١٠ من ٨٠ ⟹ نصفٌ وثلاثةُ
+   أثمانٍ وثُمنٌ ⟹ من اثنَي عشرَ سؤالًا: ٦ و٤ و٢ (ولا يسقط قسمٌ أبدًا).
+
+   وأسئلةُ القطعةِ تُبقى متجاورةً ولا تُفرَّق، واثنان من كلِّ قطعةٍ فلا
+   يقرأ ستَّ قطعٍ في جلسةٍ واحدة. ونصُّ القطعةِ يُعاد على بطاقتَي
+   سؤالَيها لأنّ العارضَ بطاقةٌ لكلِّ سؤال. */
+var STEP_MIX_W = { read:6, struct:4, write:2 };
+function stepReadItems(n){
+  var R = window.STEP_READING || [];
+  if(!R.length) return [];
+  var out = [], order = shuffle(R.map(function(_,i){ return i; }));
+  for(var i=0; i<order.length && out.length<n; i++){
+    var pas = R[order[i]], qs = shuffle(pas[1].slice()).slice(0, Math.min(2, n-out.length));
+    qs.forEach(function(q){
+      out.push(['<b>فهم المقروء:</b><div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85">'+pas[0]+'</div>'+q[0],
+                q[1].slice(), q[2],
+                'الجواب من نصّ القطعة نفسها — ارجع إليه وابحث عن الجملة التي تحمل المعنى، لا عن الكلمة نفسها.']);
+    });
+  }
+  return out;
+}
+function stepWriteItems(n){
+  var G = (window.WritingEN && window.WritingEN._gens && window.WritingEN._gens[3]) || [];
+  if(!G.length) return [];
+  var out = [], seen = {}, tries = 0;
+  while(out.length < n && tries++ < 300){
+    var q = null;
+    try{ q = gp(G)(); }catch(e){}
+    if(!q || seen[q[0]]) continue;
+    seen[q[0]] = 1;
+    out.push(['<b>التحليل الكتابي:</b> '+q[0], q[1].slice(), q[2], q[3]]);
+  }
+  return out;
+}
+function stepMix(n){
+  var R = window.STEP_READING, W = (window.WritingEN && window.WritingEN._gens);
+  /* بلا أحدِ البنكين نرجع إلى السحبِ من البنكِ العامّ فلا يفرغ التبويب */
+  if(!R || !W) return freshPick(STEP, n, "s");
+  var k = n / 12;
+  var nr = Math.max(1, Math.round(STEP_MIX_W.read  * k));
+  var nw = Math.max(1, Math.round(STEP_MIX_W.write * k));
+  var read = stepReadItems(nr), write = stepWriteItems(nw);
+  var ns = Math.max(1, n - read.length - write.length);
+  /* أسئلةُ ستيب أربعةُ خيارات، وفي البنكِ القديمِ بنودٌ بثلاثةٍ (مفرداتٌ
+     وتمييزُ خطأٍ وفهمُ مقروءٍ سبقت step-bank.js). فنُفضِّل ذواتِ الأربعةِ
+     في النموذجِ الموزون حتى يكون حظُّ التخمينِ فيه ٢٥٪ كما في الاختبار،
+     ولا نحذف القديمَ فهو باقٍ في التبويبِ العامِّ لبقيّةِ الأبناء. */
+  var pool4 = STEP.filter(function(q){ return q && q[1] && q[1].length >= 4; });
+  var struct = (pool4.length >= ns ? freshPick(pool4, ns, "s4") : freshPick(STEP, ns, "s"))
+                 .map(function(q){ return q.slice(); });
+  /* القراءةُ أوّلًا كي تُقرأ بذهنٍ صافٍ، ثمّ التراكيبُ ثمّ التحليل */
+  return read.concat(struct, write);
+}
 var HEAD_EYE = VERBAL_ONLY ? 'تدريب لفظي' : (NO_GAT ? 'تحصيلي وSTEP · بأسلوب قياس' : 'اختبارات تجريبية · بأسلوب قياس');
 var HEAD_TTL = VERBAL_ONLY ? '📖 قدرات لفظي — ' : (NO_GAT ? '🧪 تحصيلي وSTEP — ' : '📊 قدرات وتحصيلي — ');
 app.innerHTML =
@@ -861,7 +919,7 @@ function skillOf(q){
   var m=/^<b>(.*?)<\/b>/.exec((q && q[0]) || "");
   return m ? m[1].replace(/[:：]\s*$/,"").trim() : "غير محدّد";
 }
-var SECS = { v:780, q:720, t:900, s:720 }; // ثواني كل قسم (مثل الاختبار الحقيقي)
+var SECS = { v:780, q:720, t:900, s:(who==="fahad" ? 900 : 720) };  /* نموذجُ فهدٍ فيه ثلاثُ قطعِ قراءةٍ فيلزمه وقتٌ أطول — تقديرُ تدريبٍ لا زمنٌ رسميّ */ // ثواني كل قسم (مثل الاختبار الحقيقي)
 var TIMED = false; // الوضع المؤقّت اختياري
 function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
 /* ═══ «أسئلة جديدة» في التحصيلي وSTEP ═══
@@ -1014,6 +1072,15 @@ function buildAll(){
       }
     }
     var sN = STEP.length;
+    if(SENIOR){
+      var mix = stepMix(12), rc = mix.filter(function(q){ return /^<b>فهم المقروء/.test(q[0]); }).length;
+      var wc = mix.filter(function(q){ return /^<b>التحليل الكتابي/.test(q[0]); }).length;
+      renderSet("s", mix,
+        "STEP: 12 سؤال · 15 دقيقة"+tnote+" — <b>موزون بأوزان الاختبار</b>: "+rc+" فهم مقروء · "+(12-rc-wc)+" تراكيب · "+wc+" تحليل كتابي. <b>أسئلة جديدة كل مرة</b>، والتراكيب من بنكٍ فيه "+sN+" سؤالًا."+
+        stepWeightsHtml()+
+        '<div style="margin-top:8px;font-size:.9rem">🔊 <b>فهم المسموع (20%) ما هو هنا</b> — يحتاج صوتًا، وتدريبه في <a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع</a> (٤٠ جملة إملاء مسموع). لا تتركه: خُمس الاختبار.</div>',
+        function(){ return stepMix(12); }, "STEP إنجليزي");
+    } else
     renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
   }
 }
