@@ -42,6 +42,22 @@
   .chead .who{font-size:1.2rem;font-weight:800;display:flex;align-items:center;gap:8px}
   .chead .who small{color:var(--muted);font-weight:600;font-size:.8rem}
   .pill{padding:5px 12px;border-radius:99px;font-weight:800;font-size:.85rem;font-variant-numeric:tabular-nums}
+  /* بطاقاتُ الأبناء صارت مطويّةً (بلاغُ الأب ٢٤ سبتمبر ٢٠٢٦: «صفحة المتابعة
+     متعبة… خلّ التقارير مسكّرة وأنا أفتح الي أبي»). والسطرُ المطويُّ يحمل
+     خلاصةً تُغني عن فتحِه: النسبة، وعددَ المحاولات، وتنبيهَ الانقطاع. */
+  details.card{padding:0}
+  details.card>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:15px 18px;cursor:pointer;list-style:none;border-radius:18px}
+  details.card>summary::-webkit-details-marker{display:none}
+  details.card>summary::marker{content:""}
+  details.card>summary:hover{background:var(--bg)}
+  details.card[open]>summary{border-bottom:1px solid var(--line);border-radius:18px 18px 0 0}
+  details.card>summary .chead{margin:0}
+  details.card .kidbody{padding:14px 18px 18px}
+  .sumr{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .sub{color:var(--muted);font-weight:600;font-size:.8rem;margin-top:4px;line-height:1.5}
+  .chev{color:var(--muted);font-size:.72rem;transition:transform .15s ease;display:inline-block}
+  details.card[open] .chev{transform:rotate(180deg)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
   .stat{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
   .stat .lbl{color:var(--muted);font-size:.85rem;margin-bottom:4px}
@@ -84,6 +100,7 @@
   </header>
   <div class="bar">
     <button id="refresh">🔄 تحديث</button>
+    <button id="toggleAll" style="display:none">⬇️ افتح الكل</button>
     <a href="report.html" style="text-decoration:none;background:#0f766e;color:#fff;padding:9px 15px;border-radius:12px;font-weight:800;font-size:.9rem">📊 تقرير المستوى</a>
     <span class="muted" id="status"><span class="spin"></span> جارٍ التحميل...</span>
   </div>
@@ -231,6 +248,15 @@ function rowTime(r){ return (r && r.meta && r.meta.at) || (r && r.created_at) ||
    شهرين ظاهرًا بـ(×5) ويُوهم أنّ مستواه الحالي كذلك. الآن: نافذة ٣٠ يومًا،
    ونُعلّم ما أجابه صحيحًا بعد آخر خطأٍ فيه. */
 const WEAK_DAYS = 30;
+/* العددُ في العربيّة أربعُ حالات: واحدٌ، ومثنّى، وثلاثةٌ إلى عشرةٍ بالجمع،
+   وأحدَ عشرَ فما فوق بالمفرد المنصوب. فسطرُ الخلاصةِ يُصرِّفُ لا يُلصِق. */
+function arCount(n, one, two, few, many){
+  if(n === 1) return one;
+  if(n === 2) return two;
+  if(n >= 3 && n <= 10) return n + " " + few;
+  return n + " " + many;
+}
+function arDays(n){ return arCount(n, "يوم", "يومين", "أيّام", "يومًا"); }
 function weakAreas(rows){
   const cut = Date.now() - WEAK_DAYS*864e5;
   const tOf = r => { const t = Date.parse(rowTime(r)); return isFinite(t) ? t : 0; };
@@ -345,16 +371,31 @@ function azureQuotaHtml(rows){
         const p = pctOf((x.en_correct+x.ma_correct),(x.en_total+x.ma_total));
         return `<span>${p}%</span>`;
       }).join("");
-      return `<div class="card">
-        <div class="chead">
-          <div class="who">${EMOJI[name]||"👦"} ${name} <small>${grade}</small></div>
-          ${rows.length? `<div class="pill" style="${pillColor(d.overall)}">${d.overall}%</div>`:``}
-        </div>
+      /* خلاصةُ السطرِ المطويّ — ليعرف من يحتاج الفتحَ دون أن يفتحَ الجميع */
+      const prN = (practiceBy[name]||[]).length;
+      const bits = [];
+      if(rows.length) bits.push(arCount(rows.length, "محاولةٌ واحدة", "محاولتان", "محاولات", "محاولةً") + " في «اختبر نفسك»");
+      if(prN) bits.push(arCount(prN, "نشاطٌ منهجيٌّ واحد", "نشاطان منهجيّان", "أنشطةٍ منهجيّة", "نشاطًا منهجيًّا"));
+      if(!bits.length) bits.push("ما فيه نشاط بعد");
+      if(rows.length && !weak.attempts) bits.push("⚠️ ما حلّ خلال آخر " + arDays(weak.days));
+      else if(weak.list && weak.list.length) bits.push("🎯 " + arCount(weak.list.length, "نقطةُ ضعفٍ واحدة", "نقطتا ضعف", "نقاطِ ضعف", "نقطةَ ضعف"));
+      return `<details class="card" data-kid="${name}"${OPEN.indexOf(name)>=0?" open":""}>
+        <summary>
+          <div>
+            <div class="chead"><div class="who">${EMOJI[name]||"👦"} ${name} <small>${grade}</small></div></div>
+            <div class="sub">${bits.join(" · ")}</div>
+          </div>
+          <div class="sumr">
+            ${rows.length? `<div class="pill" style="${pillColor(d.overall)}">${d.overall}%</div>`:``}
+            <span class="chev">▾</span>
+          </div>
+        </summary>
+        <div class="kidbody">
         ${rows.length? `<div class="grid2">
           <div class="stat"><div class="lbl">الإنجليزي (متوسط)</div><div class="val">${d.enAvg}%</div>
-            <div class="trend">${rows.length} محاولة</div></div>
+            <div class="trend">${arCount(rows.length,"محاولةٌ واحدة","محاولتان","محاولات","محاولةً")}</div></div>
           <div class="stat"><div class="lbl">الرياضيات (متوسط)</div><div class="val">${d.maAvg}%</div>
-            <div class="trend">${rows.length} محاولة</div></div>
+            <div class="trend">${arCount(rows.length,"محاولةٌ واحدة","محاولتان","محاولات","محاولةً")}</div></div>
         </div>
         <div class="diag ${d.good?'good':'warn'}">${d.html}</div>`
         /* بلا صفوف «اختبر نفسك» تكون المتوسّطات NaN والتشخيص كلامًا لا معنى
@@ -537,14 +578,51 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
           </div></div>`;
         })()}
         ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
-      </div>`;
+      </div></details>`;
     }).join("") + azureQuotaHtml(allRows);
+    wireCards();
   }catch(e){
     status.textContent = "";
     content.innerHTML = `<div class="card empty">⚠️ تعذّر تحميل النتائج (${e.message}).<br>
       تأكد من الاتصال بالإنترنت، وأنك شغّلت سطر SQL الخاص بالقراءة.</div>`;
   }
 }
+/* ── طيُّ البطاقات ──────────────────────────────────────────────────
+   الأصلُ مطويّ، ويُحفَظ ما فتحه الأبُ فيرجع مفتوحًا في الزيارةِ القادمة
+   (في متصفّحه وحده، لا في قاعدة البيانات). وإن تعطّل التخزينُ — كنافذةٍ
+   خاصّةٍ أو تخزينٍ ممنوع — تعمل الصفحةُ كما هي والبطاقاتُ كلُّها مطويّة. */
+var OPEN_KEY = "rafeef_open_cards_v1";
+function readOpen(){
+  try{ var a = JSON.parse(localStorage.getItem(OPEN_KEY) || "[]"); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function writeOpen(a){ try{ localStorage.setItem(OPEN_KEY, JSON.stringify(a)); }catch(e){} }
+var OPEN = readOpen();
+
+function syncToggleAll(){
+  var btn = document.getElementById("toggleAll");
+  var ds  = document.getElementById("content").querySelectorAll('details[data-kid]');
+  if(!btn) return;
+  btn.style.display = ds.length ? "" : "none";
+  var anyClosed = Array.prototype.some.call(ds, function(d){ return !d.open; });
+  btn.textContent = anyClosed ? "⬇️ افتح الكل" : "⬆️ سكّر الكل";
+}
+function wireCards(){
+  Array.prototype.forEach.call(document.getElementById("content").querySelectorAll('details[data-kid]'), function(el){
+    el.addEventListener("toggle", function(){
+      var n = el.getAttribute("data-kid"), i = OPEN.indexOf(n);
+      if(el.open){ if(i < 0) OPEN.push(n); } else if(i >= 0){ OPEN.splice(i, 1); }
+      writeOpen(OPEN); syncToggleAll();
+    });
+  });
+  syncToggleAll();
+}
+document.getElementById("toggleAll").addEventListener("click", function(){
+  var ds = Array.prototype.slice.call(document.getElementById("content").querySelectorAll('details[data-kid]'));
+  var openThem = ds.some(function(d){ return !d.open; });
+  ds.forEach(function(d){ d.open = openThem; });   /* حدثُ toggle يحفظ لكلِّ بطاقة */
+  syncToggleAll();
+});
 document.getElementById("refresh").addEventListener("click", load);
 load();
 </script>
