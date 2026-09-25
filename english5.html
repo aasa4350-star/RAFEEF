@@ -466,6 +466,45 @@ var ALL = UW.concat(U1).concat(U2).concat(U3).concat(U4);
    يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*20){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
 
+/* وسمٌ عربيٌّ لكلِّ مولّدٍ — يُخزَّن مع النتيجةِ فيصير التقريرُ على
+   مستوى المهارةِ داخلَ الدرسِ لا الدرسِ كلِّه. وأُلِّف من نصِّ كلِّ
+   مولّدٍ نفسِه لا من اسمِه، فلا يوصف سؤالٌ بغيرِ ما يسأل عنه.
+   (طلبُ الأب ٢٥ سبتمبر ٢٠٢٦: «سوّ تفصيل المهارات لصفحات المنهج».) */
+var GEN_AR = {
+  gWVoc: "مفردات: كلمات الترحيب والزمن",
+  gMonthAr: "مفردات: ترتيب الشهور بالرقم",
+  gMonthOrder: "مفردات: الشهر الذي يلي شهرًا",
+  gNum: "كتابة الأعداد بالحروف",
+  gHowManyLong: "قواعد: سؤال how long / how many",
+  gAgo: "مفردات: ago والزمن الماضي",
+  gSup: "قواعد: صيغة التفضيل",
+  gWPast: "قواعد: الماضي الشاذّ",
+  gAdjPI: "مفردات: صفات الشخصيّة",
+  gPIExp: "مفردات: الهوايات والفنون",
+  gUn: "قواعد: السابقة un‑ لصنع الضدّ",
+  gUnMean: "قواعد: معنى السابقة un‑",
+  gPresPast: "قواعد: المضارع البسيط أم الماضي البسيط",
+  gStateAction: "قواعد: فعلُ حالةٍ أم فعلُ حدث",
+  gStateProg: "قواعد: المضارع المستمرّ للحدث الآنيّ",
+  gHouse: "مفردات: غرف البيت وأجزاؤه",
+  gHouseW: "مفردات: أدوات البيت",
+  gWill: "قواعد: will للمستقبل",
+  gWillGoing: "قواعد: will أم be going to",
+  gVerbNoun2: "قواعد: الكلمة اسمًا أم فعلًا",
+  gJob: "مفردات: أسماء المهن",
+  gPlace: "مفردات: أماكن العمل",
+  gJobPlace: "مفردات: مطابقة المهنة بمكانها",
+  gIst: "قواعد: اللاحقة ‑ist لصنع اسم المهنة",
+  gGoingTo3: "قواعد: be going to للخطّة",
+  gMayMight: "قواعد: may / might للاحتمال",
+  gTag: "قواعد: السؤال الذيليّ (question tag)",
+  gFoodN: "مفردات: أسماء الطعام والمكوّنات",
+  gFoodV: "مفردات: أفعال الطبخ",
+  gFoodStep: "مفردات: خطوات وصفة الطبخ",
+  gShould: "قواعد: should للنصيحة والتحذير",
+  gZeroCond: "قواعد: الشرط الصفريّ (Zero Conditional)",
+  gSmells: "قواعد: أفعال الحواسّ (smells / looks)",
+};
 var app = document.getElementById("app");
 if(!NAMES[who]){
   app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';

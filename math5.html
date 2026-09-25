@@ -750,6 +750,56 @@ var F5 = [gExprAddSub,gExprMulDiv,gEqAddSub,gEqMulDiv,gOrderOps,gFuncTable];
 var F6 = [gFracSimplify,gImproperToMixed,gMixedToImproper,gFracCompare,gFracRound];
 var ALL = PV.concat(F1).concat(F2).concat(F3).concat(F4).concat(F5).concat(F6);
 
+/* وسمٌ عربيٌّ لكلِّ مولّدٍ — يُخزَّن مع النتيجةِ فيصير التقريرُ على
+   مستوى المهارةِ داخلَ الدرسِ لا الدرسِ كلِّه. وأُلِّف من نصِّ كلِّ
+   مولّدٍ نفسِه لا من اسمِه، فلا يوصف سؤالٌ بغيرِ ما يسأل عنه.
+   (طلبُ الأب ٢٥ سبتمبر ٢٠٢٦: «سوّ تفصيل المهارات لصفحات المنهج».) */
+var GEN_AR = {
+  gPvPlaceName: "تسمية منزلة الرقم في عددٍ صحيح",
+  gPvValue: "القيمة المنزلية لرقمٍ في عدد",
+  gPvConcept: "مفهوم: قيمة الصفر داخل العدد",
+  gPvExpanded: "من الصيغة التحليلية إلى القياسية",
+  gPvToExpanded: "من الصيغة القياسية إلى التحليلية",
+  gPvCompare: "مقارنة عددين صحيحين",
+  gPvOrder: "ترتيب الأعداد الصحيحة",
+  gPvRound: "تقريب عددٍ صحيح",
+  gPvDecThousandth: "تسمية منزلة رقمٍ عشريّ",
+  gPvTimesTen: "الضرب في 10 و100 و1000",
+  gDecPlace: "القيمة المنزلية لرقمٍ عشريّ",
+  gDecPlaceName: "تسمية منزلة الرقم العشريّ",
+  gDecCompare: "مقارنة كسرين عشريّين",
+  gDecOrder: "ترتيب الكسور العشريّة",
+  gFracToDec: "تحويل الكسر إلى كسرٍ عشريّ",
+  gDecWords: "قراءة الكسر العشريّ بالحروف",
+  gDecAdd: "جمع الكسور العشريّة",
+  gDecSub: "طرح الكسور العشريّة",
+  gDecRoundWhole: "تقريب العشريّ لأقرب عددٍ صحيح",
+  gDecRoundTenth: "تقريب العشريّ لأقرب جزءٍ من عشرة",
+  gDecEstimate: "تقدير ناتج جمع الكسور العشريّة",
+  gDistProp: "خاصيّة التوزيع",
+  gMulPattern: "أنماط الضرب الذهنيّ",
+  gMulEstimate: "تقدير ناتج الضرب",
+  gMul1: "الضرب في عددٍ من رقمٍ واحد",
+  gMul2: "ضرب عددين من رقمين",
+  gMulWord: "مسألة لفظية: ضرب",
+  gDivPattern: "أنماط القسمة الذهنيّة",
+  gDivEstimate: "تقدير ناتج القسمة بالأعداد المتوافقة",
+  gDiv1: "القسمة على عددٍ من رقمٍ واحد",
+  gDivRemainder: "باقي القسمة",
+  gDiv2: "القسمة على عددٍ من رقمين",
+  gDivWord: "مسألة لفظية: قسمة",
+  gExprAddSub: "كتابة عبارةٍ جبريّة (جمع وطرح)",
+  gExprMulDiv: "كتابة عبارةٍ جبريّة (ضرب وقسمة)",
+  gEqAddSub: "حلّ معادلة بالجمع أو الطرح",
+  gEqMulDiv: "حلّ معادلة بالضرب أو القسمة",
+  gOrderOps: "ترتيب العمليّات",
+  gFuncTable: "قاعدة الدالة من جدول",
+  gFracSimplify: "تبسيط الكسر",
+  gImproperToMixed: "من كسرٍ غيرِ عاديٍّ إلى عددٍ كسريّ",
+  gMixedToImproper: "من عددٍ كسريٍّ إلى كسرٍ غيرِ عاديّ",
+  gFracCompare: "مقارنة كسرين",
+  gFracRound: "تقريب الكسر إلى 0 أو ½ أو 1",
+};
 var app = document.getElementById("app");
 if(!NAMES[who]){
   app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=saud</div>';
