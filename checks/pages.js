@@ -183,7 +183,13 @@ function run(){
       const body = inline.join('\n');
       if (!/AQ\.post\s*\(|fetch\s*\(\s*SUPA_URL|sendBeacon\s*\(/.test(body))
         issues.push({ sev:'خطأ', file:f, msg:'مادّةٌ فوق الصفّ لا تحفظ نتائجها — طلب الأب أن تظهر له في صفحته' });
-      const metas = body.match(/meta\s*:\s*\{[^}]*\}/g) || [];
+      /* الوسمُ يُكتب على صورتين منذ أن صارت الصفحاتُ تدمج «مهارات» في
+         الميتا: كائنٌ داخل الجسم (meta:{…}) أو متغيّرٌ يُبنى ثمّ يُسنَد
+         (var meta = {…} … meta:meta). وكان الفحص يعرف الأولى وحدها،
+         فلمّا تحوّلت الصفحات الثلاث إلى الثانية رأى الوسمَ غائبًا وهو
+         مكتوبٌ في سطره — ثلاثةُ أخطاءٍ كاذبةٍ تُعمي عن خطأٍ صادق. */
+      const metas = (body.match(/meta\s*:\s*\{[^}]*\}/g) || [])
+        .concat(body.match(/\bmeta\s*=\s*\{[^}]*\}/g) || []);
       const unmarked = metas.filter(m => !/preview\s*:\s*true/.test(m));
       if (!metas.length || unmarked.length)
         issues.push({ sev:'خطأ', file:f, msg:'مادّةٌ فوق الصفّ تحفظ صفًّا بلا وسم preview:true — سيدخل التقييم ويخفض المستوى بما ليس من الصفّ' });

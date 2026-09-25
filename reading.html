@@ -513,6 +513,30 @@ function awaySnap(){ return { total:AWAY.total, exits:AWAY.exits }; }
 function awaySince(s){ var extra = AWAY.hiddenAt!=null ? (Date.now()-AWAY.hiddenAt) : 0; return { away: Math.round((AWAY.total - s.total + extra)/1000), exits: AWAY.exits - s.exits + (AWAY.hiddenAt!=null?1:0) }; }
 var EXIT_WARN_HTML = '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ انتبه: خرجت من الصفحة أثناء الحل، فهذه الجلسة قد لا تُحتسب. أكمل عادي — بس لا تفتح تطبيقًا ثانيًا وأنت تحل.</div>';
 function wireExitWarn(sec){ AWAY.onReturn = function(){ var wb=sec.querySelector("[data-exitwarn]"); if(wb) wb.style.display="block"; }; }
+
+/* ═══ pagehide وحدَها لا تكفي على آيفون ═══════════════════════════
+   بلاغ الأب (٢٥ سبتمبر ٢٠٢٦): «غير صحيح، شبه يوميّ يفتحون القسم هذا،
+   وخصوصًا حسن قبل أمس كنتُ معه وقرأنا القطعة سوا» — وهو محقّ: صفوف
+   حسن تُثبت أنّه قرأ القطعة بصوته ٢٣ سبتمبر ١٦:٢٦ (نطق ٧٠٪)، ولم
+   يُحفظ لتلك الجلسة صفُّ فهمٍ واحد.
+
+   والعلّة أنّ الحفظ الجزئيّ في هذه الصفحة معلَّقٌ على pagehide وحدَها،
+   وسفاري على آيفون لا يُطلقها حين ينتقل الطفل إلى تطبيقٍ آخر أو يُقفل
+   الشاشة ثمّ يُهمَل اللسان فيُطوى — إنّما يُطلق visibilitychange. فمن
+   أجاب عن أربعةٍ ثمّ أقفل الجوّال ضاع عملُه كلُّه.
+
+   وكان الامتناع عن الحفظ عند الاختفاء مقصودًا يومًا: «لئلّا يُقفل
+   الحفظ على جزءٍ ناقص». وذلك السببُ زال منذ ١٢ سبتمبر: الحفظ الجزئيّ
+   يحمل meta.pid، وRR.dedupe تُبقي الأكمل من صفوف المعرّف الواحد
+   وتُسقط ما دونه — فالحفظ المبكّر لم يعد يمنع حفظًا أكمل بعده. */
+function hookLeaveSave(owner, fn){
+  if(owner._hook)  window.removeEventListener("pagehide", owner._hook);
+  if(owner._vhook) document.removeEventListener("visibilitychange", owner._vhook);
+  owner._hook  = function(){ try{ fn(); }catch(e){} };
+  owner._vhook = function(){ if(document.hidden){ try{ fn(); }catch(e){} } };
+  window.addEventListener("pagehide", owner._hook);
+  document.addEventListener("visibilitychange", owner._vhook);
+}
 // لو خرج من الصفحة أثناء أي قسم، نحفظ اللي سوّاه لين الآن (عشان لا يضيع تعبه)
 // لا نحفظ جزئيًا عند اختفاء الصفحة (فتح تطبيق/فيديو ثم الرجوع)، وإلا قُفل الحفظ على
 // جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند تبديل القسم فعليًا.
@@ -1251,9 +1275,7 @@ if(!META[who] || !DATA[who]){
        الجزئيّ عند مغادرة الصفحة وحدها. */
     renderDict._save = savePartial;
     sec._leave = function(){};
-    if(renderDict._hook) window.removeEventListener("pagehide", renderDict._hook);
-    renderDict._hook = function(){ savePartial(); };
-    window.addEventListener("pagehide", renderDict._hook);
+    hookLeaveSave(renderDict, savePartial);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
@@ -1527,9 +1549,7 @@ if(!META[who] || !DATA[who]){
        صفحةٍ أخرى (بلاغ الأب ٧ سبتمبر ٢٠٢٦). */
     renderRead._save = savePartial;
     sec._leave = function(){};
-    if(renderRead._hook) window.removeEventListener("pagehide", renderRead._hook);
-    renderRead._hook = function(){ savePartial(); };
-    window.addEventListener("pagehide", renderRead._hook);
+    hookLeaveSave(renderRead, savePartial);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -2232,9 +2252,7 @@ if(!META[who] || !DATA[who]){
        جلسةٌ أُتمّت. */
     renderVocab._save = saveIfPartial;
     sec._leave = function(){};
-    if(renderVocab._hook) window.removeEventListener("pagehide", renderVocab._hook);
-    renderVocab._hook = function(){ saveIfPartial(); };
-    window.addEventListener("pagehide", renderVocab._hook);
+    hookLeaveSave(renderVocab, saveIfPartial);
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
