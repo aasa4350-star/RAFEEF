@@ -569,6 +569,8 @@ function azureCreds(){ var A = window.AZURE_SPEECH||{}; var c = A[who]; if(c && 
 function azureConfigured(){ return !!azureCreds(); }
 // القطعة الطويلة: تسجيل مستمر يقرأ الطفل القطعة كاملة على راحته ثم يضغط «⏹️ خلّصت» — بلا مهلة تقفه ولا توقّف بين الجمل يقصّه.
 // مايك Azure على آيفون غير مستقر (قيد Apple على سفاري) لذا نعيد المحاولة تلقائيًا مرة إن لم يفتح من أول ضغطة.
+/* أرقامُ تشخيصِ آخرِ قراءةِ قطعةٍ — تُقرأ عند حفظ درجة الفهم */
+var READ_DIAG = { maxRz:0, partOnly:0 };
 function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var SDK = window.SpeechSDK;
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
@@ -614,12 +616,19 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
   var _maxRz=0;               /* أطول دورةٍ نجحت — للمقارنة بالفاشلة */
+  /* ═══ هذان رقما تشخيصٍ لا درجة، وقد أسقطا درجةَ الفهم سبعةَ عشرَ يومًا ═══
+     كانا يُقرآن في صفّ «قراءة إنجليزي 📖» من نطاقٍ لا يراهما (هما محلّيّان
+     هنا في _paRunLong)، فكان آخرُ سؤالٍ يُجيب عنه الابن يرمي ReferenceError
+     قبل أن يصل نداءُ الحفظ — فتضيع القطعة كلُّها في اللحظة التي أتمّها.
+     وآخرُ صفِّ قراءةٍ في القاعدة ٨ سبتمبر، وهو يومُ إدخال هذين الرقمين.
+     فصارا يُنسخان إلى READ_DIAG المرئيّ للحفظ (تعريفه أعلى الملفّ). */
   var _heardAny=false;        /* هل سمعناه في أيّ دورة؟ يُغيّر ما نقوله له في النهاية */
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
   function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; } var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
+    READ_DIAG.maxRz = _maxRz; READ_DIAG.partOnly = _partialOnly;
     if(btn){ btn.disabled=false; }
     if(!allWords.length){
       statusEl.style.color="var(--bad)";
@@ -1544,12 +1553,36 @@ if(!META[who] || !DATA[who]){
        فلا تُقرأ نسبةٌ عاليةٌ ناتجةٌ عن الحفظ على أنّها فهم. */
     var _pid = passageId(passage);
     function savePartial(){ var n=Object.keys(ans).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId}); }
+    /* ═══ ما دون ثلاثِ إجاباتٍ: أثرٌ لا درجة ═══════════════════════
+       جواب الأب حين سألتُه ماذا فعل حسن (٢٥ سبتمبر ٢٠٢٦): «مدري عنه
+       صراحةً، لكن ممكن أنّه حلّ الأسئلة ولم يقرأها — ممكن طبعًا».
+       وهذا هو موضع العمى بعينه: مَن فتح القطعة وأجاب عن سؤالٍ أو
+       سؤالين ثمّ خرج لا يترك في القاعدة أثرًا البتّة، فيسأل الأب
+       ولا يجد جوابًا لا عندنا ولا عند ابنه.
+
+       وعتبةُ الثلاث لم تكن عبثًا: صفٌّ بدرجة «١ / ١» يرفع متوسّط
+       القراءة بغير حقّ. فالحلّ ألّا نُسقط الخبر ولا نُدخله الدرجات:
+       يُحفظ كـ kind="activity" — وهو وسمٌ تستثنيه صفحاتُ التقرير من
+       كلّ متوسّطٍ وتشخيص أصلًا — فيُعرض أثرًا: «فتح القطعة وأجاب عن
+       سؤالين من ثمانية». ويُحفظ كذلك من فتح الأسئلة ولم يُجب البتّة. */
+    var _actN = -1;
+    function saveActivity(){
+      var n = Object.keys(ans).length;
+      if(!unlocked) return;              /* لم تُفتح الأسئلة له أصلًا */
+      if(n >= 3 || n === _actN) return;  /* الثلاثُ فأكثر لها صفُّ درجةٍ كامل */
+      _actN = n;
+      saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", 0, 0,
+        /* correct/total صفران عمدًا: صفُّ أثرٍ لا درجة. والعددُ الحقيقيّ
+           في answered/right فلا يدخل أيّ متوسّط ولو سها عنه فلترٌ يومًا. */
+        { kind:"activity", sect:"read", answered:n, of:total, right:correct,
+          dur:Math.round((Date.now()-t0)/1000), item:_pid, noMic:noMic, pid:attId+"_act" });
+    }
     /* نفس علّة الإملاء أعلاه: التبويب لا يُنهي الجلسة، والحفظ الجزئيّ
        عند مغادرة الصفحة — وإلّا ضاعت قراءةُ الطفل كلّها إذا انتقل إلى
        صفحةٍ أخرى (بلاغ الأب ٧ سبتمبر ٢٠٢٦). */
     renderRead._save = savePartial;
     sec._leave = function(){};
-    hookLeaveSave(renderRead, savePartial);
+    hookLeaveSave(renderRead, function(){ savePartial(); saveActivity(); });
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, right=questions[i][2];
       qEl.querySelectorAll(".opts button").forEach(function(btn){
@@ -1572,11 +1605,20 @@ if(!META[who] || !DATA[who]){
             var qlb=qrow.querySelector("[data-qlisten]"); if(qlb) qlb.addEventListener("click",function(){ speak(qtext,1,ar?"ar-SA":"en-US"); });
             var qaz=qrow.querySelector(".azbtn"), qfb=qrow.querySelector(".pfb2"); if(qaz) qaz.addEventListener("click",function(){ azureAssess(qtext, ar, qfb, qaz); });
           }
-          if(savedN<total && Object.keys(ans).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, maxRz:_maxRz, partOnly:_partialOnly, pid:attId}); }
+          /* درجةُ الابن أهمُّ من أيّ رقمِ تشخيصٍ بجانبها: تُبنى الحمولةُ
+             أوّلًا، ثمّ تُضاف أرقامُ التشخيص داخل try — فإن أخفق شيءٌ
+             منها حُفظت الدرجةُ على أيّة حال. */
+          if(savedN<total && Object.keys(ans).length===total){
+            savedN=total; saved=true;
+            var dur=Math.round((Date.now()-t0)/1000), aw=awaySince(aw0);
+            var _x={dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId};
+            try{ _x.maxRz=READ_DIAG.maxRz; _x.partOnly=READ_DIAG.partOnly; }catch(e){}
+            saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, _x);
+          }
         });
       });
     });
-    sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); renderRead(); });
+    sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); saveActivity(); renderRead(); });
   }
 
   // 300 كلمة (نفس ملف الطباعة PDF) — قسم الكلمات يختبر منها

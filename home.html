@@ -331,6 +331,10 @@ async function loadReport(){
      فتُخفّض enAvg/maAvg و«المستوى الحالي» زورًا كلّما كتب الابن فقرة
      أو تكلّم في talk.html. هذه هي الصفحة التي يفتحها الابن نفسه. */
   var practice=rows.filter(function(x){ return x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"); });
+  /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج. صفُّ
+     activity لا يدخل متوسّطًا، ويُعرض في بطاقة القراءة ليعرف الأب أنّه
+     فتح القسم فعلًا — انظر reading.html (saveActivity) وبلاغ ٢٥ سبتمبر. */
+  var readActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="read"; });
   rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
 
   var notes=[];
@@ -432,10 +436,18 @@ async function loadReport(){
     /* قراءةُ القطعة بصوته تُعرض هنا أيضًا: هي دليلُ فتح القسم ولو لم
        يُكمل أسئلة الفهم — انظر RR.passageReads وبلاغ ٢٥ سبتمبر ٢٠٢٦. */
     var passReads = (window.RR && RR.passageReads) ? RR.passageReads(pronAll) : [];
-    if(readAll.length || passReads.length){
+    if(readAll.length || passReads.length || readActs.length){
       var readByT={};
       readAll.forEach(function(p){ var t=p.meta.test||"قراءة"; (readByT[t]=readByT[t]||[]).push(p); });
       html+='<div class="sec-title"><span class="dot"></span> 📖 القراءة (فهم المقروء)</div><div class="card">';
+      if(readActs.length){
+        var acts=readActs.slice().sort(function(a,b){ return RR.when(a)<RR.when(b)?1:-1; });
+        html+='<div style="font-weight:700;margin:4px 2px 2px">📖 فتح القطعة ولم يُكملها <span class="cnt">('+acts.length+' مرّة · لا تدخل المتوسّط)</span></div><ul class="weak">'+
+          acts.slice(0,3).map(function(p){
+            return '<li>'+(p.meta.answered?('أجاب عن <b>'+p.meta.answered+'</b> من '+p.meta.of+' ثمّ خرج'):'فتح الأسئلة ولم يُجب')+
+              (p.meta.dur?' · ⏱️ '+p.meta.dur+'ث':'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+          '</ul>';
+      }
       if(passReads.length){
         var lastRead = passReads[0], lastComp = readAll.slice().sort(function(a,b){ return RR.when(a)<RR.when(b)?1:-1; })[0];
         var openNoComp = !lastComp || RR.when(lastRead) > RR.when(lastComp);

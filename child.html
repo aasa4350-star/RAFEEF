@@ -212,6 +212,9 @@ async function main(){
      المستوى زورًا — وسعود فعلًا عنده جلسات محادثة حقيقية اليوم كانت
      تُحسب صفرًا في معدّله بصمت. */
   const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"));
+  /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج — صفُّ
+     activity لا يدخل متوسّطًا (reading.html/saveActivity، بلاغ ٢٥ سبتمبر). */
+  const readActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="read");
   rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
@@ -391,10 +394,16 @@ async function main(){
     /* قراءةُ القطعة بصوته تُعرض هنا أيضًا: دليلُ فتح القسم ولو لم يُكمل
        أسئلة الفهم — انظر RR.passageReads وبلاغ ٢٥ سبتمبر ٢٠٢٦. */
     const passReads = (window.RR && RR.passageReads) ? RR.passageReads(pronAll) : [];
-    if(readAll.length || passReads.length){
+    if(readAll.length || passReads.length || readActs.length){
       const readByT={};
       readAll.forEach(p=>{ const t=p.meta.test||"قراءة"; (readByT[t]=readByT[t]||[]).push(p); });
       html+=`<div class="sec-title"><span class="dot"></span> 📖 القراءة (فهم المقروء)</div><div class="card">`;
+      if(readActs.length){
+        const acts=readActs.slice().sort((a,b)=> RR.when(a)<RR.when(b)?1:-1);
+        html+=`<div style="font-weight:700;margin:4px 2px 2px">📖 فتح القطعة ولم يُكملها <span class="cnt">(${acts.length} مرّة · لا تدخل المتوسّط)</span></div><ul class="weak">`+
+          acts.slice(0,3).map(p=>`<li>${p.meta.answered?`أجاب عن <b>${p.meta.answered}</b> من ${p.meta.of} ثمّ خرج`:`فتح الأسئلة ولم يُجب`}${p.meta.dur?` · ⏱️ ${p.meta.dur}ث`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+          `</ul>`;
+      }
       if(passReads.length){
         const lastRead=passReads[0], lastComp=readAll.slice().sort((a,b)=> RR.when(a)<RR.when(b)?1:-1)[0];
         const openNoComp = !lastComp || RR.when(lastRead) > RR.when(lastComp);
