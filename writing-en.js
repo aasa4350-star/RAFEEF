@@ -15,6 +15,18 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function en(s){ return '<span class="wen" dir="ltr">'+esc(s)+'</span>'; }
 
+/* ═══ التعليمةُ نفسُها مادّةُ تعلّم ═══
+   طلبُ الأب (٢٥ سبتمبر ٢٠٢٦): «الي مكتوب بالعربي حط تحته الترجمة
+   بالانجليزي». وهو في موضعه: هذا قسمُ تعبيرٍ إنجليزيّ، والابنُ يقرأ
+   السؤالَ بالعربيّة فيفهم المطلوب، ثمّ يرى صياغتَه الإنجليزيّةَ تحته
+   فيألفها — وهي عينُها التي ستأتيه في الاختبار وفي الكتاب. فلا يضيع
+   الفهمُ (بالعربيّة) ولا تضيع الألفة (بالإنجليزيّة).
+   tr  = سطرُ تعليمةٍ عربيٌّ تحته ترجمتُه.  trs = ترجمةٌ وحدها لعنوانٍ أو زرّ. */
+function tr(ar, enTxt){ return ar+'<div class="wtr" dir="ltr">'+enTxt+'</div>'; }
+function trs(enTxt){ return '<div class="wtr" dir="ltr">'+enTxt+'</div>'; }
+/* وسمٌ صغيرٌ في السطر نفسه — للأزرار والعناوين القصيرة */
+function trI(enTxt){ return ' <span class="wen" style="font-weight:600;font-size:.82rem;opacity:.75">'+esc(enTxt)+'</span>'; }
+
 /* بلاغ الأب (١ سبتمبر ٢٠٢٦): «حتى التعبير حط فيه علاجي» — نفس نمط
    الفيديو التوضيحي الموجود في كل درسٍ آخر بالموقع، لأضعف مقياسٍ من
    مقاييس كامبردج الأربعة بعد كل تقييم. */
@@ -403,7 +415,7 @@ function wOrder(){
   var w2 = v.charAt(0).toUpperCase()+v.slice(1)+" "+s.toLowerCase()+" "+t+".";
   var o=pick3(correct,[w1,w2]); if(!o) return null;
   var words=shuffle((s+" "+v+" "+t).split(" ")).join(" / ");
-  return ["رتّب الكلمات لتكوين جملة صحيحة:<br>"+en(words),
+  return [tr("رتّب الكلمات لتكوين جملة صحيحة:","Put the words in the correct order to make a sentence:")+en(words),
     o[0].map(en), o[1],
     "الترتيب الإنجليزي: <b>الفاعل ← الفعل ← بقيّة الجملة ← ظرف الزمن</b>، ونبدأ بحرفٍ كبير وننهي بنقطة.",
     "wo:"+s+"|"+v];
@@ -416,7 +428,7 @@ function wCapital(){
   var w1 = correct.charAt(0).toLowerCase()+correct.slice(1);      // بداية بحرف صغير
   var w2 = correct.slice(0,-1);                                    // بلا نقطة
   var o=pick3(correct,[w1,w2]); if(!o) return null;
-  return ["أيّ الجمل مكتوبة بطريقة صحيحة؟",o[0].map(en),o[1],
+  return [tr("أيّ الجمل مكتوبة بطريقة صحيحة؟","Which sentence is written correctly?"),o[0].map(en),o[1],
     "كلّ جملة تبدأ بحرفٍ <b>كبير</b> وتنتهي بـ<b>نقطة</b>.","wc:"+s+"|"+v];
 }
 
@@ -426,7 +438,7 @@ function wCapitalI(){
   var t=gp(TIME);
   var correct = "I "+v+" "+t+".";
   var o=pick3(correct,["i "+v+" "+t+".", "I "+v+" "+t]); if(!o) return null;
-  return ["أيّ الجمل مكتوبة بطريقة صحيحة؟",o[0].map(en),o[1],
+  return [tr("أيّ الجمل مكتوبة بطريقة صحيحة؟","Which sentence is written correctly?"),o[0].map(en),o[1],
     "الضمير "+en("I")+" يُكتب <b>كبيرًا دائمًا</b> في أيّ موضعٍ من الجملة، والجملة تنتهي بنقطة.","wi:"+v];
 }
 
@@ -435,7 +447,7 @@ function wConnect(){
   var p=gp(JOIN), c=p[2];
   var wrongs=shuffle(["and","but","because","so"].filter(function(x){ return x!==c; })).slice(0,2);
   var o=pick3(c,wrongs); if(!o) return null;
-  return ["اختر أداة الربط المناسبة:<br>"+en(p[0]+" ___ "+p[1]+"."),
+  return [tr("اختر أداة الربط المناسبة:","Choose the correct linking word:")+en(p[0]+" ___ "+p[1]+"."),
     o[0].map(en),o[1],
     "الصحيح: "+en(p[0]+" "+c+" "+p[1]+".")+"<br>"+
     "<b>and</b> للإضافة · <b>but</b> للتضادّ · <b>because</b> للسبب · <b>so</b> للنتيجة.",
@@ -446,7 +458,8 @@ function wConnect(){
 function wTopicSentence(){
   var p=gp(TOPIC_SENT);
   var o=pick3(p[1],[p[2],p[3]]); if(!o) return null;
-  return ["أيّ جملةٍ تصلح <b>جملةً موضوعيّة</b> (Topic Sentence) لفقرةٍ عن «"+p[0]+"»؟",
+  return [tr("أيّ جملةٍ تصلح <b>جملةً موضوعيّة</b> (Topic Sentence) لفقرةٍ عن «"+p[0]+"»؟",
+      "Which sentence is a good topic sentence for a paragraph about \u201c"+p[0]+"\u201d?"),
     o[0].map(en),o[1],
     "جملة الموضوع تُلخّص فكرة الفقرة كلّها. أمّا الجملة التي تذكر تفصيلةً دقيقة فهي جملة داعمة، والجملة البعيدة عن الموضوع لا مكان لها.",
     "wt:"+p[0]];
@@ -456,7 +469,8 @@ function wTopicSentence(){
 function wOffTopic(){
   var p=gp(TOPIC_SENT);
   var o=pick3(p[3],[p[1],p[2]]); if(!o) return null;
-  return ["فقرةٌ عن «"+p[0]+"». أيّ جملةٍ <b>لا تنتمي</b> إليها؟",
+  return [tr("فقرةٌ عن «"+p[0]+"». أيّ جملةٍ <b>لا تنتمي</b> إليها؟",
+      "A paragraph about \u201c"+p[0]+"\u201d. Which sentence does not belong?"),
     o[0].map(en),o[1],
     "وحدة الفقرة تعني أنّ كلّ جملةٍ فيها تخدم الفكرة نفسها. الجملة الصحيحة هنا تتكلّم عن موضوعٍ آخر تمامًا.",
     "wx:"+p[0]];
@@ -469,7 +483,7 @@ function wOrderPara(){
   var w1=[p[1],p[0],p[2]].join(" ");
   var w2=[p[2],p[1],p[0]].join(" ");
   var o=pick3(correct,[w1,w2]); if(!o) return null;
-  return ["رتّب جُمل الفقرة ترتيبًا صحيحًا:",o[0].map(en),o[1],
+  return [tr("رتّب جُمل الفقرة ترتيبًا صحيحًا:","Put the sentences of the paragraph in the correct order:"),o[0].map(en),o[1],
     "علامات التسلسل تدلّك على الترتيب: "+en("First")+" ← "+en("Then")+" ← "+en("Finally")+".",
     "wp:"+p[0]];
 }
@@ -478,7 +492,7 @@ function wOrderPara(){
 function wRunOn(){
   var p=gp(RUNON);
   var o=pick3(p[1],[p[2],p[3]]); if(!o) return null;
-  return ["الجملة التالية <b>متلاحقة</b> (run-on):<br>"+en(p[0])+"<br>أيّ إصلاحٍ صحيح؟",
+  return [tr("الجملة التالية <b>متلاحقة</b> (run-on):","This sentence is a run-on. Which correction is right?")+en(p[0]),
     o[0].map(en),o[1],
     "جملتان كاملتان لا تُوضعان معًا بلا رابط. الحلّ: <b>فاصلة + أداة ربط</b> ("+en("and / but / so")+") أو نقطة تفصل بينهما.",
     "wr:"+p[0]];
@@ -488,7 +502,7 @@ function wRunOn(){
 function wConnector2(){
   var p=gp(CONN2);
   var o=pick3(p[2],[p[3],p[4]]); if(!o) return null;
-  return ["اختر الأداة المناسبة:<br>"+en(p[0])+"<br>"+en(p[1]),
+  return [tr("اختر الأداة المناسبة:","Choose the correct linking word:")+en(p[0])+"<br>"+en(p[1]),
     o[0].map(en),o[1],
     "<b>However</b> للتضادّ · <b>Therefore</b> للنتيجة · <b>For example</b> للتمثيل · <b>In addition</b> للإضافة · <b>Finally</b> للختام.",
     "wn:"+p[0]];
@@ -737,7 +751,8 @@ var SEQ3 = [
 function wThesis(){
   var p=gp(TOPIC_SENT3);
   var o=pick4(p[1],[p[2],p[3],p[4]]); if(!o) return null;
-  return ["أيُّ جملةٍ تصلح <b>أطروحةً</b> (Thesis Statement) لمقالٍ عن «"+p[0]+"»؟",
+  return [tr("أيُّ جملةٍ تصلح <b>أطروحةً</b> (Thesis Statement) لمقالٍ عن «"+p[0]+"»؟",
+      "Which sentence works as a thesis statement for an essay about \u201c"+p[0]+"\u201d?"),
     o[0].map(en),o[1],
     "الأطروحةُ تُعلِن موقفَ المقالِ كلِّه وتُلمِّح إلى محاورِه. أمّا الجملةُ التي تذكر رقمًا أو واقعةً واحدةً فهي دليلٌ داخلَ فقرةٍ لا أطروحة، والبعيدةُ عن الموضوعِ لا موضعَ لها.",
     "w3t:"+p[0]];
@@ -746,7 +761,8 @@ function wThesis(){
 function wOffTopic3(){
   var p=gp(TOPIC_SENT3);
   var o=pick4(p[3],[p[1],p[2],p[4]]); if(!o) return null;
-  return ["مقالٌ عن «"+p[0]+"». أيُّ جملةٍ <b>لا تنتمي</b> إليه؟",
+  return [tr("مقالٌ عن «"+p[0]+"». أيُّ جملةٍ <b>لا تنتمي</b> إليه؟",
+      "An essay about \u201c"+p[0]+"\u201d. Which sentence does not belong?"),
     o[0].map(en),o[1],
     "وحدةُ الموضوعِ شرطٌ في المقالِ كما في الفقرة: كلُّ جملةٍ تخدم الأطروحة. والدليلُ الضيّقُ ينتمي إليه وإن كان جزئيًّا، والجملةُ الغريبةُ لا تنتمي البتّة.",
     "w3x:"+p[0]];
@@ -755,7 +771,7 @@ function wOffTopic3(){
 function wRegister(){
   var p=gp(REGISTER3);
   var o=pick4(p[0],[p[1],p[2],p[3]]); if(!o) return null;
-  return ["أيُّ جملةٍ تناسب <b>الكتابةَ الأكاديميّةَ الرسميّة</b>؟",
+  return [tr("أيُّ جملةٍ تناسب <b>الكتابةَ الأكاديميّةَ الرسميّة</b>؟","Which sentence is suitable for formal academic writing?"),
     o[0].map(en),o[1],
     "الأكاديميُّ يتجنّب المختصراتِ ولغةَ الحديثِ ("+en("kind of / gonna / loads of / to be honest")+") والخِطابَ المباشرَ للقارئ، ويستعمل صيغًا محتاطةً مثل "+en("suggests / may / appears to")+".",
     "w3g:"+p[0].slice(0,18)];
@@ -764,7 +780,7 @@ function wRegister(){
 function wFragment(){
   var p=gp(FRAGMENT3);
   var o=pick4(p[0],[p[1],p[2],p[3]]); if(!o) return null;
-  return ["أيُّ ما يلي <b>جملةٌ تامّة</b> لا شبهَ جملةٍ (fragment) ؟",
+  return [tr("أيُّ ما يلي <b>جملةٌ تامّة</b> لا شبهَ جملةٍ (fragment) ؟","Which of these is a complete sentence, not a fragment?"),
     o[0].map(en),o[1],
     "الجملةُ التامّةُ فيها فاعلٌ وفعلٌ مُصرَّفٌ وتستقلّ بمعناها. وما بدأ بأداةِ ربطٍ تابعةٍ ("+en("Because / Although / Since / Which")+") أو كان فعلُه "+en("-ing")+" وحدَه فهو شبهُ جملةٍ يحتاج تكملة.",
     "w3f:"+p[0].slice(0,18)];
@@ -773,7 +789,7 @@ function wFragment(){
 function wWordy(){
   var p=gp(WORDY3);
   var o=pick4(p[0],[p[1],p[2],p[3]]); if(!o) return null;
-  return ["أيُّ صياغةٍ <b>أوجزُ وأوضح</b> بالمعنى نفسِه؟",
+  return [tr("أيُّ صياغةٍ <b>أوجزُ وأوضح</b> بالمعنى نفسِه؟","Which version is the most concise and clear with the same meaning?"),
     o[0].map(en),o[1],
     "الأكاديميُّ موجَزٌ لا مُطوَّل: تُحذف الحشوُ مثل "+en("made the decision that / it is necessary that / in nature / in a timely manner")+" ويُستعمل الفعلُ المباشرُ والمبنيُّ للمعلوم.",
     "w3w:"+p[0].slice(0,18)];
@@ -782,7 +798,7 @@ function wWordy(){
 function wConnector3(){
   var p=gp(CONN3);
   var o=pick4(p[2],[p[3],p[4],p[5]]); if(!o) return null;
-  return ["اختر الأداةَ المناسبة:<br>"+en(p[0])+"<br>"+en(p[1]),
+  return [tr("اختر الأداةَ المناسبة:","Choose the correct linking word:")+en(p[0])+"<br>"+en(p[1]),
     o[0].map(en),o[1],
     "للتضادّ: "+en("However / Nevertheless / In contrast")+" · وللنتيجة: "+en("Therefore / Consequently / As a result")+" · وللإضافة: "+en("Furthermore / In addition / Moreover")+" · وللتمثيل: "+en("For example / For instance")+".",
     "w3n:"+p[0].slice(0,18)];
@@ -791,7 +807,7 @@ function wConnector3(){
 function wGrammar3(){
   var p=gp(GRAM3);
   var o=pick4(p[0],[p[1],p[2],p[3]]); if(!o) return null;
-  return ["أيُّ جملةٍ <b>صحيحةٌ نحويًّا</b>؟",
+  return [tr("أيُّ جملةٍ <b>صحيحةٌ نحويًّا</b>؟","Which sentence is grammatically correct?"),
     o[0].map(en),o[1],
     "الصحيح: "+en(p[0])+"<br>وأشهرُ ما يُختبَر: مطابقةُ الفعلِ لفاعلٍ بعيدٍ ("+en("the number of … has")+")، و"+en("each / neither")+" مفردان، و"+en("information")+" لا يُجمَع، و"+en("fewer")+" للمعدودِ و"+en("less")+" لغيرِه، وبعد "+en("deny / suggest / look forward to")+" صيغةُ "+en("-ing")+" أو "+en("that")+".",
     "w3r:"+p[0].slice(0,18)];
@@ -805,7 +821,7 @@ function wRunOn3(){
   var splice=p[1].replace(/,\s+(and|but|so|yet|or)\s+/, ", ");
   if(splice===p[1]) return null;      /* ما وجدنا الرابطَ فلا نُخرِج سؤالًا ناقصًا */
   var o=pick4(p[1],[splice,p[2],p[3]]); if(!o) return null;
-  return ["الجملة التالية <b>متلاحقة</b> (run-on):<br>"+en(p[0])+"<br>أيّ إصلاحٍ صحيح؟",
+  return [tr("الجملة التالية <b>متلاحقة</b> (run-on):","This sentence is a run-on. Which correction is right?")+en(p[0]),
     o[0].map(en),o[1],
     "الصحيح: "+en(p[1])+"<br>جملتان كاملتان لا تُجمَعان بفاصلةٍ وحدَها (comma splice) ولا بلا رابطٍ أصلًا. الحلّ: <b>فاصلة + أداة ربط</b> ("+en("and / but / so")+") أو نقطةٌ تفصل بينهما.",
     "w3o:"+p[0].slice(0,18)];
@@ -819,7 +835,7 @@ function wOrderPara3(){
   var w2=[p[2],p[1],p[0]].join(" ");
   var w3=[p[0],p[2],p[1]].join(" ");
   var o=pick4(correct,[w1,w2,w3]); if(!o) return null;
-  return ["رتّب جُملَ الفقرةِ ترتيبًا منطقيًّا:",o[0].map(en),o[1],
+  return [tr("رتّب جُملَ الفقرةِ ترتيبًا منطقيًّا:","Put the sentences of the paragraph in a logical order:"),o[0].map(en),o[1],
     "الفقرةُ الأكاديميّةُ تسير: خطوةٌ أولى ← ثمّ ما بُني عليها ← ثمّ النتيجةُ أو الخاتمة. وعلاماتُ التسلسلِ "+en("First / Then / Finally")+" تدلّك، والنتيجةُ لا تتقدّم سببَها.",
     "w3p:"+p[0].slice(0,18)];
 }
@@ -887,32 +903,32 @@ function gradeWriting(text, level, targetOrCefr, prompt){
      شكوا منه (٥ سبتمبر ٢٠٢٦: «ما فهمنا الطريقة»). */
   var contentChecks = covered.map(function(c){
     return {ok:c.ok,
-      label:(c.ok ? "غطّيت: " : "ما غطّيت: ")+c.q,
+      label:(c.ok ? "غطّيت: " : "ما غطّيت: ")+c.q+trI(c.ok?"Covered":"Not covered yet"),
       hint:"أضف جملةً تجيب عن: "+c.q};
   });
   contentChecks.push({ok: words.length>=cef.minWords,
-    label:"الطول المطلوب لمستوى "+cef.name+": "+words.length+" من "+cef.minWords+" كلمة",
+    label:"الطول المطلوب لمستوى "+cef.name+": "+words.length+" من "+cef.minWords+" كلمة"+trI("Length: "+words.length+" of "+cef.minWords+" words"),
     hint:"اكتب "+Math.max(0,cef.minWords-words.length)+" كلمة إضافية."});
-  contentChecks.push({ok: any && !/[؀-ۿ]/.test(t), label:"الفقرة كلّها بالإنجليزية",
+  contentChecks.push({ok: any && !/[؀-ۿ]/.test(t), label:"الفقرة كلّها بالإنجليزية"+trI("All in English"),
     hint:"فيها حروف عربية — اكتبها كاملة بالإنجليزية."});
 
   /* ---------- 2) Organisation: الترتيب والربط ---------- */
   var conns = cef.conn.filter(function(c){ return hasWord(t,c); });
   var seq   = SEQ_WORDS.filter(function(c){ return hasWord(t,c); });
   var orgChecks=[
-    {ok: sents.length>=cef.minSent, label:"عدد الجمل: "+sents.length+" من "+cef.minSent,
+    {ok: sents.length>=cef.minSent, label:"عدد الجمل: "+sents.length+" من "+cef.minSent+trI("Sentences: "+sents.length+" of "+cef.minSent),
      hint:"قسّم أفكارك: كلّ جملةٍ فكرةٌ واحدة."},
     {ok: conns.length>=cef.minConn,
-     label:"أدوات الربط: "+conns.length+" من "+cef.minConn+(conns.length?" ("+conns.join(", ")+")":""),
+     label:"أدوات الربط: "+conns.length+" من "+cef.minConn+(conns.length?" ("+conns.join(", ")+")":"")+trI("Linking words"),
      hint:"اربط جُملك بـ "+cef.conn.slice(0,5).join(" / ")+"."},
     {ok: any && sents.length>=2 && sents[0].split(/\s+/).length>=4,
-     label:"جملة أولى واضحة تُقدّم الموضوع", hint:"ابدأ بجملةٍ تُعرّف القارئ بموضوعك."}
+     label:"جملة أولى واضحة تُقدّم الموضوع"+trI("Clear opening sentence"), hint:"ابدأ بجملةٍ تُعرّف القارئ بموضوعك."}
   ];
   if(cef.needSeq){
-    orgChecks.push({ok: seq.length>=1, label:"ترتيب زمنيّ/منطقيّ ظاهر"+(seq.length?" ("+seq.join(", ")+")":""),
+    orgChecks.push({ok: seq.length>=1, label:"ترتيب زمنيّ/منطقيّ ظاهر"+(seq.length?" ("+seq.join(", ")+")":"")+trI("Clear sequencing"),
       hint:"استعمل First / Then / Finally أو In conclusion لترتيب أفكارك."});
     orgChecks.push({ok: sents.length>=3 && /(?:conclusion|to sum up|overall|finally|in short|think|believe|opinion)/i.test(sents[sents.length-1]||""),
-      label:"خاتمة أو رأي في آخر جملة",
+      label:"خاتمة أو رأي في آخر جملة"+trI("Closing sentence or opinion"),
       hint:"أنهِ الفقرة برأيك أو خلاصتك (In conclusion… / I think…)."});
   }
 
@@ -937,15 +953,15 @@ function gradeWriting(text, level, targetOrCefr, prompt){
   var varied = lens.length<3 ? false : lens.some(function(L){ return Math.abs(L-avgLen)>=3; });
 
   var langChecks=[
-    {ok: sents.length>0 && badCap.length===0, label:"كلّ جملة تبدأ بحرفٍ كبير",
+    {ok: sents.length>0 && badCap.length===0, label:"كلّ جملة تبدأ بحرفٍ كبير"+trI("Every sentence starts with a capital letter"),
      hint: badCap.length? ("ابدأ بحرفٍ كبير: «"+badCap[0]+"…»") : ""},
-    {ok: !!t && /[.!?]$/.test(t), label:"النصّ ينتهي بعلامة ترقيم", hint:"أنهِ آخر جملة بنقطة."},
-    {ok: any && !lowerI, label:"الضمير I مكتوب كبيرًا", hint:"اكتب I كبيرة دائمًا، لا i."},
-    {ok: any && !overused, label:"لا تكرار مفرط لكلمة واحدة",
+    {ok: !!t && /[.!?]$/.test(t), label:"النصّ ينتهي بعلامة ترقيم"+trI("Ends with a full stop"), hint:"أنهِ آخر جملة بنقطة."},
+    {ok: any && !lowerI, label:"الضمير I مكتوب كبيرًا"+trI("Capital I"), hint:"اكتب I كبيرة دائمًا، لا i."},
+    {ok: any && !overused, label:"لا تكرار مفرط لكلمة واحدة"+trI("No overused word"),
      hint: overused? ("كرّرت «"+top+"» "+topN+" مرّات — نوّع كلماتك.") : ""},
-    {ok: words.length>=15 && ttr>=0.55, label:"تنوّع المفردات: "+Math.round(ttr*100)+"%",
+    {ok: words.length>=15 && ttr>=0.55, label:"تنوّع المفردات: "+Math.round(ttr*100)+"%"+trI("Vocabulary range"),
      hint:"استعمل مرادفاتٍ وكلماتٍ أوسع بدل تكرار نفس الكلمة."},
-    {ok: varied, label:"تنوّع أطوال الجمل",
+    {ok: varied, label:"تنوّع أطوال الجمل"+trI("Varied sentence length"),
      hint:"نوّع: جملة قصيرة ثمّ أطول — لا تجعلها كلّها بالطول نفسه."}
   ];
 
@@ -953,12 +969,12 @@ function gradeWriting(text, level, targetOrCefr, prompt){
   var chat = CHATSPEAK.filter(function(c){ return hasWord(t,c); });
   var shouty = (t.match(/\b[A-Z]{4,}\b/g)||[]).length>0;
   var comChecks=[
-    {ok: any && chat.length===0, label:"أسلوب كتابيّ لا لغة دردشة",
+    {ok: any && chat.length===0, label:"أسلوب كتابيّ لا لغة دردشة"+trI("Written style, not chat language"),
      hint: chat.length? ("تجنّب: "+chat.join(", ")+" — اكتبها كاملة.") : ""},
-    {ok: any && !shouty, label:"بلا كلماتٍ بحروفٍ كبيرة كلّها", hint:"الحروف الكبيرة كلّها تُقرأ صياحًا."},
-    {ok: any && avgLen>=5, label:"جُملٌ كاملة لا كلماتٌ مبعثرة",
+    {ok: any && !shouty, label:"بلا كلماتٍ بحروفٍ كبيرة كلّها"+trI("No ALL-CAPS words"), hint:"الحروف الكبيرة كلّها تُقرأ صياحًا."},
+    {ok: any && avgLen>=5, label:"جُملٌ كاملة لا كلماتٌ مبعثرة"+trI("Full sentences"),
      hint:"اكتب جُملًا كاملة فيها فاعلٌ وفعل."},
-    {ok: any && sents.length>0 && /[.!?]/.test(t), label:"الترقيم يفصل الأفكار",
+    {ok: any && sents.length>0 && /[.!?]/.test(t), label:"الترقيم يفصل الأفكار"+trI("Punctuation separates ideas"),
      hint:"استعمل النقاط لتفصل بين أفكارك."}
   ];
 
@@ -1011,6 +1027,19 @@ var CSS = ''+
   'font-size:.88rem;direction:ltr;unicode-bidi:isolate}'+
 '.wsec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 17px;margin-bottom:13px;box-shadow:var(--shadow)}'+
 '.wen{direction:ltr;unicode-bidi:isolate;display:inline-block;text-align:left}'+
+/* ترجمةُ التعليمة — تحت العربيّة، أصغرَ منها وأخفَّ لونًا: تُقرأ ولا تُزاحم */
+'.wtr{direction:ltr;text-align:left;unicode-bidi:isolate;font-size:.86rem;font-weight:600;color:var(--muted);margin-top:3px;line-height:1.55}'+
+'.wreq{display:inline-block;background:var(--bad-bg);color:var(--bad);border-radius:99px;padding:2px 10px;font-size:.8rem;font-weight:800}'+
+'.wreq.done{background:var(--good-bg);color:var(--good)}'+
+'.wread{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:9px}'+
+'.wread .s{direction:ltr;text-align:left;font-weight:700;font-size:1.02rem;line-height:1.8}'+
+'.wread .b{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;align-items:center}'+
+'.wread .fb{font-size:.9rem;margin-top:7px;display:block}'+
+'.wread.ok{border-color:var(--good);background:var(--good-bg)}'+
+'.wsay{border:1.5px solid var(--accent);background:transparent;color:var(--accent);padding:8px 13px;border-radius:11px;'+
+  'font-weight:800;cursor:pointer;font-family:inherit;font-size:.88rem}'+
+'.wsay.mic{background:#0a7cff;border-color:#0a7cff;color:#fff}'+
+'.wsay.skip{border-color:var(--line);color:var(--muted)}'+
 '.wq .stem{font-weight:700;margin:5px 0 9px;font-size:1.05rem}'+
 '.wq .num{font-size:.8rem;color:var(--accent);font-weight:800}'+
 '.wopts{display:grid;gap:8px}'+
@@ -1155,7 +1184,7 @@ var CRITERIA = [
 
 function howToHtml(level, cef){
   var H = HOWTO[level] || HOWTO[1];
-  return '<details class="whow"><summary>📖 ما فهمت الطريقة؟ افتح هذا أوّلًا</summary>'+
+  return '<details class="whow"><summary>📖 ما فهمت الطريقة؟ افتح هذا أوّلًا'+trI("Not sure how? Open this first")+'</summary>'+
     '<h4>١ · الطريقة خطوةً خطوة</h4><ol class="wstep">'+
       H.steps.map(function(s){ return '<li>'+s+'</li>'; }).join('')+'</ol>'+
     '<h4>٢ · على أيّ شيءٍ تُحاسَب؟ أربعة مقاييس، كلٌّ من ٥</h4>'+
@@ -1181,6 +1210,60 @@ function howToHtml(level, cef){
   '</details>';
 }
 
+/* ═════════════ الجزء الثالث — اقرأ بصوتك 🎙️ (إجباريّ: خمسُ جمل) ═════════════
+   طلبُ الأب (٢٥ سبتمبر ٢٠٢٦): «وحط قيّم نطقي (إجباري ٥ طبعًا) عشان
+   يتعودون عليها».
+
+   وموضعُها من التعبير صحيحٌ لا زائد: الجملةُ التي يكتبها الابنُ ولا
+   ينطقها تبقى حروفًا على ورق. وقراءتُها بصوته تكشف ما لا يكشفه
+   التصحيحُ الآليّ — كلمةٌ يعرف معناها ولا يعرف نطقها.
+
+   والخمسُ إجباريّةٌ بالعدّاد والتذكير لا بقفل القسم: المايكروفون
+   أعطبُ ما في الموقع (بلاغاتُ ٣١ أغسطس و٤ و٥ و٦ و٨ سبتمبر)، ولو
+   علّقنا التعبيرَ كلَّه على نجاحه لحُبس ابنٌ كتب فقرتَه كاملةً بعطلٍ
+   ليس منه. فلكلّ جملةٍ زرُّ تخطٍّ يظهر بعد محاولتين فاشلتين، ويُعدّ
+   تخطّيًا لا إنجازًا فيراه الأب على حقيقته.
+
+   والعدّ يوميّ: يبدأ من صفرٍ كلّ يومٍ لأنّ المقصود عادةٌ لا رقمٌ
+   يُجمع مرّةً ثمّ يُنسى. */
+var READ_REQ = 5;
+
+/* جملُ القراءة من بنوك القسم نفسِه — لا نؤلّف إنجليزيّةً جديدةً تُخطئ:
+   هذه جملٌ مراجَعةٌ يستعملها التدريبُ أصلًا، ومستواها مستوى الابن. */
+function sayBank(level){
+  var out=[];
+  if(level>=3){
+    TOPIC_SENT3.forEach(function(p){ out.push(p[1]); });
+    REGISTER3.forEach(function(p){ out.push(p[0]); });
+    GRAM3.forEach(function(p){ out.push(p[0]); });
+    SEQ3.forEach(function(p){ out.push(p[0]); out.push(p[2]); });
+  } else if(level>=2){
+    TOPIC_SENT.forEach(function(p){ out.push(p[1]); });
+    SEQ.forEach(function(p){ out.push(p[0]); out.push(p[1]); out.push(p[2]); });
+    JOIN.forEach(function(p){ out.push(p[0]+" "+p[2]+" "+p[1]+"."); });
+  } else {
+    SUBJ.forEach(function(sb){ out.push(sb+" "+gp(VP)+" "+gp(TIME)+"."); });
+    JOIN.forEach(function(p){ out.push(p[0]+" "+p[2]+" "+p[1]+"."); });
+  }
+  /* جملٌ قصيرةٌ جدًّا لا تُقيَّم جيّدًا، وطويلةٌ جدًّا تُتعب المبتدئ */
+  return out.filter(function(x){ var n=String(x).split(/\s+/).length; return n>=4 && n<=26; });
+}
+/* جملُ الابن نفسِه حين يكون قد كتب فقرتَه — أنفعُ من أيّ نموذج */
+function ownSentences(text){
+  return splitSentences(String(text||""))
+    .map(function(x){ return String(x).replace(/\s+/g," ").trim(); })
+    .filter(function(x){ var n=x.split(/\s+/).length; return n>=4 && n<=26 && /[A-Za-z]/.test(x); });
+}
+function pickSay(level, who){
+  var pool=sayBank(level), k="wen_said_"+who, seen=[];
+  try{ seen=JSON.parse(localStorage.getItem(k)||"[]")||[]; }catch(e){}
+  var left=pool.filter(function(x){ return seen.indexOf(x)<0; });
+  if(left.length<READ_REQ){ left=pool.slice(); seen=[]; }
+  var pick=shuffle(left).slice(0,READ_REQ);
+  try{ localStorage.setItem(k, JSON.stringify(seen.concat(pick).slice(-60))); }catch(e){}
+  return pick;
+}
+
 function injectCss(){
   if(document.getElementById("wen-css")) return;
   var st=document.createElement("style"); st.id="wen-css"; st.textContent=CSS;
@@ -1190,6 +1273,11 @@ function injectCss(){
 function render(el, ctx){
   injectCss();
   var level = ctx.level || 1;
+  /* خدمةُ تقييم النطق تصل من الصفحة المضيفة (quiz.html) — وصفحةُ فهدٍ
+     (practice.html) لا تمرّرها، فلا يظهر الجزءُ الثالثُ فيها أصلًا:
+     زرٌّ لا يعمل أسوأ من غيابه. */
+  var PRON_OK = !!(ctx.pron && ctx.pron.ok && ctx.pron.assess && ctx.pron.speak);
+  var readDone = function(){ return READ_REQ; };   /* يُستبدل حين يُبنى الجزء الثالث */
   var cef = CEFR[ctx.cefr] || (level>=2 ? CEFR.A2 : CEFR.A1);
   var prompts = PROMPTS[level] || PROMPTS[1];
   /* موضوع اليوم يتغيّر يوميًّا ولا يتغيّر بإعادة التحميل في اليوم نفسه */
@@ -1201,10 +1289,13 @@ function render(el, ctx){
      تتراكم ويُحفظ صفٌّ عن قائمةٍ لم تعد معروضة. */
   var _drillLeaveHooked = null;
   var html = ''+
-    '<div class="wsec"><b>✍️ التعبير</b> — '+
-      (level>=3 ? 'بناء المقال: الأطروحة، والحجّة بدليل، والرأي المضادّ وردّه، والتسجيل الرسميّ.'
-       : level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'
-                  : 'بناء الجملة: الترتيب، الحرف الكبير، النقطة، وأدوات الربط.')+
+    '<div class="wsec"><b>✍️ التعبير</b>'+trI("Writing")+' — '+
+      (level>=3 ? 'بناء المقال: الأطروحة، والحجّة بدليل، والرأي المضادّ وردّه، والتسجيل الرسميّ.'+
+                  trs("Essay writing: thesis, evidence, counter-argument and formal register.")
+       : level>=2 ? 'بناء الفقرة: جملة الموضوع، الوحدة، الترتيب، وأدوات الربط.'+
+                  trs("Paragraph writing: topic sentence, unity, order and linking words.")
+                  : 'بناء الجملة: الترتيب، الحرف الكبير، النقطة، وأدوات الربط.'+
+                  trs("Sentence writing: word order, capital letters, full stops and linking words."))+
       '<br><span style="color:var(--muted);font-size:.9rem">قسمان: تدريب سريع مصحّح'+
       (level>=3 ? ' على نمط «التحليل الكتابيّ» في ستيب، ثمّ اكتب مقالك' : '، ثمّ اكتب فقرتك')+
       ' — و'+(level>=3?'يُحفَظ':'تُحفظ')+' لوالدك ليقرأه'+(level>=3?'':'ا')+'.</span>'+
@@ -1212,31 +1303,46 @@ function render(el, ctx){
       '<span class="wtag">🎯 مستواك المستهدف: '+cef.name+'</span></div></div>'+
     /* الشرح أوّل ما يقع عليه البصر، مطويًّا فلا يزحم من يعرف الطريقة */
     howToHtml(level, cef)+
-    '<div class="wsec"><b>الجزء الأول — تدريب</b><div id="wquiz"></div>'+
+    '<div class="wsec"><b>الجزء الأول — تدريب</b>'+trs("Part 1 — Practice")+'<div id="wquiz"></div>'+
       /* dir="ltr" على الرقم وحده — بلاه ينعكس بصريًّا داخل السياق العربيّ
          («3 / 10» يظهر «10 / 3»)، وهو عيبٌ وقع في كل عدّادات الدرجة
          على الموقع، هنا وفي كل صفحات الاختبارات. */
       '<div style="text-align:center;font-weight:800;margin-top:10px"><span id="wscore" dir="ltr">0 / '+items.length+'</span></div>'+
-      '<button class="wbtn ghost" id="wnew">تدريب جديد 🔄</button></div>'+
+      '<button class="wbtn ghost" id="wnew">تدريب جديد 🔄'+trI("New practice")+'</button></div>'+
     '<div class="wsec"><b>الجزء الثاني — '+(level>=3?'اكتب مقالك':'اكتب فقرتك')+'</b>'+
+      trs(level>=3?"Part 2 — Write your essay":"Part 2 — Write your paragraph")+
       '<div style="margin:8px 0 4px;font-size:1.05rem"><b>'+en(prompts[pIdx].t)+'</b></div>'+
       '<div style="color:var(--muted);font-size:.92rem;margin-bottom:6px">'+en(prompts[pIdx].h)+'</div>'+
       '<div style="background:var(--bg);border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:.9rem">'+
-        '<b>نقاط المهمّة</b> — غطِّها كلّها لترفع درجة <i>Content</i>:<ol style="margin:5px 0 0;padding-inline-start:18px">'+
+        '<b>نقاط المهمّة</b> — غطِّها كلّها لترفع درجة <i>Content</i>:'+trs("Task points — cover all of them to raise your Content mark:")+'<ol style="margin:5px 0 0;padding-inline-start:18px">'+
         (prompts[pIdx].points||[]).map(function(pp){ return '<li>'+en(pp.q)+'</li>'; }).join('')+
-        '</ol><div style="color:var(--muted);margin-top:6px">الطول المطلوب لمستوى '+cef.name+': <b>'+cef.minWords+'</b> كلمة على الأقل — '+cef.say+'.</div></div>'+
+        '</ol><div style="color:var(--muted);margin-top:6px">الطول المطلوب لمستوى '+cef.name+': <b>'+cef.minWords+'</b> كلمة على الأقل — '+cef.say+'.'+
+        trs("Required length for "+cef.name+": at least "+cef.minWords+" words.")+'</div></div>'+
       '<textarea id="wtext" dir="ltr" placeholder="Write your paragraph here..." spellcheck="true"></textarea>'+
       '<div class="wmeter"><i id="wbar"></i></div>'+
       '<div id="wlive" style="font-size:.9rem;color:var(--muted)">0 كلمة · 0 جملة</div>'+
-      '<button class="wbtn" id="wcheck">قيّم كتابتي ✅</button>'+
-      '<div id="wfeed"></div></div>';
+      '<button class="wbtn" id="wcheck">قيّم كتابتي ✅'+trI("Check my writing")+'</button>'+
+      '<div id="wfeed"></div></div>'+
+    /* الجزء الثالث: لا يُعرض إن لم تكن خدمةُ النطق مُهيّأةً لهذا الابن —
+       زرٌّ لا يعمل أسوأ من غيابه (وصفحةُ فهدٍ لا تُمرّر pron أصلًا). */
+    (PRON_OK ? ('<div class="wsec" id="wreadsec"><b>الجزء الثالث — اقرأ بصوتك 🎙️</b> '+
+      '<span class="wreq" id="wreqbadge">إجباري: ٥ جمل</span>'+
+      trs("Part 3 — Read aloud (5 required sentences)")+
+      '<div style="color:var(--muted);font-size:.9rem;margin-top:6px">اقرأ كلّ جملةٍ بصوتٍ واضح واضغط «قيّم نطقي» — '+
+        'الكلمةُ التي تكتبها ولا تنطقها تبقى حروفًا على ورق.'+
+        trs("Read each sentence aloud and press “Check my pronunciation”.")+'</div>'+
+      '<div id="wreadlist"></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'+
+        '<button class="wsay" id="wreadown">📄 اقرأ ما كتبتُه أنا'+trI("Read my own writing")+'</button>'+
+        '<button class="wsay" id="wreadnew">🔄 جملٌ أخرى'+trI("Other sentences")+'</button>'+
+      '</div></div>') : '');
   el.innerHTML = html;
 
   /* ---- الجزء الأول ---- */
   function paintQuiz(list){
     var box=el.querySelector("#wquiz"), h="";
     list.forEach(function(q,i){
-      h+='<div class="wq" data-i="'+i+'" style="margin-top:12px"><div class="num">سؤال '+(i+1)+'</div>'+
+      h+='<div class="wq" data-i="'+i+'" style="margin-top:12px"><div class="num">سؤال '+(i+1)+trI("Question "+(i+1))+'</div>'+
          '<div class="stem">'+q[0]+'</div><div class="wopts">';
       q[1].forEach(function(o,j){ h+='<button data-j="'+j+'">'+o+'</button>'; });
       h+='</div><div class="wexp">'+q[3]+'</div></div>';
@@ -1291,7 +1397,7 @@ function render(el, ctx){
     var t=ta.value.replace(/\s+/g," ").trim();
     var w=t? t.split(/\s+/).filter(function(x){ return /[A-Za-z]/.test(x); }).length : 0;
     var s=splitSentences(t).length;
-    live.textContent=w+" كلمة · "+s+" جملة";
+    live.innerHTML=w+" كلمة · "+s+" جملة"+trI(w+" words · "+s+" sentences");
     bar.style.width=Math.min(100, Math.round(w/cef.minWords*100))+"%";
     try{ localStorage.setItem(draftKey, ta.value); }catch(e){}
   }
@@ -1328,11 +1434,11 @@ function render(el, ctx){
   el.querySelector("#wcheck").addEventListener("click", function(){
     var g=gradeWriting(ta.value, level, cef, prompts[pIdx]);
     var feed=el.querySelector("#wfeed");
-    if(g.words===0){ feed.innerHTML='<div style="color:var(--bad);font-weight:700;margin-top:10px">اكتب '+(level>=3?'مقالك':'فقرتك')+' أولًا ✍️</div>'; return; }
+    if(g.words===0){ feed.innerHTML='<div style="color:var(--bad);font-weight:700;margin-top:10px">اكتب '+(level>=3?'مقالك':'فقرتك')+' أولًا ✍️'+trs(level>=3?"Write your essay first.":"Write your paragraph first.")+'</div>'; return; }
 
     var bcls=function(b){ return b>=4?"wb-hi":(b>=3?"wb-ok":"wb-lo"); };
     var h='<div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">'+
-            '<b style="font-size:1.05rem">النتيجة: <span dir="ltr">'+g.total+' / 20</span></b>'+
+            '<b style="font-size:1.05rem">النتيجة'+trI("Score")+': <span dir="ltr">'+g.total+' / 20</span></b>'+
             '<span class="wband '+(g.pass?"wb-hi":"wb-lo")+'">'+(g.pass?"✅ اجتزت":"⚠️ لم تجتز")+'</span>'+
           '</div>'+
           '<p style="color:var(--muted);font-size:.86rem;margin:4px 0 0">'+
@@ -1359,10 +1465,90 @@ function render(el, ctx){
     } else {
       h+='<div style="margin-top:10px;color:var(--good);font-weight:800">ممتاز! خمسة من خمسة في المقاييس الأربعة 🎉</div>';
     }
+    /* التذكير بالإجباريّ في آخر نتيجة الكتابة — هنا يقف بصرُه فعلًا */
+    if(PRON_OK && readDone() < READ_REQ){
+      h+='<div style="margin-top:10px;background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:10px 12px;font-weight:800;font-size:.93rem">'+
+         '🎙️ باقي عليك <b>'+(READ_REQ-readDone())+'</b> من خمس جملٍ إجباريّةٍ في «الجزء الثالث — اقرأ بصوتك».'+
+         trs("You still have "+(READ_REQ-readDone())+" of 5 required sentences to read aloud in Part 3.")+'</div>';
+    }
     feed.innerHTML=h;
 
     saveParagraph(g, false);
   });
+
+  /* ---- الجزء الثالث: القراءة بصوته ---- */
+  if(PRON_OK){
+    /* العدّ يوميّ: المقصود عادةٌ تتكرّر لا رقمٌ يُبلَغ مرّةً واحدة */
+    var dayKey = "wen_read_"+ctx.who+"_"+new Date(Date.now()+3*3600*1000).toISOString().slice(0,10);
+    var st = { done:0, skip:0, sum:0 };
+    try{ var sv=JSON.parse(localStorage.getItem(dayKey)); if(sv && typeof sv.done==="number") st=sv; }catch(e){}
+    readDone = function(){ return st.done + st.skip; };
+    var saveSt = function(){ try{ localStorage.setItem(dayKey, JSON.stringify(st)); }catch(e){} };
+    var badge = function(){
+      var b=el.querySelector("#wreqbadge"); if(!b) return;
+      var ok = st.done>=READ_REQ;
+      b.className = "wreq"+(ok?" done":"");
+      b.innerHTML = ok ? ('✅ خلّصت الخمس'+(st.sum&&st.done?' · متوسط نطقك '+Math.round(st.sum/st.done)+'%':''))
+                       : ('إجباري: '+st.done+' من '+READ_REQ+(st.skip?' · تخطّى '+st.skip:''));
+    };
+    var paintRead = function(list){
+      var box=el.querySelector("#wreadlist"); if(!box) return;
+      box.innerHTML = list.map(function(sx,i){
+        return '<div class="wread" data-r="'+i+'"><div class="s">'+esc(sx)+'</div>'+
+          '<div class="b"><button class="wsay listen">🔊 استمع</button>'+
+          '<button class="wsay mic go">🎙️ قيّم نطقي</button>'+
+          '<button class="wsay skip" style="display:none">تخطّ هذه</button></div>'+
+          '<span class="fb"></span></div>';
+      }).join("");
+      box.querySelectorAll(".wread").forEach(function(row){
+        var txt=list[+row.getAttribute("data-r")], fb=row.querySelector(".fb");
+        var go=row.querySelector(".go"), sk=row.querySelector(".skip"), fails=0, counted=false;
+        row.querySelector(".listen").addEventListener("click", function(){ ctx.pron.speak(txt); });
+        go.addEventListener("click", function(){
+          ctx.pron.assess(txt, fb, go, function(pron, acc, flu){
+            if(counted) return; counted=true;
+            st.done++; st.sum+=(pron||0); saveSt(); badge();
+            row.classList.add("ok"); go.style.display="none"; sk.style.display="none";
+            /* يُحفظ كتقييم نطقٍ مثل بقيّة الموقع، فيظهر لوالده في قسم «🗣️ النطق» */
+            ctx.save({ kind:"practice", test:"نطق إنجليزي 🗣️", correct:1, total:1,
+                       kindPron:true, pmode:"word", sect:"writing", level:level,
+                       pron:pron, acc:(typeof acc==="number"?acc:null), flu:(typeof flu==="number"?flu:null),
+                       refWords:String(txt).split(/\s+/).length });
+          });
+          /* بعد إخفاقين نفتح بابَ التخطّي: العطلُ في المايك لا يُحبس به ابن */
+          fails++;
+          if(fails>=2) setTimeout(function(){ if(!counted) sk.style.display=""; }, 1500);
+        });
+        sk.addEventListener("click", function(){
+          if(counted) return; counted=true;
+          st.skip++; saveSt(); badge();
+          go.style.display="none"; sk.style.display="none";
+          fb.style.color="var(--muted)"; fb.innerHTML="⏭️ تخطّيتها — والدك يراها متخطّاةً لا مُنجَزة. ارجع لها لمّا يضبط المايك.";
+        });
+      });
+    };
+    var sayList = pickSay(level, ctx.who);
+    paintRead(sayList); badge();
+    el.querySelector("#wreadnew").addEventListener("click", function(){
+      sayList = pickSay(level, ctx.who); paintRead(sayList);
+    });
+    el.querySelector("#wreadown").addEventListener("click", function(){
+      var own = ownSentences(ta.value);
+      if(own.length < 2){
+        var box=el.querySelector("#wreadlist");
+        var w=document.createElement("div"); w.className="wread"; w.style.borderColor="var(--bad)";
+        w.innerHTML='<b style="color:var(--bad)">اكتب فقرتك أوّلًا في الجزء الثاني، ثمّ اقرأها بصوتك.</b>'+
+          trs("Write your paragraph in Part 2 first, then read it aloud.");
+        box.insertBefore(w, box.firstChild);
+        setTimeout(function(){ try{ w.remove(); }catch(e){} }, 5000);
+        return;
+      }
+      /* فقرتُه أوّلًا، ثمّ نُكمل الخمسَ من البنك إن كانت جملُه أقلّ —
+         فلا يبقى الإجباريُّ بعيدَ المنال لمن كتب أربعَ جملٍ فقط. */
+      sayList = own.concat(pickSay(level, ctx.who)).slice(0, READ_REQ);
+      paintRead(sayList);
+    });
+  }
 }
 
 window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN };

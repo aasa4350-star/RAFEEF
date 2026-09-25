@@ -1358,7 +1358,9 @@ function micFailMsg(info){
   return null;
 }
 
-function _paRun(refText, statusEl, btn, tries){
+/* onDone: يصل الدرجةَ لمن طلبها — قسمُ «اقرأ بصوتك» في التعبير يحتاجها
+   ليعدّ الخمسَ الإجباريّةَ ويحفظها. وبقيّةُ النداءات تمرّ بلا نداءٍ كما كانت. */
+function _paRun(refText, statusEl, btn, tries, onDone){
   tries = tries || 0;
   var SDK=window.SpeechSDK, cr=azureCreds(), cfg, audio, rec, pa;
   /* نطلب إذن المايك أوّلًا ثمّ نبدأ التعرّف: على آيفون كانت نافذة «Allow»
@@ -1386,7 +1388,7 @@ function _paRun(refText, statusEl, btn, tries){
   function _retryOrFail(finalMsg){
     if(tries<1){
       statusEl.style.color="var(--muted)"; statusEl.innerHTML="🔁 ما وضح — نعيد المحاولة تلقائيًا، قُل الكلمة مرة ثانية بصوت واضح...";
-      setTimeout(function(){ _paRun(refText, statusEl, btn, tries+1); }, 700);
+      setTimeout(function(){ _paRun(refText, statusEl, btn, tries+1, onDone); }, 700);
     } else { statusEl.style.color="var(--bad)"; statusEl.innerHTML=finalMsg; }
   }
   var _to=setTimeout(function(){ if(_fin) return; _fin=true; _end(); _retryOrFail("⚠️ ما التقطتُ صوتك. قرّب المايك من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية."); }, 15000);
@@ -1412,6 +1414,7 @@ function _paRun(refText, statusEl, btn, tries){
         statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+
           (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-weight:700">'+wordsHtml+'</div>'+
             '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 صحيح · 🟡 وسط · 🔴 راجعه</div>'):' ✅ ممتاز!');
+        if(onDone){ try{ onDone(pron, acc, flu); }catch(e){} }
       }
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();
@@ -1427,12 +1430,12 @@ function _paRun(refText, statusEl, btn, tries){
   }
 }
 var MIC_TAIL = '<div style="font-weight:400;font-size:.85rem;margin-top:6px">وتقدر تكمّل بقيّة الأسئلة عادي — تقييم النطق إضافةٌ لا شرط.</div>';
-function azureAssess(refText, statusEl, btn){
+function azureAssess(refText, statusEl, btn, onDone){
   var cr=azureCreds();
   if(!cr){ statusEl.innerHTML="⚠️ لم يُضبط مفتاح Azure بعد." + MIC_TAIL; return; }
   /* كانت «جرّب بعد ثانية» تعود أبدًا إن لم تصل الأداة — انظر mic-help.js */
   if(!window.SpeechSDK){
-    MIC.waitSDK(statusEl, btn, function(){ azureAssess(refText, statusEl, btn); },
+    MIC.waitSDK(statusEl, btn, function(){ azureAssess(refText, statusEl, btn, onDone); },
       function(){ statusEl.style.color="var(--bad)";
         statusEl.innerHTML="❌ ما قدرت أحمّل أداة تقييم النطق — غالبًا الإنترنت." + MIC_TAIL;
         if(btn){ btn.disabled=false; } });
@@ -1441,7 +1444,7 @@ function azureAssess(refText, statusEl, btn){
   if(btn) btn.disabled=true;
   statusEl.style.color="var(--muted)"; statusEl.innerHTML="🎤 جارٍ تجهيز المايكروفون...";
   try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC){ if(!window.__ac) window.__ac=new AC(); if(window.__ac.state==="suspended") window.__ac.resume(); } }catch(e){} // تنشيط الصوت على iOS
-  _paRun(refText, statusEl, btn); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
+  _paRun(refText, statusEl, btn, 0, onDone); // طلب المايك مرة واحدة مباشرة داخل ضغطة الزر (أثبت على iOS)
 }
 // الجملة الإنجليزية للنطق: لو فيه فراغ نملؤه بالإجابة، وإلا نتدرّب على الإجابة نفسها
 function enTargetQuiz(stemText, ansText){
@@ -2797,6 +2800,10 @@ if(!STUDENTS[who]){
     const CEFR_BY_CHILD = { saud:"A1", osama:"A1", rafeef:"A2", hasan:"B1" };
     WritingEN.render(sec, {
       who: who, name: S.name, level: level, cefr: CEFR_BY_CHILD[who] || "A1",
+      /* طلبُ الأب (٢٥ سبتمبر ٢٠٢٦): «حط قيّم نطقي (إجباري ٥)» في التعبير —
+         نمرّر خدمةَ الصفحة نفسَها التي يستعملها قسمُ الإنجليزي، فلا يتكرّر
+         مسارُ المايكروفون في ملفٍّ ثانٍ ولا يختلف سلوكُه بين قسمين. */
+      pron: { ok: azureConfigured(), assess: azureAssess, speak: azureSpeak },
       save: function(m){
         const payload = { student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0,
                           wrong:[], meta:Object.assign({ at:new Date().toISOString() }, m) };
