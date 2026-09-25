@@ -193,9 +193,8 @@ async function main(){
 
   let rows=[];
   try{
-    const r=await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
-      {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
-    rows=await r.json();
+    /* بصفحاتٍ مرقّمة: سجلُّ الابن تجاوز ألف صفٍّ والخادم يقطع عندها — انظر RR.fetchAll */
+    rows=await RR.fetchAll(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc", SUPA_KEY);
     rows=Array.isArray(rows)?rows:[];
     rows=RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
   }catch(e){}

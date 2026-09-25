@@ -178,6 +178,42 @@
       return dedupe((rows || []).filter(function(r){ return !excluded(r); }));
     },
 
+    /* ═══ الجدولُ تجاوز الألف، والخادمُ يقطع عند الألف ═══════════════
+       سؤالُ الأب (٢٥ سبتمبر ٢٠٢٦) عن سطر «قراءة إنجليزي 📖 (١٧ محاولة ·
+       المتوسط ٨٦٪)»: «التاريخ قديم». وكان في السطر خطآن لا خطأٌ واحد:
+       التاريخُ قديمٌ حقًّا (آخرُ قراءةٍ ٨ سبتمبر)، لكنّ العددَ نفسَه
+       كان ناقصًا: محاولاتُ سعودٍ ستٌّ وعشرون بمتوسّط ٨٨٪ لا سبعَ عشرةَ
+       بـ٨٦٪.
+
+       والسببُ أنّ PostgREST يقطع كلَّ طلبٍ عند ألف صفٍّ ولو طلبتَ أكثر،
+       وسعودٌ تجاوزها (١٢١٦ صفًّا اليوم). فصفحتُه تطلب صفوفَه بطلبٍ
+       واحدٍ فتصل أحدثُ ألفٍ وتسقط ٢١٦ صفًّا من أقدمها بلا خبر — فتُحذف
+       تسعُ محاولاتِ قراءةٍ من العدّ ويتغيّر المتوسّط. وهو عيبٌ يصمت
+       ولا يظهر: الرقمُ يُعرض كأنّه صحيح.
+
+       وكلّما كبر سجلُّ الابن ازداد ما يسقط، وأسامةُ على الحدّ (٩٨٣).
+       وreport.html وحدها كانت تُرقّم صفحاتِ الطلب، فنُقل الترقيمُ هنا
+       ليشترك فيه الجميع. وlimit/offset لا ترويسة Range: المتصفّح يرفض
+       ضبطَ Range من الجافاسكربت وإن سمحت بها CORS. */
+    PAGE: 1000,
+    MAX_PAGES: 20,
+    fetchAll: function(url, key){
+      var self = this, out = [];
+      var sep = (url.indexOf("?") > -1) ? "&" : "?";
+      function page(i){
+        if(i >= self.MAX_PAGES) return Promise.resolve(out);
+        return fetch(url + sep + "limit=" + self.PAGE + "&offset=" + (i * self.PAGE),
+          { headers:{ "apikey":key, "Authorization":"Bearer "+key } })
+          .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+          .then(function(rows){
+            if(!Array.isArray(rows)) rows = [];
+            out = out.concat(rows);
+            return (rows.length < self.PAGE) ? out : page(i+1);
+          });
+      }
+      return page(0);
+    },
+
     /* هل تُعرض ملاحظات هذه الجلسة؟ (خروج · سرعة · غير محتسبة) */
     freshFlag: function(row){ return ageMs(row) <= FLAG_HOURS * 3600e3; },
 

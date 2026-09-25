@@ -374,11 +374,8 @@ function azureQuotaHtml(rows){
   const content = document.getElementById("content");
   status.innerHTML = '<span class="spin"></span> جارٍ التحميل...';
   try{
-    const r = await fetch(SUPA_URL+"/rest/v1/attempts?select=*&order=created_at.desc", {
-      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY }
-    });
-    if(!r.ok){ throw new Error("HTTP "+r.status); }
-    let data = await r.json();
+    /* بصفحاتٍ مرقّمة: الجدول تجاوز ثلاثة آلاف صفٍّ والخادم يقطع عند ألف — انظر RR.fetchAll */
+    let data = await RR.fetchAll(SUPA_URL+"/rest/v1/attempts?select=*&order=created_at.desc", SUPA_KEY);
     data = Array.isArray(data)?data:[];
     /* المحاولات المستثناة تُسقط هنا مرّةً واحدةً قبل أيّ حساب — انظر RR.excluded */
     data = RR.usable(data);
