@@ -1320,6 +1320,11 @@ if(!META[who] || !DATA[who]){
       });
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(text, ar, pfb2, azb); });
       qEl.querySelector(".chk").addEventListener("click",function(){
+        /* خانةٌ فارغةٌ ليست إجابةً خاطئة — انظر التعليل في قسم الكلمات */
+        if(!String(inp.value||"").trim()){
+          fb.className="fb"; fb.innerHTML='✍️ اكتب ما سمعته أوّلًا — وإن ما عرفته اضغط <b>«👁️ أظهر»</b>.';
+          return;
+        }
         var ok = norm(inp.value,ar)===norm(text,ar);
         /* ═══ الدرجة = أوّل محاولة، والكشف لا يُحسب ══════════════════
            بلاغ ٤ سبتمبر ٢٠٢٦ (تقرير حسن): إملاؤه ٩٥٪ وهو أعلى أرقامه.
@@ -2237,6 +2242,10 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML = html;
 
     var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
+    /* الكلماتُ التي لم تُحسب له — مثل الإملاء: الكلمة، وما كتبه، وهل
+       كشفها قبل المحاولة. بها يعرف الأب أين يقف ابنُه بالضبط. */
+    var missed=[];
+    function missedList(){ return missed.slice(0,12); }
     /* كم كلمةً احتاج أن يراها قبل أن يكتبها. نعرضها بجانب الدرجة لأنّ
        «١ / ١٢» وحدها تُقرأ إخفاقًا، وهي في الحقيقة: تذكّر واحدةً وتعلّم
        إحدى عشرة — وهذا ثاني أفضل ما يقع في جلسة مراجعة. */
@@ -2265,7 +2274,7 @@ if(!META[who] || !DATA[who]){
          ووسمُ trusted باقٍ في الصفّ كما هو، فيرى الأب في التقرير أنّ الجلسة
          فيها خروج ويحكم بنفسه — إخبارُ الأب أنفعُ من معاقبة الابن. */
       if(isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
-      if(savedN<total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL,
+      if(savedN<total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(),
           /* الأرقام الثلاثة للتقرير: ما رآه · ما هو قيد التثبيت · ما يعرفه فعلًا */
           known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
           dur:dur, away:aw.away, exits:aw.exits, trusted:trusted, pid:attId }); }
@@ -2282,7 +2291,7 @@ if(!META[who] || !DATA[who]){
       if(isNew) return;
       var tn=Object.keys(tried).length; if(tn<3||tn<=savedN) return;
       savedN=tn; saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
-      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL,
+      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(),
         known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
         dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId });
     }
@@ -2342,6 +2351,16 @@ if(!META[who] || !DATA[who]){
                    : '👀 شفت الإجابة — عادي، بس ما نحسبها صح، وبترجع لك قريب عشان ترسخ.')+'</div>' : '');
       });
       qEl.querySelector(".chk").addEventListener("click",function(){
+        /* ═══ خانةٌ فارغةٌ ليست إجابةً خاطئة ═══════════════════════
+           كانت ضغطةُ «تحقّق» على خانةٍ فارغة تُحسب محاولةً أولى فاشلة:
+           تُصفَّر الدرجة، ويُرجَع صندوقُ الكلمة إلى أوّله. وضغطةٌ واحدة
+           بالخطأ (أو ليرى الجواب) تكفي. وجلساتُ «٠ من ١١» و«٠ من ٢٥»
+           في سجلّهم تحتمل هذا. فمن لم يكتب شيئًا يُذكَّر ولا يُحاسَب،
+           ومن أراد الجواب فله «👁️ أظهر» — وهو الطريق المقصود للتعلّم. */
+        if(!String(ein.value||"").trim()){
+          fb.className="fb"; fb.innerHTML='✍️ اكتب الكلمة أوّلًا — وإن ما عرفتها اضغط <b>«👁️ أظهر»</b> وتعلّمها، وبترجع لك قريب.';
+          return;
+        }
         var enOk = norm(ein.value,false)===norm(word,false);
         /* ═══ الدرجة تعكس أوّل محاولة، لا آخرها ═══════════════════════
            بلاغ الأب (٣١ أغسطس ٢٠٢٦): «مراجعة المحفوظ يجيهم فيها نفس
@@ -2363,6 +2382,9 @@ if(!META[who] || !DATA[who]){
           var scored = enOk && (isNew || !revealed[i]);
           tried[i]=1; markWeak(word, !scored); srMark(word, scored);
           if(scored){ done[i]=1; correct++; }
+          else if(missed.length<12){ missed.push({ w:String(word).slice(0,30),
+                    t:String(ein.value||"").replace(/\s+/g," ").trim().slice(0,30),
+                    seen:!!revealed[i] }); }
           if(revealed[i] && !isNew) seenN++;
           var nx=srNextTxt(word);
           if(enOk && revealed[i] && isNew){ fb.className="fb ok"; fb.innerHTML='✅ صحيح — طبيعي تشوفها، هذي أوّل مرّة تمرّ عليك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
