@@ -379,7 +379,7 @@ async function loadReport(){
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
        «الاختبارات التجريبية» وهو ليس اختبارًا بدرجةٍ من كذا. */
-    var vocabAll=[], readAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[];
+    var vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[];
     practice.forEach(function(p){
       /* مواد فوق الصفّ تُعزل أوّلًا — تُعرض ولا تدخل أيّ متوسّط */
       if(window.RR && RR.isPreview(p)){ prevAll.push(p); return; }
@@ -391,6 +391,11 @@ async function loadReport(){
       if(hidden.some(function(rx){ return rx.test(t); })) return;
       if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
+      /* الإملاء كان يسقط في «الاختبارات التجريبية» مع القدرات وكانجرو،
+         فلا يجد الأب له تقريرًا — طلبه (٢٥ سبتمبر ٢٠٢٦). وإملاءُ لغتي
+         («لغتي م٣ — إملاء…») لا يمسّه هذا: اسمُه يبدأ بالمادّة فيبقى
+         في تقرير المنهج. */
+      else if(t.indexOf("إملاء")===0){ dictAll.push(p); }
       else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
@@ -466,6 +471,36 @@ async function loadReport(){
         html+='<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
           arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
           '</ul>';
+      });
+      html+='</div>';
+    }
+    // ✍️ الإملاء (اسمع واكتب) — طلب الأب (٢٥ سبتمبر ٢٠٢٦): «المفترض يطلع لي تقرير على الإملاء»
+    if(dictAll.length){
+      var dictByT={};
+      dictAll.forEach(function(p){ var t=p.meta.test||"إملاء"; (dictByT[t]=dictByT[t]||[]).push(p); });
+      html+='<div class="sec-title"><span class="dot"></span> ✍️ الإملاء (اسمع واكتب)</div><div class="card">';
+      Object.keys(dictByT).forEach(function(t){
+        var arr=dictByT[t].slice().sort(function(a,b){ return RR.when(a)<RR.when(b)?1:-1; });
+        var avg=Math.round(arr.reduce(function(s2,p){return s2+pct(p.meta.correct,p.meta.total);},0)/arr.length);
+        var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
+        html+='<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط <b style="color:'+acol+'">'+avg+'%</b>)</span></div><ul class="weak">'+
+          arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total);
+            return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(RR.when(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
+          '</ul>';
+        /* الكلماتُ التي أخطأ فيها — أنفعُ ما في التقرير: يُمليها عليه الأب */
+        var miss={}, seenAny=false;
+        arr.slice(0,5).forEach(function(p){ (p.meta.missed||[]).forEach(function(m){
+          if(!m || !m.w) return; seenAny=true;
+          var e=miss[m.w]||(miss[m.w]={n:0,t:""}); e.n++; if(!e.t && m.t) e.t=m.t; }); });
+        if(seenAny){
+          var ws=Object.keys(miss).sort(function(a,b){ return miss[b].n-miss[a].n; }).slice(0,12);
+          html+='<div style="background:var(--bg);border-radius:10px;padding:9px 12px;margin:2px 0 10px;font-size:.9rem">'+
+            '<b>✏️ كلمات أخطأ في كتابتها</b> <span class="cnt">(من آخر '+Math.min(5,arr.length)+' محاولات — أملِها عليه)</span><div style="margin-top:5px">'+
+            ws.map(function(w){ var e=miss[w];
+              return '<span style="display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:3px 9px;margin:3px 3px 0 0" dir="auto"><b>'+w+'</b>'+
+                (e.t?' <span style="color:var(--bad)">← كتب: '+e.t+'</span>':'')+(e.n>1?' <span class="cnt">×'+e.n+'</span>':'')+'</span>'; }).join("")+
+            '</div></div>';
+        }
       });
       html+='</div>';
     }

@@ -1260,9 +1260,17 @@ if(!META[who] || !DATA[who]){
       '<button class="chk" data-regen style="width:100%;margin-top:12px">كلمات جديدة 🔄</button>';
     sec.innerHTML = html;
     var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), total=items.length, scoreEl=sec.querySelector("[data-score]");
+    /* ═══ الكلماتُ التي أخطأ في كتابتها — وما كتبه هو ═══════════════
+       طلب الأب (٢٥ سبتمبر ٢٠٢٦): «شيك على قسم الإملاء… المفترض يطلع
+       لي تقرير على الإملاء». والدرجةُ وحدها («٣ / ٨») لا يُعمل بها:
+       الأبُ يريد أن يعرف أيّ كلمةٍ يخطئ فيها ابنُه ليُمليها عليه، وأن
+       يرى صورةَ الخطأ — فمن كتب «becuase» غيرُ من كتب «bkoz». فنحفظ
+       الكلمة الصحيحة وما كتبه الابنُ فعلًا، عشرًا على الأكثر. */
+    var missed=[];
+    function missedList(){ return missed.slice(0,10); }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId}); } }
-    function savePartial(){ var n=Object.keys(tried).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId}); }
+    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); } }
+    function savePartial(){ var n=Object.keys(tried).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); }
     /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
        إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
 
@@ -1325,6 +1333,10 @@ if(!META[who] || !DATA[who]){
           var scored = ok && !revealed[i];
           tried[i]=1;
           if(scored){ done[i]=1; correct++; }
+          /* لا تُحسب صحيحةً ⇐ تُقيَّد: الكلمة، وما كتبه، وهل كشفها قبلها */
+          else if(missed.length<10){ missed.push({ w:String(text).slice(0,40),
+                    t:String(inp.value||"").replace(/\s+/g," ").trim().slice(0,40),
+                    seen:!!revealed[i] }); }
           if(ok && revealed[i]) { fb.className="fb"; fb.innerHTML='👀 كتبتها صح بعد ما شفتها — ما نحسبها، جرّب اللي بعدها بنفسك.'+meanTag(text); }
           else if(ok){ fb.className="fb ok"; fb.innerHTML="✅ صحيح!"+meanTag(text); }
           else{ fb.className="fb no"; fb.innerHTML='❌ حاول مرة ثانية · الصحيح: <span class="corr">'+text+'</span>'+meanTag(text); }
