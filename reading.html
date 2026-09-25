@@ -1819,6 +1819,14 @@ if(!META[who] || !DATA[who]){
     if(!srRecalled(st)) return true;
     return idx >= Math.max(0, learned - FRESH_WINDOW);
   }
+  /* عدد ما في خانة «ما ثبتت بعد» — كان يُحسَب داخل فرعِ العرضِ وحدَه،
+     فكان الزرُّ يظهر ولو كانت الخانةُ فارغةً ولا يُعلِم بعددِها. */
+  function freshCount(learned){
+    var srf=getSR(), n=0;
+    for(var i=0;i<learned && i<VOCAB300.length;i++)
+      if(isFreshWord(srf[VOCAB300[i][0]], i, learned)) n++;
+    return n;
+  }
   /* عدد ما عُرض ولم يُسترجَع قطّ */
   function srDebt(learned){
     var s=getSR(), n=0;
@@ -1897,7 +1905,7 @@ if(!META[who] || !DATA[who]){
     if(vocMode==="fresh"){
       /* خانة مراجعة الجديد — طلبها حسن نصًّا: الكلمات التي حفظها حديثًا
          ولم ترسخ بعد، مجموعةً وحدها بعيدًا عن طابور المحفوظ القديم. */
-      headTitle = "🆕 مراجعة الكلمات الجديدة";
+      headTitle = "🔂 كلمات ما ثبتت بعد";
       var srf = getSR(), wkf = getWeak();
       /* الجديد يُعرَّف بالذاكرة لا بالموضع: كلمةٌ عُرضت ولم تُسترجَع قطّ
          تبقى هنا مهما تقادم موضعها — وإلّا خرجت من «الجديد» بعد أربعة
@@ -2081,13 +2089,24 @@ if(!META[who] || !DATA[who]){
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
-      (learned>0 ? '<div class="row" style="gap:8px;margin-bottom:12px">'+btn("fresh","🆕 راجع الجديد")+'</div>' : '')+
+      /* بلاغ الأب (٢٥ سبتمبر ٢٠٢٦): «ليش تحط لفهد راجع الجديد؟ وهو كل شي
+         أصلًا عليه جديد». وكان محقًّا في اللفظ: زرّان يقولان «جديد»
+         ويعنيان ضدّين — «تعلّم جديدة» كلماتٌ لم تُعرَض بعد، و«راجع
+         الجديد» كلماتٌ عُرضت ولم تثبت. فمن لم يحفظ إلّا عشرًا يقرأ
+         الاثنين فلا يفرّق. فصار الوسمُ يسمّي الخانةَ بحقيقتِها ويُظهِر
+         عددَها، ولا يظهر الزرُّ إن كانت فارغةً (كان يظهر بمجرّد learned>0
+         فيفتح شاشةً لا كلمةَ فيها). */
+      (function(){
+        var fc = freshCount(learned);
+        return fc>0 ? '<div class="row" style="gap:8px;margin-bottom:12px">'+
+          btn("fresh","🔂 كلمات ما ثبتت بعد ("+fc+")")+'</div>' : '';
+      })()+
       (vocMode==="review" && learned>VOC_STEP ? sizeBar(learned) : '')+
       '<div data-daybanner style="background:linear-gradient(135deg,var(--accent-deep,#047857),var(--accent));color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:12px;font-weight:800;text-align:center;line-height:1.6">'+vocMotiv(getDay().count,getDay().best)+'</div>';
 
     if(!V.length){
       if(vocMode==="fresh"){
-        html += '<div class="q" style="text-align:center">✅ ما شاء الله — كل كلماتك الجديدة رسخت! انتقل لـ«راجع المحفوظ» 🔁 أو تعلّم كلماتٍ جديدة 📚</div>';
+        html += '<div class="q" style="text-align:center">✅ ما شاء الله — ما بقيت كلمة غير ثابتة! انتقل لـ«راجع المحفوظ» 🔁 أو تعلّم كلماتٍ جديدة 📚</div>';
       } else if(vocMode==="review"){
         html += '<div class="q" style="text-align:center">لسّا ما حفظت كلمات. اضغط «تعلّم '+VOC_STEP_AR+' جديدة» أول 📚</div>';
       } else if(gated){
@@ -2112,7 +2131,7 @@ if(!META[who] || !DATA[who]){
     }
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+goal+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
-                : vocMode==="fresh" ? '<p class="hint">🆕 <b>الكلمات الجديدة:</b> كلماتٌ مرّت عليك ولم تثبت بعد — ومنها ما طلع غلط أوّل مرّة فرجع لك. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم، ونبدأ بالي ما طلعت صح ولا مرّة. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁</p>'
+                : vocMode==="fresh" ? '<p class="hint">🔂 <b>كلمات ما ثبتت بعد:</b> كلماتٌ مرّت عليك ولم تثبت — ومنها ما طلع غلط أوّل مرّة فرجع لك. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم، ونبدأ بالي ما طلعت صح ولا مرّة. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁</p>'
                           : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
                             (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
                             (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
