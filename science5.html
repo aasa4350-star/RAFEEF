@@ -70,10 +70,15 @@ var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
 /* معرّف المحاولة — الحفظ الجزئيّ لا يُقفل الجلسة بعده (انظر math8.html) */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
-function saveScore(test, correct, total, pid){
+/* طلبُ الأب (٢٥ سبتمبر ٢٠٢٦): «سوّ تفصيل المهارات لصفحات المنهج».
+   كانت هذه الصفحةُ تحفظ الدرجةَ وحدَها، فيطبع التقريرُ «[بلا تفصيل
+   مهارات]» ويعمى العلاجيُّ عن موضعِ الخلل. فصار extra يُدمَج في meta
+   ليحمل skills وitems كما في math9.html. */
+function saveScore(test, correct, total, pid, extra){
   try{
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
-      meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null } };
+    var meta = { kind:"practice", test:test, correct:correct, total:total, pid:pid||null };
+    if(extra) for(var __k in extra) meta[__k]=extra[__k];
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
@@ -629,13 +634,30 @@ var L62 = [
    "التلوّث لا يقف عند حدود: الهواء والماء ينتقلان بما فيهما."]
 ];
 
-function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), p[2]]; }; }
-var L11G=[bankGen(L11)], L12G=[bankGen(L12)];
-var L21G=[bankGen(L21)], L22G=[bankGen(L22)];
-var L31G=[bankGen(L31)], L32G=[bankGen(L32)];
-var L41G=[bankGen(L41)], L42G=[bankGen(L42)];
-var L51G=[bankGen(L51)], L52G=[bankGen(L52)];
-var L61G=[bankGen(L61)], L62G=[bankGen(L62)];
+/* ═══ وسمُ سؤالِ البنكِ الثابت ══════════════════════════════════════
+   بنوكُ الدروسِ تُلفّ في دالّةٍ مجهولةِ الاسم، فكان f.name فراغًا وq.__g
+   فراغًا، فلا يعرف التقريرُ عن الجلسةِ إلّا درجتَها — وهو ما طبعه تقريرُ
+   حسنٍ «[بلا تفصيل مهارات]». فصار كلُّ سؤالٍ يحمل مفتاحَ بنكِه ورقمَه
+   فيه («L2#17»)، فيُعرَف السؤالُ بعينِه لا درسُه فقط، ويُعرَف أيُّ خيارٍ
+   اختاره. ووسمُ المهارةِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع
+   اسمِ الدرسِ المعروضِ على الشاشة. */
+function bankGen(bank, key){
+  var f = function(){
+    var i = Math.floor(Math.random()*bank.length), p = bank[i];
+    var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o);
+    var r = [p[0], o, o.indexOf(p[1][0]), p[2]];
+    r.__bk = (key||"")+"#"+i;
+    return r;
+  };
+  f.__bank = key || "";
+  return f;
+}
+var L11G=[bankGen(L11,"L11")], L12G=[bankGen(L12,"L12")];
+var L21G=[bankGen(L21,"L21")], L22G=[bankGen(L22,"L22")];
+var L31G=[bankGen(L31,"L31")], L32G=[bankGen(L32,"L32")];
+var L41G=[bankGen(L41,"L41")], L42G=[bankGen(L42,"L42")];
+var L51G=[bankGen(L51,"L51")], L52G=[bankGen(L52,"L52")];
+var L61G=[bankGen(L61,"L61")], L62G=[bankGen(L62,"L62")];
 var ALL1G=[L11G[0],L12G[0]], ALL2G=[L21G[0],L22G[0]], ALL3G=[L31G[0],L32G[0]];
 var ALL4G=[L41G[0],L42G[0]], ALL5G=[L51G[0],L52G[0]], ALL6G=[L61G[0],L62G[0]];
 
@@ -720,6 +742,61 @@ if(!NAMES[who]){
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
     var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
+    /* تفصيلُ المهارات: لكلِّ سؤالٍ وسمُه وأصاب أم أخطأ وكم مكث. والعتبةُ
+       حدٌّ أدنى صريحٌ لا رقمٌ معاير — المعياريّةُ تُحسَب عند التحليلِ من
+       تاريخِ الطفلِ نفسِه (كما شُرح في math9.html). */
+    var RG_MS = 2000;
+    var SKILLS={}, ITEMS=[], __t0=Date.now(), __lastTs=__t0, __fastN=0;
+    function __meta(n){
+      return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
+               trusted: (__fastN < Math.ceil(n/2)),
+               skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+    }
+    /* وسمُ بنكِ الدرسِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع اسمِ
+       الدرسِ المعروضِ على الشاشة. ويُقرأ عند الحاجةِ لا عند التحميلِ،
+       فلا يتعلّق بترتيبِ التعريفات. */
+    function __bankAr(key){
+      try{
+        if(typeof CFG==="undefined" || !CFG) return null;
+        var ks=Object.keys(CFG);
+        for(var i=0;i<ks.length;i++){
+          if(/^all/.test(ks[i])) continue;          /* الشاملُ يخلط الدروس */
+          var c=CFG[ks[i]];
+          if(c && Array.isArray(c.gens) && c.gens.some(function(g){ return g && g.__bank===key; }))
+            return c.label || c.tab || null;
+        }
+      }catch(e){}
+      return null;
+    }
+    function __genLessonAr(gname){
+      if(!gname) return null;
+      try{
+        if(typeof CFG==="undefined" || !CFG) return null;
+        var ks=Object.keys(CFG);
+        for(var i=0;i<ks.length;i++){
+          if(/^all/.test(ks[i])) continue;
+          var c=CFG[ks[i]];
+          if(c && Array.isArray(c.gens) && c.gens.some(function(g){ return g && g.name===gname; }))
+            return c.label || c.tab || null;
+        }
+      }catch(e){}
+      return null;
+    }
+    function __tally(it, ok, j, ans){
+      /* __bk أوّلًا: بنوكُ الدروسِ دوالُّ مجهولةُ الاسمِ فـ f.name لا يدلّ */
+      var g = (it && (it.__bk || it.__sk || it.__g)) || "";
+      var sk, __mb = /^([A-Za-z0-9_]+)#\d+$/.exec(g);
+      if(__mb) sk = __bankAr(__mb[1]) || __mb[1];
+      /* لا يُطبَع اسمُ دالّةٍ في تقريرٍ يقرأه الأبُ أبدًا — وهو عيبٌ وقع
+         في math9.html فظهر «gConsecFamily» في تقريرِ حسن. فإن لم يكن
+         للمولّدِ وسمٌ عربيٌّ في GEN_AR نزلنا إلى اسمِ درسِه من CFG،
+         وهو أخشنُ من الوسمِ لكنّه صحيحٌ ومفهوم. */
+      else sk = (typeof GEN_AR!=="undefined" && GEN_AR[g]) || __genLessonAr(g) || "غير محدّد";
+      var now=Date.now(), ms=now-__lastTs; __lastTs=now;
+      if(ms < RG_MS) __fastN++;
+      var s = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); s.t++; if(ok) s.c++;
+      ITEMS.push({ g:g, ok:(ok?1:0), ms:ms, j:j, a:ans });
+    }
     var TALLY={};   /* نتيجةُ كلّ درسٍ داخل الاختبار الشامل */
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -729,18 +806,19 @@ if(!NAMES[who]){
           if(answered[i]) return; answered[i]=1;
           qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
           var __ok = (+btn.dataset.j===ans);
+          __tally(items[i], __ok, +btn.dataset.j, ans);
           if(/^all/.test(id)){ var __t=topicOfGen(items[i].__g, items[i].__gf); if(__t){ var __e=TALLY[__t]||(TALLY[__t]={c:0,t:0}); __e.t++; if(__ok) __e.c++; } }
           if(__ok){ btn.classList.add("correct"); correct++; }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid);
+          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid, __meta(total));
             if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
         });
       });
     });
     /* الحفظ الجزئيّ لا يُقفل الجلسة بعده — انظر شرحه في math8.html */
-    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid, __meta(n)); if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }
