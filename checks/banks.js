@@ -42,6 +42,19 @@ function walk(src, start, open, close) {
   return -1;
 }
 
+/* نصُّ السؤال بعد تجريده من التشكيل واختلاف الهمزات والتاء المربوطة
+   والترقيم — فالطفل يرى «وحدة قياس الطاقة في النظام الدولي» و«… الدوليّ»
+   سؤالًا واحدًا مرّتين، ومقارنةُ النصوص حرفًا بحرفٍ لا تكشف ذلك.
+   والأرقام والرموز اللاتينية تبقى، فهي ما يفرّق أسئلة الحساب بعضها من بعض. */
+function flatStem(stem) {
+  return String(stem)
+    .replace(/[ً-ْٰـ]/g, '')
+    .replace(/[أإآ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+    /* الأرقام الهندية (٠-٩) تبقى كاللاتينية، وإلّا تساوى «الآية ١٢» و«الآية ١٣» */
+    .replace(/[^ء-ي٠-٩a-zA-Z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
 function arrayLiteral(src, name) {
   const m = new RegExp('\\b' + name + '\\s*=\\s*\\[').exec(src);
   if (!m) return null;
@@ -61,9 +74,12 @@ module.exports = function banks() {
     const src = fs.readFileSync(path.join(dir, file), 'utf8');
     if (!/bankGen\s*\(/.test(src)) return;
 
-    /* اسم مصفوفة المولّدات → اسم البنك:  var L1G=[bankGen(L1)] */
+    /* اسم مصفوفة المولّدات → اسم البنك:  var L1G=[bankGen(L1)]
+       وقد تأخذ bankGen وسيطًا ثانيًا للتمييز — var N1G=[bankGen(N1,"N1")] —
+       فلا يُشترط أن ينتهي القوس بعد اسم البنك، وإلّا سقط البنك من الفحص
+       بصمتٍ كما سقطت بنوك العلوم كلُّها حين أُضيف الوسيط. */
     const genOf = {};
-    for (const m of src.matchAll(/(\w+)\s*=\s*\[\s*bankGen\(\s*(\w+)\s*\)/g)) genOf[m[1]] = m[2];
+    for (const m of src.matchAll(/(\w+)\s*=\s*\[\s*bankGen\(\s*(\w+)\s*[,)]/g)) genOf[m[1]] = m[2];
 
     /* مدخل CFG: id:{ ... gens:L1G ... n:10 ... } */
     for (const m of src.matchAll(/(\w+)\s*:\s*\{[^\n]*?gens:\s*(\w+)[^\n]*?n:\s*(\d+)/g)) {
@@ -103,6 +119,7 @@ module.exports = function banks() {
 
       /* سلامة البنك نفسه: سؤالٌ مكرّر أو خيارٌ مُعاد يُنقص السعة الحقيقية */
       const stems = new Set();
+      const words = [];      /* كلماتُ كلّ سؤالٍ لكشف المتقارب لا المتطابق فقط */
       arr.forEach((q, i) => {
         if (!Array.isArray(q) || !Array.isArray(q[1])) {
           issues.push({ sev: 'خطأ', msg: where + ' — المدخل ' + i + ' ليس على صيغة [سؤال، خيارات، شرح]' });
@@ -111,11 +128,30 @@ module.exports = function banks() {
         const stem = String(q[0]).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
         if (stems.has(stem)) issues.push({ sev: 'تنبيه', msg: where + ' — سؤالٌ مكرّر داخل البنك: ' + stem.slice(0, 50) });
         stems.add(stem);
+        words.push({ i, stem, flat: flatStem(stem) });
         const opts = q[1].map(x => String(x).replace(/<[^>]*>/g, '').trim());
         if (new Set(opts).size !== opts.length) {
           issues.push({ sev: 'خطأ', msg: where + ' — خياران متطابقان في: ' + stem.slice(0, 50) });
         }
       });
+
+      /* سؤالان نصُّهما واحدٌ إلّا حرفَ تشكيلٍ أو كلمةَ ربطٍ في آخره:
+         «في البطارية تتحوّل الطاقة من:» و«في البطارية تتحوّل الطاقة:».
+         الشرط أن يكون أحدهما داخلًا في الآخر نصًّا، وأن يقاربه طولًا —
+         فبالطول يسلم ما زاد قيدًا فغيّر المعنى («من طرق انتقال العدوى»
+         مع «… العدوى الهوائية»)، وبالنصّ تسلم أسئلة الحساب التي لا
+         يفرّقها إلّا رقمُها. */
+      for (let a = 0; a < words.length; a++) {
+        for (let b = a + 1; b < words.length; b++) {
+          const A = words[a].flat, B = words[b].flat;
+          if (!A || !B) continue;
+          const lo = A.length <= B.length ? A : B, hi = A.length <= B.length ? B : A;
+          if (hi.indexOf(lo) < 0) continue;
+          if (lo.length / hi.length < 0.72) continue;
+          issues.push({ sev: 'تنبيه', msg: where + ' — سؤالان بمعنًى واحد (' + words[a].i + '، ' + words[b].i +
+            '): «' + words[a].stem.slice(0, 40) + '» و«' + words[b].stem.slice(0, 40) + '»' });
+        }
+      }
     }
   });
 
