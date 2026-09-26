@@ -15,6 +15,8 @@
 <script src="report-rules.js"></script>
 <script src="azure-config.js"></script>
 <script src="writing-en.js"></script>
+<!-- بنك العربية للمرحلة المتوسّطة (رفيف وحسن) — انظر رأس الملفّ -->
+<script src="arabic-mid.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
      كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
      يصل أجهزة الأولاد الأربعة من تلقائه ويكسر التسجيل بلا أن نلمس
@@ -1164,6 +1166,9 @@ const LESSONS = {
 // ===== مادة اللغة العربية (أسئلة + إملاء) =====
 const ARABIC = {
   hasan: {
+    /* الإملاءُ هنا مخفيٌّ عن حسنٍ ورفيف بطلب الأب (٢ سبتمبر ٢٠٢٦):
+       إملاؤهما الأوسع في reading.html. وقد نُقلت الجملُ الأربعون التي
+       كُتبت لهما إلى هناك حيث تُستعمل فعلًا، لا هنا حيث لا تُعرض. */
     dictation:["إنَّ مَعَ العُسْرِ يُسْرًا.","مَنْ جَدَّ وَجَدَ وَمَنْ زَرَعَ حَصَدَ.","العَقْلُ السَّلِيمُ فِي الجِسْمِ السَّلِيمِ.","الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ.","خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ."],
     quiz:[
       ["أعرب كلمة «محمدٌ» في: محمدٌ مسافرٌ.",["مبتدأ مرفوع","فاعل","مفعول به"],0,"محمدٌ مبتدأ مرفوع بالضمة."],
@@ -1177,6 +1182,7 @@ const ARABIC = {
     ]
   },
   rafeef: {
+    /* مخفيٌّ عنها كذلك — انظر التعليل في بنك حسن أعلاه */
     dictation:["العِلْمُ نُورٌ يُنِيرُ طَرِيقَ الإِنْسَانِ.","الصِّدْقُ صِفَةٌ يُحِبُّهَا النَّاسُ.","نَظَافَةُ البِيئَةِ مَسْؤُولِيَّةُ الجَمِيعِ.","القِرَاءَةُ غِذَاءُ العَقْلِ.","التَّعَاوُنُ يُقَوِّي المُجْتَمَعَ."],
     quiz:[
       ["«المجتهدُ ناجحٌ» نوع الجملة:",["فعلية","اسمية","شرطية"],1,"تبدأ باسم → اسمية."],
@@ -2476,22 +2482,107 @@ if(!STUDENTS[who]){
   function aComp(){var it=gpick(AR_COMP),c=it[1][it[2]],ds=it[1].filter(function(_,k){return k!==it[2];}),o=opt3(c,ds);return [it[0],o[0],o[1],"الكلمة المناسبة للسياق: "+c+".","ar"];}
   var AGEN=[aOpp,aSyn,aPlu,aMean,aType,aComp];
 
+  /* ═══ العربيّةُ بمستوى صفّه لا بمستوًى واحدٍ للجميع ═══════════════
+     بلاغ الأب (٢٦ سبتمبر ٢٠٢٦): «قسم العربي عند حسن مكرّر دائمًا وسهل
+     جدًّا… وأظنّ كلّهم نفسه». والمولّدات الستّ أعلاه (ضدّ · مرادف ·
+     جمع · معنى · نوع الكلمة · إكمال جملة) كانت تُعرض على الأربعة
+     سواءً — وهي مفرداتُ ابتدائيّةٍ دنيا، فحقٌّ لثالثٍ متوسّطٍ أن
+     يقول «أقلّ من مستواي».
+     فصار لكلّ صفٍّ مجموعتُه: الابتدائيُّ على حاله، والمتوسّطُ على
+     نحوٍ وصرفٍ وإملاءٍ وبلاغةٍ وأساليبَ ودلالةٍ سياقيّة (arabic-mid.js). */
+  var MID = (window.AR_MID || {});
+  /* مفتاحٌ فريدٌ لكلّ مدخلٍ: ذاكرةُ «لا تُعِد ما رأيتَه» تُميّز بالمفتاح
+     لا بنصّ السؤال — وأسئلةُ الإملاء كلُّها نصُّها «الكتابة الصحيحة:»،
+     فلو مُيّزت بالنصّ لظهر منها سؤالٌ واحدٌ أبدًا وسقط البنك كلُّه. */
+  function midGen(bank, tag){
+    if(!bank || !bank.length) return null;
+    /* صياغاتٌ ثلاثٌ لسؤال الإملاء: بنكُه كلُّه نصُّه واحدٌ («الكتابة
+       الصحيحة:»)، فلو جاء سؤالان منه في جولةٍ واحدةٍ بدا للابن تكرارًا
+       وهما كلمتان مختلفتان. والمفتاحُ يبقى واحدًا فلا تختلّ الذاكرة. */
+    var IMLA_ASK = ["الكتابة الصحيحة:", "اختر الكتابة الصحيحة:", "أيُّ الكلمات مكتوبةٌ كتابةً صحيحة؟"];
+    var f = function(){
+      var i = Math.floor(Math.random()*bank.length), p = bank[i];
+      var o = opt3(p[1], [p[2], p[3]]);
+      var stem = p[0];
+      if(tag==="imla" && stem==="الكتابة الصحيحة:") stem = IMLA_ASK[i % IMLA_ASK.length];
+      var q = [stem, o[0], o[1], p[4], "ar"];
+      q.key = tag + ":" + i;
+      return q;
+    };
+    f.pool = bank.length;
+    return f;
+  }
+  var aIrab = midGen(MID.IRAB,"irab"),  aSarf = midGen(MID.SARF,"sarf");
+  var aImla = midGen(MID.IMLA,"imla"),  aBal  = midGen(MID.BALAGHA,"bal");
+  var aUslub= midGen(MID.USLUB,"usl"),  aDal  = midGen(MID.DALALA,"dal");
+
+  /* ═══ أسئلةُ الابن المكتوبةُ له خاصّةً — كانت معطّلة ═══════════════
+     في ARABIC[who].quiz ثمانيةُ أسئلةٍ في مستوى كلِّ ابنٍ (إعرابٌ
+     وبلاغةٌ وإملاءٌ لحسن ورفيف)، ولم تكن تُستعمل قطّ: renderArb تنادي
+     المولّدات المشتركة وحدها. فصارت مولّدًا كبقيّتها. */
+  function ownGen(who2){
+    var A = ARABIC[who2], b = (A && A.quiz) || [];
+    if(!b.length) return null;
+    var f = function(){
+      var i = Math.floor(Math.random()*b.length), p = b[i];
+      var c = p[1][p[2]], ds = p[1].filter(function(_,k){ return k!==p[2]; });
+      var o = opt3(c, ds);
+      var q = [p[0], o[0], o[1], p[3]||("الصحيح: "+c+"."), "ar"];
+      q.key = "own:" + i;
+      return q;
+    };
+    f.pool = b.length;
+    return f;
+  }
+  function arGensFor(who2){
+    var own = ownGen(who2), mid = [aIrab,aSarf,aImla,aBal,aUslub,aDal].filter(Boolean);
+    var basic = [aOpp,aSyn,aPlu,aMean,aType,aComp];
+    var set;
+    if(who2==="hasan" || who2==="rafeef" || who2==="fahad"){
+      /* المتوسّطُ فما فوق: البنكُ المتوسّط ومعه «المعنى» وحدَه من القديم
+         (وهو الوحيد الذي مفرداته فوق الابتدائيّ) */
+      set = mid.concat([aMean]);
+    } else if(who2==="osama"){
+      /* الخامس: أساسيّاتُه ومعها الإملاءُ والأساليبُ — أوّلُ ما يُدرَّس له */
+      set = basic.concat([aImla, aUslub].filter(Boolean));
+    } else {
+      set = basic;
+    }
+    if(own) set = set.concat([own]);
+    return set;
+  }
+  /* سعةُ البنك تُحسب من المجموعة العاملة لا من بنكٍ ثابت، وإلّا صُفّرت
+     الذاكرةُ قبل أوانها أو تأخّرت عنه */
+  var AR_BASIC_TOTAL = AR_OPP.length + AR_SYN.length + AR_PLU.length + AR_MEAN.length + AR_TYPE.length + AR_COMP.length;
+  var AR_BASIC_POOL = { aOpp:AR_OPP.length, aSyn:AR_SYN.length, aPlu:AR_PLU.length,
+                        aMean:AR_MEAN.length, aType:AR_TYPE.length, aComp:AR_COMP.length };
+  function arPoolTotal(gens){
+    var n = 0;
+    gens.forEach(function(f){ n += (f.pool || AR_BASIC_POOL[f.name] || 20); });
+    return n;
+  }
+
   /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «والأسئلة كمان ركز عليها» — نفس علّة
      الإملاء أعلاه، بس هنا للأسئلة: genN() العادي يمنع تكرار السؤال
      داخل الجولة نفسها فقط، ولا يتذكّر شيئًا بين الجولات، فتتكرّر نفس
      الأسئلة تقريبًا عند كل ضغطة «أسئلة جديدة». والبنك الكلي هنا كبيرٌ
      فعلًا (~٢٠٩ سؤالًا مختلفًا عبر الأنواع الستّة) فيستحقّ نفس أسلوب
      الذاكرة المتباعدة المستعمل في الإملاء أعلاه، بدل أن يضيع بلا فائدة. */
-  var AR_POOL_TOTAL = AR_OPP.length + AR_SYN.length + AR_PLU.length + AR_MEAN.length + AR_TYPE.length + AR_COMP.length;
+  var AR_POOL_TOTAL = AR_BASIC_TOTAL;   /* يُعاد حسابه لكلّ مجموعةٍ في genNFreshAr */
   function genNFreshAr(gens, n, key){
     var k = "seen_"+key+"_"+who;
     var seen; try{ seen=JSON.parse(localStorage.getItem(k)||"{}")||{}; }catch(e){ seen={}; }
-    if(Object.keys(seen).length + n > AR_POOL_TOTAL) seen = {};
+    var total = arPoolTotal(gens);
+    if(Object.keys(seen).length + n > total) seen = {};
     var out=[], tries=0;
     while(out.length<n && tries<n*40){
       var f=gpick(gens), q=f(); tries++;
-      if(seen[q[0]]) continue;
-      seen[q[0]]=1;
+      /* المفتاحُ أوّلًا ثمّ نصُّ السؤال: أسئلةُ الإملاء تشترك في النصّ
+         («الكتابة الصحيحة:») وتختلف في المفتاح، فلو مُيّزت بالنصّ
+         لظهر منها واحدٌ لا غير. */
+      var idk = q.key || q[0];
+      if(seen[idk]) continue;
+      seen[idk]=1;
       if(f.name && QSKILL_AR[f.name]) q.gen = QSKILL_AR[f.name];
       if(f.name) q.genFn = f.name;
       out.push(q);
@@ -2512,7 +2603,7 @@ if(!STUDENTS[who]){
     if(!A){ sec.innerHTML='<div class="locked">قسم العربية غير متاح.</div>'; return; }
     const showDict = !NO_QUIZ_DICTATION[who];
     const dict = showDict ? pickFresh(A.dictation, "dictarbquiz", 6) : [];
-    const arq = genNFreshAr(AGEN, 8, "arbq");
+    const arq = genNFreshAr(arGensFor(who), 8, "arbq");
     let h = "";
     if(showDict){
       h += '<div class="block-title"><span class="dot"></span> الإملاء (اسمع واكتب)</div>'+
