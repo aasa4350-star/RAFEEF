@@ -3449,8 +3449,9 @@ var U10_RT = [
   ["Take your time.","Don't hurry.",["Be quick, please.","Give me the time."]]
 ];
 var u10RealTalk = vocabGen(U10_RT,
-  "من عبارات المحادثة (<span class=ltr>Real Talk</span>): أوّلاها في الوحدة "+
-  "<span class=ltr>10</span> (ص <span class=ltr>115</span>)، وما بعدها عباراتٌ شائعةٌ من جنسها.", "u10rt");
+  "من عبارات المحادثة (<span class=ltr>Real Talk</span>): الأوليان في صندوق الكتاب بالوحدة "+
+  "<span class=ltr>10</span> (ص <span class=ltr>115</span>) — <span class=ltr>At long last! = Finally!</span> و"+
+  "<span class=ltr>That's a bit too much. = This has gone too far.</span> — وما بعدهما عباراتٌ شائعةٌ من جنسهما.", "u10rt");
 
 /* محادثة أمل وسارة عن قريمي (ص ١١٥) */
 var U10_SARAH = [
@@ -3628,7 +3629,9 @@ var U12_INF = [
   ["We didn't expect ___ so late. (arrive)","to arrive",["arriving","arrive"]],
   ["They managed ___ an earlier flight. (get)","to get",["getting","get"]],
   ["The airline refused ___ for our hotel. (pay)","to pay",["paying","pay"]],
-  ["I didn't remember ___ my toothpaste. (bring)","to bring",["bringing","bring"]],
+  /* «toothbrush» لا «toothpaste»: هكذا هي في صندوق القواعد (ص ١٣٢)،
+     وصورةُ الصفحة من الأب أظهرت الفرق. */
+  ["I didn't remember ___ my toothbrush. (bring)","to bring",["bringing","bring"]],
   ["She tried ___ on the plane, but she couldn't. (sleep)","to sleep",["sleeping","sleep"]]
 ];
 var u12Infinitive = clozeGen(U12_INF,
@@ -3657,6 +3660,8 @@ var u12VerbNounInf = clozeGen(U12_VNI,
   "ثم مصدرًا بـ<span class=ltr>to</span>: <span class=ltr>allow children to stay up</span> (ص <span class=ltr>132</span>).", "u12vn");
 
 /* It's ... + infinitive (ص ١٣٢–١٣٣) */
+/* صندوق الكتاب يعدّ ثماني صفاتٍ بعد It's، وكان في البنك أربعٌ منها.
+   فأُتمّت بالباقي: not polite / impolite / rude / wrong (ص ١٣٢). */
 var U12_ITS = [
   ["It's advisable to arrive early in Germany.",
    ["It's advisable arriving early in Germany.","It's advisable arrive early in Germany."]],
@@ -3665,7 +3670,15 @@ var U12_ITS = [
   ["It's not common to tip in China.",
    ["It's not common tipping in China.","It's not common tip in China."]],
   ["It's a good idea to remove your shoes in India.",
-   ["It's a good idea removing your shoes.","It's a good idea remove your shoes."]]
+   ["It's a good idea removing your shoes.","It's a good idea remove your shoes."]],
+  ["It's not polite to talk loudly on the bus.",
+   ["It's not polite talking loudly on the bus.","It's not polite talk loudly on the bus."]],
+  ["It's impolite to arrive very late for a meeting.",
+   ["It's impolite arriving very late.","It's impolite arrive very late."]],
+  ["It's rude to point at people.",
+   ["It's rude pointing at people.","It's rude point at people."]],
+  ["It's wrong to ignore local customs.",
+   ["It's wrong ignoring local customs.","It's wrong ignore local customs."]]
 ];
 var u12Its = pickGen(U12_ITS,
   "بعد <span class=ltr>It's + صفة</span> نستعمل المصدر بـ<span class=ltr>to</span> دائمًا: "+
@@ -3691,6 +3704,71 @@ var U12_GS = [
 var u12GerundSubj = clozeGen(U12_GS,
   "يمكن أن يكون <span class=ltr>gerund</span> فاعلًا للجملة، مثل الفعل + <span class=ltr>ing</span> في أوّلها "+
   "(ص <span class=ltr>132</span>).", "u12gs");
+
+/* ═══ ما كان ناقصًا من صندوق القواعد (ص ١٣٢) — من صورة الصفحة ═══════════
+   الصندوق أربعةُ أقسام، وكان في الموقع ثلاثةٌ منها: الفعل + مصدر،
+   والفعل + اسم + مصدر، و«It's + صفة»، والـgerund فاعلًا. وسقط الرابع
+   كلُّه — «Expressions of Advice with Infinitives» — وسقط تمرين A
+   الذي يطبّق الأقسام كلَّها. فأُضيفا، ومعهما سؤالٌ يفرّق بين أفعال
+   المصدر (ص ١٣٢) وأفعال الـgerund التي يحيل إليها الكتاب نفسه
+   (وحدة ١٠، ص ١١٢). */
+var U12_ADVICE = [
+  ["Make sure ___ your passport with you. (take)","to take",["taking","take"]],
+  ["Don't forget ___ your shoes before entering. (remove)","to remove",["removing","remove"]],
+  ["Try not ___ late for the meeting. (be)","to be",["being","be"]],
+  ["Be sure ___ the local customs. (respect)","to respect",["respecting","respect"]],
+  ["Remember ___ taxi drivers in some countries. (tip)","to tip",["tipping","tip"]],
+  ["Try ___ a few words of the language. (learn)","to learn",["learning","learn"]],
+  ["Make sure ___ in line for the bus. (stand)","to stand",["standing","stand"]],
+  ["Don't forget ___ a small gift for your host. (bring)","to bring",["bringing","bring"]]
+];
+var u12Advice = clozeGen(U12_ADVICE,
+  "عباراتُ النصيحة كلُّها يتبعها المصدر بـ<span class=ltr>to</span>: <span class=ltr>Try to… · Try not to… · "+
+  "Remember to… · Don't forget to… · Make sure to… · Be sure to…</span> (ص <span class=ltr>132</span>).", "u12adv");
+
+/* تمرين A (ص ١٣٢): كوّن الجملة من الكلمات، وأضف it's حيث يلزم */
+var U12_MAKE = [
+  ["good idea / follow / local customs","It's a good idea to follow local customs.",
+   ["It's a good idea following local customs.","Good idea to follow local customs."]],
+  ["we / managed / get seats / on the crowded bus","We managed to get seats on the crowded bus.",
+   ["We managed getting seats on the crowded bus.","It's managed to get seats on the crowded bus."]],
+  ["not advisable / carry / a lot of money","It's not advisable to carry a lot of money.",
+   ["It's not advisable carrying a lot of money.","Not advisable to carry a lot of money."]],
+  ["make sure / tip / taxi drivers","Make sure to tip taxi drivers.",
+   ["Make sure tipping taxi drivers.","It's make sure to tip taxi drivers."]],
+  ["try / stay / in places that are safe","Try to stay in places that are safe.",
+   ["Try staying in places that are safe.","It's try to stay in places that are safe."]],
+  ["polite / stand in line / for a bus","It's polite to stand in line for a bus.",
+   ["It's polite standing in line for a bus.","Polite to stand in line for a bus."]]
+];
+function u12Make(){
+  var x = gp(U12_MAKE), o = eOpts(x[1], x[2].slice());
+  if(!o) return null;
+  return ["Make the sentence. Add "+en("it's")+" where necessary:<br>"+en(x[0]),
+    o[0].map(en), o[1],
+    "تمرين <span class=ltr>A</span> (ص <span class=ltr>132</span>): بعد الصفة أو عبارة النصيحة يأتي المصدر بـ"+
+    "<span class=ltr>to</span>، وتُضاف <span class=ltr>it's</span> قبل الصفة ولا تُضاف قبل الفعل أو عبارة الأمر.",
+    "u12mk:"+x[1]];
+}
+
+/* أفعال المصدر (ص ١٣٢) في مقابل أفعال الـgerund (وحدة ١٠، ص ١١٢) */
+var U12_INF_VERBS = ["afford","choose","decide","expect","forget","hope","learn",
+                     "manage","offer","promise","refuse","remember","try"];
+var U12_GER_VERBS = ["avoid","can't stand","enjoy","finish","give up","imagine","keep","miss","resist"];
+function u12WhichVerb(){
+  var askInf = Math.random() < 0.5;
+  var right  = askInf ? gp(U12_INF_VERBS) : gp(U12_GER_VERBS);
+  var pool   = shuffle((askInf ? U12_GER_VERBS : U12_INF_VERBS).slice()).slice(0,2);
+  var o = eOpts(right, pool);
+  if(!o) return null;
+  return ["Which verb is followed by "+(askInf ? en("to + verb")+" (infinitive)" : en("verb + -ing")+" (gerund)")+"?",
+    o[0].map(en), o[1],
+    "أفعالُ المصدر (ص <span class=ltr>132</span>): <span class=ltr>afford, choose, decide, expect, forget, hope, "+
+    "learn, manage, offer, promise, refuse, remember, try</span>.<br>وأفعالُ الـ<span class=ltr>gerund</span> "+
+    "(وحدة <span class=ltr>10</span>، ص <span class=ltr>112</span>): <span class=ltr>avoid, can't stand, enjoy, "+
+    "finish, give up, imagine, keep, miss, resist</span> — والكتابُ نفسُه يحيل إليها في صندوق الوحدة <span class=ltr>12</span>.",
+    "u12wv:"+right];
+}
 
 /* قطعة When in Rome — عادات الدول (ص ١٣٠–١٣١) */
 var U12_CUSTOMS = [
@@ -3812,7 +3890,8 @@ var U10 = [u10PresPerfect,u10Gerund,u10Phrasal,u10RealTalk,u10Sarah,u10TwoWordVo
            u10RelClause,u10Modal,u10SoSuch];
 var U11 = [u11Cond1,u11Rather,u11Cond2,u11RealTalk,u11Highway,u11Faisal,u11Durer,u11Gerund];
 var U12 = [u12Infinitive,u12VerbNounInf,u12Its,u12GerundSubj,u12Customs,u12Edgar,u12Shock,
-           u12UsedTo,u12PastPerfect];
+           u12UsedTo,u12PastPerfect,
+           u12Advice,u12Make,u12WhichVerb];   /* من صندوق القواعد وتمرين A — ص ١٣٢ */
 var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
 var ALLU2 = U4.concat(U5).concat(U6).concat(EXP2);     /* الجزء الثاني */
 var ALLU3 = U7.concat(U8).concat(U9);                  /* الجزء الثالث */

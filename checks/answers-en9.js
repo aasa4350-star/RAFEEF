@@ -965,6 +965,75 @@ check('u2King',(t,a,opts)=>{
   if(new Set(opts).size!==3) return 'خيارات مكررة';
   return e===a||('متوقّع '+e);});
 
+/* ═══ الوحدة ١٢ — صندوق القواعد وتمرين A (ص ١٣٢) ══════════════════════
+   لم تكن مولّدات الوحدتين ١٠ و١٢ مفحوصةً هنا أصلًا. وبعد أن وصلت صورةُ
+   الصفحة صار في اليد مرجعٌ مستقلٌّ يُراجَع عليه، فأُضيف فحصُ ما بُني
+   عليها — قاعدةُ المصدر بعد الصفة وعبارة النصيحة، وقائمتا الأفعال. */
+say('\n### الوحدة 12 — قواعد ص 132');
+const INF_V=new Set(['afford','choose','decide','expect','forget','hope','learn',
+  'manage','offer','promise','refuse','remember','try']);
+const GER_V=new Set(['avoid',"can't stand",'enjoy','finish','give up','imagine','keep','miss','resist']);
+/* بعد صفةٍ أو عبارةِ نصيحةٍ يأتي to + الفعل المجرّد: لا ing ولا فعلٌ عارٍ */
+const TO_FORM=/^to [a-z]+$/;
+check('u12Advice',(t,a,o)=>{
+  const m=t.match(/\(([a-z ]+)\)\s*$/); if(!m) return 'قراءة: '+t;
+  const v=m[1].trim(), e='to '+v;
+  if(!TO_FORM.test(a)) return 'الجواب ليس مصدرًا بـto: '+a;
+  if(e!==a) return 'متوقّع '+e;
+  const alsoTo=o.filter(x=>x!==a&&TO_FORM.test(x));
+  return !alsoTo.length||'مشتّتٌ بصيغة المصدر أيضًا: '+alsoTo.join(','); });
+const MAKE_OF={
+  'good idea / follow / local customs':"It's a good idea to follow local customs.",
+  'we / managed / get seats / on the crowded bus':'We managed to get seats on the crowded bus.',
+  'not advisable / carry / a lot of money':"It's not advisable to carry a lot of money.",
+  'make sure / tip / taxi drivers':'Make sure to tip taxi drivers.',
+  'try / stay / in places that are safe':'Try to stay in places that are safe.',
+  'polite / stand in line / for a bus':"It's polite to stand in line for a bus." };
+check('u12Make',(t,a,o,q)=>{
+  const cue=Object.keys(MAKE_OF).find(k=>t.indexOf(k)>=0);
+  if(!cue) return 'مدخل غير معروف: '+t;
+  const e=MAKE_OF[cue];
+  /* المقارنة بعد توحيد الفراغات: نصُّ السؤال يمرّ بتجريد الوسوم */
+  const norm=s=>s.replace(/\s+/g,' ').trim();
+  if(norm(e)!==norm(a)) return 'متوقّع '+e;
+  return q[4]==='u12mk:'+e||'الوسمُ يخالف المعلَّم'; });
+check('u12WhichVerb',(t,a,o)=>{
+  const askInf=/infinitive/.test(t);
+  const good=askInf?INF_V:GER_V, bad2=askInf?GER_V:INF_V;
+  if(!good.has(a)) return (askInf?'ليس من أفعال المصدر: ':'ليس من أفعال الـgerund: ')+a;
+  const wrongSide=o.filter(x=>x!==a&&good.has(x));
+  if(wrongSide.length) return 'مشتّتٌ من القائمة نفسها فيصير جوابًا ثانيًا: '+wrongSide.join(',');
+  const stray=o.filter(x=>x!==a&&!bad2.has(x));
+  return !stray.length||'مشتّتٌ من خارج القائمتين: '+stray.join(','); });
+/* «It's + صفة» وdynamic gerund الفاعل: الصحيحُ واحدٌ والمشتّتان لا يصحّان */
+check('u12Its',(t,a,o)=>{
+  if(!/^It's .+ to [a-z]/.test(a)) return "الجواب ليس على صيغة It's + صفة + to: "+a;
+  const alsoOk=o.filter(x=>x!==a&&/^It's .+ to [a-z]/.test(x));
+  return !alsoOk.length||'مشتّتٌ صحيحُ الصيغة أيضًا: '+alsoOk.join(','); });
+/* «ing$» وحدَها لا تكفي مقياسًا: الفعلُ «Bring» ينتهي بها وهو مجرّد.
+   فالمقياس اشتقاقُ الـgerund من الفعل المذكور بين قوسين، والمشتّتان
+   صيغتاه المجرّدة والمفرد الغائب لا صيغةُ gerund ثانية. */
+const GERUND_OF=v=>{
+  if(/[^aeiou]e$/.test(v)) return v.slice(0,-1)+'ing';          /* Arrive → Arriving */
+  if(/^[A-Za-z]{1,4}$/.test(v)&&/[aeiou][bdgklmnprt]$/i.test(v)) return v+v.slice(-1)+'ing'; /* Tip → Tipping */
+  return v+'ing'; };
+const THIRD_OF=v=>/(?:s|sh|ch|x|z|o)$/i.test(v)?v+'es':(/[^aeiou]y$/.test(v)?v.slice(0,-1)+'ies':v+'s');
+check('u12GerundSubj',(t,a,o)=>{
+  const m=t.match(/\(([A-Za-z]+)\)\s*$/); if(!m) return 'قراءة: '+t;
+  const v=m[1], e=GERUND_OF(v);
+  if(e!==a) return 'متوقّع '+e;
+  const allowed=new Set([v,THIRD_OF(v)]);
+  const stray=o.filter(x=>x!==a&&!allowed.has(x));
+  return !stray.length||'مشتّتٌ غير متوقّع: '+stray.join(','); });
+check('u12Infinitive',(t,a,o)=>{
+  const m=t.match(/\(([a-z ]+)\)\s*$/); if(!m) return 'قراءة: '+t;
+  const e='to '+m[1].trim();
+  return e===a||('متوقّع '+e); });
+check('u12VerbNounInf',(t,a,o)=>{
+  const m=t.match(/\(([a-z ]+)\)\s*$/); if(!m) return 'قراءة: '+t;
+  const e='to '+m[1].trim();
+  return e===a||('متوقّع '+e); });
+
 say('\n'+(bad?('⚠️ إجمالي الأخطاء: '+bad):('✅ الإجمالي: '+ok+' مولّدًا سليمًا')));
 
 module.exports = function(){ return { ok: ok, bad: bad, lines: LINES }; };
