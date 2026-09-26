@@ -17,7 +17,23 @@ const ROOT = path.join(__dirname, '..');
 const URL_ = 'https://kmopkxlhisrwxllagjbu.supabase.co';
 const KEY  = 'sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_';
 const PAGE = 1000;                 /* سقف Supabase الثابت */
-const KIDS = ['سعود','أسامة','رفيف','حسن'];
+/* ═══ قائمةُ الطلبة تُقرأ من الموقع لا تُكتب هنا ═══════════════════
+   كانت مكتوبةً أربعةَ أسماء، فلمّا أُضيف فهدٌ والتربيةُ الخاصّة صار
+   الفحصُ يقول «صفوفٌ باسمٍ مجهول × ١٣٣» عن طالبَين معروفَين — خطأٌ
+   كاذبٌ يُعمي عن خطأٍ صادق. والمصدرُ الأوثق لوحةُ الأب نفسُها
+   (index.html · SLUG): من كان فيها فله مكانٌ يُعرض فيه.
+   وإن تعذّرت القراءة رجعنا إلى الأسماء المعروفة حتى لا يسقط الفحص. */
+const FALLBACK_KIDS = ['سعود','أسامة','رفيف','حسن','فهد','التربية الخاصة'];
+function rosterFromSite(){
+  try{
+    const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+    const m = /const SLUG\s*=\s*\{([^}]*)\}/.exec(html);
+    if(!m) return FALLBACK_KIDS;
+    const names = [...m[1].matchAll(/"([^"]+)"\s*:/g)].map(x => x[1]);
+    return names.length ? names : FALLBACK_KIDS;
+  }catch(e){ return FALLBACK_KIDS; }
+}
+const KIDS = rosterFromSite();
 const STALE_DAYS = 21;             /* بعدها نعدّ الأداة مهجورة */
 
 async function fetchAll(){
@@ -48,6 +64,30 @@ function ceilingRisk(){
         out.push(f + ' — يطلب limit=' + lim + ' في طلبٍ واحد والسقف ' + PAGE +
                  ' ، فيفقد ما زاد بصمت');
     }
+
+    /* ═══ ولا طلبَ قراءةٍ بلا سقفٍ ولا ترقيم ═══════════════════════
+       عضّنا هذا مرّتين في يومٍ واحد (٢٥–٢٦ سبتمبر ٢٠٢٦): بطاقةُ
+       «قراءة إنجليزي» عرضت ١٧ محاولةً وهي ٢٦، و«محاولاتي» فقدت أقدم
+       أوراق سعود — كلاهما طلبٌ واحدٌ بلا limit ولا offset، والخادمُ
+       يقطع عند ألف بلا أن يقول. وهو عيبٌ صامتٌ لا يظهر إلّا حين يكبر
+       سجلُّ الابن، فيُصدَّق الرقمُ الناقصُ سنةً كاملة.
+       فالقاعدة: كلُّ قراءةٍ من attempts إمّا مرقَّمةٌ (RR.fetchAll أو
+       offset) وإمّا محدودةٌ بـlimit مقصود. */
+    /* الرابطُ يُبنى بالتوصيل («…&student=eq."+name+"…&limit=40»)، فلا يكفي
+       أن نقرأ المقطعَ النصّيَّ الأوّل: نفحص ما بعد موضع الطلب من المصدر
+       نفسه (نافذةٌ تكفي لسطر الطلب) بحثًا عن limit. */
+    /* الحكمُ على كلّ طلبٍ وحدَه لا على الملفّ كلِّه: ذكرُ RR.fetchAll في
+       تعليقٍ في أعلى الصفحة كان يُعفي طلبًا في أسفلها لا ترقيمَ فيه —
+       وهو بابٌ يُبطل الفحص من حيث لا نشعر. فننظر قبل الطلب بقليلٍ:
+       أهو مُمرَّرٌ إلى RR.fetchAll فعلًا؟ */
+    const unbounded = [...src.matchAll(/attempts\?select=/g)].filter(m => {
+      const after = src.slice(m.index, m.index + 400);
+      const before = src.slice(Math.max(0, m.index - 200), m.index);
+      return !/limit=/.test(after) && !/RR\.fetchAll\s*\(\s*$|RR\.fetchAll\s*\([^;]*$/.test(before);
+    });
+    if (unbounded.length && !paginates)
+      out.push(f + ' — يقرأ attempts بطلبٍ واحدٍ بلا limit ولا ترقيم: الخادمُ يقطع عند ' +
+               PAGE + ' صفًّا فتسقط الأقدم بصمت (استعمل RR.fetchAll)');
   }
   return out;
 }

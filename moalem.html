@@ -8,6 +8,8 @@
 <title>الرخصة المهنية — صفحتي</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<!-- قواعدُ التقرير: ترقيمُ صفحات الطلب وإسقاطُ الصفوف المكرّرة -->
+<script src="report-rules.js"></script>
 <style>
   :root{
     --accent:#b45309; --accent-deep:#78350f;
@@ -106,11 +108,10 @@ function when(r){ return (r&&r.meta&&r.meta.at) || (r&&r.created_at) || ""; }
 function load(){
   var st=document.getElementById("st"), res=document.getElementById("res");
   st.innerHTML='<span class="spin"></span>';
-  fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(ME)+"&order=created_at.desc",
-        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
-  .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  /* بصفحاتٍ مرقّمة: الخادمُ يقطع كلَّ طلبٍ عند ألف صفّ — انظر RR.fetchAll */
+  RR.fetchAll(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(ME)+"&order=created_at.desc", SUPA_KEY)
   .then(function(rows){
-    rows = Array.isArray(rows)?rows:[];
+    rows = RR.usable(Array.isArray(rows)?rows:[]);
     var pr = rows.filter(function(r){ return r.meta && r.meta.kind==="practice" && r.meta.test; });
     st.textContent = "· "+pr.length+" جلسة";
     if(!pr.length){
