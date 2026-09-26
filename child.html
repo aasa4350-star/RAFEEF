@@ -261,7 +261,7 @@ async function main(){
     </div>`:""}`;
 
   if(practice.length){
-    const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    const SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"};
     /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
     const fresh=p=> !window.RR || RR.freshFlag(p);
     const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2 && fresh(p))?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits && fresh(p)){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
@@ -525,7 +525,7 @@ async function main(){
     const bySubj={}; Object.keys(currMap).forEach(t=>{ const subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
     if(Object.keys(bySubj).length){
       html+=`<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>`;
-      ["لغتي","إنجليزي","رياضيات","علوم"].forEach(subj=>{
+      ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(subj=>{
         const arr=bySubj[subj]; if(!arr||!arr.length) return;
         arr.sort((a,b)=> (a.meta.test<b.meta.test)?-1:1);
         const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);

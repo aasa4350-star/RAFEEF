@@ -356,7 +356,7 @@ async function loadReport(){
   var html='<div class="sec-title"><span class="dot"></span> 📊 نتيجتك وتقريرك</div>';
 
   if(practice.length){
-    var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬"};
+    var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"};
     /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
     var fresh=function(p){ return !window.RR || RR.freshFlag(p); };
     var untrustedTxt=function(p){ return (p.meta.trusted===false && fresh(p))?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; };
@@ -588,7 +588,7 @@ async function loadReport(){
     var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); });
     if(Object.keys(bySubj).length){
       html+='<div class="sec-title"><span class="dot"></span> 📚 تقرير المنهج الدراسي</div>';
-      ["لغتي","إنجليزي","رياضيات","علوم"].forEach(function(subj){
+      ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){
         var arr=bySubj[subj]; if(!arr||!arr.length) return;
         arr.sort(function(a,b){ return (a.meta.test<b.meta.test)?-1:1; });
         var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);

@@ -2293,6 +2293,7 @@ if(!STUDENTS[who]){
       const done = (en?en.done:0)+(ma?ma.done:0);
       sec.innerHTML = `<div class="locked">🏁 أكمل حل <b>الإنجليزي</b> و<b>الرياضيات</b> كاملين، وبعدها تظهر النتيجة كاملة.<br><br>
         تم حلّ <b>${done}</b> من <b>${total}</b> سؤال.<br><br>
+        ${(ARB_RESULT && ARB_RESULT.done) ? `<b>العربية 🕌: ${ARB_RESULT.correct}/${ARB_RESULT.done}</b> — محفوظةٌ لوالدك مادّةً مستقلّة.<br><br>` : ``}
         <span style="font-weight:400">وإن خرجت الآن فما حللته محفوظ — يظهر لوالدك «غير مكتمل».</span></div>`;
       return;
     }
@@ -2315,6 +2316,7 @@ if(!STUDENTS[who]){
       <div class="res-grid">
         <div class="res-cell"><div class="lbl">الإنجليزي</div><div class="val">${en.correct}/${en.total}</div><div class="pct">${enP}%</div></div>
         <div class="res-cell"><div class="lbl">الرياضيات</div><div class="val">${ma.correct}/${ma.total}</div><div class="pct">${maP}%</div></div>
+        ${(ARB_RESULT && ARB_RESULT.done) ? `<div class="res-cell" style="grid-column:1 / -1"><div class="lbl">العربية 🕌</div><div class="val">${ARB_RESULT.correct}/${ARB_RESULT.done}</div><div class="pct">${Math.round(ARB_RESULT.correct/ARB_RESULT.done*100)}%</div>${ARB_RESULT.done<ARB_RESULT.total?`<div class="lbl" style="margin-top:4px">أجبتَ ${ARB_RESULT.done} من ${ARB_RESULT.total} — وتُحفظ لوالدك مادّةً مستقلّة</div>`:`<div class="lbl" style="margin-top:4px">تُحفظ لوالدك مادّةً مستقلّة</div>`}</div>` : `<div class="res-cell" style="grid-column:1 / -1"><div class="lbl">العربية 🕌</div><div class="val" style="font-size:1rem;font-weight:700">ما فتحتَ القسم بعد</div><div class="lbl" style="margin-top:4px">افتح تبويب «العربية 🕌» — نتيجتُه تُحفظ لوالدك مادّةً مستقلّة</div></div>`}
       </div>
       <div class="block-title"><span class="dot"></span> الأخطاء والتصحيح</div>
       <div class="mistakes">${mist}</div>
@@ -2437,6 +2439,9 @@ if(!STUDENTS[who]){
   window.addEventListener("pagehide", savePartialIfAny);
 
   let arbBuilt = false;
+  /* نتيجةُ قسم العربيّة في هذه الجلسة — يعرضها تبويب «النتيجة 🏁» مع
+     الإنجليزي والرياضيات (بلاغ الأب ٢٦ سبتمبر ٢٠٢٦). */
+  var ARB_RESULT = null;
   // ===== مولّد أسئلة اللغة العربية (يتجدّد كل مرة) =====
   var AR_OPP=[["كبير","صغير"],["طويل","قصير"],["حارّ","بارد"],["سعيد","حزين"],["قديم","جديد"],["أبيض","أسود"],["فوق","تحت"],["نهار","ليل"],["قويّ","ضعيف"],["سريع","بطيء"],["جميل","قبيح"],["غنيّ","فقير"],["مفتوح","مغلق"],["صعب","سهل"],["بعيد","قريب"],["كثير","قليل"],["نظيف","وسِخ"],["واسع","ضيّق"],["ثقيل","خفيف"],["عالٍ","منخفض"],["ممتلئ","فارغ"],["مبكّر","متأخّر"],["يمين","يسار"],["أمام","خلف"],["صادق","كاذب"],["كريم","بخيل"],["شجاع","جبان"],["مجتهد","كسول"],["حقيقة","خيال"],["فرح","حزن"],["نجاح","فشل"],["حبّ","كره"],["حرب","سلم"],["غنى","فقر"],["نور","ظلام"],["حلو","مرّ"],["يابس","رطب"],["واضح","غامض"],["ربح","خسارة"],["حاضر","غائب"],["دخول","خروج"],["بداية","نهاية"],["زيادة","نقصان"],["قبول","رفض"],["عدل","ظلم"],["صحّة","مرض"],["يقظة","نوم"]];
   var AR_SYN=[["سعيد","مسرور"],["شجاع","جريء"],["جميل","حسن"],["قويّ","متين"],["ذكيّ","فطِن"],["سريع","عاجل"],["ضخم","كبير"],["منزل","بيت"],["طريق","سبيل"],["فرح","سرور"],["صديق","رفيق"],["بحر","يمّ"],["أسد","ليث"],["سيف","حسام"],["مطر","غيث"],["ذهب","تِبر"],["ليل","دُجى"],["جبل","طَود"],["شمس","ذُكاء"],["كلام","حديث"],["طعام","قوت"],["فرس","حصان"],["نور","ضياء"],["عالِم","مثقّف"],["حزين","كئيب"],["ماهر","بارع"],["حرب","قتال"],["سلام","أمان"],["غضب","سخط"],["صدق","حقّ"],["عطاء","جود"],["خوف","فزع"],["أمل","رجاء"],["حكمة","رشد"],["عزم","تصميم"],["بهجة","سرور"],["تعب","نصب"],["نجاح","فلاح"],["كنز","ذخر"],["شدّة","عُسر"]];
@@ -2646,6 +2651,37 @@ if(!STUDENTS[who]){
     // أسئلة
     var answered = new Set(), correct = 0, total = arq.length;
     var scoreEl = sec.querySelector('[data-ars]'), fillEl = sec.querySelector('[data-arf]');
+    /* ═══ قسمُ العربيّة كان يُجاب ولا يُحفظ ═══════════════════════════
+       بلاغ الأب (٢٦ سبتمبر ٢٠٢٦): «قسم العربي ما تطلع لي نتيجته مع
+       الإنجليزي والرياضيات». وكان محقًّا: المعالج يُلوّن الإجابة ويحرّك
+       الشريط ثمّ ينتهي — ولا يُرسل شيئًا. فكلُّ ما عمله الأولاد في
+       العربيّة منذ فُتح القسمُ لم يخرج من متصفّحاتهم.
+
+       وجدولُ المحاولات فيه عمودان اثنان فقط للدرجات (إنجليزي ورياضيات)
+       ومفتاحُنا يُدخل ولا يُعدّل الجدول، فلا سبيل إلى عمودٍ ثالث.
+       فتُحفظ العربيّةُ صفَّ مادّةٍ مستقلًّا باسم «عربي — اختبر نفسك 🕌»،
+       وأُضيفت «عربي» إلى مواد التقرير (report-rules.js) فتظهر بطاقتُها
+       إلى جانب لغتي والإنجليزي والرياضيات والعلوم في صفحات المتابعة.
+       ومعها تفصيلُ المهارات (نحو · صرف · إملاء · بلاغة · أساليب · دلالة)
+       فتدخل بطاقات المهارات في التقرير المفصَّل. */
+    var arSkills = {}, arSaved = false, arSavedN = 0, arPid = newPid(), arT0 = Date.now();
+    ARB_RESULT = { correct:0, total:total, done:0 };   /* يقرؤها تبويب «النتيجة 🏁» */
+    var AR_SKILL = { irab:"النحو والإعراب", sarf:"الصرف والاشتقاق", imla:"الإملاء",
+                     bal:"البلاغة", usl:"الأساليب", dal:"دلالة الكلمة في سياقها", own:"أسئلة مستواك" };
+    function arSkillOf(q){
+      var k = String(q.key||"");
+      var tag = k.indexOf(":")>0 ? k.slice(0, k.indexOf(":")) : "";
+      if(AR_SKILL[tag]) return AR_SKILL[tag];
+      return "مفردات وتراكيب";
+    }
+    function arSave(n){
+      if(n < 3 || n <= arSavedN) return;
+      arSavedN = n; arSaved = true;
+      saveResult({ student:S.name, grade:S.grade, en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[],
+        meta:{ kind:"practice", test:"عربي اختبر نفسك 🕌", correct:correct, total:n,
+               skills:arSkills, dur:Math.round((Date.now()-arT0)/1000),
+               pid:arPid, at:new Date().toISOString() } });
+    }
     sec.querySelectorAll('.q[data-i]').forEach(function(qEl){
       var i = +qEl.dataset.i, ans = arq[i][2];
       qEl.querySelectorAll('.opts button').forEach(function(btn){
@@ -2653,15 +2689,29 @@ if(!STUDENTS[who]){
           if(answered.has(i)) return; answered.add(i);
           var j = +btn.dataset.j;
           qEl.querySelectorAll('.opts button').forEach(function(b){b.disabled=true;});
-          if(j===ans){ btn.classList.add('correct'); correct++; }
+          var ok = (j===ans);
+          if(ok){ btn.classList.add('correct'); correct++; }
           else{ btn.classList.add('wrong'); qEl.querySelectorAll('.opts button')[ans].classList.add('correct'); }
+          var sk = arSkillOf(arq[i]), e = arSkills[sk] || (arSkills[sk]={c:0,t:0});
+          e.t++; if(ok) e.c++;
           qEl.querySelector('.explain').classList.add('show');
           scoreEl.textContent = correct+' / '+total;
           fillEl.style.width = (answered.size/total*100)+'%';
+          ARB_RESULT = { correct:correct, total:total, done:answered.size };
+          if(answered.size===total) arSave(total);
         });
       });
     });
-    var rb=sec.querySelector('[data-arreset]'); if(rb) rb.addEventListener('click', renderArb);
+    /* ومن أجاب ثلاثًا فأكثر ثمّ خرج أو بدّل الأسئلة يُحفظ له ما عمل —
+       والمعرّفُ واحدٌ فتُبقي RR.dedupe الأكملَ وتُسقط ما دونه. */
+    function arLeave(){ arSave(answered.size); }
+    if(renderArb._hook){ window.removeEventListener("pagehide", renderArb._hook);
+                         document.removeEventListener("visibilitychange", renderArb._vhook); }
+    renderArb._hook  = function(){ arLeave(); };
+    renderArb._vhook = function(){ if(document.hidden) arLeave(); };
+    window.addEventListener("pagehide", renderArb._hook);
+    document.addEventListener("visibilitychange", renderArb._vhook);
+    var rb=sec.querySelector('[data-arreset]'); if(rb) rb.addEventListener('click', function(){ arLeave(); renderArb(); });
   }
 
   // توقيت السعودية (UTC+3، بدون توقيت صيفي)
