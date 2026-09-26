@@ -3146,7 +3146,10 @@ function u1AllBothPos(){
     ["We both teach science.",       ["Both we teach science.","We teach science both."]],
     ["We are all having fun.",       ["All we are having fun.","We are having fun all."]],
     ["Are they both science teachers?", ["Both are they science teachers?","Are they science teachers both?"]],
-    ["Can they all speak English?",  ["All can they speak English?","Can they speak English all?"]]
+    ["Can they all speak English?",  ["All can they speak English?","Can they speak English all?"]],
+    /* صورةُ الصفحة أظهرت أنّ صندوق الكتاب ثمانيةُ أمثلةٍ لا ستّة */
+    ["Do you both teach science?",   ["Both do you teach science?","Do you teach science both?"]],
+    ["Are you all having fun?",      ["All are you having fun?","Are you having fun all?"]]
   ];
   var c=gp(C);
   var o=eOpts(c[0],c[1]);
@@ -3155,6 +3158,79 @@ function u1AllBothPos(){
     en("All")+" و"+en("Both")+" تأتيان <b>بعد</b> الفعل المساعد ("+en("be, can, do")+") و<b>قبل</b> الفعل الرئيس: "+
     en(c[0])+" (ص <span class=ltr>11</span>).",
     "u1abp:"+c[0]];
+}
+
+/* ═══ ما كان ناقصًا من صندوق ص ١١ — بعد وصول صورة الصفحة ══════════════
+   عنوانُ الصندوق نفسُه قاعدةٌ لم تكن مفحوصةً في الموقع:
+     All / Both / Neither / None + of + ضمير مفعول + فعل
+   فالخطأ فيها «Both of they» أو حذفُ «of» — وهو أشهر ما يقع فيه الطالب
+   العربيّ، ولم يكن في الموقع سؤالٌ واحدٌ عليه. */
+function u1OfPronoun(){
+  var C=[
+    ["Both of them are teachers.",        ["Both of they are teachers.","Both them are teachers."]],
+    ["Neither of them is a math teacher.",["Neither of they is a math teacher.","Neither them is a math teacher."]],
+    ["All of them teach science.",        ["All of they teach science.","All them teach science."]],
+    ["None of them are math teachers.",   ["None of they are math teachers.","None them are math teachers."]],
+    ["Both of us can cook.",              ["Both of we can cook.","Both us can cook."]],
+    ["All of you are having fun.",        ["All of your are having fun.","All you are having fun of."]]
+  ];
+  var c=gp(C), o=eOpts(c[0],c[1]);
+  if(!o) return null;
+  return ["Which sentence is correct?",o[0].map(en),o[1],
+    "القاعدة في أعلى الصندوق: "+en("All / Both / Neither / None")+" + "+en("of")+" + ضمير <b>مفعول</b> "+
+    "("+en("them / us / you")+") + فعل — لا ضميرَ فاعلٍ ("+en("they / we")+")، ولا حذفَ "+en("of")+
+    " (ص <span class=ltr>11</span>).",
+    "u1ofp:"+c[0]];
+}
+
+/* تمرينا A وB على جدول الاستبيان (ص ١١): الكتاب يطلب كتابة الجملة
+   كاملةً لا اختيار كلمةٍ واحدة، فالمقياس هنا الجملةُ بتمامها —
+   الكمّيةُ الصحيحة ومطابقةُ الفعل معًا. والمشتّتان هما الخطآن اللذان
+   يقع فيهما الطالب: كمّيةٌ تخالف الجدول، أو كمّيةٌ لشخصين تُستعمل
+   لثلاثة (وبالعكس)، أو فعلٌ لا يطابق. */
+var U1_ROWS = [
+  { q:"Are you a vegetarian?", v:["no","no","no"],
+    two:["Neither of them is a vegetarian.",
+         ["Both of them are vegetarians.","Neither of them are vegetarians."]],
+    three:["None of them are vegetarians.",
+         ["All of them are vegetarians.","Neither of them is a vegetarian."]] },
+  { q:"Do you often eat junk food?", v:["no","no","yes"],
+    two:["Neither of them often eats junk food.",
+         ["Both of them often eat junk food.","Neither of them often eat junk food."]],
+    three:["Not all of them often eat junk food.",
+         ["None of them often eat junk food.","Both of them often eat junk food."]] },
+  { q:"Can you cook?", v:["yes","yes","yes"],
+    two:["Both of them can cook.",
+         ["Neither of them can cook.","None of them can cook."]],
+    three:["All of them can cook.",
+         ["Not all of them can cook.","Both of them can cook."]] },
+  { q:"Do you work out regularly?", v:["yes","yes","no"],
+    two:["Both of them work out regularly.",
+         ["Neither of them works out regularly.","Both of them works out regularly."]],
+    three:["Not all of them work out regularly.",
+         ["All of them work out regularly.","Neither of them works out regularly."]] },
+  { q:"Do you drink a lot of coffee?", v:["no","no","no"],
+    two:["Neither of them drinks a lot of coffee.",
+         ["Both of them drink a lot of coffee.","Neither of them drink a lot of coffee."]],
+    three:["None of them drink a lot of coffee.",
+         ["All of them drink a lot of coffee.","Both of them drink a lot of coffee."]] }
+];
+function u1SurveySent(){
+  var r=gp(U1_ROWS), two=Math.random()<0.5;
+  var pick = two ? r.two : r.three;
+  var o = eOpts(pick[0], pick[1].slice());
+  if(!o) return null;
+  var head = two
+    ? ("Survey — <b>Noura</b> = "+en(r.v[0])+" · <b>Maha</b> = "+en(r.v[1]))
+    : ("Survey — <b>Noura</b> = "+en(r.v[0])+" · <b>Maha</b> = "+en(r.v[1])+" · <b>Badria</b> = "+en(r.v[2]));
+  return [head+"<br>"+en(r.q)+"<br>Write the sentence with "+
+      (two ? en("both / neither") : en("all / not all / none"))+". Which is correct?",
+    o[0].map(en), o[1],
+    (two
+      ? en("Both")+" و"+en("Neither")+" لشخصين، و"+en("Neither")+" يتبعه فعلٌ <b>مفرد</b>"
+      : en("All")+" و"+en("None")+" و"+en("Not all")+" لثلاثةٍ فأكثر، ويتبعها فعلٌ <b>جمع</b>")+
+      " — تمرين "+(two?en("A"):en("B"))+" (ص <span class=ltr>11</span>).",
+    "u1ss:"+(two?"2":"3")+":"+r.q];
 }
 
 /* الترابط: مرجع الضمير (Writing Corner ص ١٠) */
@@ -3865,7 +3941,8 @@ var u12PastPerfect = clozeGen(U12_PP,
   "الماضي التامّ (<span class=ltr>had + التصريف الثالث</span>) لحدثٍ وقع <b>قبل</b> حدثٍ آخر في الماضي "+
   "(ص <span class=ltr>139</span>).", "u12pp");
 
-var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion];
+var U1 = [u1Freq,u1FreqCompare,u1Place,u1HowQ,u1People,u1Vocab,u1Survey,u1AllBothVerb,u1AllBothPos,u1Cohesion,
+          u1OfPronoun,u1SurveySent];   /* من صندوق ص ١١ وتمرينَيه — صورةُ الصفحة من الأب */
 var U2 = [u2PrepPlace,u2PrepTime,u2PastTime,u2When,u2Vocab,u2PastQ,u2Born,u2News,u2QuickCheck,
           u2UsedTo,u2IrregPast,u2RealTalk,u2Falcons,u2King];
 var U3 = [u3PresProg,u3GoingWill,u3Vocab,u3Advice,

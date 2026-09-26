@@ -969,6 +969,41 @@ check('u2King',(t,a,opts)=>{
    لم تكن مولّدات الوحدتين ١٠ و١٢ مفحوصةً هنا أصلًا. وبعد أن وصلت صورةُ
    الصفحة صار في اليد مرجعٌ مستقلٌّ يُراجَع عليه، فأُضيف فحصُ ما بُني
    عليها — قاعدةُ المصدر بعد الصفة وعبارة النصيحة، وقائمتا الأفعال. */
+/* ═══ صندوق ص ١١ وتمريناه ═════════════════════════════════════════════
+   جدولُ الاستبيان هنا منقولٌ من صورة الصفحة، والجملُ تُشتقّ منه اشتقاقًا
+   لا تُنسخ من بنك الصفحة — فلو غُيّرت خانةٌ في الموقع كشفها هذا الفحص. */
+say('\n### الوحدة 1 — صندوق ص 11');
+const SURVEY3={ 'Are you a vegetarian?':['no','no','no'],
+  'Do you often eat junk food?':['no','no','yes'],
+  'Can you cook?':['yes','yes','yes'],
+  'Do you work out regularly?':['yes','yes','no'],
+  'Do you drink a lot of coffee?':['no','no','no'] };
+check('u1OfPronoun',(t,a,o)=>{
+  if(!/^(All|Both|Neither|None) of (them|us|you) /.test(a))
+    return 'الجواب ليس على صيغة «كمّية + of + ضمير مفعول»: '+a;
+  const alsoOk=o.filter(x=>x!==a&&/^(All|Both|Neither|None) of (them|us|you) /.test(x));
+  return !alsoOk.length||'مشتّتٌ صحيحُ الصيغة أيضًا: '+alsoOk.join(','); });
+check('u1SurveySent',(t,a,o,q)=>{
+  const m=q[4].match(/^u1ss:([23]):(.+)$/); if(!m) return 'وسمٌ غير مقروء: '+q[4];
+  const three=m[1]==='3', row=SURVEY3[m[2]]; if(!row) return 'صفٌّ غير معروف: '+m[2];
+  const vals=three?row:row.slice(0,2);
+  const yes=vals.filter(x=>x==='yes').length;
+  /* الكمّيةُ المتوقّعة من الجدول لا من نصّ الموقع */
+  const want = three ? (yes===vals.length?'All':(yes===0?'None':'Not all'))
+                     : (yes===vals.length?'Both':(yes===0?'Neither':null));
+  if(!want) return 'الشخصان مختلفان في الجدول — لا يصحّ both/neither';
+  const got=(a.match(/^(Not all|All|None|Both|Neither)\b/)||[])[1];
+  if(got!==want) return 'متوقّع '+want+' لا '+got;
+  /* مطابقةُ الفعل: Neither مفرد، وما سواه جمع — على ما في الكتاب */
+  /* مطابقةُ الفعل على ما في الكتاب: Neither مفرد، وما سواه جمع */
+  const agrees=s=>/^Neither\b/.test(s) ? !/^Neither of them (are|often eat|work|drink)\b/.test(s)
+                                       : !/ of them (is|often eats|works|drinks)\b/.test(s);
+  if(!agrees(a)) return 'مطابقةُ الفعل خاطئة: '+a;
+  /* المشتّتُ الخاطئ في المطابقة مقصود؛ الممنوع مشتّتٌ صحيحٌ تمامًا */
+  const alsoRight=o.filter(x=>x!==a
+    && (x.match(/^(Not all|All|None|Both|Neither)\b/)||[])[1]===want && agrees(x));
+  return !alsoRight.length||'مشتّتٌ صحيحٌ تمامًا فيصير جوابًا ثانيًا: '+alsoRight.join(' / '); });
+
 say('\n### الوحدة 12 — قواعد ص 132');
 const INF_V=new Set(['afford','choose','decide','expect','forget','hope','learn',
   'manage','offer','promise','refuse','remember','try']);
