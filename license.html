@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>الرخصة المهنية — التربوي العام</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
@@ -61,8 +62,8 @@ var NAMES = {khassa:"التربية الخاصة"};
 var GRADES = {khassa:"الرخصة المهنية — التربوي العام"};
 var name = NAMES[who] || "التربية الخاصة";
 
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 function saveScore(test, correct, total){
   try{
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };

@@ -5,6 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>تقرير المستوى 📊</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="report-rules.js"></script>
 <style>
@@ -68,8 +69,8 @@
   <footer>يُبنى التقرير من تفصيل كل سؤال حسب مهارته · الجلسات المشكوك فيها مستبعدة</footer>
 </div>
 <script>
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 /* ═══ كلُّ من يحفظ في القاعدة له مكانٌ هنا ═══════════════════════
    كان الجدول أربعةً، فصفوفُ فهدٍ (٧٩) والتربية الخاصّة (٥٤) تُحفظ ولا
    تجد في هذه الصفحة لسانًا تُعرض فيه — تظهر في لوحة الأب وصفحة الابن

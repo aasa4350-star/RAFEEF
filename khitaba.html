@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>فنّ الإلقاء والخطابة</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
@@ -79,8 +80,8 @@ var LVL   = {saud:1, osama:2, rafeef:3, hasan:4};
 var name = NAMES[who] || "الطالب";
 var lvl  = LVL[who] || 1;
 
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 /* معرّف المحاولة — الحفظ الجزئيّ لا يُقفل الجلسة بعده (انظر math8.html) */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }

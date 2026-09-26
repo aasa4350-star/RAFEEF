@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>القراءة والاستماع</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
@@ -369,8 +370,8 @@ const app = document.getElementById("app");
 // خلط عشوائي
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 // حفظ نتيجة التمرين في التقرير (Supabase) لتظهر في لوحة المتابعة
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 /* معرّف المحاولة — انظر شرحه في math8.html: الحفظ الجزئيّ لا يُقفل
    الجلسة بعده، بل يُدخل صفًّا أكمل بالمعرّف نفسه، وقواعد العرض تُبقي
    الأكمل (RR.usable). */

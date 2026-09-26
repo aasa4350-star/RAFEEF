@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>العلوم — ثاني متوسط</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
@@ -64,8 +65,8 @@ var NAMES = {saud:"سعود",osama:"أسامة",rafeef:"رفيف",hasan:"حسن"
 var GRADES = {saud:"رابع ابتدائي",osama:"خامس ابتدائي",rafeef:"ثاني متوسط",hasan:"ثالث متوسط"};
 var name = NAMES[who] || "الطالب";
 
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 /* ═══ معرّف المحاولة ═══
    بلاغ الأب (١٢ سبتمبر ٢٠٢٦): «رفيف تقول اليوم حلّت الرياضيات وفي التقرير
    ما طلع». وكان الحفظ يُقفل بعد أوّل مرّة: إذا خرجت من الصفحة بعد أربعة

@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>صفحة الابن</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="report-rules.js"></script>
 <style>
@@ -118,8 +119,8 @@ function groupTalk(rows){
   });
   return order.map(function(k){ var s=g[k]; s.meta.turns=s._turns; s.meta.att=s._att; s.meta.unh=s._unh; s.meta.aiN=s._aiN; s.meta.fbN=s._fbN; s.meta.aiMs=s._aiMs; s.meta.skGarb=s._sg; s.meta.skConf=s._sc; s.meta.skNoV=s._sn; return s; });
 }
-const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+const SUPA_URL = APP_CONFIG.supaUrl;
+const SUPA_KEY = APP_CONFIG.supaKey;
 const META = {
   hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e"},
   rafeef:{name:"رفيف",grade:"ثاني متوسط",emoji:"📗",accent:"#4f46e5",deep:"#3730a3"},

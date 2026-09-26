@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>الرخصة المهنية — صفحتي</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <!-- قواعدُ التقرير: ترقيمُ صفحات الطلب وإسقاطُ الصفوف المكرّرة -->
 <script src="report-rules.js"></script>
@@ -89,8 +90,8 @@
 </div>
 
 <script>
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 var ME = "التربية الخاصة";
 
 function pct(c,t){ return t? Math.round(c/t*100) : 0; }

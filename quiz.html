@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>اختبارات ومراجعات الأبناء</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
@@ -138,8 +139,8 @@ function frx(s){
         '<span class="frb"><span class="frn">'+n+'</span>'+
         '<span class="frd">'+(dg?'−':'')+d+'</span></span></span>'; });
 }
-const SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-const SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+const SUPA_URL = APP_CONFIG.supaUrl;
+const SUPA_KEY = APP_CONFIG.supaKey;
 
 const STUDENTS = {
   hasan: {

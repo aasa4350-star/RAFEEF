@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>تقوية التفكير 🧠</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
@@ -109,8 +110,8 @@ var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود"};
 var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي"};
 var name = NAMES[who] || "الطالب";
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 
 function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }

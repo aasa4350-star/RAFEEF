@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>صفحة البداية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="report-rules.js"></script>
 <script src="attempts-queue.js"></script>
@@ -265,8 +266,8 @@ document.getElementById("foot").innerHTML = 'مسار «'+name+'» — احفظ 
 document.title = "مسار "+name;
 
 // ===== التقرير (نفس منطق صفحة المتابعة) =====
-var SUPA_URL = "https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY = "sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL = APP_CONFIG.supaUrl;
+var SUPA_KEY = APP_CONFIG.supaKey;
 function pct(c,t){ return t?Math.round(c/t*100):0; }
 /* نُفضّل ختم وقت الجهاز (meta.at) على created_at، لأن نتيجةً أُعيد إرسالها
    بعد انقطاعٍ تأخذ created_at الجديد فتظهر بتاريخٍ خاطئ. */

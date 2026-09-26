@@ -5,6 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>محادثة إنجليزية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
@@ -99,8 +100,8 @@ var name=NAMES[who]||"الطالب";
    مستواهم بالمحادثة؟» — لم تكن الصفحة تحفظ أيّ شيء). نسجّل عند نهاية
    كل جلسة: الموضوع، عدد الجمل التي قالها، ومتوسط درجة نطقه (Azure)
    إن وُجدت. نفس جدول attempts المستعمل في بقية الصفحات. */
-var SUPA_URL="https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_KEY2="sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA_URL=APP_CONFIG.supaUrl;
+var SUPA_KEY2=APP_CONFIG.supaKey;
 /* بلاغ الأب (٢ سبتمبر ٢٠٢٦، صورة): «حسن مادخل نهائي بس طالع لي جلستين»
    و«باقي الأولاد متكلمين كثير بس التقرير يقول جملة وحدة». سببان:
 
@@ -199,8 +200,8 @@ function saveTalkSession(useBeacon){
 }
 
 // ذكاء اصطناعي كامل عبر Edge Function (إن نُشرت). لو تعذّرت، نرجع للردود الموجّهة بالموضوع تلقائيًا.
-var SUPA="https://kmopkxlhisrwxllagjbu.supabase.co";
-var SUPA_ANON="sb_publishable_fVHi2d2S5yNdve8ErqDvVw_RvphbHH_";
+var SUPA=APP_CONFIG.supaUrl;
+var SUPA_ANON=APP_CONFIG.supaKey;
 var AI_ENDPOINT=SUPA+"/functions/v1/talk-ai";
 
 function azureCreds(){ var A=window.AZURE_SPEECH||{}; var c=A[who]; if(c&&c.key&&c.region) return c; var d=A["default"]; return (d&&d.key&&d.region)?d:null; }
