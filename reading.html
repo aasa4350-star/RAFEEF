@@ -1677,6 +1677,13 @@ if(!META[who] || !DATA[who]){
   var VOC_STEP = 10; // طلب الأب صراحةً (٢ سبتمبر ٢٠٢٦): سعود وأسامة يحفظون ١٠ كلمات جديدة كل جلسة، مثل حسن ورفيف بالضبط
   var VOC_STEP_AR = "١٠";
   var vocMode = "new"; // "new" = تعلّم جديد · "review" = مراجعة
+  /* ═══ من عليه دَينٌ ثقيل يُفتح له على دَينه ═══════════════════════
+     طلب الأب (٢٦ سبتمبر ٢٠٢٦). الخانةُ موجودةٌ («🔂 كلمات ما ثبتت
+     بعد») لكنّها الثالثةُ في الصفّ، والابنُ يفتح القسم فيجد «تعلّم
+     جديدة» أمامه فيمضي فيها — ودَينُه يكبر. فإن بلغ ثلاثين كلمةً
+     فُتح القسمُ على الدَّين أوّلَ مرّةٍ في الجلسة، والأزرارُ باقيةٌ
+     فله أن ينتقل متى شاء. */
+  var DEBT_OPEN = 30, vocModePicked = false;
   /* يُفتح الجديد رغم الباب — لهذه الجلسة وحدها، فلا يُسدّ الطريق أبدًا */
   var newForce = false;
   function vKey(k){ return "vocab_"+k+"_"+who; }
@@ -1867,6 +1874,18 @@ if(!META[who] || !DATA[who]){
   /* نافذة «الجديد»: آخر ما حُفظ ولم يرسخ بعد */
   var FRESH_WINDOW = 40;                 /* نبحث في آخر ٤٠ كلمة محفوظة */
   var FRESH_TAKE   = 15;                 /* ونعرض منها ١٥ كحدٍّ أعلى */
+  /* ═══ الدَّينُ الكبيرُ يحتاج جلسةً أكبر ══════════════════════════
+     طلب الأب (٢٦ سبتمبر ٢٠٢٦): «سوّها» — أن تبدأ المراجعةُ بالكلمات
+     التي عُرضت ولم تُسترجَع، الأثقلُ أوّلًا. وأسامةُ عنده ٣٣٥ ورفيفُ
+     ٤٤٢؛ وخمسَ عشرةَ كلمةً في الجلسة تعني عشرين جلسةً قبل أن يدور
+     على دَينه مرّةً واحدة. فيكبر سقفُ الجلسة بكِبَر الدَّين: عشرون
+     فوق المئة، وخمسٌ وعشرون فوق المئتين — ولا نتجاوزها فتصير الجلسة
+     عبئًا يُترك. */
+  function freshTake(debt){
+    if(debt >= 200) return 25;
+    if(debt >= 100) return 20;
+    return FRESH_TAKE;
+  }
   var MASTERED_BOX = 4;                  /* الصندوق ٤ فأعلى = رسخت */
 
   /* ═══ الدَّين: كلمةٌ عُرضت ولم تُسترجَع صحيحةً ولا مرّة ══════════════
@@ -1977,6 +1996,10 @@ if(!META[who] || !DATA[who]){
     if(curLang!=="en"){ sec.innerHTML=""; return; }
     syncLearnedFromDB();
     var learned = getLearned();
+    if(!vocModePicked){
+      vocModePicked = true;
+      try{ if(freshCount(learned) >= DEBT_OPEN) vocMode = "fresh"; }catch(e){}
+    }
     var lab = 'style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:8px 2px 2px"';
 
     // بناء قائمة الكلمات حسب الوضع
@@ -1994,12 +2017,20 @@ if(!META[who] || !DATA[who]){
       VOCAB300.slice(0, learned).forEach(function(w, i){
         var st = srf[w[0]];
         if(!isFreshWord(st, i, learned)) return;
-        fpool.push({ w:w, weak:(wkf[w[0]]?1:0), neverc:(srRecalled(st)?0:1), due:srDueIn(st), idx:i });
+        fpool.push({ w:w, weak:(wkf[w[0]]?1:0), neverc:(srRecalled(st)?0:1), due:srDueIn(st),
+                     shown:((st && st.s) ? st.s : 0), idx:i });
       });
       freshTotal = fpool.length;
-      /* ما لم يُسترجَع قطّ أوّلًا، ثمّ الأضعف، ثمّ الأكثر تأخّرًا، ثمّ الأحدث */
-      fpool.sort(function(a,b){ return (b.neverc-a.neverc) || (b.weak-a.weak) || (a.due-b.due) || (b.idx-a.idx); });
-      rvSize = Math.min(getRvSize(learned), FRESH_TAKE);
+      /* ═══ الأثقلُ أوّلًا ═══════════════════════════════════════
+         ما لم يُسترجَع قطّ أوّلًا، ثمّ الأضعف، ثمّ الأطولُ عهدًا بالعرض
+         (st.s الأقدم) — فالكلمةُ التي مرّت عليه من ثلاثة أسابيع ولم
+         يسترجعها أولى من أختها التي عُرضت أمس. وكان الترتيب بالأحدث
+         موضعًا، فتصدّرت آخرُ ما قُدّم وبقي قديمُ الدَّين في ذيل الطابور
+         لا يصل إليه الدور. */
+      fpool.sort(function(a,b){ return (b.neverc-a.neverc) || (b.weak-a.weak) || (a.shown-b.shown) || (a.due-b.due) || (a.idx-b.idx); });
+      /* حجمُ جلسة الدَّين لا ينزل عن سقفها ولو كان حجمُ المراجعة أصغر:
+         الدَّينُ هو الشغل الأهمّ، وحجمُ «راجع المحفوظ» اختيارٌ لغيره. */
+      rvSize = Math.min(freshTotal, Math.max(getRvSize(learned), freshTake(freshTotal)));
       /* الاختيار بالأولويّة، ثم يُعاد الترتيب حسب رقم الكلمة — لأنهم يذاكرون
          من ورقة الـPDF أوّلًا ثم يحلّون، فيجب أن يجدوها بالتسلسل نفسه لا مبعثرة. */
       V = fpool.slice(0, rvSize).sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });
@@ -2201,7 +2232,7 @@ if(!META[who] || !DATA[who]){
       }
       html += '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
       sec.innerHTML = html;
-      sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocMode=b.dataset.mode; renderVocab(); }); });
+      sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
       sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
       var go=sec.querySelector("[data-gateoff]"); if(go) go.addEventListener("click",function(){ newForce=true; renderVocab(); });
       wireSetLearned(sec);
@@ -2210,7 +2241,8 @@ if(!META[who] || !DATA[who]){
     }
 
     var rangeNote = isNew ? '<p class="hint">📖 كلمات اليوم: '+(startIdx+1)+'–'+(startIdx+V.length)+' من '+goal+'. اقرأ العربي، اكتب الإنجليزي، ثم «تحقّق».</p>'
-                : vocMode==="fresh" ? '<p class="hint">🔂 <b>كلمات ما ثبتت بعد:</b> كلماتٌ مرّت عليك ولم تثبت — ومنها ما طلع غلط أوّل مرّة فرجع لك. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم، ونبدأ بالي ما طلعت صح ولا مرّة. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁</p>'
+                : vocMode==="fresh" ? '<p class="hint">🔂 <b>كلمات ما ثبتت بعد:</b> كلماتٌ مرّت عليك ولم تثبت — ومنها ما طلع غلط أوّل مرّة فرجع لك. عندك <b>'+freshTotal+'</b> كلمة في هذي الخانة، نعرض منها <b>'+V.length+'</b> اليوم، ونبدأ بالأثقل: الي ما طلعت صح ولا مرّة وأقدمها عهدًا بك. أوّل ما ترسخ الكلمة تخرج من هنا وتنتقل لـ«راجع المحفوظ» 🔁'+
+                            (freshTotal>=DEBT_OPEN ? '<br><b style="color:var(--accent)">🎯 هذي أهمّ جلسةٍ عندك اليوم:</b> كل جلسةٍ تُنقص العدد، والكلمات الجديدة تُفتح لك لمّا يقلّ.' : '')+'</p>'
                           : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
                             (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
                             (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
@@ -2495,7 +2527,7 @@ if(!META[who] || !DATA[who]){
       wireMic(qEl, word, false);
       var vsay=qEl.querySelector("[data-vsay]"); if(vsay) vsay.addEventListener("click",function(){ speak(word,0.85,"en-US"); });
     });
-    sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocMode=b.dataset.mode; renderVocab(); }); });
+    sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
     sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
     wireSetLearned(sec);
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
