@@ -58,6 +58,14 @@
   .sub{color:var(--muted);font-weight:600;font-size:.8rem;margin-top:4px;line-height:1.5}
   .chev{color:var(--muted);font-size:.72rem;transition:transform .15s ease;display:inline-block}
   details.card[open] .chev{transform:rotate(180deg)}
+  /* ═══ زرُّ الطيّ في أسفل البطاقة ═══════════════════════════════
+     طلب الأب (٢٦ سبتمبر ٢٠٢٦): «حط تقفيل للصفحة من تحت جنب اسم
+     أسامة زي الي فوق». وبطاقةُ الابن طويلةٌ (نتائج ومهارات ونشاط
+     ومنهج)، فمن وصل آخرها لا يجد ما يطويها به إلّا أن يرجع إلى
+     أعلاها — وعلى الجوّال ذلك شوطٌ طويل. */
+  .foldup{background:transparent;border:1.5px solid var(--line);color:var(--muted);
+    padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit}
+  .foldup:hover{background:var(--bg);color:var(--ink)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
   .stat{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
   .stat .lbl{color:var(--muted);font-size:.85rem;margin-bottom:4px}
@@ -630,7 +638,10 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
             ${links.map(l=>`<a href="${l[0]}?who=${slug}" style="${st}">${l[1]}</a>`).join("")}
           </div></div>`;
         })()}
-        ${SLUG[name]?`<div style="margin-top:12px"><a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a></div>`:""}
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          ${SLUG[name]?`<a href="child.html?who=${SLUG[name]}&v=3" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem">افتح صفحة ${name} ←</a>`:""}
+          <button type="button" class="foldup" data-fold="1">▴ اطوِ بطاقة ${name}</button>
+        </div>
       </div></details>`;
     }).join("") + azureQuotaHtml(allRows);
     wireCards();
@@ -666,6 +677,15 @@ function wireCards(){
       var n = el.getAttribute("data-kid"), i = OPEN.indexOf(n);
       if(el.open){ if(i < 0) OPEN.push(n); } else if(i >= 0){ OPEN.splice(i, 1); }
       writeOpen(OPEN); syncToggleAll();
+    });
+    /* زرُّ الطيّ أسفلَ البطاقة: يُغلقها ثمّ يُرجع البصرَ إلى عنوانها،
+       وإلّا وجد الأبُ نفسَه فجأةً في وسط بطاقةِ ابنٍ آخر. وحدثُ
+       toggle أعلاه هو الذي يحفظ الحالة، فلا نحفظ هنا مرّتين. */
+    var fold = el.querySelector("[data-fold]");
+    if(fold) fold.addEventListener("click", function(){
+      el.open = false;
+      try{ el.scrollIntoView({ behavior:"smooth", block:"start" }); }
+      catch(e){ el.scrollIntoView(); }
     });
   });
   syncToggleAll();
