@@ -2246,6 +2246,83 @@ if(!META[who] || !DATA[who]){
        كشفها قبل المحاولة. بها يعرف الأب أين يقف ابنُه بالضبط. */
     var missed=[];
     function missedList(){ return missed.slice(0,12); }
+    /* ═══ جولةُ التثبيت داخل الجلسة ═══════════════════════════════
+       طلب الأب (٢٦ سبتمبر ٢٠٢٦): «سوّها» — على اقتراحٍ عرضتُه بعد فحص
+       القسم: المراجعةُ كانت تختبر ولا تُعلّم. الكلمةُ التي يخطئ فيها
+       تُعرض له مرّةً ثمّ تغيب أيّامًا، فيلقاها ثانيةً وقد نسيها،
+       فيخطئ من جديد. وهذه حلقةٌ لا تُخرج كلمةً إلى الذاكرة.
+
+       فصارت الكلمةُ التي لا تُحسب له ترجع في الجلسة نفسها بعد خمس
+       كلمات — وهي طريّةٌ في ذهنه — فيكتبها بنفسه. والتكرارُ المتباعد
+       داخل الجلسة هو الذي يُدخل الكلمة الذاكرة، لا العرضُ مرّةً.
+
+       وقواعدُها ثلاث:
+       ١) لا تمسّ الدرجة: الدرجةُ أوّلُ محاولةٍ كما كانت، والتثبيتُ
+          تدريبٌ لا امتحان (وإلّا عادت درجةُ النسخ التي أزلناها).
+       ٢) لا تمسّ صناديق التكرار: نجاحٌ بعد دقيقةٍ ليس حفظًا، فالكلمة
+          ترجع غدًا كما قرّر صندوقُها.
+       ٣) تُحفظ في الصفّ (fixed) ليرى الأب أثرَها: «أخطأ في ٦ وثبّت ٤». */
+    var repQ = [], fixedN = 0, repN = 0, fixedSaved = 0;
+    function paintScore(){
+      if(!scoreEl) return;
+      scoreEl.innerHTML = correct+" / "+total +
+        (seenN ? ' <span style="opacity:.8;font-weight:700;font-size:.85rem">· 👀 تعلّمت '+seenN+'</span>' : '') +
+        (fixedN ? ' <span style="opacity:.85;font-weight:700;font-size:.85rem;color:var(--good)">· 🔁 ثبّت '+fixedN+'</span>' : '');
+    }
+    /* جولةُ التثبيت تأتي بعد أن تُحفظ الجلسة غالبًا (يُحفظ الصفُّ فور
+       إتمام الكلمات الأصليّة)، فنُعيد إرسال الصفّ نفسه بمعرّفه نفسه
+       (pid) محمَّلًا بعدد ما ثبّته — وRR.dedupe تُبقي الأحدث من صفوف
+       المعرّف الواحد. فلا يضيع أثرُ التثبيت ولا يتكرّر الصفّ. */
+    function saveFixups(){
+      if(!saved || !savedN) return;
+      if(fixedN === fixedSaved) return;
+      fixedSaved = fixedN;
+      saveScore("كلمات إنجليزي 🔤", correct, savedN, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL,
+        missed:missedList(), fixed:fixedN, reps:repN,
+        known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
+        dur:Math.round((Date.now()-t0)/1000), pid:attId });
+    }
+    function makeRepCard(word, arWord){
+      var d = document.createElement("div");
+      d.className = "q rep";
+      d.setAttribute("style", "border:1.5px dashed var(--accent)");
+      d.innerHTML = '<div class="num">🔁 تثبيت — رجعت لك</div>'+
+        '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
+        '<span '+lab+'>اكتبها بنفسك الآن — ما تدخل الدرجة، بس تُثبّتها:</span>'+
+        '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
+        '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-rshow>👁️ ذكّرني</button></div>'+
+        '<div class="fb"></div>';
+      var inp = d.querySelector(".einp"), fb = d.querySelector(".fb"), donef = false;
+      d.querySelector("[data-rshow]").addEventListener("click", function(){
+        fb.className="fb"; fb.innerHTML='المعنى بالإنجليزي: <span class="corr">'+word+'</span>';
+      });
+      d.querySelector(".chk").addEventListener("click", function(){
+        if(donef) return;
+        if(!String(inp.value||"").trim()){ fb.className="fb"; fb.textContent="✍️ اكتبها من ذاكرتك — أنت شفتها قبل شوي."; return; }
+        if(norm(inp.value,false)===norm(word,false)){
+          donef = true; fixedN++;
+          d.style.borderColor = "var(--good)";
+          fb.className="fb ok"; fb.innerHTML="🎉 ثبّتّها! كتبتها بنفسك هالمرّة. وبترجع لك بكرة عشان ترسخ.";
+          var mi; for(mi=0; mi<missed.length; mi++){ if(missed[mi].w===word){ missed[mi].fx=1; break; } }
+          paintScore(); saveFixups();
+        } else {
+          fb.className="fb no"; fb.innerHTML='❌ مو بعد · الصحيح: <span class="corr">'+word+'</span><div style="font-weight:600;font-size:.85rem;margin-top:4px">اكتبها مرّة ثانية وأنت تشوفها، وبترجع لك بكرة.</div>';
+        }
+      });
+      return d;
+    }
+    /* تُدسّ بعد خمس بطاقاتٍ من موضع الخطأ، فإن لم يبقَ خمسٌ فآخرَ القائمة */
+    function queueRepeat(fromEl, word, arWord){
+      if(repN >= 12) return;   /* حدٌّ يمنع جلسةً لا تنتهي */
+      repN++;
+      var cards = [].slice.call(sec.querySelectorAll(".q"));
+      var at = cards.indexOf(fromEl);
+      var target = (at>-1 && cards[at+5]) ? cards[at+5] : null;
+      var card = makeRepCard(word, arWord);
+      if(target && target.nextSibling) target.parentNode.insertBefore(card, target.nextSibling);
+      else if(target) target.parentNode.appendChild(card);
+      else { var sb = sec.querySelector(".score"); if(sb) sb.parentNode.insertBefore(card, sb); else sec.appendChild(card); }
+    }
     /* كم كلمةً احتاج أن يراها قبل أن يكتبها. نعرضها بجانب الدرجة لأنّ
        «١ / ١٢» وحدها تُقرأ إخفاقًا، وهي في الحقيقة: تذكّر واحدةً وتعلّم
        إحدى عشرة — وهذا ثاني أفضل ما يقع في جلسة مراجعة. */
@@ -2274,7 +2351,7 @@ if(!META[who] || !DATA[who]){
          ووسمُ trusted باقٍ في الصفّ كما هو، فيرى الأب في التقرير أنّ الجلسة
          فيها خروج ويحكم بنفسه — إخبارُ الأب أنفعُ من معاقبة الابن. */
       if(isNew && !advanced && startIdx<VOC_TOTAL){ advanced=true; setLearned(startIdx+total); }
-      if(savedN<total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(),
+      if(savedN<total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); saveScore("كلمات إنجليزي 🔤", correct, total, { mode:(isNew?"new":vocMode), learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(), fixed:fixedN, reps:repN,
           /* الأرقام الثلاثة للتقرير: ما رآه · ما هو قيد التثبيت · ما يعرفه فعلًا */
           known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
           dur:dur, away:aw.away, exits:aw.exits, trusted:trusted, pid:attId }); }
@@ -2291,7 +2368,7 @@ if(!META[who] || !DATA[who]){
       if(isNew) return;
       var tn=Object.keys(tried).length; if(tn<3||tn<=savedN) return;
       savedN=tn; saved=true; var aw=awaySince(aw0); var dur=Math.round((Date.now()-t0)/1000);
-      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(),
+      saveScore("كلمات إنجليزي 🔤", correct, tn, { mode:"review", learned:getLearned(), vocTotal:VOC_TOTAL, missed:missedList(), fixed:fixedN, reps:repN,
         known:srKnown(VOCAB300.slice(0,getLearned())), learning:srLearning(VOCAB300.slice(0,getLearned())), unrecalled:srDebt(getLearned()),
         dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), pid:attId });
     }
@@ -2315,7 +2392,7 @@ if(!META[who] || !DATA[who]){
        جلسةٌ أُتمّت. */
     renderVocab._save = saveIfPartial;
     sec._leave = function(){};
-    hookLeaveSave(renderVocab, saveIfPartial);
+    hookLeaveSave(renderVocab, function(){ saveIfPartial(); saveFixups(); });
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, word=V[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
@@ -2382,9 +2459,12 @@ if(!META[who] || !DATA[who]){
           var scored = enOk && (isNew || !revealed[i]);
           tried[i]=1; markWeak(word, !scored); srMark(word, scored);
           if(scored){ done[i]=1; correct++; }
-          else if(missed.length<12){ missed.push({ w:String(word).slice(0,30),
+          else {
+            if(missed.length<12) missed.push({ w:String(word).slice(0,30),
                     t:String(ein.value||"").replace(/\s+/g," ").trim().slice(0,30),
-                    seen:!!revealed[i] }); }
+                    seen:!!revealed[i] });
+            queueRepeat(qEl, word, V[i][1][0]);   /* ترجع له في هذه الجلسة */
+          }
           if(revealed[i] && !isNew) seenN++;
           var nx=srNextTxt(word);
           if(enOk && revealed[i] && isNew){ fb.className="fb ok"; fb.innerHTML='✅ صحيح — طبيعي تشوفها، هذي أوّل مرّة تمرّ عليك.'+(nx?' <span style="opacity:.75;font-weight:600;font-size:.86rem">· 🔁 '+nx+'</span>':''); }
@@ -2400,8 +2480,7 @@ if(!META[who] || !DATA[who]){
         } else {
           fb.className="fb no"; fb.innerHTML='❌ حاول ثانية · الصحيح: <span class="corr">'+word+'</span>';
         }
-        scoreEl.innerHTML = correct+" / "+total +
-          (seenN ? ' <span style="opacity:.8;font-weight:700;font-size:.85rem">· 👀 تعلّمت '+seenN+'</span>' : '');
+        paintScore();
         onComplete();
       });
       var pin=qEl.querySelector(".pinp"), pfb2=qEl.querySelector(".pfb2");

@@ -435,18 +435,23 @@ async function loadReport(){
           (sm.unrecalled!=null?' · عُرضت ولم يسترجعها ولا مرّة <b style="color:var(--bad)">'+sm.unrecalled+'</b>':'')+
           ' <span class="cnt">(«رسخت» = نجت بعد ثمانية أيّامٍ فأكثر)</span></li>'; }
       /* الكلماتُ التي أخطأ فيها — من آخر خمس جلسات، وما كتبه فيها */
-      var vMiss={}, vMissAny=false;
+      var vMiss={}, vMissAny=false, vFix=0, vRep=0;
       vocabAll.slice().sort(function(a,b){ return RR.when(a)<RR.when(b)?1:-1; }).slice(0,5).forEach(function(p){
+        vFix += (p.meta.fixed||0); vRep += (p.meta.reps||0);
         (p.meta.missed||[]).forEach(function(m){ if(!m||!m.w) return; vMissAny=true;
-          var e=vMiss[m.w]||(vMiss[m.w]={n:0,t:"",seen:false}); e.n++; if(!e.t && m.t) e.t=m.t; if(m.seen) e.seen=true; }); });
+          var e=vMiss[m.w]||(vMiss[m.w]={n:0,t:"",seen:false,fx:false}); e.n++; if(!e.t && m.t) e.t=m.t; if(m.seen) e.seen=true; if(m.fx) e.fx=true; }); });
       var vMissHtml='';
       if(vMissAny){
         var vws=Object.keys(vMiss).sort(function(a,b){ return vMiss[b].n-vMiss[a].n; }).slice(0,14);
         vMissHtml='<div style="background:var(--bg);border-radius:10px;padding:9px 12px;margin:8px 0 2px;font-size:.9rem">'+
           '<b>✏️ كلمات ما جاوبها صح</b> <span class="cnt">(آخر ٥ جلسات — أملِها عليه)</span><div style="margin-top:5px">'+
           vws.map(function(w){ var e=vMiss[w];
-            return '<span style="display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:3px 9px;margin:3px 3px 0 0" dir="ltr"><b>'+w+'</b>'+
+            /* ما أعاد كتابتَه بنفسه في جولة التثبيت يُعلَّم — فيعرف الأب
+               أيَّ كلمةٍ عالجها ابنُه في مكانها وأيَّها ما زالت معلّقة. */
+            return '<span style="display:inline-block;background:'+(e.fx?'var(--good-bg)':'var(--card)')+';border:1px solid '+(e.fx?'var(--good)':'var(--line)')+';border-radius:9px;padding:3px 9px;margin:3px 3px 0 0" dir="ltr"><b>'+w+'</b>'+
+              (e.fx?' <span style="color:var(--good)">✅ ثبّتها</span>':'')+
               (e.t?' <span style="color:var(--bad)">← كتب: '+e.t+'</span>':(e.seen?' <span class="cnt">(شافها)</span>':''))+(e.n>1?' <span class="cnt">×'+e.n+'</span>':'')+'</span>'; }).join("")+
+          (vRep?'<div class="cnt" style="margin-top:7px">🔁 رجعت له في نفس الجلسة <b>'+vRep+'</b> كلمة، كتب منها بنفسه <b style="color:var(--good)">'+vFix+'</b>.</div>':'')+
           '</div></div>';
       }
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div><ul class="weak">'+
