@@ -3069,8 +3069,28 @@ var U1_SURVEY = [
   ["drinks a lot of coffee",    "no","no","no"]
 ];
 
+/* جدولُ الكتاب خمسةُ صفوفٍ فسعتُه عشرة، ولا يصحّ أن أزيد فيه صفوفًا
+   من عندي: نصُّ السؤال يقول «من استبيان الكتاب» فتصير دعوى كاذبة.
+   فالتوسعةُ تدريبٌ مستقلٌّ بأسماءٍ وأنشطةٍ من عندنا على القاعدة نفسها،
+   مُعلَنٌ أنّه تدريبٌ لا نقلٌ عن الكتاب. */
+var U1_DRILL_ACT = ["plays football","likes fish","speaks French","rides a bike",
+  "wakes up early","drinks tea","reads before bed","eats breakfast at home",
+  "walks to school","studies at night"];
+var U1_DRILL_NAMES = [["Ali","Sami"],["Noura","Hind"],["Omar","Faris"],["Sara","Lama"],["Khalid","Yazeed"]];
+function u1Drill(){
+  var act=gp(U1_DRILL_ACT), nm=gp(U1_DRILL_NAMES), both=Math.random()<0.5;
+  var a=both?"yes":"no", opts=["Both","Neither","All"], right=both?"Both":"Neither";
+  return ["Practice (not from the book): <b>"+nm[0]+"</b> = "+en(a)+" · <b>"+nm[1]+"</b> = "+en(a)+
+          "<br>Complete: "+en("___ of them "+act+"."),
+    opts.map(en), opts.indexOf(right),
+    en("Both")+" للإثبات و"+en("Neither")+" للنفي — وكلاهما لشخصين لا لثلاثة، و"+en("Neither")+
+    " يأتي بعدها فعلٌ <b>مفرد</b>.",
+    "u1dr:"+(both?"y":"n")+":"+act];
+}
+
 /* Both / Neither لشخصين — All / None / Not all لثلاثة (ص ١١) */
 function u1Survey(){
+  if(Math.random()<0.5) return u1Drill();
   var r=gp(U1_SURVEY), two=Math.random()<0.5, right, why, opts;
   if(two){
     /* نورة ومها فقط */
@@ -3415,12 +3435,22 @@ var u10Phrasal = pickGen(U10_PHRASAL,
   "<span class=ltr>turn it down</span> لا <span class=ltr>turn down it</span> — أمّا مع الاسم فيصحّ الترتيبان "+
   "(ص <span class=ltr>112</span>).", "u10ph");
 
+/* عبارتان من الكتاب لا تكفيان: سعتُهما اثنتا عشرة صورةً يحفظها الطالب
+   في جلستين. فأُضيف إليهما عباراتُ محادثةٍ من جنسها شائعةٌ في الإنجليزية،
+   ونصُّ الشرح يفرّق بينهما: الكتابُ لصفحته، والبقيةُ توسعة. */
 var U10_RT = [
   ["At long last!","Finally!",["Not at all.","I'm sorry."]],
-  ["That's a bit too much.","This has gone too far.",["That's very kind.","That's not enough."]]
+  ["That's a bit too much.","This has gone too far.",["That's very kind.","That's not enough."]],
+  ["Never mind.","It doesn't matter.",["Thank you very much.","I don't agree."]],
+  ["No way!","I don't believe it!",["You're welcome.","Of course, sure."]],
+  ["That's a relief!","I'm glad it's over.",["I'm very angry.","I don't care."]],
+  ["It's up to you.","You decide.",["I decide, not you.","Nobody can decide."]],
+  ["No wonder!","That explains it.",["That is very strange.","I have no idea."]],
+  ["Take your time.","Don't hurry.",["Be quick, please.","Give me the time."]]
 ];
 var u10RealTalk = vocabGen(U10_RT,
-  "من <span class=ltr>Real Talk</span> في الوحدة <span class=ltr>10</span> (ص <span class=ltr>115</span>).", "u10rt");
+  "من عبارات المحادثة (<span class=ltr>Real Talk</span>): أوّلاها في الوحدة "+
+  "<span class=ltr>10</span> (ص <span class=ltr>115</span>)، وما بعدها عباراتٌ شائعةٌ من جنسها.", "u10rt");
 
 /* محادثة أمل وسارة عن قريمي (ص ١١٥) */
 var U10_SARAH = [
@@ -3607,13 +3637,24 @@ var u12Infinitive = clozeGen(U12_INF,
   "<span class=ltr>-ing</span> (ص <span class=ltr>132</span>).", "u12in");
 
 /* الفعل + اسم/ضمير + infinitive (ص ١٣٢) */
+/* جملتان من الكتاب سعتُهما اثنتا عشرة صورة. زِيدت جملُ تدريبٍ على
+   القاعدة نفسها وفي موضوع الوحدة (عادات الشعوب) — القاعدةُ من الكتاب
+   والتدريبُ عليها أوسع. */
 var U12_VNI = [
   ["In Latin America, families allow children ___ up late. (stay)","to stay",["staying","stay"]],
-  ["In China, people don't expect you ___. (tip)","to tip",["tipping","tip"]]
+  ["In China, people don't expect you ___. (tip)","to tip",["tipping","tip"]],
+  ["In Japan, people expect you ___ your shoes at the door. (remove)","to remove",["removing","remove"]],
+  ["My parents don't allow me ___ out late. (stay)","to stay",["staying","stay"]],
+  ["The teacher asked us ___ the homework before Sunday. (finish)","to finish",["finishing","finish"]],
+  ["They told him ___ quiet in the museum. (be)","to be",["being","be"]],
+  ["The guide advised us ___ a small gift. (bring)","to bring",["bringing","bring"]],
+  ["In some countries, people expect visitors ___ hands. (shake)","to shake",["shaking","shake"]],
+  ["She reminded me ___ off my phone. (turn)","to turn",["turning","turn"]],
+  ["Our host wanted us ___ more food. (try)","to try",["trying","try"]]
 ];
 var u12VerbNounInf = clozeGen(U12_VNI,
-  "بعض الأفعال مثل <span class=ltr>allow, expect</span> تأخذ اسمًا أو ضميرًا ثم مصدرًا بـ<span class=ltr>to</span>: "+
-  "<span class=ltr>allow children to stay up</span> (ص <span class=ltr>132</span>).", "u12vn");
+  "بعض الأفعال مثل <span class=ltr>allow, expect, ask, tell, advise, remind, want</span> تأخذ اسمًا أو ضميرًا "+
+  "ثم مصدرًا بـ<span class=ltr>to</span>: <span class=ltr>allow children to stay up</span> (ص <span class=ltr>132</span>).", "u12vn");
 
 /* It's ... + infinitive (ص ١٣٢–١٣٣) */
 var U12_ITS = [
@@ -3631,9 +3672,21 @@ var u12Its = pickGen(U12_ITS,
   "<span class=ltr>It's polite to shake hands</span> (ص <span class=ltr>132–133</span>).", "u12its");
 
 /* gerund كفاعل (ص ١٣٢) */
+/* مشتّتُ «To travel» كان عيبًا لا توسعةً: «To travel is a good way…»
+   صحيحةٌ في الإنجليزية، فلو اختارها الطالب قيل له أخطأتَ وهو مصيب.
+   فصارت المشتّتات ما لا يصحّ في موضع الفاعل: الفعلُ المجرّد وصيغةُ
+   المفرد الغائب. والتدريب أوسع: عشرُ جملٍ على القاعدة نفسها. */
 var U12_GS = [
-  ["___ is a good way to learn about other cultures. (Travel)","Traveling",["Travel","To travel"]],
-  ["___ is not common in Japan. (Tip)","Tipping",["Tip","To tip"]]
+  ["___ is a good way to learn about other cultures. (Travel)","Traveling",["Travel","Travels"]],
+  ["___ is not common in Japan. (Tip)","Tipping",["Tip","Tips"]],
+  ["___ hands is normal in many countries. (Shake)","Shaking",["Shake","Shakes"]],
+  ["___ on time is important in Germany. (Arrive)","Arriving",["Arrive","Arrives"]],
+  ["___ your shoes is polite in Japan. (Remove)","Removing",["Remove","Removes"]],
+  ["___ loudly is rude in some places. (Talk)","Talking",["Talk","Talks"]],
+  ["___ a small gift is a nice idea. (Bring)","Bringing",["Bring","Brings"]],
+  ["___ new food is part of travelling. (Try)","Trying",["Try","Tries"]],
+  ["___ questions helps you learn faster. (Ask)","Asking",["Ask","Asks"]],
+  ["___ early is a healthy habit. (Sleep)","Sleeping",["Sleep","Sleeps"]]
 ];
 var u12GerundSubj = clozeGen(U12_GS,
   "يمكن أن يكون <span class=ltr>gerund</span> فاعلًا للجملة، مثل الفعل + <span class=ltr>ing</span> في أوّلها "+

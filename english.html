@@ -283,7 +283,23 @@ var FREQ = [["always","دائمًا (100%)","100% of the time"],["usually","عا
 var POSS = [["I","mine"],["you","yours"],["he","his"],["she","hers"],["we","ours"],["they","theirs"]];
 function gFam(){ var p=gp(FAM); var o=opt(p[0], dist(FAM,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
 function gAdj1(){ var p=gp(ADJ1); var o=opt(p[0], dist(ADJ1,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
-function gOpp(){ var o=opt("weak",["kind","tired"]); return ["Opposite of "+en("«strong»")+":", o[0], o[1], en("strong ↔ weak")+" (قويّ ↔ ضعيف)."]; }
+/* كان سؤالًا واحدًا ثابتًا (strong ↔ weak) فسعتُه ستّ صورٍ من ترتيب
+   الخيارات لا أكثر — يحفظه الطفل من جلستين. صار يسحب من عشرين ضدًّا،
+   ومشتّتاتُه من أضداد الكلمات الأخرى لا كلماتٍ لا صلة لها. */
+var OPP_PAIRS = [["strong","weak","قويّ ↔ ضعيف"],["big","small","كبير ↔ صغير"],
+  ["hot","cold","حارّ ↔ بارد"],["fast","slow","سريع ↔ بطيء"],["happy","sad","سعيد ↔ حزين"],
+  ["old","new","قديم ↔ جديد"],["open","closed","مفتوح ↔ مغلق"],["day","night","نهار ↔ ليل"],
+  ["up","down","أعلى ↔ أسفل"],["easy","difficult","سهل ↔ صعب"],["clean","dirty","نظيف ↔ وسخ"],
+  ["full","empty","ممتلئ ↔ فارغ"],["long","short","طويل ↔ قصير"],["rich","poor","غنيّ ↔ فقير"],
+  ["wet","dry","مبلول ↔ جافّ"],["near","far","قريب ↔ بعيد"],["early","late","مبكّر ↔ متأخّر"],
+  ["first","last","أوّل ↔ آخر"],["loud","quiet","عالي الصوت ↔ هادئ"],["light","dark","مضيء ↔ معتم"]];
+function gOpp(){
+  var p=gp(OPP_PAIRS), pool=[];
+  OPP_PAIRS.forEach(function(x){ if(x!==p){ pool.push(x[1]); } });
+  pool=shuffle(pool).filter(function(w){ return w!==p[0] && w!==p[1]; });
+  var o=opt(p[1], pool.slice(0,2));
+  return ["Opposite of "+en("«"+p[0]+"»")+":", o[0], o[1], en(p[0]+" ↔ "+p[1])+" ("+p[2]+")."];
+}
 function gFreqM(){ var p=gp(FREQ); var o=opt(p[0], dist(FREQ,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[2]+"."]; }
 function gFreqFill(){ var items=[["I ___ brush my teeth every day. (100%)","always"],["I ___ tell lies. (0%)","never"],["We ___ visit grandma on Fridays. (50%)","sometimes"]]; var p=gp(items); var o=opt(p[1], ["never","always","sometimes"].filter(function(x){return x!==p[1];}).slice(0,2)); return ["Complete: "+en(p[0]), o[0], o[1], "الظرف المناسب: "+en(p[1])+"."]; }
 function gPoss(){ var p=gp(POSS); var o=opt(p[1], dist(POSS,p,1)); return ["Possessive pronoun of "+en("«"+p[0]+"»")+" (mine/yours/…):", o[0], o[1], en(p[0]+" → "+p[1])+"."]; }

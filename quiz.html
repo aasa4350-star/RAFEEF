@@ -329,7 +329,11 @@ const BANK2 = {
       ["This is the ___ question in the exam.",["more difficult","most difficult","difficult"],1,"التفضيل: the most difficult."],
       ["My car is faster ___ yours.",["then","than","that"],1,"المقارنة: than."],
       ["She has ___ eaten lunch.",["already","yet","ever"],0,"already في الإثبات."],
-      ["Choose the synonym of \"big\":",["huge","tiny","short"],0,"huge = ضخم مرادف لـ big."],
+      /* كان هنا «synonym of big → huge»، ومولّدُ المرادفات يجيب على السؤال
+         نفسه بـ large. وكلاهما صحيح، لكنّ الطفل يحفظ أحدهما ثمّ يرى الآخر
+         فيظنّ أحدهما خطأً — كما وقع في «بخيل» فسأل عنه الأب. فصار السؤال
+         على كلمةٍ أخرى لا يزدوج جوابها، وهي أنسب لمستوى حسن. */
+      ["Choose the synonym of \"wealthy\":",["rich","poor","cheap"],0,"wealthy = rich (غنيّ)."],
       ["We ___ a great time yesterday.",["have","had","having"],1,"yesterday ماضٍ: had."],
       ["Ice ___ at 0 degrees.",["melt","melts","melting"],1,"حقيقة عامة: melts."],
       ["I enjoy ___ books.",["read","reading","to read"],1,"بعد enjoy نستخدم v+ing: reading."]
@@ -1883,8 +1887,14 @@ if(!STUDENTS[who]){
     var n=gpick(ns), o=opt3(n[1],[n[0]+"s",n[0]+"es",n[0]+"ies"]);
     return ['The plural of "'+n[0]+'" is:',o[0],o[1],"جمع "+n[0]+" = "+n[1]+".","en"];
   }
+  /* وُسّع البنك من ٩ إلى ٢١: تسعةٌ تُعرض منها ثمانيةٌ كلَّ جلسةٍ تعني
+     أنّ الطفل يحفظ الجواب مقرونًا بالكلمة لا بالقاعدة. */
   function ePrep(){
-    var t=gpick([["in","May"],["in","2020"],["in","summer"],["on","Monday"],["on","Friday"],["on","my birthday"],["at","night"],["at","6 o'clock"],["at","noon"]]);
+    var t=gpick([["in","May"],["in","2020"],["in","summer"],["in","winter"],["in","April"],
+      ["in","the morning"],["in","the evening"],["in","March"],
+      ["on","Monday"],["on","Friday"],["on","my birthday"],["on","Sunday"],["on","Tuesday"],
+      ["on","the first of May"],["on","Thursday evening"],
+      ["at","night"],["at","6 o'clock"],["at","noon"],["at","midnight"],["at","7:30"],["at","sunset"]]);
     return ["We meet ___ "+t[1]+".",["in","on","at"],["in","on","at"].indexOf(t[0]),"مع «"+t[1]+"» نستخدم "+t[0]+".","en"];
   }
   function eOpp(){
@@ -1894,10 +1904,20 @@ if(!STUDENTS[who]){
     var o=opt3(p[1],others.slice(0,2));
     return ['The opposite of "'+p[0]+'" is:',o[0],o[1],"عكس "+p[0]+" = "+p[1]+".","en"];
   }
+  /* وُسّع من ٩ إلى ٢٢، ودخل فيه الاستثناءان المشهوران: القاعدة على
+     الصوت لا على الحرف — «an hour» بحرفٍ ساكنٍ صامتٍ، و«a university»
+     بحرفٍ متحرّكٍ يُلفظ «يو». ولهما شرحٌ خاصٌّ في الحقل الثالث، وإلّا
+     كذّبا القاعدةَ العامّة التي يقرؤها الطفل في الشرح. */
   function eAan(){
-    var ns=[["apple","an"],["orange","an"],["egg","an"],["umbrella","an"],["book","a"],["car","a"],["hat","a"],["dog","a"],["pen","a"]];
+    var ns=[["apple","an"],["orange","an"],["egg","an"],["umbrella","an"],["elephant","an"],
+      ["idea","an"],["animal","an"],["exam","an"],["uncle","an"],["envelope","an"],
+      ["hour","an","«hour» حرفُ الـh فيها صامت، فالصوتُ متحرّكٌ → an"],
+      ["book","a"],["car","a"],["hat","a"],["dog","a"],["pen","a"],["table","a"],
+      ["chair","a"],["teacher","a"],["ball","a"],["window","a"],
+      ["uniform","a","«uniform» تُلفظ «يونيفورم» فصوتُها الأوّل ساكن → a"]];
     var n=gpick(ns);
-    return ["I have ___ "+n[0]+".",["a","an","the"],["a","an","the"].indexOf(n[1]),(n[1]==="an"?("«"+n[0]+"» تبدأ بحرف متحرك → an"):("«"+n[0]+"» تبدأ بحرف ساكن → a"))+".","en"];
+    var why = n[2] || (n[1]==="an"?("«"+n[0]+"» تبدأ بحرف متحرك → an"):("«"+n[0]+"» تبدأ بحرف ساكن → a"));
+    return ["I have ___ "+n[0]+".",["a","an","the"],["a","an","the"].indexOf(n[1]),why+".","en"];
   }
   function ePast(){
     var v=gpick(["play","work","walk","talk","cook","clean","help","wait","call","watch","rain","start","jump","open","visit","want","need","love","live","move","close","learn","answer","finish","follow","paint","plant","push","pull","rest","smile","travel","use"]);
@@ -2028,11 +2048,17 @@ if(!STUDENTS[who]){
     return [s[0]+" ___ it already.",o[0],o[1],"المضارع التام: "+s[1]+" + التصريف الثالث ("+v[1]+").","en"];
   }
   function eThereIs(){
-    var t=gpick([["is","a book"],["is","some water"],["is","a cat"],["is","milk"],["are","three cats"],["are","many books"],["are","two apples"],["are","some pens"]]);
+    var t=gpick([["is","a book"],["is","some water"],["is","a cat"],["is","milk"],
+      ["is","a pen"],["is","sugar"],["is","an apple"],["is","bread"],["is","a chair"],
+      ["are","three cats"],["are","many books"],["are","two apples"],["are","some pens"],
+      ["are","two cups"],["are","five apples"],["are","two bags"],["are","some flowers"]]);
     return ["There ___ "+t[1]+" on the table.",["is","are","am"],["is","are","am"].indexOf(t[0]),(t[0]==="is"?"مفرد/غير معدود ← there is":"جمع ← there are")+".","en"];
   }
   function eMuchMany(){
-    var t=gpick([["many","books"],["many","cars"],["many","apples"],["many","students"],["much","water"],["much","money"],["much","time"],["much","sugar"]]);
+    var t=gpick([["many","books"],["many","cars"],["many","apples"],["many","students"],
+      ["many","chairs"],["many","pens"],["many","days"],["many","friends"],
+      ["much","water"],["much","money"],["much","time"],["much","sugar"],
+      ["much","milk"],["much","rice"],["much","bread"],["much","salt"]]);
     return ["How ___ "+t[1]+"?",["many","much","more"],["many","much","more"].indexOf(t[0]),(t[0]==="many"?"«"+t[1]+"» معدود ← many":"«"+t[1]+"» غير معدود ← much")+".","en"];
   }
   /* المرادفات: كان بنك حسن ٣ أسئلة ثابتة تتكرّر عليه كلّ جلسة بلا استثناء،

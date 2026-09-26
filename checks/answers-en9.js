@@ -836,6 +836,15 @@ const SURVEY={'is a vegetarian':['no','no','no'],'often eats junk food':['no','n
   'drinks a lot of coffee':['no','no','no']};
 check('u1Survey',(t,a,opts)=>{
   const m=t.match(/___ of them (.+?)\.\s*$/); if(!m) return 'قراءة: '+t;
+  /* فرعُ التدريب لا يقرأ جدولَ الكتاب بل يكتب قيمتَي الشخصين في نصّه،
+     فيُراجَع منهما — ولا يُعفى من المراجعة. */
+  if(/Practice \(not from the book\)/.test(t)){
+    const v=t.match(/=\s*(yes|no)\b[\s\S]*?=\s*(yes|no)\b/);
+    if(!v) return 'تدريبٌ لا تُقرأ قيمتاه: '+t;
+    if(v[1]!==v[2]) return 'الشخصان مختلفان في التدريب — كان يجب تجنّبه';
+    const e = v[1]==='yes'?'Both':'Neither';
+    return e===a||('متوقّع '+e+' في التدريب');
+  }
   const row=SURVEY[m[1]]; if(!row) return 'صفّ غير معروف: '+m[1];
   const three=/Badria/.test(t);
   if(three){
