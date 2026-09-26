@@ -257,6 +257,48 @@ check('u8Body',(t,a)=>{
   const m=t.match(/Which part of the body\s+(.+?)\?$/); if(!m) return 'قراءة: '+t;
   const w=BODY_OF[m[1]]; return w?(w===a||'متوقّع '+w):'دليل غير معروف: '+m[1]; });
 
+/* ═══ Pair Work — ص ١١ ═══════════════════════════════════════════════
+   المراجعة هنا من جدولٍ مستقلٍّ مكتوبٍ من صورة الصفحة نفسها، لا من
+   بنك الصفحة — وإلّا صحّح المولّدُ نفسَه بنفسه. */
+const P11_OF={
+  'What is the cook doing?':"He's making soup.",
+  'What is Lee doing?':"He's feeding the fish.",
+  'What is the writer typing on the laptop?':'A new script.',
+  "«I love pizza. It's excellent.» — this shows:":'approval',
+  'Where does the Pair Work take place?':'in a TV studio' };
+check('u2Pair11',(t,a,o,q)=>{
+  const right=q[4].slice('u2p11:'.length);
+  if(right!==a) return 'الوسمُ يخالف المعلَّم: '+right;
+  const w=P11_OF[t];
+  if(w) return w===a||'متوقّع '+w;
+  if(/Which sentence is in the picture\?/.test(t)){
+    /* جملُ الفقاعات كلُّها مضارعٌ مستمرّ صحيحُ التركيب */
+    const okForm=/^(Why are you running away\?|Help! He's breaking my ladder\.|Am I doing this right\?|I'm writing a new script\.)$/;
+    return okForm.test(a)||'ليست من فقاعات الصفحة: '+a;
+  }
+  return 'سؤال غير معروف: '+t; });
+const YN_OF={
+  'Is the cook making soup?':'Yes, he is.',
+  'Is Lee feeding the fish?':'Yes, he is.',
+  'Is Lee cooking dinner?':"No, he isn't.",
+  'Is the cook feeding the fish?':"No, he isn't.",
+  'Are the people working in a TV studio?':'Yes, they are.',
+  'Are the actors wearing modern clothes?':"No, they aren't.",
+  'Is the story about today?':"No, it isn't.",
+  'Is someone writing a new script?':'Yes, someone is.' };
+check('u2Short11',(t,a,o)=>{
+  const w=YN_OF[t]; if(!w) return 'سؤال غير معروف: '+t;
+  if(w!==a) return 'متوقّع '+w;
+  /* لا يصحّ أن يكون بين الخيارات جوابان صحيحان */
+  const alsoRight=o.filter(x=>x!==a&&x===w).length;
+  return !alsoRight||'خياران صحيحان'; });
+const MODERN=new Set(['a cell phone','a laptop computer','sneakers (running shoes)','a backpack']);
+check('u2Wrong11',(t,a,o)=>{
+  if(!MODERN.has(a)) return 'المعلَّم ليس شيئًا حديثًا: '+a;
+  const others=o.filter(x=>x!==a);
+  const bad=others.filter(x=>MODERN.has(x));
+  return !bad.length||'مشتّتٌ حديثٌ أيضًا فيصير جوابًا صحيحًا ثانيًا: '+bad.join(','); });
+
 module.exports = function(){ return { ok, bad, checked:seen, lines:LINES }; };
 if(DIRECT){
   console.log('\n— مولّدات سليمة: '+ok+' · أخطاء: '+bad);

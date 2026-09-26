@@ -318,6 +318,77 @@ function u2Appr(){
     "u2appr:"+right];
 }
 
+/* ═══ Pair Work — استوديو التلفاز (ص ١١) ═══════════════════════════════
+   من صفحة الكتاب نفسها التي أرسلها الأب: صورةُ استوديو يصوّر قصّةً
+   قديمة، وفيها فقاعاتُ كلامٍ كلُّها مضارعٌ مستمرّ، وتمرينان:
+     A — سؤالٌ وجوابٌ عن الناس:  What is the cook doing? He's making soup.
+                                Is Lee feeding the fish?  Yes, he is.
+     B — القصّة في الماضي، فابحث عمّا لا يصحّ وجودُه في الصورة:
+                                the old man is holding a cell phone.
+   فالمولّدات الثلاثة الآتية على هذه الصفحة: سؤالُ «ما الذي يفعله؟»،
+   والجوابُ القصير لسؤال be، ومفارقاتُ الزمن. */
+
+var P11_WH = [
+  ["What is the cook doing?","He's making soup.",["He's eating pizza.","He's feeding the fish."]],
+  ["What is Lee doing?","He's feeding the fish.",["He's making soup.","He's painting the door."]],
+  ["What is the writer typing on the laptop?","A new script.",["A letter to his family.","A shopping list."]],
+  ["Which sentence is in the picture?","Why are you running away?",["Why did you run away?","Why do you run away?"]],
+  ["Which sentence is in the picture?","Help! He's breaking my ladder.",["Help! He broke my ladder.","Help! He breaks my ladder."]],
+  ["Which sentence is in the picture?","Am I doing this right?",["Do I this right?","Am I do this right?"]],
+  ["Which sentence is in the picture?","I'm writing a new script.",["I write a new script now.","I am write a new script."]],
+  ["«I love pizza. It's excellent.» — this shows:","approval",["disapproval","a request"]],
+  ["Where does the Pair Work take place?","in a TV studio",["in a real Chinese street","in a school"]]
+];
+function u2Pair11(){
+  var x = gp(P11_WH), o = eOpts(x[1], x[2].slice());
+  if(!o) return null;
+  return [x[0], o[0].map(en), o[1],
+    "من <span class=ltr>Pair Work</span> (ص <span class=ltr>11</span>): الكلامُ كلُّه عمّا يجري <b>الآن</b>، فالزمن مضارعٌ مستمرّ: <span class=ltr>be + verb-ing</span>.",
+    "u2p11:"+x[1]];
+}
+
+/* الجواب القصير لسؤال be — الكتاب: Is Lee feeding the fish? Yes, he is. */
+var P11_YN = [
+  ["Is the cook making soup?","Yes, he is."],
+  ["Is Lee feeding the fish?","Yes, he is."],
+  ["Is Lee cooking dinner?","No, he isn't."],
+  ["Is the cook feeding the fish?","No, he isn't."],
+  ["Are the people working in a TV studio?","Yes, they are."],
+  ["Are the actors wearing modern clothes?","No, they aren't."],
+  ["Is the story about today?","No, it isn't."],
+  ["Is someone writing a new script?","Yes, someone is."]
+];
+function u2Short11(){
+  var x = gp(P11_YN), right = x[1];
+  var pron = right.replace(/^(Yes|No), /,"").replace(/ (is|isn't|are|aren't)\.$/,"");
+  var pos  = /^Yes/.test(right);
+  /* المشتّتان: جوابٌ بـdo مكان be، وجوابٌ بالاتّجاه المعاكس */
+  var doForm = (pron==="they") ? (pos?"Yes, they do.":"No, they don't.")
+             : (pos?"Yes, "+pron+" does.":"No, "+pron+" doesn't.");
+  var flip = pos ? right.replace(/^Yes/,"No").replace(/ is\.$/," isn't.").replace(/ are\.$/," aren't.")
+                 : right.replace(/^No/,"Yes").replace(/ isn't\.$/," is.").replace(/ aren't\.$/," are.");
+  var o = eOpts(right, [doForm, flip]);
+  if(!o) return null;
+  return [x[0], o[0].map(en), o[1],
+    "سؤالٌ يبدأ بـ<span class=ltr>be</span> يُجاب بـ<span class=ltr>be</span> لا بـ<span class=ltr>do</span>: "+
+    "<span class=ltr>Is Lee feeding the fish? — Yes, he is.</span> (ص <span class=ltr>11</span>)",
+    "u2sh11:"+x[0]];
+}
+
+/* B — مفارقاتُ الزمن: القصّة في الماضي فما لا يوجد فيه خطأٌ في الصورة */
+var P11_MODERN = ["a cell phone","a laptop computer","sneakers (running shoes)","a backpack"];
+var P11_OLD    = ["a paper lantern","a wooden ladder","a stone bridge","a dragon statue",
+                  "a willow tree","fish in the pond"];
+function u2Wrong11(){
+  var right = gp(P11_MODERN), olds = shuffle(P11_OLD.slice()).slice(0,2);
+  var o = eOpts(right, olds);
+  if(!o) return null;
+  return ["The story takes place in the past. Which thing is <b>wrong</b> in the picture?", o[0].map(en), o[1],
+    "القصّة قديمة، فكلُّ شيءٍ حديثٍ خطأٌ في الصورة — ومثالُ الكتاب نفسه: "+
+    "<span class=ltr>the old man is holding a cell phone</span> (ص <span class=ltr>11</span>).",
+    "u2wr11:"+right];
+}
+
 /* ===================== الوحدة ٣ — Who's Who (ص ١٨–٢٥) ===================== */
 
 var JOBS = [
@@ -895,7 +966,8 @@ function u8Body(){
 
 /* ===================== تجميع المولّدات ===================== */
 var U1 = [u1Be, u1BeNeg, u1Wh, u1Prep, u1Func, u1Dir];
-var U2 = [u2Prog, u2Ing, u2Imper, u2Appr, u1Prep];      /* حروف الجرّ مشتركةٌ بين ١ و٢ كما في الجدول */
+var U2 = [u2Prog, u2Ing, u2Imper, u2Appr, u1Prep,       /* حروف الجرّ مشتركةٌ بين ١ و٢ كما في الجدول */
+          u2Pair11, u2Short11, u2Wrong11];              /* Pair Work — ص ١١ (صورةُ الصفحة من الأب) */
 var U3 = [u3Job, u3Pres, u3DoDoes, u3Want, u3Rel];
 var U4 = [u4FreqWord, u4FreqPos, u4FreqExpr, u4HowOften, u4KnowHow, u4GerInf];
 var U5 = [u5Count, u5SomeAny, u5Part, u5TooEnough, u5WouldLike];
