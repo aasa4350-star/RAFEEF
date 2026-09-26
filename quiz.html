@@ -10,6 +10,9 @@
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
+<!-- قواعدُ التقرير: ترقيمُ صفحات الطلب (الجدول تجاوز الألف) وإسقاطُ
+     الصفوف المكرّرة بمعرّف المحاولة — يستعملها تبويب «محاولاتي 📚» -->
+<script src="report-rules.js"></script>
 <script src="azure-config.js"></script>
 <script src="writing-en.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
@@ -2584,17 +2587,31 @@ if(!STUDENTS[who]){
     if (logLoaded && !force) return;
     sec.innerHTML = '<div class="locked">⏳ جارٍ تحميل محاولاتك السابقة...</div>';
     try{
-      const r = await fetch(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc",
-        {headers:{apikey:SUPA_KEY,Authorization:"Bearer "+SUPA_KEY}});
-      const rows = await r.json();
+      /* ═══ «محاولاتي» كانت تعرض كلَّ صفٍّ لا أوراقَ الاختبار ═══════════
+         علّتان اجتمعتا (٢٦ سبتمبر ٢٠٢٦):
+         ١) طلبٌ واحدٌ بلا ترقيم، والخادمُ يقطع عند ألف صفّ — وسجلّ سعودٍ
+            ١٢١٦ صفًّا، فتسقط أقدمُ أوراقه بلا خبر.
+         ٢) والأسوأ: كان يعرض كلَّ صفٍّ في سجلّه — كلمات وقراءة ومحادثة
+            وإخفاقات تسجيل — وهي محفوظةٌ بـen_total=0 وma_total=0، فتظهر
+            «٠٪ — إنجليزي ٠/٠ · رياضيات ٠/٠». ومن أصل ١٢١٦ صفًّا لسعودٍ
+            ٤٧ ورقةَ اختبارٍ فقط؛ فالطفل يفتح «محاولاتي» فيجد ألفَ بطاقةٍ
+            فارغةٍ تُخفي أوراقه الحقيقيّة.
+         فصار الجلبُ بصفحات، والعرضُ للأوراق التي فيها درجةٌ فعلًا،
+         وتُسقَط الصفوف المكرّرة بمعرّف المحاولة (RR.usable). */
+      let all = await RR.fetchAll(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc", SUPA_KEY);
+      all = RR.usable(Array.isArray(all)?all:[]);
+      const rows = all.filter(function(x){ return ((x.en_total||0)+(x.ma_total||0)) > 0; });
       logLoaded = true;
-      if(!Array.isArray(rows) || !rows.length){
+      if(!rows.length){
         sec.innerHTML = '<div class="locked">ما عندك محاولات سابقة بعد. حل الاختبار وبتنحفظ هنا تلقائيًا.</div>'; return;
       }
-      let h = '<div class="block-title"><span class="dot"></span> محاولاتك السابقة ('+rows.length+')</div>';
-      rows.forEach(function(x,i){
+      /* لا نرسم ألفَ بطاقةٍ على جوّال: الأحدثُ خمسون تكفي، ونقول كم الكلّ */
+      const SHOW = 50, shown = rows.slice(0, SHOW);
+      let h = '<div class="block-title"><span class="dot"></span> محاولاتك السابقة ('+rows.length+')</div>'+
+        (rows.length>SHOW ? '<p class="hint">نعرض أحدث '+SHOW+' محاولة من '+rows.length+'.</p>' : '');
+      shown.forEach(function(x,i){
         var tot = Math.round((x.en_correct+x.ma_correct)/((x.en_total+x.ma_total)||1)*100);
-        var dt = saTime(x.created_at) + " (السعودية)";
+        var dt = saTime(RR.when(x)) + " (السعودية)";
         var wrong = x.wrong || [];
         h += '<div class="q"><div class="num">محاولة '+(rows.length-i)+' · '+dt+'</div>'+
              '<div class="stem">النتيجة: '+tot+'% — إنجليزي '+x.en_correct+'/'+x.en_total+' · رياضيات '+x.ma_correct+'/'+x.ma_total+'</div>';
