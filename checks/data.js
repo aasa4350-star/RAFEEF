@@ -156,9 +156,19 @@ async function run(){
      kind="micfail" تشخيصُ إخفاق تسجيلٍ لا جلسةَ اختبار — تُحفظ ليُعرف
      سببُ تعطّل المايك بدل تخمينه (انظر MIC.why في mic-help.js).
      فالمبتور ما خلا من ذلك كلّه. */
+  /* صفوفٌ ليست جلساتِ اختبارٍ أصلًا فلا يُطلب منها درجة:
+       activity  فتحَ القسمَ ولم يُكمل
+       talk      محادثة
+       micfail   تعذّر المايكروفون
+       vocabreset ساعةُ تصفير حفظ الكلمات — علامةٌ أُدخلت لأنّ المفتاح
+                 يُدخل ولا يحذف، فلا سبيل إلى محو الصفوف القديمة.
+     ومَن أضاف علامةً جديدةً فليُسجّلها هنا وفي MARKERS في
+     report-rules.js، وإلّا عُدّت جلسةً بلا درجة. */
+  const NOT_SESSION = new Set(['activity', 'talk', 'micfail', 'vocabreset']);
+
   const stub = rows.filter(r => {
     const m = r.meta || {};
-    if (m.kind === 'activity' || m.kind === 'talk' || m.kind === 'micfail') return false;
+    if (NOT_SESSION.has(m.kind)) return false;
     return !(m.test || m.paper || m.per || m.total);
   }).length;
   if (stub) issues.push({ sev:'خطأ', msg:stub + ' جلسة بلا اسم اختبارٍ ولا نتيجة ولا تفصيل' });
@@ -177,7 +187,7 @@ async function run(){
     (Array.isArray(m.per) && m.per.length > 0);
   const mute = rows.filter(r => {
     const m = r.meta || {};
-    return m.kind !== 'activity' && m.kind !== 'talk' && m.kind !== 'micfail' && !scorable(m);
+    return !NOT_SESSION.has(m.kind) && !scorable(m);
   });
   if (mute.length){
     const by = {};
