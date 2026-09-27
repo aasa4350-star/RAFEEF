@@ -3867,11 +3867,88 @@ var U12_CUSTOMS = [
   ["What is important to Germans?","Being punctual, even arriving a few minutes early",
    ["Being casual about time","Arriving late on purpose"]],
   ["What should you do before entering a home in India?","Remove your shoes",
-   ["Bring a gift","Knock three times"]]
+   ["Bring a gift","Knock three times"]],
+  /* زيدت بعد وصول صورة القطعة كاملةً (ص ١٣٠–١٣١) */
+  ["What do the British call standing in line?","Queuing up",
+   ["Lining down","Waiting around"]],
+  ["What is a favorite topic of conversation with the British?","The weather",
+   ["Politics","Money"]],
+  ["Why do many stores in Mediterranean countries close for three hours in the afternoon?",
+   "So workers can eat with their family, rest, and return to work relaxed",
+   ["Because there are no customers at all","Because it is against the law to work"]],
+  ["What should you do with your chopsticks when you are not using them?",
+   "Place them on the chopsticks holder",
+   ["Leave them standing up in the rice","Put them in your pocket"]],
+  ["What is advisable if you can't manage to eat with chopsticks?","Ask for a spoon or a fork",
+   ["Eat with your hands","Leave the table"]],
+  ["Why should you try not to spread dust and mud in an Indian home?",
+   "Out of respect for the house and the carpets of your host",
+   ["Because shoes are not sold there","Because the floors are always wet"]]
 ];
 var u12Customs = factGen(U12_CUSTOMS,
   "من قطعة <span class=ltr>When in Rome, Do as the Romans Do</span> في الوحدة <span class=ltr>12</span> "+
   "(ص <span class=ltr>130–131</span>): ", "u12cu");
+
+/* ═══ تمرين B (ص ١٣٢) — يُكمَل من القطعة نفسها (ص ١٣٠–١٣١) ═════════════
+   كان هذا التمرين متروكًا لأنّ القطعة لم تكن عندي، فلا يُختلق جوابٌ
+   يُنسب إلى الكتاب. ولمّا وصلت صورتها صار لكلّ فراغٍ سندٌ في نصّها.
+   والمشتّتان: جملةٌ تخالف القطعة، وجملةٌ صحيحةٌ لكنّها عن بلدٍ آخر —
+   فلا يُنجي إلّا قراءةُ القطعة لا حفظُ الصيغة. */
+var U12_COMPB = [
+  ["It's advisable ___ in Japan.","to read a business card and comment on it",
+   ["to put a business card in your pocket right away","to remove your shoes before entering a home"]],
+  ["It's not a good idea ___ in Germany.","to be late for a meeting",
+   ["to arrive a few minutes early","to talk about the weather"]],
+  ["It's polite ___ in England.","to stand in line and wait your turn",
+   ["to go ahead of people who are waiting","to leave your chopsticks in the rice"]],
+  ["It's not common ___ in India.","to wear your shoes inside a home",
+   ["to remove your shoes at the door","to tip taxi drivers 15 percent"]],
+  ["It's important ___ in Mexico.","to use a university graduate's title",
+   ["to call every person Licenciado","to arrive a few minutes early"]],
+  ["It's common ___ in Mediterranean countries.","to eat dinner after 9 P.M.",
+   ["to eat dinner before 6 P.M.","to exchange business cards"]]
+];
+function u12CompleteB(){
+  var x=gp(U12_COMPB), o=eOpts(x[1],x[2].slice());
+  if(!o) return null;
+  return ["Complete with an infinitive. Use the article on pages 130–131:<br>"+en(x[0]),
+    o[0].map(en), o[1],
+    "تمرين <span class=ltr>B</span> (ص <span class=ltr>132</span>): بعد <span class=ltr>It's + صفة</span> مصدرٌ بـ"+
+    "<span class=ltr>to</span>، والجوابُ نفسُه من قطعة <span class=ltr>When in Rome</span> (ص <span class=ltr>130–131</span>).",
+    "u12cb:"+x[0]];
+}
+
+/* Quick Check B (ص ١٣١): ستُّ جملٍ صوابٍ وخطأ — وثالثُ الخيارات
+   «لم تذكرها القطعة» لأنّ تمييزَ المذكور من غير المذكور مهارةُ قراءةٍ
+   في نفسه، ولأنّ صيغة الصواب والخطأ خياران والموقع يلزمه ثلاثة. */
+var U12_TF = [
+  ["It's not a good idea to discuss the weather in England.",
+   "False — the article says it's a good idea to talk about the weather.",
+   ["True — the British dislike that topic.","The article doesn't mention the weather."]],
+  ["You are expected to take off your shoes in an Indian home.",
+   "True — removing shoes before entering a home is customary in India.",
+   ["False — shoes are kept on indoors.","The article doesn't mention shoes."]],
+  ["Make sure you call everyone in Mexico Licenciado.",
+   "False — the title is for university graduates, not for everyone.",
+   ["True — everyone there is called Licenciado.","The article doesn't mention titles."]],
+  ["Be sure to carry business cards with you in Japan.",
+   "True — you should be prepared to exchange personal or business cards.",
+   ["False — cards are not used in Japan.","The article doesn't mention business cards."]],
+  ["Remember not to be late for an appointment in Germany.",
+   "True — being punctual is important, and being late makes a bad impression.",
+   ["False — Germans are relaxed about time.","The article doesn't mention punctuality."]],
+  ["You should always remember to tip in China.",
+   "False — tipping is not practiced in China, and almost no one asks for tips.",
+   ["True — a 15 percent tip is expected there.","The article doesn't mention China."]]
+];
+function u12TrueFalse(){
+  var x=gp(U12_TF), o=eOpts(x[1],x[2].slice());
+  if(!o) return null;
+  return ["True or false? Use the article on pages 130–131:<br>"+en(x[0]),
+    o[0].map(en), o[1],
+    "من <span class=ltr>Quick Check</span> (ص <span class=ltr>131</span>) — والجوابُ من نصّ القطعة نفسِه.",
+    "u12tf:"+x[0]];
+}
 
 /* محادثة ويل وإدجار في الصين (ص ١٣٥) */
 var U12_EDGAR = [
@@ -3969,7 +4046,8 @@ var U10 = [u10PresPerfect,u10Gerund,u10Phrasal,u10RealTalk,u10Sarah,u10TwoWordVo
 var U11 = [u11Cond1,u11Rather,u11Cond2,u11RealTalk,u11Highway,u11Faisal,u11Durer,u11Gerund];
 var U12 = [u12Infinitive,u12VerbNounInf,u12Its,u12GerundSubj,u12Customs,u12Edgar,u12Shock,
            u12UsedTo,u12PastPerfect,
-           u12Advice,u12Make,u12WhichVerb];   /* من صندوق القواعد وتمرين A — ص ١٣٢ */
+           u12Advice,u12Make,u12WhichVerb,   /* من صندوق القواعد وتمرين A — ص ١٣٢ */
+           u12CompleteB,u12TrueFalse];       /* تمرين B و Quick Check — ص ١٣٠–١٣٢ */
 var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
 var ALLU2 = U4.concat(U5).concat(U6).concat(EXP2);     /* الجزء الثاني */
 var ALLU3 = U7.concat(U8).concat(U9);                  /* الجزء الثالث */

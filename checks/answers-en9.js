@@ -1077,6 +1077,41 @@ check('u12VerbNounInf',(t,a,o)=>{
   const e='to '+m[1].trim();
   return e===a||('متوقّع '+e); });
 
+/* ═══ قطعة When in Rome (ص ١٣٠–١٣١) وتمرين B و Quick Check ════════════
+   الجدولان هنا مكتوبان من نصّ القطعة في صورة الصفحة، لا منقولان من
+   بنك الصفحة — فلو غُيّر جوابٌ في الموقع يومًا كشفه هذا الفحص. */
+const COMPB={
+  "It's advisable ___ in Japan.":'to read a business card and comment on it',
+  "It's not a good idea ___ in Germany.":'to be late for a meeting',
+  "It's polite ___ in England.":'to stand in line and wait your turn',
+  "It's not common ___ in India.":'to wear your shoes inside a home',
+  "It's important ___ in Mexico.":"to use a university graduate's title",
+  "It's common ___ in Mediterranean countries.":'to eat dinner after 9 P.M.' };
+check('u12CompleteB',(t,a,o,q)=>{
+  const key=q[4].slice('u12cb:'.length), e=COMPB[key];
+  if(!e) return 'فراغٌ غير معروف: '+key;
+  if(e!==a) return 'متوقّع '+e;
+  if(!/^to [a-z]/.test(a)) return 'الجواب ليس مصدرًا بـto: '+a;
+  const notInf=o.filter(x=>!/^to [a-z]/.test(x));
+  return !notInf.length||'مشتّتٌ ليس مصدرًا، فيُعرف الجوابُ بشكله لا بمعناه: '+notInf.join(','); });
+/* صوابُ كلّ جملةٍ من جمل Quick Check كما تقتضيه القطعة */
+const TF_TRUTH={
+  "It's not a good idea to discuss the weather in England.":false,
+  'You are expected to take off your shoes in an Indian home.':true,
+  'Make sure you call everyone in Mexico Licenciado.':false,
+  'Be sure to carry business cards with you in Japan.':true,
+  'Remember not to be late for an appointment in Germany.':true,
+  'You should always remember to tip in China.':false };
+check('u12TrueFalse',(t,a,o,q)=>{
+  const key=q[4].slice('u12tf:'.length);
+  if(!(key in TF_TRUTH)) return 'جملةٌ غير معروفة: '+key;
+  const want=TF_TRUTH[key]?'True':'False';
+  const got=(a.match(/^(True|False)\b/)||[])[1];
+  if(!got) return 'الجواب لا يبدأ بـTrue/False: '+a;
+  if(got!==want) return 'متوقّع '+want+' لا '+got;
+  const alsoSame=o.filter(x=>x!==a&&(x.match(/^(True|False)\b/)||[])[1]===want);
+  return !alsoSame.length||'مشتّتٌ بالحكم نفسه: '+alsoSame.join(' / '); });
+
 say('\n'+(bad?('⚠️ إجمالي الأخطاء: '+bad):('✅ الإجمالي: '+ok+' مولّدًا سليمًا')));
 
 module.exports = function(){ return { ok: ok, bad: bad, lines: LINES }; };
