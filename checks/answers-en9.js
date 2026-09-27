@@ -11,8 +11,16 @@ const ctx={window:{},document:{getElementById:()=>null,querySelector:()=>null,qu
  navigator:{},localStorage:{getItem:()=>null,setItem:noop,removeItem:noop},location:{search:'?who=hasan'},
  fetch:()=>new Promise(()=>{}),setTimeout:noop,setInterval:noop,console:{log:noop,warn:noop,error:noop},
  URLSearchParams,JSON,Math,Date,encodeURIComponent};
-ctx.globalThis=ctx;Object.assign(ctx.window,ctx);vm.createContext(ctx);
+ctx.globalThis=ctx;ctx.window=ctx;   /* أليافُ العالميّ: config.js يكتب window.APP_CONFIG ثمّ تُقرأ APP_CONFIG مجرّدة */vm.createContext(ctx);
 const html=fs.readFileSync(path.join(ROOT,'english9.html'),'utf8');
+/* السكربتاتُ الخارجية أوّلًا: منذ أن صار عنوانُ قاعدة البيانات ومفتاحُها
+   في config.js صارت الصفحةُ تقرأ APP_CONFIG في أوّل سطرٍ من كتلتها، فلو
+   لم تُحمَّل سقطت الكتلةُ كلُّها بصمتٍ (الـcatch يبتلعها) ولم يُعرَّف
+   مولّدٌ واحد — فيصير الفحصُ يمرّ وهو لا يفحص شيئًا. */
+for(const s of [...html.matchAll(/<script[^>]*\bsrc=["']([^"']+)["']/gi)].map(m=>m[1].split('?')[0])){
+  const p=path.join(ROOT,s);
+  if(fs.existsSync(p)){ try{ vm.runInContext(fs.readFileSync(p,'utf8'),ctx); }catch(e){} }
+}
 for(const b of [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]))
   { try{ vm.runInContext(b,ctx); }catch(e){} }
 const S=s=>String(s).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();

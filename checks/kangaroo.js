@@ -42,6 +42,11 @@ function build(who) {
     document: { getElementById: () => null },
     fetch: () => Promise.resolve()
   });
+  /* الصفحة تقرأ APP_CONFIG من config.js، وwindow هنا ألياف العالميّ
+     نفسِه لا نسخةٌ منه — وإلّا لم يُعرَّف المتغيّر فتسقط الكتلةُ كلُّها. */
+  ctx.window = ctx;
+  const cfg = path.join(__dirname, '..', 'config.js');
+  if (fs.existsSync(cfg)) vm.runInContext(fs.readFileSync(cfg, 'utf8'), ctx);
   vm.runInContext(code + '\n;globalThis.__K={MATH_GENS,VERB_GENS,GK_GENS,VIS_GENS,GK,GK_POOL:(typeof GK_POOL!=="undefined"?GK_POOL:GK),MEM_CAP:(typeof MEM_CAP!=="undefined"?MEM_CAP:{gk:20}),COLL,VIS,SEQ,lvl};',
                   ctx, { timeout: 8000 });
   return { ctx, K: ctx.__K };

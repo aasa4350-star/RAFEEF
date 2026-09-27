@@ -51,7 +51,11 @@ function makeCtx(){
     SpeechSynthesisUtterance:function(){}, Promise, Array, Object, String, Number, RegExp, Error
   };
   ctx.globalThis = ctx;
-  Object.assign(ctx.window, ctx);
+  /* window أليافُ العالميّ نفسِه لا نسخةٌ منه: الصفحاتُ تكتب
+     window.APP_CONFIG = {...} في config.js ثمّ تقرأ APP_CONFIG مجرّدةً
+     في كتلتها. فلو كانت window نسخةً منفصلةً لم يُعرَّف المتغيّرُ
+     العالميّ، فتسقط الكتلةُ كلُّها بصمتٍ ولم يُفحص مولّدٌ واحد. */
+  ctx.window = ctx;
   return vm.createContext(ctx);
 }
 

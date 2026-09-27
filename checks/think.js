@@ -80,9 +80,14 @@ function loadRemedy(){
   const cut = code.indexOf('var app = document.getElementById');   /* نقف قبل ما يعتمد على DOM */
   const ctx = { console, fetch: () => Promise.resolve({ ok:false, json: () => [] }),
                 document: { getElementById: () => null, addEventListener: () => {} },
-                window: { addEventListener: () => {} },
+                addEventListener: () => {},
                 location: { search: '?who=hasan' }, URLSearchParams, encodeURIComponent };
   vm.createContext(ctx);
+  /* الصفحة تقرأ APP_CONFIG من config.js، وwindow ألياف العالميّ نفسِه
+     لا نسخةٌ منه — وإلّا سقطت الكتلةُ عند أوّل سطرٍ يقرأ الإعداد. */
+  ctx.window = ctx;
+  const cfg = path.join(ROOT, 'config.js');
+  if (fs.existsSync(cfg)) vm.runInContext(fs.readFileSync(cfg, 'utf8'), ctx);
   vm.runInContext(cut > 0 ? code.slice(0, cut) : code, ctx);
   return { REMEDY: ctx.REMEDY || null, REASON: ctx.REASON || null };
 }
