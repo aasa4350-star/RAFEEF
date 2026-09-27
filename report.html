@@ -873,7 +873,10 @@ function fetchAll(){
       })
       .then(function(rows){
         if(!Array.isArray(rows)) rows = [];
-        rows = RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
+        /* ⚠️ لا تُصفَّ الصفحةُ هنا: RR.usable يقرأ حدودَ التصفير من صفوف
+           العلامة ثمّ يستثنيها، فلو طُبّق على كلّ صفحةٍ وحدها ضاعت
+           العلامةُ الواقعةُ في صفحةٍ أخرى وبقيت جلساتُ الكلمات القديمة.
+           فتُجمع الصفحاتُ خامًا ويُصفّى المجموعُ مرّةً واحدة في load(). */
         out = out.concat(rows);
         return rows.length < PAGE ? out : page(i+1);
       });
@@ -886,9 +889,9 @@ function load(){
   st.style.display = "block"; st.textContent = "جارٍ التحميل...";
   fetchAll()
   .then(function(data){
-    /* الصفحات تُجلب واحدةً واحدة وRR.usable يُطبَّق على كلٍّ منها، فقد
-       يقع صفّا المحاولة الواحدة في صفحتين. فنُمرّر المجموع مرّةً أخيرة. */
-    ALL = RR.dedupe(Array.isArray(data) ? data : []);
+    /* الصفحات تُجمع خامًا (انظر التعليق في fetchAll) ويُصفّى المجموعُ هنا
+       مرّةً واحدة: استثناءٌ، وحدُّ تصفير الكلمات، وإزالةُ التكرار. */
+    ALL = RR.usable(Array.isArray(data) ? data : []);
     var withSkills = ALL.filter(function(r){ return r.meta && r.meta.skills; }).length;
     st.style.display = "none";
     if(!withSkills){

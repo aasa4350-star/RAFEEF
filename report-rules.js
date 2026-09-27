@@ -185,8 +185,38 @@
     excluded: excluded,
     dedupe: dedupe,
     /* تُطبَّق مرّةً واحدةً على الصفوف فور جلبها، قبل أيّ حساب */
+    /* ═══ التصفير يسري على التقرير أيضًا ══════════════════════════════
+       طلبُ الأب (٢٧ سبتمبر ٢٠٢٦) بعد تصفير حفظ الكلمات: «والتقرير حقّ
+       الكلمات عندي صفّره».
+
+       والصفوفُ لا تُحذف — المفتاحُ يُدخل ولا يحذف ولا يعدّل — فالحدُّ
+       هو صفُّ العلامة نفسُه: ما سُجّل من جلسات الكلمات قبل آخر تصفيرٍ
+       لذلك الابن لا يدخل التقرير. وهو يسري تلقائيًّا كلّما صفّر أحدُهم
+       من الصفحة، فلا يحتاج تعديلَ قائمةٍ هنا في كلّ مرّة.
+
+       وبقيّةُ الموادّ لا تُمسّ: التصفيرُ للكلمات وحدها. */
+    VOCAB_TEST: "كلمات إنجليزي 🔤",
     usable: function(rows){
-      return dedupe((rows || []).filter(function(r){ return !excluded(r); }));
+      var self = this, list = rows || [];
+      /* حدودُ التصفير تُقرأ قبل الاستثناء، فصفُّ العلامة نفسُه مستثنًى */
+      var bound = {};
+      list.forEach(function(r){
+        var m = (r && r.meta) || {};
+        if(m.kind !== "vocabreset") return;
+        var t = (typeof m.resetAt === "number") ? m.resetAt : Date.parse(m.at || r.created_at || "");
+        if(!t || isNaN(t)) return;
+        var k = r.student || "";
+        if(!bound[k] || t > bound[k]) bound[k] = t;
+      });
+      return dedupe(list.filter(function(r){
+        if(excluded(r)) return false;
+        var m = (r && r.meta) || {};
+        if(m.test !== self.VOCAB_TEST) return true;
+        var b = bound[r.student || ""];
+        if(!b) return true;
+        var t = Date.parse(m.at || r.created_at || "");
+        return isNaN(t) ? true : (t > b);
+      }));
     },
 
     /* ═══ الجدولُ تجاوز الألف، والخادمُ يقطع عند الألف ═══════════════
