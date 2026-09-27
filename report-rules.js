@@ -46,9 +46,15 @@
   var SKIP = [
     { student:"حسن", test:"رياضيات م٣ — شامل ف١", before:"2026-08-27" }
   ];
+  /* صفوفٌ ليست محاولاتٍ أصلًا، إنّما علاماتُ حالةٍ أُدخلت لأنّ المفتاح
+     يُدخل ولا يحذف ولا يعدّل. فلا تُعدّ في تقريرٍ ولا متوسّط.
+       vocabreset — ساعةُ تصفير حفظ الكلمات (reading.html) */
+  var MARKERS = { vocabreset:1 };
+
   function excluded(row){
     if(!row) return false;
     var m = row.meta || {};
+    if(m.kind && MARKERS[m.kind]) return true;
     var t = (m.at || row.created_at || "");
     for(var i=0;i<SKIP.length;i++){
       var k = SKIP[i];

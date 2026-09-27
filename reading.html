@@ -1688,6 +1688,30 @@ if(!META[who] || !DATA[who]){
   /* يُفتح الجديد رغم الباب — لهذه الجلسة وحدها، فلا يُسدّ الطريق أبدًا */
   var newForce = false;
   function vKey(k){ return "vocab_"+k+"_"+who; }
+  /* ═══ التصفير يلزمه علامةٌ في قاعدة البيانات لا في المتصفّح وحده ═══
+     طلبُ الأبناء (٢٧ سبتمبر ٢٠٢٦): «صفّر الكلمات وبنعيد من جديد».
+
+     وكان في الصفحة زرُّ «تصفير التقدّم» لكنّه لا يصفّر شيئًا في الحقيقة:
+     يمسح تخزينَ المتصفّح، ثمّ تفتح الصفحةُ في المرّة التالية فتسحب
+     المزامنةُ أعلى «learned» سُجّل في قاعدة البيانات فيرجع الرقمُ كما
+     كان. والمفتاحُ يُدخل ولا يحذف ولا يعدّل، فلا سبيل إلى محو الصفوف.
+
+     فالعلاجُ حدٌّ زمنيّ: صفٌّ واحدٌ يُدخَل ساعةَ التصفير، والمزامنةُ
+     تتجاهل كلَّ ما سُجّل قبله. وبهذا يسري التصفيرُ على كلّ جهازٍ يفتح
+     الصفحة لا على جهازٍ واحد، ويبقى تاريخُ المحاولات في التقرير كما هو
+     — فالمطلوبُ إعادةُ الحفظ لا محوُ ما مضى. */
+  var VOC_RESET_TEST = "تصفير الكلمات ♻️";
+  function getResetAt(){ var n=parseInt(localStorage.getItem(vKey("resetat"))||"0",10); return isNaN(n)?0:n; }
+  function setResetAt(ms){ try{ localStorage.setItem(vKey("resetat"), String(ms)); }catch(e){} }
+  function wipeVocabLocal(){ setLearned(0); setWeak({}); setReviewSeen({}); setSR({}); }
+  function markVocabReset(before, setTo){
+    var now = Date.now();
+    setResetAt(now);
+    saveScore(VOC_RESET_TEST, 0, 0, { kind:"vocabreset", resetAt:now, learnedBefore:before,
+                                      setTo:(setTo==null?0:setTo), at:new Date().toISOString() });
+    _vocSynced = true;   /* لا تُعِد المزامنةُ الرقمَ القديم في هذي الجلسة */
+    return now;
+  }
   function getLearned(){ var n=parseInt(localStorage.getItem(vKey("learned"))||"0",10); return isNaN(n)?0:Math.max(0,Math.min(VOC_TOTAL,n)); }
   function setLearned(n){ try{ localStorage.setItem(vKey("learned"), String(Math.max(0,Math.min(VOC_TOTAL,n)))); }catch(e){} }
   // مزامنة تقدّم الحفظ من قاعدة البيانات — يحفظ التقدّم حتى لو فُتحت الصفحة من الشاشة الرئيسية
@@ -1697,10 +1721,30 @@ if(!META[who] || !DATA[who]){
     if(_vocSynced) return; _vocSynced=true;
     try{
       var nm = (META[who] && META[who].name) || who;
+      /* أوّلًا: هل صُفّرت الكلمات — هنا أو على جهازٍ آخر؟ */
+      fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(nm)+
+            "&meta->>test=eq."+encodeURIComponent(VOC_RESET_TEST)+"&order=created_at.desc&limit=5",
+        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        var dbReset = 0;
+        (rows||[]).forEach(function(x){
+          var m=x.meta||{};
+          if(typeof m.resetAt==="number" && m.resetAt>dbReset) dbReset=m.resetAt;
+        });
+        /* تصفيرٌ وقع على جهازٍ آخر بعد آخر ما يعرفه هذا الجهاز: نتبعه */
+        if(dbReset > getResetAt()){ wipeVocabLocal(); setResetAt(dbReset); }
+        pullLearned(nm, getResetAt());
+      })
+      .catch(function(){ pullLearned(nm, getResetAt()); });
+    }catch(e){}
+  }
+  function pullLearned(nm, resetAt){
+    try{
       /* نطلب صفوف الكلمات وحدها لا آخر مئتَي صفٍّ من كلّ شيء: الطفل قد
          يحلّ اختباراتٍ كثيرةً بين جلستَي كلمات، فتخرج جلسات الكلمات من
          النافذة فيعود العدّاد صفرًا على جهازٍ جديد — وهو ما لا يجوز. */
-      fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(nm)+
+      fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(nm)+
             "&meta->>test=eq."+encodeURIComponent("كلمات إنجليزي 🔤")+"&order=created_at.desc&limit=400",
         { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
       .then(function(r){ return r.ok ? r.json() : []; })
@@ -1711,6 +1755,11 @@ if(!META[who] || !DATA[who]){
         (rows||[]).forEach(function(x){
           var m=x.meta||{};
           if(m.trusted === false) return;
+          /* وما سُجّل قبل التصفير لا يُحتسب — وإلّا رجع الرقمُ بعد ساعة */
+          if(resetAt){
+            var tms = Date.parse(m.at || x.created_at || "");
+            if(!isNaN(tms) && tms <= resetAt) return;
+          }
           if(typeof m.learned==="number" && m.learned>maxL) maxL=m.learned;
         });
         if(maxL>getLearned()){
@@ -1988,7 +2037,24 @@ if(!META[who] || !DATA[who]){
       var sr=getSR(), keep={};
       VOCAB300.slice(0,n).forEach(function(w){ if(sr[w[0]]) keep[w[0]]=sr[w[0]]; });
       setSR(keep);
-      _vocSynced = true;   /* حتى لا تُعيد المزامنة الرقم القديم في هذي الجلسة */
+      /* إنزالُ الرقم كان يُنقض كالتصفير سواءً بسواء: يُحفظ محلّيًّا ثمّ
+         تُرجعه المزامنةُ من أعلى رقمٍ في قاعدة البيانات. فيأخذ الحدَّ
+         الزمنيَّ نفسَه، ورفعُ الرقم لا يحتاجه. */
+      if(n < cur) markVocabReset(cur, n);
+      else _vocSynced = true;
+      renderVocab();
+    });
+  }
+  /* زرُّ التصفير: كان في شاشة «ما فيه كلمات» وحدها — وهي شاشةٌ لا
+     يصل إليها من عنده مئاتُ الكلمات. فصار في الشاشتين. */
+  function wireReset(sec){
+    var b=sec.querySelector("[data-reset]"); if(!b) return;
+    b.addEventListener("click",function(){
+      var cur=getLearned();
+      if(!confirm("تصفير حفظ الكلمات والبدء من الكلمة الأولى؟\n\nالعدّاد الآن "+cur+" كلمة، وسيرجع صفرًا على كلّ الأجهزة.\nتقرير الأب يبقى كما هو — ما يُمحى شيءٌ من تاريخ المحاولات.")) return;
+      wipeVocabLocal();
+      markVocabReset(cur, 0);
+      vocMode = "new"; vocModePicked = true; newForce = false;
       renderVocab();
     });
   }
@@ -2237,7 +2303,7 @@ if(!META[who] || !DATA[who]){
       sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
       var go=sec.querySelector("[data-gateoff]"); if(go) go.addEventListener("click",function(){ newForce=true; renderVocab(); });
       wireSetLearned(sec);
-      var rz0=sec.querySelector("[data-reset]"); if(rz0) rz0.addEventListener("click",function(){ if(confirm("تصفير تقدّم الحفظ لهذا الابن؟")){ setLearned(0); setWeak({}); setReviewSeen({}); setSR({}); renderVocab(); } });
+      wireReset(sec);
       return;
     }
 
@@ -2271,7 +2337,7 @@ if(!META[who] || !DATA[who]){
     html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+V.length+'</span></div>'+
       '<div class="fb" data-donemsg style="text-align:center;min-height:20px;margin-top:8px"></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
-      '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button></div>';
+      '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
     sec.innerHTML = html;
 
     var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
@@ -2531,6 +2597,7 @@ if(!META[who] || !DATA[who]){
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
     sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
     wireSetLearned(sec);
+    wireReset(sec);
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
   }
 
