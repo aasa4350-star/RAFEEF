@@ -406,7 +406,7 @@ function saveScore(test, correct, total, extra){
    إخفاقٍ يُحفظ بسببه كما تقوله أزور، ومعه وصف الجهاز.
    ولا نحفظ الإخفاق الأوّل الذي تعقبه محاولةٌ ناجحة — إنّما الإخفاق
    الذي وقف عنده الطفل فعلًا، لئلّا يمتلئ الجدول بضجيجٍ لا يدلّ. */
-function saveMicFail(sect, info, st, stage){
+function saveMicFail(sect, info, st, stage, run){
   try{
     var e = (window.MIC && MIC.env) ? MIC.env() : {};
     st = st || {};
@@ -422,7 +422,12 @@ function saveMicFail(sect, info, st, stage){
       res:(info && info.res) || null, txt:(info && info.txt), pa:(info && info.pa),
       br:e.br, ios:e.ios, osv:e.osv, inApp:e.inApp, online:e.online, build:((window.MIC&&MIC.build)||null),
       stage:stage||null, ss:st.ss, sd:st.sd, rz:st.rz, rz1:st.rz1, part:st.part,
-      cx:st.cx, cxr:st.cxr, cxd:st.cxd
+      cx:st.cx, cxr:st.cxr, cxd:st.cxd,
+      /* ═══ خلاصةُ الجولة كلِّها لا آخرِ دورةٍ وحدها ═══════════════════
+         الحقولُ أعلاه تصف الدورةَ الأخيرة فقط، وهذا أضلّني: صفٌّ يقول
+         «no-session» فيُظنّ أنّ الطفل لم يُسمع قطّ، وهو قد سُمع في دورةٍ
+         قبلها ثمّ انقطع المسار. فتُحفظ معها خلاصةُ الجولة. */
+      run:(run||null)
     });
   }catch(err){}
 }
@@ -614,7 +619,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   }
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
-  var _longTo=null, _cycSeq=0, _longCuts=0;   /* حارسُ النطق الطويل — انظر تعليله في _cycle */
+  var _longTo=null, _cycSeq=0, _longCuts=0; var _cutJustNow=false;   /* حارسُ النطق الطويل — انظر تعليله في _cycle */
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
   var _maxRz=0;               /* أطول دورةٍ نجحت — للمقارنة بالفاشلة */
@@ -641,7 +646,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
          فذلك تكذيبٌ لعينه. نقول الحقّ: سمعناك، والعطل عندنا في التقييم
          لا في صوتك ولا في قراءتك، وأسئلة الفهم مفتوحةٌ لك (تفتحها
          onFail أدناه) فلا تضيع عليك القطعة. */
-      if(_heardAny){
+      /* ولا نقول «سمعتك» لمن انقطع عنه الاتصالُ آخرَ محاولة: العلمُ
+         لاصقٌ من دورةٍ قديمة، والحالُ الآن أنّ الجلسة لم تُفتح أصلًا —
+         فيُطمأن إلى أنّ العطل في التقييم وهو في الوصول إلى الخدمة. */
+      if(_heardAny && _stage()==="no-session"){
+        statusEl.style.color="var(--bad)";
+        statusEl.innerHTML = "📡 سمعتك في أوّل المحاولة ثمّ انقطع الاتصال بخدمة التقييم. تأكّد من الشبكة "+
+          "(أو بدّل من البيانات إلى الواي‑فاي) وجرّب — <b>قراءتك سليمة والعطل مو منك</b>، "+
+          "وأسئلة الفهم مفتوحةٌ لك." + KEEP_GOING;
+      } else if(_heardAny){
         statusEl.style.color="var(--warn)";
         statusEl.innerHTML = "👂 سمعتك وأنت تقرأ — بس خدمة تقييم النطق ما رجّعت الدرجة هالمرّة. "+
           "<b>قراءتك سليمة والعطل مو منك.</b> كمّل أسئلة الفهم عادي، "+
@@ -650,7 +663,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
         statusEl.innerHTML = (_m || "⚠️ ما التقطتُ صوتك بعد ثلاث محاولات. قرّب الجوّال من فمك واقرأ بصوتٍ أعلى، ثمّ اضغط <b>«🎙️ قيّم نطقي»</b> ثانية.") + KEEP_GOING;
       }
       /* ولو لم تردّ أزور بحرفٍ فالمرحلة وحدها تدلّ — فلا يُحفظ صفٌّ أجوف */
-      saveMicFail("passage", _lastWhy, _st, _stage());
+      saveMicFail("passage", _lastWhy, _st, _stage(), { heard:_heardAny, cuts:(_longCuts>90?0:_longCuts),
+        partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq, cutOff:(_longCuts>90) });
       if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon(); return; }
     var sum=0,n=0; allWords.forEach(function(w){ var a=w.PronunciationAssessment||{}; if(typeof a.AccuracyScore==="number" && (a.ErrorType||"None")!=="Insertion"){ sum+=a.AccuracyScore; n++; } });
     var wordAcc = n?Math.round(sum/n):0;
@@ -788,6 +802,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
          الجلسة نفسها — فمتى فُتحت فالطفل يقرأ على راحته بلا عدّاد. */
       _cycTo = setTimeout(function(){
         if(_fin || _userStopped || _st.ss!=null) return;
+        /* دورةٌ لم تُفتح لها جلسةٌ بعد قطعٍ مباشرةً: القطعُ نفسُه أضرَّ
+           بالمايك على هذا الجهاز، فنكفُّ عنه بقيّةَ الجلسة ونعود إلى
+           السلوك الذي كان — خيرٌ من إخفاقٍ نصنعه نحن. */
+        if(_cutJustNow){ _longCuts = 99; _cutJustNow = false; }
         _dead++; _closeRec();
         if(_dead < 2){ window.__micGrace=Date.now()+9000;
           setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
@@ -806,9 +824,17 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
         if(_fin || _userStopped || _myCyc !== _cycSeq) return;
         if(_st.ss==null || !_st.rz) return;      /* لا صوت أصلًا: لحارسٍ آخر */
         _cycSeq++;                               /* يُبطل ردَّ هذه الدورة */
-        _longCuts++; _heardAny = true; _closeRec();
+        _longCuts++; _heardAny = true; _cutJustNow = true; _closeRec();
+        /* ═══ لا تُخنق الدورةُ التالية ═══════════════════════════════
+           القطعُ يُغلق مسار المايك وهو حيّ، وآيفون لا يُحرّره في ٣٠٠ج،
+           فتُفتح التاليةُ على مسارٍ ميّتٍ ولا تُفتح لها جلسةٌ أصلًا
+           (no-session) — وهي عين ما وقع لحسن في قسم الإلقاء أوّلَ يومٍ
+           بعد إضافة الحارس. فصار الفاصلُ ١٢٠٠ج، ونُحرّر المايك صراحةً
+           قبله. */
+        try{ MIC.release(); }catch(e){}
         if(_longCuts <= 6){
-          setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 300);
+          window.__micGrace = Date.now()+9000;
+          setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 1200);
         } else if(!_retryOrFail()) finish();
       }, 12000);
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
@@ -817,6 +843,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       /* ردٌّ متأخّرٌ من دورةٍ قطعها حارسُ النطق الطويل: أُهمل، فقد فُتحت غيرُها */
       if(_myCyc !== _cycSeq){ return; }
       if(_longTo){ clearTimeout(_longTo); _longTo=null; }
+      _cutJustNow = false;   /* رجعت دورةٌ بردٍّ، فالمايك سليم */
       var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
       try{
         if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
