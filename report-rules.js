@@ -196,6 +196,32 @@
 
        وبقيّةُ الموادّ لا تُمسّ: التصفيرُ للكلمات وحدها. */
     VOCAB_TEST: "كلمات إنجليزي 🔤",
+    /* ═══ متى صُفّرت كلماتُ هذا الابن؟ ══════════════════════════════════
+       يُقرأ من الصفوف الخام قبل usable، لأنّ صفَّ العلامة يُستثنى فيها.
+       وبه تعرف لوحةُ الأب أنّ الخانة فارغةٌ لأنّه بدأ من جديدٍ لا لأنّ
+       شيئًا انكسر — بلاغُ الأب (٢٨ سبتمبر): «تقرير حفظ الكلمات حقّ حسن
+       اختفى عندي»، وقد صُفّر بطلبهم ولم يبدأ بعدُ. */
+    vocabResetAt: function(rows){
+      var t = 0;
+      (rows || []).forEach(function(r){
+        var m = (r && r.meta) || {};
+        if(m.kind !== "vocabreset") return;
+        var v = (typeof m.resetAt === "number") ? m.resetAt : Date.parse(m.at || r.created_at || "");
+        if(v && !isNaN(v) && v > t) t = v;
+      });
+      return t || null;
+    },
+    /* آخرُ ما بلغه قبل التصفير — للسياق لا للحساب */
+    vocabBeforeReset: function(rows){
+      var best = null, t = 0;
+      (rows || []).forEach(function(r){
+        var m = (r && r.meta) || {};
+        if(m.kind !== "vocabreset") return;
+        var v = (typeof m.resetAt === "number") ? m.resetAt : Date.parse(m.at || r.created_at || "");
+        if(v && !isNaN(v) && v >= t){ t = v; best = (typeof m.learnedBefore === "number") ? m.learnedBefore : best; }
+      });
+      return best;
+    },
     usable: function(rows){
       var self = this, list = rows || [];
       /* حدودُ التصفير تُقرأ قبل الاستثناء، فصفُّ العلامة نفسُه مستثنًى */

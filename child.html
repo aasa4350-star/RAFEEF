@@ -192,11 +192,13 @@ async function main(){
   document.documentElement.style.setProperty("--accent-deep",S.deep);
   document.title="صفحة "+S.name;
 
-  let rows=[];
+  let rows=[], VOC_RESET_AT=null, VOC_RESET_BEFORE=null;
   try{
     /* بصفحاتٍ مرقّمة: سجلُّ الابن تجاوز ألف صفٍّ والخادم يقطع عندها — انظر RR.fetchAll */
     rows=await RR.fetchAll(SUPA_URL+"/rest/v1/attempts?select=*&student=eq."+encodeURIComponent(S.name)+"&order=created_at.desc", SUPA_KEY);
     rows=Array.isArray(rows)?rows:[];
+    /* قبل التصفية: صفُّ علامة التصفير يُستثنى فيها، ونحتاج خبرَه */
+    VOC_RESET_AT = RR.vocabResetAt(rows); VOC_RESET_BEFORE = RR.vocabBeforeReset(rows);
     rows=RR.usable(rows);   /* المحاولات المستثناة — انظر RR.excluded */
   }catch(e){}
   // نفصل الاختبارات التجريبية والنشاط والتعبير والمحادثة عن اختبارات المدرسة
@@ -347,6 +349,15 @@ async function main(){
       else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
+    /* خانةٌ فارغةٌ بعد تصفيرٍ تُقال ولا تُطوى — انظر التعليل في home.html */
+    if(!vocabAll.length && VOC_RESET_AT){
+      const _rd = new Date(VOC_RESET_AT);
+      const _rs = _rd.getFullYear()+"-"+String(_rd.getMonth()+1).padStart(2,"0")+"-"+String(_rd.getDate()).padStart(2,"0");
+      html += '<div class="card"><div style="font-weight:800;margin-bottom:8px">📖 حفظ الكلمات (إنجليزي)</div>'+
+        '<div style="line-height:1.9;color:var(--muted);font-size:.92rem">♻️ <b>صُفّرت كلماتُك يوم '+_rs+'</b> وبديت من جديد — وما فتحت القسم بعدها.'+
+        (VOC_RESET_BEFORE ? '<br>آخر ما وصلتَ له قبل التصفير: <b>'+VOC_RESET_BEFORE+'</b> كلمة.' : '')+
+        '<br>افتح «حفظ الكلمات» وحلّ جلسةً، وترجع أرقامُك هنا.</div></div>';
+    }
     if(vocabAll.length){
       let vLearned=0, vTotal=300;
       /* عدد المحفوظ تراكميّ فيُقرأ من كلّ الجلسات؛ وما عداه محصورٌ
