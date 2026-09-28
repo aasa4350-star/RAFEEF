@@ -69,6 +69,19 @@
   <footer>يُبنى التقرير من تفصيل كل سؤال حسب مهارته · الجلسات المشكوك فيها مستبعدة</footer>
 </div>
 <script>
+  /* ═══ الإلقاءُ يُسمّى إلقاءً لا «قطعة» ═══════════════════════════════
+     بلاغ الأب (٢٨ سبتمبر): «رفيف ضبط معها لكن ما يطلع لي في التقرير،
+     يطلع بس الاختبار». والدرجةُ محفوظةٌ وظاهرةٌ فعلًا (٨٢٪)، لكنّها
+     تُعرض تحت «🗣️ النطق» باسم «قطعة»، فيبحث الأبُ عن الإلقاء فلا يجده
+     ويرى من قسمِ الإلقاء أسئلتَه وحدَها. والصفُّ يحمل sect:"khitaba"
+     فالخبرُ عندنا ولم نكن نقوله. */
+  function pronKind(m){
+    m = m || {};
+    if(m.sect === "khitaba") return "🎤 إلقاء";
+    if(m.sect === "writing" || m.pmode === "word") return "كلمة/جملة";
+    return (m.pmode === "passage") ? "قطعة كاملة" : "كلمة/جملة";
+  }
+
 var SUPA_URL = APP_CONFIG.supaUrl;
 var SUPA_KEY = APP_CONFIG.supaKey;
 /* ═══ كلُّ من يحفظ في القاعدة له مكانٌ هنا ═══════════════════════
@@ -615,7 +628,7 @@ function pronCardHtml(student){
     '<ul class="sk">'+rows.slice(0,10).map(function(r){
       var m=r.meta, p=val(r,"pron");
       return '<li>'+(p!=null?'<span class="pill '+cls(p)+'">'+p+'%</span>':'<span class="pill" style="background:var(--bg)">—</span>')+
-        '<span class="nm">'+(m.pmode==="passage"?"قطعة كاملة":"كلمة/جملة")+' · '+esc(String(m.test||""))+
+        '<span class="nm">'+pronKind(m)+' · '+esc(String(m.test||""))+
         '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+saTime(r.created_at)+
           (m.words?' · '+m.words+' كلمة':'')+(val(r,"wpm")?' · '+m.wpm+' كلمة/د':'')+
           (val(r,"comp")!=null?' · اكتمال '+m.comp+'%':'')+'</span>'+

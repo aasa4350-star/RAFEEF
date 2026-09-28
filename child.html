@@ -77,6 +77,19 @@
 <div class="wrap" id="app"><p class="empty"><span class="spin"></span> جارٍ التحميل...</p></div>
 
 <script>
+  /* ═══ الإلقاءُ يُسمّى إلقاءً لا «قطعة» ═══════════════════════════════
+     بلاغ الأب (٢٨ سبتمبر): «رفيف ضبط معها لكن ما يطلع لي في التقرير،
+     يطلع بس الاختبار». والدرجةُ محفوظةٌ وظاهرةٌ فعلًا (٨٢٪)، لكنّها
+     تُعرض تحت «🗣️ النطق» باسم «قطعة»، فيبحث الأبُ عن الإلقاء فلا يجده
+     ويرى من قسمِ الإلقاء أسئلتَه وحدَها. والصفُّ يحمل sect:"khitaba"
+     فالخبرُ عندنا ولم نكن نقوله. */
+  function pronKind(m){
+    m = m || {};
+    if(m.sect === "khitaba") return "🎤 إلقاء";
+    if(m.sect === "writing" || m.pmode === "word") return "كلمة/جملة";
+    return (m.pmode === "passage") ? "قطعة كاملة" : "كلمة/جملة";
+  }
+
 /* talk.html صار يحفظ بعد كلّ جملة (كانت الجلسة تُحفظ عند الخروج وحده فتضيع
    إن لم يوقظ الإغلاقُ الحدثَ) — فالجلسة الواحدة عدّة صفوف يجمعها meta.sid.
    الصفوف القديمة بلا sid تبقى كلٌّ منها جلسةً كما كانت. */
@@ -473,7 +486,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ النطق</div><div class="card"><ul class="weak">`+
         `<li>🎙️ <b>${prs.length}</b> تقييم${aP!=null?` · متوسط النطق <b style="color:${col(aP)}">${aP}%</b>`:``}${aA!=null?` · دقّة ${aA}%`:``}${aF!=null?` · طلاقة ${aF}%`:``}${aW!=null?` · <b>${aW}</b> كلمة/دقيقة`:``}</li>`+
         prs.slice(0,6).map(p=>{ const m=p.meta, v=pv(p,"pron");
-          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${m.pmode==="passage"?"قطعة كاملة":"كلمة/جملة"} · ${m.test||""} <span class="cnt">${saTime(RR.when(p))}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
+          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${pronKind(m)} · ${m.test||""} <span class="cnt">${saTime(RR.when(p))}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
         `</ul>${prs.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${prs.length-6} تقييمًا.</p>`:``}</div>`;
     }
     // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
