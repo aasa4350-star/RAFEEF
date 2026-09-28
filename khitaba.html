@@ -683,7 +683,7 @@ function paRun(refText, statusEl, btn, onDone, onFail){
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
   var _audioSec=0, _lastWhy=null, _dead=0, _deadAudio=0, _partialOnly=0, _heardAny=false, _cycTo=null;
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
-  var _longTo=null, _cycSeq=0, _longCuts=0; var _cutJustNow=false;   /* حارسُ النطق الطويل — كما في reading.html */
+  var _cycSeq=0;   /* عدّادُ الدورات — للتشخيص */
   var _st={t0:0,ss:null,sd:null,rz:0,part:null,cx:null,cxr:null,cxd:null};
   function _stage(){
     if(_st.ss==null) return "no-session";
@@ -708,7 +708,6 @@ function paRun(refText, statusEl, btn, onDone, onFail){
   }
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
   function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; }
-    if(_longTo){ clearTimeout(_longTo); _longTo=null; }
     var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
   window.__paBusy++; window.__micGrace=Date.now()+9000;
   function finish(){
@@ -735,8 +734,8 @@ function paRun(refText, statusEl, btn, onDone, onFail){
         statusEl.style.color="var(--bad)";
         statusEl.innerHTML=(_m||"⚠️ ما التقطتُ صوتك. قرّب الجوّال من فمك وألقِ بصوتٍ أعلى، ثمّ اضغط الزرّ ثانية.")+KEEP_GOING;
       }
-      saveMicFail(_lastWhy, _st, _stage(), { heard:_heardAny, cuts:_longCuts>90?0:_longCuts,
-        partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq, cutOff:(_longCuts>90) });
+      saveMicFail(_lastWhy, _st, _stage(), { heard:_heardAny,
+        partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq });
       if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon(); return;
     }
     function wavg(key){ var s=0,c=0; segs.forEach(function(g){ if(typeof g[key]==="number"){ s+=g[key]*g.n; c+=g.n; } }); return c?Math.round(s/c):null; }
@@ -809,40 +808,22 @@ function paRun(refText, statusEl, btn, onDone, onFail){
       /* جلسةٌ لم تُفتح في ١٥ث = مسارٌ ميّت: نُغلق ونُعيد، ودورتان تكفيان للحكم */
       _cycTo=setTimeout(function(){
         if(_fin || _userStopped || _st.ss!=null) return;
-        /* دورةٌ لم تُفتح لها جلسةٌ بعد قطعٍ مباشرةً: القطعُ نفسُه أضرَّ
-           بالمايك على هذا الجهاز، فنكفُّ عنه بقيّةَ الجلسة ونعود إلى
-           السلوك الذي كان — خيرٌ من إخفاقٍ نصنعه نحن. */
-        if(_cutJustNow){ _longCuts = 99; _cutJustNow = false; }
         _dead++; _closeRec();
         if(_dead<2){ window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
         finish();
       }, 15000);
-      /* إن مضت ١٢ث والصوتُ يصل ولم تَرجع نتيجة، قطعنا الدورةَ وفتحنا
-         غيرها: تضيع جملةٌ ولا يضيع الخطابُ كلُّه. */
-      var _myCyc = ++_cycSeq;
-      _longTo=setTimeout(function(){
-        if(_fin || _userStopped || _myCyc !== _cycSeq) return;
-        if(_st.ss==null || !_st.rz) return;
-        _cycSeq++;                               /* يُبطل ردَّ هذه الدورة */
-        _longCuts++; _heardAny = true; _cutJustNow = true; _closeRec();
-        /* ═══ لا تُخنق الدورةُ التالية ═══════════════════════════════
-           القطعُ يُغلق مسار المايك وهو حيّ، وآيفون لا يُحرّره في ٣٠٠ج،
-           فتُفتح التاليةُ على مسارٍ ميّتٍ ولا تُفتح لها جلسةٌ أصلًا
-           (no-session) — وهي عين ما وقع لحسن في قسم الإلقاء أوّلَ يومٍ
-           بعد إضافة الحارس. فصار الفاصلُ ١٢٠٠ج، ونُحرّر المايك صراحةً
-           قبله. */
-        try{ MIC.release(); }catch(e){}
-        if(_longCuts <= 6){
-          window.__micGrace = Date.now()+9000;
-          setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 1200);
-        } else if(!_retryOrFail()) finish();
-      }, 12000);
+      /* ═══ حارسُ النطق الطويل: جُرّب فأضرَّ فرُفع (٢٨ سبتمبر ٢٠٢٦) ═══
+         وُضع أمس ليسبق حدَّ الخدمة، فردّه الميدانُ في يومه: صفوفُ اليوم
+         لثلاثة أبناء في القسمين كلُّها «heard:true ثمّ no-session» بعد
+         قطعٍ — أي أنّ إغلاق المسار وهو حيٌّ يترك المايك معطّلًا على
+         آيفون مدّةً أطولَ ممّا انتظرنا (٣٠٠ج ثمّ ١٢٠٠ج مع تحريرٍ صريح).
+         والعدُّ يقطع: من ١–٦ إخفاقاتٍ يوميًّا يغلب عليها partial-no-result
+         إلى ١١ اليومَ منها ١٠ no-session. فالحارسُ استبدل بالإخفاق
+         إخفاقًا أسوأ. رُفع، وبقي من علاج أمس ما لا يمسّ المايك: مهلةُ
+         التقطيع ٩٠٠ج. — التفصيل في reading.html */
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
     rec.recognizeOnceAsync(function(result){
       if(_fin || _userStopped){ _closeRec(); return; }
-      if(_myCyc !== _cycSeq) return;    /* ردٌّ متأخّرٌ من دورةٍ قطعها الحارس */
-      if(_longTo){ clearTimeout(_longTo); _longTo=null; }
-      _cutJustNow = false;   /* رجعت دورةٌ بردٍّ، فالمايك سليم */
       var gotWords=false, _ex=null;
       try{
         if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
@@ -874,7 +855,6 @@ function paRun(refText, statusEl, btn, onDone, onFail){
       setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 450);
     }, function(err){
       if(_fin || _userStopped) return;
-      if(_myCyc !== _cycSeq) return;    /* دورةٌ قطعها الحارس */
       try{ _lastWhy=MIC.why(SDK, null, err); }catch(e){}
       _closeRec();
       if(_resumes<MAX_RESUMES){ _resumes++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
