@@ -231,6 +231,8 @@ async function main(){
   /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج — صفُّ
      activity لا يدخل متوسّطًا (reading.html/saveActivity، بلاغ ٢٥ سبتمبر). */
   const readActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="read");
+  /* فتحَ المحادثةَ ولم يضغط «تكلّم» — انظر saveTalkOpened في talk.html */
+  const talkActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="talk");
   rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
@@ -523,6 +525,14 @@ async function main(){
         `</div>`;
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
+    /* جلسةٌ فُتحت ولم يتكلّم فيها — انظر التعليل في home.html */
+    if(talkActs.length && !talkAll.length){
+      const ta=talkActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      html+=`<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">`+
+        `<li>🚪 فتحت المحادثة <b>${ta.length}</b> مرّة وما ضغطت «تكلّم» — ما فيه جملةٌ تُقيَّم بعد.</li>`+
+        ta.slice(0,3).map(p=>`<li>${p.meta.topic||''} <span class="cnt">${saTime(RR.when(p))}${p.meta.secs?' · مكثت '+p.meta.secs+'ث':''}</span></li>`).join("")+
+        `</ul></div>`;
+    }
     if(talkAll.length){
       const tks=groupTalk(talkAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1));
       const totTurns=tks.reduce((s,p)=>s+(p.meta.turns||0),0);

@@ -139,6 +139,34 @@ var SUPA_KEY2=APP_CONFIG.supaKey;
    الحلّ: نحفظ بعد كلّ جملةٍ يقولها الطفل عبر AQ (طابورٌ محلّيٌّ يُعيد
    الإرسال عند فتح الصفحة القادم، ومختوم بـ cid فلا يتكرّر)، ويبقى
    sendBeacon عند الخروج للدفعة الأخيرة وحدها. */
+
+/* ═══ جلسةٌ فُتحت ولم يُضغط فيها «تكلّم» ═══════════════════════════════
+   بلاغ الأب (٢٨ سبتمبر): «حسن قبل شوي داخل المحادثة بس ما طلع في
+   التقرير». وقاعدةُ البيانات تصدّقه في الشقّ الثاني: آخرُ محادثةٍ له
+   ٢٦ سبتمبر، ولا صفَّ له اليوم. ولا إخفاقَ مايكٍ كذلك — فالمرجّح أنّه
+   فتح الموضوع ثمّ خرج قبل أن يضغط «تكلّم».
+
+   وذلك لا يترك أثرًا البتّة، فلا يفرّق الأبُ بين «فتح وخرج» و«تكلّم
+   وضاع كلامُه» — وهو فرقٌ يبني عليه حكمَه على ابنه. وقد عالجنا مثلَه
+   في القراءة بصفّ activity، فهذا مثلُه: صفٌّ واحدٌ للجلسة يقول إنّه
+   فتح الموضوع وكم مكث، ولا يدخل متوسّطًا ولا يُحسب جلسةَ محادثة. */
+var _openedSaved = {};
+function saveTalkOpened(){
+  try{
+    if(!state.topic || !state.sid) return;
+    if(_openedSaved[state.sid]) return;
+    var secs = state.sessionStart ? Math.round((Date.now()-state.sessionStart)/1000) : 0;
+    if(secs < 10) return;                 /* مرورٌ عابرٌ لا يُسجَّل */
+    _openedSaved[state.sid] = 1;
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
+      meta:{ kind:"activity", sect:"talk", sid:state.sid, topic:TOPICS[state.topic].t,
+             secs:secs, at:new Date().toISOString() } };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
+      body: JSON.stringify(body) });
+  }catch(e){}
+}
 function saveTalkSession(useBeacon){
   var turns = state.msgs.filter(function(m){ return m.role==="user"; }).length;
   var delta = turns - (state.savedTurns||0);
@@ -155,7 +183,7 @@ function saveTalkSession(useBeacon){
   var fbD  = (state.fbN||0) - (state.savedFbN||0);
   var msD  = (state.aiMs||0) - (state.savedAiMs||0);
   if(!state.topic) return;
-  if(delta<1 && attD<1 && unhD<1 && aiD<1 && fbD<1) return;
+  if(delta<1 && attD<1 && unhD<1 && aiD<1 && fbD<1){ saveTalkOpened(); return; }
   var scores = (state.pronScores||[]).filter(function(v){ return typeof v==="number"; });
   var avgPron = scores.length ? Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length) : null;
   /* نسبة صحّة الجملة (نحو ومعنى) — انظر applyCorrectness أعلاه؛ نفس أسلوب

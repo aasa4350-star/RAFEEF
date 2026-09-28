@@ -351,6 +351,8 @@ async function loadReport(){
      activity لا يدخل متوسّطًا، ويُعرض في بطاقة القراءة ليعرف الأب أنّه
      فتح القسم فعلًا — انظر reading.html (saveActivity) وبلاغ ٢٥ سبتمبر. */
   var readActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="read"; });
+  /* فتحَ المحادثةَ ولم يضغط «تكلّم» — انظر saveTalkOpened في talk.html */
+  var talkActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="talk"; });
   rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
 
   var notes=[];
@@ -601,6 +603,18 @@ async function loadReport(){
         '</ul></div>';
     }
     // 🗣️ المحادثة الإنجليزية
+    /* ═══ جلسةٌ فُتحت ولم يتكلّم فيها ═══════════════════════════════
+       بلاغ الأب (٢٨ سبتمبر): «حسن داخل المحادثة بس ما طلع في التقرير».
+       وكان محقًّا في أنّه دخل: صفُّ الفتح يُظهره الآن، ويُفرّق بين
+       «فتح وخرج» و«تكلّم وضاع كلامه» — وهو فرقٌ يبني عليه حكمَه. */
+    if(talkActs.length && !talkAll.length){
+      var ta=talkActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
+      html+='<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">'+
+        '<li>🚪 فتح المحادثة <b>'+ta.length+'</b> مرّة ولم يضغط «تكلّم» — ما فيه جملةٌ تُقيَّم بعد.</li>'+
+        ta.slice(0,3).map(function(p){ return '<li>'+(p.meta.topic||'')+' <span class="cnt">'+saTime(RR.when(p))+
+          (p.meta.secs?' · مكث '+p.meta.secs+'ث':'')+'</span></li>'; }).join("")+
+        '</ul></div>';
+    }
     if(talkAll.length){
       var tks=groupTalk(talkAll.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; }));
       var totTurns=tks.reduce(function(s,p){return s+(p.meta.turns||0);},0);
