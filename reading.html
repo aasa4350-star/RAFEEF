@@ -571,7 +571,7 @@ function azureConfigured(){ return !!azureCreds(); }
 // القطعة الطويلة: تسجيل مستمر يقرأ الطفل القطعة كاملة على راحته ثم يضغط «⏹️ خلّصت» — بلا مهلة تقفه ولا توقّف بين الجمل يقصّه.
 // مايك Azure على آيفون غير مستقر (قيد Apple على سفاري) لذا نعيد المحاولة تلقائيًا مرة إن لم يفتح من أول ضغطة.
 /* أرقامُ تشخيصِ آخرِ قراءةِ قطعةٍ — تُقرأ عند حفظ درجة الفهم */
-var READ_DIAG = { maxRz:0, partOnly:0 };
+var READ_DIAG = { maxRz:0, partOnly:0, longCuts:0 };   /* longCuts: دوراتٌ قطعها حارسُ النطق الطويل */
 function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var SDK = window.SpeechSDK;
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
@@ -614,6 +614,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   }
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
+  var _longTo=null, _cycSeq=0, _longCuts=0;   /* حارسُ النطق الطويل — انظر تعليله في _cycle */
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
   var _maxRz=0;               /* أطول دورةٍ نجحت — للمقارنة بالفاشلة */
@@ -626,10 +627,12 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var _heardAny=false;        /* هل سمعناه في أيّ دورة؟ يُغيّر ما نقوله له في النهاية */
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
-  function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; } var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
+  function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; }
+    if(_longTo){ clearTimeout(_longTo); _longTo=null; }
+    var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
-    READ_DIAG.maxRz = _maxRz; READ_DIAG.partOnly = _partialOnly;
+    READ_DIAG.maxRz = _maxRz; READ_DIAG.partOnly = _partialOnly; READ_DIAG.longCuts = _longCuts;
     if(btn){ btn.disabled=false; }
     if(!allWords.length){
       statusEl.style.color="var(--bad)";
@@ -742,7 +745,30 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
               فصارت ١٥٠٠ — وهي قيمة المحادثة التي تعمل عندهم — فتُنهي
               أزور عند وقفته الطبيعيّة في آخر الجملة وتُرجع نتيجةً مقيَّمة،
               ثمّ تفتح الدورة التالية للجملة التي بعدها. */
-           cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"1500"); }catch(e){}
+           /* ═══ ٢٧ سبتمبر ٢٠٢٦: ١٥٠٠ ما زالت أطولَ من وقفة القارئ ═══
+              بلاغ الأب اليوم: «حسن يقول قراءة القطعة ما ضبط معه». وصفُّ
+              الإخفاق: rz=٢٣ نتيجةً جزئيّةً بنصٍّ صحيحٍ من القطعة
+              («khaldun argued that civilisations rise…») ثمّ نتيجةٌ
+              نهائيّةٌ فارغة — أي سمعناه وكتبنا كلامه ثمّ ضاع.
+
+              والقياس على ثلاثين يومًا: قسمُ القطعة ٤٣ قراءةً ناجحةً
+              مقابل ٤٧ فاشلة — إخفاقٌ ٥٢٪، ونصفُ الإخفاق من هذا الباب
+              (partial-no-result وspeech-no-result).
+
+              والعلّة في التقاء أمرين: recognizeOnceAsync تُنهي «النطقَ
+              الواحد» عند الصمت أو عند حدِّ الخدمة (نحو خمس عشرة ثانية)،
+              وقطعُ حسن ٤٩ كلمةً يقرؤها في نحو عشرين ثانية. فإن لم يقف
+              وقفةً كاملةً مقدارُها ثانيةٌ ونصف — وهي أطولُ من وقفة
+              القارئ المتّصل بين الجملتين — لم تنتهِ الدورةُ عند وقفته،
+              بل بلغت حدَّ الخدمة فأُبطلت كلُّها. ولذلك يخفق القارئُ
+              الطَّلْق أكثرَ من المتعثّر: وقفاتُه أقصر.
+
+              فصارت ٩٠٠: تنتهي الدورةُ عند وقفة آخر الجملة الطبيعيّة
+              (٣٠٠–٨٠٠ جزءٍ من الثانية عند القراءة الجهريّة)، فتُقيَّم
+              الجملةُ وتُفتح التالية. وإن قطعت جملةً طويلةً نصفين فكلا
+              النصفين يُقيَّم وتُجمع كلماتُهما — والخسارةُ في دقّة
+              التقطيع لا في القراءة، وهي أهونُ من ضياع القطعة كلِّها. */
+           cfg.setProperty(SDK.PropertyId.Speech_SegmentationSilenceTimeoutMs,"900"); }catch(e){}
       /* مسارٌ جديد لكلّ دورة. أمسكنا المسار مرّةً فماتت الدورة الثانية على
          سفاري — انظر MIC.audioConfig في mic-help.js وبلاغ ٦ سبتمبر ٢٠٢٦. */
       audio = MIC.audioConfig(SDK);
@@ -767,9 +793,30 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
           setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
         finish();
       }, 15000);
+      /* ═══ حارسُ النطق الطويل ═══════════════════════════════════════
+         مهلةُ التقطيع تُنهي الدورةَ عند وقفة القارئ — فإن لم يقف بلغت
+         الدورةُ حدَّ الخدمة (نحو ١٥ث) وأُبطلت وضاع ما قرأه فيها. وهذا
+         ما وقع لحسن. فنسبق الحدَّ: إن مضت ١٢ث والصوتُ يصل ولم تَرجع
+         نتيجة، أغلقنا الدورةَ وفتحنا غيرها فورًا. تضيع جملةٌ ولا تضيع
+         القطعة، ويبقى ما جُمع قبلها في allWords.
+         والإغلاقُ يُبطل نداءَ recognizeOnceAsync، فنحرسه بعلمٍ خاصٍّ
+         بالدورة لئلّا تُفتح دورتان معًا لو رجع النداءُ متأخّرًا. */
+      var _myCyc = ++_cycSeq;
+      _longTo = setTimeout(function(){
+        if(_fin || _userStopped || _myCyc !== _cycSeq) return;
+        if(_st.ss==null || !_st.rz) return;      /* لا صوت أصلًا: لحارسٍ آخر */
+        _cycSeq++;                               /* يُبطل ردَّ هذه الدورة */
+        _longCuts++; _heardAny = true; _closeRec();
+        if(_longCuts <= 6){
+          setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 300);
+        } else if(!_retryOrFail()) finish();
+      }, 12000);
     }catch(e){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy(); statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ في الإعداد: "+(e.message||e); if(btn){ btn.disabled=false; } return; }
     rec.recognizeOnceAsync(function(result){
       if(_fin || _userStopped){ _closeRec(); return; }
+      /* ردٌّ متأخّرٌ من دورةٍ قطعها حارسُ النطق الطويل: أُهمل، فقد فُتحت غيرُها */
+      if(_myCyc !== _cycSeq){ return; }
+      if(_longTo){ clearTimeout(_longTo); _longTo=null; }
       var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
       try{
         if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
@@ -854,6 +901,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       setTimeout(function(){ if(_fin||_userStopped) return; _cycle(next); }, 450);
     }, function(err){
       if(_fin || _userStopped) return;
+      if(_myCyc !== _cycSeq) return;    /* دورةٌ قطعها الحارس — غيرُها تعمل الآن */
       try{ _lastWhy = MIC.why(SDK, null, err); }catch(e){}
       _closeRec();
       if(_resumes < MAX_RESUMES){ _resumes++; window.__micGrace=Date.now()+9000; setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
@@ -1630,7 +1678,7 @@ if(!META[who] || !DATA[who]){
             savedN=total; saved=true;
             var dur=Math.round((Date.now()-t0)/1000), aw=awaySince(aw0);
             var _x={dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId};
-            try{ _x.maxRz=READ_DIAG.maxRz; _x.partOnly=READ_DIAG.partOnly; }catch(e){}
+            try{ _x.maxRz=READ_DIAG.maxRz; _x.partOnly=READ_DIAG.partOnly; _x.longCuts=READ_DIAG.longCuts; }catch(e){}
             saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, total, _x);
           }
         });
