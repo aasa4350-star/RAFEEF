@@ -302,6 +302,7 @@ function run(){
 
   issues.push(...skillLabels());
   issues.push(...typedAnswers());
+  issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
 
   return { issues, pageCount, genCount, fileCount: files.length, bankCount: allBanks.length };
@@ -322,6 +323,71 @@ function run(){
      autocorrect="off" · spellcheck="false" · autocapitalize="off"
    وهذا الفحص يمسك من أضاف حقلًا جديدًا ونسيها — فالعطبُ صامتٌ: الحقلُ
    يعمل، والدرجةُ ترتفع، ولا يظهر شيء. */
+
+/* ═══ الجوابُ المعلَّم هو جوابُ البنك نفسُه ═══════════════════════════
+   بنوكُ الأسئلة الثابتة صيغتُها [سؤال، [الصحيح، مشتّت، مشتّت]، شرح]،
+   وbankGen يخلط الخيارات ثمّ يُعلّم موضعَ الصحيح بعد الخلط. فلو أخطأ
+   الخلطُ أو الفهرس مرّةً واحدة صُحّح الخطأُ للطفل وخُطّئ الصواب — وهو
+   أسوأُ ما يقع في موقعٍ تعليميّ، ولا يظهر في أيّ فحصٍ آخر: الصفحةُ
+   تعمل، والدرجةُ تُحفظ، والطفلُ وحده يعرف أنّ شيئًا غلط.
+
+   سأل الأب (٢٩ سبتمبر) عن سؤال «المتغيّر المستقلّ على أيّ محور؟» في
+   علوم رفيف، وظنّه خطأً لأنّ «المحور الرأسيّ» ظهر أوّلَ الخيارات —
+   والخياراتُ تُخلط في كلّ عرض، فأوّلُها ليس جوابَها. فكان الجوابُ
+   سليمًا، وهذا الفحصُ يُبقيه كذلك. */
+function bankAnswerIndex(){
+  const out = [];
+  const SAMPLES = 400;
+  fs.readdirSync(ROOT).filter(f => /\.html$/.test(f)).forEach(f => {
+    const html = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if (!/bankGen\s*\(/.test(html)) return;
+    const ctx = makeCtx();
+    const { inline, srcs } = scripts(html);
+    for (const s of srcs){
+      const p = path.join(ROOT, s);
+      if (fs.existsSync(p)) { try { vm.runInContext(fs.readFileSync(p,'utf8'), ctx); } catch(e){} }
+    }
+    for (const src of inline){ try { vm.runInContext(src, ctx); } catch(e){} }
+    let checked = 0;
+    const stemKey = t => String(t).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+    for (const key of Object.keys(ctx)){
+      let arr; try { arr = ctx[key]; } catch(e){ continue; }
+      if (!Array.isArray(arr) || typeof arr[0] !== 'function') continue;
+      for (const fn of arr){
+        if (typeof fn !== 'function') continue;
+        /* اسمُ البنك: من وسم bankGen الجديد، وإلّا من اسم مصفوفة
+           المولّدات بحذف G الأخيرة (DEFG ← DEF) — فالصفحاتُ القديمة
+           تستعمل bankGen بوسيطٍ واحدٍ بلا وسم. */
+        let bankName = (typeof fn.__bank === 'string' && fn.__bank) ? fn.__bank
+                     : (/G$/.test(key) ? key.slice(0, -1) : null);
+        if (!bankName) continue;
+        let bank; try { bank = ctx[bankName]; } catch(e){ continue; }
+        if (!Array.isArray(bank) || !Array.isArray(bank[0])) continue;
+        /* خريطةُ السؤال ← جوابه الصحيح، فتصحّ المطابقة بلا فهرس */
+        const byStem = {};
+        bank.forEach(b => { if (Array.isArray(b) && Array.isArray(b[1])) byStem[stemKey(b[0])] = b[1][0]; });
+        checked++;
+        for (let i = 0; i < SAMPLES; i++){
+          let q; try { q = fn(); } catch(e){ continue; }
+          if (!q || !Array.isArray(q[1])) continue;
+          const idx = +String(q.__bk || '').split('#')[1];
+          let want = (bank[idx] && Array.isArray(bank[idx][1])) ? bank[idx][1][0] : undefined;
+          if (want === undefined) want = byStem[stemKey(q[0])];
+          if (want === undefined) continue;
+          if (q[1][q[2]] !== want){
+            out.push({ sev:'خطأ', file:f,
+              msg:'الجوابُ المعلَّم يخالف بنكَ ' + bankName + ' — معلَّم «' +
+                  String(q[1][q[2]]).slice(0,40) + '» والصواب «' + String(want).slice(0,40) + '»' });
+            i = SAMPLES;
+          }
+        }
+      }
+    }
+    if (!checked) out.push({ sev:'تنبيه', file:f, msg:'فيها bankGen ولم يُفحص منها مولّدٌ واحد — تغيّر شكلُ التعريف؟' });
+  });
+  return out;
+}
+
 function typedAnswers(){
   const out = [];
   const SAFE = /type=["'](checkbox|radio|range|file|password|color|date|time)["']/;
