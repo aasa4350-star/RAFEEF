@@ -639,7 +639,7 @@ if(!NAMES[who]){
             if(tgt){
               var row=document.createElement("div"); row.className="prow";
               row.innerHTML='🗣️ <span class="en"></span> <button class="say small listen">🔊 استمع</button>'+
-                '<input class="kmic" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
+                '<input class="kmic" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
                 '<button class="say small kchk" style="background:#16a34a;border-color:#16a34a">✅ افحص النطق</button>'+
                 azBtnHtml()+'<span class="pfb"></span>';
               row.querySelector(".en").textContent=tgt;

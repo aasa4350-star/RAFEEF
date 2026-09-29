@@ -301,6 +301,7 @@ function run(){
   }
 
   issues.push(...skillLabels());
+  issues.push(...typedAnswers());
   issues.push(...conflicts(allBanks));
 
   return { issues, pageCount, genCount, fileCount: files.length, bankCount: allBanks.length };
@@ -310,6 +311,38 @@ function run(){
    ظهر في تشخيص الأب باسمه البرمجيّ (gConsecOdd) لا بوصفه. الخريطة
    تُولَّد بـ tools/gen-skill-labels.js، وهذا يمسك مَن نسي أن يُعيد
    توليدها بعد إضافة مولّدٍ جديد. */
+
+/* ═══ لوحةُ المفاتيح كانت تُملي الجواب ═══════════════════════════════
+   بلاغ الأب (٢٩ سبتمبر ٢٠٢٦) بصورةٍ من حفظ الكلمات: الكلمة «أخ»،
+   والطفل كتب «Bro»، فعرض عليه آيفون في شريط التوقّع «Brother» —
+   فيضغطها ويُحسب له أنّه يعرفها. ومثلُه في الإملاء: التصحيحُ التلقائيّ
+   يصلح ما كتبه فيضيع المقصودُ من التمرين كلِّه.
+
+   فكلُّ حقلٍ يكتب فيه الطفل جوابًا يلزمه إطفاءُ التصحيح والتوقّع:
+     autocorrect="off" · spellcheck="false" · autocapitalize="off"
+   وهذا الفحص يمسك من أضاف حقلًا جديدًا ونسيها — فالعطبُ صامتٌ: الحقلُ
+   يعمل، والدرجةُ ترتفع، ولا يظهر شيء. */
+function typedAnswers(){
+  const out = [];
+  const SAFE = /type=["'](checkbox|radio|range|file|password|color|date|time)["']/;
+  fs.readdirSync(ROOT).filter(f => /\.(html|js)$/.test(f)).forEach(f => {
+    const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    for (const m of src.matchAll(/<input\b[^>]*>/g)) {
+      const tag = m[0];
+      if (SAFE.test(tag)) continue;
+      const miss = [];
+      if (!/autocorrect=["']off["']/.test(tag))  miss.push('autocorrect="off"');
+      if (!/spellcheck=["']false["']/.test(tag)) miss.push('spellcheck="false"');
+      if (miss.length) {
+        const cls = (tag.match(/class=["']([^"']+)["']/) || [,'(بلا صنف)'])[1];
+        out.push({ sev:'خطأ', file:f,
+          msg:'حقلُ إجابةٍ بلا إطفاء تصحيح لوحة المفاتيح — ' + cls + ' ينقصه: ' + miss.join(' و') });
+      }
+    }
+  });
+  return out;
+}
+
 function skillLabels(){
   const out = [];
   const f = 'math9.html';

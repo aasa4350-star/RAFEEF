@@ -1474,7 +1474,7 @@ function injectProw(qEl, stemText, ansText){
   if(!tgt) return;
   var row=document.createElement("div"); row.className="prow";
   row.innerHTML='🗣️ <span class="ltr"></span> <button class="say small listen">🔊 استمع</button>'+
-    '<input class="kmic" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
+    '<input class="kmic" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="🎤 انطقها بمايك الكيبورد ثم افحص" style="direction:ltr;flex:1;min-width:150px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">'+
     '<button class="say small kchk" style="background:#16a34a;border-color:#16a34a">✅ افحص النطق</button>'+
     azBtnHtml()+'<span class="pfb"></span>';
   row.querySelector(".ltr").textContent=tgt;
@@ -2246,7 +2246,7 @@ if(!STUDENTS[who]){
       html += `<div class="q" data-i="${i}" ${useInput?'data-input="1"':''}><div class="num">سؤال ${i+1}${q.rev?` <span class="revb">🔁 سبق أن أخطأت فيه</span>`:``}</div>
         <div class="stem ${isEn?'ltr':''}">${frx(q[0])}</div>`;
       if(useInput){
-        html += `<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="nans" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;font-weight:700;font-family:inherit;text-align:center;background:transparent;color:var(--ink)"><button class="nchk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>`;
+        html += `<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="nans" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;font-weight:700;font-family:inherit;text-align:center;background:transparent;color:var(--ink)"><button class="nchk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>`;
       } else {
         html += `<div class="opts">`;
         q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${frx(o)}</button>`; });
@@ -2645,7 +2645,7 @@ if(!STUDENTS[who]){
           '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
           '<button type="button" data-say style="background:var(--accent);color:#fff;border-color:var(--accent);font-weight:800">🔊 استمع</button>'+
           '<button type="button" data-slow>🐢 أبطأ</button></div>'+
-          '<input class="dinp" placeholder="اكتب هنا..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)">'+
+          '<input class="dinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="اكتب هنا..." style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.1rem;margin:10px 0;font-family:inherit;background:transparent;color:var(--ink)">'+
           '<div class="opts" style="grid-auto-flow:column;justify-content:start;gap:8px">'+
           '<button type="button" data-chk>تحقّق</button><button type="button" data-show>👁️ أظهر</button></div>'+
           '<div class="dfb" style="margin-top:8px;font-weight:700;min-height:20px"></div></div>';

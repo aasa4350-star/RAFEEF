@@ -1697,7 +1697,7 @@ if(!NAMES[who]){
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
       if(input){
-        html += '<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="ans" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.15rem;font-weight:700;font-family:inherit;text-align:center">'+
+        html += '<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><input class="ans" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric" placeholder="اكتب الإجابة..." style="flex:1;min-width:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1.15rem;font-weight:700;font-family:inherit;text-align:center">'+
           '<button class="chk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button></div>';
       } else {
         html += '<div class="opts">';

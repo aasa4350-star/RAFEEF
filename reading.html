@@ -1303,14 +1303,14 @@ if(!META[who] || !DATA[who]){
       html += '<div class="q" data-i="'+i+'"><div class="num">رقم '+(i+1)+'</div>'+
         '<div class="row"><button class="say" data-say>🔊 استمع</button>'+
         '<button class="say small" data-slow>🐢 أبطأ</button></div>'+
-        '<input class="dinp" placeholder="اكتب هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
+        '<input class="dinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="اكتب هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
         '<div class="row"><button class="chk">تحقّق</button>'+
         '<button class="say small" data-show>👁️ أظهر</button>'+
         '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
         '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
           '<span style="font-weight:700;font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px">🎤 درّب نطقك — انطقها بمايك الكيبورد:</span>'+
-          '<input class="dinp pinp" placeholder="انطق هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
+          '<input class="dinp pinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="انطق هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
           '<div class="row"><button class="say small pchk">افحص النطق</button>'+azBtnHtml()+'<span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
@@ -2382,7 +2382,7 @@ if(!META[who] || !DATA[who]){
       html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(dayBase+i+1)+' اليوم</div>'+
         '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
         '<span '+lab+'>اكتب معناها بالإنجليزي:</span>'+
-        '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
+        '<input class="einp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
         '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-show>👁️ أظهر</button></div>'+
         '<div class="fb"></div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
@@ -2390,7 +2390,7 @@ if(!META[who] || !DATA[who]){
           '<div class="row"><button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button>'+
             '<button class="say small" data-vsay>🔊 اسمعها</button>'+azBtnHtml()+'</div>'+
           '<div class="pfb" style="font-weight:700;margin-top:6px;font-size:.92rem"></div>'+
-          '<input class="pinp" placeholder="أو اكتبها كما تُنطق..." style="direction:ltr;text-align:left;margin-top:8px">'+
+          '<input class="pinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="أو اكتبها كما تُنطق..." style="direction:ltr;text-align:left;margin-top:8px">'+
           '<div class="row"><button class="say small pchk">افحص المكتوب</button><span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
@@ -2448,7 +2448,7 @@ if(!META[who] || !DATA[who]){
       d.innerHTML = '<div class="num">🔁 تثبيت — رجعت لك</div>'+
         '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
         '<span '+lab+'>اكتبها بنفسك الآن — ما تدخل الدرجة، بس تُثبّتها:</span>'+
-        '<input class="einp" placeholder="English..." style="direction:ltr;text-align:left">'+
+        '<input class="einp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
         '<div class="row"><button class="chk">تحقّق</button><button class="say small" data-rshow>👁️ ذكّرني</button></div>'+
         '<div class="fb"></div>';
       var inp = d.querySelector(".einp"), fb = d.querySelector(".fb"), donef = false;
