@@ -2082,29 +2082,13 @@ if(!META[who] || !DATA[who]){
     return msg;
   }
 
-  /* تصحيح رقم المحفوظ يدويًّا: خللٌ سابق كان يضخّم العدّاد عبر المزامنة،
-     فظهرت للطفل كلماتٌ لم يدرسها قطّ. هذا يُعيده إلى الرقم الحقيقيّ. */
-  function wireSetLearned(sec){
-    var b=sec.querySelector("[data-setlearned]"); if(!b) return;
-    b.addEventListener("click",function(){
-      var cur=getLearned();
-      var v=prompt("كم كلمة حفظها فعلًا؟ (الرقم الحالي "+cur+" من "+VOC_TOTAL+")", String(cur));
-      if(v===null) return;
-      var n=parseInt(String(v).replace(/[^0-9]/g,""),10);
-      if(isNaN(n)) return;
-      n=Math.max(0,Math.min(VOC_TOTAL,n));
-      setLearned(n);
-      var sr=getSR(), keep={};
-      VOCAB300.slice(0,n).forEach(function(w){ if(sr[w[0]]) keep[w[0]]=sr[w[0]]; });
-      setSR(keep);
-      /* إنزالُ الرقم كان يُنقض كالتصفير سواءً بسواء: يُحفظ محلّيًّا ثمّ
-         تُرجعه المزامنةُ من أعلى رقمٍ في قاعدة البيانات. فيأخذ الحدَّ
-         الزمنيَّ نفسَه، ورفعُ الرقم لا يحتاجه. */
-      if(n < cur) markVocabReset(cur, n);
-      else _vocSynced = true;
-      renderVocab();
-    });
-  }
+  /* ═══ «تعديل رقم المحفوظ» رُفع بطلب الأب (٣٠ سبتمبر ٢٠٢٦) ═══════════
+     وُضع يومَ كان خللٌ في المزامنة يضخّم العدّاد، فيحتاج الأبُ إعادتَه
+     إلى الرقم الحقيقيّ بيده. وقد زال سببُه: صار للتصفير حدٌّ زمنيٌّ
+     يسري على كلّ جهاز، فمن أراد أن يبدأ من جديدٍ فله زرُّ التصفير،
+     ومن أراد أن يرفع الرقم فالجلساتُ ترفعه. وبقاؤه بعد ذلك خطرٌ لا
+     نفع فيه: نقرةٌ واحدةٌ على شاشة الطفل تمحو تقدّمه بلا قصد. */
+
   /* زرُّ التصفير: كان في شاشة «ما فيه كلمات» وحدها — وهي شاشةٌ لا
      يصل إليها من عنده مئاتُ الكلمات. فصار في الشاشتين. */
   function wireReset(sec){
@@ -2357,12 +2341,11 @@ if(!META[who] || !DATA[who]){
       } else {
         html += '<div class="q" style="text-align:center">🎉 ما شاء الله! حفظت كل الـ'+goal+' كلمة. انتقل لـ«راجع المحفوظ» 🔁</div>';
       }
-      html += '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير التقدّم</button></div>';
+      html += '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
       sec.innerHTML = html;
       sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
       sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
       var go=sec.querySelector("[data-gateoff]"); if(go) go.addEventListener("click",function(){ newForce=true; renderVocab(); });
-      wireSetLearned(sec);
       wireReset(sec);
       return;
     }
@@ -2397,7 +2380,7 @@ if(!META[who] || !DATA[who]){
     html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+V.length+'</span></div>'+
       '<div class="fb" data-donemsg style="text-align:center;min-height:20px;margin-top:8px"></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
-      '<div style="text-align:center;margin-top:12px"><button data-setlearned style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تعديل رقم المحفوظ</button> · <button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
+      '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
     sec.innerHTML = html;
 
     var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
@@ -2656,7 +2639,6 @@ if(!META[who] || !DATA[who]){
     });
     sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
     sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ saveIfPartial(); setRvSize(+b.dataset.rv); renderVocab(); }); });
-    wireSetLearned(sec);
     wireReset(sec);
     var rg=sec.querySelector("[data-regen]"); if(rg) rg.addEventListener("click", function(){ saveIfPartial(); renderVocab(); });
   }
