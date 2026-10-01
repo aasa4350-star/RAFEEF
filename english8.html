@@ -8,6 +8,7 @@
 <title>الإنجليزي — ثاني متوسط</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="config.js"></script>
+<script src="typed.js?v=20261001"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
@@ -1054,10 +1055,17 @@ if(!NAMES[who]){
     var c = CFG[id], sec = panelOf(id);
     var items = genN(c.gens, c.n);
     var html = '<div class="intro">'+c.intro+ytLinkHtml(id)+'</div>';
+    /* سؤالان في الجولة يُكتب جوابُهما بدل الاختيار — انظر typed.js */
+    var typedPick = (window.TYPED ? TYPED.pick(items, 2, "en", function(q){ return q[1][q[2]]; }) : {});
     items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div><div class="opts">';
-      q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
-      html += '</div><div class="explain">'+q[3]+'</div></div>';
+      html += '<div class="q" data-i="'+i+'"'+(typedPick[i]?' data-typed="1"':'')+'><div class="num">سؤال '+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
+      if(typedPick[i]){ html += TYPED.inputHtml("en"); }
+      else {
+        html += '<div class="opts">';
+        q[1].forEach(function(o,j){ html += '<button data-j="'+j+'">'+o+'</button>'; });
+        html += '</div>';
+      }
+      html += '<div class="explain">'+q[3]+'</div></div>';
     });
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
@@ -1066,15 +1074,26 @@ if(!NAMES[who]){
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];
+      /* مسارُ الحساب واحدٌ للاختيار والكتابة، فلا يختلفان في التسجيل */
+      function answer(__ok, __chosen){
+        if(answered[i]) return; answered[i]=1;
+        if(__ok) correct++;
+        qEl.querySelector(".explain").classList.add("show");
+        scoreEl.textContent = correct+" / "+total;
+        if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid); }
+      }
+      if(qEl.dataset.typed){
+        TYPED.wire(qEl, items[i][1][ans], "en", function(__ok){ answer(__ok, -1); });
+        return;
+      }
       qEl.querySelectorAll(".opts button").forEach(function(btn){
         btn.addEventListener("click",function(){
-          if(answered[i]) return; answered[i]=1;
+          if(answered[i]) return;
           qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          if(+btn.dataset.j===ans){ btn.classList.add("correct"); correct++; }
+          var __ok = (+btn.dataset.j===ans);
+          if(__ok){ btn.classList.add("correct"); }
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          qEl.querySelector(".explain").classList.add("show");
-          scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; saveScore(c.label, correct, total, pid); }
+          answer(__ok, +btn.dataset.j);
         });
       });
     });

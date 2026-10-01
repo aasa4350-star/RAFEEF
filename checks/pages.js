@@ -301,6 +301,7 @@ function run(){
   }
 
   issues.push(...skillLabels());
+  issues.push(...typedPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -384,6 +385,34 @@ function bankAnswerIndex(){
       }
     }
     if (!checked) out.push({ sev:'تنبيه', file:f, msg:'فيها bankGen ولم يُفحص منها مولّدٌ واحد — تغيّر شكلُ التعريف؟' });
+  });
+  return out;
+}
+
+/* ═══ مسارُ «اكتب الجواب» في صفحات المنهج ══════════════════════════
+   طلبُ الأب (١ أكتوبر ٢٠٢٦): «ما تصير اختياريةً كلّها». والمسارُ أربعُ
+   وصلاتٍ في كلّ صفحة: تحميلُ typed.js، واختيارُ المواضع، ورسمُ الحقل،
+   وربطُ التصحيح. وسقوطُ واحدةٍ منها يُعيد الصفحةَ اختيارًا كلَّها من
+   غير أن يُخطئ شيء — فيُمتحن الأبناء بالتخمين ولا نعلم. */
+const TYPED_PAGES = ['math4.html', 'math5.html', 'math8.html', 'math9.html',
+                     'english.html', 'english5.html', 'english8.html', 'english9.html'];
+
+function typedPath(){
+  const out = [];
+  if (!fs.existsSync(path.join(ROOT, 'typed.js')))
+    return [{ sev:'خطأ', file:'typed.js', msg:'ملفُّ «اكتب الجواب» غير موجود' }];
+  TYPED_PAGES.forEach(f => {
+    const p = path.join(ROOT, f);
+    if (!fs.existsSync(p)){ out.push({ sev:'خطأ', file:f, msg:'صفحةٌ مفقودة' }); return; }
+    const src = fs.readFileSync(p, 'utf8');
+    const miss = [];
+    if (!/<script src="typed\.js/.test(src))      miss.push('تحميل typed.js');
+    if (!/TYPED\.pick\(/.test(src))               miss.push('اختيار المواضع (TYPED.pick)');
+    if (!/TYPED\.inputHtml\(/.test(src))          miss.push('رسم الحقل (TYPED.inputHtml)');
+    if (!/TYPED\.wire\(/.test(src))               miss.push('ربط التصحيح (TYPED.wire)');
+    if (!/qEl\.dataset\.typed/.test(src))         miss.push('تمييز السؤال المكتوب');
+    if (miss.length)
+      out.push({ sev:'خطأ', file:f, msg:'مسارُ «اكتب الجواب» ناقص — ينقصه: ' + miss.join('، ') });
   });
   return out;
 }
