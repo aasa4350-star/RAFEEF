@@ -370,14 +370,23 @@ function azureQuotaHtml(rows){
     sec+=a; n++; byKid[r.student]=(byKid[r.student]||0)+a;
   });
   if(!n) return "";
+  /* ═══ الرقمُ الصغير يُقال بوحدته ═══════════════════════════════════
+     بلاغ الأب (٢ أكتوبر ٢٠٢٦): البطاقةُ كانت تقول «1 دقيقة من ٣٠٠
+     (0%) · أسامة 0د · فهد 0د» — وهي ٣٤ ثانيةً قُرِّبت ثلاثَ مرّاتٍ
+     بثلاث نتائج: دقيقةً في المجموع، وصفرًا في النسبة، وصفرًا عند كلّ
+     ابن. فيقرؤها قارئُها متناقضةً فلا يثق بها. فما دون الدقيقة يُقال
+     بالثواني، والنسبةُ دون الواحد تُقال «أقلّ من ١٪» لا صفرًا. */
   var LIMIT=5*3600, used=Math.min(100, Math.round(100*sec/LIMIT));
   var col = used>=90?"var(--bad)":used>=60?"var(--warn)":"var(--good)";
+  var dur = function(s){ return s<60 ? (Math.round(s)+" ثانية") : (Math.round(s/60)+" دقيقة"); };
+  var durShort = function(s){ return s<60 ? (Math.round(s)+"ث") : (Math.round(s/60)+"د"); };
+  var pctTxt = (used<1 && sec>0) ? "أقلّ من ١٪" : (used+"%");
   var kids=Object.keys(byKid).sort(function(a,b){return byKid[b]-byKid[a];})
-    .map(function(k){ return k+" "+Math.round(byKid[k]/60)+"د"; }).join(" · ");
+    .map(function(k){ return k+" "+durShort(byKid[k]); }).join(" · ");
   return `<div class="card"><div style="font-weight:800;margin-bottom:6px">🎛️ حصّة أزور المجانية هذا الشهر</div>
     <div style="background:var(--bg);border-radius:99px;height:14px;overflow:hidden;border:1px solid var(--line)">
       <div style="width:${used}%;height:100%;background:${col}"></div></div>
-    <div style="font-size:.88rem;color:var(--muted);margin-top:8px"><b style="color:${col}">${Math.round(sec/60)} دقيقة</b> من ٣٠٠ (${used}%) · ${n} تسجيلًا${kids?'<br>'+kids:''}</div>
+    <div style="font-size:.88rem;color:var(--muted);margin-top:8px"><b style="color:${col}">${dur(sec)}</b> من ٥ ساعات (${pctTxt}) · ${n} تسجيلًا${kids?'<br>'+kids:''}</div>
     ${used>=80?`<div style="font-size:.88rem;color:var(--bad);margin-top:6px"><b>قاربتم الحدّ.</b> أسهل حلّ: مفتاحٌ مجانيٌّ لكل ابن في azure-config.js فتصير ٢٠ ساعة بلا تكلفة.</div>`:``}</div>`;
 }
   const content = document.getElementById("content");

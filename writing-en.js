@@ -1505,7 +1505,9 @@ function render(el, ctx){
         var go=row.querySelector(".go"), sk=row.querySelector(".skip"), fails=0, counted=false;
         row.querySelector(".listen").addEventListener("click", function(){ ctx.pron.speak(txt); });
         go.addEventListener("click", function(){
-          ctx.pron.assess(txt, fb, go, function(pron, acc, flu){
+          /* sec: ثواني الصوت التي عدّتها أزور — بلا حفظها كانت حصّة
+             الشهر تُنقص قراءات هذا القسم كلَّها (٢ أكتوبر ٢٠٢٦). */
+          ctx.pron.assess(txt, fb, go, function(pron, acc, flu, sec){
             if(counted) return; counted=true;
             st.done++; st.sum+=(pron||0); saveSt(); badge();
             row.classList.add("ok"); go.style.display="none"; sk.style.display="none";
@@ -1513,6 +1515,7 @@ function render(el, ctx){
             ctx.save({ kind:"practice", test:"نطق إنجليزي 🗣️", correct:1, total:1,
                        kindPron:true, pmode:"word", sect:"writing", level:level,
                        pron:pron, acc:(typeof acc==="number"?acc:null), flu:(typeof flu==="number"?flu:null),
+                       audioSec:(typeof sec==="number"?sec:0),
                        refWords:String(txt).split(/\s+/).length });
           });
           /* بعد إخفاقين نفتح بابَ التخطّي: العطلُ في المايك لا يُحبس به ابن */

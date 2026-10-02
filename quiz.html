@@ -1361,6 +1361,28 @@ function saveMicFail(info){
       body: JSON.stringify(body) }).catch(function(){});
   }catch(err){}
 }
+/* ═══ ثواني أزور تُحسب من هذه الصفحة أيضًا ═════════════════════════
+   بلاغ الأب (٢ أكتوبر ٢٠٢٦): «شيّك على أزور أتوقّع فيه مشكلة» —
+   والبطاقةُ تقول دقيقةً واحدةً هذا الشهر والأبناء يُقيّمون نطقَهم كلّ
+   يوم. والعلّة أنّ زرّ «قيّم نطقي» كان يُنادي أزور ثمّ لا يحفظ ثانيةً
+   في الحصّة. وهذا خطرٌ لا نقصُ بيانات: البطاقةُ وُضعت بعد انقطاع ٩
+   سبتمبر، يومَ نفدت الحصّةُ المجانية فمات المايك في الموقع كلِّه
+   ساعتين ولا أحد يدري — فإن أنقصت العدَّ لم تُنذر في وقتها. */
+function savePronSec(pron, acc, flu, refText, sec){
+  try{
+    var meta = { kind:"practice", test:"نطق إنجليزي 🗣️", correct:1, total:1,
+      kindPron:true, pmode:"word", sect:"quiz",
+      pron:pron, acc:(typeof acc==="number"?acc:null), flu:(typeof flu==="number"?flu:null),
+      words:0, refWords:String(refText||"").trim().split(/\s+/).filter(Boolean).length,
+      audioSec:(typeof sec==="number"?sec:0), wpm:null };
+    var body = { student:(STUDENTS[who]&&STUDENTS[who].name)||who, grade:(STUDENTS[who]&&STUDENTS[who].grade)||"",
+                 en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
+      body: JSON.stringify(body) }).catch(function(){});
+  }catch(e){}
+}
 function micFailMsg(info){
   var c = (info && info.code) || "";
   if(info && info.reason === "canceled"){
@@ -1428,7 +1450,11 @@ function _paRun(refText, statusEl, btn, tries, onDone){
         statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+
           (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-weight:700">'+wordsHtml+'</div>'+
             '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 صحيح · 🟡 وسط · 🔴 راجعه</div>'):' ✅ ممتاز!');
-        if(onDone){ try{ onDone(pron, acc, flu); }catch(e){} }
+        var _sec = (result && typeof result.duration === "number") ? Math.round(result.duration/1e7) : 0;
+        /* من طلب النتيجة يحفظ صفَّه بنفسه (قسم التعبير) فنمرّر له الثواني،
+           ومن لم يطلبها حفظناها له هنا — فلا يُحسب تقييمٌ واحدٌ مرّتين. */
+        if(onDone){ try{ onDone(pron, acc, flu, _sec); }catch(e){} }
+        else savePronSec(pron, acc, flu, refText, _sec);
       }
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();

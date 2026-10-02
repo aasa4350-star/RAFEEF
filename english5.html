@@ -167,6 +167,25 @@ function saveMicFail(info){
       body: JSON.stringify(body) }).catch(function(){});
   }catch(err){}
 }
+/* ═══ ثواني أزور تُحسب من هذه الصفحة أيضًا ═══════════════════
+   بلاغ الأب (٢ أكتوبر ٢٠٢٦): «شيّك على أزور أتوقّع فيه مشكلة» —
+   والبطاقةُ تقول دقيقةً واحدةً هذا الشهر والأبناء يُقيّمون نطقَهم كلّ
+   يوم. والعلّة أنّ زرّ «قيّم نطقي» هنا كان يُنادي أزور ثمّ لا يحفظ
+   شيئًا: لا ثانيةً في الحصّة ولا سطرًا في تقرير الأب.
+
+   وهذا خطرٌ لا نقصُ بيانات: البطاقةُ وُضعت بعد انقطاع ٩ سبتمبر، يومَ
+   نفدت الحصّةُ المجانية فمات المايك في الموقع كلّه ساعتين ولا أحد
+   يدري. فإن أنقصت العدّ لم تُنذر في وقتها، وعاد العطلُ نفسُه. */
+function savePronSec(pron, acc, flu, refText, result){
+  try{
+    var sec = (result && typeof result.duration === "number") ? Math.round(result.duration/1e7) : 0;
+    saveScore("نطق إنجليزي 🗣️", 1, 1, null, {
+      kindPron:true, pmode:"word", sect:"english5",
+      pron:pron, acc:(typeof acc==="number"?acc:null), flu:(typeof flu==="number"?flu:null),
+      words:0, refWords:String(refText||"").trim().split(/\s+/).filter(Boolean).length,
+      audioSec:sec, wpm:null });
+  }catch(e){}
+}
 function micFailMsg(info){
   var c = (info && info.code) || "";
   if(info && info.reason === "canceled"){
@@ -232,6 +251,7 @@ function _paRun(refText, statusEl, btn, tries){
         statusEl.innerHTML=face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu+
           (wordsHtml?('<div style="direction:ltr;text-align:left;margin-top:8px;line-height:2.1;font-weight:700">'+wordsHtml+'</div>'+
             '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">🟢 صحيح · 🟡 وسط · 🔴 راجعه</div>'):' ✅ ممتاز!');
+        savePronSec(pron, acc, flu, refText, result);
       }
     }catch(e){ outcome="error"; statusEl.style.color="var(--bad)"; statusEl.textContent="خطأ: "+(e.message||e); }
     _end();

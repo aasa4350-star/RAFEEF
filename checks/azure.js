@@ -147,6 +147,28 @@ module.exports = async function azure(){
     issues.push({ sev: 'خبر', msg: 'تعذّر حساب الاستهلاك: ' + String(e.message || e).slice(0, 50) });
   }
 
+  /* ═══ ٤ · كلُّ من يُقيّم النطق يحسب ثوانيَه ═══
+     علّة ٢ أكتوبر ٢٠٢٦: english وenglish5 وquiz كانت تُنادي أزور
+     ثمّ لا تحفظ result.duration، فسقط ١٧٪ من تقييمات سبتمبر و٦٧٪
+     من تقييمات أكتوبر خارج الحساب — والبطاقةُ تقول للأب إنّ الحصّة
+     لم تُمَسّ. وبطاقةٌ تُنقص العدَّ أخطرُ من بطاقةٍ لا توجد: هي
+     إنذارُنا الوحيد قبل أن تنفد الحصّةُ فيموت المايك في الموقع
+     كلِّه، كما جرى في ٩ سبتمبر. فمن استدعى التقييم لزمه العدّ. */
+  try {
+    const blind = [];
+    for (const f of fs.readdirSync(ROOT).filter(x => /\.(html|js)$/.test(x))){
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      if (!/PronunciationAssessmentResult\.fromResult/.test(src)) continue;
+      if (!/result\.duration|audioSec/.test(src))
+        blind.push(f);
+    }
+    if (blind.length)
+      issues.push({ sev: 'خطأ', msg: 'تُقيّم النطق بأزور ولا تحسب ثوانيَه: ' + blind.join('، ') +
+        ' — فحصّةُ الشهر تظهر أقلّ ممّا استُهلك فعلًا' });
+  } catch (e){
+    issues.push({ sev: 'خبر', msg: 'تعذّر فحص عدّ الثواني: ' + String(e.message || e).slice(0, 50) });
+  }
+
   return { live, region, used, issues };
 };
 
@@ -165,7 +187,11 @@ if (require.main === module){
       if (i.sev === 'خطأ') bad++;
     });
     if (!res.issues.length) console.log('✅ لا ملاحظات');
-    if (bad) console.log('::error::خدمة النطق متوقّفة — المايكروفون لا يعمل عند الأولاد الآن');
+    /* الإنذارُ يقول ما وقع بعينه: «متوقّفة» على خللٍ في العدّ كذبٌ
+       يُفزع الأب بلا سبب، ويُعوّده ألّا يصدّق الإنذار حين يصدق. */
+    if (bad) console.log('::error::' + (res.live === false
+      ? 'خدمة النطق متوقّفة — المايكروفون لا يعمل عند الأولاد الآن'
+      : res.issues.filter(i => i.sev === 'خطأ').map(i => i.msg).join(' · ')));
     process.exit(bad ? 1 : 0);
   }).catch(e => { console.error('تعذّر الفحص: ' + (e && e.stack || e)); process.exit(2); });
 }
