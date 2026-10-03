@@ -351,7 +351,13 @@ async function main(){
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — صار يحفظ
        باسم «نطق إنجليزي/عربي 🗣️»، ونفرزه في دلوٍ خاصّ لئلّا يسقط في
        «الاختبارات التجريبية» وهو ليس اختبارًا بدرجةٍ من كذا. */
-    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[];
+    /* ═══ مقياسُ موهبة في دلوٍ خاصّ ═══════════════════════════════════
+       سؤالُ الأب (٣ أكتوبر ٢٠٢٦): «تطلع لي نتيجته في التقرير موهبة؟».
+       وكانت تطلع — سطرًا واحدًا في «الاختبارات التجريبية»: «موهبة م٣
+       (محاولتان · المتوسط ٦٣٪)». وهذا لا يُفيده في شيء: المقصودُ من
+       المقياس مجالاتُه الأربعةُ لا متوسّطُها، فالمتوسّطُ يُخفي أنّ
+       اللغويَّ ٨/٨ والعلميَّ الميكانيكيَّ ٣/٨. فصار له قسمُه. */
+    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[];
     practice.forEach(p=>{
       const t=(p.meta.test||"");
       /* الإخفاءُ أوّلَ الفرزِ لا بعدَه: كانت صفوفُ «التجريبية» تُعزَل قبله
@@ -365,7 +371,8 @@ async function main(){
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
       const subj=RR.subjectOf(t);
-      if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
+      if(t.indexOf("موهبة")===0){ mawhibaAll.push(p); }
+      else if(t.indexOf("كلمات")===0){ vocabAll.push(p); }
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       /* الإملاء له بطاقتُه — كان يسقط في «الاختبارات التجريبية» (طلب الأب ٢٥ سبتمبر) */
       else if(t.indexOf("إملاء")===0){ dictAll.push(p); }
@@ -534,6 +541,24 @@ async function main(){
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
     /* جلسةٌ فُتحت ولم يتكلّم فيها — انظر التعليل في home.html */
+    /* 🧠 مقياس موهبة — المجالاتُ الأربعةُ مرتّبةً من الأضعف */
+    if(mawhibaAll.length){
+      const mwA=mawhibaAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      const mwD={}; let mwC=0, mwT=0;
+      mwA.forEach(function(x){
+        mwC+=(x.meta.correct||0); mwT+=(x.meta.total||0);
+        var sk=x.meta.skills||{};
+        Object.keys(sk).forEach(function(k){ var e=mwD[k]||(mwD[k]={c:0,t:0}); e.c+=(sk[k].c||0); e.t+=(sk[k].t||0); });
+      });
+      const mwK=Object.keys(mwD).sort(function(a,b){ return (mwD[a].c/mwD[a].t)-(mwD[b].c/mwD[b].t); });
+      html+='<div class="sec-title"><span class="dot"></span> 🧠 مقياس موهبة — المستوى الثالث</div><div class="card"><ul class="weak">'+
+        '<li>🎯 <b>'+arCount(mwA.length,"جولة واحدة","جولتان","جولات","جولة")+'</b> · '+
+        '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+saTime(RR.when(mwA[0]))+'</span></li>'+
+        mwK.map(function(k){ var e=mwD[k];
+          return '<li>'+k+' <span class="cnt">'+e.c+'/'+e.t+' · '+pct(e.c,e.t)+'%</span></li>'; }).join("")+
+        '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
+        'والاختبارُ الحقيقيُّ ١٢٠ سؤالًا — وهذه أسئلةُ تدريبٍ على أنماطه لا أسئلتُه.</small></div>';
+    }
     /* 💪 القسم العلاجيّ */
     if(remActs.length){
       const ra=remActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);

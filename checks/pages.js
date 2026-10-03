@@ -520,6 +520,16 @@ function mawhibaPath(){
     if (!/q\.gen = d\.name/.test(src) || !/keys:\[d\.name\]/.test(src))
       out.push({ sev:'خطأ', file:'practice.html', msg:'اسمُ مجال موهبة لا يطابق مفتاحَه العلاجيّ — الضعفُ لن يجد علاجه' });
   }
+  /* النتيجةُ تصل الأبَ بمجالاتها لا بمتوسّطها: سؤالُه (٣ أكتوبر) «تطلع
+     لي نتيجته في التقرير موهبة؟» — وكانت تطلع سطرًا واحدًا في
+     «الاختبارات التجريبية»، والمتوسّطُ يُخفي أنّ مجالًا ٨/٨ وآخرَ ٣/٨. */
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    const rsrc = fs.readFileSync(rp, 'utf8');
+    if (!/mawhibaAll\b/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'نتيجةُ موهبة بلا قسمٍ خاصّ — تسقط في «الاختبارات التجريبية» بمتوسّطٍ يُخفي مجالاتِها' });
+  }
   if (!out.length && ran < 20)
     out.push({ sev:'تنبيه', file:f, msg:'مولّداتُ موهبة قليلة: ' + ran });
   return out;
