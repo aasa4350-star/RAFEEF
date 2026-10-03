@@ -302,6 +302,7 @@ function run(){
 
   issues.push(...skillLabels());
   issues.push(...typedPath());
+  issues.push(...remedialPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -414,6 +415,44 @@ function typedPath(){
     if (miss.length)
       out.push({ sev:'خطأ', file:f, msg:'مسارُ «اكتب الجواب» ناقص — ينقصه: ' + miss.join('، ') });
   });
+  return out;
+}
+
+/* ═══ القسمُ العلاجيُّ في practice.html ════════════════════════════
+   علّةُ ٣ أكتوبر ٢٠٢٦: كان يسحب آخرَ أربعين صفًّا بلا فرز، فامتلأت
+   عند فهد بالنطقِ والمحادثةِ فلم يبقَ فيها صفٌّ واحدٌ فيه مهارات —
+   وبقي شهرًا يُقال له «لسّا ما فيه بيانات» وعنده صفرٌ في الاشتقاق.
+   وعطلٌ كهذا لا يُرى: الصفحةُ تُفتح والقسمُ يظهر ورسالتُه معقولة.
+   فيُحرَس بثلاثة: فرزُ الخادم، والمثالُ المحلول، ومطابقةُ مفاتيحه. */
+function remedialPath(){
+  const out = [], f = 'practice.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  if (!/meta->skills=not\.is\.null/.test(src))
+    out.push({ sev:'خطأ', file:f,
+      msg:'نداءُ القسم العلاجيّ بلا فرزِ المهارات — سيمتلئ بالنطق والمحادثة فيعمى عن الاختبارات' });
+  const wm = /var WORKED = \{[\s\S]*?\n\};/.exec(src);
+  if (!wm){ out.push({ sev:'خطأ', file:f, msg:'الأمثلةُ المحلولة (WORKED) غير موجودة' }); return out; }
+  if (!/workedHtml\(s\)/.test(src))
+    out.push({ sev:'خطأ', file:f, msg:'الأمثلةُ المحلولة موجودةٌ ولا تُعرض — بطاقةُ الدرس لا تنادي workedHtml' });
+  /* المفتاحُ اسمُ المهارة حرفًا بحرف؛ وحرفٌ واحدٌ يزيغ يُخفي المثالَ بلا خطأ */
+  let W = {};
+  try { W = (new vm.Script('(' + wm[0].replace(/^var WORKED = /, '') .replace(/;$/, '') + ')')).runInNewContext({}); }
+  catch (e){ out.push({ sev:'خطأ', file:f, msg:'تعذّرت قراءةُ WORKED: ' + e.message }); return out; }
+  const keys = new Set();
+  for (const m of src.matchAll(/keys:\s*\[\s*key\s*\]/g)) void m;   /* تُبنى في وقت التشغيل */
+  for (const m of src.matchAll(/"(Grammar — [^"]+)"/g)) keys.add(m[1]);
+  for (const sub of ['tahsili-math.js']){
+    const sp = path.join(ROOT, sub);
+    if (!fs.existsSync(sp)) continue;
+    const ssrc = fs.readFileSync(sp, 'utf8');
+    for (const m of ssrc.matchAll(/^L\("[^"]+","([^"]+)"/gm)) keys.add('رياضيات — ' + m[1]);
+  }
+  const orphan = Object.keys(W).filter(k => !keys.has(k));
+  if (orphan.length)
+    out.push({ sev:'خطأ', file:f, msg: orphan.length + ' مثالًا محلولًا بلا مهارةٍ تطابقه (فلن يظهر): ' +
+      orphan.slice(0,3).join('، ') + (orphan.length>3 ? ' …' : '') });
   return out;
 }
 
