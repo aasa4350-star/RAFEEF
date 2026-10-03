@@ -153,6 +153,33 @@ function run(){
   samples += auditGroup(G.REMEDY, CHECK,   'مهارات',  issues, { needViz:true, needCheck:true });
   samples += auditGroup(G.REASON, CHECK_R, 'استدلال', issues, { needViz:true, needCheck:true });
 
+  /* ═══ قياسُ الزمنِ ومسارُه ═══════════════════════════════════════
+     طلبُ الأب (٣ أكتوبر ٢٠٢٦): الهدفُ يتحوّل من الصحّة إلى السرعة.
+     وثلاثةٌ تنقطع بصمت: أن تعمل ساعةٌ واحدةٌ لا ساعات (وإلّا عُدّ
+     الزمنُ مرّتين فظهر للطفل رقمٌ كاذب)، وألّا تجري وهو غائبٌ عن
+     الصفحة (قفلُ الجوّال ليس تفكيرًا)، وأن تُحفظ الأزمنةُ وإلّا لم
+     يُعرف أتحسّنت سرعتُه أم ثبتت — وهو المقصودُ كلُّه.
+
+     ورابعٌ تربويّ: ألّا يُمدح سريعٌ مخطئ، وإلّا علّمناه التخمين. */
+  try {
+    const src = fs.readFileSync(path.join(__dirname, '..', 'think.html'), 'utf8');
+    const need = [
+      [/var T_SKILL = \d+, T_REASON = \d+;/, 'هدفا الزمن (T_SKILL و T_REASON) غير معرَّفين'],
+      [/function secOf\(/,                    'لا تُقاس أزمنةُ الأسئلة'],
+      [/document\.hidden \? null : pickActive\(\)/, 'الساعةُ تجري والصفحةُ مخفيّة — قفلُ الجوّال يُحسب تفكيرًا'],
+      [/data-tm/,                             'الزمنُ لا يُعرض للطالب'],
+      [/items:\(items\|\|\[\]\), msAvg:/, 'الأزمنةُ لا تُحفظ — فلا يُعرف أتحسّنت السرعةُ أم ثبتت'],
+      [/تسرّعت/,                               'لا تنبيهَ على السرعة بلا صحّة — وهو يُعلّم التخمين'],
+      [/weakIn\(agg, REASON/,                 'المسائلُ المركّبةُ غيرُ مستهدَفةٍ بالضعف — تمرّ بالصدفة']
+    ];
+    need.forEach(function(x){ if(!x[0].test(src)) issues.push({ sev:'خطأ', msg:x[1] }); });
+    /* المدحُ مشروطٌ بالصحّة: شرطُ t-good لا بدّ أن يبدأ بـ ok */
+    if (!/if\(ok && sec <= goal\)\{ klass="t-good"/.test(src))
+      issues.push({ sev:'خطأ', msg:'المدحُ على السرعة غيرُ مشروطٍ بالإجابة الصحيحة' });
+  } catch (e){
+    issues.push({ sev:'خطأ', msg:'تعذّر فحصُ مسار الزمن: ' + e.message });
+  }
+
   return { issues, gens: Object.keys(G.REMEDY).length + Object.keys(G.REASON).length, samples,
            skills: Object.keys(G.REMEDY).length, reason: Object.keys(G.REASON).length };
 }

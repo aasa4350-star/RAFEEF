@@ -51,6 +51,20 @@
   .tag{display:inline-block;background:var(--soft);color:var(--deep);border-radius:8px;
        padding:2px 9px;font-size:.78rem;font-weight:800;margin-right:6px}
   @media (prefers-color-scheme:dark){ .tag{color:#fff} }
+  /* ═══ الزمنُ يُرى ═══ (طلب الأب ٣ أكتوبر ٢٠٢٦) */
+  .goal{display:inline-block;color:var(--muted);font-size:.76rem;font-weight:700}
+  .tm{display:none;margin-top:9px;border-radius:11px;padding:9px 12px;font-size:.93rem;line-height:1.8;
+      border:1.5px solid transparent}
+  .tm.t-good,.tm.t-mid,.tm.t-bad{display:block}
+  .tm.t-good{background:#ecfdf5;border-color:#6ee7b7;color:#065f46}
+  .tm.t-mid{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+  .tm.t-bad{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+  @media (prefers-color-scheme:dark){
+    .tm.t-good{background:#052e21;border-color:#065f46;color:#6ee7b7}
+    .tm.t-mid{background:#2e2206;border-color:#92400e;color:#fcd34d}
+    .tm.t-bad{background:#2e0a0a;border-color:#991b1b;color:#fca5a5}
+  }
+  .spd{display:block;font-size:.84rem;font-weight:700;color:var(--muted);margin-top:4px}
   .stem{font-weight:800;font-size:1.06rem;margin:6px 0 10px}
   .opts{display:flex;flex-direction:column;gap:8px}
   .opts button{background:var(--bg);border:1.5px solid var(--line);color:var(--ink);
@@ -618,6 +632,27 @@ var REASON = {
    مهارةٍ صحيحَها من مجموعها. الأضعف أوّلًا — بشرط ٣ أسئلةٍ فأكثر،
    فنسبةٌ من سؤالٍ واحد لا يُبنى عليها حكم. */
 var MIN_ASK = 3, SESSION = 8, TOP_WEAK = 4;
+
+/* ═══ الهدفُ يتحوّل من الصحّة إلى السرعة ══════════════════════════
+   طلبُ الأب (٣ أكتوبر ٢٠٢٦) بعد تقرير حسن: «قياسُ زمنٍ ظاهرٌ له —
+   حلّيتها في ١٨ ثانية، جرّب تنزل تحت ١٢».
+
+   وسببُه في القياس: حسنٌ يُصيب الآن ٦٤٪ في الاستدلال الرياضيّ بعد أن
+   كان ٥٢٪، لكنّ زمنَه لم يتحرّك — اثنتان وعشرون ثانيةً للسؤال مقابل
+   سبعٍ في الاستدلال اللغويّ. فدرجتُه ارتفعت لأنّه صار يحسب صحيحًا،
+   لا لأنّه صار يرى الحلّ. وفي كانجرو وموهبة الوقتُ محدود، فالبطءُ
+   يُسقطه ولو عرف.
+
+   والهدفان أدناه من قياسه هو لا من فرضٍ: عشرون ثانيةً لمهارةٍ مفردة
+   (ضعفُ زمنِه في أقوى مجالاته تقريبًا، فهو هدفٌ قريبٌ لا تعجيزيّ)،
+   وخمسٌ وأربعون لمسألةِ استدلالٍ متعدّدةِ الخطوات — فهذه يُرادُ فيها
+   التفكيرُ لا العجلة.
+
+   ═══ وحرسٌ تربويٌّ لازم ═══
+   لا يُمدح سريعٌ مخطئ أبدًا. فمن أخطأ وأسرع قيل له «تسرّعت»، ومن
+   أخطأ وتأنّى صُرف عن الوقت إلى الحلّ. فالسرعةُ لا تُطلب إلّا بعد
+   الصحّة — وإلّا علّمناه التخمين. */
+var T_SKILL = 20, T_REASON = 45;
 function fetchSkills(){
   var url = SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+
             "&order=created_at.desc&limit=1000";
@@ -639,13 +674,27 @@ function fetchSkills(){
     })
     .catch(function(){ return {}; });
 }
-function weakest(agg){
-  var list = Object.keys(agg)
-    .filter(function(k){ return REMEDY[k] && agg[k].t >= MIN_ASK; })
+/* ═══ المسائلُ المركّبةُ كانت خارجَ الاستهداف ═══════════════════════
+   كان الكشفُ عن الضعف يقتصر على REMEDY (المهاراتِ المفردة)، وREASON
+   (المسائلُ المركّبةُ متعدّدةُ الخطوات) لا يُنظر فيها — فتُسحب منها
+   مسألتان عشوائيّتان في آخر كلّ جلسة.
+
+   وأضعفُ ثلاثِ مهاراتٍ عند حسن (٣ أكتوبر ٢٠٢٦) كلُّها في REASON:
+   رفعُ المعدّل ١/٤، ورحلةٌ ووقود ٢/٤، ومقارنةُ عرضين ٢/٤ — أي أنّ
+   أضعفَ ما عنده لم يكن يُستهدَف قطّ، وإنّما يمرّ عليه بالصدفة.
+
+   وهو يوافق تشخيصَه: يعرف الخطوةَ المفردةَ ويتعثّر إذا تركّبت. فصار
+   الضعفُ يُقرأ من البنكين، ولكلٍّ خاناتُه: خمسُ مهاراتٍ مفردةٍ ثمّ
+   ثلاثُ مسائلَ مركّبةٍ من أضعفها هو — بدل ستٍّ ومسألتين عشوائيّتين.
+   والمجموعُ ثمانيةٌ كما كان، فالجلسةُ لم تَطُل وإنّما تحوّل ثقلُها. */
+function weakIn(agg, BANK, n){
+  return Object.keys(agg)
+    .filter(function(k){ return BANK[k] && agg[k].t >= MIN_ASK; })
     .map(function(k){ return { k:k, c:agg[k].c, t:agg[k].t, p:Math.round(100*agg[k].c/agg[k].t) }; })
-    .sort(function(a,b){ return a.p - b.p; });
-  return list.slice(0, TOP_WEAK);
+    .sort(function(a,b){ return a.p - b.p; })
+    .slice(0, n);
 }
+function weakest(agg){ return weakIn(agg, REMEDY, TOP_WEAK); }
 /* لا بيانات بعد (ابنٌ جديد أو لم يحلّ قدرات): نبدأ بأساسيّاتٍ يُبنى عليها */
 var DEFAULT_WEAK = ["النسبة المئوية","مساحة المثلّث","نظرية فيثاغورس","أعداد متتالية"]
   .map(function(k){ return { k:k, c:0, t:0, p:null }; });
@@ -654,8 +703,8 @@ var DEFAULT_WEAK = ["النسبة المئوية","مساحة المثلّث","�
    ٣، ٢، ١)، ثمّ مسألتا استدلالٍ متعدّدتا الخطوات — لأنّ مهاراتٍ منفردةً
    لا تُنتج استدلالًا؛ ومجال «الاستدلال» في TIMSS مسائلُ تدمج أكثر من
    خطوةٍ في سياقٍ غير مألوف، وهو أضعف ما عند حسن. */
-var SKILL_Q = 6, REASON_Q = 2;
-function buildSession(weak){
+var SKILL_Q = 5, REASON_Q = 3;
+function buildSession(weak, weakR){
   var pool=[];
   weak.forEach(function(w,i){ var reps = Math.max(1, 4-i); for(var j=0;j<reps;j++) pool.push(w.k); });
   shuffle(pool);
@@ -668,7 +717,10 @@ function buildSession(weak){
     if(!item || seen[item.q]) continue;
     seen[item.q]=1; item.skill=k; out.push(item);
   }
-  var rk = shuffle(Object.keys(REASON)); guard=0;
+  /* المسائلُ المركّبة: من أضعفها هو إن عُرف، وإلّا فعشوائيّةٌ كما كانت */
+  var rk = (weakR && weakR.length) ? shuffle(weakR.map(function(w){ return w.k; }))
+                                   : shuffle(Object.keys(REASON));
+  guard=0;
   while(out.length < SKILL_Q+REASON_Q && guard < REASON_Q*30){
     guard++;
     var key = rk[(out.length - SKILL_Q) % rk.length], it2;
@@ -685,11 +737,14 @@ function buildSession(weak){
    الأكمل (RR.usable). */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
-function saveScore(correct, total, skills, pid){
+function saveScore(correct, total, skills, pid, items, msAvg){
   try{
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
+      /* items وmsAvg جديدان: بلا تخزين الزمن لا يُعرف أتحسّنت سرعتُه أم
+         ثبتت — وهو المقصودُ من هذا التغيير كلِّه. */
       meta:{ kind:"practice", test:"تقوية التفكير 🧠", correct:correct, total:total,
-             skills:(skills||{}), targeted:true, pid:pid||null } };
+             skills:(skills||{}), items:(items||[]), msAvg:(msAvg||null),
+             tSkill:T_SKILL, tReason:T_REASON, targeted:true, pid:pid||null } };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
@@ -706,10 +761,45 @@ function renderLoading(){
     '<div class="card"><p class="note">أقرأ نتائجك السابقة لأحدّد أضعف مهاراتك…</p></div>';
 }
 
-function render(weak, hasData){
-  var items = buildSession(weak);
+function render(weak, hasData, weakR){
+  var items = buildSession(weak, weakR);
   var answered = {}, correct = 0, saved = false, savedN = 0, pid = newPid();
   var skillTally = {};
+  var log = [];        /* سطرٌ لكلّ سؤال: المهارة والصحّة والزمن */
+
+  /* ═══ ساعةٌ واحدةٌ تعمل في كلّ لحظة ═══════════════════════════════
+     الأسئلةُ الثمانيةُ معروضةٌ معًا، فلو شغّلنا ساعةً لكلّ سؤالٍ ظاهرٍ
+     لعُدَّ الزمنُ مرّتين وخرج رقمٌ كاذب. والرقمُ الكاذبُ يُعرض على الطفل
+     أسوأُ من ألّا يُعرض شيء.
+
+     فالساعةُ واحدة، تتبع السؤالَ غيرَ المُجاب الأقربَ إلى وسط الشاشة،
+     وتقف إذا غاب عن الصفحة (قفلُ الجوّال لا يُحسب تفكيرًا). */
+  var clk = {}, active = null, lastTick = 0, ticker = null;
+  function tick(){
+    var now = Date.now();
+    if(active !== null && lastTick) (clk[active] = clk[active] || 0, clk[active] += now - lastTick);
+    lastTick = now;
+  }
+  function pickActive(){
+    var best = null, bestD = Infinity, mid = window.innerHeight / 2;
+    app.querySelectorAll(".q").forEach(function(qEl){
+      var i = +qEl.getAttribute("data-i");
+      if(answered[i]) return;
+      var r = qEl.getBoundingClientRect();
+      if(r.bottom < 0 || r.top > window.innerHeight) return;   /* خارج الشاشة */
+      var d = Math.abs((r.top + r.bottom) / 2 - mid);
+      if(d < bestD){ bestD = d; best = i; }
+    });
+    return best;
+  }
+  function refresh(){ tick(); active = document.hidden ? null : pickActive(); }
+  function startClock(){
+    if(ticker) return;
+    lastTick = Date.now(); active = pickActive();
+    ticker = setInterval(function(){ tick(); active = document.hidden ? null : pickActive(); }, 500);
+    window.addEventListener("scroll", refresh, { passive:true });
+  }
+  function secOf(i){ tick(); return Math.max(1, Math.round((clk[i] || 0) / 1000)); }
 
   var head =
     '<header class="top"><p class="eyebrow">'+(GRADES[who]||"")+' · تدريبٌ مُوجَّه</p>'+
@@ -722,12 +812,22 @@ function render(weak, hasData){
              : 'أوّل جلسة لك — نبدأ بمهاراتٍ أساسيّة، وبعدها تصير الأسئلة مُفصّلةً على ضعفك أنت.')+
     '<small>كل سؤالٍ بعد إجابتك يفتح لك <b>الحلّ خطوة بخطوة</b> — اقرأه حتى لو أجبت صح.</small></div>';
 
-  var skillsCard = '<div class="card"><b>مهاراتك المستهدَفة اليوم:</b><ul class="skills">'+
-    weak.map(function(w){
+  function skillLis(list){
+    return list.map(function(w){
       return '<li><span class="pill '+cls(w.p)+'">'+(w.p==null?"جديد":w.p+"%")+'</span>'+
              '<span class="nm">'+esc(w.k)+'</span>'+
              (w.t ? '<span class="note">'+w.c+'/'+w.t+' سابقًا</span>' : '')+'</li>';
-    }).join("")+'</ul></div>';
+    }).join("");
+  }
+  var skillsCard = '<div class="card"><b>مهاراتك المستهدَفة اليوم:</b><ul class="skills">'+
+    skillLis(weak)+'</ul>'+
+    ((weakR && weakR.length)
+      ? '<div style="margin-top:10px;font-weight:800">🧩 ومسائلُ مركّبةٌ من أضعفها عندك:</div>'+
+        '<ul class="skills">'+skillLis(weakR)+'</ul>'+
+        '<small style="color:var(--muted)">هذي اللي تتركّب فيها أكثرُ من خطوة — وهي موضعُ تعثّرك، '+
+        'لا الخطوةُ المفردة.</small>'
+      : '')+
+    '</div>';
 
   /* أسئلةُ مراقبة التفكير — توصية ٢ (دليل قويّ) في IES/WWC، منقولةٌ من
      قائمة الأسئلة في الدليل نفسه (Example 6). تُعرض قبل الخيارات لا بعدها،
@@ -739,13 +839,15 @@ function render(weak, hasData){
   var qs_ = items.map(function(it,i){
     var pr = it.reason ? PROMPTS_REASON : PROMPTS_SKILL;
     return '<div class="q'+(it.reason?' q-reason':'')+'" data-i="'+i+'">'+
-      '<div class="num">سؤال '+(i+1)+' <span class="tag">'+(it.reason?'🧩 استدلال · ':'')+esc(it.skill)+'</span></div>'+
+      '<div class="num">سؤال '+(i+1)+' <span class="tag">'+(it.reason?'🧩 استدلال · ':'')+esc(it.skill)+'</span>'+
+        '<span class="goal">🎯 الهدف: دون '+(it.reason?T_REASON:T_SKILL)+'ث</span></div>'+
       '<div class="stem">'+esc(it.q)+'</div>'+
       (it.viz || '')+
       '<div class="ask"><b>قبل ما تحلّ، اسأل نفسك:</b><ul>'+
         pr.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join("")+'</ul></div>'+
       '<div class="opts">'+ it.opts.map(function(o,j){
         return '<button data-j="'+j+'">'+esc(o)+'</button>'; }).join("") +'</div>'+
+      '<div class="tm" data-tm></div>'+
       '<div class="sol" data-sol>'+
         '<div class="rule">📌 القاعدة: '+esc(it.rule)+'</div>'+
         '<ol>'+ it.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join("") +'</ol>'+
@@ -762,17 +864,28 @@ function render(weak, hasData){
     '<button class="go" data-again>جلسة جديدة 🔄</button>'+
     '<footer>الأسئلة تتغيّر أرقامها كل مرّة · والمهارات تتحدّث تلقائيًّا مع تقدّمك</footer>';
 
+  /* سطرُ النتيجة: الصحّةُ والسرعةُ معًا — فهما هدفان لا هدفٌ واحد */
+  function tallyLine(){
+    var n = log.length;
+    if(!n) return "الدرجة: 0 / "+items.length;
+    var avg = Math.round(log.reduce(function(a,x){ return a+x.ms; },0)/n);
+    var under = log.filter(function(x){ return x.ms <= (x.r?T_REASON:T_SKILL); }).length;
+    return "الدرجة: "+correct+" / "+items.length+
+      ' <span class="spd">⏱️ متوسّط '+avg+'ث · تحت الهدف '+under+' من '+n+'</span>';
+  }
+  function msAvgOf(){ return log.length ? Math.round(log.reduce(function(a,x){ return a+x.ms; },0)/log.length) : null; }
   function finishIfDone(){
     var n = Object.keys(answered).length;
     if(saved) return;
-    if(n === items.length && savedN < n){ savedN = n; saved = true; saveScore(correct, items.length, skillTally, pid); }
+    if(n === items.length && savedN < n){ savedN = n; saved = true;
+      saveScore(correct, items.length, skillTally, pid, log, msAvgOf()); }
   }
   /* حفظٌ جزئيّ إن غادر قبل أن يُكمل — كبقيّة صفحات الموقع، فلا يضيع جهده */
   function savePartial(){
     /* لا يُقفل: من حُفظ له جزءٌ ثمّ أكمل، يُحفظ إكماله بالمعرّف نفسه */
     var n = Object.keys(answered).length;
     if(n < MIN_ASK || n <= savedN) return;
-    savedN = n; saved = true; saveScore(correct, n, skillTally, pid);
+    savedN = n; saved = true; saveScore(correct, n, skillTally, pid, log, msAvgOf());
   }
   document.addEventListener("visibilitychange", function(){ if(document.hidden) savePartial(); });
   window.addEventListener("pagehide", function(){ savePartial(); });
@@ -796,12 +909,28 @@ function render(weak, hasData){
         t.t++; if(ok) t.c++;
         qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled = true; });
         sol.classList.add("show");
+
+        /* ═══ الزمن: يُرى ويُقال فيه الصدق ═══
+           ولا يُمدح سريعٌ مخطئ — وإلّا علّمناه التخمين. */
+        var sec = secOf(i), goal = it.reason ? T_REASON : T_SKILL;
+        log.push({ s:it.skill, ok:(ok?1:0), ms:sec, r:(it.reason?1:0) });
+        var tmEl = qEl.querySelector("[data-tm]"), msg, klass;
+        if(ok && sec <= goal){ klass="t-good"; msg = "⏱️ <b>"+sec+" ثانية</b> — صحيحة وتحت الهدف ("+goal+"ث). ممتاز 🎯"; }
+        else if(ok){ klass="t-mid"; msg = "⏱️ <b>"+sec+" ثانية</b> — صحيحة. والهدف أن تنزل تحت <b>"+goal+"ث</b>؛ اقرأ «طريقة ثانية» تحت، فهي أقصر."; }
+        else if(sec < goal/2){ klass="t-bad"; msg = "⏱️ <b>"+sec+" ثانية</b> — <b>تسرّعت</b>. السرعةُ بلا صحّةٍ لا تنفع: اقرأ الحلّ كاملًا."; }
+        else { klass="t-bad"; msg = "⏱️ <b>"+sec+" ثانية</b> — المهمُّ الآن الحلُّ لا الوقت. الوقتُ يأتي بعد أن تتقن."; }
+        if(tmEl){ tmEl.className = "tm "+klass; tmEl.innerHTML = msg; }
+        active = null; refresh();
+
         var sc = app.querySelector("[data-score]");
-        if(sc) sc.textContent = "الدرجة: "+correct+" / "+items.length;
+        if(sc) sc.innerHTML = tallyLine();
         finishIfDone();
       });
     });
   });
+
+  startClock();
+  document.addEventListener("visibilitychange", refresh);
 
   var again = app.querySelector("[data-again]");
   if(again) again.addEventListener("click", function(){ savePartial(); start(); });
@@ -810,9 +939,9 @@ function render(weak, hasData){
 function start(){
   renderLoading();
   fetchSkills().then(function(agg){
-    var w = weakest(agg);
-    if(w.length) render(w, true);
-    else render(DEFAULT_WEAK, false);
+    var w = weakest(agg), wr = weakIn(agg, REASON, 3);
+    if(w.length) render(w, true, wr);
+    else render(DEFAULT_WEAK, false, wr);
   });
 }
 start();
