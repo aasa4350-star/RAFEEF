@@ -285,6 +285,11 @@ function pct(c,t){ return t?Math.round(c/t*100):0; }
 /* نُفضّل ختم وقت الجهاز (meta.at) على created_at، لأن نتيجةً أُعيد إرسالها
    بعد انقطاعٍ تأخذ created_at الجديد فتظهر بتاريخٍ خاطئ. */
 function rowTime(r){ return (r && r.meta && r.meta.at) || (r && r.created_at) || ""; }
+/* العددُ العربيُّ يُطابِق معدودَه: جولةٌ وجولتان وجولاتٌ وجولة.
+   و«2 درسًا» تُقرأ عُجمةً، والأبُ يقرأ ما نكتب. */
+function arCount(n, one, two, few, many){
+  return n===1 ? one : n===2 ? two : (n>=3 && n<=10) ? (n+" "+few) : (n+" "+many);
+}
 function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
 function saToday(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
 var SKILLNAMES=[
@@ -353,6 +358,9 @@ async function loadReport(){
   var readActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="read"; });
   /* فتحَ المحادثةَ ولم يضغط «تكلّم» — انظر saveTalkOpened في talk.html */
   var talkActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="talk"; });
+  /* جولاتُ القسم العلاجيّ — انظر saveRemedial في practice.html. تُظهر
+     أنّه اشتغل فعلًا على درسٍ بعينه، لا أنّه فتح الصفحةَ وخرج. */
+  var remActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="rem"; });
   rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
 
   var notes=[];
@@ -607,6 +615,22 @@ async function loadReport(){
        بلاغ الأب (٢٨ سبتمبر): «حسن داخل المحادثة بس ما طلع في التقرير».
        وكان محقًّا في أنّه دخل: صفُّ الفتح يُظهره الآن، ويُفرّق بين
        «فتح وخرج» و«تكلّم وضاع كلامه» — وهو فرقٌ يبني عليه حكمَه. */
+    /* 💪 القسم العلاجيّ */
+    if(remActs.length){
+      var ra=remActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
+      var rBy={}, rN=0, rC=0, rT=0;
+      ra.forEach(function(x){ var k=x.meta.label||x.meta.skill||"—";
+        var e=rBy[k]||(rBy[k]={n:0,c:0,t:0}); e.n++; rN++;
+        e.c+=(x.meta.correct||0); e.t+=(x.meta.total||0); rC+=(x.meta.correct||0); rT+=(x.meta.total||0); });
+      var rKeys=Object.keys(rBy).sort(function(a,b){ return rBy[b].n-rBy[a].n; });
+      html+='<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">'+
+        '<li>🎯 <b>'+arCount(rN,"جولة تدرّب واحدة","جولتا تدرّب","جولات تدرّب","جولة تدرّب")+'</b>'+' على '+'<b>'+arCount(rKeys.length,"درس واحد","درسين","دروس","درسًا")+'</b>'+
+        (rT?' · الصحيح <b>'+rC+'/'+rT+'</b> ('+Math.round(rC/rT*100)+'%)':'')+
+        ' <span class="cnt">آخرها '+saTime(RR.when(ra[0]))+'</span></li>'+
+        rKeys.slice(0,6).map(function(k){ var e=rBy[k];
+          return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
+        '</ul></div>';
+    }
     if(talkActs.length && !talkAll.length){
       var ta=talkActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
       html+='<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">'+

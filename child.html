@@ -154,6 +154,11 @@ const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
 function pct(c,t){ return t?Math.round(c/t*100):0; }
+/* العددُ العربيُّ يُطابِق معدودَه: جولةٌ وجولتان وجولاتٌ وجولة.
+   و«2 درسًا» تُقرأ عُجمةً، والأبُ يقرأ ما نكتب. */
+function arCount(n, one, two, few, many){
+  return n===1 ? one : n===2 ? two : (n>=3 && n<=10) ? (n+" "+few) : (n+" "+many);
+}
 function saTime(iso){ if(!iso) return ""; var d=new Date(iso); if(isNaN(d)) return String(iso).slice(0,16).replace("T"," "); d=new Date(d.getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes()); }
 function saToday(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
 var SKILLNAMES=[
@@ -233,6 +238,9 @@ async function main(){
   const readActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="read");
   /* فتحَ المحادثةَ ولم يضغط «تكلّم» — انظر saveTalkOpened في talk.html */
   const talkActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="talk");
+  /* جولاتُ القسم العلاجيّ — انظر saveRemedial في practice.html. تُظهر
+     أنّه اشتغل فعلًا على درسٍ بعينه، لا أنّه فتح الصفحةَ وخرج. */
+  const remActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="rem");
   rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
@@ -526,6 +534,22 @@ async function main(){
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
     /* جلسةٌ فُتحت ولم يتكلّم فيها — انظر التعليل في home.html */
+    /* 💪 القسم العلاجيّ */
+    if(remActs.length){
+      const ra=remActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      const rBy={}; let rN=0, rC=0, rT=0;
+      ra.forEach(x=>{ const k=x.meta.label||x.meta.skill||"—";
+        const e=rBy[k]||(rBy[k]={n:0,c:0,t:0}); e.n++; rN++;
+        e.c+=(x.meta.correct||0); e.t+=(x.meta.total||0); rC+=(x.meta.correct||0); rT+=(x.meta.total||0); });
+      const rKeys=Object.keys(rBy).sort((a,b)=> rBy[b].n-rBy[a].n);
+      html+='<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">'+
+        '<li>🎯 <b>'+arCount(rN,"جولة تدرّب واحدة","جولتا تدرّب","جولات تدرّب","جولة تدرّب")+'</b>'+' على '+'<b>'+arCount(rKeys.length,"درس واحد","درسين","دروس","درسًا")+'</b>'+
+        (rT?' · الصحيح <b>'+rC+'/'+rT+'</b> ('+Math.round(rC/rT*100)+'%)':'')+
+        ' <span class="cnt">آخرها '+saTime(RR.when(ra[0]))+'</span></li>'+
+        rKeys.slice(0,6).map(k=>{ const e=rBy[k];
+          return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
+        '</ul></div>';
+    }
     if(talkActs.length && !talkAll.length){
       const ta=talkActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">`+

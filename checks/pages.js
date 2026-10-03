@@ -453,6 +453,17 @@ function remedialPath(){
   if (orphan.length)
     out.push({ sev:'خطأ', file:f, msg: orphan.length + ' مثالًا محلولًا بلا مهارةٍ تطابقه (فلن يظهر): ' +
       orphan.slice(0,3).join('، ') + (orphan.length>3 ? ' …' : '') });
+  /* أثرُ العمل في العلاجيّ: يُحفظ في practice.html ويُعرض في التقريرين.
+     وانقطاعُ أيّ وصلةٍ منها يُسقط القياسَ بلا أن يُخطئ شيءٌ ظاهر —
+     وهو القياسُ الذي نعرف به: أفتَح الدرسَ ولم ينفعه، أم لم يفتحه؟ */
+  if (!/function saveRemedial\(/.test(src) || !/saveRemedial\(_skill/.test(src))
+    out.push({ sev:'خطأ', file:f, msg:'جولاتُ القسم العلاجيّ لا تُحفظ — لا نعرف أعمل الطالبُ عليها أم لا' });
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    if (!/sect\s*===\s*"rem"/.test(fs.readFileSync(rp, 'utf8')))
+      out.push({ sev:'خطأ', file:rf, msg:'جولاتُ العلاجيّ تُحفظ ولا تُعرض — بطاقةُ «القسم العلاجي» مفقودة' });
+  }
   return out;
 }
 

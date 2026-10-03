@@ -1350,17 +1350,50 @@ if(window.STEP_BANK){ (function(){
 })(); }
 
 function skillItems(s, n){ var out=[], seen={}, t=0; n=n||3; while(out.length<n && t<40){ var q; try{ q=s.gen(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; out.push(q); } return out; }
-function renderMini(box, items){
+/* ═══ أثرُ العمل في القسم العلاجيّ ═══════════════════════════════════
+   جولاتُ التدرّب هنا لم تكن تُحفظ. فلو لم تتحرّك درجةُ فهد لم نعرف:
+   أفتَح القسمَ وذاكر ولم ينفعه، أم لم يفتحه أصلًا؟ وهما علّتان
+   لكلٍّ منهما علاجٌ غيرُ علاج الأخرى — الأولى تعني أنّ محتوانا ضعيف،
+   والثانية تعني أنّ المسألة التزامٌ لا أداة. فصار يُحفظ سطرٌ واحدٌ
+   للجولة إذا أجاب سؤالين فأكثر.
+
+   ولا يُحفظ فتحُ البطاقة ولا الضغطُ على زرّ الفيديو: الفتحُ والإغلاق
+   ليسا مذاكرةً، وزرُّ اليوتيوب لا يدلّ على أنّه شاهد — فتسجيلُه كذبٌ
+   يُرينا اجتهادًا لم يقع.
+
+   والوسمُ activity لا practice، فلا يدخل في متوسّطات الاختبارات ولا
+   يُغيّر نسبةَ التحصيليّ — كالمحادثة والنطق سواء. */
+function saveRemedial(skill, label, correct, total, pid){
+  try{
+    if(!skill) return;
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[],
+      meta:{ kind:"activity", sect:"rem", test:"علاجي 💪", skill:skill, label:(label||skill),
+             correct:correct, total:total, pid:pid, at:new Date().toISOString() } };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
+      body: JSON.stringify(body) }).catch(function(){});
+  }catch(e){}
+}
+function renderMini(box, items, s){
   items = items.map(shuffleQ);
   var h="";
   items.forEach(function(q,i){ h+='<div class="q" data-i="'+i+'"><div class="stem" dir="auto">'+frx(q[0])+'</div><div class="opts">'; q[1].forEach(function(o,j){ h+='<button data-j="'+j+'" dir="auto">'+frx(o)+'</button>'; }); h+='</div><div class="explain">'+frx(q[3])+'</div></div>'; });
   box.innerHTML=h;
+  var _skill=(s && s.keys && s.keys[0])||"", _label=(s && s.name)||"";
+  var _done=0, _ok=0, _pid=newPid(), _savedN=0;
   box.querySelectorAll(".q").forEach(function(qEl){ var i=+qEl.dataset.i, ans=items[i][2];
     qEl.querySelectorAll(".opts button").forEach(function(btn){ btn.addEventListener("click",function(){
       if(qEl.dataset.done) return; qEl.dataset.done=1;
       qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-      if(+btn.dataset.j===ans){ btn.classList.add("correct"); } else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+      var __good = (+btn.dataset.j===ans);
+      if(__good){ btn.classList.add("correct"); } else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
       qEl.querySelector(".explain").classList.add("show");
+      _done++; if(__good) _ok++;
+      /* سطرٌ واحدٌ للجولة: يُدخَل عند السؤال الثاني ثمّ يُعاد بالمعرّف
+         نفسه أكملَ — وقواعدُ العرض تُبقي الأكمل (RR.usable)، فلا تضيع
+         جولةٌ خرج منها قبل أن يتمّها. */
+      if(_done>=2 && _done>_savedN){ _savedN=_done; saveRemedial(_skill, _label, _ok, _done, _pid); }
     }); });
   });
 }
@@ -1541,14 +1574,14 @@ async function renderRemedial(){
   sec.querySelectorAll("[data-practice]").forEach(function(btn){
     btn.addEventListener("click", function(){
       var box = btn.parentNode.querySelector("[data-mini]");
-      renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3));
+      renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3), SKILLS[+btn.dataset.practice]);
       btn.textContent = "أسئلة أخرى 🔄";
     });
   });
   // البند ٤: البطاقات المفتوحة (مهارات تحت ٥٠٪) تبدأ جولتها فورًا في نفس المهارة
   sec.querySelectorAll("details[open] [data-practice]").forEach(function(btn){
     var box = btn.parentNode.querySelector("[data-mini]");
-    renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3));
+    renderMini(box, skillItems(SKILLS[+btn.dataset.practice], 3), SKILLS[+btn.dataset.practice]);
     btn.textContent = "أسئلة أخرى 🔄";
   });
 }
