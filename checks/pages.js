@@ -303,6 +303,7 @@ function run(){
   issues.push(...skillLabels());
   issues.push(...typedPath());
   issues.push(...remedialPath());
+  issues.push(...mawhibaPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -464,6 +465,63 @@ function remedialPath(){
     if (!/sect\s*===\s*"rem"/.test(fs.readFileSync(rp, 'utf8')))
       out.push({ sev:'خطأ', file:rf, msg:'جولاتُ العلاجيّ تُحفظ ولا تُعرض — بطاقةُ «القسم العلاجي» مفقودة' });
   }
+  return out;
+}
+
+/* ═══ مقياسُ موهبة — المستوى الثالث ════════════════════════════════
+   بُني لحسنٍ (٣ أكتوبر ٢٠٢٦) حين سأل الأب عن تسجيله في موهبة. وثلاثةُ
+   أشياءٍ تنقطع بصمت: أن يُحمَّل البنك، وأن يظهر التبويبُ لمن هو في
+   المستوى الثالث، وأن يطابق اسمُ المجال مفتاحَه في القسم العلاجيّ —
+   فحرفٌ يزيغ يقطع الضعفَ عن علاجه. ويُشغَّل البنكُ فعلًا هنا، فسؤالٌ
+   بثلاثة خياراتٍ أو بخيارين متطابقين لا يُرى إلّا بالتشغيل. */
+function mawhibaPath(){
+  const out = [], f = 'mawhiba3.js';
+  const bp = path.join(ROOT, f);
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:f, msg:'بنكُ مقياس موهبة غير موجود' }];
+  const ctx = { window:{} }; ctx.window = ctx;
+  try { vm.createContext(ctx); vm.runInContext(fs.readFileSync(bp,'utf8'), ctx); }
+  catch (e){ return [{ sev:'خطأ', file:f, msg:'البنك لا يُحمَّل: ' + e.message }]; }
+  const M = ctx.MAWHIBA3;
+  if (!M || !Array.isArray(M.domains) || M.domains.length !== 4)
+    return [{ sev:'خطأ', file:f, msg:'المجالاتُ الأربعةُ غير مكتملة (' + ((M&&M.domains&&M.domains.length)||0) + ')' }];
+
+  /* تشغيلٌ فعليّ: كلُّ مولّدٍ يُنتج سؤالًا سليمًا */
+  let ran = 0;
+  M.domains.forEach(d => {
+    if (!d.lesson || !d.yt) out.push({ sev:'خطأ', file:f, msg:'المجال «'+d.name+'» بلا شرحٍ أو رابطِ فيديو — فبطاقتُه العلاجيّةُ خاوية' });
+    d.gens.forEach(g => {
+      let q = null, tries = 0, err = null;
+      while (!q && tries++ < 120){ try { q = g(); } catch(e){ err = e.message; break; } }
+      if (err){ out.push({ sev:'خطأ', file:f, msg:'المولّد ' + (g.name||'?') + ' يرمي: ' + err }); return; }
+      if (!q){ out.push({ sev:'خطأ', file:f, msg:'المولّد ' + (g.name||'?') + ' لا يُنتج سؤالًا في ١٢٠ محاولة' }); return; }
+      ran++;
+      if (!Array.isArray(q[1]) || q[1].length !== 4)
+        out.push({ sev:'خطأ', file:f, msg:'المولّد ' + (g.name||'?') + ' يُخرج ' + ((q[1]&&q[1].length)||0) + ' خيارات لا أربعة' });
+      else {
+        const plain = q[1].map(o => String(o).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim());
+        if (new Set(plain).size !== 4)
+          out.push({ sev:'خطأ', file:f, msg:'المولّد ' + (g.name||'?') + ' يُكرّر خيارًا — فللسؤال جوابان' });
+      }
+      if (q[2] !== 0)
+        out.push({ sev:'خطأ', file:f, msg:'المولّد ' + (g.name||'?') + ' لا يضع الصحيحَ أوّلًا (shuffleQ تعتمد ذلك)' });
+    });
+  });
+
+  const pp = path.join(ROOT, 'practice.html');
+  if (fs.existsSync(pp)){
+    const src = fs.readFileSync(pp, 'utf8');
+    if (!/<script src="mawhiba3\.js"><\/script>/.test(src))
+      out.push({ sev:'خطأ', file:'practice.html', msg:'بنكُ موهبة غيرُ محمَّل' });
+    if (!/TABS\.push\(\["mw"/.test(src))
+      out.push({ sev:'خطأ', file:'practice.html', msg:'تبويبُ موهبة غيرُ معروضٍ لأحد' });
+    if (!/renderSet\("mw"/.test(src))
+      out.push({ sev:'خطأ', file:'practice.html', msg:'لوحةُ موهبة لا تُرسَم' });
+    /* اسمُ المجالِ هو مفتاحُ المهارة: q.gen = d.name و keys:[d.name] */
+    if (!/q\.gen = d\.name/.test(src) || !/keys:\[d\.name\]/.test(src))
+      out.push({ sev:'خطأ', file:'practice.html', msg:'اسمُ مجال موهبة لا يطابق مفتاحَه العلاجيّ — الضعفُ لن يجد علاجه' });
+  }
+  if (!out.length && ran < 20)
+    out.push({ sev:'تنبيه', file:f, msg:'مولّداتُ موهبة قليلة: ' + ran });
   return out;
 }
 

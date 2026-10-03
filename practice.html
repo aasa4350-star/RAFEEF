@@ -69,6 +69,7 @@
 <script src="tahsili-bio.js"></script>
 <script src="tahsili-phys.js"></script>
 <script src="step-reading.js"></script>
+<script src="mawhiba3.js"></script>
 <script src="writing-en.js"></script>
 <script>
 /* ═══ الكسر يُرصَف: البسطُ فوق والمقامُ تحت ═══
@@ -807,6 +808,18 @@ var NO_GAT = (who==="fahad");
    وفهدٌ لا اختبارَ مدرسيًّا له، فمُرْكَبُه هنا في صفحةِ تدريبه.
    ومستواه ٣ (أكاديميّ) لا ١ ولا ٢ — فهما جملةٌ وفقرةٌ لمن دونه. */
 var WRITING = (who==="fahad");
+/* ═══ مقياسُ موهبة — المستوى الثالث ═══════════════════════════════
+   سؤالُ الأب (٣ أكتوبر ٢٠٢٦): «أسئلة موهبة حقّت حسن تصنّف أيّ مستوى؟
+   عشان لو بغيت أسجّله في موهبة».
+
+   وتبيّن أنّ كتاب موهبة الذي في الموقع هو **المستوى الأول (٣–٥
+   ابتدائي)** — بُني لسعودٍ وأسامة. وحسنٌ في ثالثٍ متوسّط، أي
+   **المستوى الثالث** (٣ متوسط + ١ ثانوي)، فهو فوقه بمستويين.
+
+   والمستوى الثالث آخرُ المستويات، والطالبُ يختبر مرّةً لكلّ مستوى —
+   فنافذتُه هذه السنةُ أو التي تليها ثمّ تُغلق. */
+var MAWHIBA3_GRADES = ["ثالث متوسط","أول ثانوي"];
+var MW3 = (MAWHIBA3_GRADES.indexOf(GRADES[who]||"") >= 0) && !!window.MAWHIBA3;
 
 /* التبويباتُ تُبنى من قائمةٍ لا بنصٍّ ثابت: كان «لفظي» مفتوحًا دائمًا
    بالنصّ (class="panel active")، فحذفُه وحدَه يترك الصفحة بلا تبويبٍ
@@ -825,6 +838,7 @@ if(!VERBAL_ONLY){
      بالأصل). فالبرنامجُ لا يقيس الجَلَدَ ولا السرعةَ أصلًا، وهما نصفُ
      الاختبار. فهذا نموذجٌ كاملٌ بالمؤقّت، يُحفَظ باسمٍ مستقلٍّ فلا
      يختلط متوسّطُه بمتوسّطِ التدريبِ القصير. */
+  if(MW3) TABS.push(["mw","موهبة 🧠"]);
   if(SENIOR) TABS.push(["full","نموذج كامل ⏱️"]);
   TABS.push(["rem","علاجي 💪"]);
   TABS.push(["o","نماذج رسمية 🏛️"]);
@@ -934,7 +948,7 @@ function skillOf(q){
    هنا وحدَه. والنسبةُ دقيقةٌ: ستّون سؤالًا في خمسٍ وسبعين دقيقةً =
    دقيقةٌ وربعٌ للسؤال. */
 var FULL_N = 60, FULL_SECS = 75*60;
-var SECS = { v:780, q:720, t:900, s:(who==="fahad" ? 900 : 720), full:FULL_SECS };  /* نموذجُ فهدٍ فيه ثلاثُ قطعِ قراءةٍ فيلزمه وقتٌ أطول — تقديرُ تدريبٍ لا زمنٌ رسميّ */ // ثواني كل قسم (مثل الاختبار الحقيقي)
+var SECS = { v:780, q:720, t:900, s:(who==="fahad" ? 900 : 720), mw:1200, full:FULL_SECS };  /* نموذجُ فهدٍ فيه ثلاثُ قطعِ قراءةٍ فيلزمه وقتٌ أطول — تقديرُ تدريبٍ لا زمنٌ رسميّ */ // ثواني كل قسم (مثل الاختبار الحقيقي)
 var TIMED = false; // الوضع المؤقّت اختياري
 function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
 /* ═══ «أسئلة جديدة» في التحصيلي وSTEP ═══
@@ -1068,6 +1082,27 @@ function renderSet(id, items, intro, regen, label){
 }
 
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+/* ═══ خلطةُ مقياس موهبة — المستوى الثالث ═══════════════════════════
+   المجالاتُ أربعةٌ ولا أعرف وزنَها الرسميَّ بالضبط، فأقسمها بالتساوي
+   وأقولها صراحةً في العرض. وكلُّ مجالٍ حاضرٌ في كلّ جولةٍ ولو قلّ
+   العدد: من اختبر مجالًا دون مجالٍ لم يعرف أين يقف. */
+function mawhibaMix(n){
+  if(!window.MAWHIBA3) return [];
+  var doms = window.MAWHIBA3.domains, out = [], per = Math.floor(n/doms.length), extra = n - per*doms.length;
+  doms.forEach(function(d, di){
+    var want = per + (di < extra ? 1 : 0), seen = {}, tries = 0;
+    while(want > 0 && tries++ < want*40){
+      var q = null;
+      try{ q = gp(d.gens)(); }catch(e){}
+      if(!q || seen[q[0]]) continue;
+      seen[q[0]] = 1;
+      q.gen = d.name;            /* اسمُ المهارة في التقرير = اسمُ المجال */
+      out.push(q); want--;
+    }
+  });
+  return shuffle(out);
+}
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
   if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
@@ -1101,6 +1136,19 @@ function buildAll(){
       } else {
         renderSet("t", freshPick(TAHSILI,12,"t"), "تحصيلي: 12 سؤال · 15 دقيقة"+tnote+". رياضيات وعلوم (تحضيري) — <b>أسئلة جديدة كل مرة</b>.", function(){ return freshPick(TAHSILI,12,"t"); }, "تحصيلي");
       }
+    }
+    if(MW3){
+      var mwN = window.MAWHIBA3.domains.reduce(function(a,d){ return a+d.gens.length; }, 0);
+      renderSet("mw", mawhibaMix(16),
+        "<b>مقياس موهبة — المستوى الثالث</b> (٣ متوسط + ١ ثانوي): 16 سؤالًا · 20 دقيقة"+tnote+
+        ". والمجالاتُ الأربعةُ حاضرةٌ كلُّها: المرونة العقلية، والاستدلال العلمي والميكانيكي، "+
+        "والاستدلال اللغوي وفهم المقروء، والاستدلال الرياضي والمكاني — "+mwN+" مولّدًا، <b>أسئلة جديدة كل مرة</b>."+
+        '<div style="margin-top:8px;font-size:.9rem;color:var(--muted)">الاختبارُ الحقيقيُّ ١٢٠ سؤالًا. '+
+        'وهذه أسئلةُ تدريبٍ من إعدادي على <b>أنماط</b> المجالات — ليست الأسئلةَ الرسميّة ولا منقولةً عنها، '+
+        'ووزنُ الربعِ لكلّ مجالٍ اجتهادٌ منّي لا توزيعٌ معتمَد.</div>'+
+        '<div style="margin-top:6px;font-size:.9rem;color:var(--accent);font-weight:700">⏱️ شغّل المؤقّت فوق: '+
+        'الاختبارُ الحقيقيُّ محدودُ الوقت، والسرعةُ نصفُ المسألة.</div>',
+        function(){ return mawhibaMix(16); }, "موهبة م٣");
     }
     var sN = STEP.length;
     if(SENIOR){
@@ -1303,6 +1351,23 @@ if(window.TAHSILI_CHEM){ (function(){
         while(!q && tr++ < 80){ try{ q = gp(t.gens)(); }catch(e){} }
         if(!q) return null;
         return ['<b>كيمياء — '+t.name+':</b> '+q[0], q[1], q[2], q[3]];
+      } });
+  });
+})(); }
+
+/* ═══ مجالاتُ موهبة في القسم العلاجيّ ═══════════════════════════════
+   اسمُ المهارة المحفوظُ هو اسمُ المجال نفسُه (q.gen في mawhibaMix)،
+   وkeys تطابقه حرفًا بحرف — وإلّا لم يلتقِ الضعفُ المقروءُ من القاعدة
+   بعلاجه هنا. */
+if(window.MAWHIBA3){ (function(){
+  window.MAWHIBA3.domains.forEach(function(d){
+    SKILLS.push({ group:"موهبة", name:"موهبة — "+d.name,
+      rx:new RegExp(d.name.slice(0,10).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")),
+      yt:d.yt, keys:[d.name], lesson:d.lesson,
+      gen:function(){
+        var q=null, tr=0;
+        while(!q && tr++ < 80){ try{ q = gp(d.gens)(); }catch(e){} }
+        return q;
       } });
   });
 })(); }
@@ -1565,6 +1630,8 @@ async function renderRemedial(){
   var groups = YOUNG ? [["STEP","🌍 STEP إنجليزي"+_ov]]
              : NO_GAT ? [["تحصيلي","🧪 التحصيلي"],["STEP","🌍 STEP إنجليزي"]]
              : [["كمي","🔢 القدرات الكمي"],["تحصيلي","🧪 التحصيلي"+_ov],["STEP","🌍 STEP إنجليزي"+_ov]];
+  /* مجالاتُ موهبة تُضاف لمن هو في المستوى الثالث فقط */
+  if(MW3) groups.push(["موهبة","🧠 مقياس موهبة — المستوى الثالث"]);
   groups.forEach(function(g){
     lib += '<div style="font-weight:800;margin:12px 2px 6px">'+g[1]+'</div>';
     SKILLS.filter(function(s){ return s.group===g[0]; }).forEach(function(s){ lib += lessonCard(s, 0, false); });
