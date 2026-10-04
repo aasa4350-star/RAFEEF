@@ -475,13 +475,20 @@ function remedialPath(){
    فحرفٌ يزيغ يقطع الضعفَ عن علاجه. ويُشغَّل البنكُ فعلًا هنا، فسؤالٌ
    بثلاثة خياراتٍ أو بخيارين متطابقين لا يُرى إلّا بالتشغيل. */
 function mawhibaPath(){
-  const out = [], f = 'mawhiba3.js';
+  const out = [];
+  /* مستويان: الثاني لرفيف (٦ ابتدائي–٢ متوسط) والثالث لحسن (٣ متوسط–١ ثانوي) */
+  for (const [f, g] of [['mawhiba2.js','MAWHIBA2'], ['mawhiba3.js','MAWHIBA3']])
+    out.push(...auditMawhibaBank(f, g));
+  return out.concat(mawhibaWiring());
+}
+function auditMawhibaBank(f, globalName){
+  const out = [];
   const bp = path.join(ROOT, f);
   if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:f, msg:'بنكُ مقياس موهبة غير موجود' }];
   const ctx = { window:{} }; ctx.window = ctx;
   try { vm.createContext(ctx); vm.runInContext(fs.readFileSync(bp,'utf8'), ctx); }
   catch (e){ return [{ sev:'خطأ', file:f, msg:'البنك لا يُحمَّل: ' + e.message }]; }
-  const M = ctx.MAWHIBA3;
+  const M = ctx[globalName];
   if (!M || !Array.isArray(M.domains) || M.domains.length !== 4)
     return [{ sev:'خطأ', file:f, msg:'المجالاتُ الأربعةُ غير مكتملة (' + ((M&&M.domains&&M.domains.length)||0) + ')' }];
 
@@ -507,11 +514,20 @@ function mawhibaPath(){
     });
   });
 
+  if (!out.length && ran < 20)
+    out.push({ sev:'تنبيه', file:f, msg:'مولّداتُ موهبة قليلة: ' + ran });
+  return out;
+}
+function mawhibaWiring(){
+  const out = [];
   const pp = path.join(ROOT, 'practice.html');
   if (fs.existsSync(pp)){
     const src = fs.readFileSync(pp, 'utf8');
-    if (!/<script src="mawhiba3\.js"><\/script>/.test(src))
-      out.push({ sev:'خطأ', file:'practice.html', msg:'بنكُ موهبة غيرُ محمَّل' });
+    for (const bk of ['mawhiba2', 'mawhiba3'])
+      if (!new RegExp('<script src="' + bk + '\\.js"><\\/script>').test(src))
+        out.push({ sev:'خطأ', file:'practice.html', msg:'بنكُ ' + bk + ' غيرُ محمَّل' });
+    if (!/MW_GRADES/.test(src))
+      out.push({ sev:'خطأ', file:'practice.html', msg:'خريطةُ صفوفِ مستويات موهبة مفقودة' });
     if (!/TABS\.push\(\["mw"/.test(src))
       out.push({ sev:'خطأ', file:'practice.html', msg:'تبويبُ موهبة غيرُ معروضٍ لأحد' });
     if (!/renderSet\("mw"/.test(src))
@@ -530,8 +546,6 @@ function mawhibaPath(){
     if (!/mawhibaAll\b/.test(rsrc))
       out.push({ sev:'خطأ', file:rf, msg:'نتيجةُ موهبة بلا قسمٍ خاصّ — تسقط في «الاختبارات التجريبية» بمتوسّطٍ يُخفي مجالاتِها' });
   }
-  if (!out.length && ran < 20)
-    out.push({ sev:'تنبيه', file:f, msg:'مولّداتُ موهبة قليلة: ' + ran });
   return out;
 }
 

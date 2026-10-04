@@ -551,7 +551,10 @@ async function main(){
         Object.keys(sk).forEach(function(k){ var e=mwD[k]||(mwD[k]={c:0,t:0}); e.c+=(sk[k].c||0); e.t+=(sk[k].t||0); });
       });
       const mwK=Object.keys(mwD).sort(function(a,b){ return (mwD[a].c/mwD[a].t)-(mwD[b].c/mwD[b].t); });
-      html+='<div class="sec-title"><span class="dot"></span> 🧠 مقياس موهبة — المستوى الثالث</div><div class="card"><ul class="weak">'+
+      /* المستوى يُقرأ من اسم الاختبار نفسِه (موهبة م٢ / م٣)، فالعنوانُ
+         الثابتُ كان يقول لرفيفَ «الثالث» وهي في الثاني. */
+      const mwLvl = /م٢/.test((mwA[0].meta.test)||"") ? "الثاني" : "الثالث";
+      html+='<div class="sec-title"><span class="dot"></span> 🧠 مقياس موهبة — المستوى '+mwLvl+'</div><div class="card"><ul class="weak">'+
         '<li>🎯 <b>'+arCount(mwA.length,"جولة واحدة","جولتان","جولات","جولة")+'</b> · '+
         '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+saTime(RR.when(mwA[0]))+'</span></li>'+
         mwK.map(function(k){ var e=mwD[k];
