@@ -51,6 +51,15 @@
             إلّا حين تفصل ثلاثةَ أرقامٍ تامّة — وما عداها يبقى، فلا
             يصلح السؤالُ للكتابة ويبقى اختيارًا. */
          .replace(/\d{1,3}(?:,\d{3})+/g, function(m){ return m.replace(/,/g, ""); })
+         /* ═══ السالبُ يقع آخرًا في حقلٍ اتّجاهُه من اليمين ═══════════
+            بلاغ الأب (٤ أكتوبر ٢٠٢٦) بصورة شاشة: رفيف كتبت جوابَ
+            «−10/7» فحُسب خطأً — والجوابُ هو هو. والعلّةُ أنّ حقلَ
+            الرياضيات كان يرث اتّجاهَ الصفحة (من اليمين)، فالسالبُ
+            المكتوبُ أوّلًا يُعرض آخرًا، فمن كتبه كما يراه خزّنه
+            «10/7-». وقد صار الحقلُ ltr (وهو الأصل)، وهذا احتياطٌ
+            لمن كتبه هكذا: سالبٌ في الآخر لا معنى له إلّا أنّه
+            للمقدّمة. */
+         .replace(/^(.+?)-$/, "-$1")
          .replace(/^[a-zA-Zسصع]\s*=\s*/i, "")                 /* «س = ٥» ← «٥» */
          .replace(/^[a-zA-Zسصع]=/i, "")
          .replace(/\.$/, "");
@@ -132,7 +141,9 @@
   }
 
   function inputHtml(kind){
-    var ltr = (kind === "en") ? 'dir="ltr" style="text-align:left;' : 'style="';
+    /* الحقلان كلاهما ltr: الرياضياتُ تُكتب من اليسار كالإنجليزيّة،
+       وتركُه يرث اتّجاهَ الصفحة هو ما أوقع رفيفَ في «10/7-». */
+    var ltr = 'dir="ltr" style="text-align:left;';
     return '<div class="trow" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">'+
       '<input class="tans" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" '+
         (kind === "en" ? '' : 'inputmode="text" ')+ltr+
@@ -141,7 +152,17 @@
         'placeholder="'+(kind === "en" ? "Write the answer..." : "اكتب الجواب...")+'">'+
       '<button class="tchk" style="background:var(--accent);color:#fff;border:0;padding:12px 18px;'+
         'border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">تحقّق ✅</button>'+
-      '</div><div class="tfb" style="margin-top:8px;font-weight:700;font-size:.95rem"></div>';
+      '</div>'+
+      /* «البسطُ والمقامُ ما نقدر نحطّها فوق بعض» — ملاحظةُ الأب نفسِه.
+         فالسؤالُ يرسم الكسرَ مرصوفًا والحقلُ سطرٌ واحد، فيُقال له كيف
+         يكتبه بدل أن يُترك يُقدّر. */
+      (kind === "en" ? '' :
+        /* dir وحده لا يعزل داخل فقرةٍ عربيّة، فظهر المثالُ «3/4-» —
+           أي عكسَ ما يُعلّمه. ويلزم unicode-bidi:isolate صراحةً. */
+        '<div style="margin-top:6px;font-size:.84rem;color:var(--muted)">'+
+        'اكتب الكسر بخطٍّ مائل: <b dir="ltr" style="unicode-bidi:isolate">3/4</b>'+
+        ' &nbsp;· والسالب أوّلًا: <b dir="ltr" style="unicode-bidi:isolate">-3/4</b></div>')+
+      '<div class="tfb" style="margin-top:8px;font-weight:700;font-size:.95rem"></div>';
   }
 
   /* يربط الحقل: يُنادي done(ok) مرّةً واحدة، ويُري الطفلَ الجواب الصحيح */
@@ -160,7 +181,7 @@
       inp.style.borderColor = good ? "var(--good)" : "var(--bad)";
       fb.style.color = good ? "var(--good)" : "var(--bad)";
       fb.innerHTML = good ? "✅ إجابةٌ صحيحة"
-        : ('❌ الجواب الصحيح: <b dir="ltr">' + stripTags(correctText) + '</b>');
+        : ('❌ الجواب الصحيح: <b dir="ltr" style="unicode-bidi:isolate">' + stripTags(correctText) + '</b>');
       try{ done(good, val); }catch(e){}
     }
     btn.addEventListener("click", submit);
