@@ -1795,8 +1795,9 @@ if(!META[who] || !DATA[who]){
         /* تصفيرٌ وقع على جهازٍ آخر بعد آخر ما يعرفه هذا الجهاز: نتبعه */
         if(dbReset > getResetAt()){ wipeVocabLocal(); setResetAt(dbReset); }
         pullLearned(nm, getResetAt());
+        pullSR();   /* ذاكرةُ التكرار من الخادم — تُدمَج ولا تَمحو */
       })
-      .catch(function(){ pullLearned(nm, getResetAt()); });
+      .catch(function(){ pullLearned(nm, getResetAt()); pullSR(); });
     }catch(e){}
   }
   function pullLearned(nm, resetAt){
@@ -1914,6 +1915,7 @@ if(!META[who] || !DATA[who]){
       st.b = 0;                                  // نسيها → ترجع بكرة
     }
     st.t = Date.now(); s[word]=st; setSR(s);
+    pushSR();   /* نسخةٌ في الخادم — انظر pushSR */
   }
   /* ما يُقال للطفل حين يزلّ في كلمةٍ لها تاريخ: أنّها لم تضع. */
   function srLapseTxt(word){
@@ -2064,6 +2066,101 @@ if(!META[who] || !DATA[who]){
   // تتبّع اللفّة الحالية — الكلمات الي ظهرت في هاللفّة (ما تتكرر لين تخلص كل الكلمات ثم تلفّ من جديد)
   function getReviewSeen(){ try{ return JSON.parse(localStorage.getItem(vKey("rseen"))||"{}")||{}; }catch(e){ return {}; } }
   function setReviewSeen(o){ try{ localStorage.setItem(vKey("rseen"), JSON.stringify(o)); }catch(e){} }
+  /* ═══════════════════════════════════════════════════════════════════
+     ذاكرةُ التكرار تُحفَظ في الخادم لا في الجهاز وحده
+     ═══════════════════════════════════════════════════════════════════
+     بلاغُ حسن (٥ أكتوبر ٢٠٢٦): «مراجعة المحفوظ ثلاثون كلمةً فقط تتكرّر
+     عليّ نفسُها». وقِستُه فصحّ حرفًا بحرف: خمسُ جلساتٍ متتاليةٍ أعطته
+     الثلاثين نفسَها (أوّلَ ثلاثين كلمةً في البنك) ولو أجاب عنها كلِّها
+     صحيحًا.
+
+     وسببُه في سجلّه: الساعةَ ١:٣٨ ظهرًا كانت ذاكرتُه ٣٨٧ كلمةً مسترجَعة
+     من ٤٦٠، وبعد إحدى وخمسين دقيقةً صارت ٣٧. و«راجع المحفوظ» لا يدخله
+     إلّا ما استُرجع صحيحًا مرّةً (isFreshWord)، فصارت بركتُه سبعًا
+     وثلاثين وحجمُ الجلسة ثلاثين — فلزم التكرار لزومًا.
+
+     ولم أقدر أن أجزم بما أفرغ الذاكرة: لا شيءَ في الكود يُنقص c، ولا
+     تغيّر البنكُ ولا الصفحةُ منذ ٣٠ سبتمبر، وأبوه يقول إنّ الجهاز
+     والمتصفّح لم يتغيّرا. فلا أبني على تخمين — أبني على ما يُبطل العلّة
+     أيًّا كان سببُها: الذاكرةُ تُحفَظ في الخادم وتُدمَج عند الفتح، فلو
+     فرغت في الجهاز مرّةً أخرى لأيّ سببٍ رجعت كما كانت.
+
+     والصيغةُ مختصرة: لكلّ كلمةٍ [صندوق، إصابات، يومٌ منذ المبدأ] —
+     فأربعُ مئةٍ وستّون كلمةً تَزِن نحوَ عشرةِ كيلوبايت لا أكثر. والصفُّ
+     يُدخَل ولا يُعدَّل (الخادمُ لا يسمح بالتعديل)، فنأخذ أحدثَ لقطةٍ
+     ونُقدّم الأحدثَ لكلّ كلمةٍ على حدة — فلا يُضيع جهازٌ قديمٌ عملَ
+     جهازٍ جديد. */
+  var SR_SNAP_TEST = "ذاكرة الكلمات 🧠";
+  var SR_DAY0 = 1735689600000;                 /* ٢٠٢٥-٠١-٠١ — مبدأُ عدّ الأيّام */
+  function srPack(s){
+    var o = {};
+    Object.keys(s||{}).forEach(function(k){
+      var st = s[k]; if(!st) return;
+      var d = st.t ? Math.round((st.t - SR_DAY0)/86400000) : 0;
+      o[k] = [st.b||0, st.c||0, d];
+    });
+    return o;
+  }
+  function srUnpack(o){
+    var s = {};
+    Object.keys(o||{}).forEach(function(k){
+      var a = o[k]; if(!a || !a.length) return;
+      s[k] = { b:(a[0]||0), c:(a[1]||0), n:(a[1]||0), t:(a[2] ? a[2]*86400000 + SR_DAY0 : 0) };
+    });
+    return s;
+  }
+  /* الدمجُ بالكلمة لا بالجملة: لكلّ كلمةٍ يفوز أحدثُ عهدٍ بها (t)،
+     وعند التساوي يفوز الأعلى صندوقًا — فلا تُسقط لقطةٌ قديمةٌ تقدّمًا. */
+  function srMerge(local, remote){
+    var out = {}, k;
+    for(k in remote) if(remote.hasOwnProperty(k)) out[k] = remote[k];
+    for(k in local) if(local.hasOwnProperty(k)){
+      var a = local[k], b = out[k];
+      if(!b){ out[k] = a; continue; }
+      var at = a.t||0, bt = b.t||0;
+      if(at > bt || (at === bt && (a.b||0) >= (b.b||0))) out[k] = a;
+    }
+    return out;
+  }
+  var _srPushed = 0, _srPulled = false;
+  function pushSR(force){
+    try{
+      var s = getSR(), n = Object.keys(s).length;
+      if(!n) return;
+      /* لا نُدخل صفًّا مع كلّ إجابة: مرّةً كلّ عشر دقائق تكفي، والصفُّ
+         الأخيرُ هو المعتمَد فلا يضرّ تأخّرُ ما قبله. وعند انتهاء الجلسة
+         نُلزمه بالدفع (force) فلا تبيت جلسةٌ كاملةٌ بلا نسخةٍ في الخادم. */
+      if(!force && Date.now() - _srPushed < 10*60*1000) return;
+      _srPushed = Date.now();
+      saveScore(SR_SNAP_TEST, 0, 0, { kind:"vocabsr", words:n, sr:srPack(s), at:new Date().toISOString() });
+    }catch(e){}
+  }
+  function pullSR(){
+    if(_srPulled) return; _srPulled = true;
+    try{
+      var nm = (META[who] && META[who].name) || who;
+      fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(nm)+
+            "&meta->>test=eq."+encodeURIComponent(SR_SNAP_TEST)+"&order=created_at.desc&limit=3",
+        { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        if(!rows || !rows.length) return;
+        var resetAt = getResetAt(), best = null;
+        rows.forEach(function(x){
+          var m = x.meta || {}; if(!m.sr) return;
+          /* لقطةٌ سبقت التصفيرَ لا تُعاد — وإلّا رجع المحذوف */
+          var tms = Date.parse(m.at || x.created_at || "");
+          if(resetAt && !isNaN(tms) && tms <= resetAt) return;
+          if(!best) best = m.sr;
+        });
+        if(!best) return;
+        var before = Object.keys(getSR()).length;
+        var merged = srMerge(getSR(), srUnpack(best));
+        var after = Object.keys(merged).length;
+        if(after > before){ setSR(merged); renderVocab(); }
+      }).catch(function(){});
+    }catch(e){}
+  }
   // ===== عدّاد الكلمات اليومي + تحفيز =====
   function saDate(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
   function getDay(){ try{ var o=JSON.parse(localStorage.getItem(vKey("day"))||"{}"); if(o.date!==saDate()) return {date:saDate(),count:0,best:(o.best||0)}; return {date:o.date,count:o.count||0,best:(o.best||0)}; }catch(e){ return {date:saDate(),count:0,best:0}; } }
@@ -2115,6 +2212,7 @@ if(!META[who] || !DATA[who]){
 
     // بناء قائمة الكلمات حسب الوضع
     var V, headTitle, isNew=false, startIdx=learned, passReset=false, dueNow=0, masteredNow=0, rvSize=VOC_STEP, freshTotal=0, gated=false, gateDebt=0;
+    var rvWidened=false, rvPool=0;   /* هل وُسِّعت بركةُ المراجعة، وكم كانت */
     if(vocMode==="fresh"){
       /* خانة مراجعة الجديد — طلبها حسن نصًّا: الكلمات التي حفظها حديثًا
          ولم ترسخ بعد، مجموعةً وحدها بعيدًا عن طابور المحفوظ القديم. */
@@ -2167,7 +2265,26 @@ if(!META[who] || !DATA[who]){
       var pool = fullPool.filter(function(w, i){
         return !isFreshWord(srs[w[0]], i, learned);
       });
-      if(pool.length < Math.min(fullPool.length, VOC_STEP)) pool = fullPool;
+      /* ═══ بركةٌ أصغرُ من الجلسةِ تُعيد نفسَها إلى الأبد ═══════════════
+         بلاغُ حسن (٥ أكتوبر ٢٠٢٦): «ثلاثون كلمةً فقط تتكرّر عليّ نفسُها».
+         وقِستُه فصحّ: خمسُ جلساتٍ متتاليةٍ أعطته الثلاثين نفسَها ولو
+         أجاب عنها كلَّها صحيحًا.
+
+         والعلّةُ هنا: «راجع المحفوظ» لا يدخله إلّا ما استُرجع صحيحًا
+         مرّةً، وذاكرةُ حسنٍ يومَها كانت سبعًا وثلاثين كلمةً من أربعِ
+         مئةٍ وستّين — فالبركةُ سبعٌ وثلاثون والجلسةُ ثلاثون، فلزم
+         التكرارُ لزومًا رياضيًّا.
+
+         وكان ههنا حارسٌ يوسّع البركةَ إن ضاقت، لكنّ شرطَه «دون عشر
+         كلمات» — وسبعٌ وثلاثون فوقَها، فمرّ الخللُ من تحته. والصوابُ
+         أن يُقاس الضيقُ بحجمِ الجلسةِ نفسِها لا برقمٍ ثابت: بركةٌ لا
+         تزيد على الجلسةِ إلّا قليلًا تُعيد نفسَها مهما أحسنّا الترتيب.
+         فالعتبةُ الآن حجمُ الجلسةِ وزيادةُ دورانٍ قدرُها عشر. */
+      var rvWant = getRvSize(learned);
+      var poolNeed = rvWant + VOC_STEP;
+
+      rvPool = pool.length;
+      if(pool.length < Math.min(fullPool.length, poolNeed)){ pool = fullPool; rvWidened = true; }
       if(pool.length){
         /* الترتيب: الكلمة الي غلط فيها أوّلًا، ثم الأكثر تأخّرًا عن موعدها،
            ثم الأقدم حفظًا — فالكلمات القديمة ترجع أوّل لا آخِرًا. */
@@ -2213,7 +2330,7 @@ if(!META[who] || !DATA[who]){
         function byPri(a,b){ return (a.seen-b.seen) || (b.weak-a.weak) || (a.due-b.due) || (a.idx-b.idx); }
         dueL.sort(byPri); restL.sort(byPri);
         newL.sort(function(a,b){ return (a.seen-b.seen) || (b.weak-a.weak) || (a.idx-b.idx); });
-        rvSize = getRvSize(learned);
+        rvSize = rvWant;
         var wantNew = Math.min(newL.length, Math.round(rvSize * NEW_SHARE));
         var wantDue = Math.min(dueL.length, rvSize - wantNew);
         var sel = dueL.slice(0, wantDue).concat(newL.slice(0, wantNew));
@@ -2356,7 +2473,11 @@ if(!META[who] || !DATA[who]){
                           : '<p class="hint">🔁 <b>مراجعة بالمواعيد:</b> كل كلمة لها موعد يخصّها — الجديدة والي غلطت فيها ترجع بكرة، والي رسخت تتباعد شيئًا فشيئًا. '+
                             (dueNow>=startIdx ? 'نبدأ بأقدم كلماتك حفظًا.' : dueNow ? ('اليوم <b>'+dueNow+'</b> كلمة حان موعدها.') : 'ما فيه كلمة متأخّرة اليوم — هذي مراجعة تقدّمية 👌.')+
                             (masteredNow ? (' <b>'+masteredNow+'</b> كلمة رسخت 🏆.') : '')+
-                            ' اكتب الإنجليزي ثم «تحقّق».</p>';
+                            ' اكتب الإنجليزي ثم «تحقّق».'+
+                            /* إن وُسِّعت البركة نقول له لماذا — لا نُدخل عليه
+                               كلماتٍ لم يسترجعها بلا بيان، فيظنّ الخلل عاد. */
+                            (rvWidened ? '<br>🧺 <b>وسّعنا المراجعة:</b> الي استرجعتها صح من قبل <b>'+rvPool+'</b> كلمة فقط، وهي أقلّ من حجم الجلسة — فلو اقتصرنا عليها لرجعت لك نفس الكلمات كل مرّة. فضمّينا معها من كلماتك الي ما استرجعتها بعد.' : '')+
+                            '</p>';
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
       '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ انتبه: خرجت من الصفحة أثناء الحل، فهذه الجلسة قد لا تُحتسب. أكمل عادي — بس لا تفتح تطبيقًا ثانيًا وأنت تحل.</div>';
     var dayBase = getDay().count;

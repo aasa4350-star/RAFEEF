@@ -305,6 +305,7 @@ function run(){
   issues.push(...remedialPath());
   issues.push(...mawhibaPath());
   issues.push(...grammarPath());
+  issues.push(...vocabReviewPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -506,6 +507,48 @@ function remedialPath(){
 
    ودرسٌ تعلّمتُه مرّتين في هذا المستودع: حارسٌ لم يُختبَر سقوطُه لا
    يُوثَق به — فكلُّ بندٍ هنا جُرِّب بكسرِه أوّلًا والتأكّدِ من صياحه. */
+/* ═══ مسارُ مراجعةِ الكلمات 🔁 ═══════════════════════════════════════
+   بلاغُ حسن (٥ أكتوبر ٢٠٢٦): «ثلاثون كلمةً فقط تتكرّر عليّ نفسُها».
+   وقِستُه بالمتصفّح على حالته الفعليّة (٣٧ مسترجَعةً من ٤٦٠) فصحّ:
+   ٢٣ ثمّ ٢٣ ثمّ ٣٠ من ثلاثين مكرّرةً من الجلسة السابقة.
+
+   وله سببان، ولكلٍّ حارسُه هنا:
+   ١) بركةُ المراجعةِ لا تضمّ إلّا ما استُرجع صحيحًا، فإن ضاقت عن حجم
+      الجلسةِ لزم التكرارُ لزومًا رياضيًّا. فالعتبةُ يجب أن تُقاس بحجم
+      الجلسةِ لا برقمٍ ثابت.
+   ٢) ذاكرةُ التكرارِ في الجهازِ وحدَه والعدّادُ في الخادم، فإن فرغت
+      الذاكرةُ لأيّ سببٍ بقي العدّادُ ٤٦٠ وصارت البركةُ أصفارًا.
+      فلا بدّ من نسخةٍ في الخادمِ تُدمَج عند الفتح. */
+function vocabReviewPath(){
+  const out = [], f = 'reading.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+  /* ١) عتبةُ توسيعِ البركة */
+  if (!/var poolNeed = rvWant \+ VOC_STEP;/.test(src))
+    E('عتبةُ توسيعِ بركةِ المراجعة ليست مقيسةً بحجم الجلسة — تعود «نفس الكلمات تتكرّر»');
+  if (!/pool = fullPool; rvWidened = true;/.test(src))
+    E('البركةُ لا تتوسّع عند ضيقها — الجلسةُ ستُعيد نفسَها');
+  if (!/rvWidened \? /.test(src))
+    out.push({ sev:'تنبيه', file:f, msg:'التوسيعُ يقع بلا بيانٍ للطفل — سيظنّ الخللَ عاد' });
+  /* ٢) نسخةُ الذاكرةِ في الخادم */
+  if (!/function pushSR\(/.test(src) || !/kind:"vocabsr"/.test(src))
+    E('ذاكرةُ التكرار لا تُحفَظ في الخادم — تضيع مراجعاتُه بفراغِ تخزينِ المتصفّح');
+  if (!/function pullSR\(/.test(src) || !/pullSR\(\);/.test(src))
+    E('نسخةُ الذاكرةِ تُحفَظ ولا تُقرأ — فلا تنفع');
+  if (!/function srMerge\(/.test(src))
+    E('الذاكرةُ تُستبدل ولا تُدمَج — لقطةٌ قديمةٌ قد تمحو عملَ اليوم');
+  /* الدمجُ بالكلمةِ على الأحدثِ عهدًا — لا بالجملة */
+  if (!/at > bt \|\| \(at === bt/.test(src))
+    E('الدمجُ لا يُرجّح الأحدثَ لكلّ كلمةٍ على حدة');
+  /* لقطةٌ سبقت التصفيرَ لا تُعاد */
+  if (!/if\(resetAt && !isNaN\(tms\) && tms <= resetAt\) return;/.test(src))
+    E('اللقطةُ تُقرأ بلا احترامِ التصفير — سيرجع ما صُفّر');
+  if (!/if\(!force && Date\.now\(\) - _srPushed/.test(src))
+    out.push({ sev:'تنبيه', file:f, msg:'دفعُ اللقطةِ بلا خنقٍ — صفٌّ مع كلّ إجابة' });
+  return out;
+}
 function grammarPath(){
   const out = [], f = 'practice.html';
   const p = path.join(ROOT, f);
