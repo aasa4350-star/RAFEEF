@@ -307,6 +307,7 @@ function run(){
   issues.push(...grammarPath());
   issues.push(...vocabReviewPath());
   issues.push(...listenPath());
+  issues.push(...fragmentPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -525,6 +526,39 @@ function remedialPath(){
    القسمِ كلُّها في ثلاثةِ قيود: ألّا يظهر النصُّ قبل الإجابة (وإلّا
    صار قراءةً)، وألّا يُسمَع أكثرَ من مرّتين، وألّا تُفتح الأسئلةُ
    قبل الاستماع. فإن سقط قيدٌ منها بقي القسمُ ظاهرًا وهو لا يقيس شيئًا. */
+/* ═══ القُصاصةُ لا تصير جلسةً ═══════════════════════════════════════
+   بلاغُ الأب (٥ أكتوبر ٢٠٢٦): «تطلع لي ٢ من ٤ وهو جايب ٨ من ١٠»،
+   و«سعود حلّ ٣ دروس وما طلع إلا درسان».
+
+   وكانا بلاغَين عن علّتَين في الحفظِ نفسِه:
+   ١) من بدأ درسًا وأجاب بعضَه ثمّ انتقل إلى غيره حُفظت له قُصاصةٌ،
+      فإذا رجع أُعيد بناءُ الدرسِ بمعرِّفٍ جديدٍ — فصار عملُه جلستَين
+      وبقيت القُصاصةُ تُعرَض بجانبِ جولتِه الكاملة. فالمعرِّفُ يبقى ما
+      دامت الجولةُ لم تكتمل، وقواعدُ العرضِ تُبقي الأكمل.
+   ٢) الحفظُ الجزئيُّ كان لا يقع دون ثلاثِ إجابات، فدرسٌ أجاب فيه
+      سؤالَين لا يُسجَّل أصلًا — فيعدّه أبوه درسًا وهو غائبٌ عن التقرير. */
+function fragmentPath(){
+  const out = [];
+  const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+  let withPid = 0, bad = [], floor = [];
+  for (const f of files){
+    const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if (!/var answered=\{\}, correct=0, total=items\.length/.test(src)) continue;
+    withPid++;
+    /* المعرِّفُ يبقى للجولةِ غيرِ المكتملة، ويُجدَّد بعد اكتمالها */
+    if (!/sec\._pid && sec\._frag/.test(src) || !/sec\._pid = pid; sec\._frag = true;/.test(src))
+      bad.push(f);
+    else if (!/sec\._frag=false;/.test(src))
+      bad.push(f);
+    if (/if\(n<3\|\|n<=savedN\) return;/.test(src)) floor.push(f);
+  }
+  if (!withPid) out.push({ sev:'تنبيه', file:'checks', msg:'لم يُعثر على صفحاتِ المنهج — تغيّر شكلُ الحفظ؟' });
+  if (bad.length)
+    out.push({ sev:'خطأ', file: bad[0], msg: bad.length+' صفحةً تُجدّد معرِّفَ الجلسةِ عند العودة للدرس — فتصير القُصاصةُ جلسةً ثانية: '+bad.slice(0,4).join('، ') });
+  if (floor.length)
+    out.push({ sev:'خطأ', file: floor[0], msg: floor.length+' صفحةً لا تحفظ دون ثلاثِ إجابات — درسٌ أجاب فيه سؤالَين يغيب عن التقرير: '+floor.slice(0,4).join('، ') });
+  return out;
+}
 function listenPath(){
   const out = [], f = 'reading.html', bk = 'listen-bank.js';
   const p = path.join(ROOT, f), bp = path.join(ROOT, bk);

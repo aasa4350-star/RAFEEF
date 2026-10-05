@@ -1709,7 +1709,17 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
-    var answered={}, correct=0, total=items.length, saved=false, savedN=0, pid=newPid();
+    /* ═══ الجلسةُ الواحدةُ صفٌّ واحدٌ لا صفَّان ═══════════════════════
+       بلاغُ الأب (٥ أكتوبر ٢٠٢٦): «تطلع لي ٢ من ٤ وهو جايب ٨ من ١٠».
+       وكان محقًّا: إذا بدأ الدرسَ وأجاب أربعةً ثمّ انتقل إلى درسٍ آخر
+       حُفظ له «٢ من ٤»، فإذا رجع أُعيد بناءُ الدرسِ بمعرِّفٍ جديد —
+       فصار ما عمله جلسةً واحدةً في نفسِه، جلستَين في التقرير، وبقيت
+       القُصاصةُ تُعرَض بجانبِ جولتِه الكاملة.
+       فالمعرِّفُ الآن يبقى ما دامت الجولةُ السابقةُ لم تكتمل، وقواعدُ
+       العرضِ تُبقي الأكملَ منهما (RR.usable) فتسقط القُصاصةُ وحدَها. */
+    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
+    sec._pid = pid; sec._frag = true;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0;
     var scoreEl = sec.querySelector("[data-score]");
     var t0=Date.now(), lastTs=t0, fast=0;
     /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة، ليعرف التقرير أين الضعف بالضبط */
@@ -1722,9 +1732,9 @@ if(!NAMES[who]){
       if(fn){ var r=srRound[fn] || (srRound[fn]={c:0,t:0}); r.t++; if(ok) r.c++; }
     }
     function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills, pid:pid}; }
-    function savePartial(){ var n=Object.keys(answered).length; if(n<3||n<=savedN) return; savedN=n; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, n, meta(n)); }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
-    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, total, meta(total)); } }
+    function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; sec._frag=false; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, total, meta(total)); } }
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2], correctVal=items[i][1][ans];
       if(input){

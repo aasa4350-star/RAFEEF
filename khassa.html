@@ -64,9 +64,12 @@ var name = NAMES[who] || "التربية الخاصة";
 
 var SUPA_URL = APP_CONFIG.supaUrl;
 var SUPA_KEY = APP_CONFIG.supaKey;
-function saveScore(test, correct, total){
+/* المعرِّفُ (pid) يجعل قُصاصةَ الدرسِ وجولتَه الكاملةَ صفًّا واحدًا —
+   تُبقي قواعدُ العرضِ أكملَهما. انظر البلاغ في checks/pages.js. */
+function newPid(){ return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8); }
+function saveScore(test, correct, total, pid){
   try{
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total } };
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null } };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
@@ -668,7 +671,9 @@ if(!NAMES[who]){
     html += '<div class="scorebar"><span data-score>0 / '+items.length+'</span></div>'+
       '<button class="reset">أسئلة جديدة 🔄</button>';
     sec.innerHTML = html;
-    var answered={}, correct=0, total=items.length, saved=false;
+    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
+    sec._pid = pid; sec._frag = true;
+    var answered={}, correct=0, total=items.length, saved=false, savedN=0;
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];
@@ -680,12 +685,12 @@ if(!NAMES[who]){
           else{ btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
           qEl.querySelector(".explain").classList.add("show");
           scoreEl.textContent = correct+" / "+total;
-          if(Object.keys(answered).length===total && !saved){ saved=true; saveScore(c.label, correct, total);
+          if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; sec._frag=false; saveScore(c.label, correct, total, pid);
             if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } }
         });
       });
     });
-    function savePartial(){ var n=Object.keys(answered).length; if(saved||n<3) return; saved=true; saveScore(c.label, correct, n); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
+    function savePartial(){ var n=Object.keys(answered).length; if(n<1||n<=savedN) return; savedN=n; saved=true; saveScore(c.label, correct, n, pid); if(id!=="all"&&id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/n*100)})); }catch(e){} } }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
   }

@@ -1334,7 +1334,7 @@ if(!META[who] || !DATA[who]){
     function missedList(){ return missed.slice(0,10); }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
     function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); } }
-    function savePartial(){ var n=Object.keys(tried).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); }
+    function savePartial(){ var n=Object.keys(tried).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); }
     /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
        إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
 
@@ -1633,7 +1633,7 @@ if(!META[who] || !DATA[who]){
     /* بصمة القطعة: بها يعرف التقرير كم مرّة تكرّرت هذه القطعة على الطفل،
        فلا تُقرأ نسبةٌ عاليةٌ ناتجةٌ عن الحفظ على أنّها فهم. */
     var _pid = passageId(passage);
-    function savePartial(){ var n=Object.keys(ans).length; if(n<3||n<=savedN) return; savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId}); }
+    function savePartial(){ var n=Object.keys(ans).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"قراءة عربي 📖":"قراءة إنجليزي 📖", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), skills:skills, item:_pid, noMic:noMic, pid:attId}); }
     /* ═══ ما دون ثلاثِ إجاباتٍ: أثرٌ لا درجة ═══════════════════════
        جواب الأب حين سألتُه ماذا فعل حسن (٢٥ سبتمبر ٢٠٢٦): «مدري عنه
        صراحةً، لكن ممكن أنّه حلّ الأسئلة ولم يقرأها — ممكن طبعًا».
