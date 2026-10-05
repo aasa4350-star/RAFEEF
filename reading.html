@@ -13,6 +13,7 @@
 <script src="attempts-queue.js"></script>
 <script src="vocab-plus.js"></script>
 <script src="step-reading.js"></script>
+<script src="listen-bank.js?v=20261005"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
      كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
@@ -1245,10 +1246,12 @@ if(!META[who] || !DATA[who]){
       '<button data-tab="dict" aria-selected="true">إملاء 🔊✍️</button>'+
       '<button data-tab="read" aria-selected="false">قراءة وفهم 📖</button>'+
       '<button data-tab="vocab" aria-selected="false">كلمات ✍️</button>'+
+      '<button data-tab="listen" aria-selected="false">فهم المسموع 🎧</button>'+
     '</div>'+
     '<section class="panel active" id="dict"></section>'+
     '<section class="panel" id="read"></section>'+
     '<section class="panel" id="vocab"></section>'+
+    '<section class="panel" id="listen"></section>'+
     '<footer>استمع، اكتب، وافهم · صفحة تعليمية</footer>';
 
   var curLang = "en";
@@ -2161,6 +2164,119 @@ if(!META[who] || !DATA[who]){
       }).catch(function(){});
     }catch(e){}
   }
+  /* ═══════════════════════════════════════════════════════════════════
+     فهمُ المسموع 🎧 — خُمسُ درجةِ ستيب
+     ═══════════════════════════════════════════════════════════════════
+     تقريرُ حسنٍ (٥ أكتوبر ٢٠٢٦): فهمُ المسموعِ عشرون في المئة من وزنِ
+     ستيبَ بما نقله الأب، وحسنٌ تدرّب عليه مرّةً واحدةً في عمرِه كلِّه.
+
+     والإملاءُ المسموعُ في هذه الصفحةِ استماعٌ فعليّ، لكنّه إملاءُ كلمةٍ
+     مفردة: يقيس التقاطَ الحروفِ لا فهمَ جملةٍ ولا استنتاجَ مقصِد — وهو
+     المطلوبُ في الاختبار. فهذا قسمٌ يُسمِعه حوارًا أو إعلانًا قصيرًا
+     **بلا نصٍّ مكتوب**، ثمّ يسأله عنه.
+
+     وثلاثةُ قيودٍ تجعله يشبه الاختبارَ لا يشبه اللعب:
+     ١) النصُّ لا يظهر إلّا بعد الإجابة — فلو ظهر لصار قراءةً لا استماعًا.
+     ٢) الاستماعُ مرّتان لا أكثر، كما في الاختبار.
+     ٣) الأسئلةُ مقفلةٌ حتى يستمع — فلا يُخمّن بلا سماع.
+     ولا تُفتح الإجابةُ بالاستماعِ وحدَه إن تعذّر الصوت: إن لم يعمل
+     المشغّلُ أصلًا يُفتح النصُّ ويُقال له إنّها قراءةٌ لا استماع، فلا
+     يبقى القسمُ مقفلًا بعطلٍ ليس منه. */
+  function renderListen(){
+    var sec = document.getElementById("listen");
+    if(!sec) return;
+    var B = window.LISTEN_BANK || [];
+    if(curLang !== "en"){
+      sec.innerHTML = '<p class="hint">🎧 هذا القسم للإنجليزي — بدّل اللغة فوق إلى <b>الإنجليزية</b>.</p>';
+      return;
+    }
+    if(!B.length){ sec.innerHTML = '<p class="hint">تعذّر تحميل بنك الاستماع. حدّث الصفحة.</p>'; return; }
+    var N = 4;                                  /* أربعةُ نصوصٍ = ثمانيةُ أسئلة */
+    var items = pickFresh(B.map(function(_,i){ return String(i); }), "listen_en", N)
+                  .map(function(i){ return B[+i]; });
+    var attId = (window.newAttId ? newAttId() : (Date.now().toString(36)+Math.random().toString(36).slice(2,7)));
+    var total = items.reduce(function(s,x){ return s+x.q.length; }, 0);
+    var correct = 0, answered = 0, savedN = 0, t0 = Date.now();
+    var html = '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> 🎧 فهم المسموع</div>'+
+      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس، وبعدها تنفتح لك الأسئلة. والنصّ يظهر لك بعد ما تجاوب، تقارن فيه.</p>';
+    items.forEach(function(it, i){
+      html += '<div class="q" data-li="'+i+'">'+
+        '<div class="num">مقطع '+(i+1)+' من '+items.length+'</div>'+
+        '<div class="row" style="margin:8px 0"><button class="say" data-play>🔊 اسمع</button>'+
+          '<span data-plays style="font-weight:700;color:var(--muted);font-size:.9rem">تبقّى لك مرّتان</span></div>'+
+        '<div data-qs style="display:none"></div>'+
+        '<div data-script style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:10px 12px;font-size:.93rem;line-height:1.8"></div>'+
+      '</div>';
+    });
+    html += '<div class="scorebar" style="text-align:center;font-weight:800;margin-top:6px"><span data-lscore dir="ltr">0 / '+total+'</span></div>';
+    sec.innerHTML = html;
+    var scoreEl = sec.querySelector("[data-lscore]");
+    function save(){
+      if(answered < 2 || answered <= savedN) return;
+      savedN = answered;
+      saveScore("فهم المسموع 🎧", correct, answered,
+        { dur:Math.round((Date.now()-t0)/1000), clips:items.length, pid:attId, lang:"en" });
+    }
+    sec.querySelectorAll("[data-li]").forEach(function(box){
+      var it = items[+box.dataset.li], plays = 0, opened = false;
+      var playBtn = box.querySelector("[data-play]"), cnt = box.querySelector("[data-plays]");
+      var qsEl = box.querySelector("[data-qs]"), scEl = box.querySelector("[data-script]");
+      function openQs(){
+        if(opened) return; opened = true;
+        var h = "";
+        it.q.forEach(function(q, qi){
+          var pairs = q[1].map(function(o,ix){ return [o,ix]; });
+          for(var z=pairs.length-1; z>0; z--){ var y=Math.floor(Math.random()*(z+1)); var tmp=pairs[z]; pairs[z]=pairs[y]; pairs[y]=tmp; }
+          var ans = 0; var opts = pairs.map(function(p,ni){ if(p[1]===0) ans=ni; return p[0]; });
+          h += '<div class="q" data-qi="'+qi+'" data-ans="'+ans+'" style="box-shadow:none;margin:10px 0 0;padding:12px 14px">'+
+            '<div class="stem" dir="ltr" style="text-align:left;font-weight:700">'+q[0]+'</div>'+
+            '<div class="opts" style="display:flex;flex-direction:column;gap:7px;margin-top:9px">'+
+            opts.map(function(o,j){ return '<button data-j="'+j+'" dir="ltr" style="text-align:left;background:transparent;border:1.5px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:11px;font-weight:700;cursor:pointer;font-family:inherit">'+o+'</button>'; }).join('')+
+            '</div><div class="fb" data-ex style="display:none;margin-top:8px;font-weight:700"></div></div>';
+        });
+        qsEl.innerHTML = h; qsEl.style.display = "block";
+        qsEl.querySelectorAll("[data-qi]").forEach(function(qEl){
+          var qi = +qEl.dataset.qi, ans = +qEl.dataset.ans;
+          qEl.querySelectorAll(".opts button").forEach(function(btn){
+            btn.addEventListener("click", function(){
+              if(qEl.dataset.done) return; qEl.dataset.done = 1;
+              qEl.querySelectorAll(".opts button").forEach(function(b2){ b2.disabled = true; });
+              var good = (+btn.dataset.j === ans);
+              btn.style.borderColor = good ? "var(--good)" : "var(--bad)";
+              btn.style.background  = good ? "var(--good-bg)" : "var(--bad-bg)";
+              if(!good) qEl.querySelectorAll(".opts button")[ans].style.borderColor = "var(--good)";
+              var ex = qEl.querySelector("[data-ex]");
+              ex.style.display = "block";
+              ex.innerHTML = (good ? '✅ ' : '❌ ') + it.q[qi][2];
+              answered++; if(good) correct++;
+              scoreEl.textContent = correct + " / " + total;
+              /* النصُّ يظهر بعد أن تُجاب أسئلةُ المقطعِ كلُّها — لا قبلها */
+              if(qsEl.querySelectorAll("[data-qi][data-done]").length === it.q.length){
+                scEl.style.display = "block";
+                scEl.innerHTML = '<b>📝 النصّ المسموع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+it.t+'</div>';
+              }
+              save();
+            });
+          });
+        });
+      }
+      playBtn.addEventListener("click", function(){
+        if(plays >= 2){ return; }
+        plays++;
+        cnt.textContent = plays >= 2 ? "خلصت مرّاتك — جاوب من اللي سمعت" : "تبقّى لك مرّة واحدة";
+        playBtn.textContent = "🔁 اسمع مرّة ثانية";
+        if(plays >= 2) playBtn.disabled = true;
+        openQs();
+        try{ azureTTS(it.t, false, -10, null, 0.9); }
+        catch(e){
+          /* لا صوتَ أصلًا: نفتح النصَّ ونقول له الحقيقة — قراءةٌ لا استماع */
+          scEl.style.display = "block";
+          scEl.innerHTML = '<b style="color:var(--bad)">⚠️ الصوت ما اشتغل، فهذي قراءة مو استماع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+it.t+'</div>';
+        }
+      });
+    });
+    sec._leave = save;
+  }
   // ===== عدّاد الكلمات اليومي + تحفيز =====
   function saDate(){ var d=new Date(new Date().getTime()+3*3600*1000); var p=function(n){return String(n).padStart(2,"0");}; return d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); }
   function getDay(){ try{ var o=JSON.parse(localStorage.getItem(vKey("day"))||"{}"); if(o.date!==saDate()) return {date:saDate(),count:0,best:(o.best||0)}; return {date:o.date,count:o.count||0,best:(o.best||0)}; }catch(e){ return {date:saDate(),count:0,best:0}; } }
@@ -2801,7 +2917,7 @@ if(!META[who] || !DATA[who]){
   }
   MANI_P.then(updateVoiceBars);
 
-  function renderAll(){ renderDict(); renderRead(); renderVocab(); syncVocabTab(); populateVoices(); updateVoiceBars(); }
+  function renderAll(){ renderDict(); renderRead(); renderVocab(); renderListen(); syncVocabTab(); populateVoices(); updateVoiceBars(); }
   renderAll();
 
   document.querySelectorAll(".langtabs button").forEach(function(b){

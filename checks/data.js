@@ -164,7 +164,7 @@ async function run(){
                  يُدخل ولا يحذف، فلا سبيل إلى محو الصفوف القديمة.
      ومَن أضاف علامةً جديدةً فليُسجّلها هنا وفي MARKERS في
      report-rules.js، وإلّا عُدّت جلسةً بلا درجة. */
-  const NOT_SESSION = new Set(['activity', 'talk', 'micfail', 'vocabreset']);
+  const NOT_SESSION = new Set(['activity', 'talk', 'micfail', 'vocabreset', 'vocabsr']);
 
   const stub = rows.filter(r => {
     const m = r.meta || {};

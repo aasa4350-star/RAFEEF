@@ -49,7 +49,9 @@
   /* صفوفٌ ليست محاولاتٍ أصلًا، إنّما علاماتُ حالةٍ أُدخلت لأنّ المفتاح
      يُدخل ولا يحذف ولا يعدّل. فلا تُعدّ في تقريرٍ ولا متوسّط.
        vocabreset — ساعةُ تصفير حفظ الكلمات (reading.html) */
-  var MARKERS = { vocabreset:1 };
+  /* vocabsr — لقطةُ ذاكرةِ التكرارِ (reading.html): بيانٌ لا جلسة،
+     درجتُها صفرٌ من صفر، فلو عُدَّت جلسةً أفسدت المتوسّطات. */
+  var MARKERS = { vocabreset:1, vocabsr:1 };
 
   function excluded(row){
     if(!row) return false;

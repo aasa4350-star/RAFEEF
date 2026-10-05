@@ -306,6 +306,7 @@ function run(){
   issues.push(...mawhibaPath());
   issues.push(...grammarPath());
   issues.push(...vocabReviewPath());
+  issues.push(...listenPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -519,6 +520,47 @@ function remedialPath(){
    ٢) ذاكرةُ التكرارِ في الجهازِ وحدَه والعدّادُ في الخادم، فإن فرغت
       الذاكرةُ لأيّ سببٍ بقي العدّادُ ٤٦٠ وصارت البركةُ أصفارًا.
       فلا بدّ من نسخةٍ في الخادمِ تُدمَج عند الفتح. */
+/* ═══ مسارُ فهمِ المسموع 🎧 ═══════════════════════════════════════════
+   خُمسُ درجةِ ستيب، وحسنٌ تدرّب عليه مرّةً واحدةً في عمرِه. وقيمةُ
+   القسمِ كلُّها في ثلاثةِ قيود: ألّا يظهر النصُّ قبل الإجابة (وإلّا
+   صار قراءةً)، وألّا يُسمَع أكثرَ من مرّتين، وألّا تُفتح الأسئلةُ
+   قبل الاستماع. فإن سقط قيدٌ منها بقي القسمُ ظاهرًا وهو لا يقيس شيئًا. */
+function listenPath(){
+  const out = [], f = 'reading.html', bk = 'listen-bank.js';
+  const p = path.join(ROOT, f), bp = path.join(ROOT, bk);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  if (!fs.existsSync(bp)){ E(bk, 'بنكُ فهمِ المسموع مفقود'); return out; }
+  if (!/listen-bank\.js/.test(src)) E(f, 'بنكُ الاستماع غيرُ محمَّلٍ في الصفحة');
+  if (!/data-tab="listen"/.test(src)) E(f, 'تبويبُ «فهم المسموع» غيرُ موجود');
+  if (!/function renderListen\(/.test(src) || !/renderListen\(\);/.test(src))
+    E(f, 'قسمُ الاستماع لا يُبنى');
+  if (!/if\(plays >= 2\)\{ return; \}/.test(src))
+    E(f, 'الاستماعُ بلا حدٍّ — الاختبارُ الحقيقيُّ مرّتان');
+  if (!/data-script[\s\S]{0,400}display:none/.test(src))
+    E(f, 'النصُّ المسموعُ ظاهرٌ من البداية — يصير القسمُ قراءةً لا استماعًا');
+  if (!/if\(opened\) return; opened = true;/.test(src) || !/data-qs[\s\S]{0,200}display:none/.test(src))
+    E(f, 'الأسئلةُ مفتوحةٌ قبل الاستماع — يُخمّن بلا سماع');
+  if (!/saveScore\("فهم المسموع 🎧"/.test(src))
+    E(f, 'نتيجةُ الاستماعِ لا تُحفَظ — فلا تظهر في التقرير');
+  /* البنكُ نفسُه: أربعةُ خياراتٍ لكلّ سؤال، والصحيحُ أوّلًا، ولكلٍّ شرح */
+  let L = [];
+  try { const ctx = { window:{} }; vm.createContext(ctx);
+        vm.runInContext(fs.readFileSync(bp,'utf8'), ctx); L = ctx.window.LISTEN_BANK || []; }
+  catch(e){ E(bk, 'تعذّرت قراءةُ البنك: ' + e.message); return out; }
+  if (L.length < 10) out.push({ sev:'تنبيه', file:bk, msg:'بنكُ الاستماعِ صغير ('+L.length+' مقطعًا) — سيتكرّر سريعًا' });
+  let badOpt = 0, badEx = 0, dup = 0;
+  L.forEach(x => (x.q||[]).forEach(q => {
+    if (!q[1] || q[1].length !== 4) badOpt++;
+    if (!q[2]) badEx++;
+    if (q[1] && new Set(q[1].map(o => String(o).toLowerCase())).size !== q[1].length) dup++;
+  }));
+  if (badOpt) E(bk, badOpt + ' سؤالًا خياراتُه ليست أربعة — فحظُّ التخمينِ غيرُ حظِّ الاختبار');
+  if (badEx)  E(bk, badEx + ' سؤالًا بلا شرحٍ — يُخطئ ولا يعرف لِمَ');
+  if (dup)    E(bk, dup + ' سؤالًا فيه خيارٌ مكرّر');
+  return out;
+}
 function vocabReviewPath(){
   const out = [], f = 'reading.html';
   const p = path.join(ROOT, f);

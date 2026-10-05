@@ -1189,7 +1189,7 @@ function buildAll(){
       renderSet("s", mix,
         "STEP: 12 سؤال · 15 دقيقة"+tnote+" — <b>موزون بأوزان الاختبار</b>: "+rc+" فهم مقروء · "+(12-rc-wc)+" تراكيب · "+wc+" تحليل كتابي. <b>أسئلة جديدة كل مرة</b>، والتراكيب من بنكٍ فيه "+sN+" سؤالًا."+
         stepWeightsHtml()+
-        '<div style="margin-top:8px;font-size:.9rem">🔊 <b>فهم المسموع (20%) ما هو هنا</b> — يحتاج صوتًا، وتدريبه في <a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع</a> (٤٠ جملة إملاء مسموع). لا تتركه: خُمس الاختبار.</div>',
+        '<div style="margin-top:8px;font-size:.9rem">🔊 <b>فهم المسموع (20%) ما هو هنا</b> — يحتاج صوتًا، وتدريبه في <a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع ← تبويب «فهم المسموع 🎧»</a>: تسمع حوارًا قصيرًا بلا نصّ مكتوب ثم تجاوب عنه، مثل الاختبار. لا تتركه: خُمس الدرجة.</div>',
         function(){ return stepMix(12); }, "STEP إنجليزي");
     } else
     renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
