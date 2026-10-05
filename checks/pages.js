@@ -304,6 +304,7 @@ function run(){
   issues.push(...typedPath());
   issues.push(...remedialPath());
   issues.push(...mawhibaPath());
+  issues.push(...grammarPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -497,6 +498,62 @@ function remedialPath(){
    المستوى الثالث، وأن يطابق اسمُ المجال مفتاحَه في القسم العلاجيّ —
    فحرفٌ يزيغ يقطع الضعفَ عن علاجه. ويُشغَّل البنكُ فعلًا هنا، فسؤالٌ
    بثلاثة خياراتٍ أو بخيارين متطابقين لا يُرى إلّا بالتشغيل. */
+/* ═══ مسارُ القواعدِ المركَّزة ✏️ ═══════════════════════════════════
+   القسمُ يقوم على خمسِ وصلاتٍ متتابعة، وانقطاعُ أيٍّ منها يُفرغه بلا
+   أن يُخطئ شيءٌ ظاهر: التبويبُ، وبناؤه عند الضغط، والطابورُ من
+   meta.wrong مطابَقًا على البنك، وإعادةُ المخطوءِ آخرَ الطابور،
+   وحفظُ ما صُحِّح ثمّ عرضُه في التقريرين.
+
+   ودرسٌ تعلّمتُه مرّتين في هذا المستودع: حارسٌ لم يُختبَر سقوطُه لا
+   يُوثَق به — فكلُّ بندٍ هنا جُرِّب بكسرِه أوّلًا والتأكّدِ من صياحه. */
+function grammarPath(){
+  const out = [], f = 'practice.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!/TABS\.push\(\["gr",/.test(src))
+    E('تبويبُ «قواعد مركّزة» غيرُ مضافٍ إلى TABS — القسمُ لا يُرى');
+  else if (!/if\(b\.dataset\.tab==="gr"\)\{\s*renderGrammar\(\);/.test(src))
+    E('تبويبُ القواعد موجودٌ ولا يُبنى عند الضغط — سيبقى فارغًا');
+  if (!/function renderGrammar\(/.test(src))
+    E('renderGrammar غيرُ معرّفة');
+  /* الطابورُ من أخطائه هو: الفرزُ على محاولاتِ ستيب، ثمّ قراءةُ
+     meta.wrong، ثمّ مطابقتُها على البنكِ بنصِّها. */
+  if (!/meta->>test=eq\./.test(src))
+    E('القسمُ لا يفرز محاولاتِ ستيب — سيقرأ نافذةً عامّةً فيزيغ ترتيبُ الضعف');
+  if (!/\(m\.wrong \|\| \[\]\)\.forEach/.test(src))
+    E('القسمُ لا يقرأ meta.wrong — فالطابورُ لن يكون من أخطائه');
+  if (!/function grBankIndex\(/.test(src) || !/bank\[stem\]/.test(src))
+    E('نصُّ الخطأِ لا يُطابَق على البنك — فلا يُعاد السؤالُ بعينه');
+  /* ولا يخرج السؤالُ حتى يُجيبه صحيحًا */
+  if (!/queue\.shift\(\); queue\.push\(cur\);/.test(src))
+    E('المخطوءُ لا يعود إلى آخرِ الطابور — فقد تُقرأ القاعدةُ ولا يُصحَّح الخطأ');
+  if (!/if\(cur\.missed\)\{ fixedN\+\+/.test(src))
+    E('تصحيحُ الخطأِ لا يُعدّ — فلا يُعرَف كم صحّح');
+  /* ما صُحِّح يُحفَظ في الخادمِ لا في الجهازِ وحده */
+  if (!/function saveGram\(/.test(src) || !/sect:"gram"/.test(src))
+    E('جولاتُ القواعدِ لا تُحفظ — لا نعرف أعمل عليها أم لا');
+  if (!/fixedKeys:/.test(src) || !/meta->>sect=eq\.gram/.test(src))
+    E('ما صُحِّح لا يُقرأ من الخادم — ستُعاد عليه أسئلةٌ أتمّها في جهازٍ آخر');
+  /* شرحُ القاعدةِ يُقرأ من جدولٍ واحدٍ لا يُكتب مرّتين */
+  if (!/GRAM_BY_KEY\[key\] = \{/.test(src))
+    out.push({ sev:'تنبيه', file:f, msg:'جدولُ شروحِ القواعدِ غيرُ مفتوحٍ للقسمِ المركَّز' });
+  /* عزلُ المقاطعِ اللاتينيّة: بلا isoLatin تُعرَض «if + had p.p» مقلوبة */
+  if (!/function isoLatin\(/.test(src) || !/isoLatin\(g\.lesson\)/.test(src))
+    E('شرحُ القاعدةِ بلا عزلِ المقاطعِ اللاتينيّة — تُعرَض القاعدةُ مقلوبةً فيحفظها الطالبُ خطأً');
+  /* وأثرُه يُعرَض في التقريرين */
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    const rsrc = fs.readFileSync(rp, 'utf8');
+    if (!/sect\s*===\s*"gram"/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'جولاتُ القواعدِ المركَّزة تُحفظ ولا تُعرض — بطاقةُ «القواعد المركّزة» مفقودة' });
+    else if (!/meta\.fixed\|\|0\)|meta\.fixed \|\| 0\)/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'البطاقةُ تعدّ الجولاتِ ولا تعدّ ما صُحِّح — وهو الرقمُ المقصود' });
+  }
+  return out;
+}
 function mawhibaPath(){
   const out = [];
   /* مستويان: الثاني لرفيف (٦ ابتدائي–٢ متوسط) والثالث لحسن (٣ متوسط–١ ثانوي) */

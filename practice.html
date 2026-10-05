@@ -839,6 +839,25 @@ if(!VERBAL_ONLY){
   if(!YOUNG && !NO_GAT) TABS.push(["q","قدرات — كمي 🔢"]);
   if(!YOUNG) TABS.push(["t","تحصيلي 🧪"]);
   TABS.push(["s","STEP إنجليزي 🌍"]);
+  /* ═══ قسمُ القواعدِ المركَّز ═════════════════════════════════════════
+     بعد تقرير حسن (٥ أكتوبر ٢٠٢٦) اختار الأب الأوّلَ من اثنين: «قسم
+     قواعد مركّز على هذي الستّ بالضبط، مع شرح مكتوب لكل قاعدة وتكرار
+     السؤال اللي أخطأه حتى يصحّحه».
+
+     ولِمَ لم يكفِ «علاجي»؟ لثلاثة أمور قِستُها في بياناته:
+     ١) هو غيرُ ثانويٍّ، فقواعدُ ستيب عنده في weakStretch — تُعرَض
+        تحت عنوان «فوق المستوى» بعد بطاقاتِ الضعفِ كلِّها، وهو
+        موضعٌ لا يُقرأ. وجولاتُه في علاجيٍّ صفرٌ منذ فُتح.
+     ٢) بطاقةُ علاجيٍّ تسحب ثلاثةَ أسئلةٍ عشواءَ من البنك — فيجوز أن
+        لا يرى سؤالَه المخطوءَ أبدًا. وأخطاؤه محفوظةٌ بنصِّها في
+        meta.wrong، فإعادتُها ممكنةٌ بلا تخمين.
+     ٣) أخطأ سؤالَين بعينهما مرّتين في تاريخين مختلفين — فالعلّةُ ليست
+        قلّةَ أسئلةٍ بل أنّ لا شيءَ كان يُمسك الخطأَ ويردّه عليه.
+
+     فهذا قسمٌ يبني طابورَه من أخطائه هو، ولا يُسقِط السؤالَ من الطابور
+     حتى يُجيبه صحيحًا — وإن أخطأه عاد إلى آخر الطابور في الجولةِ
+     نفسِها، لا في جلسةٍ بعيدةٍ قد لا تأتي. */
+  if(window.STEP_BANK) TABS.push(["gr","قواعد مركّزة ✏️"]);
   if(WRITING) TABS.push(["w","تعبير ✍️"]);
   /* سأل الأب (٣٠ سبتمبر ٢٠٢٦): «متى نعطي فهد اختبارًا حقيقيًّا في
      التحصيليّ؟». وحلّلتُ لقطةَ نتائجِه فوجدتُ ما يمنع الجواب: جلساتُه
@@ -1385,6 +1404,12 @@ if(MW_BANK){ (function(){
   });
 })(); }
 
+/* ═══ جدولُ قواعدِ ستيب مفتوحًا للقسمِ المركَّز ══════════════════════
+   كانت شروحُ القواعدِ محجوبةً داخلَ هذا المغلَّفِ لا يصل إليها إلّا
+   «علاجي»، وطلب الأب (٥ أكتوبر ٢٠٢٦) قسمًا مستقلًّا للقواعدِ يُعيد
+   على حسنٍ سؤالَه الذي أخطأه بعينه. فصار الجدولُ مفتوحًا بمفتاحِ
+   المهارةِ كما يكتبه البنك، يقرؤه القسمان كلاهما ولا يُكتب الشرحُ مرّتين. */
+var GRAM_BY_KEY = {};
 if(window.STEP_BANK){ (function(){
   var SB = window.STEP_BANK;
   [
@@ -1420,6 +1445,7 @@ if(window.STEP_BANK){ (function(){
     "الترتيب: فاعل + فعل + مفعول + مكان + زمان. وظرفُ التكرار (always, usually, never) قبل الفعلِ الرئيس وبعد المساعدِ وبعد be. ولا يُفصَل الفعلُ عن مفعوله بحال. وفي اكتشاف الخطأ: افحص تطابقَ الفعلِ مع الفاعل، ثمّ الزمن، ثمّ حرفَ الجرّ، ثمّ المعدود."]
   ].forEach(function(t){
     var key = "Grammar — " + t[0];
+    GRAM_BY_KEY[key] = { en:t[0], ar:t[1], yt:t[2], lesson:t[3] };
     SKILLS.push({ group:"STEP", name:"قواعد — "+t[1]+" ("+t[0]+")",
       rx:new RegExp(t[0].replace(/[^A-Za-z ]/g,".")), yt:t[2], keys:[key],
       lesson:t[3],
@@ -1535,7 +1561,7 @@ function lessonCard(s, stat, open){
   return '<details '+(open?'open':'')+' style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
     '<summary style="font-weight:800;cursor:pointer;padding:8px 0">🎬 '+s.name+badge+'</summary>'+
     '<div style="padding:4px 0 12px">'+guide+
-      '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9">'+s.lesson+'</div>'+
+      '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9">'+isoLatin(s.lesson)+'</div>'+
       workedHtml(s)+
       '<div style="margin-top:10px"><a href="'+yt+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">🎬 شاهد فيديو شرح على يوتيوب</a></div>'+
       '<button data-practice="'+idx+'" style="margin-top:10px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:9px 15px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit">✏️ تدرّب (3 أسئلة)</button>'+
@@ -1666,6 +1692,325 @@ async function renderRemedial(){
   });
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   قسمُ القواعدِ المركَّز ✏️ — يُبنى من أخطائه هو
+   ═══════════════════════════════════════════════════════════════════
+   الفَرقُ عن «علاجي» في ثلاثةِ أمور:
+   ١) الطابورُ من meta.wrong — نصُّ السؤالِ الذي أخطأه محفوظٌ حرفًا
+      بحرف، فنُطابقه على البنكِ ونُعيده هو، لا سؤالًا آخرَ في بابه.
+   ٢) السؤالُ لا يخرج من الطابورِ حتى يُجيبه صحيحًا؛ وإن أخطأه عاد
+      إلى آخرِ الطابورِ في الجولةِ نفسِها.
+   ٣) ما صحّحه يُحفَظ بمفتاحٍ مختصرٍ في الخادمِ لا في الجهازِ وحده —
+      فلو ذاكر في جهازٍ وجلس في آخرَ لم تُعَد عليه أسئلةٌ أتمّها.
+
+   وبعد أن يفرغ طابورُ أخطائه في قاعدةٍ نُقدّم ثلاثةً جديدةً من بنكِها
+   ليثبتَ أنّ التصحيحَ فهمٌ للقاعدةِ لا حفظٌ لسؤالٍ بعينه. */
+var GR_LS = "rafeef_gr_" + who;
+function grHash(s){
+  var t = String(s||""), h = 5381;
+  for(var i=0;i<t.length;i++) h = ((h<<5) + h + t.charCodeAt(i)) | 0;
+  /* الطولُ مع البصمةِ يقلّلان احتمالَ التصادمِ إلى ما لا يُعتدّ به،
+     ولو وقع لأُسقط سؤالٌ واحدٌ من الطابور — لا أكثر. */
+  return t.length.toString(36) + "_" + (h>>>0).toString(36);
+}
+function grFixedLocal(){ try{ return JSON.parse(localStorage.getItem(GR_LS) || "{}") || {}; }catch(e){ return {}; } }
+/* ═══ عزلُ المقاطعِ اللاتينيّةِ داخلَ الشرحِ العربيّ ══════════════════
+   شرحُ القاعدةِ عربيٌّ فيه مقاطعُ إنجليزيّةٌ بينها علاماتٌ محايدة
+   (+ و. و/)، والمحايدُ بين عربيٍّ ولاتينيٍّ يأخذ اتّجاهَ الفقرةِ فينقلب
+   موضعُه. فكان «if + had p.p.» يُعرَض «‏p.p + if had» — قاعدةٌ مقلوبةٌ
+   يحفظها الولدُ مقلوبة. فيُعزَل المقطعُ كلُّه بـ bdi فيُقرأ كما كُتب.
+   والشرطُ أن يبدأ المقطعُ بحرفٍ وينتهيَ بحرفٍ أو رقمٍ أو قوسٍ مغلق،
+   فلا تُبتلَع نقطةُ آخرِ الجملةِ العربيّة. */
+function isoLatin(s){
+  /* نصٌّ فيه وسمٌ لا يُعزَل — فالتعبيرُ النمطيُّ لا يميّز متنًا من وسم */
+  if(/[<>]/.test(String(s||""))) return String(s||"");
+  return String(s||"").replace(/[A-Za-z][A-Za-z0-9 .+\/()'’\-]*[A-Za-z0-9)]|[A-Za-z]/g,
+    function(m){ return '<bdi dir="ltr" style="unicode-bidi:isolate">'+m+'</bdi>'; });
+}
+var GR_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+/* بتوقيتِ السعودية (+٣) فلا يُنسب خطأُ الليلِ إلى اليومِ السابق */
+function grDay(iso){
+  try{ var d = new Date(new Date(iso).getTime() + 3*3600*1000);
+    return d.getUTCDate() + " " + GR_MONTHS[d.getUTCMonth()];
+  }catch(e){ return ""; }
+}
+function grMarkFixed(stem){
+  try{ var o = grFixedLocal(); o[grHash(stem)] = 1; localStorage.setItem(GR_LS, JSON.stringify(o)); }catch(e){}
+}
+/* الوسمُ activity لا practice — كالعلاجيّ والنطقِ والمحادثة، فلا يدخل
+   في متوسّطاتِ الاختباراتِ ولا يُغيّر نسبةَ ستيب. */
+function saveGram(skill, label, correct, total, fixedN, remain, pid, fixedKeys){
+  try{
+    if(!skill) return;
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[],
+      meta:{ kind:"activity", sect:"gram", test:"قواعد مركّزة ✏️", skill:skill, label:(label||skill),
+             correct:correct, total:total, fixed:fixedN, remain:remain,
+             fixedKeys:(fixedKeys||[]).slice(0,40), pid:pid, at:new Date().toISOString() } };
+    if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+    fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+      headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
+      body: JSON.stringify(body) }).catch(function(){});
+  }catch(e){}
+}
+/* فهرسُ البنكين بنصِّ السؤال: الجديدُ (step-bank.js) والقديمُ المدمَجُ في
+   هذه الصفحة — فأخطاؤه قبل ٢٣ سبتمبر من القديم، وبعده من الجديد. */
+function grBankIndex(){
+  var idx = {};
+  [window.STEP_BANK, STEP].forEach(function(b){
+    if(!b || !b.length) return;
+    b.forEach(function(q){ if(q && q[0] && !idx[q[0]]) idx[q[0]] = q; });
+  });
+  return idx;
+}
+function grKeyOf(stem){
+  var m = /^<b>Grammar — ([^:<]+):<\/b>/.exec(String(stem||""));
+  if(m) return "Grammar — " + m[1].trim();
+  return /^<b>Grammar:<\/b>/.test(String(stem||"")) ? "Grammar" : null;
+}
+function grFresh(key, n){
+  var pool;
+  if(key === "Grammar"){
+    pool = STEP.filter(function(q){ return /^<b>Grammar:<\/b>/.test(q[0]); });
+  }else{
+    var SB = window.STEP_BANK || [];
+    pool = SB.filter(function(q){ return q[0].indexOf(key + ":") >= 0; });
+  }
+  if(!pool.length) return [];
+  var pick = [], seen = {}, tries = 0;
+  while(pick.length < n && tries++ < 60){
+    var q = gp(pool); if(seen[q[0]]) continue; seen[q[0]] = 1; pick.push(q);
+  }
+  return pick;
+}
+/* جولةُ قاعدةٍ واحدة: سؤالٌ واحدٌ معروضٌ في كلّ لحظة، وشرحُه يُقرأ قبل
+   «التالي» — فعرضُ ثلاثةٍ معًا يجعله يُظلِّل ثمّ يمضي بلا قراءة. */
+function grRun(box, prog, key, label, missed){
+  var queue = missed.map(function(x){ return { q:x.q, missed:true, when:x.when }; });
+  var startN = queue.length, phase = (startN ? "missed" : "fresh");
+  if(!startN) queue = grFresh(key, 3).map(function(q){ return { q:q, missed:false }; });
+  var pid = newPid(), done = 0, ok = 0, fixedN = 0, savedN = 0, fixedKeys = [];
+  function remain(){ var n = 0; queue.forEach(function(x){ if(x.missed) n++; }); return n; }
+  function drawProg(){
+    if(!prog) return;
+    if(!startN){ prog.innerHTML = '<span style="color:var(--muted);font-weight:700">أسئلةٌ جديدة في هذي القاعدة — ما عندك فيها خطأٌ مسجَّل.</span>'; return; }
+    var w = Math.round(fixedN / startN * 100);
+    prog.innerHTML = '<div style="background:var(--bg);border-radius:9px;height:9px;overflow:hidden;margin:8px 0 4px">'+
+      '<div style="height:100%;width:'+w+'%;background:#16a34a;transition:width .3s"></div></div>'+
+      '<span style="font-weight:800;color:'+(fixedN===startN?'#16a34a':'var(--muted)')+'">صحّحت '+fixedN+' من '+startN+
+      ' من أخطائك في هذي القاعدة'+(remain()?' · وبقي '+remain():' ✅')+'</span>';
+  }
+  /* الطابورُ قد يطول (خمسةُ أخطاءٍ وثلاثةٌ جديدةٌ وما رجع منها)، فلا
+     نُدخل صفًّا لكلّ إجابةٍ كما في علاجيٍّ ذي الأسئلةِ الثلاثة: صفٌّ
+     كلَّ ثلاثِ إجاباتٍ وصفٌّ عند الفراغ، كلُّها بالمعرّفِ نفسِه فتُبقي
+     قواعدُ العرضِ الأكملَ منها (RR.usable). */
+  function save(force){
+    if(done < 2) return;
+    if(!force && done - savedN < 3) return;
+    savedN = done; saveGram(key, label, ok, done, fixedN, remain(), pid, fixedKeys);
+  }
+  function step(){
+    if(!queue.length){
+      if(phase === "missed"){
+        phase = "fresh";
+        queue = grFresh(key, 3).map(function(q){ return { q:q, missed:false }; });
+        if(queue.length){
+          box.innerHTML = '<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;padding:11px 13px;font-weight:800;color:#047857">'+
+            '✅ صحّحت أخطاءك كلّها في هذي القاعدة. وهذي ثلاثةٌ جديدةٌ في نفسِها — لتتأكّد أنّك فهمتَ القاعدةَ لا أنّك حفظتَ السؤال.</div>'+
+            '<div data-grq style="margin-top:8px"></div>';
+          box = box.querySelector("[data-grq]");
+          return step();
+        }
+      }
+      box.innerHTML = '<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;padding:11px 13px;font-weight:800;color:#047857">🎉 خلّصت هذي القاعدة. ارجع لها بعد يومين للتثبيت.</div>';
+      drawProg(); save(true); return;
+    }
+    var cur = queue[0], q = shuffleQ(cur.q), ans = q[2];
+    box.innerHTML =
+      '<div class="q" style="margin:0">'+
+        '<div class="num">'+(cur.missed ? '🔁 سؤالٌ أخطأتَه'+(cur.when ? ' يوم '+cur.when : '') : '✨ سؤالٌ جديد')+
+          ' <span style="color:var(--muted);font-weight:600">· باقي في الطابور '+queue.length+'</span></div>'+
+        '<div class="stem" dir="auto">'+frx(q[0])+'</div><div class="opts">'+
+        q[1].map(function(o,j){ return '<button data-j="'+j+'" dir="auto">'+frx(o)+'</button>'; }).join('')+
+        '</div><div class="explain">'+frx(q[3])+'</div>'+
+        '<div data-grnext style="margin-top:10px"></div>'+
+      '</div>';
+    var qEl = box.querySelector(".q");
+    qEl.querySelectorAll(".opts button").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(qEl.dataset.done) return; qEl.dataset.done = 1;
+        qEl.querySelectorAll(".opts button").forEach(function(b2){ b2.disabled = true; });
+        var good = (+btn.dataset.j === ans);
+        if(good){ btn.classList.add("correct"); }
+        else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+        qEl.querySelector(".explain").classList.add("show");
+        done++; if(good) ok++;
+        if(good){
+          queue.shift();
+          if(cur.missed){ fixedN++; fixedKeys.push(grHash(cur.q[0])); grMarkFixed(cur.q[0]); }
+        }else{
+          /* يعود آخرَ الطابورِ في الجولةِ نفسِها — لا في جلسةٍ قد لا تأتي */
+          queue.shift(); queue.push(cur);
+        }
+        drawProg(); save();
+        qEl.querySelector("[data-grnext]").innerHTML =
+          '<button data-grgo style="background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit">'+
+          (good ? 'التالي ⟶' : 'اقرأ الشرح ثمّ التالي ⟶')+'</button>'+
+          (good ? '' : '<div style="margin-top:6px;color:#b45309;font-weight:700;font-size:.9rem">🔁 هذا السؤالُ يرجع لك في آخرِ الطابور.</div>');
+        qEl.querySelector("[data-grgo]").addEventListener("click", step);
+      });
+    });
+  }
+  drawProg(); step();
+}
+function grCard(key, st, missed, open, totalMiss){
+  var g = GRAM_BY_KEY[key] || { ar:"قواعدُ ستيب العامّة", en:"Grammar", lesson:"", yt:"شرح قواعد ستيب grammar" };
+  var label = "قواعد — " + g.ar + (GRAM_BY_KEY[key] ? " (" + g.en + ")" : "");
+  var badge = (st && st.t) ? ' <span style="color:#dc2626;font-weight:800">('+Math.round(st.c/st.t*100)+'% — '+st.c+'/'+st.t+')</span>' : '';
+  totalMiss = totalMiss || missed.length;
+  var more = totalMiss > missed.length ? ' <span style="font-weight:800">(من '+totalMiss+' — والبقيّةُ في الجولةِ القادمة)</span>' : '';
+  var mnote = missed.length
+    ? '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:11px;padding:9px 12px;margin-bottom:9px;font-weight:700;color:#c2410c">'+
+      '🔁 نُعيد عليك '+missed.length+' سؤالًا أخطأتَها في هذي القاعدة'+more+' بنصِّها — ولا يخرج السؤالُ حتى تُجيبه صحيحًا.</div>'
+    : '<div style="background:var(--bg);border-radius:11px;padding:9px 12px;margin-bottom:9px;font-weight:700;color:var(--muted)">ما عندك خطأٌ مسجَّلٌ هنا بنصِّه — فالجولةُ أسئلةٌ جديدةٌ في القاعدة.</div>';
+  return '<details '+(open?'open':'')+' data-grk="'+key.replace(/"/g,'&quot;')+'" style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
+    '<summary style="font-weight:800;cursor:pointer;padding:8px 0">✏️ '+g.ar+(GRAM_BY_KEY[key]?' <span dir="ltr" style="unicode-bidi:isolate;color:var(--muted);font-weight:700">('+g.en+')</span>':'')+badge+
+      (totalMiss?' <span style="color:#c2410c;font-weight:800">· '+totalMiss+' خطأ</span>':'')+'</summary>'+
+    '<div style="padding:4px 0 12px">'+
+      (g.lesson ? '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9;margin-bottom:9px"><b>📘 القاعدة:</b> '+isoLatin(g.lesson)+'</div>' : '')+
+      mnote+
+      '<div data-grbox></div><div data-grprog></div>'+
+      '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(g.yt)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:8px 14px;border-radius:11px;font-weight:800">🎬 فيديو شرح</a></div>'+
+    '</div></details>';
+}
+var grBuilt = false;
+async function renderGrammar(){
+  var sec = document.getElementById("gr");
+  if(!sec || grBuilt) return;
+  sec.innerHTML = '<div class="intro">⏳ نقرأ أخطاءك في قواعدِ ستيب...</div>';
+  var rows = [], gramRows = [];
+  /* ═══ لِمَ نسحب محاولاتِ ستيب وحدَها لا آخرَ ستّين صفًّا ═══════════
+     جرّبتُ أوّلًا نافذةَ «علاجي» نفسَها (آخر ستّين صفًّا فيه مهارات)،
+     فخرج ترتيبُ الضعفِ غيرَ ترتيبِه الحقيقيّ: آخرُ ستّين صفًّا عند
+     حسنٍ خمسةٌ منها فقط من ستيب — والبقيّةُ رياضيّاتٌ وعلومٌ وقدرات.
+     فصار «المعدود» ٠ من ٥ و«الشرط» ٠ من ٤، ووقع «المبنيُّ للمجهول»
+     و«الأفعالُ بعدها to/ing» خارجَ الستّةِ المفتوحةِ وهما من أضعفِه.
+     وقواعدُ ستيب لا تُرصَد إلّا في محاولاتِ ستيب، فالفرزُ عليها يُعطي
+     تاريخَه كلَّه (سبعًا وثلاثين محاولة) في طلبةٍ واحدة. */
+  try{
+    var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+        "&meta->>test=eq."+encodeURIComponent("STEP إنجليزي")+"&order=created_at.desc&limit=60",
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
+    rows = await r.json(); if(!Array.isArray(rows)) rows = [];
+  }catch(e){}
+  /* وإن تغيّر اسمُ الاختبارِ يومًا أو رفض الخادمُ الفرزَ، نرجع إلى
+     النافذةِ العامّةِ فلا يُترك القسمُ فارغًا. */
+  if(!rows.length){
+    try{
+      var rF = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+          "&meta->skills=not.is.null&order=created_at.desc&limit=60",
+        {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
+      var jF = await rF.json(); if(Array.isArray(jF)) rows = jF;
+    }catch(e){}
+  }
+  /* ما صحّحه سابقًا — من الخادمِ لا من الجهازِ وحده */
+  try{
+    var r2 = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+
+        "&meta->>sect=eq.gram&order=created_at.desc&limit=120",
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
+    gramRows = await r2.json(); if(!Array.isArray(gramRows)) gramRows = [];
+  }catch(e){}
+  grBuilt = true;
+  var fixed = grFixedLocal();
+  gramRows.forEach(function(x){ ((x.meta && x.meta.fixedKeys) || []).forEach(function(k){ fixed[k] = 1; }); });
+
+  var agg = {}, bank = grBankIndex(), missedBy = {}, lost = 0, seenStem = {};
+  rows.forEach(function(x){
+    var m = x.meta || {};
+    Object.keys(m.skills || {}).forEach(function(nm){
+      if(nm.indexOf("Grammar") !== 0) return;
+      var v = m.skills[nm]; if(!v || !v.t) return;
+      var a = agg[nm] || (agg[nm] = {c:0,t:0}); a.c += (v.c||0); a.t += v.t;
+    });
+    (m.wrong || []).forEach(function(stem){
+      var key = grKeyOf(stem); if(!key) return;
+      if(fixed[grHash(stem)]) return;
+      /* السؤالُ المعادُ غلطُه مرّتين أشدُّ من غيره، فنعدّ المرّاتِ ولا
+         نُسقِط المكرّرَ عند أوّلِ مرّة — ثمّ نُقدّمه في الطابور. */
+      if(seenStem[stem]){ seenStem[stem].times++; return; }
+      var q = bank[stem];
+      /* ما لم نجده في البنكِ لا نُعيده: لا نصنع سؤالًا من نصٍّ بلا
+         خياراتٍ ولا شرح — ونُحصي العددَ ونقوله صراحةً. */
+      if(!q){ lost++; return; }
+      var rec = { q:q, when:grDay(x.created_at), times:1 };
+      seenStem[stem] = rec;
+      (missedBy[key] || (missedBy[key] = [])).push(rec);
+    });
+  });
+  /* ═══ خمسةٌ في الجولة لا خمسةٌ وسبعون ══════════════════════════════
+     مجموعُ أخطائه غيرِ المصحَّحةِ خمسةٌ وسبعون، وفي «قواعدَ عامّة»
+     وحدَها ثلاثةٌ وثلاثون. وطابورٌ بهذا الطولِ يُثبِّط لا يُعالج —
+     وهو عينُ ما عالجناه في علاجيٍّ حين قصرناه على ثمانيةِ دروس.
+     فخمسةٌ لكلّ قاعدةٍ في الجولة، المعادُ غلطُه أوّلًا ثمّ الأحدثُ،
+     والبقيّةُ تأتي في الجولةِ القادمة. */
+  var GR_PER_CARD = 5, missedAll = {};
+  Object.keys(missedBy).forEach(function(k){
+    missedAll[k] = missedBy[k].length;
+    missedBy[k] = missedBy[k].sort(function(a,b){ return (b.times - a.times); }).slice(0, GR_PER_CARD);
+  });
+
+  var keys = Object.keys(GRAM_BY_KEY);
+  var stats = keys.map(function(k){
+    var st = agg[k] || {c:0,t:0};
+    return { k:k, st:st, p:(st.t ? st.c/st.t : 1), miss:(missedAll[k]||0) };
+  });
+  var MINQ = 2, WEAK = 0.5, TOPN = 6;
+  var weak = stats.filter(function(o){ return o.st.t >= MINQ && o.p < WEAK; })
+                  .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
+  var rest = stats.filter(function(o){ return weak.indexOf(o) < 0 && (o.miss > 0 || o.st.t > 0); })
+                  .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
+  var totMiss = 0; Object.keys(missedAll).forEach(function(k){ totMiss += missedAll[k]; });
+
+  var html = '';
+  if(!rows.length){
+    html += '<div class="intro">لسّا ما فيه محاولاتُ ستيب مسجّلةٌ لك. افتح <b>STEP إنجليزي 🌍</b> وحُلّ جولةً أو جولتين، وارجع هنا — يبني لك القسمُ طابورًا من <b>أخطائك أنت</b> بنصِّها، ويعيدها عليك حتى تصحّحها.</div>';
+  }else{
+    html += '<div class="intro">✏️ <b>القواعدُ المركَّزة</b> — مو أسئلةٌ عشواء: الطابورُ من <b>أخطائك أنت</b> في ستيب، محفوظةً بنصِّها. '+
+      (totMiss ? 'عندك <b>'+totMiss+' سؤالًا</b> أخطأتَها ولم تصحّحها بعد، ونبدأ بخمسةٍ في كلّ قاعدة. ' : 'ما بقي سؤالٌ أخطأتَه ولم تصحّحه ✅ ')+
+      'والسؤالُ <b>لا يخرج من الطابور حتى تُجيبه صحيحًا</b> — وإن أخطأته رجع آخرَ الطابور.'+
+      (lost ? ' <span style="color:var(--muted);font-weight:600">(و'+lost+' خطأً قديمًا تغيّر نصُّه في البنكِ فما قدرنا نُعيده بعينه.)</span>' : '')+'</div>';
+    if(weak.length){
+      html += '<div class="intro" style="margin-top:12px">🎯 <b>قواعدُك تحت ٥٠٪</b>'+(weak.length>TOPN?' — ابدأ بهذي '+Math.min(TOPN,weak.length)+'، هي الأضعف.':'')+
+        ' اقرأ القاعدةَ أوّلًا، ثمّ حُلّ الطابور.</div>';
+      weak.slice(0, TOPN).forEach(function(o){ html += grCard(o.k, o.st, missedBy[o.k]||[], true, missedAll[o.k]||0); });
+    }
+    var tail = weak.slice(TOPN).concat(rest);
+    if(tail.length){
+      html += '<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0">➕ بقيّةُ القواعدِ ('+tail.length+')</summary><div style="margin-top:8px">'+
+        tail.map(function(o){ return grCard(o.k, o.st, missedBy[o.k]||[], false, missedAll[o.k]||0); }).join('')+'</div></details>';
+    }
+    if((missedBy["Grammar"]||[]).length){
+      html += '<div class="intro" style="margin-top:12px">📌 وهذي أخطاءٌ في أسئلةِ قواعدَ عامّةٍ ما فيها وسمُ قاعدةٍ بعينها — نُعيدها عليك كما هي.</div>'+
+        grCard("Grammar", agg["Grammar"]||{c:0,t:0}, missedBy["Grammar"], true, missedAll["Grammar"]||0);
+    }
+  }
+  html += '<p class="intro" style="background:transparent;border:0;color:var(--muted);margin-top:14px">'+
+    'النسبةُ المكتوبةُ بجانبِ كلّ قاعدةٍ من آخرِ ستّين محاولةٍ مسجَّلة. وجولاتُ هذا القسم <b>لا تُحسب</b> في متوسّطِ ستيب — هي تدريبٌ لا اختبار.</p>';
+  sec.innerHTML = html;
+  /* الطابورُ يبدأ فورًا في البطاقاتِ المفتوحة، ولا يُبنى للمطويّةِ إلّا
+     عند فتحِها — فبناءُ ستّةَ عشرَ طابورًا دفعةً واحدةً إثقالٌ بلا داعٍ. */
+  function startCard(d){
+    if(d.dataset.grgo) return; d.dataset.grgo = 1;
+    var key = d.getAttribute("data-grk");
+    var g = GRAM_BY_KEY[key];
+    var label = "قواعد — " + (g ? g.ar + " (" + g.en + ")" : "عامّة");
+    grRun(d.querySelector("[data-grbox]"), d.querySelector("[data-grprog]"), key, label, missedBy[key] || []);
+  }
+  sec.querySelectorAll("details[data-grk]").forEach(function(d){
+    if(d.open) startCard(d);
+    d.addEventListener("toggle", function(){ if(d.open) startCard(d); });
+  });
+}
+
 document.querySelectorAll(".tabs button").forEach(function(b){
   b.addEventListener("click", function(){
     var cur = document.querySelector(".panel.active");
@@ -1677,6 +2022,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     pan.classList.add("active");
     if(typeof pan._reopen === "function") pan._reopen(); // لو كان محفوظ جزئيًا، ابدأه من جديد
     if(b.dataset.tab==="rem"){ renderRemedial(); }
+    if(b.dataset.tab==="gr"){ renderGrammar(); }
     if(b.dataset.tab==="w"){ renderWriting(); }
     if(b.dataset.tab==="full" && typeof renderFullMock==="function"){ renderFullMock(); }
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم

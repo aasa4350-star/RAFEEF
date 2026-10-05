@@ -241,6 +241,8 @@ async function main(){
   /* جولاتُ القسم العلاجيّ — انظر saveRemedial في practice.html. تُظهر
      أنّه اشتغل فعلًا على درسٍ بعينه، لا أنّه فتح الصفحةَ وخرج. */
   const remActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="rem");
+  /* جولاتُ القواعدِ المركَّزة — انظر saveGram في practice.html */
+  const gramActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="gram");
   rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
@@ -577,6 +579,23 @@ async function main(){
         rKeys.slice(0,6).map(k=>{ const e=rBy[k];
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
+    }
+    /* ✏️ القواعدُ المركَّزة */
+    if(gramActs.length){
+      const ga=gramActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      const gBy={}; let gN=0, gFix=0;
+      ga.forEach(x=>{ const k=x.meta.label||x.meta.skill||"—";
+        const e=gBy[k]||(gBy[k]={n:0,f:0,r:null}); e.n++; gN++;
+        e.f+=(x.meta.fixed||0); gFix+=(x.meta.fixed||0);
+        if(e.r===null && typeof x.meta.remain==="number") e.r=x.meta.remain; });
+      const gKeys=Object.keys(gBy).sort((a,b)=> gBy[b].f-gBy[a].f);
+      let gRem=0; gKeys.forEach(k=>{ gRem += (gBy[k].r||0); });
+      html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
+        '<li>✅ <b>صحّحت '+arCount(gFix,"خطأً واحدًا","خطأين","أخطاء","خطأً")+'</b> من أخطائك في قواعد ستيب'+
+        (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+saTime(RR.when(ga[0]))+'</span></li>'+
+        gKeys.slice(0,6).map(k=>{ const e=gBy[k];
+          return '<li>'+k+' <span class="cnt">صحّحت '+e.f+(e.r?' · بقي '+e.r:'')+'</span></li>'; }).join("")+
+        '</ul><small style="color:var(--muted)">الطابورُ من أخطائك أنت، والسؤالُ لا يخرج حتى تُجيبه صحيحًا.</small></div>';
     }
     if(talkActs.length && !talkAll.length){
       const ta=talkActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
