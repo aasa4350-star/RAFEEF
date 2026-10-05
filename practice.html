@@ -104,12 +104,48 @@ var SUPA_KEY = APP_CONFIG.supaKey;
    الأكمل (RR.usable). */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
-function saveScore(test, correct, total, wrongs, skills, pid){
+/* ═══ الجلسةُ التي لم تُحلَّ لا تُحسَب ═══════════════════════════════
+   تقريرُ فهدٍ (٥ أكتوبر ٢٠٢٦): تسعُ جلساتٍ ومئةٌ وثمانيةُ أسئلةٍ في
+   ستِّ دقائق — ثلاثُ ثوانٍ للسؤال. وأسئلةُ التحصيليِّ أربعةُ خيارات،
+   فحظُّ التخمينِ ٢٥٪، ودرجتُه يومَها ٣٢٪.
+
+   وقِستُ تاريخَه كلَّه فبان الأثرُ بوضوح: جلساتُه التي دون ثماني ثوانٍ
+   للسؤال معدّلُها في التحصيليِّ ٣٤٪، والتي فوقها ٤٨٪ — أربعَ عشرةَ
+   نقطةً فرقًا. فالطاقةُ موجودةٌ والجلوسُ مفقود.
+
+   وكان البرنامجُ يكافئ النقر: يسجّل له تسعَ جلساتٍ في ستِّ دقائق
+   فيرى أباه نشاطًا كثيرًا ولم يقع شيء. وأسوأُ من ذلك أنّ متوسّطَه
+   المعروضَ للأب خليطٌ من جلساتٍ حلَّها وجلساتٍ مرّ عليها، فلا يدلّ
+   واحدًا منّا على الحقيقة.
+
+   فصار يُحفَظ زمنُ الجلسةِ وعددُ الإجاباتِ المتسرّعة، وتُوسَم الجلسةُ
+   «غيرَ موثوقة» إن نزل متوسّطُها عن ثماني ثوانٍ للسؤال — تُعرَض في
+   السجلّ ولا تدخل المتوسّط، كما يفعل حارسُ صفحات المنهج من قبل.
+   والعتبةُ ثمانٍ لأنّها نصفُ ما يعطيه الاختبارُ الحقيقيُّ للسؤال
+   (دقيقةٌ وربعٌ = خمسٌ وسبعون ثانية) — فمن نزل عنها لم يقرأ السؤال. */
+var FAST_SEC = 8;        /* دون هذا لكلّ سؤالٍ = نقرٌ لا حلّ */
+var FAST_ONE = 3;        /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ تُعدّ متسرّعة */
+function saveScore(test, correct, total, wrongs, skills, pid, timing){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
     // نوسمهما stretch حتى يفصلهما تقرير المستوى ولا يحسبهما ضدّ الطالب.
     var stretch = !SENIOR && /تحصيلي|STEP/i.test(test);
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null } };
+    var T = timing || {};
+    var per = (T.dur && total) ? (T.dur/total) : null;
+    var meta = { kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null };
+    if(T.dur != null){
+      meta.dur = T.dur; meta.fast = T.fast || 0; meta.secPerQ = per!=null ? Math.round(per*10)/10 : null;
+      /* الوسمُ صريحٌ لا ضمنيّ: الصفُّ يحمل سببَ استبعاده فيقرؤه التقرير */
+      /* معياران لا واحد: متوسّطُ الجلسةِ، وعددُ الإجاباتِ المتسرّعة.
+         فمن نقر أحدَ عشرَ سؤالًا ثمّ تركَ الصفحةَ مفتوحةً دقيقتين يرتفع
+         متوسّطُه فوقَ العتبةِ وهو لم يحلّ شيئًا — والعدُّ يكشفه.
+         وهو معيارُ صفحاتِ المنهجِ نفسُه (أكثرُ من النصف متسرّعًا). */
+      var tooMany = (T.fast||0) > Math.floor(total/2);
+      if(per != null && (per < FAST_SEC || tooMany)){
+        meta.trusted = false; meta.why = tooMany && per >= FAST_SEC ? "burst" : "fast";
+      }
+    }
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:meta };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", {
@@ -1022,6 +1058,9 @@ function renderSet(id, items, intro, regen, label){
   if(regen) html += '<button class="reset">أسئلة جديدة 🔄</button>';
   sec.innerHTML = html;
   var answered = {}, correct = 0, total = items.length, wrongs = [];
+  /* زمنُ الجلسةِ وعددُ الإجاباتِ المتسرّعة — انظر FAST_SEC أعلاه */
+  var __t0 = Date.now(), __lastTs = __t0, __fastN = 0;
+  function __timing(){ return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN }; }
   var skills = {};   /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة */
   function mark(i, ok){
     var g = skillOf(items[i]);
@@ -1034,6 +1073,9 @@ function renderSet(id, items, intro, regen, label){
     qEl.querySelectorAll(".opts button").forEach(function(btn){
       btn.addEventListener("click", function(){
         if(answered[i]) return; answered[i]=1;
+        var __now = Date.now();
+        if((__now - __lastTs) < FAST_ONE*1000) __fastN++;
+        __lastTs = __now;
         qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
         var ok = (+btn.dataset.j===ans);
         mark(i, ok);
@@ -1056,7 +1098,7 @@ function renderSet(id, items, intro, regen, label){
        ولا يمنع حفظ نتيجةٍ أكمل ممّا حُفظ. */
     if(ended && savedN >= total) return;
     if(tId){ clearInterval(tId); tId = null; }
-    if(ended){ if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid); } return; }
+    if(ended){ if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing()); } return; }
     ended = true;
     if(auto){
       sec.querySelectorAll(".q").forEach(function(qEl){
@@ -1071,7 +1113,30 @@ function renderSet(id, items, intro, regen, label){
       scoreEl.textContent = correct+" / "+total;
     }
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
-    if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid); }
+    if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing()); }
+    /* ═══ يُقال له في وجهه، لا في تقريرِ أبيه وحدَه ═══════════════════
+       لو استُبعدت جلستُه بصمتٍ لظنّ أنّه يعمل ويتقدّم، ولفوجئ أبوه
+       برقمٍ لا يفهم من أين جاء. فيُعرَض السببُ والرقمُ ساعةَ وقوعِه،
+       ومعه ما يُفعَل: أعِدها بتأنٍّ. */
+    (function(){
+      var T = __timing(), per = total ? (T.dur/total) : 0;
+      var box = sec.querySelector("[data-pace]");
+      if(!box){ box = document.createElement("div"); box.setAttribute("data-pace",""); 
+        var sb = sec.querySelector(".scorebar"); if(sb && sb.parentNode) sb.parentNode.insertBefore(box, sb.nextSibling); else sec.appendChild(box); }
+      var tooMany = T.fast > Math.floor(total/2);
+      if(per && (per < FAST_SEC || tooMany)){
+        box.innerHTML = '<div style="background:var(--bad-bg);border:1.5px solid var(--bad);color:var(--bad);border-radius:14px;padding:13px 15px;margin:10px 0;font-weight:800;line-height:1.9">'+
+          '⚠️ <b>هذي الجولة ما تُحسب لك.</b><br>'+
+          (per < FAST_SEC
+            ? 'حلّيت '+total+' سؤال في <b dir="ltr" style="unicode-bidi:isolate">'+T.dur+'</b> ثانية — <b dir="ltr" style="unicode-bidi:isolate">'+(Math.round(per*10)/10)+'</b> ثانية للسؤال.'
+            : '<b dir="ltr" style="unicode-bidi:isolate">'+T.fast+'</b> سؤالًا من '+total+' جاوبتها في أقلّ من ٣ ثوانٍ — ما قرأتها.')+
+          '<div style="font-weight:600;margin-top:6px">والاختبار الحقيقي يعطيك <b>٧٥ ثانية</b> للسؤال. اللي تحت ٨ ثوانٍ يعني ما قرأت السؤال.</div>'+
+          '<div style="font-weight:600;margin-top:6px">تطلع لأبوك في التقرير مفصولة. أعِدها بتأنٍّ وتُحسب لك ✅</div></div>';
+      } else if(per){
+        box.innerHTML = '<div style="background:var(--good-bg);border:1px solid var(--good);color:var(--good);border-radius:14px;padding:11px 14px;margin:10px 0;font-weight:800">'+
+          '✅ محسوبة لك · <b dir="ltr" style="unicode-bidi:isolate">'+(Math.round(per*10)/10)+'</b> ثانية للسؤال.</div>';
+      }
+    })();
   }
   // حفظ جزئي: لو بدّل القسم أو طلع قبل ما يكمّل، نحفظ اللي جاوبه (عشان لا يضيع تعبه)
   function savePartial(){
@@ -1080,7 +1145,7 @@ function renderSet(id, items, intro, regen, label){
     if(n<3 || !label || n<=savedN) return;
     savedN = n;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
-    saveScore(label, correct, n, wrongs, skills, pid);
+    saveScore(label, correct, n, wrongs, skills, pid, __timing());
   }
   sec._leave = savePartial;
   sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };

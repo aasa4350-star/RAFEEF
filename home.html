@@ -409,7 +409,12 @@ async function loadReport(){
     var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"};
     /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
     var fresh=function(p){ return !window.RR || RR.freshFlag(p); };
-    var untrustedTxt=function(p){ return (p.meta.trusted===false && fresh(p))?' <b style="color:var(--bad)">🚫 غير محتسبة</b>':''; };
+    var untrustedTxt=function(p){ if(p.meta.trusted!==false) return '';
+      /* سببُ الاستبعادِ يُقال: «نقر» غيرُ «خرج من الصفحة» — وعلاجُهما مختلف.
+         ووسمُ النقرِ لا يسقط بعد ٤٨ ساعة: هو حكمٌ على الجلسةِ لا تنبيهٌ عابر. */
+      var why = (p.meta.why==="fast") ? (' <b style="color:var(--bad)">🚫 نقر — '+(p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':'')+' · غير محتسبة</b>') : null;
+      if(why) return why;
+      return fresh(p) ? ' <b style="color:var(--bad)">🚫 غير محتسبة</b>' : ''; };
     var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2 && fresh(p))?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits && fresh(p)){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
     /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
        رابع وأسامة صفّ خامس». انظر الشرح الكامل في child.html. */
@@ -761,8 +766,17 @@ async function loadReport(){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)</div>'+
         Object.keys(otherMap).map(function(t){
           var arr=otherMap[t].slice().sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; });
-          var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
-          return '<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
+          /* ═══ المتوسّطُ من الجلساتِ المحلولةِ وحدَها ═════════════════════
+             تقريرُ فهدٍ (٥ أكتوبر): متوسّطُه المعروضُ هنا كان خليطًا من
+             جلساتٍ حلَّها وجلساتٍ نقر عليها في ثلاثِ ثوانٍ للسؤال —
+             فلا يدلّ أحدًا على الحقيقة. وجلساتُ النقرِ تُعرَض في السجلّ
+             أسفلَه بوسمِها، ولا تدخل الرقم. */
+          var kept=arr.filter(function(p){ return p.meta.trusted!==false; });
+          var skipped=arr.length-kept.length;
+          var base=kept.length?kept:arr;
+          var avg=Math.round(base.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/base.length);
+          return '<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+base.length+' محاولة · المتوسط '+avg+'%'+
+            (skipped?(kept.length?'':' — كلّها نقر!')+' · <b style="color:var(--bad)">'+skipped+' مستبعدة (نقر)</b>':'')+')</span></div><ul class="weak">'+
             arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
             '</ul>'; }).join("")+
         '</div>';

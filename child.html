@@ -293,7 +293,9 @@ async function main(){
     /* الملاحظة تُعرض ٤٨ ساعة ثمّ تسقط — انظر report-rules.js */
     const fresh=p=> !window.RR || RR.freshFlag(p);
     const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2 && fresh(p))?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits && fresh(p)){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
-    const untrustedTxt=p=> (p.meta.trusted===false && fresh(p))?` <b style="color:var(--bad)">🚫 غير محتسبة</b>`:``;
+    const untrustedTxt=p=>{ if(p.meta.trusted!==false) return ``;
+      if(p.meta.why==="fast") return ` <b style="color:var(--bad)">🚫 نقر — ${p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':''} · غير محتسبة</b>`;
+      return fresh(p) ? ` <b style="color:var(--bad)">🚫 غير محتسبة</b>` : ``; };
     /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
        رابع وأسامة صفّ خامس». lughati.html مطابقٌ لكتاب رابع ابتدائي،
        وأسامة صار في الخامس، فلا يصحّ أن يظهر في منهجه الدراسي مادّةٌ
@@ -674,8 +676,12 @@ async function main(){
         <div class="card">`+
         Object.keys(otherMap).map(t=>{
           const arr=otherMap[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
-          const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
-          return `<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul class="weak">`+
+          /* المتوسّطُ من الجلساتِ المحلولةِ وحدَها — انظر home.html */
+          const kept=arr.filter(p=> p.meta.trusted!==false);
+          const skipped=arr.length-kept.length;
+          const base=kept.length?kept:arr;
+          const avg=Math.round(base.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/base.length);
+          return `<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${base.length} محاولة · المتوسط ${avg}%${skipped?` · <b style="color:var(--bad)">${skipped} مستبعدة (نقر)</b>`:``})</span></div><ul class="weak">`+
             arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
             `</ul>`; }).join("")+
         `</div>`;

@@ -308,6 +308,7 @@ function run(){
   issues.push(...vocabReviewPath());
   issues.push(...listenPath());
   issues.push(...fragmentPath());
+  issues.push(...pacePath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -537,6 +538,54 @@ function remedialPath(){
       دامت الجولةُ لم تكتمل، وقواعدُ العرضِ تُبقي الأكمل.
    ٢) الحفظُ الجزئيُّ كان لا يقع دون ثلاثِ إجابات، فدرسٌ أجاب فيه
       سؤالَين لا يُسجَّل أصلًا — فيعدّه أبوه درسًا وهو غائبٌ عن التقرير. */
+/* ═══ النقرُ لا يُحسَب حلًّا ═══════════════════════════════════════
+   تقريرُ فهدٍ (٥ أكتوبر ٢٠٢٦): تسعُ جلساتٍ ومئةٌ وثمانيةُ أسئلةٍ في
+   ستِّ دقائق — ثلاثُ ثوانٍ للسؤال، وأسئلةُ التحصيليِّ أربعةُ خيارات
+   فحظُّ التخمينِ ٢٥٪ ودرجتُه ٣٢٪. وقياسُ تاريخِه كلِّه: جلساتُ النقرِ
+   ٣٤٪ وجلساتُ الحلِّ ٤٨٪.
+
+   والعلّةُ أنّ صفحةَ التحصيليِّ وستيب لم تكن تقيس زمنًا أصلًا، بينما
+   صفحاتُ المنهجِ تقيسه وتستبعد المتسرّعة. فالمتوسّطُ المعروضُ للأب
+   خليطٌ من جلساتٍ حُلّت وجلساتٍ مُرَّ عليها.
+
+   وثلاثُ وصلاتٍ لا تنفع واحدةٌ منها وحدَها: القياسُ في الصفحة،
+   والوسمُ في الصفّ، والفصلُ في التقريرَين. */
+function pacePath(){
+  const out = [], f = 'practice.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  if (!/var FAST_SEC = \d+/.test(src) || !/var FAST_ONE = \d+/.test(src))
+    E(f, 'عتبتا السرعة غير معرّفتَين — لا يُعرف النقرُ من الحلّ');
+  if (!/function __timing\(\)/.test(src) || !/__fastN\+\+/.test(src))
+    E(f, 'زمنُ الجلسةِ لا يُقاس — فلا يُعرف أحلَّ أم نقر');
+  if ((src.match(/__timing\(\)\)/g) || []).length < 3)
+    E(f, 'الزمنُ لا يُمرَّر في كلّ مواضع الحفظ — جلسةٌ تُحفظ بلا زمنٍ تمرّ بلا فحص');
+  if (!/meta\.trusted = false; meta\.why =/.test(src))
+    E(f, 'الجلسةُ المتسرّعةُ لا تُوسَم — ستدخل المتوسّط');
+  /* معياران: المتوسّطُ وعددُ المتسرّعة */
+  if (!/per < FAST_SEC \|\| tooMany/.test(src))
+    E(f, 'معيارٌ واحدٌ فقط — من نقر ثمّ ترك الصفحةَ مفتوحةً يُفلت');
+  /* ويُقال للطفلِ في وجهِه */
+  /* ⚠️ كان الفحصُ /data-pace/ فيطابق data-paceX بعد الكسرِ فلا يصيح —
+     وهي ثالثُ مرّةٍ يقع فيها هذا في هذا الملفّ. فالقوسان يلزمان. */
+  if (!/\[data-pace\]/.test(src) || !/ما تُحسب لك/.test(src))
+    out.push({ sev:'تنبيه', file:f, msg:'الاستبعادُ يقع بصمتٍ — الطفلُ لا يعرف أنّ جولتَه سقطت' });
+  /* والفصلُ في التقريرَين */
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    const rsrc = fs.readFileSync(rp, 'utf8');
+    if (!/trusted!==false\s*\)?;?\s*\n?\s*(var|const) skipped/.test(rsrc) && !/skipped=arr\.length-kept\.length/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'متوسّطُ الاختبارات يضمّ جلساتِ النقر — الرقمُ الذي يقرؤه الأبُ غيرُ صادق' });
+    if (!/مستبعدة \(نقر\)/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'الجلساتُ المستبعدةُ لا يُقال عددُها — يختفي ثلثُ عملِه بلا بيان' });
+    if (!/why==="fast"/.test(rsrc))
+      out.push({ sev:'تنبيه', file:rf, msg:'سببُ الاستبعادِ لا يُفرَّق: «نقر» غيرُ «خرج من الصفحة»' });
+  }
+  return out;
+}
 function fragmentPath(){
   const out = [];
   const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
