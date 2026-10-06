@@ -125,6 +125,20 @@ function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.rand
    (دقيقةٌ وربعٌ = خمسٌ وسبعون ثانية) — فمن نزل عنها لم يقرأ السؤال. */
 var FAST_SEC = 8;        /* دون هذا لكلّ سؤالٍ = نقرٌ لا حلّ */
 var FAST_ONE = 3;        /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ تُعدّ متسرّعة */
+/* ═══ الحارسُ لفهدٍ وحدَه — طلبُ الأب (٦ أكتوبر ٢٠٢٦) ════════════════
+   أُطلق الحارسُ أمسَ على الصفحةِ كلِّها، فوقع على حسنٍ ورفيفَ في قسم
+   «قدرات — لفظي» وهو أسئلةُ معاني كلماتٍ يعرفها الطفلُ أو لا يعرفها —
+   ثلاثُ ثوانٍ فيها إجابةٌ صادقةٌ لا تسرّع، بخلاف سؤالِ تحصيليٍّ يحتاج
+   حسابًا. فأرسل الأبُ صورةَ «١٣/١٣ في ٤٧ ثانية — ما تُحسب لك» وقال:
+   «شِلّ الخاصية منهم كلّهم ما عدا فهد».
+
+   وهو محقّ: الحارسُ بُني على تشخيصِ فهدٍ بعينِه (تحصيليٌّ وستيبُ
+   أربعةُ خيارات، وفرقُ أربعَ عشرةَ نقطةً بين نقرِه وحلّه)، ولم يُقَس
+   على غيرِه. فتعميمُه عقوبةٌ على إجابةٍ سريعةٍ صحيحة.
+
+   والقياسُ يبقى يجري للجميع (dur و fast و secPerQ) فلا نفقد البيانات،
+   وإنّما يُرفَع الحكمُ والتنبيهُ عمّن لم يُقَس عليه. */
+var PACE_ON = (who === "fahad");
 function saveScore(test, correct, total, wrongs, skills, pid, timing){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
@@ -141,7 +155,7 @@ function saveScore(test, correct, total, wrongs, skills, pid, timing){
          متوسّطُه فوقَ العتبةِ وهو لم يحلّ شيئًا — والعدُّ يكشفه.
          وهو معيارُ صفحاتِ المنهجِ نفسُه (أكثرُ من النصف متسرّعًا). */
       var tooMany = (T.fast||0) > Math.floor(total/2);
-      if(per != null && (per < FAST_SEC || tooMany)){
+      if(PACE_ON && per != null && (per < FAST_SEC || tooMany)){
         meta.trusted = false; meta.why = tooMany && per >= FAST_SEC ? "burst" : "fast";
       }
     }
@@ -1119,6 +1133,7 @@ function renderSet(id, items, intro, regen, label){
        برقمٍ لا يفهم من أين جاء. فيُعرَض السببُ والرقمُ ساعةَ وقوعِه،
        ومعه ما يُفعَل: أعِدها بتأنٍّ. */
     (function(){
+      if(!PACE_ON) return;
       var T = __timing(), per = total ? (T.dur/total) : 0;
       var box = sec.querySelector("[data-pace]");
       if(!box){ box = document.createElement("div"); box.setAttribute("data-pace",""); 
