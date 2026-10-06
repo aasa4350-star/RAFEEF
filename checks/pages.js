@@ -560,7 +560,20 @@ function remedialPath(){
    وثلاثةُ أرقامٍ لا تُترك للصدفة: عددُ الأسئلة، ومجموعُ الدرجات،
    ونطاقُ الدروس — فزيادةُ درسٍ من الثالثِ تُدخله في اختبارٍ لا يدخله. */
 function fatriPath(){
-  const out = [], f = 'math9.html';
+  /* صفحتان الآن: حسنٌ (ثالث متوسط) ورفيف (ثاني متوسط) — ولكلٍّ مقرَّرُه
+     وعددُ أسئلتِه، والمجموعُ عشرون في كلتيهما. */
+  const SPEC = {
+    'math9.html': { ids:['h1','h2','h3','h4','h5','r1','r2','r3','r4','r5','r6','t1'], mcq:14, essay:6,
+                    label:'رياضيات م٣ — الفتري 📝', ban:/"t2"|"t3"|"t4"/, banMsg:'درسٌ من الفصلِ الثالثِ غيرُ ٣-١ — خارجُ المقرَّر' },
+    'math8.html': { ids:['n1','n2','n3','n4','n5','n6','n7','n8','n9','r1','r2','r3','r4','r5','r6','r7'], mcq:16, essay:4,
+                    label:'رياضيات م٢ — الفتري 📝', ban:/"t\d"|"v\d"|"s\d"/, banMsg:'درسٌ من الفصلِ الثالثِ فما بعدَه — خارجُ المقرَّر' }
+  };
+  const out = [];
+  for (const f of Object.keys(SPEC)) out.push(...fatriOne(f, SPEC[f]));
+  return out;
+}
+function fatriOne(f, SP){
+  const out = [];
   const p = path.join(ROOT, f);
   if (!fs.existsSync(p)) return out;
   const src = fs.readFileSync(p, 'utf8');
@@ -568,21 +581,21 @@ function fatriPath(){
   const m = /var FATRI_IDS = \[([^\]]*)\];/.exec(src);
   if (!m){ E('قائمةُ دروسِ الفتري مفقودة'); return out; }
   const ids = m[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean);
-  if (ids.length !== 14)
-    E('دروسُ الفتري ' + ids.length + ' والمطلوبُ ١٤ سؤالًا اختياريًّا (مع المقاليّ ١٥)');
-  /* النطاق: الفصلان الأوّلُ والثاني كاملَين، ومن الثالثِ t1 وحدَه */
-  const want = ['h1','h2','h3','h4','h5','r1','r2','r3','r4','r5','r6','t1'];
+  if (ids.length !== SP.mcq)
+    E('دروسُ الفتري ' + ids.length + ' والمطلوبُ ' + SP.mcq + ' سؤالًا اختياريًّا');
+  const want = SP.ids;
   const extra = ids.filter(x => want.indexOf(x) < 0);
   if (extra.length) E('دروسٌ خارجَ مقرَّر الفتري: ' + [...new Set(extra)].join('، '));
   const missing = want.filter(x => ids.indexOf(x) < 0);
   if (missing.length) E('دروسٌ من المقرَّرِ غائبةٌ عن الفتري: ' + missing.join('، '));
-  if (/"t2"|"t3"|"t4"/.test(m[1]))
-    E('دخل الفتريَّ درسٌ من الفصلِ الثالثِ غيرُ ٣-١ — وهو خارجُ المقرَّر');
-  /* الدرجات: ١٤ + ٦ = ٢٠ */
-  if (!/var FATRI_ESSAY = 6;/.test(src)) E('درجةُ المقاليِّ ليست ستًّا');
+  if (SP.ban.test(m[1])) E('دخل الفتريَّ ' + SP.banMsg);
+  /* المجموعُ عشرون في الصفحتين */
+  if (!new RegExp('var FATRI_ESSAY = ' + SP.essay + ';').test(src))
+    E('درجةُ المقاليِّ ليست ' + SP.essay);
+  if (SP.mcq + SP.essay !== 20) E('مجموعُ الدرجاتِ ليس عشرين');
   if (!/var FATRI_TOTAL = FATRI_MCQ \+ FATRI_ESSAY;/.test(src)) E('مجموعُ الدرجاتِ لا يُحسب من جزأيه');
-  if (!/FATRI_TOTAL\b/.test(src) || !/saveScore\("رياضيات م٣ — الفتري 📝", marks\(\), FATRI_TOTAL/.test(src))
-    E('الدرجةُ لا تُحفَظ من عشرين');
+  if (!/FATRI_TOTAL\b/.test(src) || src.indexOf('saveScore("' + SP.label + '", marks(), FATRI_TOTAL') < 0)
+    E('الدرجةُ لا تُحفَظ من عشرين باسمِ الاختبارِ الصحيح');
   /* المقاليُّ: لا يُكشفُ النموذجُ قبل الكتابة، ويُحفَظ نصُّه */
   if (!/essayText\.length < 10/.test(src))
     E('الحلُّ النموذجيُّ يظهر قبل أن يكتب — فينقله');
