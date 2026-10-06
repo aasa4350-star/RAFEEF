@@ -309,6 +309,7 @@ function run(){
   issues.push(...listenPath());
   issues.push(...fragmentPath());
   issues.push(...pacePath());
+  issues.push(...fatriPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -550,6 +551,52 @@ function remedialPath(){
 
    وثلاثُ وصلاتٍ لا تنفع واحدةٌ منها وحدَها: القياسُ في الصفحة،
    والوسمُ في الصفّ، والفصلُ في التقريرَين. */
+/* ═══ الاختبار الفتري 📝 ═══════════════════════════════════════════
+   طلبُ الأب (٦ أكتوبر ٢٠٢٦) لاختبار حسنٍ يومَ الأحد: خمسةَ عشرَ سؤالًا،
+   الدرجةُ من عشرين، سؤالٌ واحدٌ مقاليّ، واسمُه «الفتري». ومقرَّرُه
+   بصورةِ الفهرس: الفصلان الأوّلُ والثاني كاملَين، ومن الثالثِ الدرسُ
+   ٣-١ وحدَه.
+
+   وثلاثةُ أرقامٍ لا تُترك للصدفة: عددُ الأسئلة، ومجموعُ الدرجات،
+   ونطاقُ الدروس — فزيادةُ درسٍ من الثالثِ تُدخله في اختبارٍ لا يدخله. */
+function fatriPath(){
+  const out = [], f = 'math9.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+  const m = /var FATRI_IDS = \[([^\]]*)\];/.exec(src);
+  if (!m){ E('قائمةُ دروسِ الفتري مفقودة'); return out; }
+  const ids = m[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean);
+  if (ids.length !== 14)
+    E('دروسُ الفتري ' + ids.length + ' والمطلوبُ ١٤ سؤالًا اختياريًّا (مع المقاليّ ١٥)');
+  /* النطاق: الفصلان الأوّلُ والثاني كاملَين، ومن الثالثِ t1 وحدَه */
+  const want = ['h1','h2','h3','h4','h5','r1','r2','r3','r4','r5','r6','t1'];
+  const extra = ids.filter(x => want.indexOf(x) < 0);
+  if (extra.length) E('دروسٌ خارجَ مقرَّر الفتري: ' + [...new Set(extra)].join('، '));
+  const missing = want.filter(x => ids.indexOf(x) < 0);
+  if (missing.length) E('دروسٌ من المقرَّرِ غائبةٌ عن الفتري: ' + missing.join('، '));
+  if (/"t2"|"t3"|"t4"/.test(m[1]))
+    E('دخل الفتريَّ درسٌ من الفصلِ الثالثِ غيرُ ٣-١ — وهو خارجُ المقرَّر');
+  /* الدرجات: ١٤ + ٦ = ٢٠ */
+  if (!/var FATRI_ESSAY = 6;/.test(src)) E('درجةُ المقاليِّ ليست ستًّا');
+  if (!/var FATRI_TOTAL = FATRI_MCQ \+ FATRI_ESSAY;/.test(src)) E('مجموعُ الدرجاتِ لا يُحسب من جزأيه');
+  if (!/FATRI_TOTAL\b/.test(src) || !/saveScore\("رياضيات م٣ — الفتري 📝", marks\(\), FATRI_TOTAL/.test(src))
+    E('الدرجةُ لا تُحفَظ من عشرين');
+  /* المقاليُّ: لا يُكشفُ النموذجُ قبل الكتابة، ويُحفَظ نصُّه */
+  if (!/essayText\.length < 10/.test(src))
+    E('الحلُّ النموذجيُّ يظهر قبل أن يكتب — فينقله');
+  if (!/essay: essayText\.slice/.test(src) || !/essaySelf: essayMark/.test(src))
+    E('نصُّ المقاليِّ أو درجتُه الذاتيّةُ لا تُحفَظ — فلا يراجعها الأب');
+  /* ويُعرَضان في التقريرَين */
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    if (!/meta\.essay &&/.test(fs.readFileSync(rp, 'utf8')))
+      out.push({ sev:'خطأ', file:rf, msg:'نصُّ المقاليِّ يُحفَظ ولا يُعرَض — فالدرجةُ الذاتيّةُ بلا مراجعة' });
+  }
+  return out;
+}
 function pacePath(){
   const out = [], f = 'practice.html';
   const p = path.join(ROOT, f);
