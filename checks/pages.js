@@ -566,7 +566,12 @@ function fatriPath(){
     'math9.html': { ids:['h1','h2','h3','h4','h5','r1','r2','r3','r4','r5','r6','t1'], mcq:14, essay:6,
                     label:'رياضيات م٣ — الفتري 📝', ban:/"t2"|"t3"|"t4"/, banMsg:'درسٌ من الفصلِ الثالثِ غيرُ ٣-١ — خارجُ المقرَّر' },
     'math8.html': { ids:['n1','n2','n3','n4','n5','n6','n7','n8','n9','r1','r2','r3','r4','r5','r6','r7'], mcq:16, essay:4,
-                    label:'رياضيات م٢ — الفتري 📝', ban:/"t\d"|"v\d"|"s\d"/, banMsg:'درسٌ من الفصلِ الثالثِ فما بعدَه — خارجُ المقرَّر' }
+                    label:'رياضيات م٢ — الفتري 📝', ban:/"t\d"|"v\d"|"s\d"/, banMsg:'درسٌ من الفصلِ الثالثِ فما بعدَه — خارجُ المقرَّر' },
+    /* أسامةُ فصولٌ لا دروس: خمسةُ فصولٍ × ثلاثةِ أسئلةٍ + مقاليٌّ بخمس.
+       والشطبُ في صورةِ الأبِ أخرج «العبارات والمعادلات» (f5)، ولم يُذكر
+       «الكسور الاعتياديّة» (f6) فبقي خارجًا. */
+    'math5.html': { ids:['pv','f1','f2','f3','f4'], mcq:15, essay:5, per:3,
+                    label:'رياضيات خ٥ — الفتري 📝', ban:/"f5"|"f6"|"all"/, banMsg:'فصلٌ خارجَ المقرَّر (العبارات والمعادلات أو الكسور الاعتياديّة)' }
   };
   const out = [];
   for (const f of Object.keys(SPEC)) out.push(...fatriOne(f, SPEC[f]));
@@ -581,8 +586,11 @@ function fatriOne(f, SP){
   const m = /var FATRI_IDS = \[([^\]]*)\];/.exec(src);
   if (!m){ E('قائمةُ دروسِ الفتري مفقودة'); return out; }
   const ids = m[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean);
-  if (ids.length !== SP.mcq)
-    E('دروسُ الفتري ' + ids.length + ' والمطلوبُ ' + SP.mcq + ' سؤالًا اختياريًّا');
+  const per = SP.per || 1;
+  if (per > 1 && !new RegExp('var FATRI_PER = ' + per + ';').test(src))
+    E('عددُ أسئلةِ الفصلِ الواحدِ ليس ' + per);
+  if (ids.length * per !== SP.mcq)
+    E('أسئلةُ الفتري ' + (ids.length*per) + ' والمطلوبُ ' + SP.mcq);
   const want = SP.ids;
   const extra = ids.filter(x => want.indexOf(x) < 0);
   if (extra.length) E('دروسٌ خارجَ مقرَّر الفتري: ' + [...new Set(extra)].join('، '));
