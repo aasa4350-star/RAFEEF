@@ -595,7 +595,11 @@ function fatriPath(){
        والشطبُ في صورةِ الأبِ أخرج «العبارات والمعادلات» (f5)، ولم يُذكر
        «الكسور الاعتياديّة» (f6) فبقي خارجًا. */
     'math5.html': { ids:['pv','f1','f2','f3','f4'], mcq:15, essay:5, per:3,
-                    label:'رياضيات خ٥ — الفتري 📝', ban:/"f5"|"f6"|"all"/, banMsg:'فصلٌ خارجَ المقرَّر (العبارات والمعادلات أو الكسور الاعتياديّة)' }
+                    label:'رياضيات خ٥ — الفتري 📝', ban:/"f5"|"f6"|"all"/, banMsg:'فصلٌ خارجَ المقرَّر (العبارات والمعادلات أو الكسور الاعتياديّة)' },
+    /* سعودٌ ستّةُ فصولٍ بتوزيعٍ غيرِ متساوٍ (٣ ٣ ٢ ٣ ٣ ٢ = ١٦)، لأنّ
+       بنكَي «البيانات» و«الضربِ في رقمين» أصغرُ من غيرِهما. */
+    'math4.html': { ids:['f1','f2','f3','f4','f5','f6'], mcq:16, essay:4, perMap:{f1:3,f2:3,f3:2,f4:3,f5:3,f6:2},
+                    label:'رياضيات خ٤ — الفتري 📝', ban:/"fw"|"all"/, banMsg:'قسمٌ ليس فصلًا من الكتاب (مسائل كلاميّة أو الشامل)' }
   };
   const out = [];
   for (const f of Object.keys(SPEC)) out.push(...fatriOne(f, SPEC[f]));
@@ -610,11 +614,27 @@ function fatriOne(f, SP){
   const m = /var FATRI_IDS = \[([^\]]*)\];/.exec(src);
   if (!m){ E('قائمةُ دروسِ الفتري مفقودة'); return out; }
   const ids = m[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean);
-  const per = SP.per || 1;
-  if (per > 1 && !new RegExp('var FATRI_PER = ' + per + ';').test(src))
-    E('عددُ أسئلةِ الفصلِ الواحدِ ليس ' + per);
-  if (ids.length * per !== SP.mcq)
-    E('أسئلةُ الفتري ' + (ids.length*per) + ' والمطلوبُ ' + SP.mcq);
+  if (SP.perMap){
+    /* توزيعٌ غيرُ متساوٍ: نقرؤه من الكودِ ونجمعه */
+    const pm = /var FATRI_PER = \{([^}]*)\};/.exec(src);
+    if (!pm) E('توزيعُ أسئلةِ الفصولِ (FATRI_PER) مفقود');
+    else {
+      let sum = 0, mism = [];
+      Object.keys(SP.perMap).forEach(k => {
+        const g = new RegExp(k + '\\s*:\\s*(\\d+)').exec(pm[1]);
+        const v = g ? +g[1] : 0; sum += v;
+        if (v !== SP.perMap[k]) mism.push(k + '=' + v + ' والمطلوبُ ' + SP.perMap[k]);
+      });
+      if (mism.length) E('توزيعُ الأسئلةِ على الفصولِ تغيّر: ' + mism.join('، '));
+      if (sum !== SP.mcq) E('مجموعُ أسئلةِ الفصولِ ' + sum + ' والمطلوبُ ' + SP.mcq);
+    }
+  } else {
+    const per = SP.per || 1;
+    if (per > 1 && !new RegExp('var FATRI_PER = ' + per + ';').test(src))
+      E('عددُ أسئلةِ الفصلِ الواحدِ ليس ' + per);
+    if (ids.length * per !== SP.mcq)
+      E('أسئلةُ الفتري ' + (ids.length*per) + ' والمطلوبُ ' + SP.mcq);
+  }
   const want = SP.ids;
   const extra = ids.filter(x => want.indexOf(x) < 0);
   if (extra.length) E('دروسٌ خارجَ مقرَّر الفتري: ' + [...new Set(extra)].join('، '));

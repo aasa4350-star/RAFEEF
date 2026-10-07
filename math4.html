@@ -735,7 +735,8 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="lughati.html?who='+who+'">📗 لغتي</a></div>'+
     '<div class="unit">📘 مطابق لكتاب الرياضيات (الفصل الدراسي الأول)</div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="f1" aria-selected="true">1) القيمة المنزلية</button>'+
+            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
+      '<button data-tab="f1" aria-selected="false">1) القيمة المنزلية</button>'+
       '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
       '<button data-tab="f3" aria-selected="false">3) البيانات</button>'+
       '<button data-tab="f4" aria-selected="false">4) الأنماط والجبر</button>'+
@@ -745,8 +746,9 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
+    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel active" id="f1"></section>'+
+    '<section class="panel" id="f1"></section>'+
     '<section class="panel" id="f2"></section>'+
     '<section class="panel" id="f3"></section>'+
     '<section class="panel" id="f4"></section>'+
@@ -756,6 +758,8 @@ if(!NAMES[who]){
     '<section class="panel" id="rem"></section>'+
     '<footer>الرياضيات · الصف الرابع · الفصل الأول · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
 
+  var FATRI_AR = { f1:"القيمة المنزلية", f2:"الجمع والطرح", f3:"البيانات",
+                   f4:"الأنماط والجبر", f5:"الضرب × رقم", f6:"الضرب × رقمين" };
   var CFG = {
     all: {gens:ALL, n:15, intro:"اختبار شامل: القيمة المنزلية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
     f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> القيمة والمنزلة، المقارنة، الترتيب، التقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
@@ -969,7 +973,166 @@ if(!NAMES[who]){
   }
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
-  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab);
+
+
+  /* ═══════════════════════════════════════════════════════════════════
+     الاختبار الفتري 📝 — سعود (٧ أكتوبر ٢٠٢٦)
+     ═══════════════════════════════════════════════════════════════════
+     طلبُ الأب: «حط لسعود اختبار فتري» — بلا تحديدِ مقرَّرٍ ولا درجات.
+     فالمقرَّرُ فصولُ صفحتِه الستّةُ كلُّها (وهي الفصلُ الدراسيُّ الأوّل)،
+     والدرجةُ عشرون كإخوتِه الثلاثة، فيبقى المقياسُ واحدًا بينهم.
+
+     وهو رابعُ ابتدائيّ — أصغرُهم — فلا يُطال عليه: ستّةَ عشرَ سؤالًا
+     اختياريًّا ومقاليٌّ بأربع. والتوزيعُ ثلاثةٌ لكلّ فصلٍ إلّا
+     «البيانات» و«الضرب في رقمين» فسؤالان، لأنّ بنكَيهما أصغرُ أصلًا
+     (ثمانيةٌ وتسعةٌ مقابل عشرة) فلا نُجهدهما بما ليس فيهما.
+
+     ومقاليُّه مسألةُ مكتبةٍ: ضربٌ ثمّ طرح — يجمع «الضربَ في رقم»
+     و«الجمعَ والطرح» في موقفٍ يفهمه ابنُ العاشرة. */
+  var FATRI_IDS = ["f1","f2","f3","f4","f5","f6"];
+  var FATRI_PER = { f1:3, f2:3, f3:2, f4:3, f5:3, f6:2 };   /* ١٦ سؤالًا */
+  var FATRI_MCQ = 16;
+  var FATRI_ESSAY = 4;
+  var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;   /* ٢٠ */
+
+  function fatriEssay(){
+    var rows = gp([3,4,5,6]);                    /* عدد الرفوف */
+    var per  = gp([120,135,214,225,243,312]);    /* كتبٌ في الرفّ */
+    var tot  = rows*per;
+    var lent = gp([80,95,120,150,180,200]);
+    if(lent >= tot) return fatriEssay();         /* لا يُعار أكثرُ ممّا فيها */
+    var left = tot - lent;
+    var stem =
+      '<b>السؤال المقالي (٤ درجات):</b><br>'+
+      'في المكتبة <b>'+rows+'</b> رفوف، في كلّ رفٍّ <span class="ax">'+per+'</span> كتابًا. '+
+      'وأُعير منها <span class="ax">'+lent+'</span> كتابًا.'+
+      '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2">'+
+        '<li>كم كتابًا في المكتبة <b>كلّها</b>؟ اكتب خطواتك. <span style="color:var(--muted)">(درجتان)</span></li>'+
+        '<li>كم كتابًا <b>بقي</b> في المكتبة؟ <span style="color:var(--muted)">(درجتان)</span></li>'+
+      '</ol>';
+    var model =
+      '<b>الحلّ النموذجي:</b>'+
+      '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2.1">'+
+        '<li><b>كل الكتب:</b> نضرب عدد الكتب في الرفّ × عدد الرفوف<br>'+
+          '<span class="ax">'+per+' × '+rows+' = <b>'+tot+'</b> كتابًا</span></li>'+
+        '<li><b>الباقي:</b> نطرح المُعار من المجموع<br>'+
+          '<span class="ax">'+tot+' − '+lent+' = <b>'+left+'</b> كتابًا</span></li>'+
+      '</ol>'+
+      '<div style="margin-top:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:11px;padding:10px 12px">'+
+        '<b>⚠️ أشهر غلطتين:</b> الجمعُ بدل الضرب ('+per+' + '+rows+' وهو خطأ)، '+
+        'ونسيانُ الاستلافِ عند الطرح.</div>';
+    return { stem:stem, model:model };
+  }
+
+  function renderFatri(){
+    var sec = document.getElementById("fatri");
+    var items = [];
+    FATRI_IDS.forEach(function(id){
+      var got = genN(CFG[id].gens, FATRI_PER[id] || 3);
+      got.forEach(function(q){ q.__lesson = FATRI_AR[id] || id; items.push(q); });
+    });
+    var E = fatriEssay();
+    var html =
+      '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
+        '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — الرياضيات</div>'+
+        '<b>١٧ سؤالًا · ٢٠ درجة.</b> ستّةَ عشرَ سؤالًا بدرجةٍ لكلٍّ وسؤالٌ مقاليٌّ بأربع.'+
+        '<div style="margin-top:6px">📘 <b>المقرَّر:</b> '+FATRI_IDS.map(function(id){ return FATRI_AR[id]; }).join(' · ')+'</div>'+
+        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك. والمقاليُّ تكتب حلَّك بخطّك ثمّ يطلع لك الحلّ النموذجي.</div>'+
+      '</div>';
+    items.forEach(function(q,i){
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+' <span style="color:var(--muted);font-weight:600">· '+(q.__lesson||"")+' · درجة</span></div>'+
+        '<div class="stem">'+q[0]+'</div><div class="opts">'+
+        q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
+        '</div><div class="explain">'+q[3]+'</div></div>';
+    });
+    html += '<div class="q" data-essay><div class="num">سؤال '+(items.length+1)+' <span style="color:var(--muted);font-weight:600">· مقالي · ٤ درجات</span></div>'+
+      '<div class="stem">'+E.stem+'</div>'+
+      '<textarea data-etext rows="7" placeholder="اكتب حلّك هنا بخطواته..." style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:1rem;line-height:2;background:transparent;color:var(--ink)"></textarea>'+
+      '<button data-eshow style="margin-top:8px;background:var(--accent);color:#fff;border:0;padding:11px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">✅ خلّصت — أرني الحلّ النموذجي</button>'+
+      '<div data-emodel style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:12px 14px;line-height:2"></div>'+
+      '<div data-erub style="display:none;margin-top:10px"></div></div>';
+    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
+      '<button class="reset">اختبار جديد 🔄</button>';
+    sec.innerHTML = html; if(typeof mergeMath==="function") mergeMath(sec);
+
+    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
+    sec._pid = pid; sec._frag = true;
+    var answered={}, correct=0, essayMark=null, essayText="", savedN=0, saved=false;
+    var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
+    var scoreEl = sec.querySelector("[data-score]");
+    function marks(){ return correct + (essayMark||0); }
+    function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
+    function meta(){
+      return { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
+               trusted: (fastN < Math.ceil(FATRI_MCQ/2)),
+               skills: SKILLS, items: ITEMS, rgMs: RG_MS,
+               mcq: correct, mcqTotal: FATRI_MCQ,
+               essay: essayText.slice(0, 1200), essaySelf: essayMark, essayMax: FATRI_ESSAY };
+    }
+    function save(force){
+      var n = Object.keys(answered).length;
+      var done = n===FATRI_MCQ && essayMark!=null;
+      if(!force && !done) return;
+      if(savedN >= marks() && saved && !done) return;
+      savedN = marks(); saved = true; if(done) sec._frag=false;
+      saveScore("رياضيات خ٤ — الفتري 📝", marks(), FATRI_TOTAL, pid, meta());
+    }
+    sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
+      var i=+qEl.dataset.i, ans=items[i][2];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          if(answered[i]) return; answered[i]=1;
+          var now=Date.now(), ms=now-lastTs; lastTs=now; if(ms<RG_MS) fastN++;
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
+          var ok = (+btn.dataset.j===ans);
+          if(ok){ btn.classList.add("correct"); correct++; }
+          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
+          /* اسمُ الفصلِ هو الوسم — ولا يُطبَع اسمُ دالّةٍ في تقريرِ الأب */
+          var sk = items[i].__lesson || "غير محدّد";
+          var s = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); s.t++; if(ok) s.c++;
+          ITEMS.push({ g:(items[i].__g||""), ok:(ok?1:0), ms:ms, j:+btn.dataset.j, a:ans });
+          qEl.querySelector(".explain").classList.add("show");
+          draw(); save();
+        });
+      });
+    });
+    var eBtn = sec.querySelector("[data-eshow]"), eTa = sec.querySelector("[data-etext]");
+    eBtn.addEventListener("click", function(){
+      essayText = (eTa.value||"").trim();
+      if(essayText.length < 10){
+        eBtn.textContent = "✍️ اكتب حلّك أوّلًا";
+        setTimeout(function(){ eBtn.textContent = "✅ خلّصت — أرني الحلّ النموذجي"; }, 1800);
+        return;
+      }
+      eTa.readOnly = true; eBtn.disabled = true; eBtn.style.opacity = ".5";
+      var m = sec.querySelector("[data-emodel]"); m.style.display="block"; m.innerHTML = E.model;
+      if(typeof mergeMath==="function") mergeMath(m);
+      var r = sec.querySelector("[data-erub]"); r.style.display="block";
+      r.innerHTML = '<div style="font-weight:800;margin-bottom:8px">⚖️ قارن حلّك بالنموذج وضع درجتك بصدق:</div>'+
+        '<div class="row" style="gap:7px;flex-wrap:wrap">'+
+        [[4,"الضرب والطرح صحيحان"],[2,"الضرب صحيح والطرح غلط"],[1,"حاولت وما ضبط"],[0,"ما ضبط شي"]]
+          .map(function(p){ return '<button data-em="'+p[0]+'" style="flex:1;min-width:150px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;font-size:.9rem">'+p[0]+' — '+p[1]+'</button>'; }).join('')+
+        '</div><div style="color:var(--muted);font-size:.88rem;margin-top:8px;font-weight:600">درجتك هذي تطلع لأبوك مع نصّ حلّك — فيراجعها.</div>';
+      r.querySelectorAll("[data-em]").forEach(function(b){
+        b.addEventListener("click", function(){
+          if(essayMark!=null) return;
+          essayMark = +b.dataset.em;
+          r.querySelectorAll("[data-em]").forEach(function(x){ x.disabled=true; x.style.opacity=".45"; });
+          b.style.background="var(--accent)"; b.style.color="#fff"; b.style.opacity="1";
+          draw(); save();
+        });
+      });
+    });
+    function savePartial(){
+      essayText = essayText || ((eTa && eTa.value)||"").trim();
+      if(Object.keys(answered).length<1 && essayMark==null) return;
+      save(true);
+    }
+    sec._leave = savePartial;
+    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ && essayMark!=null; };
+    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
+    draw();
+  }
 
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
@@ -978,9 +1141,18 @@ if(!NAMES[who]){
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
-      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+      if(id==="rem"){ renderRem(); }
+      else if(id==="fatri"){ if(!pan.innerHTML || (pan._done && pan._done())) renderFatri(); }
+      else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
+  /* يُنادى بعد تعريفِ ثوابتِ الفتري لا قبلَها — ‏var يرفع الإعلانَ لا
+     القيمة، فنداؤه قبلَها يرمي وتبقى اللوحةُ فارغةً بلا رسالة. (وقعت في math5.) */
+  (function(){
+    var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab;
+    if(first === "fatri") renderFatri(); else render(first);
+  })();
+
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });
 // ===== إنذاران للخروج من الصفحة: أول مرة تنبيه، ثاني مرة تنتهي الجلسة =====
 (function(){var ex=0,h=null;
