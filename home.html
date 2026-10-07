@@ -672,6 +672,12 @@ async function loadReport(){
         '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
         'والاختبارُ الحقيقيُّ ١٢٠ سؤالًا — وهذه أسئلةُ تدريبٍ على أنماطه لا أسئلتُه.</small></div>';
     }
+    /* والعلاجيُّ مثلُه: فراغُه يُقال لا يُطوى */
+    if(!remActs.length && (hasStep || Object.keys(otherMap).length)){
+      html+='<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">'+
+        '<li>🚪 <b>ما فتح القسم بعد</b> — وهو شغّالٌ وجاهز: يعرض أضعف مهاراته مع شرحٍ ومثالٍ محلولٍ وجولةِ تدرّب.</li>'+
+        '</ul><div style="margin-top:8px"><a href="practice.html?who='+who+'&tab=rem" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">💪 افتح العلاجي</a></div></div>';
+    }
     /* 💪 القسم العلاجيّ */
     if(remActs.length){
       var ra=remActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
@@ -687,6 +693,25 @@ async function loadReport(){
         rKeys.slice(0,6).map(function(k){ var e=rBy[k];
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
+    }
+    /* ═══ الخانةُ الفارغةُ تُقال لا تُطوى ══════════════════════════════
+       بلاغُ الأب (٧ أكتوبر ٢٠٢٦): «القواعدُ المركَّزةُ ما تطلع لي في
+       التقرير». وفحصتُ فإذا فهدٌ لم يفتح القسمَ ولا مرّةً منذ نُشر،
+       فالبطاقةُ لم تُرسَم أصلًا لأنّها مشروطةٌ بوجودِ جولات.
+
+       وهذا هو العيبُ: الفراغُ لا يُفرَّق عن العطل. يرى الأبُ القسمَ
+       غائبًا فيظنّه معطَّلًا، وهو شغّالٌ لم يُفتَح. ووقعتُ في هذا من
+       قبلُ في بطاقةِ حفظِ الكلمات، وكتبتُ يومَها هذا العنوانَ نفسَه
+       ثمّ نسيتُه.
+
+       فتُرسَم البطاقةُ ولو بصفرٍ، وتقول صراحةً: لم يفتحه، ومعها الرابطُ
+       المباشر. والشرطُ أن يكون له محاولاتُ ستيبَ أصلًا — فطابورُ
+       القواعدِ يُبنى من أخطائِه فيها، فمن لم يختبر ستيبَ لا قسمَ له. */
+    var hasStep = !!(otherMap["STEP إنجليزي"] && otherMap["STEP إنجليزي"].length);
+    if(!gramActs.length && hasStep){
+      html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
+        '<li>🚪 <b>ما فتح القسم بعد</b> — وهو شغّالٌ وجاهز: يبني له طابورًا من أخطائه هو في ستيب ويعيدها بنصّها حتى يصحّحها.</li>'+
+        '</ul><div style="margin-top:8px"><a href="practice.html?who='+who+'&tab=gr" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">✏️ افتح القواعد المركّزة</a></div></div>';
     }
     /* ✏️ القواعدُ المركَّزة */
     if(gramActs.length){

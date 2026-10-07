@@ -786,6 +786,18 @@ function grammarPath(){
     const rp = path.join(ROOT, rf);
     if (!fs.existsSync(rp)) continue;
     const rsrc = fs.readFileSync(rp, 'utf8');
+    /* ═══ الخانةُ الفارغةُ تُقال لا تُطوى ══════════════════════════════
+       بلاغُ الأب (٧ أكتوبر ٢٠٢٦): «القواعدُ المركَّزةُ ما تطلع لي في
+       التقرير» — ولم يكن فيها عطل، إنّما لم يفتحها فهدٌ فطُويت
+       البطاقة. والفراغُ المطويُّ لا يُفرَّق عن العطل. */
+    /* ⚠️ لا يُترك الطرفُ مفتوحًا: /hasStep/ يطابق hasStepX بعد الكسر
+       فلا يصيح الحارس — وهي رابعُ مرّةٍ يقع فيها هذا هنا. */
+    if (!/!gramActs\.length && hasStep[^A-Za-z0-9_]/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'بطاقةُ القواعدِ تختفي إذا لم يفتحها — فلا يُفرَّق الفراغُ عن العطل' });
+    if (!/!remActs\.length &&/.test(rsrc))
+      out.push({ sev:'خطأ', file:rf, msg:'بطاقةُ العلاجيِّ تختفي إذا لم يفتحها — فلا يُفرَّق الفراغُ عن العطل' });
+    if (!/tab=gr"/.test(rsrc))
+      out.push({ sev:'تنبيه', file:rf, msg:'البطاقةُ الفارغةُ بلا رابطٍ مباشرٍ للقسم' });
     if (!/sect\s*===\s*"gram"/.test(rsrc))
       out.push({ sev:'خطأ', file:rf, msg:'جولاتُ القواعدِ المركَّزة تُحفظ ولا تُعرض — بطاقةُ «القواعد المركّزة» مفقودة' });
     else if (!/meta\.fixed\|\|0\)|meta\.fixed \|\| 0\)/.test(rsrc))

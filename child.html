@@ -566,6 +566,11 @@ async function main(){
         '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
         'والاختبارُ الحقيقيُّ ١٢٠ سؤالًا — وهذه أسئلةُ تدريبٍ على أنماطه لا أسئلتُه.</small></div>';
     }
+    if(!remActs.length && (hasStep || Object.keys(otherMap).length)){
+      html+=`<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">`+
+        `<li>🚪 <b>ما فتحته بعد</b> — وهو جاهز: يعرض أضعف مهاراتك مع شرحٍ ومثالٍ محلولٍ وجولةِ تدرّب.</li>`+
+        `</ul><div style="margin-top:8px"><a href="practice.html?who=${who}&tab=rem" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">💪 افتح العلاجي</a></div></div>`;
+    }
     /* 💪 القسم العلاجيّ */
     if(remActs.length){
       const ra=remActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
@@ -581,6 +586,13 @@ async function main(){
         rKeys.slice(0,6).map(k=>{ const e=rBy[k];
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
+    }
+    /* الخانةُ الفارغةُ تُقال لا تُطوى — انظر home.html */
+    const hasStep = !!(otherMap["STEP إنجليزي"] && otherMap["STEP إنجليزي"].length);
+    if(!gramActs.length && hasStep){
+      html+=`<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">`+
+        `<li>🚪 <b>ما فتحته بعد</b> — وهو جاهز: يبني لك طابورًا من أخطائك أنت في ستيب ويعيدها بنصّها حتى تصحّحها.</li>`+
+        `</ul><div style="margin-top:8px"><a href="practice.html?who=${who}&tab=gr" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">✏️ افتح القواعد المركّزة</a></div></div>`;
     }
     /* ✏️ القواعدُ المركَّزة */
     if(gramActs.length){
