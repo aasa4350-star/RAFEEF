@@ -310,6 +310,7 @@ function run(){
   issues.push(...fragmentPath());
   issues.push(...pacePath());
   issues.push(...fatriPath());
+  issues.push(...ytPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -559,6 +560,29 @@ function remedialPath(){
 
    وثلاثةُ أرقامٍ لا تُترك للصدفة: عددُ الأسئلة، ومجموعُ الدرجات،
    ونطاقُ الدروس — فزيادةُ درسٍ من الثالثِ تُدخله في اختبارٍ لا يدخله. */
+/* ═══ معلّمُ التحصيليِّ باسمِه ═══════════════════════════════════════
+   طلبُ فهدٍ (٧ أكتوبر ٢٠٢٦): «حط ناصر العبدالكريم ٢٠٢٦» في مقاطعِ
+   التحصيليّ. والبحثُ العامُّ يُخرج عشراتِ المقاطعِ من سنواتٍ ومستوياتٍ
+   مختلفة، فيضيع وقتُه في الاختيارِ قبل أن يبدأ.
+
+   وحدُّه أن يُقيَّد بالتحصيليِّ وحدَه: قواعدُ ستيبَ لها معلّمُها،
+   وتقييدُها به خطأٌ يُخفي ما ينفعها. */
+function ytPath(){
+  const out = [], f = 'practice.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  if (!/var YT_TAHSILI = "ناصر العبدالكريم 2026";/.test(src))
+    out.push({ sev:'خطأ', file:f, msg:'اسمُ معلّمِ التحصيليِّ غيرُ مثبَّت — يرجع البحثُ عامًّا كما كان' });
+  if (!/s\.group === "تحصيلي"/.test(src) || !/\(YT_TAHSILI \+ " " \+ s\.yt\)/.test(src))
+    out.push({ sev:'خطأ', file:f, msg:'اسمُ المعلّمِ لا يُضاف للتحصيليِّ وحدَه — إمّا لا يُضاف أو يُضاف لستيبَ كذلك' });
+  if (/YT_TAHSILI \+ " " \+ s\.yt\s*\)\s*:\s*\(YT_TAHSILI/.test(src))
+    out.push({ sev:'خطأ', file:f, msg:'اسمُ معلّمِ التحصيليِّ أُضيف لغيرِ التحصيليّ' });
+  /* ورابطُ بحثٍ لا معرّفُ فيديو — فالمقطعُ يُحذف فينكسر الزرُّ صامتًا */
+  if (/youtube\.com\/watch\?v=/.test(src))
+    out.push({ sev:'تنبيه', file:f, msg:'رابطُ فيديو بمعرّفٍ ثابت — يُحذف المقطعُ فينكسر الزرُّ صامتًا' });
+  return out;
+}
 function fatriPath(){
   /* صفحتان الآن: حسنٌ (ثالث متوسط) ورفيف (ثاني متوسط) — ولكلٍّ مقرَّرُه
      وعددُ أسئلتِه، والمجموعُ عشرون في كلتيهما. */

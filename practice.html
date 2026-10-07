@@ -1635,7 +1635,23 @@ function workedHtml(s){
 function lessonCard(s, stat, open){
   var idx = SKILLS.indexOf(s);
   var badge = (stat && stat.t) ? ' <span style="color:#dc2626;font-weight:800">('+Math.round(stat.c/stat.t*100)+'% — '+stat.c+'/'+stat.t+')</span>' : '';
-  var yt = 'https://www.youtube.com/results?search_query='+encodeURIComponent(s.yt);
+  /* ═══ معلّمُ التحصيليِّ باسمِه ═══════════════════════════════════════
+     طلبُ فهدٍ عبرَ أبيه (٧ أكتوبر ٢٠٢٦): «مقاطع اليوتيوب — حط ناصر
+     العبدالكريم ٢٠٢٦» لدروسِ التحصيليّ.
+
+     وهو يعرف ما يُفيده: البحثُ العامُّ «تحليل فرق مربعين تحصيلي» يُخرج
+     عشراتِ المقاطعِ من سنواتٍ مختلفةٍ ومستوياتٍ مختلفة، فيضيع وقتُه في
+     الاختيارِ قبل أن يبدأ. وتقييدُه بمعلّمٍ بعينِه وسنةٍ بعينِها يُقرّب
+     المطلوبَ من أوّلِ نتيجة.
+
+     وهذا ما فُعل في ستيبَ من قبلُ (عرفات القزعة في yt نفسِه)، فالسُّنّةُ
+     قائمةٌ في الصفحة.
+
+     ورابطُ بحثٍ لا معرّفُ فيديو: المقطعُ يُحذف أو يصير خاصًّا فينكسر
+     الزرُّ صامتًا، والبحثُ لا ينكسر. */
+  var YT_TAHSILI = "ناصر العبدالكريم 2026";
+  var ytq = (s.group === "تحصيلي") ? (YT_TAHSILI + " " + s.yt) : s.yt;
+  var yt = 'https://www.youtube.com/results?search_query='+encodeURIComponent(ytq);
   /* البند ٤ من الجرعة: شاهد الفيديو (≈ ربع ساعة) ثم جولة فورًا في نفس المهارة. */
   var guide = open ? '<div style="background:var(--bg);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:.9rem;font-weight:700;color:#dc2626">📺 شاهد الفيديو (≈ ربع ساعة)، وبعده مباشرة حُلّ الجولة تحت — في نفس المهارة.</div>' : '';
   return '<details '+(open?'open':'')+' style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
