@@ -4164,6 +4164,21 @@ if(!NAMES[who]){
     u12:{tab:"12 Culture Shock", gens:U12, n:10, intro:"<b><span class=ltr>Unit 12 — Culture Shock</span> (ص <span class=ltr>130–139</span>):</b> الفعل + <span class=ltr>infinitive</span>، و<span class=ltr>It's…to</span>، وgerund كفاعل، وعادات دولٍ مختلفة، و<span class=ltr>used to / be used to / get used to</span>، والماضي التامّ.", label:"إنجليزي م٣ — Unit 12"}
   };
 
+  /* ═══ الفصلُ الدراسيُّ الأوّل = الوحدات ١–٦ ═══════════════════════
+     طلبُ الأب (٩ أكتوبر ٢٠٢٦): «أخفِ وحدات الفصل الثاني حتى يبدأ»، كما
+     فُعل في صفحةِ سعودٍ بالمفتاح نفسِه.
+
+     والحدُّ عند السادسة لا السابعة: لحسنٍ ثلاثٌ ومئةُ جلسةٍ في هذه
+     الصفحة، كلُّها في الوحداتِ من الأولى إلى السادسة، ولم يفتح السابعةَ
+     فما بعدَها ولا مرّة. والكتابُ اثنتا عشرةَ وحدةً في أربعةِ أجزاء،
+     فالنصفُ الأوّلُ جزآن (ص ٢–٧٣).
+
+     ومولّداتُ ٧–١٢ باقيةٌ في الصفحةِ لم تُمسّ: يُخفى الجزآن الثالثُ
+     والرابعُ من شريطِ الأجزاء، وتُحذف دروسُهما من CFG ومن «علاجي».
+     وشاملُ كلِّ جزءٍ مقصورٌ على وحداتِه أصلًا، فلا يحتاج تعديلًا.
+     عند بدءِ الفصلِ الثاني: اجعل TERM2 = true. */
+  var TERM2 = false;
+
   var CHAPS = {
     p1: {name:"Part 1 · الوحدات 1–3", unit:'\ud83d\udcd8 مطابق لكتاب <span class="ltr">SuperGoal 3</span> — ثالث متوسط · <span class="ltr">Part 1</span>: الوحدات <span class="ltr">1–3</span> (ص <span class="ltr">2\u201331</span>)',
          ids:["u1","u2","u3","exp","allu"]},
@@ -4174,6 +4189,14 @@ if(!NAMES[who]){
     p4: {name:"Part 4 · الوحدات 10–12", unit:'\ud83d\udcd8 <span class="ltr">SuperGoal 3</span> · <span class="ltr">Part 4</span>: الوحدات <span class="ltr">10–12</span> (ص <span class="ltr">110\u2013139</span>)',
          ids:["u10","u11","u12","allu4"]}
   };
+
+  /* ما ليس من الفصلِ الأوّلِ يُطوى: الجزآن من شريطِ الأجزاء، ودروسُهما
+     من CFG فلا تُرسَم لوحاتُها ولا تُحسب في «علاجي». */
+  var TERM2_IDS = ["u7","u8","u9","allu3","u10","u11","u12","allu4"];
+  if(!TERM2){
+    delete CHAPS.p3; delete CHAPS.p4;
+    TERM2_IDS.forEach(function(k){ delete CFG[k]; });
+  }
 
   var curCh = "p1", curId = "u1";
 
@@ -4338,6 +4361,8 @@ if(!NAMES[who]){
     {id:"u12", name:"Unit 12 — Culture Shock", tip:"أفعال مثل expect وmanage وrefuse تأخذ مصدرًا بـto. وIt's + صفة يأخذ مصدرًا بـto دائمًا. وused to لعادةٍ ماضية، وbe/get used to + gerund للتعوّد. والماضي التامّ لحدثٍ سبق حدثًا آخر في الماضي.", yt:"شرح verb infinitive used to past perfect ثالث متوسط سوبر قول"}
   ];
   var ALL_IDS = ["allu", "allu2", "allu3", "allu4"];
+  /* «علاجي» يُبنى من REMTOPICS، فما خرج من المقرَّرِ يخرج منه */
+  if(!TERM2) REMTOPICS = REMTOPICS.filter(function(t){ return TERM2_IDS.indexOf(t.id) < 0; });
 
   /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
      بلاغ الأب (٢٦ أغسطس ٢٠٢٦): «قسم علاجي ما حطّيت فيه دروس بعد
