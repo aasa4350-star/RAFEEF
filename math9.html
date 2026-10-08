@@ -3146,7 +3146,17 @@ if(!NAMES[who]){
      ثمّ يُعرَض عليه الحلُّ النموذجيُّ بخطواته وسُلّمُ التصحيح، فيضع
      درجتَه بنفسه. ويُحفَظ نصُّه كما كتبه ليقرأه أبوه ويُراجع تقديره —
      فالتقديرُ الذاتيُّ تعلُّمٌ، والمراجعةُ ضمانُه. */
-  var FATRI_IDS = ["h1","h2","h3","h3","h4","h4","h5","r1","r2","r3","r4","r5","r6","t1"];
+  /* ═══ ضُيِّق إلى الفصلَين الأوّلِ والثاني — صورةُ الأب (٨ أكتوبر) ═══
+     كان المقرَّرُ أوّلَ مرّةٍ يشمل درسَ «الميلِ والمقطع» (٣-١) بنصِّ
+     طلبِه. ثمّ أرسل صورةَ الفهرسِ وقال «عدّل الأوّل»، وفيها الفصلان
+     الأوّلُ والثاني وحدَهما — فخرج ٣-١، وخرج معه السؤالُ المقاليُّ
+     القديمُ لأنّه كان مبنيًّا عليه (كتابةُ ص = م س + ب).
+
+     والعددُ يبقى أربعةَ عشرَ والدرجةُ عشرين: دروسُ الفصلَين أحدَ عشرَ،
+     فثلاثةٌ منها سؤالان — «متعدّدةُ الخطوات» و«متغيّرٌ في الطرفين»
+     لأنّهما أساسُ الفصلِ الأوّل، و«معدّلُ التغيّرِ والميل» لأنّه أكثرُ
+     ما يُبنى عليه الفصلُ الثاني وما بعدَه. */
+  var FATRI_IDS = ["h1","h2","h3","h3","h4","h4","h5","r1","r2","r3","r4","r5","r5","r6"];
   var FATRI_MCQ = FATRI_IDS.length;     /* ١٤ درجة */
   var FATRI_ESSAY = 6;                  /* درجاتُ المقاليّ */
   var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;   /* ٢٠ */
@@ -3154,41 +3164,57 @@ if(!NAMES[who]){
   /* السؤالُ المقاليّ: نقطتان على مستقيم — الميلُ ثمّ المعادلةُ ثمّ
      المقطعان. يجمع ٢-٥ و٣-١ و٢-٣ في مسألةٍ واحدةٍ متّصلة، وهي صلبُ
      المقرَّر. والأعدادُ تُختار ليخرج الميلُ والمقطعان صحيحةً بلا كسور. */
+  /* المقاليُّ لا يخرج عن الفصلَين: معادلةٌ ذاتُ متغيّرٍ في الطرفين
+     (١-٤) تُحلّ بخطواتِها ثمّ يُتحقَّق منها بالتعويض (١-١)، ثمّ جدولُ
+     دالّةٍ يُقرأ منه معدّلُ التغيّرِ (٢-٥) ويُحكَم أخطّيّةٌ هي أم لا
+     (٢-٢). والأعدادُ تُختار ليخرج الحلُّ عددًا صحيحًا بلا كسور. */
   function fatriEssay(){
-    var m = gp([2,3,-2,-3]);            /* الميل */
-    var k = gp([-3,-2,-1,1,2,3]);       /* المقطعُ السينيّ */
-    var b = -m*k;                       /* فالمقطعُ الصاديُّ = −م×ك */
-    /* لا تكون إحدى النقطتين على المحور الصاديّ: لو كانت س₁ = 0 لصار
-       المقطعُ الصاديُّ معطًى في السؤالِ نفسِه فيسقط ثلثُ المطلوب. */
-    var x1 = gp([-2,-1,1,2]), x2 = x1 + gp([2,3,4]);
-    var y1 = m*x1 + b, y2 = m*x2 + b;
-    var S = function(n){ return n<0 ? "−"+Math.abs(n) : String(n); };
-    var eq = "ص = " + (m===1?"":m===-1?"−":S(m)) + "س " + (b>=0 ? "+ "+b : "− "+Math.abs(b));
+    var A  = gp([3,4,5]);                 /* معاملُ القوس */
+    var B  = gp([2,3,4,5]);               /* ما داخلَ القوس */
+    var X  = gp([-3,-2,2,3,4,5]);         /* الحلُّ — يُختار أوّلًا */
+    var C  = (A-1)*X - A*B;               /* فيخرج الطرفُ الأيمنُ صحيحًا */
+    var M  = gp([2,3,4,-2,-3]);           /* ميلُ الجدول */
+    var K  = gp([-4,-2,1,3,5]);
+    var xs = [1,2,3], ys = xs.map(function(x){ return M*x + K; });
+    var S  = function(n){ return n<0 ? "− "+Math.abs(n) : "+ "+n; };
+    var SS = function(n){ return n<0 ? "−"+Math.abs(n) : String(n); };
+    /* السالبُ المطروحُ يُقوَّس: «−10 − (−7)» لا «−10 − −7» — وهي
+       الغلطةُ التي نحذّر منها في الميل، فلا نقع فيها في النموذج. */
+    var P  = function(n){ return n<0 ? "("+SS(n)+")" : String(n); };
+    var tbl = '<table style="width:100%;margin-top:8px;border-collapse:collapse;text-align:center">'+
+      '<tr><th style="border:1px solid var(--line);padding:6px;background:var(--bg)"><span class="ax">س</span></th>'+
+        xs.map(function(x){ return '<td style="border:1px solid var(--line);padding:8px;font-weight:800"><span class="ax">'+x+'</span></td>'; }).join('')+'</tr>'+
+      '<tr><th style="border:1px solid var(--line);padding:6px;background:var(--bg)"><span class="ax">ص</span></th>'+
+        ys.map(function(y){ return '<td style="border:1px solid var(--line);padding:8px;font-weight:800"><span class="ax">'+SS(y)+'</span></td>'; }).join('')+'</tr></table>';
     var stem =
-      '<b>السؤال المقالي (٦ درجات):</b><br>'+
-      'مستقيمٌ يمرّ بالنقطتين <span class="ax">أ('+S(x1)+' ، '+S(y1)+')</span> و<span class="ax">ب('+S(x2)+' ، '+S(y2)+')</span>.'+
+      '<b>السؤال المقالي (٦ درجات):</b>'+
       '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2">'+
-        '<li>أوجد <b>ميل</b> المستقيم موضّحًا القانون والتعويض. <span style="color:var(--muted)">(درجتان)</span></li>'+
-        '<li>اكتب <b>معادلته</b> بصيغة الميل والمقطع <span class="ax">ص = م س + ب</span>. <span style="color:var(--muted)">(درجتان)</span></li>'+
-        '<li>أوجد <b>المقطع الصادي</b> و<b>المقطع السيني</b>. <span style="color:var(--muted)">(درجتان)</span></li>'+
+        '<li>حُلّ المعادلة <span class="ax">'+A+'(س − '+B+') = س '+S(C)+'</span> موضّحًا خطواتك. <span style="color:var(--muted)">(٣ درجات)</span></li>'+
+        '<li>تحقّق من صحّة حلّك <b>بالتعويض</b> في المعادلة الأصلية. <span style="color:var(--muted)">(درجة)</span></li>'+
+        '<li>الجدول التالي لدالّة:'+tbl+
+          'أوجد <b>معدّل التغيّر</b>، وهل العلاقة <b>دالّة خطّية</b>؟ ولماذا؟ <span style="color:var(--muted)">(درجتان)</span></li>'+
       '</ol>';
+    var L = A*X - A*B;
     var model =
       '<b>الحلّ النموذجي:</b>'+
       '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2.1">'+
-        '<li><b>الميل:</b> <span class="ax">م = (ص₂ − ص₁) ÷ (س₂ − س₁)</span><br>'+
-          '<span class="ax">م = ('+S(y2)+' − ('+S(y1)+')) ÷ ('+S(x2)+' − ('+S(x1)+')) = '+S(y2-y1)+' ÷ '+S(x2-x1)+' = <b>'+S(m)+'</b></span></li>'+
-        '<li><b>المعادلة:</b> نعوّض بالميل وبإحدى النقطتين في <span class="ax">ص = م س + ب</span>:<br>'+
-          '<span class="ax">'+S(y1)+' = ('+S(m)+')('+S(x1)+') + ب &nbsp;⟸&nbsp; ب = '+S(b)+'</span><br>'+
-          '<span class="ax">'+eq+'</span></li>'+
-        '<li><b>المقطع الصادي</b> (عند س = 0): <span class="ax">ص = '+S(b)+'</span> ⟸ النقطة <span class="ax">(0 ، '+S(b)+')</span><br>'+
-          '<b>المقطع السيني</b> (عند ص = 0): <span class="ax">0 = ('+S(m)+')س + ('+S(b)+') ⟸ س = '+S(k)+'</span> ⟸ النقطة <span class="ax">('+S(k)+' ، 0)</span></li>'+
+        '<li><b>الحلّ:</b> نوزّع أوّلًا على القوس:<br>'+
+          '<span class="ax">'+A+'س − '+(A*B)+' = س '+S(C)+'</span><br>'+
+          'ننقل المتغيّر إلى طرفٍ والأعداد إلى الآخر:<br>'+
+          '<span class="ax">'+A+'س − س = '+SS(C)+' + '+(A*B)+'</span> ⟸ <span class="ax">'+(A-1)+'س = '+SS(C + A*B)+'</span><br>'+
+          'نقسم على معامل س: &nbsp;<span class="ax">س = '+SS(C+A*B)+' ÷ '+(A-1)+' = <b>'+SS(X)+'</b></span></li>'+
+        '<li><b>التحقّق:</b> نعوّض <span class="ax">س = '+SS(X)+'</span> في الأصلية:<br>'+
+          '<span class="ax">'+A+'('+SS(X)+' − '+B+') = '+A+'×'+P(X-B)+' = '+SS(L)+'</span> &nbsp;·&nbsp; '+
+          '<span class="ax">'+SS(X)+' '+S(C)+' = '+SS(X+C)+'</span> ⟸ الطرفان متساويان ✅</li>'+
+        '<li><b>معدّل التغيّر:</b> كلّما زادت <span class="ax">س</span> واحدًا تغيّرت <span class="ax">ص</span> بمقدار '+
+          '<span class="ax">'+SS(ys[1])+' − '+P(ys[0])+' = <b>'+SS(M)+'</b></span>، وكذلك بين الحدّين التاليين — '+
+          '<b>فالمعدّل ثابت</b>.<br><b>نعم، دالّة خطّية</b> — لأنّ معدّل تغيّرها ثابت، فتمثيلها البيانيّ مستقيم.</li>'+
       '</ol>'+
       '<div style="margin-top:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:11px;padding:10px 12px">'+
-        '<b>⚠️ أشهر غلطتين:</b> عكسُ س وص في قانون الميل، ونسيانُ قوسَي السالب عند التعويض — '+
-        '<span class="ax">'+S(y2)+' − ('+S(y1)+')</span> لا <span class="ax">'+S(y2)+' − '+S(y1)+'</span>.</div>';
+        '<b>⚠️ أشهر غلطتين:</b> القسمةُ قبل التوزيع على القوس، '+
+        'والاكتفاءُ بقول «خطّية» بلا تعليل — والتعليلُ هو ثباتُ معدّل التغيّر.</div>';
     return { stem:stem, model:model };
   }
-
   function renderFatri(){
     var sec = panelOf("fatri");
     /* سؤالٌ لكلّ درسٍ من دروس المقرَّر بالترتيب — لا عشوائيًّا:
