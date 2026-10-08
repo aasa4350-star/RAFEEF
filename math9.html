@@ -32,8 +32,13 @@
   .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
   .bar a{text-decoration:none;background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 15px;border-radius:12px;font-weight:700;font-size:.9rem;box-shadow:var(--shadow)}
   .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px;box-shadow:var(--shadow);font-weight:800}
-  .chapsel{display:flex;gap:8px;margin:14px 0 8px}
-  .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  /* ═══ شريطُ الفصولِ يلتفّ ولا يُخرج الصفحةَ عن الشاشة ═══════════
+     قياسٌ على جوّالٍ عرضُه ٣٩٠ (٨ أكتوبر): عرضُ المستند ٤٧٥ — فالصفحةُ
+     تُسحب يمينًا ويسارًا، ويخرج طرفُ البطاقةِ عن الشاشة. والسببُ أنّ
+     أزرارَ الفصولِ ستّةٌ في صفٍّ واحدٍ لا يلتفّ، وأضيقُ ما تقبله كلمةُ
+     «الفصل الخامس» أوسعُ من سُدس الشاشة. فيلتفّ الشريطُ صفَّين. */
+  .chapsel{display:flex;gap:8px;margin:14px 0 8px;flex-wrap:wrap}
+  .chapsel button{flex:1 1 30%;min-width:96px;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
   .tabs button{flex:1;min-width:104px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
@@ -51,11 +56,30 @@
   .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
   .opts button.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
   .explain{margin-top:10px;font-size:.92rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:0 12px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
-  .explain.show{max-height:220px;padding:10px 12px}
+  .explain.show{max-height:460px;padding:10px 12px}
   .scorebar{position:sticky;bottom:12px;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 18px;box-shadow:var(--shadow);font-weight:800;text-align:center}
   .reset{width:100%;margin-top:12px;background:transparent;border:1.5px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
   .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:30px 18px;text-align:center;color:var(--muted)}
+  /* ═══ الرسمُ جزءٌ من السؤال ═══════════════════════════════════
+     أوراقُ معلّمِ حسنٍ (٨ أكتوبر ٢٠٢٦) تسأل بالصورة: خطُّ أعدادٍ عليه
+     نقطتان، ومخطَّطُ أسهم، وتمثيلٌ بيانيّ، وجدول. فهذه أنماطُها. */
+  .fig{display:block;margin:8px auto;max-width:100%;height:auto;color:var(--ink)}
+  .fig .ln{stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round}
+  .fig .gd{stroke:currentColor;stroke-width:1;fill:none;opacity:.2}
+  .fig .cv{stroke:var(--accent);stroke-width:2.4;fill:none;stroke-linejoin:round;stroke-linecap:round}
+  .fig .ov{stroke:currentColor;stroke-width:1.5;fill:none;opacity:.55}
+  .fig .pt{fill:var(--accent)}
+  /* النصُّ داخلَ الرسمِ يساريُّ الاتّجاه: الصفحةُ يمينيّةٌ والاتّجاهُ يُورَث
+     إلى <text> في الـSVG، فكانت «−٧» تُرسم «٧−» على خطِّ الأعداد وعلى
+     محورَي التمثيل. والكلمةُ العربيّةُ المفردةُ تبقى سليمةً داخلَ سياقٍ
+     يساريٍّ لأنّها مقطعٌ يمينيٌّ واحد. */
+  .fig text{fill:var(--muted);font-size:9px;font-weight:600;font-family:inherit;direction:ltr;unicode-bidi:isolate}
+  .fig .lbl{fill:var(--ink);font-size:11px}
+  .figrow{text-align:center;font-weight:800;color:var(--accent);margin-top:8px}
+  .tb{border-collapse:collapse;margin:9px auto;direction:rtl}
+  .tb th,.tb td{border:1px solid var(--line);padding:5px 14px;text-align:center;font-size:1rem;font-variant-numeric:tabular-nums}
+  .tb th{color:var(--muted);font-weight:800;background:var(--bg)}
   /* الكسرُ المرصوف — انظر تعليل mn() */
   .fr{display:inline-flex;align-items:center;gap:0;direction:ltr;unicode-bidi:isolate;vertical-align:middle;margin:0 3px}
   .fr .frs{margin-inline-end:2px}
@@ -593,7 +617,7 @@ var H1 = [gEqOrderOps, gSolutionSet, gIdentityOrNone, gEqTwoVars, gEqTerms9];
 var H2 = [gOneStepAdd, gOneStepSub, gOneStepMul, gOneStepDiv, gOneStepWord, gPropEquality, gOneStepReal];
 var H3 = [gMultiStep, gMultiStepNeg, gMultiStepFrac, gConsecFamily, gConsecInt, gMoneyMulti];
 var H4 = [gVarBothSides, gVarParens, gVarClassify, gPerimeterEqual, gStepsOrder9];
-var H5 = [gAbsEqTwo, gAbsEqNone, gAbsExpr, gAbsReal, gAbsTerms9];
+var H5 = [gAbsEqTwo, gAbsEqNone, gAbsExpr, gAbsReal, gAbsTerms9, gAbsFromNumLine, gAbsNumLinePick];
 /* ============================================================
    رياضيات ثالث متوسط — الفصل ٢: العلاقات والدوال الخطية
    من كتاب حسن نفسه (ص ٥٠–٩١):
@@ -1199,7 +1223,8 @@ function gNthTermEq(){
 
 /* قيمة حدٍّ معيّن */
 function gNthTermValue(){
-  var a1=nz(-12,12), d=nz(-8,8), n=ri(6,20);
+  /* وُسِّع المدى إلى خمسٍ وعشرين: ورقةُ المعلّم تسأل عن الحدّ الحادي والعشرين */
+  var a1=nz(-12,12), d=nz(-8,8), n=ri(6,25);
   var val=a1+(n-1)*d;
   var o=zOpts(val,[a1+n*d, a1+(n-1)*d+d, a1*n]);
   return ["في المتتابعة الحسابية "+ax(seqStr(a1,d,4))+" أوجد الحدّ رقم "+ax(fmt(n))+" .",
@@ -1248,11 +1273,478 @@ function gSeqFunction(){
     "sf:"+c[0]];
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   أسئلةٌ على نمطِ أوراقِ معلّمِ حسن
+   ───────────────────────────────────────────────────────────────────
+   أرسل الأبُ (٨ أكتوبر ٢٠٢٦) أربعَ صورٍ لأوراقٍ وزّعها معلّمُ حسنٍ على
+   صفّه، وقال: «حطّ أسئلة مشابهة لها في الفتري». فقُرئت الورقةُ سؤالًا
+   سؤالًا وقُوبلت ببنوكِ هذه الصفحة، فكان أكثرُها موجودًا: مجموعةُ الحلّ
+   من مجموعةِ التعويض، والمتطابقةُ وما لا حلَّ له، و«س ÷ ٧ = ١٤»،
+   والأعدادُ الفرديةُ المتتالية، ومجالُ علاقةٍ بأزواجٍ مرتّبة، وميلُ
+   مستقيمٍ بنقطتين، وميلُ الرأسيّ، و د(٣) لدالّةٍ تربيعيّة، والحدُّ
+   الحادي والعشرون (وُسّع مدى الرتبةِ إلى خمسٍ وعشرين من أجله).
+
+   ونقصَ تسعةُ أنماط، وجامعُها أنّها تسأل <b>بالصورة</b> لا بالنصّ —
+   وهذا هو ما كان يصنع المفاجأةَ في الورقة:
+     ١) خطُّ الأعداد: مطابقةُ معادلةِ قيمةٍ مطلقةٍ بتمثيلِ حلِّها، وعكسُها.
+     ٢) مخطَّطُ الأسهم: هل العلاقةُ دالّة؟
+     ٣) الجدول: هل العلاقةُ دالّة؟ ومعدَّلُ التغيّر منه.
+     ٤) التمثيلُ البيانيّ: هل يمثّل دالّة؟ وأيُّ معادلةٍ يمثّلها؟
+     ٥) تمثيلُ المسافةِ والزمن: ماذا يقول بالكلام؟
+     ٦) المقطعُ السينيُّ من صيغةِ «ص = م س + ب» لا من الصورةِ القياسيّة.
+     ٧) الصورةُ القياسيّة من صيغةِ الميلِ ونقطة.
+     ٨) قيمةُ المجهولِ الذي يجعل الميلَ صفرًا أو غيرَ معرّف.
+
+   والرسمُ يكون في نصِّ السؤالِ لا في الخيارات، والخياراتُ نصٌّ دائمًا.
+   وإذا كان المطلوبُ اختيارَ رسمٍ رُسمت الرسومُ الثلاثةُ في النصِّ موسومةً
+   (أ) و(ب) و(جـ) كما تفعل الورقةُ نفسُها. وهذا ليس تجميلًا: الخياراتُ
+   لو كانت رسومًا لتساوت نصوصُها عند التجريد، فعمي حارسُ «الخيارات
+   المكرّرة» في checks/pages.js عن خيارٍ مُعادٍ حقيقيٍّ لو وقع يومًا.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* عددٌ بإشارةِ السالبِ الرياضيّة، بلا فاصلةِ آلافٍ — للنصِّ داخل الرسم */
+function dnum(v){ return v<0 ? "−"+Math.abs(v) : String(v); }
+function svgEl(w,h,alt){
+  return '<svg class="fig" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+
+         '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+(alt||"رسم")+'">';
+}
+
+/* خطُّ الأعدادِ من −٧ إلى ٧، ونقاطٌ مُعلَّمةٌ عليه */
+function numLineSVG(marks){
+  var FROM=-7, TO=7, W=300, H=46, pad=17, s, v, x;
+  function X(n){ return pad + (n-FROM)*(W-2*pad)/(TO-FROM); }
+  s = svgEl(W,H,"خط أعداد عليه نقاط معلَّمة");
+  s += '<line class="ln" x1="5" y1="19" x2="'+(W-5)+'" y2="19"/>';
+  s += '<polyline class="ln" points="12,14 5,19 12,24"/>';
+  s += '<polyline class="ln" points="'+(W-12)+',14 '+(W-5)+',19 '+(W-12)+',24"/>';
+  for(v=FROM; v<=TO; v++){
+    x = X(v);
+    s += '<line class="ln" x1="'+x.toFixed(1)+'" y1="'+(v%2?16.5:15)+'" x2="'+x.toFixed(1)+'" y2="'+(v%2?21.5:23)+'"/>';
+    /* الزوجيُّ وحدَه يُرقَّم: خمسةَ عشرَ رقمًا في ثلاثِمئةِ بكسلٍ تتلاصق على
+       شاشةِ الجوّال، والشاهدُ قائمٌ لكلِّ وحدةٍ فالعدُّ ممكن */
+    if(v%2===0) s += '<text x="'+x.toFixed(1)+'" y="38" text-anchor="middle">'+dnum(v)+'</text>';
+  }
+  marks.forEach(function(v){ s += '<circle class="pt" cx="'+X(v).toFixed(1)+'" cy="19" r="4.8"/>'; });
+  return s+'</svg>';
+}
+
+/* مستوًى إحداثيٌّ من −R إلى R، وbody يرسم فوقه بإحداثيّاتِ الرياضيّات */
+function planeSVG(body, R, alt){
+  R = R || 5;
+  var W=212, H=212, O=W/2, u=(W/2-14)/R, s, v;
+  function X(x){ return O + x*u; }
+  function Y(y){ return O - y*u; }
+  s = svgEl(W,H,alt||"تمثيل بياني في المستوى الإحداثي");
+  for(v=-R; v<=R; v++){
+    s += '<line class="gd" x1="'+X(v).toFixed(1)+'" y1="'+Y(-R).toFixed(1)+'" x2="'+X(v).toFixed(1)+'" y2="'+Y(R).toFixed(1)+'"/>';
+    s += '<line class="gd" x1="'+X(-R).toFixed(1)+'" y1="'+Y(v).toFixed(1)+'" x2="'+X(R).toFixed(1)+'" y2="'+Y(v).toFixed(1)+'"/>';
+  }
+  s += '<line class="ln" x1="'+X(-R).toFixed(1)+'" y1="'+Y(0).toFixed(1)+'" x2="'+X(R).toFixed(1)+'" y2="'+Y(0).toFixed(1)+'"/>';
+  s += '<line class="ln" x1="'+X(0).toFixed(1)+'" y1="'+Y(-R).toFixed(1)+'" x2="'+X(0).toFixed(1)+'" y2="'+Y(R).toFixed(1)+'"/>';
+  [-4,-2,2,4].forEach(function(t){
+    s += '<text x="'+X(t).toFixed(1)+'" y="'+(Y(0)+12).toFixed(1)+'" text-anchor="middle">'+dnum(t)+'</text>';
+    s += '<text x="'+(X(0)-5).toFixed(1)+'" y="'+(Y(t)+3.5).toFixed(1)+'" text-anchor="end">'+dnum(t)+'</text>';
+  });
+  s += '<text x="'+(X(R)-1).toFixed(1)+'" y="'+(Y(0)-6).toFixed(1)+'" text-anchor="end" class="lbl">س</text>';
+  s += '<text x="'+(X(0)+7).toFixed(1)+'" y="'+(Y(R)+10).toFixed(1)+'" class="lbl">ص</text>';
+  s += body(X,Y,u);
+  return s+'</svg>';
+}
+/* قصُّ المستقيمِ ص = م س + ب على حدودِ المربّع [−R ، R] في البُعدين */
+function clipSeg(m,b,R){
+  var cand=[[-R, m*(-R)+b],[R, m*R+b]], out=[], seen={}, i, x, y, k;
+  if(m!==0){ cand.push([(R-b)/m, R]); cand.push([(-R-b)/m, -R]); }
+  for(i=0;i<cand.length;i++){
+    x=cand[i][0]; y=cand[i][1];
+    if(x < -R-1e-6 || x > R+1e-6 || y < -R-1e-6 || y > R+1e-6) continue;
+    k = x.toFixed(2)+"|"+y.toFixed(2);
+    if(seen[k]) continue; seen[k]=1; out.push([x,y]);
+  }
+  return out.length>=2 ? [out[0], out[out.length-1]] : null;
+}
+/* منحنًى يُرسم نقطةً نقطة: fn تأخذ المتغيّرَ الحرَّ وتُرجع الآخر.
+   byY تعني أنّ الحرَّ هو ص (كـ«س = | ص |») — وهو ما لا يكون دالّة. */
+function curvePts(fn, R, X, Y, byY){
+  var pts=[], i, a, b;
+  for(i=-R*4; i<=R*4; i++){
+    a = i/4; b = fn(a);
+    if(!isFinite(b) || b < -R || b > R) continue;
+    pts.push(byY ? (X(b).toFixed(1)+","+Y(a).toFixed(1)) : (X(a).toFixed(1)+","+Y(b).toFixed(1)));
+  }
+  return pts.length>1 ? '<polyline class="cv" points="'+pts.join(" ")+'"/>' : "";
+}
+/* نقطةٌ مُعلَّمةٌ باسمِ إحداثيّيها — وهي التي تُغيّر نصَّ السؤال
+   من توليدةٍ إلى أخرى، فلا يصير الرسمُ سؤالًا واحدًا يُحفَظ */
+function markPt(X,Y,x,y){
+  return '<circle class="pt" cx="'+X(x).toFixed(1)+'" cy="'+Y(y).toFixed(1)+'" r="4"/>'+
+         '<text x="'+(X(x)+7).toFixed(1)+'" y="'+(Y(y)-6).toFixed(1)+'" class="lbl">('+dnum(x)+', '+dnum(y)+')</text>';
+}
+/* الرُّبعُ الأوّلُ وحدَه — لتمثيلِ المسافةِ والزمن */
+function q1SVG(pts, xlab, ylab){
+  var W=214, H=200, L=32, Rr=200, B=170, T=16, MX=6, MY=6, s, v;
+  function X(x){ return L + x*(Rr-L)/MX; }
+  function Y(y){ return B - y*(B-T)/MY; }
+  s = svgEl(W,H,"تمثيل بياني للمسافة مع الزمن");
+  for(v=0; v<=MX; v++) s += '<line class="gd" x1="'+X(v).toFixed(1)+'" y1="'+Y(0).toFixed(1)+'" x2="'+X(v).toFixed(1)+'" y2="'+Y(MY).toFixed(1)+'"/>';
+  for(v=0; v<=MY; v++) s += '<line class="gd" x1="'+X(0).toFixed(1)+'" y1="'+Y(v).toFixed(1)+'" x2="'+X(MX).toFixed(1)+'" y2="'+Y(v).toFixed(1)+'"/>';
+  s += '<line class="ln" x1="'+X(0).toFixed(1)+'" y1="'+Y(0).toFixed(1)+'" x2="'+X(MX).toFixed(1)+'" y2="'+Y(0).toFixed(1)+'"/>';
+  s += '<line class="ln" x1="'+X(0).toFixed(1)+'" y1="'+Y(0).toFixed(1)+'" x2="'+X(0).toFixed(1)+'" y2="'+Y(MY).toFixed(1)+'"/>';
+  s += '<polyline class="cv" points="'+pts.map(function(p){ return X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1); }).join(" ")+'"/>';
+  s += '<text x="'+X(MX/2).toFixed(1)+'" y="'+(Y(0)+15).toFixed(1)+'" text-anchor="middle" class="lbl">'+(xlab||"الزمن")+'</text>';
+  s += '<text x="'+(X(0)+3).toFixed(1)+'" y="'+(Y(MY)-4).toFixed(1)+'" class="lbl">'+(ylab||"المسافة")+'</text>';
+  return s+'</svg>';
+}
+/* مخطَّطُ الأسهم: المجالُ يمينًا والمدى يسارًا، والسهمُ يمشي كما تُقرأ الصفحة */
+function mapDiagSVG(xs, ys, links){
+  var gap=30, n=Math.max(xs.length, ys.length), W=262, H=30+n*gap;
+  var rx=198, lx=64, top=38, s;
+  function py(arr,i){ return top + i*gap + (n-arr.length)*gap/2; }
+  function box(cx, arr){
+    var y0=py(arr,0), y1=py(arr,arr.length-1);
+    return '<rect class="ov" x="'+(cx-25)+'" y="'+(y0-17)+'" width="50" height="'+(y1-y0+34)+'" rx="23"/>';
+  }
+  s = svgEl(W,H,"مخطط أسهم بين المجال والمدى");
+  s += '<text x="'+rx+'" y="19" text-anchor="middle" class="lbl">المجال</text>';
+  s += '<text x="'+lx+'" y="19" text-anchor="middle" class="lbl">المدى</text>';
+  s += box(rx,xs)+box(lx,ys);
+  xs.forEach(function(v,i){ s += '<text x="'+rx+'" y="'+(py(xs,i)+4).toFixed(1)+'" text-anchor="middle" class="lbl">'+dnum(v)+'</text>'; });
+  ys.forEach(function(v,i){ s += '<text x="'+lx+'" y="'+(py(ys,i)+4).toFixed(1)+'" text-anchor="middle" class="lbl">'+dnum(v)+'</text>'; });
+  links.forEach(function(L){
+    var y1=py(xs,L[0]), y2=py(ys,L[1]), x1=rx-27, x2=lx+27;
+    var dx=x2-x1, dy=y2-y1, len=Math.sqrt(dx*dx+dy*dy), ux=dx/len, uy=dy/len;
+    s += '<line class="cv" x1="'+x1+'" y1="'+y1.toFixed(1)+'" x2="'+x2+'" y2="'+y2.toFixed(1)+'"/>';
+    s += '<polyline class="cv" points="'+
+         (x2-ux*9-uy*4.5).toFixed(1)+','+(y2-uy*9+ux*4.5).toFixed(1)+' '+
+         x2+','+y2.toFixed(1)+' '+
+         (x2-ux*9+uy*4.5).toFixed(1)+','+(y2-uy*9-ux*4.5).toFixed(1)+'"/>';
+  });
+  return s+'</svg>';
+}
+/* جدولٌ من عمودين — كجداولِ الكتابِ والورقة */
+function xyTable(h1,h2,rows){
+  var s = '<table class="tb"><tr><th>'+h1+'</th><th>'+h2+'</th></tr>';
+  rows.forEach(function(r){ s += '<tr><td>'+dnum(r[0])+'</td><td>'+dnum(r[1])+'</td></tr>'; });
+  return s+'</table>';
+}
+
+/* ---------- ١-٥ القيمة المطلقة: خطُّ الأعداد ---------- */
+
+/* ورقة المعلّم: من خطِّ الأعدادِ إلى معادلةِ القيمةِ المطلقة */
+function gAbsFromNumLine(){
+  var c = gp([-3,-2,-1,1,2,3]), b = ri(2,4);
+  var lo = c-b, hi = c+b;
+  var inner = (c>0) ? ("س − "+c) : ("س + "+Math.abs(c));
+  var flip  = (c>0) ? ("س + "+c) : ("س − "+Math.abs(c));
+  var correct = "| "+inner+" | = "+b;
+  var o = sOpts(correct, ["| "+flip+" | = "+b,
+                          "| س − "+b+" | = "+Math.abs(c),
+                          "| "+inner+" | = "+(b+1)].filter(function(z){ return z!==correct; }));
+  if(!o) return null;
+  return ["النقطتان المُعلَّمتان على خطّ الأعداد الآتي هما مجموعة حلّ إحدى المعادلات الآتية. فأيُّها هي؟"+
+          numLineSVG([lo,hi]),
+    o[0].map(ax), o[1],
+    "النقطتان "+mn(dnum(lo))+" و"+mn(dnum(hi))+" تبعدان المسافة نفسها "+mn(b)+" عن العدد "+
+    mn(dnum(c))+" الذي في منتصفهما، والقيمة المطلقة بُعدٌ ⇐ "+ax(correct)+
+    " . والتحقّق: "+ax(inner+" = "+b)+" ⇐ "+ax("س = "+dnum(hi))+" ، و"+
+    ax(inner+" = "+dnum(-b))+" ⇐ "+ax("س = "+dnum(lo))+" .",
+    "anl:"+c+","+b];
+}
+
+/* ورقة المعلّم: أيُّ خطوطِ الأعدادِ يمثّل حلَّ معادلةِ القيمةِ المطلقة */
+function gAbsNumLinePick(){
+  var c = gp([-3,-2,-1,1,2,3]), b = ri(2,4);
+  var inner = (c>0) ? ("س − "+c) : ("س + "+Math.abs(c));
+  /* الأوّلُ صحيح، والثاني يُهمل الثابتَ داخل القيمة، والثالثُ يعكس إشارته */
+  var sets = [ [c-b, c+b], [-b, b], [-c-b, -c+b] ];
+  var key = function(a){ return a.slice().sort(function(x,y){ return x-y; }).join(","); };
+  if(key(sets[0])===key(sets[1]) || key(sets[0])===key(sets[2]) || key(sets[1])===key(sets[2])) return null;
+  var order = shuffle([0,1,2]), LET = ["أ","ب","جـ"], fig = "";
+  order.forEach(function(si,i){ fig += '<div class="figrow">('+LET[i]+')</div>'+numLineSVG(sets[si]); });
+  /* «الخطّ (أ)» لا «أ» وحدَها: الحرفُ المفردُ في زرٍّ عريضٍ يُقرأ شَرطةً */
+  var o = ["الخطّ ("+LET[0]+")", "الخطّ ("+LET[1]+")", "الخطّ ("+LET[2]+")"];
+  return ["أيُّ خطوط الأعداد الآتية يمثّل مجموعة حلّ المعادلة "+ax("| "+inner+" | = "+b)+" ؟"+fig,
+    o, order.indexOf(0),
+    "حالتان: "+ax(inner+" = "+b)+" ⇐ "+ax("س = "+dnum(c+b))+" ، و"+ax(inner+" = "+dnum(-b))+
+    " ⇐ "+ax("س = "+dnum(c-b))+" . فالنقطتان "+mn(dnum(c-b))+" و"+mn(dnum(c+b))+
+    " ، وهما على بُعد "+mn(b)+" من "+mn(dnum(c))+" يمينًا ويسارًا — لا عن الصفر.",
+    "anp:"+c+","+b];
+}
+
+/* ---------- ٢-٢ الدوال: الجدولُ والمخطَّطُ والتمثيلُ البيانيّ ---------- */
+
+var FNTBL = [
+  ["س","ص"],
+  ["الزمن (ث)","الارتفاع (م)"],
+  ["عدد الأقلام","الثمن (ريال)"],
+  ["رقم الأسبوع","الكتلة (كجم)"],
+  ["عدد اللاعبين","عدد الكرات"],
+  ["رقم الشهر","عدد الزوّار"]
+];
+/* ورقة المعلّم: هل الجدولُ يمثّل دالّة؟ (وتكرارُ ص لا يمنع) */
+function gFuncTableYN(){
+  var h = gp(FNTBL), kind = gp(["fn","dupx","dupy"]);
+  var xs=[], ys=[], seen={}, t=0, i, v;
+  while(xs.length<4 && t<90){ t++; v=ri(1,14); if(seen[v]) continue; seen[v]=1; xs.push(v); }
+  if(xs.length<4) return null;
+  for(i=0;i<4;i++) ys.push(ri(2,45));
+  if(kind==="dupx"){ xs[3]=xs[1]; if(ys[3]===ys[1]) ys[3]=ys[1]+3; }
+  if(kind==="dupy"){ ys[3]=ys[1]; }
+  var rows=[]; for(i=0;i<4;i++) rows.push([xs[i],ys[i]]);
+  var isFn = (kind!=="dupx");
+  var A = "نعم؛ لأنّ كلّ قيمةٍ في العمود الأوّل ارتبطت بقيمةٍ واحدةٍ فقط في الثاني";
+  var B = "لا؛ لأنّ قيمةً في العمود الأوّل ارتبطت بقيمتين مختلفتين في الثاني";
+  var C = "لا؛ لأنّ قيمةً في العمود الثاني تكرّرت مع قيمتين مختلفتين في الأوّل";
+  var third = (kind==="dupy") ? C : "لا يمكن الحكم من الجدول";
+  var o = sOpts(isFn?A:B, [isFn?B:A, third]);
+  if(!o) return null;
+  var why = (kind==="dupx")
+    ? ("القيمة "+mn(xs[1])+" في العمود الأوّل ظهرت مرّتين ومعها قيمتان مختلفتان ("+
+       mn(ys[1])+" و"+mn(ys[3])+") ⇐ <b>ليست دالّة</b>.")
+    : (kind==="dupy")
+    ? ("لم تتكرّر أيُّ قيمةٍ في العمود الأوّل، فكلٌّ منها لها قيمةٌ واحدة ⇐ <b>دالّة</b>. "+
+       "وتكرارُ "+mn(ys[1])+" في العمود الثاني لا يمنع ذلك — الشرطُ على المجال لا على المدى.")
+    : "كلُّ قيمةٍ في العمود الأوّل ظهرت مرّةً واحدةً ولها قيمةٌ واحدةٌ تقابلها ⇐ <b>دالّة</b>.";
+  return ["الجدول الآتي يبيّن علاقةً بين "+h[0]+" و"+h[1]+" . هل تمثّل <b>دالّة</b>؟"+
+          xyTable(h[0],h[1],rows),
+    o[0], o[1], why, "ftb:"+kind+":"+xs.join("_")+"|"+ys.join("_")];
+}
+
+/* ورقة المعلّم: هل مخطَّطُ الأسهمِ يمثّل دالّة؟ */
+function gMapDiagram(){
+  var kind = gp(["fn","dupx","dupy"]);
+  var nY = (kind==="dupy") ? 2 : (kind==="dupx" ? 4 : 3);
+  var xs=[], ys=[], seen={}, t=0, v;
+  while(xs.length<3 && t<80){ t++; v=ri(1,9); if(seen["x"+v]) continue; seen["x"+v]=1; xs.push(v); }
+  while(ys.length<nY && t<200){ t++; v=ri(10,40); if(seen["y"+v]) continue; seen["y"+v]=1; ys.push(v); }
+  if(xs.length<3 || ys.length<nY) return null;
+  var links = (kind==="fn")   ? [[0,0],[1,1],[2,2]]
+            : (kind==="dupx") ? [[0,0],[0,1],[1,2],[2,3]]   /* الازدواجُ في المجالِ وحدَه، فلا يلتبس السبب */
+            :                   [[0,0],[1,0],[2,1]];
+  var isFn = (kind!=="dupx");
+  var A = "نعم؛ لأنّ كلّ عنصرٍ في المجال خرج منه سهمٌ واحدٌ فقط";
+  var B = "لا؛ لأنّ عنصرًا في المجال خرج منه سهمان إلى عنصرين مختلفين";
+  var C = "لا؛ لأنّ عنصرًا في المدى دخله سهمان من عنصرين مختلفين";
+  var third = (kind==="dupy") ? C : "لا يمكن الحكم من المخطَّط";
+  var o = sOpts(isFn?A:B, [isFn?B:A, third]);
+  if(!o) return null;
+  var why = (kind==="dupx")
+    ? ("العنصر "+mn(xs[0])+" في المجال خرج منه سهمان إلى "+mn(ys[0])+" و"+mn(ys[1])+
+       " ⇐ ارتبط بقيمتين، فالعلاقة <b>ليست دالّة</b>.")
+    : (kind==="dupy")
+    ? ("كلُّ عنصرٍ في المجال خرج منه سهمٌ واحد ⇐ <b>دالّة</b>. ودخولُ سهمين إلى "+mn(ys[0])+
+       " في المدى لا يمنع — الشرطُ على المجال لا على المدى.")
+    : "كلُّ عنصرٍ في المجال خرج منه سهمٌ واحدٌ إلى عنصرٍ واحدٍ من المدى ⇐ <b>دالّة</b>.";
+  return ["المخطَّط الآتي يربط عناصر المجال بعناصر المدى. هل يمثّل <b>دالّة</b>؟"+
+          mapDiagSVG(xs,ys,links),
+    o[0], o[1], why, "mdg:"+kind+":"+xs.join("_")+"|"+ys.join("_")];
+}
+
+/* ورقة المعلّم: اختبارُ الخطِّ الرأسيِّ على تمثيلٍ بيانيٍّ مرسوم */
+function gFuncGraphYN(){
+  var kind = gp(["line","vert","horiz","absV","absH","circ"]);
+  var R = 5, h = ri(-2,2), k = ri(-2,2), m = gp([-2,-1,1,2]), r = gp([2,3]);
+  if(kind==="vert"  && h===0) h = gp([-2,-1,1,2]);
+  if(kind==="horiz" && k===0) k = gp([-2,-1,1,2]);
+  var isFn = (kind==="line" || kind==="horiz" || kind==="absV");
+  var drew = true;
+  var body = function(X,Y){
+    var g = "", seg;
+    if(kind==="line"){
+      seg = clipSeg(m, k-m*h, R);
+      if(!seg){ drew=false; return ""; }
+      g += '<line class="cv" x1="'+X(seg[0][0]).toFixed(1)+'" y1="'+Y(seg[0][1]).toFixed(1)+
+           '" x2="'+X(seg[1][0]).toFixed(1)+'" y2="'+Y(seg[1][1]).toFixed(1)+'"/>';
+      g += markPt(X,Y,h,k);
+    } else if(kind==="vert"){
+      g += '<line class="cv" x1="'+X(h).toFixed(1)+'" y1="'+Y(-R).toFixed(1)+
+           '" x2="'+X(h).toFixed(1)+'" y2="'+Y(R).toFixed(1)+'"/>';
+      g += markPt(X,Y,h,0);
+    } else if(kind==="horiz"){
+      g += '<line class="cv" x1="'+X(-R).toFixed(1)+'" y1="'+Y(k).toFixed(1)+
+           '" x2="'+X(R).toFixed(1)+'" y2="'+Y(k).toFixed(1)+'"/>';
+      g += markPt(X,Y,0,k);
+    } else if(kind==="absV"){
+      g += curvePts(function(x){ return Math.abs(x-h)+k; }, R, X, Y, false);
+      g += markPt(X,Y,h,k);
+    } else if(kind==="absH"){
+      g += curvePts(function(y){ return Math.abs(y-k)+h; }, R, X, Y, true);
+      g += markPt(X,Y,h,k);
+    } else {
+      g += '<circle class="cv" cx="'+X(h).toFixed(1)+'" cy="'+Y(k).toFixed(1)+'" r="'+(X(h+r)-X(h)).toFixed(1)+'"/>';
+      g += markPt(X,Y,h+r,k);     /* نقطةٌ على المحيطِ لا مركزُه — لئلّا تُحسب جزءًا من الرسم */
+    }
+    return g;
+  };
+  var fig = planeSVG(body, R);
+  if(!drew) return null;
+  var A = "نعم؛ لأنّه لا يقطعه أيُّ خطٍّ رأسيٍّ في أكثر من نقطة";
+  var B = "لا؛ لأنّ خطًّا رأسيًّا يقطعه في أكثر من نقطة";
+  var o = sOpts(isFn?A:B, [isFn?B:A, "لا يمكن الحكم من التمثيل البيانيّ"]);
+  if(!o) return null;
+  var why = {
+    line:  "المستقيم المائل: كلُّ خطٍّ رأسيٍّ يقطعه في نقطةٍ واحدة ⇐ <b>دالّة</b>.",
+    horiz: "المستقيم الأفقيّ: كلُّ قيمةٍ لـس تقابلها القيمة "+mn(dnum(k))+" وحدَها ⇐ <b>دالّة</b>. (وميلُه صفر.)",
+    absV:  "منحنى القيمة المطلقة المفتوح للأعلى: الخطُّ الرأسيُّ يقطعه في نقطةٍ واحدة ⇐ <b>دالّة</b>.",
+    vert:  "المستقيم الرأسيّ "+ax("س = "+dnum(h))+" ينطبق عليه الخطُّ الرأسيُّ نفسُه، فتُقابل القيمةَ "+
+           mn(dnum(h))+" قيمٌ لا نهائيّةٌ لـص ⇐ <b>ليست دالّة</b>.",
+    absH:  "المنحنى مفتوحٌ يمينًا، فالخطُّ الرأسيُّ يقطعه في نقطتين (فوق الرأس وتحته) ⇐ <b>ليست دالّة</b>.",
+    circ:  "الدائرة: أيُّ خطٍّ رأسيٍّ يمرّ داخلها يقطعها في نقطتين ⇐ <b>ليست دالّة</b>."
+  }[kind];
+  return ["انظر التمثيل البيانيّ الآتي. هل يمثّل <b>دالّة</b>؟ (استعمل اختبار الخطّ الرأسيّ)"+fig,
+    o[0], o[1],
+    why+" والقاعدة: العلاقة دالّةٌ إذا ارتبطت كلُّ قيمةٍ لـس بقيمةٍ <b>واحدةٍ</b> لـص.",
+    "fgy:"+kind+":"+h+","+k+","+m+","+r];
+}
+
+/* ---------- ٢-٣ تمثيل المعادلات: من الرسمِ إلى المعادلة ---------- */
+
+/* ورقة المعلّم: أيُّ معادلةٍ يمثّلها هذا المستقيمُ المارُّ بالأصل */
+function gGraphToEquation(){
+  var PQ = [[2,3],[3,2],[1,2],[2,1],[1,3],[3,1],[3,4],[4,3],[1,4],[4,1],[2,5],[5,2],[5,3],[3,5]];
+  var pq = gp(PQ), p = pq[0], q = pq[1], sg = gp([-1,1]);
+  var mS   = (sg<0?"−":"") + (q===1 ? String(p) : (p+"/"+q));
+  var negS = (sg<0?"" :"−") + (q===1 ? String(p) : (p+"/"+q));
+  var invS = (sg<0?"−":"") + (p===1 ? String(q) : (q+"/"+p));
+  var correct = "ص = "+mS+" س";
+  var o = sOpts(correct, ["ص = "+negS+" س", "ص = "+invS+" س"].filter(function(z){ return z!==correct; }));
+  if(!o) return null;
+  var R = 5, m = sg*p/q, px = q, py = sg*p;
+  var seg = clipSeg(m, 0, R);
+  if(!seg) return null;
+  var fig = planeSVG(function(X,Y){
+    return '<line class="cv" x1="'+X(seg[0][0]).toFixed(1)+'" y1="'+Y(seg[0][1]).toFixed(1)+
+           '" x2="'+X(seg[1][0]).toFixed(1)+'" y2="'+Y(seg[1][1]).toFixed(1)+'"/>'+
+           markPt(X,Y,px,py);
+  }, R);
+  return ["المستقيم الآتي يمرّ بنقطة الأصل. أيُّ المعادلات الآتية يمثّله؟"+fig,
+    o[0].map(ax), o[1],
+    "المستقيم يمرّ بالنقطة "+ax(pairS([px,py]))+" وبنقطة الأصل "+ax("(0 ، 0)")+" ، فالميل "+
+    ax("م = ("+dnum(py)+" − 0) ÷ ("+dnum(px)+" − 0) = "+mS)+" . والمقطع الصاديُّ صفرٌ لأنّه يمرّ بالأصل ⇐ "+
+    ax(correct)+" .",
+    "g2e:"+p+","+q+","+sg];
+}
+
+/* ورقة المعلّم: المقطعُ السينيُّ من صيغةِ ص = م س + ب */
+function gXInterceptSI(){
+  var m = gp([-6,-5,-4,-3,-2,2,3,4,5,6]), k = nz(-9,9), b = -m*k;
+  var o = zOpts(k, [b, -k, m, -b]);
+  return ["أوجد <b>المقطع السينيّ</b> للمعادلة "+ax("ص = "+fmt(m)+"س + "+fmt(b))+" .",
+    o[0], o[1],
+    "المقطع السينيّ قيمة س عندما "+ax("ص = 0")+" : "+ax("0 = "+fmt(m)+"س + "+fmt(b))+" ⇐ "+
+    ax(fmt(m)+"س = "+fmt(-b))+" ⇐ "+ax("س = "+fmt(-b)+" ÷ "+pz(m)+" = "+fmt(k))+
+    " . <b>لا تخلط:</b> العدد "+mn(fmt(b))+" هو المقطع <b>الصاديّ</b> لا السينيّ.",
+    "xsi:"+m+","+k];
+}
+
+/* ورقة المعلّم: الصورةُ القياسيّة من صيغةِ الميلِ ونقطة */
+function gStandardFromPS(){
+  var m = gp([-4,-3,-2,2,3,4]), x1 = nz(-6,6), y1 = nz(-9,9);
+  var lhs = "ص "+(y1<0 ? "+ "+Math.abs(y1) : "− "+y1);
+  var rhs = fmt(m)+"(س "+(x1<0 ? "+ "+Math.abs(x1) : "− "+x1)+")";
+  var A, C, correct;
+  if(m>0){ A = m;  C = m*x1-y1; correct = A+"س − ص = "+fmt(C); }
+  else   { A = -m; C = y1-m*x1; correct = A+"س + ص = "+fmt(C); }
+  var cands = (m>0)
+    ? [A+"س + ص = "+fmt(m*x1+y1), A+"س − ص = "+fmt(-C), A+"س − ص = "+fmt(y1-m*x1)]
+    : [A+"س − ص = "+fmt(-y1-m*x1), A+"س + ص = "+fmt(-C), A+"س + ص = "+fmt(m*x1-y1)];
+  var o = sOpts(correct, cands.filter(function(z){ return z!==correct; }));
+  if(!o) return null;
+  return ["اكتب المعادلة "+ax(lhs+" = "+rhs)+" بالصورة <b>القياسية</b> "+ax("أ س + ب ص = جـ")+" :",
+    o[0].map(ax), o[1],
+    "نوزّع أوّلًا: "+ax(lhs+" = "+fmt(m)+"س + "+fmt(-m*x1))+" ، ثمّ ننقل حدَّ س إلى الطرف الأيسر "+
+    "والعددَ إلى الأيمن ⇐ "+ax(correct)+
+    " . ومُعامِل س يُترك <b>موجبًا</b> في الصورة القياسية، فإن خرج سالبًا ضُرب الطرفان في "+ax("−1")+" .",
+    "sps:"+m+","+x1+","+y1];
+}
+
+/* ---------- ٢-٥ معدّل التغيّر والميل: الجدولُ والمجهول ---------- */
+
+/* ═══ المعدَّلُ السالبُ يحتاج سياقًا ينقص فيه الشيء ═══════════════════
+   الموجودُ في RATECTX كلُّه متزايدٌ بطبعه (أجرٌ وتكلفةٌ وطولُ شعر)، فإذا
+   خرج المعدَّلُ سالبًا قرأ الطالبُ «طولُ الشعرِ ينقص خمسةَ سنتمتراتٍ في
+   الشهر» — وهو لغوٌ يشغله عن الحساب. والميلُ السالبُ مهارةٌ مطلوبةٌ لا
+   يصحّ إسقاطُها، فيُؤتى لها بسياقٍ ينقص فيه الشيءُ حقًّا. */
+var RATE4 = [
+  ["عدد ساعات العمل","الأجر (ريال)","ريالًا في الساعة",1],
+  ["عدد الوجبات","التكلفة (ريال)","ريالًا لكلّ وجبة",1],
+  ["عدد البلاطات","المساحة المبلّطة (سم²)","سم² لكلّ بلاطة",1],
+  ["عدد الأشهر","طول النبتة (سم)","سم في الشهر",1],
+  ["عدد التذاكر المُباعة","دخل الحفل (ريال)","ريالًا لكلّ تذكرة",1],
+  ["زمن النزول (دقيقة)","ارتفاع المنطاد (م)","مترًا في الدقيقة",-1],
+  ["عدد الأيام","ما تبقّى من المدّخرات (ريال)","ريالًا في اليوم",-1],
+  ["زمن السير (ساعة)","ما تبقّى من الطريق (كم)","كيلومترًا في الساعة",-1],
+  ["عدد الدلاء المسحوبة","ماء الخزّان (لتر)","لترًا لكلّ دلو",-1]
+];
+/* ورقة المعلّم: معدّلُ التغيّرِ من جدولٍ بأربعةِ صفوف */
+function gRateTable4(){
+  var c = gp(RATE4), dx = gp([2,3,4,5]), x0 = ri(1,4), m = c[3]*ri(2,9), i;
+  var y0 = (m<0) ? (3*Math.abs(m)*dx + ri(2,12)) : ri(5,40);
+  var rows = [];
+  for(i=0;i<4;i++) rows.push([x0+i*dx, y0+i*m*dx]);
+  var dy = m*dx;
+  var o = zOpts(m, [dy, dx, -m, dy+dx]);
+  return ["الجدول الآتي يبيّن العلاقة بين "+c[0]+" و"+c[1]+" . أوجد <b>معدّل التغيّر</b>."+
+          xyTable(c[0], c[1], rows),
+    o[0], o[1],
+    "نأخذ صفَّين متجاورين: التغيّر في العمود الثاني "+mn(fmt(dy))+" والتغيّر في الأوّل "+mn(fmt(dx))+
+    " ⇐ معدّل التغيّر = "+ax(fmt(dy)+" ÷ "+fmt(dx)+" = "+fmt(m))+" ، أي "+mn(fmt(Math.abs(m)))+" "+
+    c[2]+(m<0?" نقصانًا":" زيادةً")+" . وهو ثابتٌ بين كلّ صفَّين ⇐ الدالّة <b>خطّية</b>.",
+    "rt4:"+c[0]+":"+x0+","+dx+","+m+","+y0];
+}
+
+/* ورقة المعلّم: قيمةُ المجهولِ التي تجعل الميلَ صفرًا أو غيرَ معرّف */
+function gSlopeUnknownZero(){
+  var zero = Math.random()<0.5, x1 = nz(-8,8), y1 = nz(-8,8), x2, y2, o, qs, why, correct;
+  if(zero){
+    x2 = x1; while(x2===x1) x2 = nz(-8,8);
+    correct = y1;
+    o = zOpts(correct, [0, -y1, x1, x2]);
+    qs = "ما قيمة "+ax("هـ")+" التي تجعل ميل المستقيم المارّ بالنقطتين "+ax(pairS([x1,y1]))+
+         " و"+ax("("+fmt(x2)+" ، هـ)")+" يساوي <b>صفرًا</b>؟";
+    why = "الميل "+ax("م = (ص₂ − ص₁) ÷ (س₂ − س₁)")+" يكون صفرًا إذا كان <b>البسط</b> صفرًا، "+
+          "أي إذا تساوى الصاديّان ⇐ "+ax("هـ = "+fmt(y1))+" والمستقيم <b>أفقيّ</b>. "+
+          "و"+ax("هـ = 0")+" خطأٌ شائع: الصفرُ مطلوبٌ في البسط لا في الإحداثيّ.";
+  } else {
+    y2 = y1; while(y2===y1) y2 = nz(-8,8);
+    correct = x1;
+    o = zOpts(correct, [0, -x1, y1, y2]);
+    qs = "ما قيمة "+ax("هـ")+" التي تجعل ميل المستقيم المارّ بالنقطتين "+ax(pairS([x1,y1]))+
+         " و"+ax("(هـ ، "+fmt(y2)+")")+" <b>غير معرّف</b>؟";
+    why = "الميل غيرُ معرّفٍ إذا كان <b>المقام</b> صفرًا، أي إذا تساوى السينيّان ⇐ "+
+          ax("هـ = "+fmt(x1))+" والمستقيم <b>رأسيّ</b> (والقسمة على صفرٍ غير معرّفة).";
+  }
+  return [qs, o[0], o[1], why, "suz:"+(zero?"z":"u")+":"+x1+","+y1+","+(zero?x2:y2)];
+}
+
+var DTG = [
+  { p:[[0,0],[2,4],[4,4],[6,6]], d:"يتحرّك مبتعدًا بسرعةٍ ثابتة، ثمّ يتوقّف فترةً، ثمّ يعود إلى الحركة" },
+  { p:[[0,0],[2,5],[4,5],[6,0]], d:"يتحرّك مبتعدًا، ثمّ يتوقّف فترةً، ثمّ يرجع إلى نقطة البداية" },
+  { p:[[0,0],[6,6]],             d:"يتحرّك بسرعةٍ ثابتةٍ من البداية إلى النهاية بلا توقّف" },
+  { p:[[0,0],[4,2],[6,6]],       d:"يتحرّك ببطءٍ في البداية، ثمّ تزيد سرعته" },
+  { p:[[0,0],[2,4],[6,6]],       d:"يتحرّك بسرعةٍ كبيرةٍ في البداية، ثمّ تقلّ سرعته" },
+  { p:[[0,6],[3,3],[6,3]],       d:"يقترب من هدفه بسرعةٍ ثابتة، ثمّ يتوقّف فيبقى على المسافة نفسها" },
+  { p:[[0,2],[6,2]],             d:"لا يتحرّك البتّة — يبقى على المسافة نفسها طول الوقت" }
+];
+/* ورقة المعلّم: تمثيلُ المسافةِ مع الزمن — ترجمتُه إلى كلام */
+function gDistTimeGraph(){
+  var i = Math.floor(Math.random()*DTG.length), cur = DTG[i];
+  var rest = DTG.filter(function(z,j){ return j!==i; });
+  shuffle(rest);
+  var o = sOpts(cur.d, [rest[0].d, rest[1].d]);
+  if(!o) return null;
+  return ["التمثيل البيانيّ الآتي يبيّن المسافة التي قطعها متنزّهٌ مع الزمن. أيُّ الأوصاف الآتية يطابقه؟"+
+          q1SVG(cur.p),
+    o[0], o[1],
+    "نقرأ <b>ميل</b> كلّ جزء: الجزءُ المائل صعودًا حركةٌ مبتعدة، والجزءُ <b>الأفقيّ</b> (ميلُه صفر) توقّفٌ "+
+    "فالمسافة لا تتغيّر، والجزءُ المائل هبوطًا رجوعٌ نحو البداية. وكلّما زاد ميلُ الجزء زادت السرعة.",
+    "dtg:"+i];
+}
+
 var R1 = [gQuadrant, gDomainRange, gIndepDep, gAxisPoint];
-var R2 = [gIsFunction, gFuncValueLin, gFuncValueQuad, gFuncCombo, gDiscreteCont, gVerticalTest];
-var R3 = [gIsLinear, gStandardForm, gXIntercept, gYIntercept, gPointOnLine];
+var R2 = [gIsFunction, gFuncValueLin, gFuncValueQuad, gFuncCombo, gDiscreteCont, gVerticalTest, gFuncTableYN, gMapDiagram, gFuncGraphYN];
+var R3 = [gIsLinear, gStandardForm, gXIntercept, gYIntercept, gPointOnLine, gGraphToEquation, gXInterceptSI, gStandardFromPS];
 var R4 = [gZero, gRoot, gZeroMeaning, gClassifyEq, gZeroContext];
-var R5 = [gRateOfChange, gSlopeTwoPoints, gSlopeType, gMissingCoord, gLinearTable];
+var R5 = [gRateOfChange, gSlopeTwoPoints, gSlopeType, gMissingCoord, gLinearTable, gRateTable4, gSlopeUnknownZero, gDistTimeGraph];
 var R6 = [gIsArithmetic, gCommonDiff, gNextTerms, gNthTermEq, gNthTermValue, gWhichTerm, gSeqFunction];
 var ALLR2 = R1.concat(R2).concat(R3).concat(R4).concat(R5).concat(R6);
 
@@ -2738,34 +3230,34 @@ var GEN_AR = {
   gAbsEqNone: "ص39: قيمةٌ مطلقةٌ تساوي عددًا سالبًا ⇐ Ø",
   gAbsEqTwo: "ص39 مثال 2: |س + a| = b ⇐ حالتان",
   gAbsExpr: "ص41: حساب قيمة عبارةٍ فيها قيمٌ مطلقة",
+  gAbsFromNumLine: "ورقة المعلّم: من خطِّ الأعدادِ إلى معادلةِ القيمةِ المطلقة",
+  gAbsNumLinePick: "ورقة المعلّم: أيُّ خطوطِ الأعدادِ يمثّل حلَّ معادلةِ القيمةِ المطلقة",
   gAbsReal: "ص42: موقفٌ حياتيّ — مدًى مسموح",
   gAbsTerms9: "ص38–39: مفهوم القيمة المطلقة",
   gAxisPoint: "نقطة على المحاور أو نقطة الأصل",
   gClassifyEq: "معادلةٌ لها حلٌّ واحد / لا حلّ / متطابقة",
   gCommonDiff: "أساس المتتابعة",
-  /* gConsecFamily كان غائبًا عن هذا القاموس وهو المولّد العاملُ في H3،
-     فكان التقريرُ يطبع اسمَ الدالّةِ نفسَه: «gConsecFamily: -40 نقطة» —
-     ظهر في تقريرِ حسنٍ الذي أرسله الأب (٢٥ سبتمبر ٢٠٢٦). وgConsecInt
-     نداءٌ لها لا غير، فيأخذان الوسمَ نفسَه ليجتمع سجلُّ المهارةِ الواحدةِ
-     في خانةٍ واحدةٍ بدل أن يتفرّق نصفين. وgConsecOdd لم يبقَ في H3 بعد
-     الدمج، فوسمُه للسجلِّ القديمِ وحده. */
   gConsecFamily: "ص29: أعداد متتالية (صحيحة/فردية/زوجية)",
   gConsecInt: "ص29: أعداد متتالية (صحيحة/فردية/زوجية)",
-  gConsecOdd: "ص29 مثال 3: ثلاثة أعداد فردية متتالية",
   gDiscreteCont: "٢-٢: دالّة متّصلة أم منفصلة",
+  gDistTimeGraph: "ورقة المعلّم: تمثيلُ المسافةِ مع الزمن — ترجمتُه إلى كلام",
   gDomainRange: "المجال أو المدى لمجموعة أزواج مرتبة",
   gEqOrderOps: "ص13 مثال 2: حلّ معادلة بترتيب العمليات",
   gEqTerms9: "ص12–15: المصطلحات",
   gEqTwoVars: "ص14 مثال 5: معادلة بمتغيّرين — التعويض",
   gFuncCombo: "تركيب قيمتين: د(a) + د(b) أو د(a) − د(b)",
+  gFuncGraphYN: "ورقة المعلّم: اختبارُ الخطِّ الرأسيِّ على تمثيلٍ بيانيٍّ مرسوم",
+  gFuncTableYN: "ورقة المعلّم: هل الجدولُ يمثّل دالّة؟ (وتكرارُ ص لا يمنع)",
   gFuncValueLin: "قيمة دالة خطّية",
   gFuncValueQuad: "قيمة دالة غير خطّية (تربيعية)",
+  gGraphToEquation: "ورقة المعلّم: أيُّ معادلةٍ يمثّلها هذا المستقيمُ المارُّ بالأصل",
   gIdentityOrNone: "ص14 مثال 4: متطابقة أم بلا حلّ",
   gIndepDep: "٢-١: المتغيّر المستقلّ والتابع",
   gIsArithmetic: "أيّ المتتابعات حسابية؟",
   gIsFunction: "أيّ العلاقات تمثّل دالة؟ (واحدة فقط بلا تكرار في المجال)",
   gIsLinear: "أيّ المعادلات خطّية؟ (واحدة فقط)",
   gLinearTable: "هل الدالة خطّية؟ (ثبات معدّل التغيّر في جدول)",
+  gMapDiagram: "ورقة المعلّم: هل مخطَّطُ الأسهمِ يمثّل دالّة؟",
   gMissingCoord: "إيجاد إحداثيّ مجهول إذا عُلم الميل",
   gMoneyMulti: "ص29 مثال 2: مسألة نقود متعدّدة الخطوات",
   gMultiStep: "ص28 مثال 1: aس + b = c",
@@ -2785,12 +3277,15 @@ var GEN_AR = {
   gPropEquality: "ص21: تسمية الخاصيّة المستعملة",
   gQuadrant: "الربع الذي تقع فيه نقطة",
   gRateOfChange: "٢-٥: معدّل التغيّر من جدول",
+  gRateTable4: "ورقة المعلّم: معدّلُ التغيّرِ من جدولٍ بأربعةِ صفوف",
   gRoot: "جذر معادلة خطّية",
   gSeqFunction: "المتتابعة كدالة: المجال",
   gSlopeTwoPoints: "ميل المستقيم المارّ بنقطتين",
   gSlopeType: "نوع الميل: موجب أو سالب أو صفر أو غير معرّف",
+  gSlopeUnknownZero: "ورقة المعلّم: قيمةُ المجهولِ التي تجعل الميلَ صفرًا أو غيرَ معرّف",
   gSolutionSet: "ص15: مجموعة الحلّ من مجموعة تعويض",
   gStandardForm: "الصورة القياسية من ص = م س + ب",
+  gStandardFromPS: "ورقة المعلّم: الصورةُ القياسيّة من صيغةِ الميلِ ونقطة",
   gStepsOrder9: "ص34: خطوات حلّ المعادلة",
   gVarBothSides: "ص33 مثال 1: aس + b = cس + d",
   gVarClassify: "ص34: متطابقة أم لا حلّ لها",
@@ -2798,6 +3293,7 @@ var GEN_AR = {
   gVerticalTest: "اختبار الخط الرأسي — مفهوم",
   gWhichTerm: "ما الحدّ الذي قيمته كذا؟",
   gXIntercept: "المقطع السيني",
+  gXInterceptSI: "ورقة المعلّم: المقطعُ السينيُّ من صيغةِ ص = م س + ب",
   gYIntercept: "المقطع الصادي",
   gZero: "صفر الدالة الخطّية",
   gZeroContext: "٢-٢: صفر الدالّة في موقفٍ حياتيّ",
@@ -2886,7 +3382,12 @@ if(!NAMES[who]){
      يُقدَّم على الفصولِ كلّها ويُفتح أوّلَ ما تُفتح الصفحة، كما فُعل في
      «اختبار الغد» للغةِ أسامة. وهو تبويبٌ وحيدٌ في فصلِه فلا يزاحمه شيء. */
   CHAPS = Object.assign({ fatri:{ name:"📝 الفتري", ids:["fatri"],
-    unit:'\ud83d\udcdd <b>الاختبار الفتري</b> — الفصلان الأوّل والثاني كاملَين، ومن الثالث الدرس <span class="en">3-1</span> فقط · ١٥ سؤالًا · ٢٠ درجة' } }, CHAPS);
+    /* ═══ هذا السطرُ يُعرَض فوق التبويبِ فيلزم أن يطابق القائمة ═══
+       ضُيِّق المقرَّرُ بصورةِ الفهرس ورُفع المقاليُّ (٨ أكتوبر)، فبقي
+       هنا سطرٌ يقول «ومن الثالث الدرس ٣-١ · ١٥ سؤالًا» بعد أن خرج
+       الدرسُ وصارت الأسئلةُ عشرين — فيقرأ حسنٌ سطرًا ويُختبَر في غيره،
+       ومقدّمةُ اللوحةِ تحته تقول الصوابَ فيتناقض السطران في شاشةٍ واحدة. */
+    unit:'\ud83d\udcdd <b>الاختبار الفتري</b> — الفصلان الأوّل والثاني كاملَين · ٢٠ سؤالًا · ٢٠ درجة' } }, CHAPS);
   CFG.fatri = { tab:"الفتري 📝", gens:[], n:0, intro:"", label:"رياضيات م٣ — الفتري 📝" };
 
   var curCh = "fatri", curId = "fatri";
