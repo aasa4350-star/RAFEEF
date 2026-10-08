@@ -593,7 +593,7 @@ if(!NAMES[who]){
     var topic=null; for(var ti=0;ti<REMTOPICS.length;ti++){ if(REMTOPICS[ti].id===id){ topic=REMTOPICS[ti]; break; } }
     if(topic){
       html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الوحدة من قناة عين، ثم ابدأ الحل تحت.'+
-        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name)+' انجليزي')+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الوحدة</a></div></div>';
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الوحدة</a></div></div>';
     }
     html += '<div class="intro">'+c.intro+'</div>';
     /* سؤالان في الجولة يُكتب جوابُهما بدل الاختيار — انظر typed.js */
@@ -739,14 +739,26 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="english", REM_LABEL="الإنجليزي";
   var REMTOPICS=[
-    {id:"u1", name:"1) Family", tip:"راجع مفردات العائلة، ظروف التكرار (always/never)، والضمائر الملكية (mine/yours/hers).", yt:"شرح ظروف التكرار always usually never والضمائر الملكية انجليزي"},
-    {id:"u2", name:"2) Chores", tip:"الأعمال المنزلية (wash the dishes…)، المضارع المستمر (am/is/are + verb-ing)، والطلب بـ Can.", yt:"شرح المضارع المستمر present continuous am is are انجليزي"},
-    {id:"u3", name:"3) Stories", tip:"الماضي البسيط: أضف ed للأفعال المنتظمة، والنفي didn't، والسؤال Did you…? Yes I did / No I didn't.", yt:"شرح الماضي البسيط past simple did didn't انجليزي"},
-    {id:"u4", name:"4) After-School", tip:"الأفعال الشاذّة (go→went, see→saw)، الظروف (quick→quickly)، وأدوات الربط (and/but/because/so/when).", yt:"شرح الأفعال الشاذة في الماضي والظروف وأدوات الربط انجليزي"},
-    {id:"u5", name:"5) Outdoor", tip:"أماكن الطبيعة، verb+to مقابل verb+ing، وcould للقدرة في الماضي.", yt:"شرح verb to infinitive و verb ing و could انجليزي"},
-    {id:"u6", name:"6) Accidents", tip:"الأمراض والإصابات، must/have to/should + mustn't، والضمائر (something/anything/everything/nothing).", yt:"شرح must have to should mustn't انجليزي"},
-    {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل.", yt:"شرح العبارات الوصلية who which where whose relative clauses انجليزي"},
-    {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was).", yt:"شرح المستقبل be going to والفعل to be انجليزي"}
+    /* ═══ البحثُ يسمّي الدرسَ لا القاعدةَ ═══════════════════════════
+       بلاغُ الأب (٨ أكتوبر ٢٠٢٦): «درس أسامة في الإنجليزي Job Paths —
+       الشرح اللي أنت حاطّه من اليوتيوب يختلف عن الدرس».
+
+       وكان نصُّ البحثِ قاعدةً نحويّةً مجرّدةً («شرح question tags و may
+       might») بلا صفٍّ ولا اسمِ وحدة، فيردُّ يوتيوب دروسَ قواعدَ عامّةً
+       لأعمارٍ أخرى — لا شرحَ الوحدةِ التي بين يديه. وصفحتا رفيفٍ وحسنٍ
+       تحملان الصفَّ في نصِّ بحثِهما من قبلُ، وصفحتا أسامةَ وسعودٍ لا.
+       بل صفحةُ سعودٍ أشدّ: لا صفَّ في نصِّ بحثِها البتّة.
+
+       فصار النصُّ يسمّي الوحدةَ بعنوانِها ثمّ الصفَّ — وهكذا تُعنوَن
+       دروسُ المنهجِ على يوتيوب. */
+    {id:"u1", name:"1) Family", tip:"راجع مفردات العائلة، ظروف التكرار (always/never)، والضمائر الملكية (mine/yours/hers).", yt:"Unit 1 Family Events انجليزي رابع ابتدائي"},
+    {id:"u2", name:"2) Chores", tip:"الأعمال المنزلية (wash the dishes…)، المضارع المستمر (am/is/are + verb-ing)، والطلب بـ Can.", yt:"Unit 2 Chores انجليزي رابع ابتدائي"},
+    {id:"u3", name:"3) Stories", tip:"الماضي البسيط: أضف ed للأفعال المنتظمة، والنفي didn't، والسؤال Did you…? Yes I did / No I didn't.", yt:"Unit 3 Stories انجليزي رابع ابتدائي"},
+    {id:"u4", name:"4) After-School", tip:"الأفعال الشاذّة (go→went, see→saw)، الظروف (quick→quickly)، وأدوات الربط (and/but/because/so/when).", yt:"Unit 4 After-School Fun انجليزي رابع ابتدائي"},
+    {id:"u5", name:"5) Outdoor", tip:"أماكن الطبيعة، verb+to مقابل verb+ing، وcould للقدرة في الماضي.", yt:"Unit 5 Outdoor Fun انجليزي رابع ابتدائي"},
+    {id:"u6", name:"6) Accidents", tip:"الأمراض والإصابات، must/have to/should + mustn't، والضمائر (something/anything/everything/nothing).", yt:"Unit 6 House Accidents انجليزي رابع ابتدائي"},
+    {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل.", yt:"Unit 7 Wildlife انجليزي رابع ابتدائي"},
+    {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was).", yt:"Unit 8 Weather انجليزي رابع ابتدائي"}
   ];
   var ALL_IDS = ["all"];
 

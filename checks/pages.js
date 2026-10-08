@@ -312,6 +312,7 @@ function run(){
   issues.push(...fatriPath());
   issues.push(...clickExclusion());
   issues.push(...ytPath());
+  issues.push(...engVideoPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -610,6 +611,77 @@ function clickExclusion(){
         out.push({ sev:'خطأ', file:f, msg:'عاد الاستبعادُ بسرعةِ النقر — والأبُ رفعه عن الجميعِ إلّا فهد: ' +
                    'trusted: ' + cond.slice(0, 70) });
     }
+  }
+  return out;
+}
+
+/* ═══ شرحُ درسِ الإنجليزيِّ يسمّي الدرسَ والصفّ ══════════════════════
+   بلاغُ الأب (٨ أكتوبر ٢٠٢٦): «درس أسامة في الإنجليزي Job Paths — الشرح
+   اللي أنت حاطّه من اليوتيوب يختلف عن الدرس».
+
+   وكان نصُّ البحثِ قاعدةً نحويّةً مجرّدةً بلا صفٍّ ولا اسمِ وحدة، فيردُّ
+   يوتيوب دروسَ قواعدَ عامّةً لأعمارٍ أخرى. والعطبُ صامتٌ تمامًا: الزرُّ
+   يعمل، والصفحةُ تفتح، ولا يكشفه إلّا أن يجلس الطفلُ ليشاهد.
+
+   وظهر معه عيبٌ ثانٍ: الصفحةُ تبني الاستعلامَ في موضعين — زرِّ الوحدةِ
+   وبطاقةِ الضعف — وكان أحدهما يزيد كلمةَ «انجليزي» والآخرُ لا. فالدرسُ
+   الواحدُ له بحثان مختلفان بحسب الزرِّ المضغوط.
+
+   فهذا الحارسُ يفحص خمسةً: أنّ لكلّ درسٍ نصَّ بحثٍ غيرَ فارغ، وأنّه يحمل
+   صفَّ صاحبِه، وأنّ النصوصَ لا تتكرّر (فلا يُرسَل الولدُ إلى شرحِ درسٍ
+   ليس درسَه)، وأنّ الاستعلامَ يُبنى بصورةٍ واحدةٍ في المواضع كلِّها،
+   وأنّه بحثٌ لا معرّفُ فيديو (الفيديو يُحذف فينكسر الزرُّ صامتًا). */
+function engVideoPath(){
+  const SPEC = {
+    /* صفحتا أسامةَ وسعودٍ يسمّي بحثُهما الوحدةَ بعنوانِها (needTitle)،
+       وصفحتا رفيفٍ وحسنٍ تسمّيان القاعدةَ مع الصفِّ واسمِ السلسلة —
+       ولم يشكُ الأبُ منهما، فلا يُشترط فيهما العنوان. */
+    'english.html':  { grade:'رابع ابتدائي',  needTitle:true  },
+    'english5.html': { grade:'خامس ابتدائي', needTitle:true  },
+    'english8.html': { grade:'ثاني متوسط',   needTitle:false },
+    'english9.html': { grade:'ثالث متوسط',   needTitle:false }
+  };
+  const out = [];
+  for (const f of Object.keys(SPEC)){
+    const SP = SPEC[f], p = path.join(ROOT, f);
+    if (!fs.existsSync(p)) continue;
+    const src = fs.readFileSync(p, 'utf8');
+    const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+
+    const rows = [...src.matchAll(/\{id:"([^"]+)",\s*name:"([^"]+)"[\s\S]*?\}/g)]
+      .map(m => {
+        const seg = m[0];
+        const y = /yt:"([^"]*)"/.exec(seg);
+        return { id:m[1], name:m[2], yt: y ? y[1] : null };
+      });
+    if (!rows.length){ E('قائمةُ دروسِ الإنجليزيِّ (REMTOPICS) لا تُقرأ'); continue; }
+
+    const seen = {};
+    for (const r of rows){
+      if (!r.yt){ E('الدرس ' + r.name + ' بلا نصِّ بحثٍ — زرُّ الشرحِ يبحث باسمِ التبويبِ وحدَه'); continue; }
+      if (r.yt.indexOf(SP.grade) < 0)
+        E('نصُّ بحثِ «' + r.name + '» لا يذكر الصفَّ (' + SP.grade +
+          ') — فيردُّ يوتيوب شرحًا لعمرٍ آخر');
+      if (seen[r.yt]) E('درسان بنصِّ بحثٍ واحد: «' + r.name + '» و«' + seen[r.yt] + '»');
+      seen[r.yt] = r.name;
+      if (SP.needTitle){
+        /* العنوانُ ما بعد «١) » أو «Unit ١ — » */
+        const title = r.name.replace(/^[A-Za-z0-9]+\)\s*/, '').replace(/^Unit\s*\d+\s*[—-]\s*/, '').trim();
+        if (title && r.yt.indexOf(title) < 0)
+          E('نصُّ بحثِ «' + r.name + '» لا يسمّي الوحدةَ («' + title +
+            '») — فيُعرَض شرحُ قاعدةٍ لا شرحُ الدرس');
+      }
+    }
+
+    /* صورةُ الاستعلامِ واحدةٌ في المواضعِ كلِّها */
+    const qs = [...src.matchAll(/encodeURIComponent\('عين دروس '\+\([^)]*\)([^)]*)\)/g)].map(m => m[1]);
+    if (!qs.length) E('زرُّ شرحِ الدرسِ لا يُبنى — لا استعلامَ بحثٍ في الصفحة');
+    else if (new Set(qs).size > 1)
+      E('استعلامُ البحثِ يُبنى بصورتين مختلفتين (' + qs.map(x => '«'+x.trim()+'»').join(' و') +
+        ') — فللدرسِ الواحدِ بحثان بحسب الزرِّ المضغوط');
+
+    if (/youtube\.com\/watch\?v=|youtu\.be\//.test(src))
+      E('رابطُ فيديو بمعرّفٍ ثابت — يُحذف الفيديو فينكسر الزرُّ صامتًا، والبحثُ لا ينكسر');
   }
   return out;
 }

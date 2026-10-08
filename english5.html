@@ -570,7 +570,7 @@ if(!NAMES[who]){
     var topic=null; for(var ti=0;ti<REMTOPICS.length;ti++){ if(REMTOPICS[ti].id===id){ topic=REMTOPICS[ti]; break; } }
     if(topic){
       html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الوحدة من قناة عين، ثم ابدأ الحل تحت.'+
-        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name)+' انجليزي')+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الوحدة</a></div></div>';
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الوحدة</a></div></div>';
     }
     html += '<div class="intro">'+c.intro+'</div>';
     /* سؤالان في الجولة يُكتب جوابُهما بدل الاختيار — انظر typed.js */
@@ -716,11 +716,22 @@ if(!NAMES[who]){
   // ===== علاجي =====
   var REM_PAGE="english5", REM_LABEL="الإنجليزي";
   var REMTOPICS=[
-    {id:"w",  name:"W) Welcome", tip:"شهور السنة بالترتيب، والأعداد من 101 إلى 1000، والفرق بين How many (للعدد) وHow long (للمدّة)، ومراجعة الماضي البسيط وصيغة التفضيل the -est.", yt:"شرح How many How long والأعداد بالإنجليزي للأطفال"},
-    {id:"u1", name:"1) Personal Interests", tip:"الصفات (amazing/enormous/popular…)، والسابقة un- التي تقلب المعنى إلى ضدّه (friendly→unfriendly)، ومتى نستعمل المضارع البسيط (عادة) والماضي البسيط (انتهى)، وأفعال الحالة (like/know/believe) التي لا تأتي في المستمرّ.", yt:"شرح present simple vs past simple و state verbs"},
-    {id:"u2", name:"2) House Designs", tip:"مفردات البيت والتصميم، وwill للقرار في اللحظة والوعد، وbe going to للخطّة المرتّبة سلفًا أو الدليل الظاهر.", yt:"شرح الفرق بين will و be going to"},
-    {id:"u3", name:"3) Job Paths", tip:"أسماء المهن وأماكن العمل، واللاحقة -ist (art→artist)، وmay/might للاحتمال غير المؤكّد، وأسئلة الذيل: جملة مثبتة ⇐ ذيل منفيّ والعكس.", yt:"شرح question tags و may might بالإنجليزي"},
-    {id:"u4", name:"4) Glorious Food", tip:"أفعال الطبخ (measure/mix/pour/stir/bake)، وshould للنصيحة وhad better للتحذير الأقوى، والشرط الصفريّ للحقائق المتكرّرة: If + present, present.", yt:"شرح zero conditional و should had better"}
+    /* ═══ البحثُ يسمّي الدرسَ لا القاعدةَ ═══════════════════════════
+       بلاغُ الأب (٨ أكتوبر ٢٠٢٦): «درس أسامة في الإنجليزي Job Paths —
+       الشرح اللي أنت حاطّه من اليوتيوب يختلف عن الدرس».
+
+       وكان نصُّ البحثِ قاعدةً نحويّةً مجرّدةً («شرح question tags و may
+       might») بلا صفٍّ ولا اسمِ وحدة، فيردُّ يوتيوب دروسَ قواعدَ عامّةً
+       لأعمارٍ أخرى — لا شرحَ الوحدةِ التي بين يديه. وصفحتا رفيفٍ وحسنٍ
+       تحملان الصفَّ في نصِّ بحثِهما من قبلُ، وصفحتا أسامةَ وسعودٍ لا.
+
+       فصار النصُّ يسمّي الوحدةَ بعنوانِها ثمّ الصفَّ — وهكذا تُعنوَن
+       دروسُ المنهجِ على يوتيوب. */
+    {id:"w",  name:"W) Welcome", tip:"شهور السنة بالترتيب، والأعداد من 101 إلى 1000، والفرق بين How many (للعدد) وHow long (للمدّة)، ومراجعة الماضي البسيط وصيغة التفضيل the -est.", yt:"Welcome انجليزي خامس ابتدائي"},
+    {id:"u1", name:"1) Personal Interests", tip:"الصفات (amazing/enormous/popular…)، والسابقة un- التي تقلب المعنى إلى ضدّه (friendly→unfriendly)، ومتى نستعمل المضارع البسيط (عادة) والماضي البسيط (انتهى)، وأفعال الحالة (like/know/believe) التي لا تأتي في المستمرّ.", yt:"Unit 1 Personal Interests انجليزي خامس ابتدائي"},
+    {id:"u2", name:"2) House Designs", tip:"مفردات البيت والتصميم، وwill للقرار في اللحظة والوعد، وbe going to للخطّة المرتّبة سلفًا أو الدليل الظاهر.", yt:"Unit 2 House Designs انجليزي خامس ابتدائي"},
+    {id:"u3", name:"3) Job Paths", tip:"أسماء المهن وأماكن العمل، واللاحقة -ist (art→artist)، وmay/might للاحتمال غير المؤكّد، وأسئلة الذيل: جملة مثبتة ⇐ ذيل منفيّ والعكس.", yt:"Unit 3 Job Paths انجليزي خامس ابتدائي"},
+    {id:"u4", name:"4) Glorious Food", tip:"أفعال الطبخ (measure/mix/pour/stir/bake)، وshould للنصيحة وhad better للتحذير الأقوى، والشرط الصفريّ للحقائق المتكرّرة: If + present, present.", yt:"Unit 4 Glorious Food انجليزي خامس ابتدائي"}
   ];
   var ALL_IDS = ["all"];
 
