@@ -50,7 +50,15 @@
   }
 
   /* ── حالةُ التثبيت: مفتاحٌ لكلِّ طفلٍ ووحدة ── */
-  function memKey(id){ return "memo_en4_" + (window.who || "saud") + "_" + id; }
+  /* ═══ الوحدةُ تخدم أيَّ كتاب ═══════════════════════════════════════
+     كانت مربوطةً بـBOOK_EN4 وبـ«سعود» نصًّا، وقد طلب الأب (٨ أكتوبر
+     ٢٠٢٦) أن تُعادَ لحسنٍ من كتابِه. فصارت تقرأ الكتابَ من
+     window.STUDY_BOOK إن وُضِع، وإلّا فالرابعُ كما كان — فلا تتغيّر
+     صفحةُ سعودٍ بحرف. ومفتاحُ التخزينِ يحمل وسمَ الكتابِ مع اسمِ
+     الابن، فلا يلتقي «u1» من كتابٍ بـ«u1» من آخر. */
+  function BK(){ return window.STUDY_BOOK || window.BOOK_EN4 || null; }
+  function TAG(){ return window.STUDY_TAG || "en4"; }
+  function memKey(id){ return "memo_" + TAG() + "_" + (window.who || "saud") + "_" + id; }
   function memLoad(id){ try{ return JSON.parse(localStorage.getItem(memKey(id))) || {}; }catch(e){ return {}; } }
   function memSave(id, m){ try{ localStorage.setItem(memKey(id), JSON.stringify(m)); }catch(e){} }
 
@@ -296,11 +304,11 @@
   /* يُركَّب فوق أسئلةِ الوحدة: ينقل ما رسمته render() إلى قسم «أسئلة»
      ويضع أمامه شريطَ الأقسام. ويبقى القسمُ المختار إن أُعيد الرسم. */
   window.STUDY = {
-    has: function(id){ return !!(window.BOOK_EN4 && BOOK_EN4[id]); },
+    has: function(id){ var b=BK(); return !!(b && b[id]); },
     mount: function(sec, id){
       if(!this.has(id)) return;
       injectCss();
-      var unit = BOOK_EN4[id];
+      var unit = BK()[id];
       var qpane = document.createElement("div");
       while(sec.firstChild) qpane.appendChild(sec.firstChild);
       var bar = document.createElement("div"); bar.className = "st-bar";
