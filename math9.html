@@ -3146,75 +3146,24 @@ if(!NAMES[who]){
      ثمّ يُعرَض عليه الحلُّ النموذجيُّ بخطواته وسُلّمُ التصحيح، فيضع
      درجتَه بنفسه. ويُحفَظ نصُّه كما كتبه ليقرأه أبوه ويُراجع تقديره —
      فالتقديرُ الذاتيُّ تعلُّمٌ، والمراجعةُ ضمانُه. */
-  /* ═══ ضُيِّق إلى الفصلَين الأوّلِ والثاني — صورةُ الأب (٨ أكتوبر) ═══
-     كان المقرَّرُ أوّلَ مرّةٍ يشمل درسَ «الميلِ والمقطع» (٣-١) بنصِّ
-     طلبِه. ثمّ أرسل صورةَ الفهرسِ وقال «عدّل الأوّل»، وفيها الفصلان
-     الأوّلُ والثاني وحدَهما — فخرج ٣-١، وخرج معه السؤالُ المقاليُّ
-     القديمُ لأنّه كان مبنيًّا عليه (كتابةُ ص = م س + ب).
+  /* ═══ الفصلان الأوّلُ والثاني، وبلا مقاليّ ═════════════════════════
+     ضُيِّق المقرَّرُ أوّلًا بصورةِ الفهرس (٨ أكتوبر) فخرج درسُ الميلِ
+     والمقطع، ثمّ قال الأبُ «شِلّ» للسؤالِ المقاليِّ بعد أن قرأه.
 
-     والعددُ يبقى أربعةَ عشرَ والدرجةُ عشرين: دروسُ الفصلَين أحدَ عشرَ،
-     فثلاثةٌ منها سؤالان — «متعدّدةُ الخطوات» و«متغيّرٌ في الطرفين»
-     لأنّهما أساسُ الفصلِ الأوّل، و«معدّلُ التغيّرِ والميل» لأنّه أكثرُ
-     ما يُبنى عليه الفصلُ الثاني وما بعدَه. */
-  var FATRI_IDS = ["h1","h2","h3","h3","h4","h4","h5","r1","r2","r3","r4","r5","r5","r6"];
-  var FATRI_MCQ = FATRI_IDS.length;     /* ١٤ درجة */
-  var FATRI_ESSAY = 6;                  /* درجاتُ المقاليّ */
-  var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;   /* ٢٠ */
+     والدرجةُ تبقى عشرين — كإخوتِه الثلاثة — فلا تُنقَص إلى أربعَ عشرةَ.
+     فصارت عشرين سؤالًا، درجةٌ لكلٍّ، موزّعةً على أحدَ عشرَ درسًا:
+     سؤالان لكلّ درسٍ إلّا الدرسَين الافتتاحيَّين «١-١ المعادلات»
+     و«٢-١ العلاقات» فسؤالٌ لكلٍّ — فهما تمهيدٌ ومصطلحاتٌ لا مهارةٌ
+     تُمرَّن مرّتين. ٩ + ١١ = ٢٠.
 
-  /* السؤالُ المقاليّ: نقطتان على مستقيم — الميلُ ثمّ المعادلةُ ثمّ
-     المقطعان. يجمع ٢-٥ و٣-١ و٢-٣ في مسألةٍ واحدةٍ متّصلة، وهي صلبُ
-     المقرَّر. والأعدادُ تُختار ليخرج الميلُ والمقطعان صحيحةً بلا كسور. */
-  /* المقاليُّ لا يخرج عن الفصلَين: معادلةٌ ذاتُ متغيّرٍ في الطرفين
-     (١-٤) تُحلّ بخطواتِها ثمّ يُتحقَّق منها بالتعويض (١-١)، ثمّ جدولُ
-     دالّةٍ يُقرأ منه معدّلُ التغيّرِ (٢-٥) ويُحكَم أخطّيّةٌ هي أم لا
-     (٢-٢). والأعدادُ تُختار ليخرج الحلُّ عددًا صحيحًا بلا كسور. */
-  function fatriEssay(){
-    var A  = gp([3,4,5]);                 /* معاملُ القوس */
-    var B  = gp([2,3,4,5]);               /* ما داخلَ القوس */
-    var X  = gp([-3,-2,2,3,4,5]);         /* الحلُّ — يُختار أوّلًا */
-    var C  = (A-1)*X - A*B;               /* فيخرج الطرفُ الأيمنُ صحيحًا */
-    var M  = gp([2,3,4,-2,-3]);           /* ميلُ الجدول */
-    var K  = gp([-4,-2,1,3,5]);
-    var xs = [1,2,3], ys = xs.map(function(x){ return M*x + K; });
-    var S  = function(n){ return n<0 ? "− "+Math.abs(n) : "+ "+n; };
-    var SS = function(n){ return n<0 ? "−"+Math.abs(n) : String(n); };
-    /* السالبُ المطروحُ يُقوَّس: «−10 − (−7)» لا «−10 − −7» — وهي
-       الغلطةُ التي نحذّر منها في الميل، فلا نقع فيها في النموذج. */
-    var P  = function(n){ return n<0 ? "("+SS(n)+")" : String(n); };
-    var tbl = '<table style="width:100%;margin-top:8px;border-collapse:collapse;text-align:center">'+
-      '<tr><th style="border:1px solid var(--line);padding:6px;background:var(--bg)"><span class="ax">س</span></th>'+
-        xs.map(function(x){ return '<td style="border:1px solid var(--line);padding:8px;font-weight:800"><span class="ax">'+x+'</span></td>'; }).join('')+'</tr>'+
-      '<tr><th style="border:1px solid var(--line);padding:6px;background:var(--bg)"><span class="ax">ص</span></th>'+
-        ys.map(function(y){ return '<td style="border:1px solid var(--line);padding:8px;font-weight:800"><span class="ax">'+SS(y)+'</span></td>'; }).join('')+'</tr></table>';
-    var stem =
-      '<b>السؤال المقالي (٦ درجات):</b>'+
-      '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2">'+
-        '<li>حُلّ المعادلة <span class="ax">'+A+'(س − '+B+') = س '+S(C)+'</span> موضّحًا خطواتك. <span style="color:var(--muted)">(٣ درجات)</span></li>'+
-        '<li>تحقّق من صحّة حلّك <b>بالتعويض</b> في المعادلة الأصلية. <span style="color:var(--muted)">(درجة)</span></li>'+
-        '<li>الجدول التالي لدالّة:'+tbl+
-          'أوجد <b>معدّل التغيّر</b>، وهل العلاقة <b>دالّة خطّية</b>؟ ولماذا؟ <span style="color:var(--muted)">(درجتان)</span></li>'+
-      '</ol>';
-    var L = A*X - A*B;
-    var model =
-      '<b>الحلّ النموذجي:</b>'+
-      '<ol style="margin:8px 0 0;padding-inline-start:20px;line-height:2.1">'+
-        '<li><b>الحلّ:</b> نوزّع أوّلًا على القوس:<br>'+
-          '<span class="ax">'+A+'س − '+(A*B)+' = س '+S(C)+'</span><br>'+
-          'ننقل المتغيّر إلى طرفٍ والأعداد إلى الآخر:<br>'+
-          '<span class="ax">'+A+'س − س = '+SS(C)+' + '+(A*B)+'</span> ⟸ <span class="ax">'+(A-1)+'س = '+SS(C + A*B)+'</span><br>'+
-          'نقسم على معامل س: &nbsp;<span class="ax">س = '+SS(C+A*B)+' ÷ '+(A-1)+' = <b>'+SS(X)+'</b></span></li>'+
-        '<li><b>التحقّق:</b> نعوّض <span class="ax">س = '+SS(X)+'</span> في الأصلية:<br>'+
-          '<span class="ax">'+A+'('+SS(X)+' − '+B+') = '+A+'×'+P(X-B)+' = '+SS(L)+'</span> &nbsp;·&nbsp; '+
-          '<span class="ax">'+SS(X)+' '+S(C)+' = '+SS(X+C)+'</span> ⟸ الطرفان متساويان ✅</li>'+
-        '<li><b>معدّل التغيّر:</b> كلّما زادت <span class="ax">س</span> واحدًا تغيّرت <span class="ax">ص</span> بمقدار '+
-          '<span class="ax">'+SS(ys[1])+' − '+P(ys[0])+' = <b>'+SS(M)+'</b></span>، وكذلك بين الحدّين التاليين — '+
-          '<b>فالمعدّل ثابت</b>.<br><b>نعم، دالّة خطّية</b> — لأنّ معدّل تغيّرها ثابت، فتمثيلها البيانيّ مستقيم.</li>'+
-      '</ol>'+
-      '<div style="margin-top:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:11px;padding:10px 12px">'+
-        '<b>⚠️ أشهر غلطتين:</b> القسمةُ قبل التوزيع على القوس، '+
-        'والاكتفاءُ بقول «خطّية» بلا تعليل — والتعليلُ هو ثباتُ معدّل التغيّر.</div>';
-    return { stem:stem, model:model };
-  }
+     وأصغرُ بنكٍ في دروسِه أربعةُ مولّدات (٢-١)، فسؤالان منه لا
+     يتكرّران في الجولةِ الواحدة. */
+  var FATRI_IDS = ["h1","h2","h2","h3","h3","h4","h4","h5","h5",
+                   "r1","r2","r2","r3","r3","r4","r4","r5","r5","r6","r6"];
+  var FATRI_MCQ = FATRI_IDS.length;   /* ٢٠ */
+  var FATRI_ESSAY = 0;                /* لا مقاليَّ في اختبارِه */
+  var FATRI_TOTAL = FATRI_MCQ;        /* ٢٠ */
+
   function renderFatri(){
     var sec = panelOf("fatri");
     /* سؤالٌ لكلّ درسٍ من دروس المقرَّر بالترتيب — لا عشوائيًّا:
@@ -3225,15 +3174,14 @@ if(!NAMES[who]){
       var got = genN(CFG[id].gens, 1, seen);
       if(got.length) { got[0].__lesson = CFG[id].tab; items.push(got[0]); }
     });
-    var E = fatriEssay();
     var html =
       '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
         '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — الرياضيات</div>'+
-        '<b>١٥ سؤالًا · ٢٠ درجة.</b> أربعةَ عشرَ سؤالًا بدرجةٍ لكلٍّ، وسؤالٌ مقاليٌّ بستّ درجات.'+
+        '<b>٢٠ سؤالًا · ٢٠ درجة</b> — درجةٌ لكلّ سؤال.'+
         '<div style="margin-top:6px">📘 <b>المقرَّر:</b> الفصل الأول كاملًا (<span class="en">1-1</span> إلى <span class="en">1-5</span>) · '+
-        'الفصل الثاني كاملًا (<span class="en">2-1</span> إلى <span class="en">2-6</span>) · '+
-        'ومن الفصل الثالث: <b>الدرس <span class="en">3-1</span> فقط</b> (تمثيل المعادلات بصيغة الميل والمقطع بيانيًّا).</div>'+
-        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا. والمقاليُّ تكتب حلَّك بخطّك ثمّ يطلع لك الحلّ النموذجي.</div>'+
+        'والفصل الثاني كاملًا (<span class="en">2-1</span> إلى <span class="en">2-6</span>). '+
+        '<span style="color:var(--muted)">ولا شيء من الفصل الثالث.</span></div>'+
+        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
       '</div>';
     items.forEach(function(q,i){
       html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+' <span style="color:var(--muted);font-weight:600">· '+(q.__lesson||"")+' · درجة</span></div>'+
@@ -3242,34 +3190,25 @@ if(!NAMES[who]){
         '</div><div class="explain">'+q[3]+'</div></div>';
     });
     /* المقاليّ */
-    html += '<div class="q" data-essay><div class="num">سؤال '+(items.length+1)+' <span style="color:var(--muted);font-weight:600">· مقالي · ٦ درجات</span></div>'+
-      '<div class="stem">'+E.stem+'</div>'+
-      '<textarea data-etext rows="7" placeholder="اكتب حلّك هنا بخطواته..." style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:1rem;line-height:2;background:transparent;color:var(--ink)"></textarea>'+
-      '<button data-eshow style="margin-top:8px;background:var(--accent);color:#fff;border:0;padding:11px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">✅ خلّصت — أرني الحلّ النموذجي</button>'+
-      '<div data-emodel style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:12px 14px;line-height:2"></div>'+
-      '<div data-erub style="display:none;margin-top:10px"></div></div>';
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
       '<button class="reset">اختبار جديد 🔄</button>';
     sec.innerHTML = html; mergeMath(sec);
 
     var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
     sec._pid = pid; sec._frag = true;
-    var answered={}, correct=0, essayMark=null, essayText="", savedN=0, saved=false;
+    var answered={}, correct=0, savedN=0, saved=false;
     var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
     var scoreEl = sec.querySelector("[data-score]");
-    function marks(){ return correct + (essayMark||0); }
+    function marks(){ return correct; }
     function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
     function meta(){
       return { pid:pid, dur: Math.round((Date.now()-t0)/1000), fast: fastN,
                trusted: (fastN < Math.ceil(FATRI_MCQ/2)),
                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ,
-               /* نصُّ المقاليّ ودرجتُه الذاتيّة — يقرؤهما الأبُ ويُراجعهما */
-               essay: essayText.slice(0, 1200), essaySelf: essayMark, essayMax: FATRI_ESSAY };
+               mcq: correct, mcqTotal: FATRI_MCQ };
     }
     function save(force){
-      var n = Object.keys(answered).length;
-      var done = n===FATRI_MCQ && essayMark!=null;
+      var done = Object.keys(answered).length === FATRI_MCQ;
       if(!force && !done) return;
       if(savedN >= marks() && saved && !done) return;
       savedN = marks(); saved = true; if(done) sec._frag=false;
@@ -3294,40 +3233,12 @@ if(!NAMES[who]){
       });
     });
     /* المقاليّ: الحلُّ النموذجيُّ لا يظهر قبل أن يكتب — وإلّا نقله */
-    var eBtn = sec.querySelector("[data-eshow]"), eTa = sec.querySelector("[data-etext]");
-    eBtn.addEventListener("click", function(){
-      essayText = (eTa.value||"").trim();
-      if(essayText.length < 10){
-        eBtn.textContent = "✍️ اكتب حلّك أوّلًا";
-        setTimeout(function(){ eBtn.textContent = "✅ خلّصت — أرني الحلّ النموذجي"; }, 1800);
-        return;
-      }
-      eTa.readOnly = true; eBtn.disabled = true; eBtn.style.opacity = ".5";
-      var m = sec.querySelector("[data-emodel]"); m.style.display="block"; m.innerHTML = E.model; mergeMath(m);
-      var r = sec.querySelector("[data-erub]"); r.style.display="block";
-      r.innerHTML = '<div style="font-weight:800;margin-bottom:8px">⚖️ قارن حلّك بالنموذج وضع درجتك بصدق:</div>'+
-        '<div class="row" style="gap:7px;flex-wrap:wrap">'+
-        [[6,"الثلاثة كلّها صحيحة بخطواتها"],[4,"اثنان صحيحان"],[2,"واحد صحيح"],[0,"ما ضبط شي"]]
-          .map(function(p){ return '<button data-em="'+p[0]+'" style="flex:1;min-width:140px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;font-size:.9rem">'+p[0]+' — '+p[1]+'</button>'; }).join('')+
-        '</div><div style="color:var(--muted);font-size:.88rem;margin-top:8px;font-weight:600">درجتك هذي تطلع لأبوك مع نصّ حلّك — فيراجعها.</div>';
-      r.querySelectorAll("[data-em]").forEach(function(b){
-        b.addEventListener("click", function(){
-          if(essayMark!=null) return;
-          essayMark = +b.dataset.em;
-          r.querySelectorAll("[data-em]").forEach(function(x){ x.disabled=true; x.style.opacity=".45"; });
-          b.style.background="var(--accent)"; b.style.color="#fff"; b.style.opacity="1";
-          draw(); save();
-        });
-      });
-    });
     function savePartial(){
-      essayText = essayText || ((eTa && eTa.value)||"").trim();
-      var n = Object.keys(answered).length;
-      if(n<1 && essayMark==null) return;
+      if(Object.keys(answered).length < 1) return;
       save(true);
     }
     sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ && essayMark!=null; };
+    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
     draw();
   }
