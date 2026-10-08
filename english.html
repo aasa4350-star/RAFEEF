@@ -496,7 +496,13 @@ var U5 = [gNature, gNatureAr, gVing, gCould];
 var U6 = [gAil, gModal, gIndef];
 var U7 = [gWild, gRel, gComp];
 var U8 = [gWeatherV, gGoing, gToBeW];
-var ALL = U1.concat(U2).concat(U3).concat(U4).concat(U5).concat(U6).concat(U7).concat(U8);
+/* الفصلُ الدراسيُّ الأوّل = الوحدات 1–4 فقط (طلبُ الأب ٨ أكتوبر ٢٠٢٦: «هذي
+   الأربع حقّ الفصل الأوّل، والباقي احذفها حتى يبدأ الفصل الثاني، وعدّل
+   الاختبار الشامل»). مولّداتُ 5–8 باقيةٌ في الصفحة لم تُمسّ؛ تُخفى تبويباتُها
+   ويُقصر عليها الشاملُ وعلاجي. عند بدء الفصل الثاني: اجعل TERM2 = true. */
+var TERM2 = false;
+var ALL = U1.concat(U2).concat(U3).concat(U4);
+if(TERM2) ALL = ALL.concat(U5).concat(U6).concat(U7).concat(U8);
 
 /* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
    يحتاجه الاختبار الشامل ليُغذّي «علاجي» بنتيجة كلّ درسٍ على حدة. */
@@ -548,16 +554,16 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)</div>'+
+    '<div class="unit">'+(TERM2 ? '📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)' : '📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: الوحدات 1–4')+'</div>'+
     '<div class="tabs" role="tablist">'+
             '<button data-tab="u1" aria-selected="true">1) Family</button>'+
       '<button data-tab="u2" aria-selected="false">2) Chores</button>'+
       '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
       '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
-      '<button data-tab="u5" aria-selected="false">5) Outdoor</button>'+
+      (TERM2 ? '<button data-tab="u5" aria-selected="false">5) Outdoor</button>'+
       '<button data-tab="u6" aria-selected="false">6) Accidents</button>'+
       '<button data-tab="u7" aria-selected="false">7) Wildlife</button>'+
-      '<button data-tab="u8" aria-selected="false">8) Weather</button>'+
+      '<button data-tab="u8" aria-selected="false">8) Weather</button>' : '')+
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
@@ -566,10 +572,10 @@ if(!NAMES[who]){
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
     '<section class="panel" id="u4"></section>'+
-    '<section class="panel" id="u5"></section>'+
+    (TERM2 ? '<section class="panel" id="u5"></section>'+
     '<section class="panel" id="u6"></section>'+
     '<section class="panel" id="u7"></section>'+
-    '<section class="panel" id="u8"></section>'+
+    '<section class="panel" id="u8"></section>' : '')+
     '<section class="panel" id="rem"></section>'+
     '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
 
@@ -584,6 +590,7 @@ if(!NAMES[who]){
     u7:  {gens:U7,  n:10, intro:"<b>Unit 7 — Wildlife:</b> الحيوانات، العبارات الوصلية (who/which/where/whose)، المقارنة والتفضيل.", label:"إنجليزي و7 — Wildlife"},
     u8:  {gens:U8,  n:10, intro:"<b>Unit 8 — Weather:</b> الطقس، المستقبل (be going to)، الفعل to be (is/was).", label:"إنجليزي و8 — Weather"}
   };
+  if(!TERM2){ ["u5","u6","u7","u8"].forEach(function(k){ delete CFG[k]; }); }
 
   function render(id){
     var c = CFG[id], sec = document.getElementById(id);
@@ -760,6 +767,7 @@ if(!NAMES[who]){
     {id:"u7", name:"7) Wildlife", tip:"الحيوانات، العبارات الوصلية (who/which/where/whose)، والمقارنة والتفضيل.", yt:"Unit 7 Wildlife انجليزي رابع ابتدائي"},
     {id:"u8", name:"8) Weather", tip:"الطقس، المستقبل be going to، والفعل to be (is/was).", yt:"Unit 8 Weather انجليزي رابع ابتدائي"}
   ];
+  if(!TERM2) REMTOPICS = REMTOPICS.filter(function(t){ return ["u5","u6","u7","u8"].indexOf(t.id)<0; });
   var ALL_IDS = ["all"];
 
   /* ═══ الاختبار الشامل يُغذّي «علاجي» ═══════════════════════════
