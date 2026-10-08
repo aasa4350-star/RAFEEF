@@ -2096,7 +2096,9 @@ if(!NAMES[who]){
     var SKILLS={}, ITEMS=[], __t0=Date.now(), __lastTs=__t0, __fastN=0;
     function __meta(n){
       return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
-               trusted: (__fastN < Math.ceil(n/2)),
+               /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر): «شِلّ الخاصّية
+                  هذي منهم كلّهم ما عدا فهد». وتبقى fast محفوظةً فتُقرأ ولا يُحذف بها شيء. */
+               trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS };
     }
     /* وسمُ بنكِ الدرسِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع اسمِ

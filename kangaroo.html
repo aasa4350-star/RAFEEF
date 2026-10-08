@@ -1731,7 +1731,7 @@ if(!NAMES[who]){
       var fn=(items[i] && items[i]._fn);
       if(fn){ var r=srRound[fn] || (srRound[fn]={c:0,t:0}); r.t++; if(ok) r.c++; }
     }
-    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:(fast<Math.ceil(n/2)), skills:skills, pid:pid}; }
+    function meta(n){ return {dur:Math.round((Date.now()-t0)/1000), fast:fast, trusted:true /* لا استبعادَ بسرعةِ النقر — طلبُ الأب ٧ أكتوبر */, skills:skills, pid:pid}; }
     function savePartial(){ var n=Object.keys(answered).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, n, meta(n)); }
     sec._leave = savePartial; sec._done=function(){ return saved; };
     function afterAnswer(){ var now=Date.now(); if(now-lastTs<1500) fast++; lastTs=now; scoreEl.textContent = correct+" / "+total; if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; sec._frag=false; srCommit(kind, srRound); srRound={}; saveScore(c.label, correct, total, meta(total)); } }

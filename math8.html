@@ -1448,7 +1448,9 @@ if(!NAMES[who]){
     var SKILLS={}, ITEMS=[], __t0=Date.now(), __lastTs=__t0, __fastN=0;
     function __meta(n){
       return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
-               trusted: (__fastN < Math.ceil(n/2)),
+               /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر): «شِلّ الخاصّية
+                  هذي منهم كلّهم ما عدا فهد». وتبقى fast محفوظةً فتُقرأ ولا يُحذف بها شيء. */
+               trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS };
     }
     /* وسمُ بنكِ الدرسِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع اسمِ
@@ -1684,7 +1686,14 @@ if(!NAMES[who]){
     function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
     function meta(){
       return { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-               trusted: (fastN < Math.ceil(FATRI_MCQ/2)),
+               /* ═══ لا استبعادَ بسرعةِ النقرِ هنا ═══════════════════════
+                  طلبُ الأب (٧ أكتوبر ٢٠٢٦) بعد أن رأى حسنًا يُستبعَد وقد
+                  أصاب ١٣ من ١٣: «شِلّ الخاصّية هذي منهم كلّهم ما عدا فهد».
+                  وكانت باقيةً في اختبارات الفتري الأربعة سهوًا، فتُسقِط
+                  الجلسةَ من المعدَّلِ في صفحةِ الأبِ بلا أن يطلبَ ذلك.
+                  وتبقى fast وdur محفوظتين فيرى الأبُ السرعةَ إن أرادها،
+                  ولكن لا يُبنى عليها حكمٌ يحذف درجةَ ابنِه. */
+               trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
                mcq: correct, mcqTotal: FATRI_MCQ };
     }

@@ -903,7 +903,9 @@ if(!NAMES[who]){
     var SKILLS={}, ITEMS=[], __t0=Date.now(), __lastTs=__t0, __fastN=0;
     function __meta(n){
       return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
-               trusted: (__fastN < Math.ceil(n/2)),
+               /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر): «شِلّ الخاصّية
+                  هذي منهم كلّهم ما عدا فهد». وتبقى fast محفوظةً فتُقرأ ولا يُحذف بها شيء. */
+               trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS };
     }
     /* وسمُ بنكِ الدرسِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع اسمِ
@@ -1075,7 +1077,7 @@ if(!NAMES[who]){
      والتوزيعُ يختلف عن اختبارِ حسن ورفيف بالضرورة: فصولُه خمسةٌ لا
      دروسٌ مفردة، فثلاثةُ أسئلةٍ لكلّ فصلٍ (خمسةَ عشرَ) ومقاليٌّ بخمس
      — والمجموعُ عشرون كما طلب، وكما في اختبارَي أخويه. */
-  var FATRI_IDS = ["pv","f1","f2","f3","f4"];
+  var FATRI_IDS = ["f2"];
   /* ═══ رُفع السؤالُ المقاليُّ — طلبُ الأب (٧ أكتوبر ٢٠٢٦) ════════════
      «بالنسبة للفتري حقّ أسامة، شِلّ السؤال المقالي».
 
@@ -1085,10 +1087,22 @@ if(!NAMES[who]){
 
      وأصغرُ بنكٍ في فصولِه خمسةُ مولّدات (الجمعُ والطرح)، فأربعةٌ منه
      لا تُكرّر سؤالًا في الجولةِ الواحدة. */
-  var FATRI_PER = 4;
-  var FATRI_MCQ = FATRI_IDS.length * FATRI_PER;   /* ٢٠ */
+  /* ═══ حُصِر في الجمعِ والطرحِ وحدَه، وصار السؤالُ بدرجتين ═══════════
+     طلبُ الأب (٨ أكتوبر ٢٠٢٦): «بالنسبة لسعود وأسامة، الاختبار الفتري
+     عندهم هو الفصل الثاني اللي هو الجمع والطرح فقط. حط ١٠ أسئلة فقط من
+     ٢٠ درجة، ولا تكتب اسم الدرس في الاختبار».
+
+     فالمقرَّرُ فصلٌ واحد، والأسئلةُ عشرةٌ لا عشرون، والدرجةُ تبقى عشرين
+     — فالسؤالُ بدرجتين. وهذا أوّلُ اختبارٍ هنا تختلف فيه الدرجةُ عن عددِ
+     الأسئلة، فمِن ثَمَّ FATRI_MARK ولا يُحسب المجموعُ من العددِ وحدَه.
+
+     ورُفع اسمُ الدرسِ من فوقِ السؤالِ ومن سطرِ المقرَّرِ في المقدّمة —
+     وبقي الوسمُ في الحفظ (__lesson) فلا يفقد تقريرُ الأبِ تفصيلَه. */
+  var FATRI_PER = 10;
+  var FATRI_MCQ = FATRI_IDS.length * FATRI_PER;   /* ١٠ */
+  var FATRI_MARK = 2;                             /* درجتان لكلّ سؤال */
   var FATRI_ESSAY = 0;                            /* لا مقاليَّ في اختبارِه */
-  var FATRI_TOTAL = FATRI_MCQ;                    /* ٢٠ */
+  var FATRI_TOTAL = FATRI_MCQ * FATRI_MARK;       /* ٢٠ */
 
   function renderFatri(){
     var sec = document.getElementById("fatri");
@@ -1100,12 +1114,11 @@ if(!NAMES[who]){
     var html =
       '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
         '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — الرياضيات</div>'+
-        '<b>٢٠ سؤالًا · ٢٠ درجة</b> — أربعةٌ لكلّ فصل، ودرجةٌ لكلّ سؤال.'+
-        '<div style="margin-top:6px">📘 <b>المقرَّر:</b> '+FATRI_IDS.map(function(id){ return FATRI_AR[id]; }).join(' · ')+'</div>'+
+        '<b>١٠ أسئلة · ٢٠ درجة</b> — درجتان لكلّ سؤال.'+
         '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
       '</div>';
     items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+' <span style="color:var(--muted);font-weight:600">· '+(q.__lesson||"")+' · درجة</span></div>'+
+      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+' <span style="color:var(--muted);font-weight:600">· درجتان</span></div>'+
         '<div class="stem">'+q[0]+'</div><div class="opts">'+
         q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
         '</div><div class="explain">'+q[3]+'</div></div>';
@@ -1119,11 +1132,18 @@ if(!NAMES[who]){
     var answered={}, correct=0, savedN=0, saved=false;
     var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
     var scoreEl = sec.querySelector("[data-score]");
-    function marks(){ return correct; }
+    function marks(){ return correct * FATRI_MARK; }
     function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
     function meta(){
       return { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-               trusted: (fastN < Math.ceil(FATRI_MCQ/2)),
+               /* ═══ لا استبعادَ بسرعةِ النقرِ هنا ═══════════════════════
+                  طلبُ الأب (٧ أكتوبر ٢٠٢٦) بعد أن رأى حسنًا يُستبعَد وقد
+                  أصاب ١٣ من ١٣: «شِلّ الخاصّية هذي منهم كلّهم ما عدا فهد».
+                  وكانت باقيةً في اختبارات الفتري الأربعة سهوًا، فتُسقِط
+                  الجلسةَ من المعدَّلِ في صفحةِ الأبِ بلا أن يطلبَ ذلك.
+                  وتبقى fast وdur محفوظتين فيرى الأبُ السرعةَ إن أرادها،
+                  ولكن لا يُبنى عليها حكمٌ يحذف درجةَ ابنِه. */
+               trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
                mcq: correct, mcqTotal: FATRI_MCQ };
     }
