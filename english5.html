@@ -12,6 +12,7 @@
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
+<script src="fatri-en5.js?v=20261009"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
      كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
@@ -115,6 +116,20 @@ function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function opt(correct, others){ var o=[correct].concat(others); shuffle(o); return [o, o.indexOf(correct)]; }
 function en(s){ return '<span class="en">'+s+'</span>'; }
+/* ═══ نصُّ السؤالِ الإنجليزيُّ يُعزَل يساريًّا ═══════════════════════
+   الصفحةُ يمينيّةُ الاتّجاه، ونصوصُ الأسئلةِ إنجليزيّةٌ بلا عزل — فالنقطتان
+   وعلامةُ الاستفهامِ محايدتان في خوارزميّة الاتّجاه فتُرسمان في الطرفِ
+   الخطأ: «Complete the recipe step:» تُرسَم «‏:Complete the recipe step»
+   و«‏…common?» تُرسَم «‏?…common». قِيس بمواضعِ المحارفِ لا بالنظر.
+
+   فما خلا من العربيّةِ يُلفّ في bdi يساريّ، وما فيه عربيّةٌ يُترك لأنّ
+   سياقَه يمينيٌّ أصلًا. */
+function stemLtr(h){
+  var plain = String(h).replace(/<[^>]*>/g, "");
+  if(/[\u0600-\u06FF]/.test(plain)) return h;
+  return '<bdi dir="ltr" style="display:block;text-align:left">' + h + '</bdi>';
+}
+
 // مشتّتات مميّزة من نفس القائمة (تستبعد القيمة الصحيحة وتحذف المكرّر)
 function dist(pool, item, idx, n){ var correct=item[idx], seen={}, o=[]; pool.forEach(function(x){ var v=x[idx]; if(v!==correct && !seen[v]){ seen[v]=1; o.push(v); } }); shuffle(o); return o.slice(0, n||2); }
 function normEN(s){ return String(s||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); }
@@ -534,9 +549,14 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English · الفصل الأول</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a></div>'+
-    '<div class="unit">📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)</div>'+
+    /* ═══ السطرُ يطابق ما في الصفحة ═══════════════════════════════════
+       كان يقول «٨ وحدات كاملة (Part 1 + Part 2)» والتبويباتُ أربعٌ
+       وWelcome، والتذييلُ تحته يقول «الفصل الأول: Welcome + Units 1–4».
+       فيقرأ أسامةُ في شاشةٍ واحدةٍ أنّ مقرَّرَه ثمانٍ وأنّه أربع. */
+    '<div class="unit">📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: <span class="en">Welcome</span> والوحدات <span class="en">1–4</span></div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="w" aria-selected="true">W) Welcome</button>'+
+            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
+      '<button data-tab="w" aria-selected="false">W) Welcome</button>'+
       '<button data-tab="u1" aria-selected="false">1) Personal Interests</button>'+
       '<button data-tab="u2" aria-selected="false">2) House Designs</button>'+
       '<button data-tab="u3" aria-selected="false">3) Job Paths</button>'+
@@ -544,8 +564,9 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
+    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel active" id="w"></section>'+
+    '<section class="panel" id="w"></section>'+
     '<section class="panel" id="u1"></section>'+
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
@@ -576,7 +597,7 @@ if(!NAMES[who]){
     /* سؤالان في الجولة يُكتب جوابُهما بدل الاختيار — انظر typed.js */
     var typedPick = (window.TYPED ? TYPED.pick(items, 2, "en", function(q){ return q[1][q[2]]; }) : {});
     items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"'+(typedPick[i]?' data-typed="1"':'')+'><div class="num">Q'+(i+1)+'</div><div class="stem">'+q[0]+'</div>';
+      html += '<div class="q" data-i="'+i+'"'+(typedPick[i]?' data-typed="1"':'')+'><div class="num">Q'+(i+1)+'</div><div class="stem">'+stemLtr(q[0])+'</div>';
       if(typedPick[i]){ html += TYPED.inputHtml("en"); }
       else {
         html += '<div class="opts">';
@@ -794,7 +815,16 @@ if(!NAMES[who]){
   }
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
-  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"w"}}).dataset.tab);
+  /* ═══ الفتري أوّلَ ما تُفتح الصفحة ════════════════════════════════
+     طلبُ الأب (٩ أكتوبر ٢٠٢٦) بملفِّ المعلّم: «حطّ نفس النموذج هذا فتري
+     لأسامة في الإنجليزي». وهو اختبارُه القريب، فيُقدَّم كما قُدِّم فتريُّ
+     إخوتِه في صفحاتِ الرياضيات. */
+  (function(){
+    var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"fatri"}}).dataset.tab;
+    if(first === "fatri"){
+      if(window.FATRI_EN5) FATRI_EN5.render(document.getElementById("fatri"));
+    } else render(first);
+  })();
 
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
@@ -803,7 +833,9 @@ if(!NAMES[who]){
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
-      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+      if(id==="rem"){ renderRem(); }
+      else if(id==="fatri"){ if(window.FATRI_EN5 && (!pan.innerHTML || (pan._done && pan._done()))) FATRI_EN5.render(pan); }
+      else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });

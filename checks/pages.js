@@ -316,6 +316,7 @@ function run(){
   issues.push(...ytPath());
   issues.push(...engVideoPath());
   issues.push(...bookStudyPath());
+  issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -647,6 +648,85 @@ function clickExclusion(){
    ٣) تعديلُ ملفِّ الكتابِ بلا إعادةِ توليدِ الـPDF: الورقةُ في يدِ الطفلِ
       أسابيعَ، فيحفظ منها ما ليس في الشاشة. ولذلك تُحفَظ بصمةُ المصدرِ في
       pdf/manifest.json ساعةَ التوليد، وتُقارَن هنا. */
+/* ═══ فتريُّ الإنجليزيِّ لأسامة — على نموذجِ ورقةِ المعلّم ═══════════
+   أرسل الأبُ (٩ أكتوبر ٢٠٢٦) ملفَّ المعلّمِ وقال: «حطّ نفس النموذج هذا».
+   والورقةُ ستّةُ أقسامٍ بدرجاتٍ معلومةٍ مجموعُها عشرون:
+
+     General questions 4 · Controlled Writing 1 · Reading short sentence 4
+     Grammar 4 · Vocabulary 5 · Orthography 2
+
+   و«النموذج» هو هذه الأقسامُ بأوزانِها — فلو تغيّر وزنُ قسمٍ أو سقط قسمٌ
+   لم يعد الاختبارُ نموذجَ معلّمِه، ولا يظهر ذلك في الصفحة: تبقى عشرون
+   بندًا وتبقى الدرجةُ عشرين. فيُقرأ الجدولُ من الملفِّ ويُقارن بالورقة. */
+function fatriEn5Path(){
+  const out = [];
+  const f = 'fatri-en5.js', page = 'english5.html';
+  const fp = path.join(ROOT, f), pp = path.join(ROOT, page);
+  if (!fs.existsSync(fp)){ out.push({ sev:'خطأ', file:f, msg:'ملفُّ الفتري مفقود' }); return out; }
+  const src = fs.readFileSync(fp, 'utf8');
+  const E  = m => out.push({ sev:'خطأ', file:f, msg:m });
+  const EP = m => out.push({ sev:'خطأ', file:page, msg:m });
+
+  /* الورقةُ كما وصلت — الاسمُ والدرجةُ وعددُ البنود */
+  const WANT = [
+    ['gq', 'General questions',      4],
+    ['cw', 'Controlled Writing',     1],
+    ['rs', 'Reading short sentence', 4],
+    ['gr', 'Grammar',                4],
+    ['vo', 'Vocabulary',             5],
+    ['or', 'Orthography',            2]
+  ];
+  const m = /var SECTS = \[([\s\S]*?)\n  \];/.exec(src);
+  if (!m) E('جدولُ الأقسامِ (SECTS) لا يُقرأ');
+  else {
+    const rows = [...m[1].matchAll(/\["(\w+)",\s*"([^"]+)",\s*(\d+)\]/g)]
+      .map(g => [g[1], g[2], +g[3]]);
+    if (rows.length !== WANT.length)
+      E('أقسامُ الفتري ' + rows.length + ' والنموذجُ ' + WANT.length);
+    WANT.forEach((w, i) => {
+      const r = rows[i];
+      if (!r) return;
+      if (r[0] !== w[0] || r[1] !== w[1])
+        E('القسم ' + (i+1) + ' «' + r[1] + '» والنموذجُ «' + w[1] + '»');
+      else if (r[2] !== w[2])
+        E('درجةُ «' + w[1] + '» ' + r[2] + ' والنموذجُ ' + w[2]);
+    });
+    const sum = rows.reduce((a, r) => a + r[2], 0);
+    if (sum !== 20) E('مجموعُ درجاتِ الأقسامِ ' + sum + ' والورقةُ من ٢٠');
+    /* كلُّ قسمٍ يُولَّد بعددِ درجتِه — وإلّا اختلّ الوزنُ بلا أثرٍ ظاهر */
+    rows.forEach(r => {
+      const pat = r[0] === 'cw' ? /pick\(REORDER, 1\)/
+                : r[0] === 'gq' ? /pick\(QA, 4\)/
+                : r[0] === 'or' ? /pick\(SPELL, 2\)/
+                : null;
+      if (pat && !pat.test(src))
+        E('قسم «' + r[1] + '» لا يُولّد ' + r[2] + ' بندًا كما في النموذج');
+    });
+    if (!/gen\(\[[^\]]*\],\s*2,\s*"rs"/.test(src)) E('قسمُ القراءةِ لا يُولّد بندَي الاختيار');
+    if (!/gen\(\[[^\]]*\],\s*4,\s*"gr"/.test(src)) E('قسمُ القواعدِ لا يُولّد أربعةَ بنود');
+    if (!/gen\(\[[^\]]*\],\s*5,\s*"vo"/.test(src)) E('قسمُ المفرداتِ لا يُولّد خمسةَ بنود');
+    if (!/TICK, 2/.test(src)) E('قسمُ القراءةِ لا يُولّد بندَي ✓/✗');
+  }
+  if (!/var TOTAL = 20;/.test(src)) E('الدرجةُ ليست من ٢٠');
+  if (src.indexOf('saveScore("إنجليزي خ٥ — الفتري 📝", correct, TOTAL') < 0)
+    E('الدرجةُ لا تُحفَظ من ٢٠ باسمِ الاختبارِ الصحيح');
+  /* نصُّ السؤالِ الإنجليزيُّ يُعزَل، وإلّا رُسمت النقطتان في الطرفِ الخطأ */
+  if (!/function stemLtr\(/.test(src) || !/stemLtr\(q\.stem\)/.test(src))
+    E('نصُّ السؤالِ غيرُ معزولٍ يساريًّا — تُرسم «:Complete» بدل «Complete:»');
+
+  if (!fs.existsSync(pp)) return out;
+  const psrc = fs.readFileSync(pp, 'utf8');
+  if (psrc.indexOf('src="fatri-en5.js') < 0) EP('لا تُحمّل fatri-en5.js');
+  if (!/data-tab="fatri"/.test(psrc))        EP('لا تبويبَ للفتري');
+  if (!/id="fatri"/.test(psrc))              EP('لا لوحةَ للفتري');
+  if (!/FATRI_EN5\.render\(/.test(psrc))     EP('لوحةُ الفتري لا تُرسَم');
+  if (!/data-tab="fatri" aria-selected="true"/.test(psrc))
+    EP('الفتري ليس التبويبَ المفتوحَ أوّلًا');
+  if (!/function stemLtr\(/.test(psrc) || !/stemLtr\(q\[0\]\)/.test(psrc))
+    EP('نصُّ سؤالِ الوحداتِ غيرُ معزولٍ يساريًّا — تُرسم «:Complete» بدل «Complete:»');
+  return out;
+}
+
 function bookStudyPath(){
   const out = [];
   const SPEC = [
