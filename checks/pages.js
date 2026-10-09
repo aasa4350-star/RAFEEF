@@ -13,7 +13,9 @@
    لماذا vm لا متصفّح: هذا الفحص يجب أن يعمل في أيّ جلسةٍ ولو بلا
    Chromium. والفحص البصريّ يبقى يدويًّا عند تغيير التصميم.
    ============================================================ */
-const fs = require('fs'), path = require('path'), vm = require('vm');
+const fs = require('fs'), path = require('path'), vm = require('vm')
+/* crypto العامّ في Node هو WebCrypto ولا createHash فيه — فيُطلَب الوحدة */
+const nodeCrypto = require('crypto');
 const ROOT = path.join(__dirname, '..');
 
 const LOW_CAPACITY = 12;      /* أقلّ من هذا يُعدّ قابلًا للحفظ */
@@ -313,6 +315,7 @@ function run(){
   issues.push(...clickExclusion());
   issues.push(...ytPath());
   issues.push(...engVideoPath());
+  issues.push(...bookStudyPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -631,6 +634,118 @@ function clickExclusion(){
    صفَّ صاحبِه، وأنّ النصوصَ لا تتكرّر (فلا يُرسَل الولدُ إلى شرحِ درسٍ
    ليس درسَه)، وأنّ الاستعلامَ يُبنى بصورةٍ واحدةٍ في المواضع كلِّها،
    وأنّه بحثٌ لا معرّفُ فيديو (الفيديو يُحذف فينكسر الزرُّ صامتًا). */
+/* ═══ مادّةُ الكتابِ وشريطُ احفظ·ثبّت·جمل وملفّاتُ الطباعة ═══════════
+   طلبُ الأب (٨ و٩ أكتوبر ٢٠٢٦): «في كلّ درس حطّ حفظ كلماته وجمله وتثبيت
+   وتمارين»، ثمّ «نفسه لحسن من كتابه»، ثمّ «ملف PDF للكلمات والجمل».
+
+   وثلاثةُ أشياءَ تنكسر هنا بلا صوت:
+
+   ١) وحدةٌ في الكتابِ لا درسَ لها في الصفحة (أو العكس): الشريطُ لا يُركَّب
+      فيبقى الدرسُ أسئلةً بلا حفظٍ ولا تثبيت، ولا يظهر خطأ.
+   ٢) معنًى عربيٌّ فيه نصٌّ لاتينيّ: يُعرَض خيارًا في «ثبّت» فيلتبس على
+      الطفلِ ويدلُّه على الجواب. وقع في ستَّ عشرةَ مدخلةٍ عند أوّلِ بناء.
+   ٣) تعديلُ ملفِّ الكتابِ بلا إعادةِ توليدِ الـPDF: الورقةُ في يدِ الطفلِ
+      أسابيعَ، فيحفظ منها ما ليس في الشاشة. ولذلك تُحفَظ بصمةُ المصدرِ في
+      pdf/manifest.json ساعةَ التوليد، وتُقارَن هنا. */
+function bookStudyPath(){
+  const out = [];
+  const SPEC = [
+    { book:'book-en4.js', global:'BOOK_EN4', tag:'en4', page:'english.html' },
+    { book:'book-en9.js', global:'BOOK_EN9', tag:'en9', page:'english9.html' }
+  ];
+  let man = null;
+  const manPath = path.join(ROOT, 'pdf', 'manifest.json');
+  if (fs.existsSync(manPath)){ try { man = JSON.parse(fs.readFileSync(manPath,'utf8')); } catch(e){} }
+
+  for (const S of SPEC){
+    const bp = path.join(ROOT, S.book), pp = path.join(ROOT, S.page);
+    if (!fs.existsSync(bp) || !fs.existsSync(pp)) continue;
+    const raw = fs.readFileSync(bp, 'utf8');
+    const E = m => out.push({ sev:'خطأ', file:S.book, msg:m });
+    const EP = m => out.push({ sev:'خطأ', file:S.page, msg:m });
+
+    let book = null;
+    try { const sb = { window:{} }; vm.createContext(sb); vm.runInContext(raw, sb); book = sb.window[S.global]; }
+    catch(e){ E('لا يُقوَّم: ' + String(e.message).slice(0,70)); continue; }
+    if (!book || typeof book !== 'object'){ E(S.global + ' غير معرَّف'); continue; }
+
+    /* ── شكلُ المادّة ── */
+    const isSent = e => /[.?!]$/.test(e) && String(e).trim().split(/\s+/).length >= 3;
+    const ids = Object.keys(book);
+    for (const id of ids){
+      const u = book[id];
+      if (!u || !u.title || !u.ar || !Array.isArray(u.sections) || !u.sections.length){
+        E('الوحدة ' + id + ' ناقصةُ الحقول (title / ar / sections)'); continue; }
+      u.sections.forEach(sec => {
+        if (!sec || !sec.t || !Array.isArray(sec.items) || !sec.items.length){
+          E('قسمٌ بلا عنوانٍ أو بلا عناصرَ في ' + id); return; }
+        sec.items.forEach(it => {
+          if (!Array.isArray(it) || it.length !== 2 || typeof it[0] !== 'string' || typeof it[1] !== 'string'
+              || !it[0].trim() || !it[1].trim()){
+            E('عنصرٌ ليس زوجًا [إنجليزي، عربي] في ' + id + ' · ' + sec.t); return; }
+          if (!/[؀-ۿ]/.test(it[1]))
+            E('معنًى بلا عربيّة: «' + it[0] + '» ← «' + it[1] + '»');
+          /* سطرُ القاعدةِ يُعرَض في «احفظ» ولا يدخل «ثبّت»، فله أن يحمل أمثلةً
+             لاتينيّة. وغيرُه يصير خيارًا، فالمعنى فيه عربيٌّ خالص. */
+          /* ‏study-en4.js تقشر بادئتَي «منتظم:» و«شاذ:» قبل العرض وتُبقي ما
+             بعدهما وصفًا للتصريف («نضيف ed») — فهو مقصودٌ لا تسرُّبًا،
+             والحارسُ يتبع قاعدةَ الوحدةِ نفسِها لا قاعدةً أشدَّ منها. */
+          if (!/^قاعدة/.test(it[1]) && !/^(منتظم|شاذ):/.test(it[1])
+              && !isSent(it[0]) && /[A-Za-z]/.test(it[1]))
+            E('معنًى فيه نصٌّ لاتينيٌّ يُعرَض خيارًا في «ثبّت» فيلتبس: «' + it[0] + '» ← «' + it[1] + '»');
+        });
+      });
+    }
+
+    /* ── الصفحةُ تُحمّل الكتابَ والوحدةَ وتُركّبها ── */
+    const src = fs.readFileSync(pp, 'utf8');
+    if (src.indexOf('src="' + S.book) < 0) EP('لا تُحمّل ' + S.book);
+    if (src.indexOf('src="study-en4.js') < 0) EP('لا تُحمّل study-en4.js');
+    if (!/STUDY\.mount\(/.test(src)) EP('لا تُركّب شريطَ احفظ·ثبّت·جمل (STUDY.mount)');
+    if (S.tag !== 'en4'){
+      if (!new RegExp('window\\.STUDY_BOOK\\s*=\\s*window\\.' + S.global).test(src))
+        EP('لا تُسنِد window.STUDY_BOOK إلى ' + S.global + ' — فيُعرَض كتابُ سعودٍ لغيرِه');
+      if (!new RegExp('window\\.STUDY_TAG\\s*=\\s*"' + S.tag + '"').test(src))
+        EP('وسمُ التخزينِ (STUDY_TAG) ليس "' + S.tag + '" — فيلتقي «u1» من كتابين');
+    }
+    /* كلُّ وحدةٍ في الكتابِ لها درسٌ في الصفحة */
+    const cfgIds = new Set();
+    const cm = /var CFG = \{([\s\S]*?)\n  \};/.exec(src);
+    if (cm) for (const g of cm[1].matchAll(/^\s*(\w+)\s*:\s*\{/gm)) cfgIds.add(g[1]);
+    /* ما حذفه مفتاحُ الفصلِ الثاني ليس درسًا قائمًا وإن بقي في نصِّ CFG:
+       فوحدةٌ في الكتابِ تقابله لا يُركَّب لها شريطٌ ولا تُفتح أصلًا. */
+    if (/var TERM2 = false/.test(src)){
+      const tm = /var TERM2_IDS = \[([^\]]*)\]/.exec(src);
+      const t2 = tm ? tm[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean)
+                    : ['u5','u6','u7','u8'];   /* صفحةُ سعودٍ تحذفها بالاسم */
+      t2.forEach(k => cfgIds.delete(k));
+    }
+    if (cfgIds.size){
+      const miss = ids.filter(id => !cfgIds.has(id));
+      if (miss.length) EP('وحداتٌ في ' + S.book + ' بلا درسٍ في الصفحة: ' + miss.join('، ') +
+                          ' — فلا يُركَّب لها الشريط');
+    }
+
+    /* ── ملفّاتُ الطباعةِ موجودةٌ وموافقةٌ لمصدرِها ── */
+    const h = nodeCrypto.createHash('sha256').update(raw).digest('hex').slice(0,16);
+    const rec = man && man.books && man.books[S.tag];
+    if (!rec) out.push({ sev:'خطأ', file:'pdf/manifest.json', msg:'لا سجلَّ لـ' + S.tag + ' — شغّل tools/gen-book-pdf.js' });
+    else {
+      if (rec.hash !== h)
+        out.push({ sev:'خطأ', file:'pdf/' + S.tag + '-*.pdf',
+          msg:'تغيّر ' + S.book + ' بعد توليدِ ملفّاتِ الطباعة — الورقةُ تخالف الشاشة. شغّل tools/gen-book-pdf.js' });
+      const want = ids.map(id => S.tag + '-' + id + '.pdf').concat([S.tag + '-term1.pdf']);
+      const gone = want.filter(f => !fs.existsSync(path.join(ROOT,'pdf',f)));
+      if (gone.length) out.push({ sev:'خطأ', file:'pdf/', msg:'ملفّاتُ طباعةٍ مفقودة: ' + gone.join('، ') });
+    }
+    /* والرابطُ في الصفحةِ يشير إلى ما وُلِّد فعلًا */
+    const st = fs.readFileSync(path.join(ROOT,'study-en4.js'),'utf8');
+    if (!/href="pdf\/'\+TAG\(\)\+'-'\+id\+'\.pdf"/.test(st) || !/TAG\(\)\+'-term1\.pdf/.test(st))
+      out.push({ sev:'خطأ', file:'study-en4.js', msg:'رابطُ ملفِّ الطباعةِ لا يُبنى من وسمِ الكتابِ ورقمِ الوحدة' });
+  }
+  return out;
+}
+
 function engVideoPath(){
   const SPEC = {
     /* صفحتا أسامةَ وسعودٍ يسمّي بحثُهما الوحدةَ بعنوانِها (needTitle)،

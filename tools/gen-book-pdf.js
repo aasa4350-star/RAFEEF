@@ -17,6 +17,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '..');
@@ -94,6 +95,11 @@ function page(title, sub, body){
 
 (async () => {
   if (!fs.existsSync(OUTDIR)) fs.mkdirSync(OUTDIR, { recursive: true });
+  /* ═══ بصمةُ المصدر تُحفظ مع المولَّد ═══════════════════════════════
+     الورقةُ تُطبَع مرّةً وتبقى في يدِ الطفلِ أسابيع، والملفُّ يُعدَّل بعدها
+     فتتخالف الورقةُ والشاشةُ ولا شيء يُنبّه. فنحفظ بصمةَ كلِّ كتابٍ ساعةَ
+     التوليد، ويقارنها حارسُ checks/pages.js ببصمةِ الملفِّ الحاليّ. */
+  const manifest = { generated: new Date().toISOString(), books: {} };
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const ctx = await browser.newContext();
   const pg = await ctx.newPage();
@@ -102,9 +108,10 @@ function page(title, sub, body){
   for (const B of BOOKS){
     const src = path.join(ROOT, B.file);
     if (!fs.existsSync(src)){ console.log('⚠️  ' + B.file + ' غير موجود — تُخطّى'); continue; }
+    const raw = fs.readFileSync(src, 'utf8');
     const sandbox = { window: {} };
     require('vm').createContext(sandbox);
-    require('vm').runInContext(fs.readFileSync(src, 'utf8'), sandbox);
+    require('vm').runInContext(raw, sandbox);
     const book = sandbox.window[B.global];
     if (!book){ console.log('⚠️  ' + B.global + ' غير معرَّف في ' + B.file); continue; }
 
@@ -128,9 +135,15 @@ function page(title, sub, body){
       ids.map(id => unitHtml(book[id])).join('')), { waitUntil: 'load' });
     await pg.pdf({ path: all, format: 'A4', printBackground: true });
     made++;
+    manifest.books[B.tag] = {
+      source: B.file,
+      hash: crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16),
+      files: ids.map(id => B.tag + '-' + id + '.pdf').concat([B.tag + '-term1.pdf'])
+    };
     console.log('✅ ' + B.kid + ' — ' + ids.length + ' وحدة + ملفٌّ شامل · ' +
                 words + ' كلمة و' + sents + ' جملة');
   }
   await browser.close();
-  console.log('المولَّد: ' + made + ' ملفًّا في pdf/');
+  fs.writeFileSync(path.join(OUTDIR, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+  console.log('المولَّد: ' + made + ' ملفًّا في pdf/ ومعها manifest.json');
 })();
