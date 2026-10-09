@@ -380,7 +380,8 @@ async function main(){
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       /* الإملاء له بطاقتُه — كان يسقط في «الاختبارات التجريبية» (طلب الأب ٢٥ سبتمبر) */
       else if(t.indexOf("إملاء")===0){ dictAll.push(p); }
-      else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
+      /* أحدثُ جلسةٍ محتسبة، لا أحدثُ جلسةٍ مطلقًا — انظر RR.curKeep */
+      else if(subj && SUBJ_EMOJI[subj]){ currMap[t]=RR.curKeep(currMap[t], p); }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
     /* خانةٌ فارغةٌ بعد تصفيرٍ تُقال ولا تُطوى — انظر التعليل في home.html */
@@ -566,6 +567,13 @@ async function main(){
         '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
         'والاختبارُ الحقيقيُّ ١٢٠ سؤالًا — وهذه أسئلةُ تدريبٍ على أنماطه لا أسئلتُه.</small></div>';
     }
+    /* ═══ hasStep تُعرَّف هنا لا بعدَ مئةِ سطر ═══════════════════════
+       كانت const hasStep مكتوبةً بعد هذا الموضعِ بثلاثةٍ وعشرين سطرًا،
+       وconst في منطقةِ موتٍ زمنيّةٍ قبل تعريفِها — فإذا صدق الشرطُ
+       الأوّلُ (لم يفتح العلاجيَّ بعد) رُمي ReferenceError فانقطع بناءُ
+       الصفحةِ كلِّها: لا تقريرَ منهجٍ ولا غيره، وبيضاءُ بلا رسالة.
+       وُجد وهو يمنع فحصَ «تقرير المنهج الدراسي» في ٩ أكتوبر ٢٠٢٦. */
+    const hasStep = !!(otherMap["STEP إنجليزي"] && otherMap["STEP إنجليزي"].length);
     if(!remActs.length && (hasStep || Object.keys(otherMap).length)){
       html+=`<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">`+
         `<li>🚪 <b>ما فتحته بعد</b> — وهو جاهز: يعرض أضعف مهاراتك مع شرحٍ ومثالٍ محلولٍ وجولةِ تدرّب.</li>`+
@@ -587,8 +595,7 @@ async function main(){
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
     }
-    /* الخانةُ الفارغةُ تُقال لا تُطوى — انظر home.html */
-    const hasStep = !!(otherMap["STEP إنجليزي"] && otherMap["STEP إنجليزي"].length);
+    /* الخانةُ الفارغةُ تُقال لا تُطوى — انظر home.html. وhasStep عُرِّفت أعلاه */
     if(!gramActs.length && hasStep){
       html+=`<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">`+
         `<li>🚪 <b>ما فتحته بعد</b> — وهو جاهز: يبني لك طابورًا من أخطائك أنت في ستيب ويعيدها بنصّها حتى تصحّحها.</li>`+
@@ -648,9 +655,12 @@ async function main(){
       ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(subj=>{
         const arr=bySubj[subj]; if(!arr||!arr.length) return;
         arr.sort((a,b)=> (a.meta.test<b.meta.test)?-1:1);
-        const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
-        const acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
-        html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg}%</span></div><ul class="weak">`+
+        /* المتوسّطُ من المحتسَبِ وحدَه، وإلّا فالرقمُ الذي يقرؤه الأبُ
+           يضمّ جولةً نُقرت نقرًا. ومن لا محتسَبَ له يُقال «—» لا صفرًا. */
+        const okArr=arr.filter(p=> p.meta.trusted!==false);
+        const avg=okArr.length?Math.round(okArr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/okArr.length):null;
+        const acol=avg==null?"var(--muted)":avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
+        html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg==null?"—":avg+"%"}</span></div><ul class="weak">`+
           arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=RR.lessonOf(p.meta.test); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             /* نصُّ المقاليِّ ودرجتُه الذاتيّة — انظر home.html */
             const esc=x=>String(x).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
@@ -658,7 +668,8 @@ async function main(){
               `<li style="list-style:none;margin-top:6px"><details style="background:var(--bg);border-radius:11px;padding:4px 11px">`+
               `<summary style="cursor:pointer;font-weight:800;padding:7px 0">📝 إجابتك في السؤال المقالي — وضعت لنفسك <b style="color:var(--accent)">${p.meta.essaySelf!=null?p.meta.essaySelf:'؟'} من ${p.meta.essayMax||6}</b></summary>`+
               `<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">${esc(p.meta.essay)}</div></details></li>` : ``;
-            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(RR.when(p))}</span></li>`+ess; }).join("")+
+            const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
+            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(RR.when(p))}</span>${un}</li>`+ess; }).join("")+
           `</ul></div>`;
       });
     }

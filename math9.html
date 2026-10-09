@@ -11,6 +11,7 @@
 <script src="typed.js?v=20261001"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
+<script src="pace.js?v=20261009"></script>
 <style>
   :root{
     --accent:#0d9488; --accent-deep:#115e59;
@@ -3489,12 +3490,16 @@ if(!NAMES[who]){
     var RG_MS = 3000;
     var t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
     function meta(n){
-      return { pid:pid, dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-               /* كثرةُ التخمين السريع تُسقط الثقة بالجلسة كلّها — كما في كانجرو */
-               /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر): «شِلّ الخاصّية
-                  هذي منهم كلّهم ما عدا فهد». وتبقى fast محفوظةً فتُقرأ ولا يُحذف بها شيء. */
-               trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+      var m = { pid:pid, dur: Math.round((Date.now()-t0)/1000), fast: fastN,
+                skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+      /* ═══ حارسُ التأنّي ═══════════════════════════════════════════════
+         طلبُ الأب (٩ أكتوبر ٢٠٢٦): «حطّ له نفس فهد في مادة الرياضيات
+         والإنجليزي». وهو في pace.js لا هنا: القاعدةُ واحدةٌ في صفحتَين،
+         فلو كُتبت في كلٍّ منهما لتخالفتا أوّلَ تعديل. وفيه قياسُ أثرِها
+         على جلساتِ حسنٍ المحفوظةِ ولِمَ زِيد شرطُ الدرجة. */
+      if(window.PACE) PACE.stamp(m, who, m.dur, (n||total), fastN, correct);
+      else m.trusted = true;
+      return m;
     }
     var scoreEl = sec.querySelector("[data-score]");
     sec.querySelectorAll(".q").forEach(function(qEl){
@@ -3517,6 +3522,8 @@ if(!NAMES[who]){
         qEl.querySelector(".explain").classList.add("show");
         scoreEl.textContent = correct+" / "+total;
         if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; sec._frag=false; saveScore(c.label, correct, total, meta(total));
+          /* يُقال له في وجهِه ساعةَ وقوعِه، لا في تقريرِ أبيه وحدَه */
+          if(window.PACE) PACE.box(sec, who, Math.round((Date.now()-t0)/1000), total, fastN, correct);
           if(!/^all/.test(id)){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
       }
       /* والمكتوب يُسجَّل بـ j = −١: لم يختر مشتّتًا بل كتب جوابَه */
@@ -3705,17 +3712,17 @@ if(!NAMES[who]){
     function marks(){ return correct; }
     function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
     function meta(){
-      return { pid:pid, dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-               /* ═══ لا استبعادَ بسرعةِ النقرِ هنا ═══════════════════════
-                  طلبُ الأب (٧ أكتوبر ٢٠٢٦) بعد أن رأى حسنًا يُستبعَد وقد
-                  أصاب ١٣ من ١٣: «شِلّ الخاصّية هذي منهم كلّهم ما عدا فهد».
-                  وكانت باقيةً في اختبارات الفتري الأربعة سهوًا، فتُسقِط
-                  الجلسةَ من المعدَّلِ في صفحةِ الأبِ بلا أن يطلبَ ذلك.
-                  وتبقى fast وdur محفوظتين فيرى الأبُ السرعةَ إن أرادها،
-                  ولكن لا يُبنى عليها حكمٌ يحذف درجةَ ابنِه. */
-               trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ };
+      var m = { pid:pid, dur: Math.round((Date.now()-t0)/1000), fast: fastN,
+                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
+                mcq: correct, mcqTotal: FATRI_MCQ };
+      /* ═══ حارسُ التأنّي — وهذا موضعُه الأصليّ ═══════════════════════
+         تسعُ محاولاتٍ للفتريِّ، خمسٌ منها في يومٍ واحد، والزمنُ ينزل من
+         ٩٫٧ ثانيةٍ للسؤالِ إلى ٤٫٠ والدرجةُ ثابتة. فهو يُعيد رميَ الورقةِ
+         لا يذاكرها. والعدُّ على الأسئلةِ لا على الدرجاتِ: FATRI_MCQ سؤالًا
+         تُقسَم عليها الثواني، وFATRI_TOTAL درجتُها. */
+      if(window.PACE) PACE.stamp(m, who, m.dur, FATRI_MCQ, fastN, correct);
+      else m.trusted = true;
+      return m;
     }
     function save(force){
       var done = Object.keys(answered).length === FATRI_MCQ;
@@ -3723,6 +3730,7 @@ if(!NAMES[who]){
       if(savedN >= marks() && saved && !done) return;
       savedN = marks(); saved = true; if(done) sec._frag=false;
       saveScore("رياضيات م٣ — الفتري 📝", marks(), FATRI_TOTAL, meta());
+      if(done && window.PACE) PACE.box(sec, who, Math.round((Date.now()-t0)/1000), FATRI_MCQ, fastN, correct);
     }
     sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];

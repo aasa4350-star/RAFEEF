@@ -458,7 +458,8 @@ async function loadReport(){
          («لغتي م٣ — إملاء…») لا يمسّه هذا: اسمُه يبدأ بالمادّة فيبقى
          في تقرير المنهج. */
       else if(t.indexOf("إملاء")===0){ dictAll.push(p); }
-      else if(subj && SUBJ_EMOJI[subj]){ if(!currMap[t]) currMap[t]=p; }
+      /* أحدثُ جلسةٍ محتسبة، لا أحدثُ جلسةٍ مطلقًا — انظر RR.curKeep */
+      else if(subj && SUBJ_EMOJI[subj]){ currMap[t]=RR.curKeep(currMap[t], p); }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
     // 📖 حفظ الكلمات (إنجليزي)
     /* ═══ الخانةُ الفارغةُ تُقال لا تُطوى ═══════════════════════════════
@@ -760,9 +761,11 @@ async function loadReport(){
       ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){
         var arr=bySubj[subj]; if(!arr||!arr.length) return;
         arr.sort(function(a,b){ return (a.meta.test<b.meta.test)?-1:1; });
-        var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
-        var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
-        html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+avg+'%</span></div><ul class="weak">'+
+        /* المتوسّطُ من المحتسَبِ وحدَه، وإلّا ضمَّ الرقمُ جولةً نُقرت نقرًا */
+        var okArr=arr.filter(function(p){ return p.meta.trusted!==false; });
+        var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/okArr.length):null;
+        var acol=avg==null?"var(--muted)":avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
+        html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+(avg==null?"—":avg+'%')+'</span></div><ul class="weak">'+
           arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             /* ═══ السؤالُ المقاليُّ يُقرأ لا يُختصر في رقم ══════════════
                الاختبارُ الفتريُّ فيه سؤالٌ مقاليٌّ يضع الابنُ درجتَه فيه
@@ -776,7 +779,8 @@ async function loadReport(){
                 '<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">'+
                   String(p.meta.essay).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+
                 '</div></details></li>' : '';
-            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span></li>'+ess; }).join("")+
+            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
+            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span>'+un+'</li>'+ess; }).join("")+
           '</ul></div>';
       });
     }
