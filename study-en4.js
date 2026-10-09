@@ -18,7 +18,26 @@
   function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function words(s){ return String(s).trim().split(/\s+/).filter(Boolean); }
   function isSentence(e){ return /[.?!]$/.test(e) && words(e).length >= 3; }
-  function say(t){ try{ (window.azureSpeak || window.speakEN)(String(t).replace(/[«»…]/g,"")); }catch(e){} }
+  /* ═══ النطقُ يعمل في أيّ صفحةٍ تُركَّب فيها الوحدة ═══════════════════
+     صفحةُ سعودٍ فيها azureSpeak وspeakEN، وصفحةُ حسنٍ ليس فيها واحدٌ
+     منهما — فلو بقي النداءُ عليهما وحدَهما لظهر زرُّ 🔊 ولم يَنطق، وهو
+     عطبٌ صامت: الزرُّ موجودٌ ويُضغط ولا يُسمَع شيء. فإن غابا نطقنا
+     بمحرّكِ المتصفّح مباشرةً، وإن حضرا قُدِّما لأنّ صوتَهما أحسن. */
+  function say(t){
+    var txt = String(t).replace(/[«»…]/g, "");
+    try{
+      if(window.azureSpeak) return window.azureSpeak(txt);
+      if(window.speakEN)    return window.speakEN(txt);
+      speechSynthesis.cancel();
+      try{ speechSynthesis.resume(); }catch(e){}   /* iOS قد يُعلّق المحرّك */
+      var u = new SpeechSynthesisUtterance(txt); u.lang = "en-US"; u.rate = 0.9;
+      var cands = speechSynthesis.getVoices().filter(function(x){ return /^en/i.test(x.lang); });
+      var good  = cands.filter(function(x){ return /(natural|neural|enhanced|premium|samantha|daniel|karen|serena|aria|guy|jenny)/i.test(x.name); });
+      var v = good[0] || cands[0]; if(v) u.voice = v;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  try{ speechSynthesis.getVoices(); }catch(e){}
 
   /* عناصرُ الحفظ: الكلماتُ والعبارات (لا الجمل ولا سطورُ القواعد) */
   function vocab(unit){
@@ -68,6 +87,7 @@
   '.st-bar button.on{background:var(--good);border-color:var(--good);color:#fff}'+
   '.st-sec{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}'+
   '.st-sec h4{margin:0;padding:10px 14px;background:var(--bg);font-size:.95rem;color:var(--accent)}'+
+  '.st-tools a.st-pdf{display:inline-block;text-decoration:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;border-radius:12px;font-weight:800;font-size:.86rem;margin-inline-start:6px}'+
   '.st-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line)}'+
   '.st-row .e{flex:1;direction:ltr;text-align:left;font-weight:800;unicode-bidi:isolate}'+
   '.st-row .a{flex:1;color:var(--muted);font-size:.95rem}'+
@@ -107,7 +127,16 @@
     var hide = false;
     function draw(){
       var h = '<div class="intro"><b>📖 احفظ:</b> كلماتُ الوحدة وجملُها من كتابك. اسمع كلَّ كلمةٍ 🔊 وردِّدها، ثمّ غطِّ المعنى واختبر نفسك.</div>'+
-        '<div class="st-tools"><button data-hide class="'+(hide?'on':'')+'">'+(hide?'👀 أظهر المعاني':'🙈 غطِّ المعنى')+'</button></div>';
+        '<div class="st-tools"><button data-hide class="'+(hide?'on':'')+'">'+(hide?'👀 أظهر المعاني':'🙈 غطِّ المعنى')+'</button>'+
+        /* ═══ نسخةٌ للطباعة ═══════════════════════════════════════════
+           طلبُ الأب (٩ أكتوبر ٢٠٢٦): «ملف PDF للكلمات والجمل ومعناها —
+           ملف لكلّ وحدة وملف شامل للفصل». وهي مولَّدةٌ من هذا الملفِّ
+           نفسِه بـtools/gen-book-pdf.js، فلا تتخالف الورقةُ والشاشة.
+           واسمُ الملفِّ لاتينيٌّ عمدًا: الاسمُ العربيُّ في الرابطِ يحتاج
+           ترميزًا يختلف بين المتصفّحات. */
+        '<a class="st-pdf" href="pdf/'+TAG()+'-'+id+'.pdf" target="_blank" rel="noopener">⬇️ PDF الوحدة</a>'+
+        '<a class="st-pdf" href="pdf/'+TAG()+'-term1.pdf" target="_blank" rel="noopener">⬇️ PDF الفصل كامل</a>'+
+        '</div>';
       unit.sections.forEach(function(s){
         h += '<div class="st-sec"><h4>'+esc(s.t)+'</h4>';
         s.items.forEach(function(it){
