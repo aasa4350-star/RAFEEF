@@ -144,6 +144,25 @@ function lw(n){ return n + (n >= 3 && n <= 10 ? ' دروس' : ' درسًا'); }
     };
     console.log('✅ ' + tag.padEnd(10) + ' ' + String(n).padStart(3) + ' درسًا' +
                 (kids.length ? '  · ' + kids.join('، ') : '  · لا ابنَ يفتحها'));
+
+    /* ═══ وورقةُ المقرَّرِ الفتريِّ وحدَه ═══════════════════════════════
+       طلبُ الأب: «أبي قواعد الرياضيات دروس حسن اختبار الفتري فقط».
+       فورقةُ المادّةِ خمسةٌ وعشرون درسًا والمقرَّرُ أحدَ عشرَ — فلا
+       يذاكر ما لا يُسأل عنه. والقائمةُ من FATRI_IDS في الصفحةِ نفسِها. */
+    const F = RULES.readFatri(fs.readFileSync(path.join(ROOT, f), 'utf8'), f);
+    if (!F) continue;
+    if (F.missing.length)
+      console.log('⚠️  ' + tag + ' — دروسٌ في مقرَّرِ الفتريِّ بلا قاعدة: ' + F.missing.join('، '));
+    const qw = F.questions + (F.questions >= 3 && F.questions <= 10 ? ' أسئلة' : ' سؤالًا');
+    const fsub = (F.unit || ('المقرَّر · ' + qw + (F.marks ? ' · ' + F.marks + ' درجة' : ''))) +
+                 (kids.length ? ' · ' + kids.join(' و') : '');
+    await emit('rules-' + tag + '-fatri',
+      doc(F.title + ' — مقرَّر الاختبار الفتري', fsub, subjHtml(F, false)));
+    manifest.pages[tag + '-fatri'] = {
+      source: f, lessons: F.count, file: 'rules-' + tag + '-fatri.pdf',
+      questions: F.questions, hash: F.digest
+    };
+    console.log('   📝 الفتري: ' + F.count + ' درسًا من ' + n + ' · ' + qw);
   }
 
   /* وملفٌّ جامعٌ لكلّ ابنٍ بمواده كلِّها، بترتيبِ صفحتِه */

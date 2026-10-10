@@ -27,7 +27,7 @@
   }
  },
  "rules": {
-  "generated": "2026-10-10T07:10:36.186Z",
+  "generated": "2026-10-10T07:35:27.223Z",
   "pages": {
    "bio10": {
     "source": "bio10.html",
@@ -107,11 +107,25 @@
     "file": "rules-math4.pdf",
     "hash": "f4c4adfcf449377a"
    },
+   "math4-fatri": {
+    "source": "math4.html",
+    "lessons": 1,
+    "file": "rules-math4-fatri.pdf",
+    "questions": 10,
+    "hash": "2fd5c5c731ddd90d"
+   },
    "math5": {
     "source": "math5.html",
     "lessons": 8,
     "file": "rules-math5.pdf",
     "hash": "0e1cb03c6b7652ba"
+   },
+   "math5-fatri": {
+    "source": "math5.html",
+    "lessons": 1,
+    "file": "rules-math5-fatri.pdf",
+    "questions": 10,
+    "hash": "c23a4f97d469487c"
    },
    "math7": {
     "source": "math7.html",
@@ -125,11 +139,25 @@
     "file": "rules-math8.pdf",
     "hash": "31644ba3cf713480"
    },
+   "math8-fatri": {
+    "source": "math8.html",
+    "lessons": 16,
+    "file": "rules-math8-fatri.pdf",
+    "questions": 20,
+    "hash": "31c8de921f8db8c1"
+   },
    "math9": {
     "source": "math9.html",
     "lessons": 25,
     "file": "rules-math9.pdf",
     "hash": "b2b16f1bf9f6940d"
+   },
+   "math9-fatri": {
+    "source": "math9.html",
+    "lessons": 11,
+    "file": "rules-math9-fatri.pdf",
+    "questions": 20,
+    "hash": "1054521c76078014"
    },
    "phys10": {
     "source": "phys10.html",

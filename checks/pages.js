@@ -1039,6 +1039,54 @@ function rulesPdfPath(){
     /* ── وزرُّ الطباعةِ في الصفحة ── */
     if (!/<script src="rules-print\.js/.test(raw))
       E(f, 'لها ورقةُ قواعدَ ولا زرَّ طباعةٍ فيها — الورقةُ في مجلّدٍ لا يصل إليه أحد');
+
+    /* ═══ ورقةُ المقرَّرِ الفتريِّ ══════════════════════════════════════
+       طلبُ الأب: «قواعد الرياضيات دروس حسن اختبار الفتري فقط».
+       وثلاثةٌ تنكسر بلا صوت: يُضيَّق المقرَّرُ أو يُوسَّع (FATRI_IDS)
+       ولا تتبعه الورقة فيذاكر ما لا يُسأل عنه أو يفوته ما يُسأل؛ ودرسٌ
+       في المقرَّرِ بلا قاعدةٍ فيسقط من الورقةِ وحدَه؛ وورقةٌ مفقودةٌ
+       وزرُّها في الشاشة. */
+    let FA = null;
+    try { FA = RULES.readFatri(raw, f); } catch(e){ FA = null; }
+    if (FA){
+      if (FA.missing.length)
+        E(f, 'دروسٌ في مقرَّرِ الفتريِّ بلا قاعدةٍ فتسقط من ورقته: ' + FA.missing.join('، '));
+      const ffile = 'rules-' + tag + '-fatri.pdf';
+      const frec = R.pages && R.pages[tag + '-fatri'];
+      if (!frec) E('pdf/manifest.json', 'لا سجلَّ لورقةِ فتريِّ ' + tag + ' — شغّل tools/gen-rules-pdf.js');
+      else {
+        if (frec.hash !== FA.digest)
+          E('pdf/' + ffile, 'تغيّر مقرَّرُ الفتريِّ أو قواعدُه في ' + f +
+                            ' بعد توليدِ الورقة — شغّل tools/gen-rules-pdf.js');
+        if (frec.lessons !== FA.count)
+          E('pdf/' + ffile, 'ورقةُ الفتريِّ فيها ' + frec.lessons + ' درسًا والمقرَّرُ ' + FA.count +
+                            ' — شغّل tools/gen-rules-pdf.js');
+      }
+      if (!fs.existsSync(path.join(PDFDIR, ffile)))
+        E('pdf/', 'ورقةُ فتريٍّ مفقودة: ' + ffile);
+    }
+  }
+
+  /* ═══ وقائمةُ أزرارِ الفتريِّ تقابل ما وُلِّد ═══════════════════════
+     جُرِّب أوّلًا أن يُستدَلَّ على وجودِ الفتريِّ بتبويبِه في الشاشة،
+     فأخطأ في الجهتَين: math8 وmath9 تبنيان تبويبَهما وقتَ التشغيل فلا
+     يَبين في المصدر، وenglish5 فيها تبويبُ فتريٍّ ومقرَّرُه في ملفٍّ
+     آخرَ لا دروسَ له — فكان الزرُّ يفتح ٤٠٤. فصارت القائمةُ صريحةً في
+     rules-print.js وتُقابَل هنا بالملفّات. */
+  const fatriOnDisk = fs.readdirSync(PDFDIR)
+    .filter(x => /^rules-.+-fatri\.pdf$/.test(x))
+    .map(x => x.replace(/^rules-|-fatri\.pdf$/g, '')).sort();
+  const psrc = fs.readFileSync(path.join(ROOT, 'rules-print.js'), 'utf8');
+  const plit = EXTRACT.literalAfter(psrc, /(?:var|let|const)\s+FATRI_PAGES\s*=/, '[', ']');
+  let plisted = null;
+  try { plisted = plit ? EXTRACT.evalLiteral(plit, 'FATRI_PAGES') : null; } catch(e){}
+  if (!plisted) E('rules-print.js', 'FATRI_PAGES غيرُ موجودة — لا زرَّ لورقةِ الفتري');
+  else {
+    const P = plisted.slice().sort();
+    const extra = P.filter(k => fatriOnDisk.indexOf(k) < 0);
+    const gone  = fatriOnDisk.filter(k => P.indexOf(k) < 0);
+    if (extra.length) E('rules-print.js', 'زرُّ فتريٍّ لورقةٍ غيرِ موجودة: ' + extra.join('، '));
+    if (gone.length)  E('rules-print.js', 'ورقةُ فتريٍّ بلا زرٍّ يفتحها: ' + gone.join('، '));
   }
 
   /* ولا صفحةَ تحمل الزرَّ بلا ورقة */
