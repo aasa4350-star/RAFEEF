@@ -150,6 +150,14 @@ function qs(k){ return new URLSearchParams(location.search).get(k); }
    الأصغر، وفهدٌ ثالثُ ثانويٍّ مسارُه التحصيليُّ وستيب. والتربيةُ الخاصّةُ
    كذلك: طالبةُ رخصةٍ مهنيّةٍ لا تلميذةَ مدرسة. */
 const NO_QUIZ = { fahad:1, khassa:1 };
+/* ═══ من له ورقةُ «قواعد كلّ المواد» ═══════════════════════════════
+   طلبُ الأب (١٠ أكتوبر ٢٠٢٦): «اكتب قاعدة كلّ درس في بي دي اف عشان
+   أطبعها». فلكلّ مادّةٍ ورقتُها في صفحتِها، ولكلّ ابنٍ ورقةٌ جامعةٌ
+   هنا — يطبعها مرّةً فتكون عنده مواده كلُّها.
+   وفهدٌ ليس فيها: صفحتُه تحصيليٌّ وستيب، لا مناهجَ مدرسيّةً له.
+   والقائمةُ يحرسها checks/pages.js فتُقابَل بملفّات pdf/rules-all-*
+   — فلا يبقى زرٌّ يفتح ملفًّا غيرَ موجود، ولا ورقةٌ لا زرَّ لها. */
+const RULES_KIDS = ["saud", "osama", "rafeef", "hasan", "khassa"];
 const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
@@ -278,6 +286,7 @@ async function main(){
       ${NO_QUIZ[who]?``:`<a href="quiz.html?who=${who}">📝 اختبر نفسك</a>`}
       <a href="reading.html?who=${who}">🔊 استماع وقراءة</a>
       <a href="talk.html?who=${who}">🗣️ محادثة إنجليزية</a>
+      ${RULES_KIDS.indexOf(who)<0?``:`<a href="pdf/rules-all-${who}.pdf" target="_blank" rel="noopener" data-rules-all>🖨️ اطبع قواعد كل المواد</a>`}
       ${who==="saud"?`<a href="practice.html?who=${who}">📖 قدرات لفظي</a>`:`${NO_QUIZ[who]?``:`<a href="quiz.html?who=${who}&set=2">🔄 مجموعة 2</a>`}<a href="practice.html?who=${who}">📊 ${who==="fahad"?"تحصيلي وSTEP":"قدرات وتحصيلي"}</a>`}<!-- عنوانُ الرابطِ يسمّي ما في الصفحةِ فعلًا: فهدٌ لا قدراتَ له بعد حذفِها -->
     </div>
     ${who==="saud"?`<div class="sec-title"><span class="dot"></span> 📚 المنهج الدراسي (مطابق لكتب سعود)</div>

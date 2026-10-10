@@ -25,5 +25,198 @@
     "en9-term1.pdf"
    ]
   }
+ },
+ "rules": {
+  "generated": "2026-10-10T07:10:36.186Z",
+  "pages": {
+   "bio10": {
+    "source": "bio10.html",
+    "lessons": 20,
+    "file": "rules-bio10.pdf",
+    "hash": "81210882e4bec8ec"
+   },
+   "chem10": {
+    "source": "chem10.html",
+    "lessons": 18,
+    "file": "rules-chem10.pdf",
+    "hash": "f99a93d634d89d37"
+   },
+   "english": {
+    "source": "english.html",
+    "lessons": 8,
+    "file": "rules-english.pdf",
+    "hash": "fb0353af77505393"
+   },
+   "english5": {
+    "source": "english5.html",
+    "lessons": 5,
+    "file": "rules-english5.pdf",
+    "hash": "6658e9a4d4c9f91f"
+   },
+   "english8": {
+    "source": "english8.html",
+    "lessons": 10,
+    "file": "rules-english8.pdf",
+    "hash": "dce95f811d8ecfbf"
+   },
+   "english9": {
+    "source": "english9.html",
+    "lessons": 8,
+    "file": "rules-english9.pdf",
+    "hash": "51336a93057cedd0"
+   },
+   "khassa": {
+    "source": "khassa.html",
+    "lessons": 8,
+    "file": "rules-khassa.pdf",
+    "hash": "5d74ef626b5b98f1"
+   },
+   "khitaba": {
+    "source": "khitaba.html",
+    "lessons": 12,
+    "file": "rules-khitaba.pdf",
+    "hash": "52423f99ea3bada8"
+   },
+   "license": {
+    "source": "license.html",
+    "lessons": 8,
+    "file": "rules-license.pdf",
+    "hash": "7606b457cb30a634"
+   },
+   "lughati": {
+    "source": "lughati.html",
+    "lessons": 4,
+    "file": "rules-lughati.pdf",
+    "hash": "51d590a0c7011721"
+   },
+   "lughati5": {
+    "source": "lughati5.html",
+    "lessons": 7,
+    "file": "rules-lughati5.pdf",
+    "hash": "5fb65628d9821fbf"
+   },
+   "lughati9": {
+    "source": "lughati9.html",
+    "lessons": 5,
+    "file": "rules-lughati9.pdf",
+    "hash": "9136169bc557534e"
+   },
+   "math4": {
+    "source": "math4.html",
+    "lessons": 7,
+    "file": "rules-math4.pdf",
+    "hash": "f4c4adfcf449377a"
+   },
+   "math5": {
+    "source": "math5.html",
+    "lessons": 8,
+    "file": "rules-math5.pdf",
+    "hash": "0e1cb03c6b7652ba"
+   },
+   "math7": {
+    "source": "math7.html",
+    "lessons": 31,
+    "file": "rules-math7.pdf",
+    "hash": "44761be7b8ec2f3e"
+   },
+   "math8": {
+    "source": "math8.html",
+    "lessons": 37,
+    "file": "rules-math8.pdf",
+    "hash": "31644ba3cf713480"
+   },
+   "math9": {
+    "source": "math9.html",
+    "lessons": 25,
+    "file": "rules-math9.pdf",
+    "hash": "b2b16f1bf9f6940d"
+   },
+   "phys10": {
+    "source": "phys10.html",
+    "lessons": 9,
+    "file": "rules-phys10.pdf",
+    "hash": "6729cf3198c6ffdb"
+   },
+   "science4": {
+    "source": "science4.html",
+    "lessons": 8,
+    "file": "rules-science4.pdf",
+    "hash": "8a0a31d2b0d27eb3"
+   },
+   "science5": {
+    "source": "science5.html",
+    "lessons": 12,
+    "file": "rules-science5.pdf",
+    "hash": "375236a155d83cae"
+   },
+   "science8": {
+    "source": "science8.html",
+    "lessons": 13,
+    "file": "rules-science8.pdf",
+    "hash": "060b128e573e58b0"
+   },
+   "science9": {
+    "source": "science9.html",
+    "lessons": 6,
+    "file": "rules-science9.pdf",
+    "hash": "7732a1054608749a"
+   }
+  },
+  "kids": {
+   "khassa": {
+    "pages": [
+     "license",
+     "khassa"
+    ],
+    "lessons": 16,
+    "file": "rules-all-khassa.pdf"
+   },
+   "saud": {
+    "pages": [
+     "lughati",
+     "english",
+     "khitaba",
+     "math4",
+     "science4"
+    ],
+    "lessons": 39,
+    "file": "rules-all-saud.pdf"
+   },
+   "hasan": {
+    "pages": [
+     "english9",
+     "math9",
+     "science9",
+     "chem10",
+     "bio10",
+     "phys10",
+     "lughati9",
+     "khitaba"
+    ],
+    "lessons": 103,
+    "file": "rules-all-hasan.pdf"
+   },
+   "rafeef": {
+    "pages": [
+     "math8",
+     "english8",
+     "science8",
+     "khitaba"
+    ],
+    "lessons": 72,
+    "file": "rules-all-rafeef.pdf"
+   },
+   "osama": {
+    "pages": [
+     "english5",
+     "lughati5",
+     "math5",
+     "science5",
+     "khitaba"
+    ],
+    "lessons": 44,
+    "file": "rules-all-osama.pdf"
+   }
+  }
  }
 }

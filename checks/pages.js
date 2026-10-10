@@ -16,6 +16,8 @@
 const fs = require('fs'), path = require('path'), vm = require('vm')
 /* crypto العامّ في Node هو WebCrypto ولا createHash فيه — فيُطلَب الوحدة */
 const nodeCrypto = require('crypto');
+const EXTRACT = require('../tools/lib-extract.js');
+const RULES = require('../tools/lib-rules.js');
 const ROOT = path.join(__dirname, '..');
 
 const LOW_CAPACITY = 12;      /* أقلّ من هذا يُعدّ قابلًا للحفظ */
@@ -317,6 +319,7 @@ function run(){
   issues.push(...ytPath());
   issues.push(...engVideoPath());
   issues.push(...bookStudyPath());
+  issues.push(...rulesPdfPath());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -968,6 +971,116 @@ function bookStudyPath(){
     const st = fs.readFileSync(path.join(ROOT,'study-en4.js'),'utf8');
     if (!/href="pdf\/'\+TAG\(\)\+'-'\+id\+'\.pdf"/.test(st) || !/TAG\(\)\+'-term1\.pdf/.test(st))
       out.push({ sev:'خطأ', file:'study-en4.js', msg:'رابطُ ملفِّ الطباعةِ لا يُبنى من وسمِ الكتابِ ورقمِ الوحدة' });
+  }
+  return out;
+}
+
+/* ═══ ورقةُ «قاعدة كلّ درس» للطباعة ═══════════════════════════════════
+   طلبُ الأب (١٠ أكتوبر ٢٠٢٦): «اكتب قاعدة كلّ درس في بي دي اف عشان
+   أطبعها». والمادّةُ هي REMTOPICS[].tip في كلّ صفحةِ منهج.
+
+   وأربعةٌ تنكسر هنا بلا صوت، وكلُّها تنتهي بورقةٍ في يدِ الطفلِ تخالف
+   شاشتَه — وهي أسوأُ من ألّا تكون ورقةٌ أصلًا:
+
+   ١) تُعدَّل قاعدةُ درسٍ ولا يُعاد التوليد: الورقةُ تبقى أسابيعَ في
+      يدِه بالقاعدةِ القديمة. فتُحفَظ بصمةُ كلِّ صفحةٍ ساعةَ التوليدِ
+      وتُقارَن هنا.
+   ٢) يُضاف درسٌ بلا قاعدة: لا يظهر في الورقةِ ولا يَبين أنّه سقط.
+   ٣) يُضاف زرُّ طباعةٍ لصفحةٍ بلا ملفّ (أو العكس): زرٌّ يفتح ٤٠٤.
+   ٤) تُطبَع وحداتُ الفصلِ الثاني وهي مخفيّةٌ في الشاشة (TERM2). */
+function rulesPdfPath(){
+  const out = [];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  const PDFDIR = path.join(ROOT, 'pdf');
+  const tool = path.join(ROOT, 'tools', 'gen-rules-pdf.js');
+  if (!fs.existsSync(tool)) return out;
+
+  const manPath = path.join(PDFDIR, 'manifest.json');
+  let man = null;
+  try { man = JSON.parse(fs.readFileSync(manPath, 'utf8')); } catch(e){}
+  const R = (man && man.rules) || null;
+  if (!R){ E('pdf/manifest.json', 'لا سجلَّ لأوراقِ القواعد — شغّل tools/gen-rules-pdf.js'); return out; }
+
+  /* القراءةُ من المكتبةِ نفسِها التي يقرأ بها المولّد (tools/lib-rules.js)
+     — فلا يختلف الحارسُ والمولّدُ في درسٍ أو فصلٍ فيصيح بلا سبب. */
+  const haveRules = RULES.pagesWithRules(fs, path, ROOT);
+
+  for (const f of haveRules){
+    const tag = f.replace(/\.html$/, '');
+    const raw = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    let R1 = null;
+    try { R1 = RULES.readRules(raw, f); }
+    catch(e){ E(f, 'تعذّر قراءة قواعدِ دروسِها: ' + e.message); continue; }
+    if (!R1){ E(f, 'REMTOPICS غيرُ مقروءة'); continue; }
+
+    /* ── كلُّ درسٍ له قاعدةٌ مكتوبة ── */
+    if (!R1.count){
+      out.push({ sev:'تنبيه', file:f, msg:'لا قاعدةَ لأيِّ درسٍ فيها — لا ورقةَ طباعةٍ لهذه المادّة' });
+      continue;
+    }
+    if (R1.noTip.length)
+      E(f, 'دروسٌ بلا قاعدةٍ مكتوبة فتسقط من الورقة: ' + R1.noTip.join('، '));
+
+    /* ── الورقةُ موجودةٌ وموافقةٌ لما يُعرَض على الشاشة ── */
+    const rec = R.pages && R.pages[tag];
+    const file = 'rules-' + tag + '.pdf';
+    if (!rec) E('pdf/manifest.json', 'لا سجلَّ لورقةِ ' + tag + ' — شغّل tools/gen-rules-pdf.js');
+    else {
+      if (rec.hash !== R1.digest)
+        E('pdf/' + file, 'تغيّرت قواعدُ ' + f + ' بعد توليدِ الورقة — الورقةُ تخالف الشاشة. ' +
+                         'شغّل tools/gen-rules-pdf.js');
+      if (rec.lessons !== R1.count)
+        E('pdf/' + file, 'الورقةُ فيها ' + rec.lessons + ' درسًا والصفحةُ فيها ' + R1.count +
+                         ' — شغّل tools/gen-rules-pdf.js');
+    }
+    if (!fs.existsSync(path.join(PDFDIR, file)))
+      E('pdf/', 'ورقةُ طباعةٍ مفقودة: ' + file);
+
+    /* ── وزرُّ الطباعةِ في الصفحة ── */
+    if (!/<script src="rules-print\.js/.test(raw))
+      E(f, 'لها ورقةُ قواعدَ ولا زرَّ طباعةٍ فيها — الورقةُ في مجلّدٍ لا يصل إليه أحد');
+  }
+
+  /* ولا صفحةَ تحمل الزرَّ بلا ورقة */
+  for (const f of fs.readdirSync(ROOT).filter(x => x.endsWith('.html'))){
+    const raw = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if (!/<script src="rules-print\.js/.test(raw)) continue;
+    const file = 'rules-' + f.replace(/\.html$/, '') + '.pdf';
+    if (!fs.existsSync(path.join(PDFDIR, file)))
+      E(f, 'فيها زرُّ طباعةٍ وملفُّه غيرُ موجود (' + file + ') — زرٌّ يفتح صفحةَ خطأ');
+  }
+
+  /* ── والورقةُ الجامعةُ لكلّ ابن ── */
+  const onDisk = fs.readdirSync(PDFDIR)
+    .filter(x => /^rules-all-.+\.pdf$/.test(x))
+    .map(x => x.replace(/^rules-all-|\.pdf$/g, '')).sort();
+  const csrc = fs.readFileSync(path.join(ROOT, 'child.html'), 'utf8');
+  const lit = EXTRACT.literalAfter(csrc, /(?:var|let|const)\s+RULES_KIDS\s*=/, '[', ']');
+  let listed = null;
+  try { listed = lit ? EXTRACT.evalLiteral(lit, 'RULES_KIDS') : null; } catch(e){}
+  if (!listed) E('child.html', 'RULES_KIDS غيرُ موجودة — لا زرَّ للورقةِ الجامعة');
+  else {
+    const L = listed.slice().sort();
+    const extra = L.filter(k => onDisk.indexOf(k) < 0);
+    const gone  = onDisk.filter(k => L.indexOf(k) < 0);
+    if (extra.length) E('child.html', 'زرٌّ لورقةٍ جامعةٍ غيرِ موجودة: ' + extra.join('، '));
+    if (gone.length)  E('child.html', 'ورقةٌ جامعةٌ بلا زرٍّ يفتحها: ' + gone.join('، '));
+  }
+  /* ═══ ولا تُطبَع وحدةٌ مخفيّةٌ عن الشاشة ═══════════════════════════
+     يُفحَص بالأثرِ لا بذكرِ الاسم: تُقرأ كلُّ صفحةٍ فيها مفتاحُ TERM2
+     ويُتحقَّق أنّ وحداتِه المخفيّةَ ليست في أقسامِ الورقة. فلو ذُكر
+     TERM2_IDS في المولّدِ ولم يُستعمَل لم ينفع الفحصُ النصّيّ. */
+  for (const f of haveRules){
+    const raw = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    let R1 = null;
+    try { R1 = RULES.readRules(raw, f); } catch(e){ continue; }
+    if (!R1 || !R1.hiddenIds.length) continue;
+    const printed = {};
+    R1.sections.forEach(sec => sec.items.forEach(t => { printed[t.id] = 1; }));
+    const leaked = R1.hiddenIds.filter(id => printed[id]);
+    if (leaked.length)
+      E('pdf/rules-' + f.replace(/\.html$/, '') + '.pdf',
+        'تُطبَع وحداتٌ مخفيّةٌ عن الشاشة (TERM2): ' + leaked.join('، '));
   }
   return out;
 }

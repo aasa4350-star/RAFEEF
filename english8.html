@@ -10,6 +10,7 @@
 <script src="config.js"></script>
 <script src="typed.js?v=20261001"></script>
 <script src="gate.js"></script>
+<script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
 <style>
   :root{
@@ -1032,23 +1033,59 @@ if(!NAMES[who]){
   }
   function leaveCur(){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); }
 
+  /* ═══ قاعدةُ كلِّ وحدةٍ (tip) ═══════════════════════════════════════
+     كانت هذه الصفحةُ وحدَها من إحدى وعشرين صفحةَ منهجٍ بلا قواعد: فيها
+     الأسماءُ وروابطُ الشرحِ فقط. فالقسمُ العلاجيُّ يفتح لرفيفَ وحدةً
+     ضعُفت فيها ولا يقول لها شيئًا تقرؤه، وورقةُ «قاعدة كلّ درس»
+     (tools/gen-rules-pdf.js) كانت تتخطّاها فتبقى بلا ورقةٍ تطبعها.
+
+     والقواعدُ مكتوبةٌ من مادّةِ الصفحةِ نفسِها — من مولّداتِ كلِّ وحدةٍ
+     وتعليلاتِها أدناه — لا من خارجِها، فما تقرؤه في الورقةِ هو عينُ ما
+     يُسأل عنه في الجولة. وأرقامُ الصفحاتِ من عناوينِ الوحداتِ أعلاه. */
   var REMTOPICS = [
-    {id:"u1", name:"Unit 1 — Vacation",   yt:"شرح verb to be and wh questions ثاني متوسط"},
-    {id:"u2", name:"Unit 2 — Making",     yt:"شرح present continuous and imperative ثاني متوسط"},
-    {id:"u3", name:"Unit 3 — Who's Who",  yt:"شرح simple present and relative pronouns ثاني متوسط"},
-    {id:"u4", name:"Unit 4 — Pastimes",   yt:"شرح adverbs of frequency and gerund infinitive ثاني متوسط"},
-    {id:"exp1",name:"مراجعة 1–4",         yt:"مراجعة انجليزي ثاني متوسط الوحدات الاولى"},
-    {id:"u5", name:"Unit 5 — Ice Cream",  yt:"شرح countable uncountable some any too enough ثاني متوسط"},
-    {id:"u6", name:"Unit 6 — What Was It",yt:"شرح simple past regular irregular verbs ثاني متوسط"},
-    {id:"u7", name:"Unit 7 — Happened",   yt:"شرح there was there were ago because so ثاني متوسط"},
-    {id:"u8", name:"Unit 8 — What's Wrong",yt:"شرح should pronouns possessive adjectives ثاني متوسط"},
-    {id:"exp2",name:"مراجعة 5–8",         yt:"مراجعة انجليزي ثاني متوسط الوحدات الخامسة للثامنة"}
+    {id:"u1", name:"Unit 1 — Are You Here on Vacation? (ص ٢–٩)",
+     tip:"فعل الكون: <span class=\"en\">I am · he/she/it is · you/we/they are</span>، والنفي باختصار <span class=\"en\">isn't / aren't</span> (وأمّا <span class=\"en\">am not</span> فلا تُختصر). وأدوات السؤال لكلٍّ جوابُها: <span class=\"en\">Where</span> مكان · <span class=\"en\">When</span> زمان · <span class=\"en\">Who</span> شخص · <span class=\"en\">What</span> شيء · <span class=\"en\">How old</span> عمر. وحروف الجرّ: <span class=\"en\">in</span> للمدينة والدولة، <span class=\"en\">on</span> للشارع، <span class=\"en\">at</span> للعنوان المحدّد. و<span class=\"en\">on the left/right</span> تُحدَّد من جهة المخاطَب.",
+     yt:"شرح verb to be and wh questions ثاني متوسط"},
+    {id:"u2", name:"Unit 2 — What Are They Making? (ص ١٠–١٧)",
+     tip:"المضارع المستمرّ = <span class=\"en\">be + verb-ing</span> لما يحدث الآن، وفعل الكون يتبع الفاعل لا الفعل. وصوغ <span class=\"en\">ing</span>: الأصل إضافتها، وما انتهى بـ<span class=\"en\">e</span> ساكنة تُحذف (<span class=\"en\">make → making</span>)، وما كان مقطعًا واحدًا بساكنٍ واحدٍ بعد متحرّكٍ واحدٍ يُضعَّف آخره (<span class=\"en\">run → running</span>). والأمر يبدأ بالمصدر بلا فاعل، ونفيه <span class=\"en\">Don't + verb</span>.",
+     yt:"شرح present continuous and imperative ثاني متوسط"},
+    {id:"u3", name:"Unit 3 — Who's Who (ص ١٨–٢٥)",
+     tip:"المضارع البسيط للعادة والحقيقة، ومع الغائب المفرد (<span class=\"en\">he · she · it</span>) يأخذ الفعل <span class=\"en\">s</span>، وبعد <span class=\"en\">s · sh · ch · x · o</span> يأخذ <span class=\"en\">es</span>، وما انتهى بـ<span class=\"en\">y</span> قبلها ساكن تصير <span class=\"en\">ies</span>. وفي السؤال والنفي: <span class=\"en\">does</span> للغائب المفرد و<span class=\"en\">do</span> لغيره — <b>والفعل بعدهما يرجع مصدرًا بلا s</b>. وضمائر الوصل: <span class=\"en\">who</span> للعاقل، <span class=\"en\">which</span> لغيره، <span class=\"en\">where</span> للمكان.",
+     yt:"شرح simple present and relative pronouns ثاني متوسط"},
+    {id:"u4", name:"Unit 4 — Favorite Pastimes (ص ٢٦–٣٣)",
+     tip:"ترتيب ظروف التكرار من الأكثر للأقلّ: <span class=\"en\">always · usually · often · sometimes · never</span>. وموضعها <b>قبل الفعل العاديّ وبعد فعل الكون</b> (<span class=\"en\">He always runs</span> · <span class=\"en\">He is always late</span>). وعبارات التكرار: <span class=\"en\">once</span> للمرّة و<span class=\"en\">twice</span> للمرّتين وما فوقهما <span class=\"en\">three times a week</span>. ويُسأل عنها بـ<span class=\"en\">How often</span>. والتركيب <span class=\"en\">know how to + verb</span>. وبعض الأفعال يتبعها مصدرٌ بـ<span class=\"en\">to</span> (<span class=\"en\">want · decide · hope · need · plan</span>) وبعضها اسمُ فاعلٍ بـ<span class=\"en\">ing</span> (<span class=\"en\">enjoy · finish · practice</span>).",
+     yt:"شرح adverbs of frequency and gerund infinitive ثاني متوسط"},
+    {id:"exp1",name:"مراجعة 1–4",
+     tip:"أكثر ما يسقط فيه الطالب في هذه الوحدات أربعة: فعل الكون يتبع الفاعل لا الفعل، و<span class=\"en\">s</span> الغائب المفرد تسقط بعد <span class=\"en\">do/does</span>، وظرف التكرار موضعه يختلف مع <span class=\"en\">be</span> عنه مع الفعل العاديّ، وصوغ <span class=\"en\">ing</span> له ثلاث حالات لا حالة واحدة. راجعها بهذا الترتيب.",
+     yt:"مراجعة انجليزي ثاني متوسط الوحدات الاولى"},
+    {id:"u5", name:"Unit 5 — Is There Any Ice Cream? (ص ٤٠–٤٧)",
+     tip:"المعدود يُجمع ويُسأل عنه بـ<span class=\"en\">How many</span>، وغير المعدود (<span class=\"en\">water · rice · money · bread</span>) لا يُجمع ويُسأل عنه بـ<span class=\"en\">How much</span>. و<span class=\"en\">some</span> في المثبت و<span class=\"en\">any</span> في النفي والسؤال. ووحدات الكمّ: <span class=\"en\">a glass of · a cup of · a piece of · a bottle of</span>. و<span class=\"en\">too</span> تعني الزيادة المذمومة وتأتي <b>قبل</b> الصفة، و<span class=\"en\">enough</span> تعني الكفاية وتأتي <b>بعدها</b>. و<span class=\"en\">would like</span> يتبعها اسمٌ أو <span class=\"en\">to + verb</span>.",
+     yt:"شرح countable uncountable some any too enough ثاني متوسط"},
+    {id:"u6", name:"Unit 6 — What Was It Like? (ص ٤٨–٥٥)",
+     tip:"ماضي فعل الكون: <span class=\"en\">was</span> للمفرد و<span class=\"en\">were</span> لـ<span class=\"en\">you</span> والجمع. وماضي الأفعال القياسيّة بـ<span class=\"en\">ed</span>: ما انتهى بـ<span class=\"en\">e</span> يأخذ <span class=\"en\">d</span> فقط، وما انتهى بـ<span class=\"en\">y</span> قبلها ساكن تصير <span class=\"en\">ied</span>، والمقطع الواحد بساكنٍ بعد متحرّكٍ يُضعَّف. والشاذّة تُحفظ حفظًا (<span class=\"en\">go → went · see → saw · buy → bought</span>). وفي السؤال: <span class=\"en\">Did + فاعل + مصدر</span> — <b>الفعل يرجع مصدرًا</b>. والمقوّيات <span class=\"en\">very · really · quite · extremely</span> تأتي قبل الصفة مباشرةً.",
+     yt:"شرح simple past regular irregular verbs ثاني متوسط"},
+    {id:"u7", name:"Unit 7 — What Happened? (ص ٥٦–٦٣)",
+     tip:"<span class=\"en\">There was</span> للمفرد و<span class=\"en\">There were</span> للجمع. ومع الزمن: <span class=\"en\">ago</span> تأتي <b>بعد</b> المدّة (<span class=\"en\">two days ago</span>)، و<span class=\"en\">last</span> قبل الزمن بلا <span class=\"en\">the</span>، و<span class=\"en\">in</span> مع السنوات والشهور. والضمائر المبهمة: <span class=\"en\">some-</span> في المثبت، و<span class=\"en\">any-</span> في النفي والسؤال، و<span class=\"en\">no-</span> معناها نفيٌ بلا أداة نفي. و<span class=\"en\">because</span> يليها <b>السبب</b> و<span class=\"en\">so</span> تليها <b>النتيجة</b>. وللموافقة: مثبتٌ ⇐ <span class=\"en\">So did I</span>، ومنفيٌّ ⇐ <span class=\"en\">Neither did I</span>.",
+     yt:"شرح there was there were ago because so ثاني متوسط"},
+    {id:"u8", name:"Unit 8 — What's Wrong? (ص ٦٤–٧١)",
+     tip:"النصيحة بـ<span class=\"en\">should + مصدر</span> ونفيها <span class=\"en\">shouldn't</span> — بلا <span class=\"en\">to</span> وبلا <span class=\"en\">s</span> مع الغائب. و<span class=\"en\">when</span> تربط جملتين ويصحّ أن تتقدّم أو تتأخّر (وإذا تقدّمت فبعد جملتها فاصلة). وفرّق بين ثلاثة: ضمير الفاعل (<span class=\"en\">he</span>) وضمير المفعول (<span class=\"en\">him</span>) والصفة الملكيّة (<span class=\"en\">his</span> ويتبعها اسم) وضمير الملكيّة (<span class=\"en\">his</span> ولا يتبعه اسم). وأعضاء الجسد والأعراض: <span class=\"en\">headache · stomachache · sore throat · fever</span>.",
+     yt:"شرح should pronouns possessive adjectives ثاني متوسط"},
+    {id:"exp2",name:"مراجعة 5–8",
+     tip:"أربعةٌ تتكرّر في هذه الوحدات: الفعل يرجع مصدرًا بعد <span class=\"en\">did</span> و<span class=\"en\">should</span>، و<span class=\"en\">some/any</span> يتبعان الإثبات والنفي لا المعنى، و<span class=\"en\">too</span> قبل الصفة و<span class=\"en\">enough</span> بعدها، و<span class=\"en\">because</span> للسبب و<span class=\"en\">so</span> للنتيجة. راجع الشاذّة من الأفعال قبل الاختبار فهي حفظٌ لا قاعدة.",
+     yt:"مراجعة انجليزي ثاني متوسط الوحدات الخامسة للثامنة"}
   ];
   function ytLinkHtml(id){
     var rt=null;
     for(var i=0;i<REMTOPICS.length;i++){ if(REMTOPICS[i].id===id){ rt=REMTOPICS[i]; break; } }
     if(!rt) return '';
-    return '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(rt.yt||rt.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح الدرس</a></div>';
+    /* ═══ القاعدةُ تُعرَض قبل الحلِّ لا بعد الخطأ ═══════════════════
+       بقيّةُ صفحاتِ المنهجِ تعرض قاعدةَ الدرسِ في قسمِها العلاجيّ، وهذه
+       الصفحةُ لا قسمَ علاجيَّ لها — فكانت الوحدةُ تُفتَح على الأسئلةِ
+       مباشرةً بلا سطرٍ يُقرأ. وهي القاعدةُ نفسُها التي تُطبَع في
+       pdf/rules-english8.pdf، فالورقةُ والشاشةُ من مصدرٍ واحد. */
+    var rule = rt.tip ? '<div style="margin-top:10px;background:var(--bg);border-radius:10px;' +
+      'padding:10px 12px;font-size:.92rem;line-height:1.95">💡 ' + rt.tip + '</div>' : '';
+    return rule + '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(rt.yt||rt.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح الدرس</a></div>';
   }
 
   function render(id){
