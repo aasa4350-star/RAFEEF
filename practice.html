@@ -1713,7 +1713,28 @@ async function renderRemedial(){
     Object.keys(x.meta.skills).forEach(function(nm){ var v=x.meta.skills[nm]; if(!v||!v.t) return;
       var a=agg[nm]||(agg[nm]={c:0,t:0}); a.c+=(v.c||0); a.t+=v.t; });
   });
-  function topicStat(s){ var c=0,t=0; (s.keys||[]).forEach(function(k){ if(agg[k]){ c+=agg[k].c; t+=agg[k].t; } }); return {c:c,t:t}; }
+  /* ═══ أسماءُ المهاراتِ صارت «مادّة — موضوع» فانقطعت المطابقة ═══════
+     كان المفتاحُ يُطابَق بالمهارةِ تساويًا تامًّا، ثمّ صارت بنوكُ
+     التحصيليِّ وSTEP تَسِم كلَّ سؤالٍ بـ«رياضيات — الدوال والمتباينات
+     والمصفوفات» و«Grammar — Pronouns». فلم يَعُد مفتاحُ «رياضيات»
+     يطابق شيئًا، فرجع topicStat صفرًا لكلِّ درس، وعَرَضت الصفحةُ
+     «لسّا ما فيه بيانات كافية» — وفي صفوفِ فهدٍ الستّين ستٌّ وسبعون
+     مهارةً مسجّلة.
+
+     وهذا ثاني عمًى يصيب هذا القسمَ بعينِه: الأوّلُ في السحبِ (٣ أكتوبر
+     ٢٠٢٦) وهذا في المطابقة. وكلاهما صامتٌ: الصفحةُ تعمل وتقول جملةً
+     مطمئنّةً، والطالبُ يظنّ أن لا ضعفَ عنده. وقِيس أثرُه: بين ٣ و١٠
+     أكتوبر لم يتحرّك تحصيليُّ فهدٍ (٥٠٪ ← ٤٤٪) لأنّ دليلَه مُطفأ.
+
+     فالمطابقةُ الآن على رأسِ الاسمِ قبل « — » كما على الاسمِ كلِّه. */
+  function topicStat(s){
+    var c=0, t=0, keys=(s.keys||[]);
+    Object.keys(agg).forEach(function(nm){
+      var head = nm.split(" — ")[0];
+      if(keys.indexOf(nm) >= 0 || keys.indexOf(head) >= 0){ c += agg[nm].c; t += agg[nm].t; }
+    });
+    return {c:c, t:t};
+  }
   // التحصيلي وSTEP فوق المستوى (ثانوي) ولا تدخل تقييم الأبناء — فلا نطلقها كـ«ضعف»،
   // نبقيها في المكتبة الاختيارية فقط. كشف الضعف يقتصر على المهارات في مستوى الصفّ (كمي).
   var STRETCH_GROUPS = SENIOR ? {} : {"تحصيلي":1,"STEP":1};
@@ -1733,6 +1754,19 @@ async function renderRemedial(){
     .filter(function(o){ return STRETCH_GROUPS[o.s.group] && o.st.t>=MINQ && (o.st.c/o.st.t)<WEAK; })
     .sort(function(a,b){ return (a.st.c/a.st.t)-(b.st.c/b.st.t); });
 
+  /* ═══ أضعفُ المواضيعِ بأسمائِها ═══════════════════════════════════
+     بطاقاتُ الدروسِ تجمع المواضيعَ في دِلاءٍ خشنة، وبنوكُ الأسئلةِ تَسِم
+     كلَّ سؤالٍ بموضوعِه بالاسم — والبياناتُ في يدِنا أصلًا. فهذي قائمةٌ
+     بأسمائِها تقول له أين يبدأ، ولا تُغني عن البطاقةِ فيها الفيديو
+     والمثالُ المحلولُ والجولة.
+
+     وتُحسَب قبل الرسالةِ أدناه عمدًا: «لسّا ما فيه بيانات كافية» تُقال
+     حين لا يكون في يدِنا شيءٌ أصلًا، فلو قيلت وتحتها اثنا عشرَ موضوعًا
+     بأسمائِها ناقضت نفسَها في شاشةٍ واحدة. */
+  var named = Object.keys(agg).map(function(nm){ return {nm:nm, c:agg[nm].c, t:agg[nm].t}; })
+    .filter(function(o){ return o.t >= MINQ && (o.c/o.t) < WEAK; })
+    .sort(function(a,b){ return (a.c/a.t)-(b.c/b.t) || b.t-a.t; });
+
   var html='';
   /* ═══ الأضعفُ ثمانيةً مفتوحةً، والبقيّةُ مطويّة ════════════════════
        بعد رفع السقف صار لفهد واحدٌ وعشرون درسًا تحت النصف. ولو فُتحت
@@ -1750,10 +1784,30 @@ async function renderRemedial(){
         '➕ وبقيّة مهاراتك تحت ٥٠٪ ('+(weak.length-TOPN)+')</summary><div style="margin-top:8px">'+
         weak.slice(TOPN).map(function(o){ return lessonCard(o.s, o.st, false); }).join('')+'</div></details>';
     }
+  } else if(named.length){
+    /* لا بطاقةَ في المكتبةِ تطابق ضعفَه، ولكنّ مواضيعَه الضعيفةَ معروفةٌ
+       بأسمائِها — فيُقال له ذلك صراحةً وتُعرَض تحتَه، ولا يُقال «ما عندك
+       ضعف» وتحتها اثنا عشرَ موضوعًا تحت النصف. */
+    html += '<div class="intro">🔎 <b>ما فيه درسٌ جاهزٌ لضعفك هنا</b> — لكن مواضيعك الضعيفة معروفة بأسمائها تحت. '+
+      'افتح صفحة المادّة وذاكرها من هناك.</div>';
   } else if(inLevelData){
     html += '<div class="intro">🎉 ما شاء الله! ما عندك مهارة تحت ٥٠٪'+(SENIOR?'':' في مستوى صفّك')+'. استمر 💪 (لو نزلت أي مهارة تحت النصف لاحقًا تظهر لك هنا مع الشرح والفيديو).'+(SENIOR?'':'<br><span style="color:var(--muted);font-weight:600">التحصيلي وSTEP فوق مستوى صفّك، للتعوّد فقط، وما تُحسب هنا.</span>')+'</div>';
   } else {
     html += '<div class="intro">لسّا ما فيه بيانات كافية'+(SENIOR?'':' في القدرات الكمي')+'. اختبر فيها، ويرجع هنا يعرض لك <b>المهارات تحت ٥٠٪ فقط</b> مع الشرح والفيديو والتمارين.</div>';
+  }
+  if(named.length){
+    html += '<div class="intro" style="margin-top:14px">🔎 <b>أضعف مواضيعك بالاسم</b> '+
+      '<span style="color:var(--muted);font-weight:600">(من آخر جلساتك — ابدأ من فوق)</span></div>'+
+      '<div class="card" style="padding:10px 13px"><ul style="margin:0;padding-inline-start:20px;line-height:2.1">'+
+      named.slice(0, 12).map(function(o){
+        var p = Math.round(o.c/o.t*100);
+        return '<li>'+o.nm.replace(/</g,'&lt;')+
+          /* nowrap: «0% — 0/3» انكسر على سطرَين في القياس فصار الرقمُ غيرَ مقروء */
+          ' <b dir="ltr" style="unicode-bidi:isolate;white-space:nowrap;color:'+(p<30?'var(--bad)':'#b45309')+'">'+
+          p+'% — '+o.c+'/'+o.t+'</b></li>';
+      }).join('')+'</ul>'+
+      (named.length>12 ? '<div style="color:var(--muted);font-weight:600;margin-top:6px">وتحتها '+
+        (named.length-12)+' موضوعًا آخر.</div>' : '')+'</div>';
   }
   if(weakStretch.length){
     html += '<div class="intro" style="margin-top:14px">🚀 <b>فوق المستوى — تحصيلي/STEP تحت ٥٠٪</b> (لا تُحسب ضعفًا في مستوى صفّك، لكنها فرصة تهيئة مبكرة). شاهد الفيديو ثم حُلّ الجولة تحتها.</div>';
