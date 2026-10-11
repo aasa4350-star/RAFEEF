@@ -1245,6 +1245,16 @@ function fatriPath(){
     /* حدّد الأبُ مقرَّرَ سعود (٧ أكتوبر): القيمةُ المنزليّةُ والجمعُ
        والطرحُ والبيانات — ثلاثةٌ لا ستّة. والتوزيعُ يتبع بنكَ كلٍّ:
        الأوّلان خمسةُ مولّداتٍ لكلٍّ فيُستوفيان، والثالثُ اثنا عشر. */
+    /* ═══ علومُ أسامة ═══════════════════════════════════════════════
+       أرسل الأبُ (١١ أكتوبر ٢٠٢٦) صورةَ فهرسِ الكتابِ مخطَّطًا عليها
+       ثلاثةَ فصول: الأوّل (ص ٢٢) والثاني (ص ٥٤) والثالث (ص ٨٢) — أي
+       الوحدةُ الأولى كاملةً وأوّلُ فصلٍ من الثانية. والشكلُ هو شكلُ
+       فتريِّه في الرياضيات: عشرةُ أسئلةٍ بدرجتين، وبلا اسمِ الدرس. */
+    'science5.html': { ids:['l11','l12','l21','l22','l31','l32'], mcq:10, mark:2, essay:0,
+                    countMap:{l11:2,l12:2,l21:2,l22:1,l31:2,l32:1},
+                    noLessonTag:true, distinctTypes:true, bankItems:true,
+                    label:'علوم خ٥ — الفتري 📝', ban:/"l4\d"|"l5\d"|"l6\d"|"all\d"/,
+                    banMsg:'درسٌ خارجَ مقرَّرِ أسامة (الفصولُ الأوّلُ والثاني والثالثُ وحدَها) دخل الفتري' },
     'math4.html': { ids:['f2'], mcq:10, mark:2, essay:0, perMap:{f2:10}, noLessonTag:true, distinctTypes:true,
                     label:'رياضيات خ٤ — الفتري 📝', ban:/"f1"|"f3"|"f4"|"f5"|"f6"|"fw"|"all"/, banMsg:'فصلٌ خارجَ مقرَّرِ سعود (المقرَّرُ الجمعُ والطرحُ وحدَه)' }
   };
@@ -1387,11 +1397,31 @@ function fatriOne(f, SP){
       E('الفتري يسحب أسئلتَه عشوائيًّا فيتكرّر النوعُ في الجولةِ الواحدة');
     for (const id of SP.ids){
       const nm = id.toUpperCase();
-      const bm = new RegExp('var ' + nm + ' = \\[([\\s\\S]*?)\\];').exec(src);
-      if (!bm){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
-      const cnt = bm[1].split(',').map(x => x.trim()).filter(x => /^g[A-Za-z0-9_]+$/.test(x)).length;
-      if (cnt < SP.mcq)
-        E('بنكُ ' + nm + ' فيه ' + cnt + ' نوعًا والأسئلةُ ' + SP.mcq +
+      /* ═══ شكلان للبنوك ═══════════════════════════════════════════
+         صفحاتُ الرياضيات بنوكُها دوالُّ مولّدةٌ مسمّاة (gXxx)، فالتنوّعُ
+         عددُ الدوالّ. وصفحاتُ العلومِ بنكُها مصفوفةُ أسئلةٍ جاهزةٍ ومولّدٌ
+         واحدٌ يسحب منها (bankGen)، فالتنوّعُ عددُ الأسئلةِ في المصفوفة.
+         وكان الفحصُ يعرف الشكلَ الأوّلَ وحدَه فعدَّ بنوكَ العلومِ صفرًا. */
+      const need = SP.countMap ? (SP.countMap[id] || 1) : SP.mcq;
+      let cnt;
+      if (SP.bankItems){
+        const lit = EXTRACT.literalAfter(src, new RegExp('(?:var|let|const)\\s+' + nm + '\\s*='), '[', ']');
+        if (!lit){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
+        let d=0, q=null, esc=false; cnt=1;
+        for (let i=0;i<lit.length;i++){ const ch=lit[i];
+          if (q){ if(esc){esc=false;continue;} if(ch==='\\'){esc=true;continue;} if(ch===q)q=null; continue; }
+          if (ch==='"'||ch==="'"||ch==='`'){ q=ch; continue; }
+          if (ch==='['||ch==='{'||ch==='('){ d++; continue; }
+          if (ch===']'||ch==='}'||ch===')'){ d--; continue; }
+          if (ch===',' && d===1) cnt++;
+        }
+      } else {
+        const bm = new RegExp('var ' + nm + ' = \\[([\\s\\S]*?)\\];').exec(src);
+        if (!bm){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
+        cnt = bm[1].split(',').map(x => x.trim()).filter(x => /^g[A-Za-z0-9_]+$/.test(x)).length;
+      }
+      if (cnt < need)
+        E('بنكُ ' + nm + ' فيه ' + cnt + ' نوعًا والمطلوبُ ' + need +
           ' — فلا بدّ أن يتكرّر النوعُ في الجولةِ الواحدة');
     }
   }
