@@ -793,7 +793,7 @@ if(!NAMES[who]){
 
      والدرجةُ عشرون كما في بقيّةِ اختباراتِ الفتريّ، فالسؤالُ بدرجة. */
   CHAPS = Object.assign({ fatri:{ name:"📝 الفتري", ids:["fatri"],
-    unit:'📝 <b>الاختبار الفتري</b> — طبيعة العلم · تغيّرات الأرض · أنشطة في الخلية · ٢٠ سؤالًا · ٢٠ درجة' } }, CHAPS);
+    unit:'📝 <b>الاختبار الفتري</b> — طبيعة العلم · تغيّرات الأرض · أنشطة في الخلية · ١٤ سؤالًا ومقاليّان · ٢٠ درجة' } }, CHAPS);
   CFG.fatri = { tab:"الفتري 📝", gens:[], n:0, intro:"", label:"علوم م٣ — الفتري 📝" };
 
   var curCh = "fatri", curId = "fatri";
@@ -982,19 +982,47 @@ if(!NAMES[who]){
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
 
-  var FATRI_IDS = ["l1","l1","l2","l2","l2","l3","l3",
-                   "eq","eq","eq","volc","volc","plate","plate",
-                   "cell","cell","cell","cell","cell","cell"];
-  var FATRI_MCQ = FATRI_IDS.length;         /* ٢٠ */
-  var FATRI_ESSAY = 0;                      /* لا مقاليَّ في اختبارِه */
-  var FATRI_TOTAL = FATRI_MCQ;              /* ٢٠ — درجةٌ لكلّ سؤال */
+  var FATRI_IDS = ["l1","l1","l2","l2","l3",
+                   "eq","eq","volc","volc","plate","plate",
+                   "cell","cell","cell"];
+  var FATRI_MCQ = FATRI_IDS.length;         /* ١٤ */
+  /* ═══ سؤالان مقاليّان — طلبُ الأب (١١ أكتوبر ٢٠٢٦) ═══════════════════
+     وهما شكلُ ما في ورقةِ معلّمِه بعينِه: ورقتُه فيها مرّتين «تُعطى
+     تجربةٌ فحدِّد الفرضيةَ والمتغيّرَ المستقلَّ والتابعَ وثابتَين»،
+     وفيها جدولا مقارنةٍ (بناءٌ ضوئيٌّ مقابلَ تنفّسٍ خلويّ، وتنفّسٌ
+     خلويٌّ مقابلَ تخمّر). فواحدٌ من كلِّ شكل.
+     ثلاثُ درجاتٍ لكلٍّ، فالمجموعُ عشرون كما كان. */
+  var FATRI_ESSAY = 6;                      /* ٣ لكلِّ مقاليّ */
+  var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;  /* ٢٠ */
   /* الوسمُ في الحفظِ فقط — لا يُعرَض فوقَ السؤال */
   var FATRI_AR = { l1:"1-1 أسلوب العلم", l2:"1-2 عمل العلم", l3:"1-3 العلم والتقنية",
                    eq:"2-1 الزلازل", volc:"2-2 البراكين", plate:"2-3 الصفائح",
                    cell:"أنشطة في الخلية" };
 
+  /* ═══ بنكُ المقاليّ ═══════════════════════════════════════════════
+     نوعان كما في ورقةِ معلّمِه: تحليلُ تجربةٍ (متغيّراتٌ وثوابت)،
+     ومقارنةُ عمليّتَين. ولكلّ نوعٍ أكثرُ من نصٍّ فلا يحفظ الجوابَ
+     بإعادةِ الاختبار. */
+  var ESSAY_EXP = [
+    { stem:"في تجربةٍ لدراسة العلاقة بين <b>درجة الحرارة</b> و<b>ضغط الغاز</b>، وضع سلمانُ كمّيّةً متساويةً من غازٍ ما في ثلاثة أوعيةٍ متساويةِ الحجم، وقاس الضغطَ عند "+en("٢٥")+" و"+en("٣٠")+" و"+en("٣٥")+" درجةً مئويّة.<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين.",
+      model:"<b>الفرضية:</b> كلّما ارتفعت درجةُ حرارة الغاز ارتفع ضغطُه (والعكس).<br><b>المتغيّر المستقلّ:</b> درجةُ الحرارة — هو ما غيّره الباحثُ بنفسه.<br><b>المتغيّر التابع:</b> ضغطُ الغاز — هو ما قاسه ويتأثّر بالتغيير.<br><b>الثوابت:</b> نوعُ الغاز · كمّيّةُ الغاز · حجمُ الوعاء (أيُّ اثنين)." },
+    { stem:"في تجربةٍ عمليّةٍ لدراسة <b>أثر كمّيّة الماء</b> في كمّيّة <b>الرغوة</b> المتكوّنة من الصابون:<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين.",
+      model:"<b>الفرضية:</b> كلّما زادت كمّيّةُ الماء زادت كمّيّةُ الرغوة المتكوّنة.<br><b>المتغيّر المستقلّ:</b> كمّيّةُ الماء.<br><b>المتغيّر التابع:</b> كمّيّةُ الرغوة.<br><b>الثوابت:</b> نوعُ الصابون · كمّيّتُه · نوعُ الإناء · مدّةُ التحريك وقوّتُه (أيُّ اثنين)." },
+    { stem:"أراد باحثٌ معرفةَ <b>أثر كمّيّة السماد</b> في <b>طول نبات الفول</b>، فزرع أربع مجموعاتٍ متماثلةٍ وأعطى كلًّا منها كمّيّةً مختلفةً من السماد.<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين، وما <b>العيّنة الضابطة</b> هنا؟",
+      model:"<b>الفرضية:</b> كلّما زادت كمّيّةُ السماد زاد طولُ النبات (إلى حدٍّ معيّن).<br><b>المستقلّ:</b> كمّيّةُ السماد · <b>التابع:</b> طولُ النبات.<br><b>الثوابت:</b> نوعُ البذور · كمّيّةُ الماء · نوعُ التربة · مدّةُ الإضاءة (أيُّ اثنين).<br><b>العيّنة الضابطة:</b> المجموعةُ التي لم تُعطَ سمادًا — يُقارَن بها الباقي." }
+  ];
+  var ESSAY_CMP = [
+    { stem:"<b>قارن</b> بين <b>البناء الضوئيّ</b> و<b>التنفّس الخلويّ</b> من حيث: مصدرُ الطاقة، وأين يحدث، والموادُّ المتفاعلة، والموادُّ الناتجة.",
+      model:"<b>البناء الضوئيّ:</b> مصدرُ الطاقة ضوءُ الشمس · يحدث في البلاستيدات الخضراء · المتفاعلات: ماء + ثاني أكسيد الكربون · النواتج: جلوكوز + أكسجين.<br><b>التنفّس الخلويّ:</b> مصدرُ الطاقة الغذاء (الجلوكوز) · يبدأ في السيتوبلازم ويُستكمَل في الميتوكندريا · المتفاعلات: جلوكوز + أكسجين · النواتج: ماء + ثاني أكسيد كربون + طاقة.<br><b>وهما متعاكسان:</b> ما ينتجه أحدُهما يستهلكه الآخر." },
+    { stem:"<b>قارن</b> بين <b>التنفّس الخلويّ</b> و<b>التخمّر</b> من حيث: وجودُ الأكسجين، وأين يحدث، والموادُّ الناتجة، وكمّيّةُ الطاقة.",
+      model:"<b>التنفّس الخلويّ:</b> يحتاج أكسجينًا · يبدأ في السيتوبلازم ويُستكمَل في الميتوكندريا · ينتج ماءً وثاني أكسيد كربونٍ وطاقة · وطاقتُه <b>كبيرة</b>.<br><b>التخمّر:</b> بلا أكسجين · كلُّه في السيتوبلازم · ينتج كحولًا وثاني أكسيد كربون (أو حمضَ اللاكتيك) · وطاقتُه <b>قليلة</b>.<br>ولذلك تلجأ الخلايا للتخمّر عند <b>نقص الأكسجين</b> فقط." },
+    { stem:"<b>قارن</b> بين <b>النقل السلبيّ</b> و<b>النقل النشط</b> عبر الغشاء الخلويّ من حيث: الحاجةُ إلى الطاقة، واتّجاهُ الحركة بالنسبة لتدرّج التركيز، ومثالٌ على كلٍّ منهما.",
+      model:"<b>النقل السلبيّ:</b> لا يحتاج طاقة · يسير <b>مع</b> تدرّج التركيز (من الأعلى إلى الأدنى) · أمثلته: الانتشار، والخاصيّة الأسموزيّة، والانتشار المدعوم.<br><b>النقل النشط:</b> يحتاج طاقة · يسير <b>عكس</b> تدرّج التركيز (من الأدنى إلى الأعلى) · ومنه البلعمةُ والإخراجُ الخلويُّ لنقل الجزيئات الضخمة." }
+  ];
+
   function renderFatri(){
     var sec = panelOf("fatri");
+    var ESS = [ gp(ESSAY_EXP), gp(ESSAY_CMP) ];
     var items = [], need = {};
     FATRI_IDS.forEach(function(id){ need[id] = (need[id]||0) + 1; });
     var drawn = {};
@@ -1009,7 +1037,7 @@ if(!NAMES[who]){
     var html =
       '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
         '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — العلوم</div>'+
-        '<b>٢٠ سؤالًا · ٢٠ درجة</b> — درجةٌ لكلّ سؤال.'+
+        '<b>١٤ سؤالًا ومقاليّان · ٢٠ درجة</b> — درجةٌ لكلّ سؤالِ اختيار، وثلاثٌ لكلّ مقاليّ.'+
         '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
       '</div>';
     items.forEach(function(q,i){
@@ -1019,6 +1047,16 @@ if(!NAMES[who]){
         q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
         '</div><div class="explain">'+q[3]+'</div></div>';
     });
+    /* المقاليّان: الحلُّ النموذجيُّ لا يظهر قبل أن يكتب — وإلّا نقله */
+    ESS.forEach(function(E, k){
+      html += '<div class="q" data-essay="'+k+'"><div class="num">سؤال '+(items.length+1+k)+
+        ' <span style="color:var(--muted);font-weight:600">· مقالي · ٣ درجات</span></div>'+
+        '<div class="stem">'+E.stem+'</div>'+
+        '<textarea data-etext="'+k+'" rows="6" placeholder="اكتب جوابك هنا..." style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:1rem;line-height:1.9;background:var(--bg);color:var(--ink)"></textarea>'+
+        '<button data-eshow="'+k+'" style="margin-top:8px;background:var(--accent);color:#fff;border:0;padding:11px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">✅ خلّصت — أرني الحلّ النموذجي</button>'+
+        '<div data-emodel="'+k+'" style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:12px 14px;line-height:2"></div>'+
+        '<div data-erub="'+k+'" style="display:none;margin-top:10px"></div></div>';
+    });
     html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
       '<button class="reset">اختبار جديد 🔄</button>';
     sec.innerHTML = html;
@@ -1026,9 +1064,12 @@ if(!NAMES[who]){
     var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
     sec._pid = pid; sec._frag = true;
     var answered={}, correct=0, savedN=0, saved=false;
+    var essayMark=[null,null], essayText=["",""];
     var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
     var scoreEl = sec.querySelector("[data-score]");
-    function marks(){ return correct; }
+    function essaySum(){ return (essayMark[0]||0) + (essayMark[1]||0); }
+    function essayDone(){ return essayMark[0]!=null && essayMark[1]!=null; }
+    function marks(){ return correct + essaySum(); }
     function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
     function meta(){
       /* ═══ لا حارسَ تأنٍّ هنا ═══════════════════════════════════════
@@ -1037,10 +1078,15 @@ if(!NAMES[who]){
          طلبٍ ولا قياسٍ على مادّتها. وتبقى dur وfast محفوظتَين فيُقرآن. */
       return { dur: Math.round((Date.now()-t0)/1000), fast: fastN, trusted: true,
                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ };
+               mcq: correct, mcqTotal: FATRI_MCQ,
+               /* نصُّ المقاليّ ودرجتُه الذاتيّةُ يقرؤهما تقريرُ الأبِ
+                  (home.html وchild.html) فيراجع تقديرَ ابنِه بنفسه.
+                  والنصّان يُدمجان بفاصلٍ ظاهرٍ لأنّ العقدَ حقلٌ واحد. */
+               essay: essayText.map(function(t,i){ return "("+(i+1)+") "+t; }).join("\n\n").slice(0, 1200),
+               essaySelf: essaySum(), essayMax: FATRI_ESSAY };
     }
     function save(force){
-      var done = Object.keys(answered).length === FATRI_MCQ;
+      var done = Object.keys(answered).length === FATRI_MCQ && essayDone();
       if(!force && !done) return;
       if(savedN >= marks() && saved && !done) return;
       savedN = marks(); saved = true; if(done) sec._frag=false;
@@ -1064,9 +1110,54 @@ if(!NAMES[who]){
         });
       });
     });
-    function savePartial(){ if(Object.keys(answered).length < 1) return; save(true); }
+    /* ═══ مسارُ المقاليّ ═══════════════════════════════════════════════
+       النموذجُ لا يُعرَض قبل أن يكتب عشرةَ أحرفٍ على الأقلّ، وإلّا نقله
+       ولم يُفد. ثمّ يضع درجتَه بنفسِه مقارنًا بالنموذج — وهو تقديرٌ
+       ذاتيٌّ يراجعه أبوه في التقرير، لأنّ تصحيحَ المقاليِّ آليًّا
+       تخمين. */
+    ESS.forEach(function(E, k){
+      var eBtn = sec.querySelector('[data-eshow="'+k+'"]');
+      var eTa  = sec.querySelector('[data-etext="'+k+'"]');
+      if(!eBtn || !eTa) return;
+      eBtn.addEventListener("click", function(){
+        essayText[k] = (eTa.value||"").trim();
+        if(essayText[k].length < 10){
+          eBtn.textContent = "✍️ اكتب جوابك أوّلًا";
+          setTimeout(function(){ eBtn.textContent = "✅ خلّصت — أرني الحلّ النموذجي"; }, 1800);
+          return;
+        }
+        eTa.readOnly = true; eBtn.disabled = true; eBtn.style.opacity = ".5";
+        var m = sec.querySelector('[data-emodel="'+k+'"]');
+        m.style.display = "block"; m.innerHTML = E.model;
+        var r = sec.querySelector('[data-erub="'+k+'"]');
+        r.style.display = "block";
+        r.innerHTML = '<div style="font-weight:800;margin-bottom:8px">⚖️ قارن جوابك بالنموذج وضع درجتك بصدق:</div>'+
+          '<div class="row" style="display:flex;gap:7px;flex-wrap:wrap">'+
+          [[3,"كامل — كلّ المطلوب صحيح"],[2,"أكثره صحيح"],[1,"جزءٌ يسير"],[0,"ما ضبط شي"]]
+            .map(function(x){ return '<button data-em="'+x[0]+'" style="flex:1;min-width:130px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit">'+x[0]+' — '+x[1]+'</button>'; }).join('')+
+          '</div><div style="color:var(--muted);font-size:.88rem;margin-top:8px;font-weight:600">درجتك هذي تطلع لأبوك مع نصّ جوابك — فيراجعها.</div>';
+        r.querySelectorAll("[data-em]").forEach(function(b){
+          b.addEventListener("click", function(){
+            if(essayMark[k]!=null) return;
+            essayMark[k] = +b.dataset.em;
+            r.querySelectorAll("[data-em]").forEach(function(x){ x.disabled=true; x.style.opacity=".45"; });
+            b.style.background="var(--accent)"; b.style.color="#fff"; b.style.opacity="1";
+            draw(); save();
+          });
+        });
+      });
+    });
+
+    function savePartial(){
+      essayText = essayText.map(function(t,i){
+        var ta = sec.querySelector('[data-etext="'+i+'"]');
+        return t || ((ta && ta.value)||"").trim();
+      });
+      if(Object.keys(answered).length < 1 && !essaySum()) return;
+      save(true);
+    }
     sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ; };
+    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ && essayDone(); };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
     draw();
   }

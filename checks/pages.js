@@ -1258,8 +1258,8 @@ function fatriPath(){
        والخليّةُ لم يكن لها في الصفحةِ حرفٌ واحدٌ قبل ذلك اليوم، وهي
        ستٌّ من عشرين في الورقة — فلو سقط بنكُها عاد ثلثُ الاختبارِ
        فارغًا بلا صوت. */
-    'science9.html': { ids:['l1','l2','l3','eq','volc','plate','cell'], mcq:20, essay:0,
-                    countMap:{l1:2, l2:3, l3:2, eq:3, volc:2, plate:2, cell:6},
+    'science9.html': { ids:['l1','l2','l3','eq','volc','plate','cell'], mcq:14, essay:6,
+                    countMap:{l1:2, l2:2, l3:1, eq:2, volc:2, plate:2, cell:3},
                     bankName:{l1:'L1', l2:'L2', l3:'L3', eq:'EQ', volc:'VOLC', plate:'PLATE', cell:'CELL'},
                     noLessonTag:true, distinctTypes:true, bankItems:true,
                     label:'علوم م٣ — الفتري 📝' },
@@ -1480,9 +1480,12 @@ function fatriOne(f, SP){
      خطأٌ في الحارسِ لا في الصفحة. وبالمقابل: من أُلغي مقاليُّه يجب
      ألّا تبقى في صفحتِه بقايا منه — فنتحقّق من ذهابِها. */
   if (SP.essay > 0){
-    if (!/essayText\.length < 10/.test(src))
+    /* الصفحاتُ تكتب المقاليَّ بشكلَين: واحدٌ (essayText) أو أكثر
+       (essayText[k])، فيُفحَص الأثرُ لا هجاءٌ بعينِه — وإلّا صاح
+       الحارسُ على تنفيذٍ صحيحٍ وسكت عن حذفٍ بصياغةٍ أخرى. */
+    if (!/essayText(\[[^\]]*\])?\.length < 10/.test(src))
       E('الحلُّ النموذجيُّ يظهر قبل أن يكتب — فينقله');
-    if (!/essay: essayText\.slice/.test(src) || !/essaySelf: essayMark/.test(src))
+    if (!/essay:\s*essayText/.test(src) || !/essaySelf:\s*essay/.test(src))
       E('نصُّ المقاليِّ أو درجتُه الذاتيّةُ لا تُحفَظ — فلا يراجعها الأب');
   } else {
     if (/data-essay|fatriEssay|essayMark/.test(src))
