@@ -27,7 +27,7 @@
   }
  },
  "rules": {
-  "generated": "2026-10-11T12:00:54.911Z",
+  "generated": "2026-10-11T16:02:38.680Z",
   "pages": {
    "bio10": {
     "source": "bio10.html",
@@ -199,9 +199,16 @@
    },
    "science9": {
     "source": "science9.html",
-    "lessons": 6,
+    "lessons": 7,
     "file": "rules-science9.pdf",
-    "hash": "7732a1054608749a"
+    "hash": "eb2b1d79f59e9268"
+   },
+   "science9-fatri": {
+    "source": "science9.html",
+    "lessons": 7,
+    "file": "rules-science9-fatri.pdf",
+    "questions": 20,
+    "hash": "a05944d483bb1801"
    }
   },
   "kids": {
@@ -235,7 +242,7 @@
      "lughati9",
      "khitaba"
     ],
-    "lessons": 103,
+    "lessons": 104,
     "file": "rules-all-hasan.pdf"
    },
    "rafeef": {
