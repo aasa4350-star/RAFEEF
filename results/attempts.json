@@ -1,5 +1,814 @@
 [
     {
+        "id": "e78df642-50f0-406c-bb17-f4a37dfc11ee",
+        "created_at": "2026-10-12T02:52:01.883676+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:52:01.214Z",
+            "cid": "1791773521214_9z1no1gy6c",
+            "dur": 172,
+            "mcq": 10,
+            "pid": "mv4nl8am_1dyeq7",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 7719,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimateHundred",
+                    "j": 2,
+                    "ms": 4558,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gMentalAdd",
+                    "j": 2,
+                    "ms": 3514,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gAdd",
+                    "j": 2,
+                    "ms": 11583,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordSub4",
+                    "j": 2,
+                    "ms": 32501,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimate",
+                    "j": 2,
+                    "ms": 5518,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gSubZeros",
+                    "j": 0,
+                    "ms": 15017,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gPropName",
+                    "j": 1,
+                    "ms": 4948,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingSub",
+                    "j": 1,
+                    "ms": 9287,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWordTwoStep4",
+                    "j": 1,
+                    "ms": 67457,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 20,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "c5c7dc26-0ba9-4a68-ad62-c05c643740a3",
+        "created_at": "2026-10-12T02:51:51.38748+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:51:51.028Z",
+            "cid": "1791773511028_j5z2p8bjw28",
+            "dur": 162,
+            "mcq": 10,
+            "pid": "mv4nl8am_1dyeq7",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 7719,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimateHundred",
+                    "j": 2,
+                    "ms": 4558,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gMentalAdd",
+                    "j": 2,
+                    "ms": 3514,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gAdd",
+                    "j": 2,
+                    "ms": 11583,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordSub4",
+                    "j": 2,
+                    "ms": 32501,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimate",
+                    "j": 2,
+                    "ms": 5518,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gSubZeros",
+                    "j": 0,
+                    "ms": 15017,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gPropName",
+                    "j": 1,
+                    "ms": 4948,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingSub",
+                    "j": 1,
+                    "ms": 9287,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWordTwoStep4",
+                    "j": 1,
+                    "ms": 67457,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 20,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "1cf5ebe3-dd17-4299-a38f-768d9c5435c9",
+        "created_at": "2026-10-12T02:49:09.168998+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:49:08.910Z",
+            "cid": "1791773348910_0wj2cbxm3ghr",
+            "dur": 9,
+            "mcq": 1,
+            "pid": "mv4nl1nh_1a0ebf",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gSubZeros",
+                    "j": 1,
+                    "ms": 5549,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 2,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "8cb68512-92de-4e7c-bffe-f4a63de9c78c",
+        "created_at": "2026-10-12T02:48:58.314832+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:48:58.045Z",
+            "cid": "1791773338045_mgmu9uxa7nn",
+            "dur": 8,
+            "mcq": 0,
+            "pid": "mv4nkttu_1u7z0a",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gMissingSub",
+                    "j": 0,
+                    "ms": 6736,
+                    "ok": 0
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "196e00e7-b88d-4187-8d67-2076fb1eeed7",
+        "created_at": "2026-10-12T02:48:48.225298+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:48:47.922Z",
+            "cid": "1791773327922_staq3orm7bl",
+            "dur": 84,
+            "mcq": 1,
+            "pid": "mv4niyz0_2jq5ix",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gMissingAddend",
+                    "j": 1,
+                    "ms": 21557,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gAddThree",
+                    "j": 2,
+                    "ms": 60819,
+                    "ok": 0
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 1,
+                    "t": 2
+                }
+            },
+            "correct": 2,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "95428f2a-3714-4f21-8f54-dc0a0ace8d60",
+        "created_at": "2026-10-12T02:47:23.787457+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:47:23.507Z",
+            "cid": "1791773243507_9bkmy4g98ya",
+            "dur": 150,
+            "mcq": 9,
+            "pid": "mv4nfrfw_1xwuqi",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gMentalAdd",
+                    "j": 1,
+                    "ms": 6325,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimate",
+                    "j": 2,
+                    "ms": 6663,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 6218,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gAddThree",
+                    "j": 0,
+                    "ms": 26369,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gSubZeros",
+                    "j": 0,
+                    "ms": 11783,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimateHundred",
+                    "j": 2,
+                    "ms": 6237,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gSub",
+                    "j": 2,
+                    "ms": 13282,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gPropName",
+                    "j": 0,
+                    "ms": 3803,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "gWordAdd4",
+                    "j": 1,
+                    "ms": 49766,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingSub",
+                    "j": 1,
+                    "ms": 4824,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 9,
+                    "t": 10
+                }
+            },
+            "correct": 18,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "c15d9b39-5972-4756-988f-3d1418944eb6",
+        "created_at": "2026-10-12T02:47:09.441203+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:47:09.076Z",
+            "cid": "1791773229076_zj1eaa0jolo",
+            "dur": 135,
+            "mcq": 9,
+            "pid": "mv4nfrfw_1xwuqi",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gMentalAdd",
+                    "j": 1,
+                    "ms": 6325,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimate",
+                    "j": 2,
+                    "ms": 6663,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 6218,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gAddThree",
+                    "j": 0,
+                    "ms": 26369,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gSubZeros",
+                    "j": 0,
+                    "ms": 11783,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimateHundred",
+                    "j": 2,
+                    "ms": 6237,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gSub",
+                    "j": 2,
+                    "ms": 13282,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gPropName",
+                    "j": 0,
+                    "ms": 3803,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "gWordAdd4",
+                    "j": 1,
+                    "ms": 49766,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingSub",
+                    "j": 1,
+                    "ms": 4824,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 9,
+                    "t": 10
+                }
+            },
+            "correct": 18,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "67c8f67d-556e-4f42-8e5e-efd4116136e9",
+        "created_at": "2026-10-12T02:44:35.223376+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:44:34.678Z",
+            "cid": "1791773074678_yfxjctaigb",
+            "dur": 25,
+            "mcq": 2,
+            "pid": "mv4net15_4diuth",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gPropName",
+                    "j": 1,
+                    "ms": 13380,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gEstimateSubK",
+                    "j": 2,
+                    "ms": 4150,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gMissingSub",
+                    "j": 0,
+                    "ms": 4506,
+                    "ok": 0
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 2,
+                    "t": 3
+                }
+            },
+            "correct": 4,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "0fce7223-01c7-4890-b330-48892a54fac2",
+        "created_at": "2026-10-12T02:44:09.411833+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:44:09.176Z",
+            "cid": "1791773049176_tk04j7qhdsi",
+            "dur": 998,
+            "mcq": 10,
+            "pid": "mv4mteml_3keocb",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "gAssoc",
+                    "j": 2,
+                    "ms": 7023,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWordTwoStep4",
+                    "j": 1,
+                    "ms": 815522,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordSub4",
+                    "j": 2,
+                    "ms": 29813,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordAdd4",
+                    "j": 2,
+                    "ms": 15744,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 19229,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gEstimateHundred",
+                    "j": 1,
+                    "ms": 7935,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingAddend",
+                    "j": 1,
+                    "ms": 3930,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gMentalAdd",
+                    "j": 2,
+                    "ms": 6692,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gCheckSub",
+                    "j": 1,
+                    "ms": 2763,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gAddThree",
+                    "j": 2,
+                    "ms": 70773,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 20,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
+        "id": "8c14a454-f3c3-4523-8545-f54578949ae0",
+        "created_at": "2026-10-12T02:43:51.583198+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-12T02:43:50.191Z",
+            "cid": "1791773030190_3wfhod8b4fj",
+            "dur": 979,
+            "mcq": 10,
+            "pid": "mv4mteml_3keocb",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u062e\u0664 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "gAssoc",
+                    "j": 2,
+                    "ms": 7023,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWordTwoStep4",
+                    "j": 1,
+                    "ms": 815522,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordSub4",
+                    "j": 2,
+                    "ms": 29813,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWordAdd4",
+                    "j": 2,
+                    "ms": 15744,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gEstimateSubK",
+                    "j": 0,
+                    "ms": 19229,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gEstimateHundred",
+                    "j": 1,
+                    "ms": 7935,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gMissingAddend",
+                    "j": 1,
+                    "ms": 3930,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gMentalAdd",
+                    "j": 2,
+                    "ms": 6692,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gCheckSub",
+                    "j": 1,
+                    "ms": 2763,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gAddThree",
+                    "j": 2,
+                    "ms": 70773,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 20,
+            "trusted": true,
+            "mcqTotal": 10
+        }
+    },
+    {
         "id": "adb06cd9-c3af-4a65-9bd3-d3db8d5d0ba8",
         "created_at": "2026-10-12T02:29:10.506423+00:00",
         "student": "\u062d\u0633\u0646",
@@ -140334,640 +141143,6 @@
                 }
             },
             "correct": 0,
-            "trusted": true
-        }
-    },
-    {
-        "id": "149623ad-fd83-412e-be68-a0880bac64d3",
-        "created_at": "2026-10-08T13:17:15.216328+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:17:14.786Z",
-            "cid": "1791465434786_xkv6z1kct4q",
-            "dur": 36,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 2,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gUn",
-                    "j": 2,
-                    "ms": 2966,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gStateAction",
-                    "j": 1,
-                    "ms": 3584,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gUnMean",
-                    "j": 0,
-                    "ms": 1944,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gStateProg",
-                    "j": 0,
-                    "ms": 1663,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gStateProg",
-                    "j": -1,
-                    "ms": 17529,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gPIExp",
-                    "j": 1,
-                    "ms": 4531,
-                    "ok": 0
-                }
-            ],
-            "total": 6,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0645\u0639\u0646\u0649 \u0627\u0644\u0633\u0627\u0628\u0642\u0629 un\u2011": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0627\u0644\u0647\u0648\u0627\u064a\u0627\u062a \u0648\u0627\u0644\u0641\u0646\u0648\u0646": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0633\u0627\u0628\u0642\u0629 un\u2011 \u0644\u0635\u0646\u0639 \u0627\u0644\u0636\u062f\u0651": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0641\u0639\u0644\u064f \u062d\u0627\u0644\u0629\u064d \u0623\u0645 \u0641\u0639\u0644\u064f \u062d\u062f\u062b": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0645\u0633\u062a\u0645\u0631\u0651 \u0644\u0644\u062d\u062f\u062b \u0627\u0644\u0622\u0646\u064a\u0651": {
-                    "c": 2,
-                    "t": 2
-                }
-            },
-            "correct": 5,
-            "trusted": true
-        }
-    },
-    {
-        "id": "359025e4-2ca5-4412-8708-27908e07d17c",
-        "created_at": "2026-10-08T13:16:46.155957+00:00",
-        "student": "\u0633\u0639\u0648\u062f",
-        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:16:44.682Z",
-            "cid": "1791465404682_msuv4ykduzb",
-            "dur": 187,
-            "pid": "muzk4wdm_2afvps",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u06412 \u2014 \u0627\u0644\u062c\u0645\u0639 \u0648\u0627\u0644\u0637\u0631\u062d",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gMentalAdd",
-                    "j": 1,
-                    "ms": 6982,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWordSub4",
-                    "j": 2,
-                    "ms": 9715,
-                    "ok": 0
-                },
-                {
-                    "a": 2,
-                    "g": "gEstimateHundred",
-                    "j": -1,
-                    "ms": 17270,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWordAdd4",
-                    "j": 1,
-                    "ms": 40901,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gAddThree",
-                    "j": 0,
-                    "ms": 19884,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWordTwoStep4",
-                    "j": 0,
-                    "ms": 12549,
-                    "ok": 0
-                },
-                {
-                    "a": 0,
-                    "g": "gCheckSub",
-                    "j": 1,
-                    "ms": 19874,
-                    "ok": 0
-                },
-                {
-                    "a": 0,
-                    "g": "gComm",
-                    "j": 0,
-                    "ms": 4094,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWordAdd4",
-                    "j": 0,
-                    "ms": 21091,
-                    "ok": 0
-                },
-                {
-                    "a": 2,
-                    "g": "gAddThree",
-                    "j": -1,
-                    "ms": 35064,
-                    "ok": 0
-                }
-            ],
-            "total": 10,
-            "skills": {
-                "\u062c\u0645\u0639 \u062b\u0644\u0627\u062b\u0629 \u0623\u0639\u062f\u0627\u062f": {
-                    "c": 1,
-                    "t": 2
-                },
-                "\u0645\u0633\u0623\u0644\u0629 \u0643\u0644\u0627\u0645\u064a\u0651\u0629 \u2014 \u062c\u0645\u0639": {
-                    "c": 1,
-                    "t": 2
-                },
-                "\u0645\u0633\u0623\u0644\u0629 \u0643\u0644\u0627\u0645\u064a\u0651\u0629 \u2014 \u0637\u0631\u062d \u0623\u0648 \u0641\u0631\u0642": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0627\u0644\u062a\u062d\u0642\u0651\u0642 \u0645\u0646 \u0635\u062d\u0651\u0629 \u0627\u0644\u0637\u0631\u062d \u0628\u0627\u0644\u062c\u0645\u0639": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u062e\u0627\u0635\u064a\u0651\u0629 \u0627\u0644\u0625\u0628\u062f\u0627\u0644 \u2014 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u0641\u0631\u0627\u063a": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0633\u0623\u0644\u0629 \u0645\u0646 \u062e\u0637\u0648\u062a\u064a\u0646 \u2014 \u062c\u0645\u0639\u064c \u062b\u0645\u0651 \u0637\u0631\u062d": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0627\u0644\u062c\u0645\u0639 \u0627\u0644\u0630\u0647\u0646\u064a \u0628\u0627\u0633\u062a\u0639\u0645\u0627\u0644 \u062e\u0635\u0627\u0626\u0635 \u0627\u0644\u062c\u0645\u0639": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u062a\u0642\u062f\u064a\u0631 \u0646\u0627\u062a\u062c \u0627\u0644\u062c\u0645\u0639 \u0628\u0627\u0644\u062a\u0642\u0631\u064a\u0628 \u0644\u0623\u0642\u0631\u0628 \u0645\u0626\u0629": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 5,
-            "trusted": true
-        }
-    },
-    {
-        "id": "eefe5621-8b8a-4b3b-8639-e9eedd1f595d",
-        "created_at": "2026-10-08T13:16:39.371014+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:16:38.884Z",
-            "cid": "1791465398884_pqntmciir4",
-            "dur": 23,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gPIExp",
-                    "j": 1,
-                    "ms": 1564,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gAdjPI",
-                    "j": 1,
-                    "ms": 3918,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gUn",
-                    "j": 2,
-                    "ms": 4665,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gStateAction",
-                    "j": 1,
-                    "ms": 6147,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gPIExp",
-                    "j": 1,
-                    "ms": 3556,
-                    "ok": 0
-                }
-            ],
-            "total": 5,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0635\u0641\u0627\u062a \u0627\u0644\u0634\u062e\u0635\u064a\u0651\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0627\u0644\u0647\u0648\u0627\u064a\u0627\u062a \u0648\u0627\u0644\u0641\u0646\u0648\u0646": {
-                    "c": 1,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0633\u0627\u0628\u0642\u0629 un\u2011 \u0644\u0635\u0646\u0639 \u0627\u0644\u0636\u062f\u0651": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0641\u0639\u0644\u064f \u062d\u0627\u0644\u0629\u064d \u0623\u0645 \u0641\u0639\u0644\u064f \u062d\u062f\u062b": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 4,
-            "trusted": true
-        }
-    },
-    {
-        "id": "0659c002-ee99-4d7e-95a3-6cbbf45fc43a",
-        "created_at": "2026-10-08T13:16:16.628125+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:16:16.076Z",
-            "cid": "1791465376076_24d2pktfn5s",
-            "dur": 27,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gStateAction",
-                    "j": 2,
-                    "ms": 1193,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gStateAction",
-                    "j": 1,
-                    "ms": 5516,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gPresPast",
-                    "j": -1,
-                    "ms": 16457,
-                    "ok": 0
-                }
-            ],
-            "total": 3,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0641\u0639\u0644\u064f \u062d\u0627\u0644\u0629\u064d \u0623\u0645 \u0641\u0639\u0644\u064f \u062d\u062f\u062b": {
-                    "c": 2,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0628\u0633\u064a\u0637 \u0623\u0645 \u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0628\u0633\u064a\u0637": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 2,
-            "trusted": true
-        }
-    },
-    {
-        "id": "1ea2c449-d92c-49ca-adf4-f6693b0f4ea0",
-        "created_at": "2026-10-08T13:15:50.13427+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:15:49.462Z",
-            "cid": "1791465349459_h5qbf51xmnu",
-            "dur": 56,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gPresPast",
-                    "j": -1,
-                    "ms": 5840,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gStateProg",
-                    "j": -1,
-                    "ms": 48017,
-                    "ok": 0
-                }
-            ],
-            "total": 2,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0645\u0633\u062a\u0645\u0631\u0651 \u0644\u0644\u062d\u062f\u062b \u0627\u0644\u0622\u0646\u064a\u0651": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0628\u0633\u064a\u0637 \u0623\u0645 \u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0628\u0633\u064a\u0637": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "c6c7f4cb-1ed3-44e2-840d-0aa7cb3dad88",
-        "created_at": "2026-10-08T13:15:14.006853+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:15:13.501Z",
-            "cid": "1791465313501_2qsz7pk4b3x",
-            "dur": 20,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gPresPast",
-                    "j": -1,
-                    "ms": 5840,
-                    "ok": 1
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0628\u0633\u064a\u0637 \u0623\u0645 \u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0628\u0633\u064a\u0637": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "1468d930-31e9-43d1-9cf7-db68514fa561",
-        "created_at": "2026-10-08T13:14:54.345165+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:14:53.933Z",
-            "cid": "1791465293933_rvwuvx7sg5b",
-            "dur": 6,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gUn",
-                    "j": 2,
-                    "ms": 2639,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gStateAction",
-                    "j": 2,
-                    "ms": 1320,
-                    "ok": 0
-                }
-            ],
-            "total": 2,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0633\u0627\u0628\u0642\u0629 un\u2011 \u0644\u0635\u0646\u0639 \u0627\u0644\u0636\u062f\u0651": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0641\u0639\u0644\u064f \u062d\u0627\u0644\u0629\u064d \u0623\u0645 \u0641\u0639\u0644\u064f \u062d\u062f\u062b": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "5a597738-4297-4fc6-a06e-c88484bf6363",
-        "created_at": "2026-10-08T13:14:48.528329+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:14:48.129Z",
-            "cid": "1791465288129_ku7t2zok33a",
-            "dur": 4,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gAdjPI",
-                    "j": 0,
-                    "ms": 2684,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0635\u0641\u0627\u062a \u0627\u0644\u0634\u062e\u0635\u064a\u0651\u0629": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "trusted": true
-        }
-    },
-    {
-        "id": "278ea883-6864-4a30-b12a-5200cf65c787",
-        "created_at": "2026-10-08T13:14:44.888613+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:14:44.408Z",
-            "cid": "1791465284408_i65y701dukf",
-            "dur": 11,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gPresPast",
-                    "j": -1,
-                    "ms": 7075,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gStateAction",
-                    "j": 1,
-                    "ms": 1799,
-                    "ok": 0
-                }
-            ],
-            "total": 2,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0641\u0639\u0644\u064f \u062d\u0627\u0644\u0629\u064d \u0623\u0645 \u0641\u0639\u0644\u064f \u062d\u062f\u062b": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0628\u0633\u064a\u0637 \u0623\u0645 \u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0628\u0633\u064a\u0637": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "f9d8d6fe-9a3d-4109-8aed-e5ccb857cafe",
-        "created_at": "2026-10-08T13:14:33.24371+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-08T13:14:32.822Z",
-            "cid": "1791465272822_equlis3q4gk",
-            "dur": 9,
-            "pid": "muzk3dcf_2yqksh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06481 \u2014 Personal Interests",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gStateProg",
-                    "j": 1,
-                    "ms": 1609,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gPIExp",
-                    "j": 1,
-                    "ms": 5249,
-                    "ok": 0
-                }
-            ],
-            "total": 2,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0627\u0644\u0647\u0648\u0627\u064a\u0627\u062a \u0648\u0627\u0644\u0641\u0646\u0648\u0646": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0645\u0633\u062a\u0645\u0631\u0651 \u0644\u0644\u062d\u062f\u062b \u0627\u0644\u0622\u0646\u064a\u0651": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 1,
             "trusted": true
         }
     }
