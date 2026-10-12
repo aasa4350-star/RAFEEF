@@ -19,7 +19,7 @@
   if(!TAG) return;
 
   /* الصفحاتُ التي لها ورقةُ مقرَّرٍ فتريّ — يحرسها checks/pages.js */
-  var FATRI_PAGES = ["math4", "math5", "math8", "math9", "science4", "science5", "science8", "science9"];
+  var FATRI_PAGES = ["math4", "math5", "math8", "math9", "english9", "science4", "science5", "science8", "science9"];
 
   function link(bar, mark, file, text, title){
     if(bar.querySelector("[" + mark + "]")) return;

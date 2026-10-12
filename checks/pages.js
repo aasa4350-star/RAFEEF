@@ -1250,6 +1250,20 @@ function fatriPath(){
        ثلاثةَ فصول: الأوّل (ص ٢٢) والثاني (ص ٥٤) والثالث (ص ٨٢) — أي
        الوحدةُ الأولى كاملةً وأوّلُ فصلٍ من الثانية. والشكلُ هو شكلُ
        فتريِّه في الرياضيات: عشرةُ أسئلةٍ بدرجتين، وبلا اسمِ الدرس. */
+    /* ═══ إنجليزيُّ حسن ═══════════════════════════════════════════════
+       صورةُ فهرسِ كتابِه (١٢ أكتوبر ٢٠٢٦) تُظهر الجزءَ الأوّل:
+       Unit 1 Lifestyles · Unit 2 Life Stories · Unit 3 When Are You
+       Traveling? · EXPANSION Units 1–3، وتنقطع عند Unit 4.
+       وطلب الأبُ عشرين سؤالًا منها مقاليّان، فثمانيةَ عشرَ اختيارًا
+       بدرجةٍ ومقاليّان بدرجة — والمجموعُ عشرون كبقيّةِ اختباراتِه. */
+    'english9.html': { ids:['u1','u2','u3','exp'], mcq:18, essay:2,
+                    essayQ:2,
+                    countMap:{u1:5, u2:5, u3:5, exp:3},
+                    genPat:/^[A-Za-z_][A-Za-z0-9_]*$/,
+                    noLessonTag:true, distinctTypes:true,
+                    label:'إنجليزي م٣ — الفتري 📝',
+                    ban:/"u[4-9]"|"u1[0-2]"|"exp2"|"allu/,
+                    banMsg:'وحدةٌ خارجَ مقرَّرِ حسن (الوحداتُ ١–٣ ومراجعتُها وحدَها)' },
     /* ═══ علومُ رفيف ═══════════════════════════════════════════════
        صورتا فهرسِ كتابِها (١٢ أكتوبر ٢٠٢٦) تبدآن بالوحدةِ الأولى
        وتنتهيان عند دروسِ الفصلِ الثالث: طبيعةُ العلم، والمخاليطُ
@@ -1270,6 +1284,7 @@ function fatriPath(){
        ستٌّ من عشرين في الورقة — فلو سقط بنكُها عاد ثلثُ الاختبارِ
        فارغًا بلا صوت. */
     'science9.html': { ids:['l1','l2','l3','eq','volc','plate','cell'], mcq:14, essay:6,
+                    essayQ:2,
                     countMap:{l1:2, l2:2, l3:1, eq:2, volc:2, plate:2, cell:3},
                     bankName:{l1:'L1', l2:'L2', l3:'L3', eq:'EQ', volc:'VOLC', plate:'PLATE', cell:'CELL'},
                     noLessonTag:true, distinctTypes:true, bankItems:true,
@@ -1375,10 +1390,16 @@ function fatriOne(f, SP){
   const shown = [];
   if (um) shown.push(['سطرِ الوحدةِ فوق لوحةِ الفتري', um[1]]);
   if (im) shown.push(['مقدّمةِ لوحةِ الفتري', im[0]]);
+  /* ═══ العددُ المعروضُ: الاختياراتُ وحدَها أو هي والمقاليّات ═══════
+     ورقةٌ فيها مقاليّاتٌ يصحّ أن تُعلن «٢٠ سؤالًا» وهي ثمانيةَ عشرَ
+     اختيارًا ومقاليّان — وهو ما طلبه الأبُ لإنجليزيِّ حسنٍ بنصِّه.
+     فكان الفحصُ يقبل عددَ الاختياراتِ وحدَه فصاح على إعلانٍ صادق. */
+  const okCounts = [arN(SP.mcq)];
+  if (SP.essayQ) okCounts.push(arN(SP.mcq + SP.essayQ));
   for (const [where, text] of shown)
     for (const g of String(text).matchAll(/([٠-٩]+)\s*(?:سؤالًا|أسئلة)/g))
-      if (g[1] !== arN(SP.mcq))
-        E('العددُ المعروضُ في ' + where + ' «' + g[0].trim() + '» والأسئلةُ ' + arN(SP.mcq) +
+      if (okCounts.indexOf(g[1]) < 0)
+        E('العددُ المعروضُ في ' + where + ' «' + g[0].trim() + '» والأسئلةُ ' + okCounts.join(' أو ') +
           ' — رقمان متناقضان في شاشةٍ واحدة');
   if (SP.ban && SP.ban.test('"t1"') && um && /الفصل الثالث|من الثالث/.test(um[1]))
     E('سطرُ الوحدةِ فوق اللوحةِ يُعلن درسًا من الفصلِ الثالثِ وهو خارجُ القائمة');
@@ -1458,7 +1479,11 @@ function fatriOne(f, SP){
       } else {
         const bm = new RegExp('var ' + nm + ' = \\[([\\s\\S]*?)\\];').exec(src);
         if (!bm){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
-        cnt = bm[1].split(',').map(x => x.trim()).filter(x => /^g[A-Za-z0-9_]+$/.test(x)).length;
+        /* أسماءُ المولّداتِ تختلف بين الصفحات: صفحاتُ الرياضيات تبدؤها
+           بـg (gSlope)، وصفحاتُ الإنجليزيِّ باسمِ الوحدة (u1Freq · exTigers).
+           فالنمطُ من الجدول، وبلا ذلك عُدّت بنوكُ الإنجليزيِّ صفرًا. */
+        const GP = SP.genPat || /^g[A-Za-z0-9_]+$/;
+        cnt = bm[1].split(',').map(x => x.trim()).filter(x => GP.test(x)).length;
       }
       if (cnt < need)
         E('بنكُ ' + nm + ' فيه ' + cnt + ' نوعًا والمطلوبُ ' + need +
