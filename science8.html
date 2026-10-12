@@ -36,6 +36,12 @@
   .chapsel{display:flex;gap:8px;margin:14px 0 8px}
   .chapsel button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:11px 8px;border-radius:13px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .chapsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+  /* مختارُ النماذجِ خمسةَ عشرَ زرًّا، و.chapsel صفٌّ واحدٌ لا يلتفّ —
+     فلو استُعمل كما هو لخرجت الأزرارُ عن عرضِ الجوّالِ ومُرِّرت الصفحةُ
+     أفقيًّا. فصفٌّ يلتفّ وأزرارٌ بعرضِ نصِّها. */
+  .mdlsel{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 10px}
+  .mdlsel button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--muted);padding:9px 12px;border-radius:12px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
+  .mdlsel button[aria-selected="true"]{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
   .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
   .tabs button{flex:1;min-width:105px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -1236,7 +1242,7 @@ if(!NAMES[who]){
     });
     var TOTAL = mcq.length + ess.length*3;
 
-    var pick = '<div class="chapsel" style="margin:0 0 10px">'+
+    var pick = '<div class="mdlsel">'+
       MODELS.map(function(m,i){
         return '<button data-mdl="'+i+'" aria-selected="'+(i===curModel?"true":"false")+'">'+m.name+'</button>';
       }).join('')+'</div>';
