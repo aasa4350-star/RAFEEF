@@ -320,6 +320,7 @@ function run(){
   issues.push(...engVideoPath());
   issues.push(...bookStudyPath());
   issues.push(...rulesPdfPath());
+  issues.push(...modelsSc8Path());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -1524,8 +1525,15 @@ function fatriOne(f, SP){
     if (!/essay:\s*essayText/.test(src) || !/essaySelf:\s*essay/.test(src))
       E('نصُّ المقاليِّ أو درجتُه الذاتيّةُ لا تُحفَظ — فلا يراجعها الأب');
   } else {
-    if (/data-essay|fatriEssay|essayMark/.test(src))
-      E('بقايا السؤالِ المقاليِّ في صفحةٍ أُلغي منها — إمّا يظهر ناقصًا أو يرمي');
+    /* ═══ البقايا تُفتَّش في ورقةِ الفتري وحدَها ═══════════════════════
+       كان الفحصُ يمرّ على الملفِّ كلِّه، فلمّا أُضيف تبويبُ «نماذج
+       المعلِّمين» إلى science8.html — وفيه مقاليّاتُ الأوراقِ الحقيقيّة —
+       صاح الحارسُ على ورقةٍ لا مقاليَّ فيها أصلًا. والمقصودُ أنّ من
+       أُلغي مقاليُّ فتريِّه لا تبقى في ورقتِه بقايا منه، لا أن تخلو
+       الصفحةُ كلُّها من كلمةِ «مقالي». */
+    const rfe = /function renderFatri\(\)\{[\s\S]*?\n  \}\n/.exec(src);
+    if (/data-essay|fatriEssay|essayMark/.test(rfe ? rfe[0] : src))
+      E('بقايا السؤالِ المقاليِّ في ورقةِ فتريٍّ أُلغي منها — إمّا يظهر ناقصًا أو يرمي');
     if (!/var FATRI_ESSAY = 0;/.test(src))
       E('المقاليُّ مرفوعٌ من العرضِ ودرجتُه ما زالت تُحسب');
   }
@@ -1826,6 +1834,95 @@ function typedAnswers(){
       }
     }
   });
+  return out;
+}
+
+/* ═══ نماذجُ المعلِّمين في علومِ رفيف ═══════════════════════════════════
+   طلبُ الأب (١٢ أكتوبر ٢٠٢٦): «انسخ نفس النماذج هذي بالضبط وحطها
+   بالفتري». والمادّةُ منقولةٌ باليدِ من ملفٍّ مصوَّرٍ لا نصَّ فيه، فعطبُها
+   صامتٌ بطبعِه: فهرسُ إجابةٍ خارجَ عددِ الخيارات يجعل السؤالَ بلا إجابةٍ
+   صحيحةٍ أبدًا، وخيارٌ صحيحٌ مكرَّرٌ حرفيًّا يجعل النقرَ على الصوابِ خطأً.
+   وكلاهما يمرّ بلا صياحٍ على الشاشة — فيُفحَصان هنا.
+
+   ويُفحَص الوصلُ أيضًا: ملفٌّ لا تحمّله الصفحةُ أو تبويبٌ لا لوحةَ له
+   يعني زرًّا يفتح فراغًا. */
+function modelsSc8Path(){
+  const out = [];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  const MF = 'models-sc8.js', PG = 'science8.html';
+  const mp = path.join(ROOT, MF), pp = path.join(ROOT, PG);
+  if (!fs.existsSync(mp) || !fs.existsSync(pp)) return out;
+
+  const src = fs.readFileSync(pp, 'utf8');
+  if (src.indexOf('src="' + MF) < 0)
+    E(PG, 'ملفُّ النماذجِ غير محمَّلٍ في الصفحة — فالتبويبُ يفتح فراغًا');
+  if (!/function renderModels\(\)/.test(src))
+    E(PG, 'دالّةُ عرضِ النماذج (renderModels) مفقودة');
+  if (!/id==="models"[\s\S]{0,120}renderModels\(\)/.test(src))
+    E(PG, 'لوحةُ النماذجِ غير موصولةٍ بـshowPanel — فالتبويبُ لا يعرض شيئًا');
+  if (!/fatri:\s*\{[^}]*ids:\s*\[[^\]]*"models"/.test(src))
+    E(PG, 'تبويبُ النماذجِ غير مُدرَجٍ في فصلِ الفتري — فلا يُرى');
+  if (!/CFG\.models\s*=/.test(src))
+    E(PG, 'تعريفُ تبويبِ النماذج (CFG.models) مفقود — فيرمي عند الرسم');
+  if (src.indexOf('saveScore("علوم م٢ — نماذج الفتري 📚"') < 0)
+    E(PG, 'درجةُ النماذجِ لا تُحفَظ باسمٍ مستقلٍّ — فتختلط بالفتريِّ المولَّد');
+
+  let MODELS = null;
+  try {
+    const box = { window:{} };
+    require('vm').createContext(box);
+    require('vm').runInContext(fs.readFileSync(mp, 'utf8'), box, { timeout: 8000 });
+    MODELS = box.window.SC8_MODELS;
+  } catch(e){ E(MF, 'تعذّرت قراءةُ ملفِّ النماذج: ' + e.message); return out; }
+
+  if (!Array.isArray(MODELS) || !MODELS.length){
+    E(MF, 'قائمةُ النماذجِ فارغةٌ أو ليست مصفوفة'); return out;
+  }
+  const seenId = new Set();
+  let mcqN = 0, essN = 0;
+  for (const M of MODELS){
+    const tag = (M && M.name) || '(بلا اسم)';
+    if (!M || !M.id || !M.name || !M.head || !Array.isArray(M.secs) || !M.secs.length){
+      E(MF, tag + ' — نموذجٌ ناقصُ الترويسةِ أو بلا أقسام'); continue;
+    }
+    if (seenId.has(M.id)) E(MF, M.id + ' — مُعرِّفُ نموذجٍ مكرَّر');
+    seenId.add(M.id);
+    for (const s of M.secs){
+      if (!s || !s.t || !Array.isArray(s.q) || !s.q.length){
+        E(MF, tag + ' — قسمٌ بلا عنوانٍ أو بلا أسئلة'); continue;
+      }
+      for (const q of s.q){
+        if (q && q.open){
+          essN++;
+          if (!q.stem || !q.model || String(q.model).trim().length < 10)
+            E(MF, tag + ' — مقاليٌّ بلا نصٍّ أو بلا حلٍّ نموذجيّ');
+          continue;
+        }
+        mcqN++;
+        if (!Array.isArray(q) || q.length !== 4){
+          E(MF, tag + ' — سؤالٌ ليس على شكلِ [نصّ, خيارات, الصحيح, شرح]'); continue;
+        }
+        if (!q[0] || !String(q[0]).trim()){ E(MF, tag + ' — سؤالٌ بلا نصّ'); continue; }
+        if (!Array.isArray(q[1]) || q[1].length < 2){
+          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» خياراتُه أقلُّ من اثنَين'); continue;
+        }
+        if (typeof q[2] !== 'number' || q[2] < 0 || q[2] >= q[1].length){
+          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» فهرسُ الإجابةِ خارجَ الخيارات: ' + q[2]); continue;
+        }
+        /* خيارٌ صحيحٌ مكرَّرٌ حرفيًّا: تنقر الصوابَ فيُحسَب خطأً.
+           والتكرارُ في خيارٍ خاطئٍ يُترَك — ففي ورقةِ أحدِ المعلِّمين
+           تكرّر خيارٌ خاطئٌ مرّتَين، ونُقل كما هو عمدًا. */
+        if (q[1].filter(x => x === q[1][q[2]]).length !== 1)
+          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» الخيارُ الصحيحُ مكرَّرٌ حرفيًّا فلا يُميَّز');
+        if (!q[3] || !String(q[3]).trim())
+          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» بلا سطرِ شرح');
+      }
+    }
+  }
+  if (mcqN < 200)
+    out.push({ sev:'تنبيه', file:MF, msg:'أسئلةُ الاختيارِ ' + mcqN + ' فقط — كان المنقولُ ساعةَ البناءِ ٢٨٢' });
+  if (!essN)
+    out.push({ sev:'تنبيه', file:MF, msg:'لا مقاليَّ في النماذجِ كلِّها — وأوراقُ المعلِّمين فيها «علّل» و«قارن»' });
   return out;
 }
 
