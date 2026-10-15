@@ -159,7 +159,10 @@ function conflicts(banks){
 
 /* موادّ فوق صفّ الطالب: تُحفظ نتائجها موسومةً preview فتُعرض للأب
    في قسمٍ مستقلّ، ولا تدخل متوسّطًا ولا تشخيصًا (RR.isPreview) */
-const PREVIEW_PAGES = ['chem10.html', 'bio10.html', 'phys10.html'];
+/* وmath7.html معها وإن لم تكن «فوق الصفّ»: هي منهجُ أوّلِ متوسّطٍ
+   ورفيفُ في الثاني، فمراجعةُ العامِ الماضي تُعرَض ولا تُحتسب — والعلّةُ
+   واحدةٌ وإن اختلفت الجهة: درجةٌ من غيرِ منهجِها الجاري تحرّك متوسّطَه. */
+const PREVIEW_PAGES = ['chem10.html', 'bio10.html', 'phys10.html', 'math7.html'];
 
 function run(){
   const issues = [];
@@ -322,6 +325,7 @@ function run(){
   issues.push(...rulesPdfPath());
   issues.push(...modelsSc8Path());
   issues.push(...dosePath());
+  issues.push(...math7Link());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -2024,6 +2028,32 @@ function dosePath(){
   if (!/dose:\s*\{[^}]*ids:\s*\[[^\]]*"doseq"[^\]]*"dosef"/.test(src))
     E('بابُ الجرعةِ غيرُ مُدرَجٍ في CHAPS بلوحتَيه — فلا يُرى في شريطِ الأجزاء');
 
+  return out;
+}
+
+/* ═══ صفحةُ المراجعةِ موصولةٌ ولا تُحتسَب ═══════════════════════════════
+   طلبُ الأب (١٥ أكتوبر ٢٠٢٦): «يربط». وmath7.html بقيت شهورًا بلا رابطٍ
+   من أيِّ صفحة — واحدٌ وثلاثون درسًا كاملةَ القواعدِ والفيديو لم يفتحها
+   أحد. فيُحرَس أمران: أنّ الرابطَ قائمٌ (وإلّا عادت يتيمةً بلا أن يَبين)،
+   وأنّ وسومَها «م١» لا «م٢» (وإلّا اختلطت مراجعةُ العامِ الماضي بمتوسّطِ
+   منهجِها الجاري). وأمّا وسمُ preview فيحرسه PREVIEW_PAGES أعلاه. */
+function math7Link(){
+  const out = [];
+  const src = path.join(ROOT, 'math7.html');
+  if (!fs.existsSync(src)) return out;
+  const m7 = fs.readFileSync(src, 'utf8');
+  const h = path.join(ROOT, 'math8.html');
+  if (fs.existsSync(h) && !/math7\.html\?who=/.test(fs.readFileSync(h, 'utf8')))
+    out.push({ sev:'خطأ', file:'math8.html',
+      msg:'رابطُ مراجعةِ أوّلِ متوسّط (math7.html) ساقطٌ — فتعود صفحةً يتيمةً لا يفتحها أحد' });
+  const wrong = (m7.match(/label:"رياضيات م٢/g) || []).length;
+  if (wrong)
+    out.push({ sev:'خطأ', file:'math7.html',
+      msg:'فيها ' + wrong + ' وسمًا باسم «رياضيات م٢» ومحتواها منهجُ أوّلِ متوسّط — فتختلط بمتوسّطِ منهجِها الجاري' });
+  if (!/label:"رياضيات م١/.test(m7))
+    out.push({ sev:'خطأ', file:'math7.html', msg:'لا وسمَ «رياضيات م١» فيها — فلا يُميَّز ما تحفظه' });
+  if (/<title>[^<]*ثاني متوسط/.test(m7))
+    out.push({ sev:'تنبيه', file:'math7.html', msg:'العنوانُ يقول «ثاني متوسط» ومحتواها منهجُ الأوّل' });
   return out;
 }
 

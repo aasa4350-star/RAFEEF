@@ -1315,7 +1315,15 @@ if(!NAMES[who]){
 } else {
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
-    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
+    /* ═══ رابطُ مراجعةِ أساسِ السنةِ الماضية ═══════════════════════════
+       طلبُ الأب (١٥ أكتوبر ٢٠٢٦): «يربط». وmath7.html منهجُ أوّلِ متوسّط
+       (الخطواتُ الأربع · الأعدادُ الصحيحة · النسبةُ والتناسب) وكانت بلا
+       رابطٍ من أيِّ صفحة، فما فتحها أحدٌ قطّ. وموضعُها هنا لا في الصفحةِ
+       الرئيسة: من يقف في درسٍ من منهجِ الثاني فأساسُه في الأوّل، فيجده
+       حيث تعثّر لا في قائمةٍ أخرى.
+       ونتائجُها موسومةٌ preview فلا تدخل متوسّطَ منهجِها الجاري. */
+    '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a>'+
+      '<a href="math7.html?who='+who+'" title="مراجعةُ أساسِ أوّلِ متوسّط — لا تدخل متوسّطَ هذا العام">🔙 أساسيات أول متوسط</a></div>'+
     '<div class="chapsel" id="chapsel"></div>'+
     '<div class="unit" id="unit"></div>'+
     '<div class="tabs" role="tablist" id="tabs"></div>'+

@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>الرياضيات — ثاني متوسط</title>
+<title>الرياضيات — أول متوسط (مراجعة)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="config.js"></script>
 <script src="gate.js"></script>
@@ -90,9 +90,22 @@ function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.rand
    مهارات]» ويعمى العلاجيُّ عن موضعِ الخلل: عشرُ جلساتٍ في درسٍ واحدٍ
    ولا يُعرَف أيُّ نوعٍ يسقط فيه. فصار extra يُدمَج في meta ليحمل
    skills وitems كما في math9.html. */
+/* ═══ صفحةُ مراجعةٍ لا صفحةُ منهجٍ جارٍ ═══════════════════════════════
+   طلبُ الأب (١٥ أكتوبر ٢٠٢٦) حين عُرض عليه أن تُحذف أو تُربط: «يربط».
+
+   ومحتواها منهجُ <b>أوّلِ متوسّط</b> (الخطواتُ الأربع · القوى والأسس ·
+   الأعدادُ الصحيحة · النسبةُ والتناسب) لا ثاني متوسّط، وكان عنوانُها
+   يقول «ثاني متوسط» خطأً. ورفيفُ الآن في الثاني، ومنهجُها الجاري في
+   math8.html — فهذي مراجعةُ أساسِ السنةِ الماضية.
+
+   ولذلك تُحفَظ موسومةً بـpreview: تظهر للأب في قسمِ «تُعرض ولا تُحتسب»
+   ولا تدخل متوسّطَ رياضيّاتِها الجاري. ولولا الوسمُ لاختلطت مراجعةُ
+   العامِ الماضي بدرجةِ هذا العام، فينخفض المتوسّطُ أو يرتفع بما ليس من
+   منهجِها الجاري ولا يدري الأب لِمَ تغيّر. ووسمُها «رياضيات م١» لا
+   «م٢» للسببِ نفسِه. */
 function saveScore(test, correct, total, pid, extra){
   try{
-    var meta = { kind:"practice", test:test, correct:correct, total:total, pid:pid||null };
+    var meta = { kind:"practice", test:test, correct:correct, total:total, pid:pid||null, preview:true };
     if(extra) for(var __k in extra) meta[__k]=extra[__k];
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
@@ -1997,7 +2010,12 @@ if(!NAMES[who]){
   app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=rafeef</div>';
 } else {
   app.innerHTML =
-    '<header class="top"><p class="eyebrow">'+GRADES[who]+' · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1></header>'+
+    /* الترويسةُ تقول محتوى الصفحةِ لا صفَّ الطالب: محتواها منهجُ أوّلِ
+       متوسّطٍ ورفيفُ في الثاني، فلو كُتب صفُّها لظنّت أنّها منهجُها
+       الجاري. ويُقال صراحةً إنّها لا تدخل المعدَّل — فلا تحسب أنّها
+       تذاكر ما يُحتسب لها وهي تراجع. */
+    '<header class="top"><p class="eyebrow">مراجعة أول متوسط · الرياضيات</p><h1>🔢 الرياضيات — '+name+'</h1>'+
+      '<p style="margin:8px 0 0;font-size:.86rem;opacity:.92">🔙 أساسُ السنةِ الماضية — تظهر لأبيك ولا تدخل معدَّل منهجك الجاري</p></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة</a></div>'+
     '<div class="chapsel" id="chapsel"></div>'+
     '<div class="unit" id="unit"></div>'+
@@ -2006,44 +2024,44 @@ if(!NAMES[who]){
     '<footer>الرياضيات · ثاني متوسط · مطابق للكتاب · أرقام جديدة كل مرة</footer>';
 
   var CFG = {
-    all1:{tab:"اختبار شامل 📝", gens:ALL1, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الأول الثمانية.", label:"رياضيات م٢ — شامل ف١"},
-    d1:  {tab:"1-1 الخطوات الأربع", gens:D1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م٢ — 1-1 الخطوات الأربع"},
-    d2:  {tab:"1-2 القوى والأسس", gens:D2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م٢ — 1-2 القوى والأسس"},
-    d3:  {tab:"1-3 ترتيب العمليات", gens:D3, n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م٢ — 1-3 ترتيب العمليات"},
-    d4:  {tab:"1-4 التخمين والتحقّق", gens:D4, n:10, intro:"<b>الدرس <span class=en>1-4</span> — استراتيجية التخمين والتحقّق:</b> خمّن ← تحقّق ← عدّل التخمين حتى تتوافق النتيجة مع كلّ المعطيات.", label:"رياضيات م٢ — 1-4 التخمين والتحقّق"},
-    d5:  {tab:"1-5 العبارات الجبرية", gens:D5, n:10, intro:"<b>الدرس <span class=en>1-5</span> — المتغيّرات والعبارات الجبرية:</b> المتغيّر رمزٌ لكميّةٍ غير معلومة، والمُعامِل هو العدد المضروب فيه. نحسب قيمة العبارة بالتعويض.", label:"رياضيات م٢ — 1-5 العبارات الجبرية"},
-    d6:  {tab:"1-6 المعادلات", gens:D6, n:10, intro:"<b>الدرس <span class=en>1-6</span> — المعادلات:</b> حلّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين.", label:"رياضيات م٢ — 1-6 المعادلات"},
-    d7:  {tab:"1-7 الخصائص", gens:D7, n:10, intro:"<b>الدرس <span class=en>1-7</span> — الخصائص:</b> الإبدال · التجميع · التوزيع · العنصر المحايد — واستعمالها في الحساب الذهني.", label:"رياضيات م٢ — 1-7 الخصائص"},
-    d8:  {tab:"1-8 الدوال", gens:D8, n:10, intro:"<b>الدرس <span class=en>1-8</span> — المعادلات والدوال:</b> المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، وقاعدة الدالّة تربط بينهما.", label:"رياضيات م٢ — 1-8 الدوال"},
+    all1:{tab:"اختبار شامل 📝", gens:ALL1, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الأول الثمانية.", label:"رياضيات م١ — شامل ف١"},
+    d1:  {tab:"1-1 الخطوات الأربع", gens:D1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — الخطوات الأربع لحل المسألة:</b> افهم ← خطّط ← حُلّ ← تحقّق. أنماط، وجداول، وأقطار المضلّعات.", label:"رياضيات م١ — 1-1 الخطوات الأربع"},
+    d2:  {tab:"1-2 القوى والأسس", gens:D2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — القوى والأسس:</b> الأساس والأُسّ، الصيغة الأُسّية والصيغة القياسية. تذكّر: الأُسّ تكرارُ ضربٍ لا ضربٌ في الأُسّ.", label:"رياضيات م١ — 1-2 القوى والأسس"},
+    d3:  {tab:"1-3 ترتيب العمليات", gens:D3, n:10, intro:"<b>الدرس <span class=en>1-3</span> — ترتيب العمليات:</b> الأقواس ← الأسس ← الضرب والقسمة ← الجمع والطرح.", label:"رياضيات م١ — 1-3 ترتيب العمليات"},
+    d4:  {tab:"1-4 التخمين والتحقّق", gens:D4, n:10, intro:"<b>الدرس <span class=en>1-4</span> — استراتيجية التخمين والتحقّق:</b> خمّن ← تحقّق ← عدّل التخمين حتى تتوافق النتيجة مع كلّ المعطيات.", label:"رياضيات م١ — 1-4 التخمين والتحقّق"},
+    d5:  {tab:"1-5 العبارات الجبرية", gens:D5, n:10, intro:"<b>الدرس <span class=en>1-5</span> — المتغيّرات والعبارات الجبرية:</b> المتغيّر رمزٌ لكميّةٍ غير معلومة، والمُعامِل هو العدد المضروب فيه. نحسب قيمة العبارة بالتعويض.", label:"رياضيات م١ — 1-5 العبارات الجبرية"},
+    d6:  {tab:"1-6 المعادلات", gens:D6, n:10, intro:"<b>الدرس <span class=en>1-6</span> — المعادلات:</b> حلّ المعادلة هو قيمة المتغيّر التي تجعل الطرفين متساويين.", label:"رياضيات م١ — 1-6 المعادلات"},
+    d7:  {tab:"1-7 الخصائص", gens:D7, n:10, intro:"<b>الدرس <span class=en>1-7</span> — الخصائص:</b> الإبدال · التجميع · التوزيع · العنصر المحايد — واستعمالها في الحساب الذهني.", label:"رياضيات م١ — 1-7 الخصائص"},
+    d8:  {tab:"1-8 الدوال", gens:D8, n:10, intro:"<b>الدرس <span class=en>1-8</span> — المعادلات والدوال:</b> المُدخلات ⇐ المجال، والمُخرجات ⇐ المدى، وقاعدة الدالّة تربط بينهما.", label:"رياضيات م١ — 1-8 الدوال"},
 
-    all2:{tab:"اختبار شامل 📝", gens:ALL2, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الثاني الثمانية.", label:"رياضيات م٢ — شامل ف٢"},
-    e1:  {tab:"2-1 القيمة المطلقة", gens:E1, n:10, intro:"<b>الدرس <span class=en>2-1</span> — الأعداد الصحيحة والقيمة المطلقة:</b> ما فوق المستوى موجب وما تحته سالب، والقيمة المطلقة بُعدٌ عن الصفر فهي موجبة دائمًا.", label:"رياضيات م٢ — 2-1 القيمة المطلقة"},
-    e2:  {tab:"2-2 المقارنة والترتيب", gens:E2, n:10, intro:"<b>الدرس <span class=en>2-2</span> — مقارنة الأعداد الصحيحة وترتيبها:</b> على خط الأعداد كلّما اتّجهت يمينًا كبر العدد — فـ<span class=en>−12</span> أصغر من <span class=en>−3</span>.", label:"رياضيات م٢ — 2-2 المقارنة والترتيب"},
-    e3:  {tab:"2-3 المستوى الإحداثي", gens:E3, n:10, intro:"<b>الدرس <span class=en>2-3</span> — المستوى الإحداثي:</b> الزوج المرتّب يبدأ بالإحداثي السيني، والأرباع أربعة تبدأ من أعلى اليمين وتدور عكس عقارب الساعة.", label:"رياضيات م٢ — 2-3 المستوى الإحداثي"},
-    e4:  {tab:"2-4 جمع الصحيحة", gens:E4, n:10, intro:"<b>الدرس <span class=en>2-4</span> — جمع الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ اجمع وأبقِ الإشارة. مختلفتان ⇐ اطرح وخذ إشارة الأكبر قيمةً مطلقة.", label:"رياضيات م٢ — 2-4 جمع الأعداد الصحيحة"},
-    e5:  {tab:"2-5 طرح الصحيحة", gens:E5, n:10, intro:"<b>الدرس <span class=en>2-5</span> — طرح الأعداد الصحيحة:</b> لطرح عددٍ اجمع نظيره ⇐ <span class=en>أ − ب = أ + (−ب)</span>.", label:"رياضيات م٢ — 2-5 طرح الأعداد الصحيحة"},
-    e6:  {tab:"2-6 ضرب الصحيحة", gens:E6, n:10, intro:"<b>الدرس <span class=en>2-6</span> — ضرب الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب.", label:"رياضيات م٢ — 2-6 ضرب الأعداد الصحيحة"},
-    e7:  {tab:"2-7 البحث عن نمط", gens:E7, n:10, intro:"<b>الدرس <span class=en>2-7</span> — استراتيجية البحث عن نمط:</b> رتّب المعطيات في جدول ← اكتشف العلاقة المتكرّرة ← وسّعها حتى المطلوب ← تحقّق.", label:"رياضيات م٢ — 2-7 البحث عن نمط"},
-    e8:  {tab:"2-8 قسمة الصحيحة", gens:E8, n:10, intro:"<b>الدرس <span class=en>2-8</span> — قسمة الأعداد الصحيحة:</b> القسمة تتبع قواعد إشارة الضرب نفسها.", label:"رياضيات م٢ — 2-8 قسمة الأعداد الصحيحة"},
+    all2:{tab:"اختبار شامل 📝", gens:ALL2, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الثاني الثمانية.", label:"رياضيات م١ — شامل ف٢"},
+    e1:  {tab:"2-1 القيمة المطلقة", gens:E1, n:10, intro:"<b>الدرس <span class=en>2-1</span> — الأعداد الصحيحة والقيمة المطلقة:</b> ما فوق المستوى موجب وما تحته سالب، والقيمة المطلقة بُعدٌ عن الصفر فهي موجبة دائمًا.", label:"رياضيات م١ — 2-1 القيمة المطلقة"},
+    e2:  {tab:"2-2 المقارنة والترتيب", gens:E2, n:10, intro:"<b>الدرس <span class=en>2-2</span> — مقارنة الأعداد الصحيحة وترتيبها:</b> على خط الأعداد كلّما اتّجهت يمينًا كبر العدد — فـ<span class=en>−12</span> أصغر من <span class=en>−3</span>.", label:"رياضيات م١ — 2-2 المقارنة والترتيب"},
+    e3:  {tab:"2-3 المستوى الإحداثي", gens:E3, n:10, intro:"<b>الدرس <span class=en>2-3</span> — المستوى الإحداثي:</b> الزوج المرتّب يبدأ بالإحداثي السيني، والأرباع أربعة تبدأ من أعلى اليمين وتدور عكس عقارب الساعة.", label:"رياضيات م١ — 2-3 المستوى الإحداثي"},
+    e4:  {tab:"2-4 جمع الصحيحة", gens:E4, n:10, intro:"<b>الدرس <span class=en>2-4</span> — جمع الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ اجمع وأبقِ الإشارة. مختلفتان ⇐ اطرح وخذ إشارة الأكبر قيمةً مطلقة.", label:"رياضيات م١ — 2-4 جمع الأعداد الصحيحة"},
+    e5:  {tab:"2-5 طرح الصحيحة", gens:E5, n:10, intro:"<b>الدرس <span class=en>2-5</span> — طرح الأعداد الصحيحة:</b> لطرح عددٍ اجمع نظيره ⇐ <span class=en>أ − ب = أ + (−ب)</span>.", label:"رياضيات م١ — 2-5 طرح الأعداد الصحيحة"},
+    e6:  {tab:"2-6 ضرب الصحيحة", gens:E6, n:10, intro:"<b>الدرس <span class=en>2-6</span> — ضرب الأعداد الصحيحة:</b> إشارتان متشابهتان ⇐ موجب، ومختلفتان ⇐ سالب.", label:"رياضيات م١ — 2-6 ضرب الأعداد الصحيحة"},
+    e7:  {tab:"2-7 البحث عن نمط", gens:E7, n:10, intro:"<b>الدرس <span class=en>2-7</span> — استراتيجية البحث عن نمط:</b> رتّب المعطيات في جدول ← اكتشف العلاقة المتكرّرة ← وسّعها حتى المطلوب ← تحقّق.", label:"رياضيات م١ — 2-7 البحث عن نمط"},
+    e8:  {tab:"2-8 قسمة الصحيحة", gens:E8, n:10, intro:"<b>الدرس <span class=en>2-8</span> — قسمة الأعداد الصحيحة:</b> القسمة تتبع قواعد إشارة الضرب نفسها.", label:"رياضيات م١ — 2-8 قسمة الأعداد الصحيحة"},
 
-    all3:{tab:"اختبار شامل 📝", gens:ALL3, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الثالث السبعة.", label:"رياضيات م٢ — شامل ف٣"},
-    f1:  {tab:"3-1 كتابة العبارات", gens:F1, n:10, intro:"<b>الدرس <span class=en>3-1</span> — كتابة العبارات الجبرية والمعادلات:</b> المجموع · زاد · أكبر من ⇐ جمع، والفرق · قلَّ · أقلّ من ⇐ طرح، وأضعاف · ناتج ضرب ⇐ ضرب.", label:"رياضيات م٢ — 3-1 كتابة العبارات"},
-    f2:  {tab:"3-2 معادلات الجمع والطرح", gens:F2, n:10, intro:"<b>الدرس <span class=en>3-2</span> — معادلات الجمع والطرح:</b> اعزل المتغيّر بالعملية العكسية، وطبّقها على الطرفين معًا.", label:"رياضيات م٢ — 3-2 معادلات الجمع والطرح"},
-    f3:  {tab:"3-3 معادلات الضرب", gens:F3, n:10, intro:"<b>الدرس <span class=en>3-3</span> — معادلات الضرب:</b> اقسم الطرفين على مُعامِل المتغيّر. والصيغة الرياضية معادلةٌ تربط كميّاتٍ محدّدة مثل <span class=ax>ف = ع ن</span>.", label:"رياضيات م٢ — 3-3 معادلات الضرب"},
-    f4:  {tab:"3-4 الحلّ عكسيًّا", gens:F4, n:10, intro:"<b>الدرس <span class=en>3-4</span> — استراتيجية الحلّ عكسيًّا:</b> ابدأ من النتيجة النهائية وارجع خطوةً خطوة بالعمليات العكسية، ثمّ تحقّق.", label:"رياضيات م٢ — 3-4 الحلّ عكسيًّا"},
-    f5:  {tab:"3-5 ذات الخطوتين", gens:F5, n:10, intro:"<b>الدرس <span class=en>3-5</span> — المعادلات ذات الخطوتين:</b> تخلّص من الجمع أو الطرح أوّلًا، ثمّ من الضرب أو القسمة.", label:"رياضيات م٢ — 3-5 المعادلات ذات الخطوتين"},
-    f6:  {tab:"3-6 المحيط والمساحة", gens:F6, n:10, intro:"<b>الدرس <span class=en>3-6</span> — المحيط والمساحة:</b> <span class=ax>مح = 2 (ل + ض)</span> و<span class=ax>م = ل × ض</span>. المحيط ما يحيط بالشكل، والمساحة ما يغطّي داخله.", label:"رياضيات م٢ — 3-6 المحيط والمساحة"},
-    f7:  {tab:"3-7 التمثيل البياني", gens:F7, n:10, intro:"<b>الدرس <span class=en>3-7</span> — التمثيل البياني للدوال:</b> كلّ زوجٍ مرتّبٍ (مُدخَلة، مُخرَجة) نقطةٌ على المستوى الإحداثي، وإذا وقعت على خطٍّ مستقيم فالدالّة خطية.", label:"رياضيات م٢ — 3-7 التمثيل البياني"},
+    all3:{tab:"اختبار شامل 📝", gens:ALL3, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الثالث السبعة.", label:"رياضيات م١ — شامل ف٣"},
+    f1:  {tab:"3-1 كتابة العبارات", gens:F1, n:10, intro:"<b>الدرس <span class=en>3-1</span> — كتابة العبارات الجبرية والمعادلات:</b> المجموع · زاد · أكبر من ⇐ جمع، والفرق · قلَّ · أقلّ من ⇐ طرح، وأضعاف · ناتج ضرب ⇐ ضرب.", label:"رياضيات م١ — 3-1 كتابة العبارات"},
+    f2:  {tab:"3-2 معادلات الجمع والطرح", gens:F2, n:10, intro:"<b>الدرس <span class=en>3-2</span> — معادلات الجمع والطرح:</b> اعزل المتغيّر بالعملية العكسية، وطبّقها على الطرفين معًا.", label:"رياضيات م١ — 3-2 معادلات الجمع والطرح"},
+    f3:  {tab:"3-3 معادلات الضرب", gens:F3, n:10, intro:"<b>الدرس <span class=en>3-3</span> — معادلات الضرب:</b> اقسم الطرفين على مُعامِل المتغيّر. والصيغة الرياضية معادلةٌ تربط كميّاتٍ محدّدة مثل <span class=ax>ف = ع ن</span>.", label:"رياضيات م١ — 3-3 معادلات الضرب"},
+    f4:  {tab:"3-4 الحلّ عكسيًّا", gens:F4, n:10, intro:"<b>الدرس <span class=en>3-4</span> — استراتيجية الحلّ عكسيًّا:</b> ابدأ من النتيجة النهائية وارجع خطوةً خطوة بالعمليات العكسية، ثمّ تحقّق.", label:"رياضيات م١ — 3-4 الحلّ عكسيًّا"},
+    f5:  {tab:"3-5 ذات الخطوتين", gens:F5, n:10, intro:"<b>الدرس <span class=en>3-5</span> — المعادلات ذات الخطوتين:</b> تخلّص من الجمع أو الطرح أوّلًا، ثمّ من الضرب أو القسمة.", label:"رياضيات م١ — 3-5 المعادلات ذات الخطوتين"},
+    f6:  {tab:"3-6 المحيط والمساحة", gens:F6, n:10, intro:"<b>الدرس <span class=en>3-6</span> — المحيط والمساحة:</b> <span class=ax>مح = 2 (ل + ض)</span> و<span class=ax>م = ل × ض</span>. المحيط ما يحيط بالشكل، والمساحة ما يغطّي داخله.", label:"رياضيات م١ — 3-6 المحيط والمساحة"},
+    f7:  {tab:"3-7 التمثيل البياني", gens:F7, n:10, intro:"<b>الدرس <span class=en>3-7</span> — التمثيل البياني للدوال:</b> كلّ زوجٍ مرتّبٍ (مُدخَلة، مُخرَجة) نقطةٌ على المستوى الإحداثي، وإذا وقعت على خطٍّ مستقيم فالدالّة خطية.", label:"رياضيات م١ — 3-7 التمثيل البياني"},
 
-    all4:{tab:"اختبار شامل 📝", gens:ALL4, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الرابع الثمانية.", label:"رياضيات م٢ — شامل ف٤"},
-    g1:  {tab:"4-1 النسبة", gens:G1, n:10, intro:"<b>الدرس <span class=en>4-1</span> — النسبة:</b> مقارنةٌ بين كميّتين بالقسمة، تُكتب في أبسط صورة. والنسب المتكافئة لها القيمة نفسها.", label:"رياضيات م٢ — 4-1 النسبة"},
-    g2:  {tab:"4-2 المعدَّل", gens:G2, n:10, intro:"<b>الدرس <span class=en>4-2</span> — المعدَّل:</b> نسبةٌ بين كميّتين مختلفتَي الوحدة. وإذا صار المقام واحدًا سُمّي معدَّل وحدة.", label:"رياضيات م٢ — 4-2 المعدَّل"},
-    g3:  {tab:"4-3 وحدات إنجليزية", gens:G3, n:10, intro:"<b>الدرس <span class=en>4-3</span> — التحويل بين الوحدات الإنجليزية:</b> من الكبير إلى الصغير نضرب، ومن الصغير إلى الكبير نقسم.", label:"رياضيات م٢ — 4-3 الوحدات الإنجليزية"},
-    g4:  {tab:"4-4 وحدات مترية", gens:G4, n:10, intro:"<b>الدرس <span class=en>4-4</span> — التحويل بين الوحدات المترية:</b> كيلو = ×1000، سنتي = ÷100، ملي = ÷1000.", label:"رياضيات م٢ — 4-4 الوحدات المترية"},
-    g5:  {tab:"4-5 حلّ التناسبات", gens:G5, n:10, intro:"<b>الدرس <span class=en>4-5</span> — حلّ التناسبات:</b> التناسب تساوي نسبتين، ونحلّه بالضرب التبادلي.", label:"رياضيات م٢ — 4-5 حلّ التناسبات"},
-    g6:  {tab:"4-6 استراتيجية الرسم", gens:G6, n:10, intro:"<b>الدرس <span class=en>4-6</span> — استراتيجية الرسم:</b> ارسم شكلًا بسيطًا يمثّل المعطيات — كثيرٌ من مسائل العدّ يظهر جوابها من الرسم.", label:"رياضيات م٢ — 4-6 استراتيجية الرسم"},
-    g7:  {tab:"4-7 مقياس الرسم", gens:G7, n:10, intro:"<b>الدرس <span class=en>4-7</span> — مقياس الرسم:</b> نسبةٌ تقارن قياسات الرسم بالقياسات الحقيقية، ونحلّها بالتناسب.", label:"رياضيات م٢ — 4-7 مقياس الرسم"},
-    g8:  {tab:"4-8 الكسور والنسب المئوية", gens:G8, n:10, intro:"<b>الدرس <span class=en>4-8</span> — الكسور والنسب المئوية:</b> النسبة المئوية نسبةٌ مقامها <span class=en>100</span> — فـ<span class=en>26٪ = 26/100</span>.", label:"رياضيات م٢ — 4-8 الكسور والنسب المئوية"}
+    all4:{tab:"اختبار شامل 📝", gens:ALL4, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الرابع الثمانية.", label:"رياضيات م١ — شامل ف٤"},
+    g1:  {tab:"4-1 النسبة", gens:G1, n:10, intro:"<b>الدرس <span class=en>4-1</span> — النسبة:</b> مقارنةٌ بين كميّتين بالقسمة، تُكتب في أبسط صورة. والنسب المتكافئة لها القيمة نفسها.", label:"رياضيات م١ — 4-1 النسبة"},
+    g2:  {tab:"4-2 المعدَّل", gens:G2, n:10, intro:"<b>الدرس <span class=en>4-2</span> — المعدَّل:</b> نسبةٌ بين كميّتين مختلفتَي الوحدة. وإذا صار المقام واحدًا سُمّي معدَّل وحدة.", label:"رياضيات م١ — 4-2 المعدَّل"},
+    g3:  {tab:"4-3 وحدات إنجليزية", gens:G3, n:10, intro:"<b>الدرس <span class=en>4-3</span> — التحويل بين الوحدات الإنجليزية:</b> من الكبير إلى الصغير نضرب، ومن الصغير إلى الكبير نقسم.", label:"رياضيات م١ — 4-3 الوحدات الإنجليزية"},
+    g4:  {tab:"4-4 وحدات مترية", gens:G4, n:10, intro:"<b>الدرس <span class=en>4-4</span> — التحويل بين الوحدات المترية:</b> كيلو = ×1000، سنتي = ÷100، ملي = ÷1000.", label:"رياضيات م١ — 4-4 الوحدات المترية"},
+    g5:  {tab:"4-5 حلّ التناسبات", gens:G5, n:10, intro:"<b>الدرس <span class=en>4-5</span> — حلّ التناسبات:</b> التناسب تساوي نسبتين، ونحلّه بالضرب التبادلي.", label:"رياضيات م١ — 4-5 حلّ التناسبات"},
+    g6:  {tab:"4-6 استراتيجية الرسم", gens:G6, n:10, intro:"<b>الدرس <span class=en>4-6</span> — استراتيجية الرسم:</b> ارسم شكلًا بسيطًا يمثّل المعطيات — كثيرٌ من مسائل العدّ يظهر جوابها من الرسم.", label:"رياضيات م١ — 4-6 استراتيجية الرسم"},
+    g7:  {tab:"4-7 مقياس الرسم", gens:G7, n:10, intro:"<b>الدرس <span class=en>4-7</span> — مقياس الرسم:</b> نسبةٌ تقارن قياسات الرسم بالقياسات الحقيقية، ونحلّها بالتناسب.", label:"رياضيات م١ — 4-7 مقياس الرسم"},
+    g8:  {tab:"4-8 الكسور والنسب المئوية", gens:G8, n:10, intro:"<b>الدرس <span class=en>4-8</span> — الكسور والنسب المئوية:</b> النسبة المئوية نسبةٌ مقامها <span class=en>100</span> — فـ<span class=en>26٪ = 26/100</span>.", label:"رياضيات م١ — 4-8 الكسور والنسب المئوية"}
   };
 
   var CHAPS = {
@@ -2257,7 +2275,7 @@ if(!NAMES[who]){
     if(!done.length){ html+='<div class="q" style="text-align:center">لسّا ما اختبرت الدروس. جرّب دروس '+REM_LABEL+' ويرجع هنا يعرض أضعف درس مع نصيحة وزر مراجعة.</div>'; }
     else { done.forEach(function(x){ var weak=x.pct<70, col=weak?'var(--bad)':(x.pct<85?'#b45309':'var(--good)');
       html+='<div class="q"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+x.t.name+(x.est?' <span style="font-weight:400;font-size:.78rem;color:var(--muted)">تقديريّ من الشامل ('+(x.n===1?'سؤال واحد':x.n===2?'سؤالان':x.n+' أسئلة')+')</span>':'')+'</span><span style="color:'+col+'">'+x.pct+'%'+(weak?' ⚠️':(x.pct>=85?' ✅':''))+'</span></div>'+
-        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
+        (weak?('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">💡 '+x.t.tip+'</div><div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(x.t.yt||x.t.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح</a></div>'):'')+
         '<button class="reset" data-go="'+x.t.id+'" style="margin-top:8px">'+(x.est?'اختبر «':'راجع «')+x.t.name+'» ←</button></div>'; }); }
     var un=arr.filter(function(x){return x.pct==null;});
     if(un.length){ html+='<div class="intro" style="margin-top:10px">📌 دروس ما جرّبتها بعد: '+un.map(function(x){return x.t.name;}).join(" · ")+'</div>'; }
@@ -2265,6 +2283,11 @@ if(!NAMES[who]){
     sec.innerHTML=html; mergeMath(sec);
     sec.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click",function(){ goTo(b.dataset.go); }); });
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
+    /* من فتح شرحَ الدرسِ غادر الصفحةَ وهو يتعلّم لا يهرب — فيُعفى من
+       عدِّ الخروج، وإلّا طُرد من جلستِه بعد فيديوَين (كما في math8.html) */
+    sec.querySelectorAll("[data-eduvid]").forEach(function(ev){
+      ev.addEventListener("click",function(){ window.__eduExempt=true; });
+    });
   }
 
   function showPanel(id){
@@ -2331,7 +2354,7 @@ if(!NAMES[who]){
 (function(){var ex=0,h=null;
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
 function ejc(){if(document.getElementById("__eject"))return;var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
-document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;ex++;if(ex>=2)ejc();else tst();}});})();
 }
 </script>
 </body>
