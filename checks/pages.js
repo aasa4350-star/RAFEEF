@@ -2105,8 +2105,20 @@ function mawhiba3BookPath(){
       if (!q[3] || !String(q[3]).trim()) E(BF, tag + ' بلا شرح');
     });
   }
-  if (total < 36)
-    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — والمنقولُ ساعةَ البناءِ ٤٠ (١٨ أسئلةٌ تجريبية + ٧ ميكانيكا + ١٢ من الاختبار الحادي عشر + ٣ مرونة)' });
+  if (total < 55)
+    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — والمنقولُ ساعةَ البناءِ ٦٠ (١٩ أسئلةٌ تجريبية + ٧ ميكانيكا + ١٢ من الاختبار الحادي عشر + ٣ مرونة + ١٩ من الاختبار الثاني)' });
+  /* سؤالٌ نُقل مرّتَين من قسمَين مختلفَين عطبٌ وقع فعلًا (ص ٦–٧ مع
+     الاختبار الثاني)، ولا يَظهر إلا بمقارنةِ النصوصِ كاملةً */
+  {
+    const seenStem = new Set();
+    for (const k of Object.keys(B))
+      for (const q of (B[k] || [])){
+        const s = String((q && q[0]) || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        if (!s) continue;
+        if (seenStem.has(s)) E(BF, 'سؤالٌ مكرَّرٌ حرفيًّا: «' + s.slice(0, 40) + '…»');
+        seenStem.add(s);
+      }
+  }
   /* السؤالُ المخالفُ لمفتاحِ الكتابِ يبقى موسومًا، وإلّا قُرئ فيزياءً صحيحة */
   if (/وُضع حاجزٌ بين مغناطيسٍ/.test(fs.readFileSync(bp, 'utf8')) &&
       !/⚠ تنبيهٌ مهمّ/.test(fs.readFileSync(bp, 'utf8')))
@@ -2152,8 +2164,10 @@ function mawhibaMechGens(){
 
   /* أنماطٌ كرّرها الكتابُ فبُنيت مولّداتٍ — في مجالَيها لا في العلميّ */
   const OTHER = {
-    math: { gAllExcept:'«كلُّ ما عندي كذا إلا ن»', gTriangleNum:'مثلّثاتُ الأعداد' },
-    flex: { gOrderMixed:'ترتيبٌ بمقارناتٍ مختلطةٍ وفيها مساواة' }
+    math: { gAllExcept:'«كلُّ ما عندي كذا إلا ن»', gTriangleNum:'مثلّثاتُ الأعداد',
+            gBalance:'اتّزانُ الأشكال', gDrainFill:'حوضٌ بحنفيّتَين ومخرج' },
+    flex: { gOrderMixed:'ترتيبٌ بمقارناتٍ مختلطةٍ وفيها مساواة' },
+    verb: { gNonsenseWord:'كلمةٌ مجهولةٌ في قائمةٍ معلومة' }
   };
   for (const id of Object.keys(OTHER)){
     const r = grab(id);
