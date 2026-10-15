@@ -327,6 +327,7 @@ function run(){
   issues.push(...dosePath());
   issues.push(...math7Link());
   issues.push(...mawhiba3BookPath());
+  issues.push(...mawhibaMechGens());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -2104,8 +2105,8 @@ function mawhiba3BookPath(){
       if (!q[3] || !String(q[3]).trim()) E(BF, tag + ' بلا شرح');
     });
   }
-  if (total < 15)
-    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — كان المنقولُ ساعةَ البناءِ ١٨' });
+  if (total < 22)
+    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — والمنقولُ ساعةَ البناءِ ٢٥ (١٨ من الأسئلة التجريبية + ٧ من ملحقِ القدرة الميكانيكية)' });
 
   const pp = path.join(ROOT, PG);
   if (fs.existsSync(pp)){
@@ -2123,6 +2124,43 @@ function mawhiba3BookPath(){
     if (!/localStorage\.setItem\(mwBookKey\(/.test(ps))
       E(PG, 'موضعُ الكتابِ لا يُحفَظ — فتُعاد عليه الأسئلةُ نفسُها كلَّ جولةٍ ولا يتقدّم فيه');
   }
+  return out;
+}
+
+/* ── مولّداتُ القدرةِ الميكانيكيةِ موجودةٌ ومسجَّلة ──────────────────
+   ملحقُ (٨) في كتابِ المستوى الثالثِ كشف ستّةَ أبوابٍ لا مولّدَ لها،
+   فبُنيت. والعطبُ المحتمَلُ ليس أن تُحذَف الدوالّ — بل أن تبقى معرَّفةً
+   ويسقط اسمُها من مصفوفةِ مجالِ sci، فلا تُستدعى أبدًا ولا يَظهر لذلك
+   أثرٌ في الصفحة: جولةٌ تامّةٌ بلا سؤالِ سيرٍ واحد. فيُفحَص الأمران. */
+function mawhibaMechGens(){
+  const out = [];
+  const F = 'mawhiba3.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  const m = /DOM\("sci"[\s\S]*?\n\s*\[([^\]]*)\]\);/.exec(src);
+  if (!m){ E('تعذّر استخراجُ مصفوفةِ مولّداتِ المجالِ العلميّ من DOM("sci")'); return out; }
+  const reg = m[1].split(',').map(s => s.trim()).filter(Boolean);
+
+  const NEED = {
+    gBeltDir:        'السيرُ المتقاطعُ وغيرُ المتقاطع',
+    gBeltSpeed:      'أقطارُ البكراتِ ونسبةُ دورانها',
+    gGearIdler:      'الترسُ الوسيط',
+    gGearChainCount: 'عدُّ التروسِ في كلِّ اتّجاه',
+    gRack:           'الحافّةُ المسنّنة',
+    gTorque:         'العزمُ وعلاقتُه بالأسنان',
+    gGearFrac:       'نسبةُ أسنانٍ كسريّة'
+  };
+  for (const g of Object.keys(NEED)){
+    if (src.indexOf('function ' + g + '(') < 0)
+      E('المولّدُ ' + g + ' (' + NEED[g] + ') غيرُ معرَّفٍ — وهو بابٌ من أبوابِ ملحقِ القدرةِ الميكانيكية');
+    else if (!reg.includes(g))
+      E('المولّدُ ' + g + ' (' + NEED[g] + ') معرَّفٌ لكنّه غيرُ مسجَّلٍ في مجالِ sci — فلا يُستدعى أبدًا');
+  }
+  /* ولا يُستغنى عن القديمَين بالجديد */
+  for (const g of ['gGearDir','gGearSpeed','gPulley','gLever'])
+    if (!reg.includes(g)) E('المولّدُ ' + g + ' سقط من مجالِ sci');
   return out;
 }
 
