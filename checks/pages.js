@@ -326,6 +326,7 @@ function run(){
   issues.push(...modelsSc8Path());
   issues.push(...dosePath());
   issues.push(...math7Link());
+  issues.push(...mawhiba3BookPath());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -2054,6 +2055,74 @@ function math7Link(){
     out.push({ sev:'خطأ', file:'math7.html', msg:'لا وسمَ «رياضيات م١» فيها — فلا يُميَّز ما تحفظه' });
   if (/<title>[^<]*ثاني متوسط/.test(m7))
     out.push({ sev:'تنبيه', file:'math7.html', msg:'العنوانُ يقول «ثاني متوسط» ومحتواها منهجُ الأوّل' });
+  return out;
+}
+
+/* ═══ أسئلةُ كتابِ موهبةَ — المستوى الثالث ═══════════════════════════
+   وصل الكتابُ (١٥ أكتوبر ٢٠٢٦) فنُقلت أسئلتُه بنصِّها. وثلاثةٌ تنكسر
+   هنا بلا صوت:
+   ١) فهرسُ إجابةٍ خارجَ الخيارات، أو خيارٌ صحيحٌ مكرَّرٌ حرفيًّا — فسؤالٌ
+      بلا إجابةٍ صحيحةٍ أبدًا، أو تنقر الصوابَ فيُحسَب خطأً.
+   ٢) مجالٌ في الكتابِ لا يقابله مجالٌ في mawhiba3.js — فأسئلتُه لا
+      تُسحَب أبدًا وتبقى في الملفِّ بلا أن يَبين.
+   ٣) يسقط وصلُ الكتابِ من practice.html فيعود التوليدُ وحدَه — والأبُ
+      طلب أسئلةَ الكتابِ أوّلًا. */
+function mawhiba3BookPath(){
+  const out = [];
+  const BF = 'mawhiba3-book.js', PG = 'practice.html', GF = 'mawhiba3.js';
+  const bp = path.join(ROOT, BF);
+  if (!fs.existsSync(bp)) return out;
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  let B = null;
+  try {
+    const box = { window:{} };
+    require('vm').createContext(box);
+    require('vm').runInContext(fs.readFileSync(bp, 'utf8'), box, { timeout: 8000 });
+    B = box.window.MAWHIBA3_BOOK;
+  } catch(e){ E(BF, 'تعذّرت قراءةُ الملفّ: ' + e.message); return out; }
+  if (!B || typeof B !== 'object'){ E(BF, 'قائمةُ أسئلةِ الكتابِ فارغةٌ أو ليست كائنًا'); return out; }
+
+  /* مجالاتُ الكتابِ هي مجالاتُ المولّداتِ نفسُها — وإلّا لم تُسحَب */
+  const gs = fs.existsSync(path.join(ROOT, GF)) ? fs.readFileSync(path.join(ROOT, GF), 'utf8') : '';
+  const domIds = [...gs.matchAll(/^DOM\("([a-z]+)"/gm)].map(m => m[1]);
+  let total = 0;
+  for (const k of Object.keys(B)){
+    if (domIds.length && !domIds.includes(k))
+      E(BF, 'مجالُ «' + k + '» لا يقابله مجالٌ في ' + GF + ' — فأسئلتُه لا تُسحَب أبدًا');
+    const list = B[k];
+    if (!Array.isArray(list) || !list.length){ E(BF, 'مجالُ «' + k + '» بلا أسئلة'); continue; }
+    list.forEach(q => {
+      total++;
+      const tag = k + ' — «' + String((q && q[0]) || '').replace(/<[^>]*>/g, '').slice(0, 30) + '»';
+      if (!Array.isArray(q) || q.length !== 4) return E(BF, tag + ' ليس على شكلِ [نصّ, خيارات, الصحيح, شرح]');
+      if (!Array.isArray(q[1]) || q[1].length < 2) return E(BF, tag + ' خياراتُه أقلُّ من اثنَين');
+      if (typeof q[2] !== 'number' || q[2] < 0 || q[2] >= q[1].length)
+        return E(BF, tag + ' فهرسُ الإجابةِ خارجَ الخيارات: ' + q[2]);
+      if (q[1].filter(x => x === q[1][q[2]]).length !== 1)
+        E(BF, tag + ' الخيارُ الصحيحُ مكرَّرٌ حرفيًّا فلا يُميَّز');
+      if (!q[3] || !String(q[3]).trim()) E(BF, tag + ' بلا شرح');
+    });
+  }
+  if (total < 15)
+    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — كان المنقولُ ساعةَ البناءِ ١٨' });
+
+  const pp = path.join(ROOT, PG);
+  if (fs.existsSync(pp)){
+    const ps = fs.readFileSync(pp, 'utf8');
+    if (ps.indexOf('src="' + BF) < 0)
+      E(PG, 'ملفُّ أسئلةِ الكتابِ غيرُ محمَّل — فلا تُسحَب منه أسئلة');
+    if (!/mwBookTake\(/.test(ps))
+      E(PG, 'أسئلةُ الكتابِ غيرُ موصولةٍ بالخلطة — والأبُ طلب أسئلةَ الكتابِ أوّلًا ثمّ التوليد');
+    if (!/function mawhibaMix\([\s\S]{0,900}mwBookTake\(/.test(ps))
+      E(PG, 'mwBookTake خارجَ mawhibaMix — فلا أثرَ لها في الجولة');
+    /* الوسمُ 📘 يفصل المنقولَ عن المولَّدِ في تقريرِ الأب */
+    if (!/gen\s*=\s*"📘/.test(ps))
+      E(PG, 'أسئلةُ الكتابِ بلا وسمٍ يميّزها — فلا يفرّق الأبُ بين المنقولِ والمولَّد');
+    /* وموضعُ كلِّ ابنٍ محفوظٌ وإلّا أُعيدت عليه أسئلةُ الكتابِ كلَّ جولة */
+    if (!/localStorage\.setItem\(mwBookKey\(/.test(ps))
+      E(PG, 'موضعُ الكتابِ لا يُحفَظ — فتُعاد عليه الأسئلةُ نفسُها كلَّ جولةٍ ولا يتقدّم فيه');
+  }
   return out;
 }
 
