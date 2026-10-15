@@ -4059,6 +4059,34 @@ var U12 = [u12Infinitive,u12VerbNounInf,u12Its,u12GerundSubj,u12Customs,u12Edgar
            u12UsedTo,u12PastPerfect,
            u12Advice,u12Make,u12WhichVerb,   /* من صندوق القواعد وتمرين A — ص ١٣٢ */
            u12CompleteB,u12TrueFalse];       /* تمرين B و Quick Check — ص ١٣٠–١٣٢ */
+/* ═══ جرعتا حسن المركَّزتان ═══════════════════════════════════════════
+   طلبُ الأب (١٥ أكتوبر ٢٠٢٦): «جرعة حسن سوّها».
+
+   والمولّداتُ هنا ليست مختارةً بالرأي: قِيست جلساتُه الإنجليزيّةُ
+   الموثوقةُ كلُّها (١٢٧ جلسة، والمستبعَدةُ منها مطروحة)، وأُخذ كلُّ
+   مولّدٍ عيّنتُه أربعٌ فأكثرُ ونسبتُه دون النصف:
+
+     u3TimeClause  ٢٥٪ (٢/٨)   — وفي آخرِ أسبوعَين ١٤٪ (١/٧)
+     u2PastQ       ٣٠٪ (٣/١٠)
+     u1HowQ        ٣٣٪ (٥/١٥)  — أكبرُ عيّنةٍ فيها
+     u3GoingWill   ٤٠٪ (٤/١٠)  — وفي آخرِ أسبوعَين ١٤٪ (١/٧)
+     u3PresProg    ٤٣٪ (٣/٧)
+     exPanda       ٢٥٪ (١/٤)
+
+   وانتظمت في بابَين لا ستّة: ثلاثةٌ منها صياغةُ سؤال، وثلاثةٌ زمنُ
+   المستقبلِ وجملتُه. فالجرعتان بابان لا قائمةُ مولّدات — لأنّ القاعدةَ
+   الواحدةَ تُشرَح مرّةً وتُجرَّب في ثلاثةِ أشكال.
+
+   وexPanda متروكٌ عمدًا: هو فهمُ نصٍّ واحدٍ بعينِه لا قاعدةٌ تُدرَّب،
+   وعيّنتُه أربعٌ — فلا يُبنى عليه بابٌ ولا يُخلط بقاعدةٍ تُشرَح.
+
+   وexAskQ أُدخل في بابِ السؤالِ وإن كانت نسبتُه ٥٧٪: هو صياغةُ السؤالِ
+   نفسُها، وتدريبُه مع أخوَيه يُثبّت القاعدةَ الواحدة. ولستُ أزعم أنّه
+   ضعفٌ — فقد كنتُ قلتُ للأب إنّه صفرٌ من ثلاثةٍ، وكان ذلك من يومٍ واحدٍ
+   لا من تاريخِه كلِّه. وتاريخُه ٤ من ٧. */
+var DOSE_Q = [u1HowQ, u2PastQ, exAskQ];
+var DOSE_F = [u3TimeClause, u3GoingWill, u3PresProg];
+
 var ALLU  = U1.concat(U2).concat(U3).concat(EXP);      /* الجزء الأول */
 var ALLU2 = U4.concat(U5).concat(U6).concat(EXP2);     /* الجزء الثاني */
 var ALLU3 = U7.concat(U8).concat(U9);                  /* الجزء الثالث */
@@ -4246,6 +4274,37 @@ if(!NAMES[who]){
   CHAPS = Object.assign({ fatri:{ name:"📝 الفتري", ids:["fatri"],
     unit:'📝 <b>الاختبار الفتري</b> — <span class=ltr>Units 1–3 + Expansion</span> · ١٨ سؤال اختيار ومقاليّان · ٢٠ درجة' } }, CHAPS);
   CFG.fatri = { tab:"الفتري 📝", gens:[], n:0, intro:"", label:"إنجليزي م٣ — الفتري 📝" };
+
+  /* ═══ الجرعةُ المركَّزة ═══════════════════════════════════════════════
+     بابان اثنان، كلٌّ منهما قاعدةٌ واحدةٌ تُشرَح فوقَ الورقةِ ثمّ تُجرَّب
+     في ثلاثةِ أشكال. والشرحُ فوقُ مقصودٌ: الجرعةُ تعليمٌ قبل أن تكون
+     اختبارًا، وهو قد جرَّب هذي الأسئلةَ وأخطأها فلا يُفيده تكرارُ
+     التجربةِ وحدَها. ومقابلةُ الخطأِ بالصوابِ صريحةً هي ما ينقصه:
+     فجدولُ «لا تقل / قل» يقابل ما اختاره فعلًا بما يصحّ. */
+  CHAPS = Object.assign({ dose:{ name:"💊 الجرعة", ids:["doseq","dosef"],
+    unit:'💊 <b>الجرعة المركَّزة</b> — بابان من قياسِ أخطائك أنت، لا من ترتيبِ الكتاب' } }, CHAPS);
+
+  CFG.doseq = { tab:"صياغة السؤال ❓", gens:DOSE_Q, n:12,
+    label:"إنجليزي م٣ — جرعة: صياغة السؤال",
+    intro:'<b>❓ صياغة السؤال</b> — <span class=ltr>How often / How much / How long</span> وأسئلةُ الماضي وترتيبُ الكلمات.'+
+      '<div style="margin-top:8px;line-height:2">'+
+      '• <span class=ltr>How often</span> = كم <b>مرّة</b> · <span class=ltr>How much</span> = كم <b>كمّية</b> (وقت/مال) · <span class=ltr>How long</span> = كم <b>مدّة</b>.<br>'+
+      '• في سؤالِ الماضي: <span class=ltr>Did</span> + <b>المصدر</b> — ولا يُجمع فعلان ماضيان.<br>'+
+      '• في السؤال يتقدّم الفعلُ المساعدُ على الفاعل.</div>'+
+      '<div style="margin-top:8px;background:var(--bg);border-radius:12px;padding:10px 12px;line-height:2.1">'+
+      '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">Did you lived…?</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">Did you live…?</span><br>'+
+      '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">What you are doing…?</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">What are you doing…?</span></div>' };
+
+  CFG.dosef = { tab:"المستقبل وجملة الزمن ⏳", gens:DOSE_F, n:12,
+    label:"إنجليزي م٣ — جرعة: المستقبل وجملة الزمن",
+    intro:'<b>⏳ المستقبل وجملة الزمن</b> — <span class=ltr>will</span> و<span class=ltr>be going to</span> والمضارعُ المستمرّ، وما بعد <span class=ltr>when / until / before / after / as soon as</span>.'+
+      '<div style="margin-top:8px;line-height:2">'+
+      '• <span class=ltr>be going to</span> لخطّةٍ <b>مقرَّرة</b> · <span class=ltr>will</span> مع <span class=ltr>maybe/probably/perhaps</span> لما هو <b>غير مؤكّد</b>.<br>'+
+      '• المضارعُ المستمرّ (<span class=ltr>am/is/are + V-ing</span>) لترتيبٍ <b>مؤكّدٍ</b> في المستقبل: <span class=ltr>I’m flying tomorrow</span>.<br>'+
+      '• <b>وهذي أكثرُ ما تخطئ فيه:</b> بعد <span class=ltr>when · until · before · after · as soon as · while</span> يأتي <b>المضارعُ البسيط</b> ولو كان المعنى مستقبلًا.</div>'+
+      '<div style="margin-top:8px;background:var(--bg);border-radius:12px;padding:10px 12px;line-height:2.1">'+
+      '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">…until he will finish</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">…until he finishes</span><br>'+
+      '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">…when they will be on vacation</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">…when they are on vacation</span></div>' };
 
   var curCh = "fatri", curId = "fatri";
 

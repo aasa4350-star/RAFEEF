@@ -321,6 +321,7 @@ function run(){
   issues.push(...bookStudyPath());
   issues.push(...rulesPdfPath());
   issues.push(...modelsSc8Path());
+  issues.push(...dosePath());
   issues.push(...fatriEn5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
@@ -1964,6 +1965,65 @@ function modelsSc8Path(){
     out.push({ sev:'تنبيه', file:MF, msg:'أسئلةُ الاختيارِ ' + mcqN + ' فقط — كان المنقولُ ساعةَ البناءِ ٢٨٢' });
   if (!essN)
     out.push({ sev:'تنبيه', file:MF, msg:'لا مقاليَّ في النماذجِ كلِّها — وأوراقُ المعلِّمين فيها «علّل» و«قارن»' });
+  return out;
+}
+
+/* ═══ جرعتا حسن المركَّزتان ═══════════════════════════════════════════
+   طلبُ الأب (١٥ أكتوبر ٢٠٢٦): «جرعة حسن سوّها».
+
+   وثلاثةٌ تنكسر هنا بلا صوت:
+   ١) يُبدَّل مولّدٌ في الجرعةِ بلا قياسٍ جديد — فتصير الجرعةُ رأيًا لا
+      دواءً، وهي عينُ علّةِ «الزيادةِ بلا قياس» التي في حارسِ التأنّي.
+   ٢) يُحذَف جدولُ «لا تقل / قل» — فتعود الجرعةُ تكرارَ أسئلةٍ أخطأها
+      أصلًا، ولا تُفيده إعادةُ التجربةِ بلا مقابلةِ الخطأِ بالصواب.
+   ٣) يُشار إلى مولّدٍ لا وجودَ له فتُرمى اللوحةُ فارغةً أو تَرمي. */
+function dosePath(){
+  const out = [];
+  const f = 'english9.html';
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!/var DOSE_Q\s*=/.test(src) && !/var DOSE_F\s*=/.test(src)) return out;
+
+  const read = nm => {
+    const m = new RegExp('var ' + nm + '\\s*=\\s*\\[([^\\]]*)\\]').exec(src);
+    return m ? m[1].split(',').map(s => s.trim()).filter(Boolean) : null;
+  };
+  const dq = read('DOSE_Q'), df = read('DOSE_F');
+  if (!dq || !dq.length) E('DOSE_Q فارغةٌ أو غيرُ مقروءة — بابُ صياغةِ السؤالِ بلا أسئلة');
+  if (!df || !df.length) E('DOSE_F فارغةٌ أو غيرُ مقروءة — بابُ المستقبلِ بلا أسئلة');
+
+  for (const gname of [...(dq||[]), ...(df||[])]){
+    /* المولّدُ موجودٌ فعلًا — وإلّا لوحةٌ فارغةٌ أو رميٌ عند الرسم */
+    if (!new RegExp('function ' + gname + '\\s*\\(').test(src))
+      E('الجرعةُ تشير إلى مولّدٍ لا وجودَ له: ' + gname);
+    /* ═══ ولا يدخل الجرعةَ من لم يُقَس ═══════════════════════════════
+       الاختيارُ كان من قياسِ جلساتِه الموثوقةِ لا من الرأي، فيبقى
+       القياسُ مكتوبًا بجانبِ كلِّ اسم. ومن أراد تبديلَ مولّدٍ فليَقِس
+       أوّلًا ويكتب رقمَه — وإلّا صارت الجرعةُ تخمينًا. */
+    else if (!new RegExp(gname + '[^\\n]*[٠-٩]+٪').test(src))
+      E('مولّدُ الجرعةِ ' + gname + ' بلا قياسٍ مكتوبٍ بجانبِه — فلا يُعرَف على أيِّ أساسٍ أُدخل');
+  }
+
+  /* اللوحتان موصولتان: تعريفٌ في CFG وبابٌ في CHAPS */
+  for (const [id, arr] of [['doseq','DOSE_Q'], ['dosef','DOSE_F']]){
+    /* القراءةُ بمسحِ الأقواسِ المتوازنة لا بنمطٍ على شكلِ النهاية —
+       فالكتلةُ قد تُغلَق في سطرِها أو في سطرٍ تالٍ، وكلاهما صحيح. */
+    const body = EXTRACT.literalAfter(src, new RegExp('CFG\\.' + id + '\\s*='), '{', '}');
+    if (!body){ E('تعريفُ لوحةِ الجرعة CFG.' + id + ' مفقود — فالتبويبُ يرمي عند الرسم'); continue; }
+    if (body.indexOf('gens: ' + arr) < 0 && body.indexOf('gens:' + arr) < 0)
+      E('CFG.' + id + ' لا تسحب من ' + arr + ' — فالجرعةُ تُدرّب غيرَ ما قِيس');
+    const n = /n:\s*(\d+)/.exec(body);
+    if (!n || +n[1] < 10)
+      E('CFG.' + id + ' عددُ أسئلتِها ' + (n ? n[1] : 'غيرُ محدَّد') + ' — والجرعةُ دونَ عشرةٍ لا تُثبّت قاعدة');
+    /* ═══ جدولُ «لا تقل / قل» هو الفرقُ بين جرعةٍ وتكرار ═══════════ */
+    if (!/لا تقل/.test(body) || !/<b>قل<\/b>/.test(body))
+      E('CFG.' + id + ' بلا مقابلةِ «لا تقل / قل» — فهي تكرارُ أسئلةٍ أخطأها لا تصحيحٌ لها');
+  }
+  if (!/dose:\s*\{[^}]*ids:\s*\[[^\]]*"doseq"[^\]]*"dosef"/.test(src))
+    E('بابُ الجرعةِ غيرُ مُدرَجٍ في CHAPS بلوحتَيه — فلا يُرى في شريطِ الأجزاء');
+
   return out;
 }
 
