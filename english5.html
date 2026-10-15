@@ -11,6 +11,7 @@
 <script src="typed.js?v=20261001"></script>
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
+<script src="pace.js?v=20261015"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
 <script src="fatri-en5.js?v=20261009"></script>
@@ -629,11 +630,16 @@ if(!NAMES[who]){
     var RG_MS = 2000;
     var SKILLS={}, ITEMS=[], __t0=Date.now(), __lastTs=__t0, __fastN=0;
     function __meta(n){
-      return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
-               /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر): «شِلّ الخاصّية
-                  هذي منهم كلّهم ما عدا فهد». وتبقى fast محفوظةً فتُقرأ ولا يُحذف بها شيء. */
-               trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+      /* ═══ الوسمُ بحارسِ التأنّي ═══════════════════════════════════════
+         كان الوسمُ هنا ثقةً ثابتةً بطلبِ الأب (٧ أكتوبر): «شِلّ الخاصّية
+         هذي منهم كلّهم ما عدا فهد». وفي ١٥ أكتوبر أظهرت البياناتُ أنّ
+         أسامةَ يرمي الورقةَ رميًا (٢٠٣ محاولاتٍ لفتريِّه، وسيطُها خمسَ
+         عشرةَ ثانيةً لعشرين سؤالًا)، فقِيست القاعدةُ على جلساتِه كلِّها
+         قبل تطبيقِها: لا تسقط بها جلسةٌ ممتازةٌ واحدةٌ من ٤٢٣ (انظر pace.js).
+         فالوسمُ الآن من الحارس، وهو على أسامةَ وحسنٍ لا على الجميع. */
+      var m = { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
+                skills: SKILLS, items: ITEMS, rgMs: RG_MS };
+      return (window.PACE ? PACE.stamp(m, who, m.dur, n, __fastN, correct) : m);
     }
     /* وسمُ بنكِ الدرسِ يُشتقّ من CFG نفسِه لا يُؤلَّف، فلا يتناقض مع اسمِ
        الدرسِ المعروضِ على الشاشة. ويُقرأ عند الحاجةِ لا عند التحميلِ،
@@ -712,6 +718,8 @@ if(!NAMES[who]){
         }
         scoreEl.textContent = correct+" / "+total;
         if(Object.keys(answered).length===total && savedN<total){ savedN=total; saved=true; sec._frag=false; saveScore(c.label, correct, total, pid, __meta(total));
+          /* يُقال له في وجهِه لا في تقريرِ أبيه وحدَه — وإلّا ظنّ أنّه يتقدّم */
+          if(window.PACE) PACE.box(sec, who, Math.round((Date.now()-__t0)/1000), total, __fastN, correct);
           if(id!=="all" && id!=="rem"){ try{ localStorage.setItem(remKey(id), JSON.stringify({pct:Math.round(correct/total*100)})); }catch(e){} } else saveTopicTallies(TALLY); }
       }
       /* والمكتوب يُسجَّل بـ j = −١: لم يختر مشتّتًا بل كتب جوابَه */

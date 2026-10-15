@@ -262,12 +262,19 @@
       var pid = (window.newPid ? newPid() : null);
       var answered = {}, correct = 0, saved = false, savedN = 0;
       var t0 = Date.now(), SK = {};
+      /* ═══ ما كان يُقاس هنا شيءٌ من التأنّي ═════════════════════════════
+         كانت الميتا تحمل المدّةَ وحدَها: لا عدَّ نقراتٍ سريعة، ولا تفصيلَ
+         بنودٍ (items)، ولا وسمَ ثقة. فمرّت ٢٠٣ محاولاتٍ وسيطُها خمسَ عشرةَ
+         ثانيةً لعشرين سؤالًا بلا أن يصيح شيء — ودخلت المعدَّل كلُّها.
+         فصار العدُّ هنا كما في بقيّةِ الصفحات. */
+      var RG_MS = 2000, lastTs = t0, fastN = 0, ITEMS = [];
       var scoreEl = sec.querySelector("[data-score]");
       function draw(){ scoreEl.textContent = correct + " / " + TOTAL; }
       function meta(){
         var by = {}; SECTS.forEach(function(S){ by[S[1]] = SK[S[0]] || {c:0,t:0}; });
-        return { dur: Math.round((Date.now()-t0)/1000), skills: by,
-                 sections: by, pid: pid, model: "ورقة المعلّم" };
+        var m = { dur: Math.round((Date.now()-t0)/1000), fast: fastN, skills: by,
+                  sections: by, items: ITEMS, rgMs: RG_MS, pid: pid, model: "ورقة المعلّم" };
+        return (window.PACE ? PACE.stamp(m, window.who, m.dur, items.length, fastN, correct) : m);
       }
       function save(force){
         var done = Object.keys(answered).length === items.length;
@@ -281,19 +288,54 @@
         qEl.querySelectorAll(".opts button").forEach(function(btn){
           btn.addEventListener("click", function(){
             if(answered[k]) return; answered[k] = 1;
+            var now = Date.now(), ms = now - lastTs; lastTs = now;
+            if(ms < RG_MS) fastN++;
             qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled = true; });
             var ok = (+btn.dataset.j === it.ans);
             if(ok){ btn.classList.add("correct"); correct++; }
             else { btn.classList.add("wrong");
                    qEl.querySelectorAll(".opts button")[it.ans].classList.add("correct"); }
             var s = SK[it.sect] || (SK[it.sect] = {c:0,t:0}); s.t++; if(ok) s.c++;
+            ITEMS.push({ g: it.sect || "", ok: (ok?1:0), ms: ms, j: +btn.dataset.j, a: it.ans });
             draw(); save();
+            if(Object.keys(answered).length === items.length) finish();
           });
         });
       });
-      sec._leave = function(){ if(Object.keys(answered).length) save(true); };
+      /* ═══ ما يقع عند إتمامِ الجولة ═══════════════════════════════════
+         يُقال له حكمُ الجولةِ في وجهِه، ثمّ — إن كانت جولةَ نقرٍ — يُقفَل
+         زرُّ «اختبار جديد» عشرين ثانية.
+
+         ولِمَ القفلُ معلَّقٌ بالحكمِ لا دائمًا: من حلَّ ورقتَه فعلًا لا
+         يُعاقَب بانتظار، ومن رماها رميًا لا يُعيد رميَها في الثانيةِ
+         التالية. فالمائةُ والأربعُ والعشرون التي وقعت في يومٍ واحدٍ لا
+         تقع مرّةً أخرى، ومن يذاكر لا يشعر بشيء. */
+      var resetBtn = sec.querySelector(".reset"), RESET_TXT = resetBtn.textContent;
+      function finish(){
+        var dur = Math.round((Date.now()-t0)/1000);
+        if(window.PACE) PACE.box(sec, window.who, dur, items.length, fastN, correct);
+        if(!window.PACE || !PACE.on(window.who)) return;
+        var J = PACE.judge(dur, items.length, fastN, correct);
+        if(J.trusted) return;
+        var left = 20;
+        resetBtn.disabled = true; resetBtn.style.opacity = ".5";
+        resetBtn.textContent = "راجِع أخطاءك… " + left;
+        var iv = setInterval(function(){
+          left--;
+          if(left > 0){ resetBtn.textContent = "راجِع أخطاءك… " + left; return; }
+          clearInterval(iv);
+          resetBtn.disabled = false; resetBtn.style.opacity = "";
+          resetBtn.textContent = RESET_TXT;
+        }, 1000);
+        sec._paceTimer = iv;
+      }
+      sec._leave = function(){
+        if(sec._paceTimer) clearInterval(sec._paceTimer);
+        if(Object.keys(answered).length) save(true);
+      };
       sec._done  = function(){ return Object.keys(answered).length === items.length; };
-      sec.querySelector(".reset").addEventListener("click", function(){
+      resetBtn.addEventListener("click", function(){
+        if(sec._paceTimer) clearInterval(sec._paceTimer);
         if(Object.keys(answered).length) save(true);
         window.FATRI_EN5.render(sec);
       });
