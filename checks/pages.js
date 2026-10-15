@@ -2105,8 +2105,12 @@ function mawhiba3BookPath(){
       if (!q[3] || !String(q[3]).trim()) E(BF, tag + ' بلا شرح');
     });
   }
-  if (total < 22)
-    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — والمنقولُ ساعةَ البناءِ ٢٥ (١٨ من الأسئلة التجريبية + ٧ من ملحقِ القدرة الميكانيكية)' });
+  if (total < 36)
+    out.push({ sev:'تنبيه', file:BF, msg:'أسئلةُ الكتابِ ' + total + ' فقط — والمنقولُ ساعةَ البناءِ ٤٠ (١٨ أسئلةٌ تجريبية + ٧ ميكانيكا + ١٢ من الاختبار الحادي عشر + ٣ مرونة)' });
+  /* السؤالُ المخالفُ لمفتاحِ الكتابِ يبقى موسومًا، وإلّا قُرئ فيزياءً صحيحة */
+  if (/وُضع حاجزٌ بين مغناطيسٍ/.test(fs.readFileSync(bp, 'utf8')) &&
+      !/⚠ تنبيهٌ مهمّ/.test(fs.readFileSync(bp, 'utf8')))
+    E(BF, 'سؤالُ حاجزِ المغناطيسِ فقد وسمَ ⚠ — وجوابُه جوابُ الكتابِ لا جوابُ الفيزياء');
 
   const pp = path.join(ROOT, PG);
   if (fs.existsSync(pp)){
@@ -2139,9 +2143,28 @@ function mawhibaMechGens(){
   const src = fs.readFileSync(p, 'utf8');
   const E = m => out.push({ sev:'خطأ', file:F, msg:m });
 
-  const m = /DOM\("sci"[\s\S]*?\n\s*\[([^\]]*)\]\);/.exec(src);
-  if (!m){ E('تعذّر استخراجُ مصفوفةِ مولّداتِ المجالِ العلميّ من DOM("sci")'); return out; }
-  const reg = m[1].split(',').map(s => s.trim()).filter(Boolean);
+  const grab = id => {
+    const m = new RegExp('DOM\\("' + id + '"[\\s\\S]*?\\n\\s*\\[([^\\]]*)\\]\\);').exec(src);
+    return m ? m[1].split(',').map(s => s.trim()).filter(Boolean) : null;
+  };
+  const reg = grab('sci');
+  if (!reg){ E('تعذّر استخراجُ مصفوفةِ مولّداتِ المجالِ العلميّ من DOM("sci")'); return out; }
+
+  /* أنماطٌ كرّرها الكتابُ فبُنيت مولّداتٍ — في مجالَيها لا في العلميّ */
+  const OTHER = {
+    math: { gAllExcept:'«كلُّ ما عندي كذا إلا ن»', gTriangleNum:'مثلّثاتُ الأعداد' },
+    flex: { gOrderMixed:'ترتيبٌ بمقارناتٍ مختلطةٍ وفيها مساواة' }
+  };
+  for (const id of Object.keys(OTHER)){
+    const r = grab(id);
+    if (!r){ E('تعذّر استخراجُ مصفوفةِ مولّداتِ مجالِ ' + id); continue; }
+    for (const g of Object.keys(OTHER[id])){
+      if (src.indexOf('function ' + g + '(') < 0)
+        E('المولّدُ ' + g + ' (' + OTHER[id][g] + ') غيرُ معرَّف');
+      else if (!r.includes(g))
+        E('المولّدُ ' + g + ' (' + OTHER[id][g] + ') معرَّفٌ لكنّه غيرُ مسجَّلٍ في مجالِ ' + id + ' — فلا يُستدعى أبدًا');
+    }
+  }
 
   const NEED = {
     gBeltDir:        'السيرُ المتقاطعُ وغيرُ المتقاطع',
