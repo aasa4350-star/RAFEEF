@@ -329,6 +329,7 @@ function run(){
   issues.push(...mawhiba3BookPath());
   issues.push(...mawhibaMechGens());
   issues.push(...fatriEn5Path());
+  issues.push(...muthPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -2152,6 +2153,173 @@ function mawhiba3BookPath(){
    فبُنيت. والعطبُ المحتمَلُ ليس أن تُحذَف الدوالّ — بل أن تبقى معرَّفةً
    ويسقط اسمُها من مصفوفةِ مجالِ sci، فلا تُستدعى أبدًا ولا يَظهر لذلك
    أثرٌ في الصفحة: جولةٌ تامّةٌ بلا سؤالِ سيرٍ واحد. فيُفحَص الأمران. */
+/* ═══ 📒 اختبارُ المذكّرة — علومُ حسن ════════════════════════════════
+   أرسل الأبُ (١٦ أكتوبر ٢٠٢٦) ستَّ عشرةَ صورةً من مذكّرةِ معلّمِه وقال:
+   «حطّها تحت مسمّى اختبار المذكّرة، وحطّ ٤ أسئلة مقالي نفس المقالي
+   اللي موجود بالصور». فبُني قسمٌ مستقلٌّ عن الفتريّ.
+
+   وخمسةُ أشياءَ تنكسر فيه بلا صوت:
+     ١) مجموعُ التوزيعِ يخالف العددَ المعلَن — تُعرَض أسئلةٌ والدرجةُ
+        من غيرِ عددِها، ولا يُخطئ شيءٌ ظاهر.
+     ٢) المجموعُ لا يُجمَع من جزأيه فتضيع درجاتُ المقاليّ.
+     ٣) رقمٌ معروضٌ للطالبِ يخالف رقمًا آخرَ في الشاشةِ نفسِها — وهو
+        عطبٌ وقع مرّتين في يومٍ واحدٍ في الفتريّ.
+     ٤) بنكٌ يصغُر عن ضعفِ ما يُسحَب منه، فيتكرّر السؤالُ على الطالب —
+        وهي الشكوى التي بُني هذا القسمُ أصلًا بعدها.
+     ٥) نصٌّ رفعه الأبُ بطلبِه يعود صامتًا.
+   ═══════════════════════════════════════════════════════════════════ */
+function muthPath(){
+  const out = [];
+  const F = 'science9.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  const arN = n => String(n).split('').map(d => '٠١٢٣٤٥٦٧٨٩'[+d]).join('');
+
+  const num = (name) => {
+    const m = new RegExp('var ' + name + '\\s*=\\s*(\\d+);').exec(src);
+    return m ? +m[1] : null;
+  };
+  const MCQ = num('MUTH_MCQ'), EQN = num('MUTH_EQN'), EMARK = num('MUTH_EMARK');
+  if (MCQ === null || EQN === null || EMARK === null){
+    E('أعدادُ اختبارِ المذكّرة (MUTH_MCQ / MUTH_EQN / MUTH_EMARK) مفقودة'); return out;
+  }
+  if (MCQ !== 20)  E('أسئلةُ اختيارِ المذكّرة ' + MCQ + ' والمطلوبُ ٢٠');
+  if (EQN !== 4)   E('مقاليّاتُ المذكّرة ' + EQN + ' والمطلوبُ ٤ — وهو نصُّ طلبِ الأب');
+  if (EMARK !== 3) E('درجةُ المقاليِّ ' + EMARK + ' والمطلوبُ ٣');
+  const TOTAL = MCQ + EQN * EMARK;
+
+  /* المجموعُ يُحسَب من جزأيه لا يُكتَب بيدٍ */
+  if (!/var MUTH_ESSAY = MUTH_EQN \* MUTH_EMARK;/.test(src))
+    E('درجةُ المقاليّاتِ لا تُضرَب في عددِها — فتضيع درجاتٌ بلا أثرٍ ظاهر');
+  if (!/var MUTH_TOTAL = MUTH_MCQ \+ MUTH_ESSAY;/.test(src))
+    E('مجموعُ درجاتِ المذكّرةِ لا يُجمَع من جزأيه');
+  /* ═══ الحسابُ يُفحَص داخلَ renderMuth وحدَها ══════════════════════
+     دالّةُ marks نفسُها موجودةٌ في renderFatri أيضًا بنصِّها، فبحثٌ في
+     الملفِّ كلِّه يُصيب نسخةَ الفتريِّ ويمرّ على كسرِ نسخةِ المذكّرة —
+     نجت هذه الطفرةُ أوّلَ مرّةٍ بهذا بعينِه. */
+  const muthBody = /function renderMuth\(\)\{[\s\S]*?\n    draw\(\);\n  \}/.exec(src);
+  if (!muthBody) E('دالّةُ renderMuth لا تُقرَأ');
+  else if (!/function marks\(\)\{ return correct \+ essaySum\(\); \}/.test(muthBody[0]))
+    E('درجةُ المقاليِّ لا تدخل حسابَ درجةِ المذكّرة — تُعرَض ٢٠ من ٣٢ وقد أجاب كلَّ شيء');
+
+  /* التوزيعُ على المحاورِ يطابق العددَ المعلَن */
+  const pm = /var MUTH_PER = \{([^}]*)\};/.exec(src);
+  if (!pm) E('توزيعُ أسئلةِ المذكّرةِ (MUTH_PER) مفقود');
+  else {
+    const WANT = { sci:6, eq:4, volc:3, plate:3, cell:4 };
+    let sum = 0; const mism = [];
+    for (const k of Object.keys(WANT)){
+      const g = new RegExp(k + '\\s*:\\s*(\\d+)').exec(pm[1]);
+      const v = g ? +g[1] : 0; sum += v;
+      if (v !== WANT[k]) mism.push(k + '=' + v + ' والمطلوبُ ' + WANT[k]);
+    }
+    if (mism.length) E('توزيعُ أسئلةِ المذكّرةِ على المحاورِ تغيّر: ' + mism.join('، '));
+    if (sum !== MCQ)
+      E('مجموعُ التوزيع ' + sum + ' يخالف العددَ المعلَن ' + MCQ +
+        ' — تُعرَض أسئلةٌ والدرجةُ من غيرِ عددِها');
+  }
+
+  /* الخلطُ حيٌّ والفهرسُ يتبعه: لو جمد الفهرسُ عُلّم الطالبُ الخطأ
+     والصفحةُ متّسقةٌ مع نفسِها فلا يصيح شيء */
+  if (!/return \[p\[0\], o, o\.indexOf\(p\[1\]\[0\]\), p\[2\]\];/.test(src))
+    E('فهرسُ الجوابِ في muthPick لا يتبع الخلطَ — يُعلَّم خيارٌ ليس هو الجواب');
+  if (!/var p = bank\[i\], o = p\[1\]\.slice\(\);\s*\n\s*shuffle\(o\);/.test(src))
+    E('خياراتُ سؤالِ المذكّرةِ لا تُخلَط — فيُحفَظ موضعُ الجوابِ لا الجواب');
+
+  /* كلُّ رقمٍ يُعرَض للطالبِ يطابق أخاه */
+  const um = /muth:\s*\{[\s\S]{0,900}?unit:\s*'([^']*)'/.exec(src);
+  const im = /function renderMuth\(\)\{[\s\S]{0,3000}?sec\.innerHTML/.exec(src);
+  const shown = [];
+  if (um) shown.push(['سطرِ الوحدةِ فوق لوحةِ المذكّرة', um[1]]);
+  else E('سطرُ الوحدةِ لفصلِ المذكّرةِ مفقود — لا عنوانَ فوق اللوحة');
+  if (im) shown.push(['مقدّمةِ لوحةِ المذكّرة', im[0]]);
+  else E('مقدّمةُ لوحةِ المذكّرةِ مفقودة');
+  for (const [where, text] of shown){
+    for (const g of String(text).matchAll(/([٠-٩]+)\s*(?:سؤالًا|أسئلة)/g))
+      if (g[1] !== arN(MCQ))
+        E('العددُ المعروضُ في ' + where + ' «' + g[0].trim() + '» والأسئلةُ ' + arN(MCQ) +
+          ' — رقمان متناقضان في شاشةٍ واحدة');
+    for (const g of String(text).matchAll(/([٠-٩]+)\s*درجة/g))
+      if (g[1] !== arN(TOTAL))
+        E('الدرجةُ المعروضةُ في ' + where + ' «' + g[0].trim() + '» والمجموعُ ' + arN(TOTAL));
+  }
+
+  /* التبويبُ مسجَّلٌ ومُوجَّهٌ — وإلّا بقي الاختبارُ في الملفِّ لا يُفتَح */
+  if (!/muth:\s*\{\s*name:"📒 المذكّرة", ids:\["muth"\]/.test(src))
+    E('فصلُ المذكّرةِ غيرُ مسجَّلٍ في CHAPS — لا يظهر للطالب');
+  if (!/CFG\.muth\s*=/.test(src))
+    E('CFG.muth مفقود — لا تبويبَ للمذكّرة');
+  if (!/else if\(id==="muth"\)\{[^}]*renderMuth\(\);/.test(src))
+    E('لوحةُ المذكّرةِ لا تُرسَم — يُنقَر التبويبُ فلا يظهر شيء');
+  if (!/saveScore\("علوم م٣ — اختبار المذكّرة 📒"/.test(src))
+    E('نتيجةُ المذكّرةِ لا تُحفَظ باسمِها — فلا تظهر في تقريرِ الأب');
+
+  /* بنوكُ الأسئلةِ: بنيةٌ سليمةٌ، وسعةٌ لا تُكرِّر */
+  const BANKS = { MUTH_SCI:'sci', MUTH_EQ:'eq', MUTH_VOLC:'volc',
+                  MUTH_PLATE:'plate', MUTH_CELL:'cell' };
+  const PER = { sci:6, eq:4, volc:3, plate:3, cell:4 };
+  for (const [name, key] of Object.entries(BANKS)){
+    const lit = EXTRACT.literalAfter(src, new RegExp('var\\s+' + name + '\\s*='), '[', ']');
+    let bank = null;
+    try { bank = lit ? EXTRACT.evalLiteral(lit, name) : null; } catch(e){}
+    if (!Array.isArray(bank)){ E('بنكُ ' + name + ' لا يُقرَأ'); continue; }
+    /* ضعفُ ما يُسحَب على الأقلّ — وإلّا تكرّر السؤالُ على الطالبِ بين جلسةٍ وأخرى */
+    if (bank.length < PER[key] * 2)
+      E('بنكُ ' + name + ' فيه ' + bank.length + ' سؤالًا ويُسحَب منه ' + PER[key] +
+        ' — أقلُّ من الضعفِ فيتكرّر السؤالُ، وهي الشكوى التي بُني القسمُ بعدها');
+    const stems = {};
+    bank.forEach((q, i) => {
+      const tag = name + '#' + i + ' «' + String((q && q[0]) || '').replace(/<[^>]*>/g, '').slice(0, 30) + '»';
+      if (!Array.isArray(q) || q.length !== 3) return E(tag + ' ليس على شكلِ [نصّ, خيارات, شرح]');
+      if (!Array.isArray(q[1]) || q[1].length < 2) return E(tag + ' خياراتُه أقلُّ من اثنَين');
+      /* خياران متطابقان يجعلان indexOf يُشير إلى غيرِ الجواب */
+      if (new Set(q[1]).size !== q[1].length) E(tag + ' فيه خياران متطابقان — فيُعلَّم غيرُ الجواب');
+      if (!q[2] || !String(q[2]).trim()) E(tag + ' بلا شرح');
+      const s0 = String(q[0]).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      if (stems[s0]) E(tag + ' سؤالٌ مكرّرٌ في بنكِه');
+      stems[s0] = 1;
+    });
+  }
+
+  /* بنوكُ المقاليِّ الأربعةُ: شكلٌ لكلٍّ، ولكلِّ شكلٍ أكثرُ من نصّ */
+  const EB = ['MUTH_E_EXP', 'MUTH_E_CMP', 'MUTH_E_WHY', 'MUTH_E_TERM'];
+  for (const name of EB){
+    const lit = EXTRACT.literalAfter(src, new RegExp('var\\s+' + name + '\\s*='), '[', ']');
+    const n = lit ? (lit.match(/\{\s*stem:/g) || []).length : 0;
+    if (!lit) E('بنكُ المقاليِّ ' + name + ' مفقود');
+    else if (n < 3)
+      E('بنكُ المقاليِّ ' + name + ' فيه ' + n + ' نصًّا فقط — فيتكرّر على الطالبِ في كلِّ اختبار');
+  }
+  if (!/var MUTH_E\s*=\s*\[MUTH_E_EXP, MUTH_E_CMP, MUTH_E_WHY, MUTH_E_TERM\];/.test(src))
+    E('المقاليّاتُ الأربعةُ لا تُسحَب من الأشكالِ الأربعةِ كلٍّ على حدة');
+  if (!/var ESS = MUTH_E\.map\(function\(bank\)\{ return gp\(bank\); \}\);/.test(src))
+    E('سحبُ المقاليّاتِ لا يتبع الأشكالَ الأربعة — فقد تقع كلُّها في شكلٍ واحد');
+
+  /* ═══ ما رفعه الأبُ لا يعود صامتًا ══════════════════════════════════
+     «الأسئلة المقالية هذي وكذلك سؤال التخمر — شلها لأنها تكرّرت عليه
+     كثير» (١٦ أكتوبر). والعلّةُ تكرارُها على حسنٍ لا موضعُها، فلا تعود
+     في الفتريِّ ولا في المذكّرة. */
+  const DROPPED = [
+    ['أثر كمّيّة السماد', 'مقاليُّ السمادِ والفول'],
+    ['قارن</b> بين <b>البناء الضوئيّ</b> و<b>التنفّس الخلويّ', 'مقارنةُ البناءِ الضوئيِّ بالتنفّسِ الخلويّ'],
+    ['قارن</b> بين <b>التنفّس الخلويّ</b> و<b>التخمّر', 'مقارنةُ التنفّسِ الخلويِّ بالتخمّر']
+  ];
+  for (const [needle, label] of DROPPED)
+    if (src.indexOf(needle) >= 0)
+      E(label + ' عاد إلى الصفحة — وقد رفعه الأبُ بطلبِه لتكرارِه على حسن');
+  /* ولا يبقى بنكُ مقارنةِ الفتريِّ نصًّا واحدًا بعد الرفع */
+  {
+    const lit = EXTRACT.literalAfter(src, /var\s+ESSAY_CMP\s*=/, '[', ']');
+    const n = lit ? (lit.match(/\{\s*stem:/g) || []).length : 0;
+    if (n < 3) E('بنكُ مقارنةِ الفتريِّ فيه ' + n + ' نصًّا — فيأتي الطالبَ النصُّ نفسُه كلَّ مرّة');
+    const l2 = EXTRACT.literalAfter(src, /var\s+ESSAY_EXP\s*=/, '[', ']');
+    const n2 = l2 ? (l2.match(/\{\s*stem:/g) || []).length : 0;
+    if (n2 < 3) E('بنكُ تجربةِ الفتريِّ فيه ' + n2 + ' نصًّا — فيتكرّر على الطالب');
+  }
+  return out;
+}
+
 function mawhibaMechGens(){
   const out = [];
   const F = 'mawhiba3.js', p = path.join(ROOT, F);
