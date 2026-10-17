@@ -332,6 +332,7 @@ function run(){
   issues.push(...fatriEn4Path());
   issues.push(...muthPath());
   issues.push(...mawhibaTimed());
+  issues.push(...localNoWrite());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -2343,6 +2344,52 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ لا تَكتُبُ صفحةٌ محلّيّةٌ في قاعدةِ الأبناء ═════════════════════
+   في ١٧ أكتوبر ٢٠٢٦ عددتُ محاولاتِ حسن في «اختبار المذكّرة» فوجدتُ في
+   الجدولِ ٧٣ صفًّا ليست لأحدٍ منهم: ١٦ بندًا أو أكثرَ أُجيبت كاملةً في
+   أقلِّ من عشرِ ثوانٍ. كتبَتْها فحوصي الآليّة: تفتحُ الصفحةَ بـ file://
+   وتُجيبُ كلَّ شيءٍ فتُكمِلُ المحاولةَ فتُرسِلُها. والمفتاحُ المنشورُ
+   يَكتُبُ ولا يَحذِف، فلا أستطيعُ محوَ ما كتبتُ.
+   والحارسُ هنا لأنّ إزالةَ هذا الشرطِ لا تُحدِثُ خطأً ظاهرًا أبدًا:
+   كلُّ ما يَحدُثُ أنّ تقريرَ الأبِ يَمتلئُ بجلساتٍ لم تكن. */
+function localNoWrite(){
+  const out = [];
+  const F = 'attempts-queue.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  if (!/location\.protocol === "file:"/.test(src))
+    E('شرطُ file: مفقود — فكلُّ فحصٍ آليٍّ يفتحُ صفحةً من القرصِ يكتبُ صفًّا كاذبًا في نتائجِ الأبناء');
+  if (!/var LOCAL = isLocal\(\);/.test(src))
+    E('isLocal() لا تُقرأُ مرّةً في LOCAL — فالشرطُ موجودٌ ولا يُستعمَل');
+  if (!/window\.AQ_LOCAL = LOCAL;/.test(src))
+    E('AQ_LOCAL غيرُ معلَن — وtalk.html تُرسِلُ بـsendBeacon وحدَها فلا شيءَ يمنعُها');
+
+  /* الشرطُ داخلَ post نفسِها لا في تعليق */
+  const mp = src.match(/post:\s*function\([^)]*\)\{([\s\S]*?)\n    \},/);
+  if (!mp) E('لم أجد جسمَ AQ.post لأتأكّدَ من الشرطِ فيه');
+  else if (!/if\(LOCAL\)\{/.test(mp[1]))
+    E('AQ.post تُرسِلُ وإن كانت الصفحةُ محلّيّة');
+  const mf = src.match(/flush:\s*function\(\)\{([\s\S]*?)\n    \}/);
+  if (!mf) E('لم أجد جسمَ AQ.flush');
+  else if (!/if\(LOCAL\) return/.test(mf[1]))
+    E('AQ.flush تُفرِغُ الطابورَ المحلّيَّ إلى القاعدة — فما مُنِع في post يَخرجُ من هنا');
+
+  /* ولا يُسقِطُ المضيفَ الفارغ: متصفّحُ التطبيقاتِ الداخليُّ قد يُخفيه */
+  if (/h === ""/.test(src))
+    E('المضيفُ الفارغُ يُعَدُّ محلّيًّا — فنتيجةُ طفلٍ في متصفّحٍ داخليٍّ تُسقَطُ بصمت');
+
+  /* وtalk.html تَستعملُ الوسمَ قبلَ sendBeacon */
+  const T = 'talk.html', tp = path.join(ROOT, T);
+  if (fs.existsSync(tp)) {
+    const t = fs.readFileSync(tp, 'utf8');
+    if (!/if\(window\.AQ_LOCAL\) return;\s*\n\s*if\(useBeacon && navigator\.sendBeacon\)/.test(t))
+      out.push({ sev:'خطأ', file:T, msg:'sendBeacon يَسبقُ شرطَ AQ_LOCAL — فجلسةُ المحادثةِ تُكتَبُ من الفحوصِ الآليّة' });
+  }
+  return out;
+}
+
 function mawhibaTimed(){
   const out = [];
   const F = 'practice.html', p = path.join(ROOT, F);

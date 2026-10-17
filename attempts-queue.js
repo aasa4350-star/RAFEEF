@@ -15,6 +15,31 @@
 (function(){
   var K = "attempts_queue_v1", MAX = 40;
 
+  /* ═══ لا تُكتَب نتيجةٌ إلّا من الموقعِ الحقيقيّ ═══════════════════
+     علّةٌ وجدتُها في ١٧ أكتوبر ٢٠٢٦ وأنا أعُدُّ محاولاتِ حسن: في جدولِ
+     attempts ٧٣ صفًّا ليست لأحدٍ من الأبناء. كلُّها ١٦ بندًا أو أكثرَ
+     أُجيبت كاملةً في أقلِّ من عشرِ ثوانٍ — وهذا لا يفعلُه طفل. كتبَتْها
+     فحوصي الآليّة: تفتحُ الصفحةَ بـ file:// لتتأكّدَ من عملِها، فتُجيبُ
+     كلَّ الأسئلةِ، فتُكمِلُ المحاولةَ، فتُرسِلُها إلى قاعدةِ الأبناءِ
+     الحقيقيّةِ كأنّها جلسةُ طفل. والمفتاحُ المنشورُ يَكتُبُ ولا يَحذِف،
+     فما كُتِبَ لا يُمحى إلّا من لوحةِ سوپابيس بيدِ الأب.
+
+     والأبناءُ لا يفتحونَ الموقعَ إلّا من رابطِه على https. فصار الطابورُ
+     لا يُرسِلُ ولا يُخزِّنُ شيئًا إذا كانت الصفحةُ مفتوحةً من القرصِ
+     (file:) أو من خادمٍ محلّيّ — ويُخبِرُ النداءَ أنّ الأمرَ تمّ، فلا
+     يَظهرُ للفاحصِ خطأٌ كاذب. */
+  function isLocal(){
+    try{
+      if(location.protocol === "file:") return true;
+      /* ولا نُسقِطُ المضيفَ الفارغ: متصفّحُ التطبيقاتِ الداخليُّ قد يُخفيه،
+         وإسقاطُ نتيجةِ طفلٍ حقيقيٍّ بصمتٍ أسوأُ من صفٍّ زائدٍ نَحذِفُه. */
+      var h = location.hostname || "";
+      return h === "localhost" || h === "127.0.0.1" || h === "::1";
+    }catch(e){ return false; }
+  }
+  var LOCAL = isLocal();
+  window.AQ_LOCAL = LOCAL;   /* تراه الصفحاتُ التي تُرسِلُ بنفسِها (talk.html) */
+
   function read(){
     try{ var a = JSON.parse(localStorage.getItem(K) || "[]"); return Array.isArray(a) ? a : []; }
     catch(e){ return []; }
@@ -91,6 +116,10 @@
   var AQ = {
     /* onState: "pending" ثم "ok" أو "queued" */
     post: function(url, key, payload, onState){
+      if(LOCAL){                       /* فحصٌ آليٌّ أو تجربةٌ محلّيّة — لا تلمس القاعدة */
+        try{ if(onState) onState("ok"); }catch(e){}
+        return Promise.resolve(true);
+      }
       var id = Date.now()+"_"+Math.random().toString(36).slice(2);
       stamp(payload, id);
       enqueue(url, key, payload, id);   /* نكتب أوّلًا، قبل أن نحاول الإرسال */
@@ -105,6 +134,7 @@
     },
     pending: function(){ return read().length; },
     flush: function(){
+      if(LOCAL) return Promise.resolve(0);
       var a = read();
       if(!a.length) return Promise.resolve(0);
       write([]);                       /* نُفرغ أوّلًا ثم نُعيد ما فشل، فلا يتكرّر الصفّ */

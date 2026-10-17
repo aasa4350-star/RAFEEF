@@ -214,6 +214,8 @@ function saveTalkSession(useBeacon){
       minConf:(state.confs.length? Math.min.apply(null,state.confs) : null) } };
   state.savedTurns = turns; state.savedAtt = (state.att||0); state.savedUnh = (state.unh||0); state.savedAiN = (state.aiN||0); state.savedFbN = (state.fbN||0); state.savedAiMs = (state.aiMs||0); state.savedSkGarb=(state.skGarb||0); state.savedSkConf=(state.skConf||0); state.savedSkNoV=(state.skNoV||0);   // نُثبّت العلامات فورًا حتى لا يُعاد إرسال نفس الدفعة لو استُدعيت الدالة مرّتين بسرعة
   try{
+    /* لا يُرسَل من القرصِ ولا من خادمٍ محلّيّ — انظر attempts-queue.js */
+    if(window.AQ_LOCAL) return;
     if(useBeacon && navigator.sendBeacon){
       body.meta.at = new Date().toISOString();
       var blob = new Blob([JSON.stringify(body)], { type:"application/json" });
