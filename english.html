@@ -16,6 +16,7 @@
 <script src="azure-config.js"></script>
 <script src="book-en4.js?v=20261008"></script>
 <script src="study-en4.js?v=20261008"></script>
+<script src="fatri-en4.js?v=20261017"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
      كان @latest يجلب أحدث إصدارٍ مهما كان، فأيّ تحديثٍ من مايكروسوفت
      يصل أجهزة الأولاد الأربعة من تلقائه ويكسر التسجيل بلا أن نلمس
@@ -559,7 +560,8 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a></div>'+
     '<div class="unit">'+(TERM2 ? '📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)' : '📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: الوحدات 1–4')+'</div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="u1" aria-selected="true">1) Family</button>'+
+            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
+      '<button data-tab="u1" aria-selected="false">1) Family</button>'+
       '<button data-tab="u2" aria-selected="false">2) Chores</button>'+
       '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
       '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
@@ -570,8 +572,9 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
+    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel active" id="u1"></section>'+
+    '<section class="panel" id="u1"></section>'+
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
     '<section class="panel" id="u4"></section>'+
@@ -834,7 +837,15 @@ if(!NAMES[who]){
   }
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
-  render((document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab);
+  /* ═══ الفتري أوّلُ ما يُفتَح ═══════════════════════════════════════
+     ورقةُ المعلّمِ هي ما يُمتحَن فيه، فهي أوّلُ ما يراه — كما في صفحةِ
+     أسامة. والوحداتُ باقيةٌ بعدها لمن أراد التدريبَ على وحدةٍ بعينها. */
+  (function(){
+    var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab;
+    if(first === "fatri"){
+      if(window.FATRI_EN4) FATRI_EN4.render(document.getElementById("fatri"));
+    } else render(first);
+  })();
 
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
@@ -843,7 +854,9 @@ if(!NAMES[who]){
       b.setAttribute("aria-selected","true");
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
-      if(id==="rem"){ renderRem(); } else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
+      if(id==="rem"){ renderRem(); }
+      else if(id==="fatri"){ if(window.FATRI_EN4 && (!pan.innerHTML || (pan._done && pan._done()))) FATRI_EN4.render(pan); }
+      else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });

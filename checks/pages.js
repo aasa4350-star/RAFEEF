@@ -329,6 +329,7 @@ function run(){
   issues.push(...mawhiba3BookPath());
   issues.push(...mawhibaMechGens());
   issues.push(...fatriEn5Path());
+  issues.push(...fatriEn4Path());
   issues.push(...muthPath());
   issues.push(...mawhibaTimed());
   issues.push(...typedAnswers());
@@ -880,6 +881,127 @@ function paceCurriculum(){
    و«النموذج» هو هذه الأقسامُ بأوزانِها — فلو تغيّر وزنُ قسمٍ أو سقط قسمٌ
    لم يعد الاختبارُ نموذجَ معلّمِه، ولا يظهر ذلك في الصفحة: تبقى عشرون
    بندًا وتبقى الدرجةُ عشرين. فيُقرأ الجدولُ من الملفِّ ويُقارن بالورقة. */
+/* ═══ 📝 الفتري — إنجليزي سعود (english.html + fatri-en4.js) ═══════════
+   أرسل الأبُ (١٧ أكتوبر ٢٠٢٦) ورقتَي معلّمِه وقال «هذا اختبار سعود فتري».
+   وأقسامُ ورقتِه الستّةُ ودرجاتُها هي نفسُها ورقةَ أسامة.
+
+   وأربعةٌ تنكسر هنا بلا صوت:
+     ١) يُفصَل الملفُّ عن الصفحةِ أو يُزال التبويبُ، فيبقى الفتري في
+        المستودعِ ولا يفتحه أحد.
+     ٢) يتغيّر مجموعُ درجاتِ الأقسامِ فتُعرَض عشرون بندًا والدرجةُ من غيرِها.
+     ٣) يسقط بندُ was/were أو بندُ المقارنة — وهما ما كشفت الورقةُ أنّ
+        المعلّمَ يختبرهما ولا مولّدَ لهما في الفصلِ الأوّل.
+     ٤) يُستدعى مولّدٌ من وحدةٍ خارجَ الفصلِ الأوّل، فيُسأل عمّا لم يدرسْه.
+   ═══════════════════════════════════════════════════════════════════ */
+function fatriEn4Path(){
+  const out = [];
+  const f = 'fatri-en4.js', page = 'english.html';
+  const fp = path.join(ROOT, f), pp = path.join(ROOT, page);
+  if (!fs.existsSync(fp)) return [{ sev:'خطأ', file:f, msg:'ملفُّ فتريِّ إنجليزيِّ سعودٍ مفقود' }];
+  const src = fs.readFileSync(fp, 'utf8');
+  const E  = m => out.push({ sev:'خطأ', file:f, msg:m });
+  const EP = m => out.push({ sev:'خطأ', file:page, msg:m });
+
+  /* الأقسامُ الستّةُ ودرجاتُها تجمع عشرين */
+  const lit = EXTRACT.literalAfter(src, /var\s+SECTS\s*=/, '[', ']');
+  let sects = null;
+  try { sects = lit ? EXTRACT.evalLiteral(lit, 'SECTS') : null; } catch(e){}
+  if (!Array.isArray(sects)) E('أقسامُ الورقةِ (SECTS) لا تُقرَأ');
+  else {
+    const WANT = [['gq','General questions',4], ['cw','Controlled Writing',1],
+                  ['rs','Reading short sentence',4], ['gr','Grammar',4],
+                  ['vo','Vocabulary',5], ['or','Orthography',2]];
+    if (sects.length !== WANT.length) E('أقسامُ الورقةِ ' + sects.length + ' لا ستّة');
+    WANT.forEach((w, i) => {
+      const g = sects[i];
+      if (!g) return;
+      if (g[0] !== w[0] || g[1] !== w[1])
+        E('القسمُ ' + (i+1) + ' «' + g[1] + '» والمطلوبُ «' + w[1] + '»');
+      if (g[2] !== w[2]) E('درجةُ «' + w[1] + '» ' + g[2] + ' والمطلوبُ ' + w[2]);
+    });
+    const sum = sects.reduce((a, x) => a + (+x[2] || 0), 0);
+    if (sum !== 20) E('مجموعُ درجاتِ الأقسامِ ' + sum + ' لا عشرون');
+    if (!/var TOTAL = 20;/.test(src)) E('الدرجةُ الكلّيّةُ ليست عشرين');
+  }
+
+  /* النمطانِ اللذانِ لا مولّدَ لهما — وهما سببُ بناءِ هذا الملفّ */
+  for (const [re, nm] of [[/var WASWERE = \[/, 'was/were'], [/var COMPAR = \[/, 'المقارنة -er']])
+    if (!re.test(src)) E('بنكُ ' + nm + ' مفقود — وهو ممّا يختبره المعلّمُ ولا مولّدَ له في الفصلِ الأوّل');
+  if (!/opts: wwo\.map/.test(src)) E('بندُ was/were لا يدخل الورقة');
+  if (!/ans: cpo\.indexOf\(comparative\(cp\[1\]\)\)/.test(src))
+    E('جوابُ بندِ المقارنةِ ليس صيغةَ -er');
+
+  /* لا يُسأل عمّا لم يدرسْه: مولّداتُ الوحداتِ ٥–٨ ممنوعة */
+  const OUT_OF_TERM = ['gNature','gNatureAr','gVing','gCould','gAil','gModal',
+                       'gIndef','gWild','gRel','gComp','gWeatherV','gGoing','gToBeW'];
+  const called = (src.match(/"g[A-Za-z0-9]+"/g) || []).map(x => x.replace(/"/g, ''));
+  const bad = OUT_OF_TERM.filter(x => called.indexOf(x) >= 0);
+  if (bad.length)
+    E('مولّداتٌ من خارجِ الفصلِ الأوّلِ تُستدعى: ' + bad.join('، ') + ' — فيُسأل عمّا لم يدرسْه');
+
+  /* ═══ جدولُ was/were يُفحَص هنا كذلك ═══════════════════════════════
+     يُسحَب منه بندٌ واحدٌ من ثمانية، فجولةُ المتصفّحِ قد لا ترى المعطوب —
+     ونجت بذلك طفرةٌ جعلت جمعًا مفردًا (١٧ أكتوبر). فيُقرَأ الجدولُ كلُّه:
+     المسنَدُ إليه جمعٌ ⟸ were، وإلّا ⟸ was. */
+  {
+    const WW = EXTRACT.literalAfter(src, /var\s+WASWERE\s*=/, '[', ']');
+    let rows = null;
+    try { rows = WW ? EXTRACT.evalLiteral(WW, 'WASWERE') : null; } catch(e){}
+    if (!Array.isArray(rows)) E('جدولُ was/were لا يُقرَأ');
+    else {
+      const PL = /\b(children|parents|books|those|they|we|you|boys|girls|cars|students)\b/i;
+      if (rows.length < 6) E('جدولُ was/were ' + rows.length + ' صفًّا — صغيرٌ فيتكرّر على الطالب');
+      rows.forEach(r => {
+        if (!Array.isArray(r) || r.length !== 2) return E('صفٌّ في WASWERE ليس [جملة, جواب]');
+        if (r[1] !== 'was' && r[1] !== 'were') return E('جوابٌ في WASWERE ليس was ولا were: ' + r[1]);
+        const want = PL.test(String(r[0]).replace('____', '')) ? 'were' : 'was';
+        if (r[1] !== want)
+          E('was/were: «' + r[0] + '» جوابُها «' + r[1] + '» والصواب «' + want + '»');
+      });
+    }
+  }
+
+  /* ═══ جدولُ صورةِ المفرداتِ يُفحَص هنا لا في المتصفّح ══════════════
+     الورقةُ تسحب ثلاثًا من خمسَ عشرةَ عشوائيًّا، فجولةٌ واحدةٌ في
+     المتصفّحِ قد لا ترى المعطوبَ أصلًا — ونجت بذلك طفرةٌ قلبت كلمةَ
+     الصورةِ بمشتّتِها (١٧ أكتوبر). والجدولُ ثابتٌ فيُقرأ كلُّه هنا. */
+  {
+    const PV = EXTRACT.literalAfter(src, /var\s+PICVOC\s*=/, '[', ']');
+    let rows = null;
+    try { rows = PV ? EXTRACT.evalLiteral(PV, 'PICVOC') : null; } catch(e){}
+    if (!Array.isArray(rows)) E('جدولُ صورةِ المفرداتِ (PICVOC) لا يُقرَأ');
+    else {
+      const WANT = { '🥁':'drums', '🦜':'parrot', '⚠️':'danger', '👴':'grandpa',
+                     '🚌':'bus', '🍕':'pizza', '📷':'camera', '🎈':'balloon',
+                     '🐱':'kitten', '😢':'afraid', '🤝':'helpful', '🤸':'exciting',
+                     '🎸':'guitar', '🚲':'cycling', '🎣':'fishing' };
+      if (rows.length < 12) E('جدولُ صورةِ المفرداتِ ' + rows.length + ' صفًّا — صغيرٌ فيتكرّر على الطالب');
+      rows.forEach(r => {
+        if (!Array.isArray(r) || r.length !== 3) return E('صفٌّ في PICVOC ليس [رمز, صحيح, مشتّت]');
+        if (r[1] === r[2]) E('الصحيحُ والمشتّتُ سواءٌ في صورة ' + r[0]);
+        if (WANT[r[0]] && r[1] !== WANT[r[0]])
+          E('صورةُ ' + r[0] + ' جوابُها «' + r[1] + '» والصواب «' + WANT[r[0]] + '»');
+      });
+    }
+  }
+
+  /* موصولٌ بالصفحةِ فعلًا */
+  if (!fs.existsSync(pp)) return out;
+  const ps = fs.readFileSync(pp, 'utf8');
+  if (ps.indexOf('src="' + f) < 0)                EP('لا تُحمّل ' + f);
+  if (!/data-tab="fatri"/.test(ps))               EP('لا تبويبَ للفتري');
+  if (!/id="fatri"/.test(ps))                     EP('لا لوحةَ للفتري');
+  if (!/FATRI_EN4\.render\(/.test(ps))            EP('لوحةُ الفتري لا تُرسَم');
+  /* ولا يكفي أن تُرسَم عند التحميل: من خرج منها ورجع يجب أن تُرسَم له */
+  if (!/id==="fatri"\)\{[^}]*FATRI_EN4\.render\(pan\)/.test(ps))
+    EP('لوحةُ الفتري لا تُرسَم عند النقرِ على تبويبِها — من خرج منها ورجع وجدها فارغة');
+  if (!/data-tab="fatri" aria-selected="true"/.test(ps))
+    EP('الفتري ليس أوّلَ تبويبٍ مفتوح — وورقةُ المعلّمِ هي ما يُمتحَن فيه');
+  if (!/saveScore\("إنجليزي خ٤ — الفتري 📝"/.test(src))
+    E('نتيجةُ الفتري لا تُحفَظ باسمِها — فلا تتمايز في تقريرِ الأب');
+  return out;
+}
+
 function fatriEn5Path(){
   const out = [];
   const f = 'fatri-en5.js', page = 'english5.html';
