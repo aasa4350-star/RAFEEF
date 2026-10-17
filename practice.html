@@ -918,6 +918,7 @@ if(!VERBAL_ONLY){
      الاختبار. فهذا نموذجٌ كاملٌ بالمؤقّت، يُحفَظ باسمٍ مستقلٍّ فلا
      يختلط متوسّطُه بمتوسّطِ التدريبِ القصير. */
   if(MW3) TABS.push(["mw","موهبة 🧠"]);
+  if(MW3) TABS.push(["mwf","موهبة — نموذج كامل ⏱️"]);
   if(SENIOR) TABS.push(["full","نموذج كامل ⏱️"]);
   TABS.push(["rem","علاجي 💪"]);
   TABS.push(["o","نماذج رسمية 🏛️"]);
@@ -1027,6 +1028,12 @@ function skillOf(q){
    هنا وحدَه. والنسبةُ دقيقةٌ: ستّون سؤالًا في خمسٍ وسبعين دقيقةً =
    دقيقةٌ وربعٌ للسؤال. */
 var FULL_N = 60, FULL_SECS = 75*60;
+/* ═══ نموذجُ موهبةَ الكاملُ — طلبُ الأب (١٧ أكتوبر ٢٠٢٦) ═══════════════
+   بعد أن قرّر تسجيلَ حسنٍ وسأل «كم سؤالٌ يجيه؟». والعددُ ١٢٠ للمستوى
+   الثالثِ (سعوديبيديا)، والمدّةُ ساعتانِ ونصفٌ في صفحةِ الخدمةِ الرسميّةِ
+   غيرَ مخصوصةٍ بمستوى. و١٥٠ ÷ ١٢٠ = ٧٥ ثانيةً للسؤال — وهو نفسُ إيقاعِ
+   جولةِ التدريبِ القصيرة، فالاثنانِ يقيسانِ الإيقاعَ نفسَه. */
+var MWF_N = 120, MWF_SECS = 150*60;
 var SECS = { v:780, q:720, t:900, s:(who==="fahad" ? 900 : 720), mw:1200, full:FULL_SECS };  /* نموذجُ فهدٍ فيه ثلاثُ قطعِ قراءةٍ فيلزمه وقتٌ أطول — تقديرُ تدريبٍ لا زمنٌ رسميّ */ // ثواني كل قسم (مثل الاختبار الحقيقي)
 var TIMED = false; // الوضع المؤقّت اختياري
 function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String(r).padStart(2,"0"); }
@@ -1067,11 +1074,13 @@ function renderSet(id, items, intro, regen, label){
      <b>ولا يقطع عليه</b>: إذا انتهى الزمنُ انقلب المؤقّتُ عدًّا تصاعديًّا
      وأكمل، لأنّ هذه جولةُ تدريبٍ لا امتحانَ جهوزيّة. ويُعرَض له بعدها
      إيقاعُه في كلِّ مجالٍ على حدة. */
-  var MW_SOFT = (id === "mw");
+  var MW_SOFT = (id === "mw");          /* جولةُ تدريبٍ: لا تَقطع */
+  var MW_PACE = (id === "mw" || id === "mwf");  /* الإيقاعُ يُقاس في الاثنتَين */
   var secsAll = (id==="full") ? FULL_SECS
+              : (id==="mwf") ? MWF_SECS
               : MW_SOFT ? (SECS.mw || 0)
               : (TIMED ? (SECS[id] || 0) : 0);
-  var MW_TARGET = (MW_SOFT && items.length) ? Math.round(secsAll/items.length) : 0;
+  var MW_TARGET = (MW_PACE && items.length) ? Math.round(secsAll/items.length) : 0;
   var paceLog = [];
   var html = '<div class="intro">'+intro+'</div>';
   if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
@@ -1103,7 +1112,7 @@ function renderSet(id, items, intro, regen, label){
         var __now = Date.now(), __gap = __now - __lastTs;
         if(__gap < FAST_ONE*1000) __fastN++;
         __lastTs = __now;
-        if(MW_SOFT) paceLog.push({ d: skillOf(items[i]).replace(/^📘\s*/, ""), ms: __gap });
+        if(MW_PACE) paceLog.push({ d: skillOf(items[i]).replace(/^📘\s*/, ""), ms: __gap });
         qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
         var ok = (+btn.dataset.j===ans);
         mark(i, ok);
@@ -1172,7 +1181,7 @@ function renderSet(id, items, intro, regen, label){
        يُدرَّب هو المجالُ الذي يأكل الوقت. وزمنُ الهدفِ محسوبٌ من زمنِ
        الجولةِ على عددِها لا مكتوبٌ بيد، فلو غُيّر أحدُهما تبعه الآخر. */
     (function(){
-      if(!MW_SOFT || !paceLog.length) return;
+      if(!MW_PACE || !paceLog.length) return;
       var byDom = {};
       paceLog.forEach(function(p){
         var v = byDom[p.d] || (byDom[p.d] = { n:0, ms:0 });
@@ -1283,19 +1292,32 @@ function mwBookTake(id, want){
 function mawhibaMix(n){
   if(!MW_BANK) return [];
   var doms = MW_BANK.domains, out = [], per = Math.floor(n/doms.length), extra = n - per*doms.length;
+  /* ═══ «رأيتُه» مشتركٌ بين المجالاتِ لا خاصٌّ بكلِّ مجال ═════════════
+     كان لكلِّ مجالٍ seen خاصّةٌ به، فيمرّ سؤالٌ نصُّه نفسُه في مجالَين
+     (بعضُ أنماطِ الترتيبِ والأعدادِ تصلح للمرونةِ والرياضيّ معًا).
+     ولا يظهر ذلك في جولةِ الستّةَ عشرَ إلّا نادرًا، وظهر من أوّلِ مرّةٍ
+     في النموذجِ الكاملِ (١٢٠ سؤالًا) — فكُشِف بالعددِ لا بالحظّ. */
+  var seen = {};
+  /* ═══ هويّةُ السؤالِ نصُّه <b>وخياراتُه</b> ═══════════════════════════
+     الكتابُ يضع متنًا واحدًا فوق عدّةِ أسئلةٍ لا يفرّقها إلّا صفُّ
+     خياراتِها («ثلاثٌ من هذه الكلماتِ يجمعها رابط»). فلو كان المفتاحُ
+     المتنَ وحدَه لرُفِض الثاني منها <b>وهو سؤالٌ آخر</b> — فتضيق
+     المادّةُ بلا أن يظهرَ شيء. وهذا هو المفتاحُ نفسُه الذي يستعمله
+     حارسُ التكرارِ في checks/pages.js. */
+  function mwId(q){ return q[0] + ' \u27ea' + (q[1] || []).join('|') + '\u27eb'; }
   doms.forEach(function(d, di){
-    var want = per + (di < extra ? 1 : 0), seen = {}, tries = 0;
+    var want = per + (di < extra ? 1 : 0), tries = 0;
     /* أسئلةُ الكتابِ أوّلًا بترتيبِه */
     mwBookTake(d.id, want).forEach(function(q){
-      seen[q[0]] = 1;
+      seen[mwId(q)] = 1;
       q.gen = "📘 " + d.name;
       out.push(q); want--;
     });
     while(want > 0 && tries++ < want*40){
       var q = null;
       try{ q = gp(d.gens)(); }catch(e){}
-      if(!q || seen[q[0]]) continue;
-      seen[q[0]] = 1;
+      if(!q || seen[mwId(q)]) continue;
+      seen[mwId(q)] = 1;
       q.gen = d.name;            /* اسمُ المهارة في التقرير = اسمُ المجال */
       out.push(q); want--;
     }
@@ -1353,6 +1375,29 @@ function buildAll(){
         '⏱️ <b>هذا القسم موقوت دائمًا</b> ولو أطفأت المفتاح فوق — الاختبار الحقيقي محدود الوقت، والسرعة نصف المسألة.<br>'+
         'وإذا خلص الوقت <b>ما ينقطع عليك</b>: يكمّل العدّ ويريك كم تجاوزت، وبعدها يعرض إيقاعك في كل مجال.</div>',
         function(){ return mawhibaMix(16); }, MW_TEST[MW_LEVEL]);
+
+      /* ═══ النموذجُ الكاملُ — يُبنى عند أوّلِ فتحٍ للتبويبِ لا عند تحميلِ
+         الصفحة، فمئةٌ وعشرون سؤالًا تُثقِل الفتحَ على من لا يريدها.
+         ويُقطَع عليه هنا عند انتهاءِ الزمنِ — بخلافِ جولةِ التدريب —
+         لأنّ هذا موضعُ قياسِ جهوزيّةٍ لا تدريب. */
+      (function(){
+        var built = false;
+        window.renderMwFull = function(){
+          if(built) return; built = true;
+          renderSet("mwf", mawhibaMix(MWF_N),
+            "<b>نموذج كامل — مقياس موهبة</b>: "+MWF_N+" سؤالًا · "+(MWF_SECS/60)+" دقيقة "+
+            "(<b>"+Math.round(MWF_SECS/MWF_N)+" ثانية للسؤال</b>) — <b>والمؤقّت يعمل دائمًا هنا</b>، "+
+            "<b>ويُقطع عليك إذا خلص الوقت</b> بخلاف جولة التدريب فوق، لأنّ هذا موضع قياس جهوزيّتك لا تدريب.<br>"+
+            "اجلسه كاملًا بلا انقطاع، ولا تُعِدْه في اليوم نفسه — نتيجته ما تعني شي إن أُعيدت. "+
+            "ويُحفظ باسم مستقلّ فما يختلط متوسّطه بمتوسّط التدريب القصير."+
+            '<div style="margin-top:8px;font-size:.9rem;color:var(--muted)">'+
+            'عدد أسئلة المستوى الثالث <b>١٢٠</b>، ومدّة المقياس <b>ساعتان ونصف</b> في صفحة الخدمة الرسميّة '+
+            '— وهي غير مخصوصة بمستوى، <b>فتأكّد منها في سديد عند التسجيل</b>. '+
+            'ووزن الربع لكلّ مجال اجتهادٌ منّي لا توزيعٌ معتمَد، وأسئلته تدريبيّة على <b>أنماط</b> المجالات '+
+            'ليست الأسئلة الرسميّة ولا منقولة عنها.</div>',
+            null, MW_TEST[MW_LEVEL] + " — نموذج كامل");
+        };
+      })();
     }
     var sN = STEP.length;
     if(SENIOR){
@@ -2267,6 +2312,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     if(b.dataset.tab==="gr"){ renderGrammar(); }
     if(b.dataset.tab==="w"){ renderWriting(); }
     if(b.dataset.tab==="full" && typeof renderFullMock==="function"){ renderFullMock(); }
+    if(b.dataset.tab==="mwf" && typeof renderMwFull==="function"){ renderMwFull(); }
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
