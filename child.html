@@ -243,7 +243,19 @@ async function main(){
   const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"));
   /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج — صفُّ
      activity لا يدخل متوسّطًا (reading.html/saveActivity، بلاغ ٢٥ سبتمبر). */
-  const readActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="read");
+  /* ═══ أثرٌ عتيقٌ بجانبِ درجةٍ كاملة ═══════════════════════════════
+     بلاغ حسن (١٨ أكتوبر ٢٠٢٦): «أحلّ جميع الأسئلة ويطلع ما حليتها».
+     وصفُّ الأثرِ لقطةٌ تُؤخَذ لحظةَ خروجه، فإن رجع وأكمل بقيت تقول
+     «فتح الأسئلة ولم يُجب». وجلسةُ فهد (١٢ أكتوبر) تُظهرها بمعرّفٍ
+     واحد: «أجاب ٠ من ٣» ثمّ «٣ / ٣».
+     والمفتاحُ المنشورُ لا يَحذِف، فتُسقَط عند العرض: أثرٌ لجلسةٍ لها
+     صفُّ درجةٍ ليس خبرًا، بل لقطةٌ تجاوزها صاحبُها. */
+  const _scoredRead={};
+  rows.forEach(x=>{ const m=x.meta; if(!m || m.kind==="activity") return;
+    if(!/^قراءة/.test(String(m.test||""))) return;
+    if(m.pid) _scoredRead[String(m.pid)]=1; });
+  const readActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="read"
+    && !_scoredRead[String(x.meta.pid||"").replace(/_act$/,"")]);
   /* فتحَ المحادثةَ ولم يضغط «تكلّم» — انظر saveTalkOpened في talk.html */
   const talkActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="talk");
   /* جولاتُ القسم العلاجيّ — انظر saveRemedial في practice.html. تُظهر
@@ -459,7 +471,10 @@ async function main(){
       if(readActs.length){
         const acts=readActs.slice().sort((a,b)=> RR.when(a)<RR.when(b)?1:-1);
         html+=`<div style="font-weight:700;margin:4px 2px 2px">📖 فتح القطعة ولم يُكملها <span class="cnt">(${acts.length} مرّة · لا تدخل المتوسّط)</span></div><ul class="weak">`+
-          acts.slice(0,3).map(p=>`<li>${p.meta.answered?`أجاب عن <b>${p.meta.answered}</b> من ${p.meta.of} ثمّ خرج`:`فتح الأسئلة ولم يُجب`}${p.meta.dur?` · ⏱️ ${p.meta.dur}ث`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+          /* ولا يُقال «لم يُجب» لمن أعياه المايك: صفُّ حسن (١٧ أكتوبر)
+             noMic:true و٦٨٢ ثانية — أحدَ عشرَ دقيقةً يُحاول التسجيل،
+             فالسطرُ كان يقرأ كأنّه تهمةُ كسلٍ وهو خبرُ عطل. */
+          acts.slice(0,3).map(p=>`<li>${p.meta.answered?`أجاب عن <b>${p.meta.answered}</b> من ${p.meta.of} ثمّ خرج`:(p.meta.noMic?`تعذّر المايك فما أكمل الأسئلة`:`فتح الأسئلة ولم يُجب`)}${p.meta.dur?` · ⏱️ ${p.meta.dur}ث`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
           `</ul>`;
       }
       if(passReads.length){

@@ -334,6 +334,7 @@ function run(){
   issues.push(...mawhibaTimed());
   issues.push(...localNoWrite());
   issues.push(...islamic5Path());
+  issues.push(...readingScore());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -2345,6 +2346,69 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ قراءةُ القطعة: درجةٌ تقيس القارئَ، وإجاباتٌ لا تضيع ═══════════
+   بلاغ حسن (١٨ أكتوبر ٢٠٢٦): «أقرأها كاملة وتطلع كلّها خضراء إلّا
+   كلمتين، وأتفاجأ أنّ نسبة القراءة ٣٢٪ · وأحلّ جميع الأسئلة ويطلع
+   ما حليتها».
+
+   وصفوفُه صدّقته في الاثنتين:
+     · ١٧ أكتوبر ٠٦:٣٤ — نطق ٣٢ · دقّة ٢٠ · اكتمال ١٠٠ · «١٣٨ كلمة»
+       في نصٍّ من ٣٣. والقطعةُ تُقرأ على دوراتٍ، وكلُّ دورةٍ تُقيَّم
+       على النصِّ كلِّه، فتَعُدُّ ما لم يُقرأ فيها متروكًا. وقراءاتُه
+       التي تمّت في دورةٍ واحدةٍ أعطته ٧٧–٨١.
+     · جلسةُ فهد ١٢ أكتوبر (معرّفٌ واحد): «أجاب ٠ من ٣» ثمّ «٣ / ٣».
+
+   وهذه حراسةُ ما لا يُحدِث خللُه خطأً ظاهرًا: الصفحةُ تعمل، والأرقامُ
+   تخرج، وكلُّها كذب. */
+function readingScore(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ـ الدرجةُ من أرقامِ القطعةِ لا من أرقامِ الدورة ـ */
+  if (!/var acc = Math\.round\(sum\/readCount\);/.test(src))
+    E('الدقّةُ لم تَعُد متوسّطَ درجاتِ الكلماتِ المطابَقة — فإن عادت لدقّةِ الدورةِ تبعت تقطيعَ المايك');
+  if (!/var pron = Math\.round\(0\.6\*acc \+ 0\.2\*\(flu==null\?acc:flu\) \+ 0\.2\*\(comp==null\?100:comp\)\);/.test(src))
+    E('درجةُ النطقِ لم تَعُد مركَّبةً من أرقامِ القطعة — وpronunciationScore للدورةِ يحمل اكتمالَها هي');
+  if (!/var comp = refCount \? Math\.round\(100\*readCount\/refCount\) : null;/.test(src))
+    E('الاكتمالُ لم يَعُد ما طابقَ النصَّ على عددِ كلماته');
+  if (!/return et!=="Omission" && et!=="Insertion";/.test(src))
+    E('المتروكاتُ عادت تدخل في الحساب — وهي وهمُ الدورةِ لا قراءةُ الابن');
+  if (!/var wordsHtml = refWordsArr\.map\(/.test(src))
+    E('الكلماتُ المعروضةُ لم تَعُد كلماتِ النصِّ مرّةً واحدة — فتتكرّر القطعةُ أمامه أربعَ مرّات');
+  if (!/words:readCount, refWords:refCount/.test(src))
+    E('المحفوظُ words عاد مجموعَ ما رجّعته الدورات — وwpm مبنيّةٌ عليه فتخرج سرعةٌ لا يقولها بشر');
+  /* ولا يُحفَظ صفرٌ لمن لم تُطابَق من قراءته كلمة */
+  if (!/if\(!readCount\)\{ _noWords\(\); return; \}/.test(src))
+    E('دوراتٌ رجعت بمتروكاتٍ فقط تُحفَظ درجةَ صفرٍ بدل أن تُعدّ إخفاقَ التقاط');
+
+  /* ـ وإجاباتُه تُحفَظ قبل أن تُمحى ـ */
+  if (!/if\(curLang === b\.dataset\.lang\) return;/.test(src))
+    E('ضغطُ تبويبِ اللغةِ نفسِها يُعيد البناءَ فيمحو إجاباتِه');
+  if (!/saveAllSections\(\);/.test(src))
+    E('تبديلُ اللغةِ يَمحو الأقسامَ بلا حفظ — و_leave للقسمِ دالّةٌ فارغةٌ عمدًا فلا حافظَ غيرُه');
+  if (!/function saveAllSections\(\)\{[\s\S]{0,400}?f\._save\(\)/.test(src))
+    E('saveAllSections لا تُنادي _save — فهي اسمٌ بلا فعل');
+  if (!/fn\("hidden"\)/.test(src) || !/fn\("pagehide"\)/.test(src))
+    E('hookLeaveSave لا تُفرّق بين الخروجِ والاختفاء — ومن لا يُفرّق يكتب «لم يُجب» لمن قُفل جهازُه');
+  if (!/hookLeaveSave\(renderRead, function\(why\)\{ savePartial\(\); if\(why==="pagehide"\) saveActivity\(\); \}\);/.test(src))
+    E('لقطةُ «لم يُجب» تُكتَب عند الاختفاء — وهو يعود بعدها ويُكمل');
+
+  /* ـ والتقريرُ لا يَعرض لقطةً تجاوزها صاحبُها ـ */
+  const C = 'child.html', cp2 = path.join(ROOT, C);
+  if (fs.existsSync(cp2)) {
+    const c = fs.readFileSync(cp2, 'utf8');
+    const Ec = m => out.push({ sev:'خطأ', file:C, msg:m });
+    if (!/const _scoredRead=\{\};/.test(c) || !/!_scoredRead\[String\(x\.meta\.pid\|\|""\)\.replace\(\/_act\$\/,""\)\]/.test(c))
+      Ec('أثرُ القراءةِ يُعرَض ولو كان لجلستِه صفُّ درجة — فيقرأ «لم يُجب» بجانبِ درجتِه الكاملة');
+    if (!/p\.meta\.noMic\?`تعذّر المايك/.test(c))
+      Ec('يُقال «فتح الأسئلة ولم يُجب» لمن أعياه المايك — وهو خبرُ عطلٍ لا تهمةُ كسل');
+  }
+  return out;
+}
+
 /* ═══ الدراساتُ الإسلاميّةُ — خامسُ أسامة ══════════════════════════
    أرسل الأبُ (١٧ أكتوبر ٢٠٢٦) صورَ فهرسِ الكتابِ وقال: «حطّ له أسئلة».
    والصفحةُ بُنِيت من آلةِ science5.html نفسِها، فما يحرسها هنا ليس
