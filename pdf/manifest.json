@@ -27,7 +27,7 @@
   }
  },
  "rules": {
-  "generated": "2026-10-15T12:41:51.834Z",
+  "generated": "2026-10-18T10:34:12.379Z",
   "pages": {
    "bio10": {
     "source": "bio10.html",
@@ -71,6 +71,12 @@
     "file": "rules-english9-fatri.pdf",
     "questions": 18,
     "hash": "a4c3ad6f75311ec3"
+   },
+   "islamic5": {
+    "source": "islamic5.html",
+    "lessons": 11,
+    "file": "rules-islamic5.pdf",
+    "hash": "18b822388833a28a"
    },
    "khassa": {
     "source": "khassa.html",
@@ -275,9 +281,10 @@
      "lughati5",
      "math5",
      "science5",
+     "islamic5",
      "khitaba"
     ],
-    "lessons": 44,
+    "lessons": 55,
     "file": "rules-all-osama.pdf"
    }
   }

@@ -333,6 +333,7 @@ function run(){
   issues.push(...muthPath());
   issues.push(...mawhibaTimed());
   issues.push(...localNoWrite());
+  issues.push(...islamic5Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -2344,6 +2345,125 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ الدراساتُ الإسلاميّةُ — خامسُ أسامة ══════════════════════════
+   أرسل الأبُ (١٧ أكتوبر ٢٠٢٦) صورَ فهرسِ الكتابِ وقال: «حطّ له أسئلة».
+   والصفحةُ بُنِيت من آلةِ science5.html نفسِها، فما يحرسها هنا ليس
+   شكلَ السؤالِ (يكفيه الفحصُ العامُّ وbankAnswerIndex) بل مطابقةُ
+   المقرَّرِ للفهرس: ثلاثةُ أبوابٍ وأحدَ عشرَ بنكًا وثلاثةُ شوامل.
+   وأخصُّ ما يُحرَس ثلاثةٌ لا يُحدِث اختلالُها خطأً ظاهرًا:
+     · درسٌ في CFG بلا موضعٍ في REMTOPICS — فالعلاجيُّ يعمى عنه.
+     · شاملُ بابٍ يسحب من بنكِ بابٍ آخر — فيُسأل عن الفقهِ في التوحيد.
+     · سؤالٌ واحدٌ في بنكين — والأبوابُ متجاورةٌ (الذِّكرُ في الحديث،
+       والخشوعُ في التوحيدِ والفقه) فالتكرارُ وارد. */
+function islamic5Path(){
+  const out = [];
+  const F = 'islamic5.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) { out.push({ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }); return out; }
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  const html = fs.readFileSync(p, 'utf8');
+
+  const ctx = makeCtx();
+  const { inline, srcs } = scripts(html);
+  for (const s of srcs){
+    const q = path.join(ROOT, s);
+    if (fs.existsSync(q)) { try { vm.runInContext(fs.readFileSync(q,'utf8'), ctx); } catch(e){} }
+  }
+  for (const src of inline){ try { vm.runInContext(src, ctx); } catch(e){} }
+
+  const BANKS = ['T1','T2','T3','H1','H2','H3','H4','F1','F2','F3','F4'];
+  /* البابُ ← بنوكُه ← شاملُه، كما في فهرسِ الكتاب */
+  const BOOK = { at:['T1','T2','T3'], ah:['H1','H2','H3','H4'], af:['F1','F2','F3','F4'] };
+  const LESSON = { t1:'T1', t2:'T2', t3:'T3', h1:'H1', h2:'H2', h3:'H3', h4:'H4',
+                   f1:'F1', f2:'F2', f3:'F3', f4:'F4' };
+  const MIN = 16;                     /* أقلُّ ما يُقبَل لئلّا يحفظَ البنك */
+
+  const key = t => String(t).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+  const seen = {};
+  let total = 0;
+  BANKS.forEach(n => {
+    const bk = ctx[n];
+    if (!Array.isArray(bk)) { E('بنكُ ' + n + ' غيرُ موجود'); return; }
+    total += bk.length;
+    if (bk.length < MIN) E('بنكُ ' + n + ' فيه ' + bk.length + ' سؤالًا — وأقلُّ ما يُقبَل ' + MIN);
+    bk.forEach((q, i) => {
+      if (!Array.isArray(q) || !Array.isArray(q[1]) || q[1].length !== 3)
+        { E(n + '#' + i + ': الخياراتُ ليست ثلاثة'); return; }
+      const o = q[1].map(x => key(x));
+      if (new Set(o).size !== 3) E(n + '#' + i + ': خياران متطابقان');
+      if (o.some(x => !x)) E(n + '#' + i + ': خيارٌ فارغ');
+      if (key(q[2]).length < 15) E(n + '#' + i + ': شرحٌ ناقصٌ أو مفقود');
+      const k = key(q[0]);
+      if (seen[k]) E('سؤالٌ واحدٌ في بنكين (' + seen[k] + ' و' + n + '): ' + k.slice(0, 45));
+      else seen[k] = n;
+    });
+  });
+  if (total < 200) E('مجموعُ أسئلةِ المادّةِ ' + total + ' — والمرصودُ أكثرُ من ٢٠٠');
+
+  const CFG = ctx.CFG, CHAPS = ctx.CHAPS, REM = ctx.REMTOPICS;
+  if (!CFG || !CHAPS || !Array.isArray(REM)) { E('CFG أو CHAPS أو REMTOPICS لم تُقرأ'); return out; }
+
+  /* الأبوابُ الثلاثةُ وتبويباتُها */
+  const chapIds = Object.keys(CHAPS);
+  if (chapIds.join(',') !== 'tw,hd,fq')
+    E('أبوابُ الكتابِ «' + chapIds.join(' · ') + '» والمتوقَّع التوحيدَ والحديثَ والفقه');
+  const want = { tw:['t1','t2','t3','at'], hd:['h1','h2','h3','h4','ah'], fq:['f1','f2','f3','f4','af'] };
+  Object.keys(want).forEach(c => {
+    if (!CHAPS[c]) return;
+    if ((CHAPS[c].ids || []).join(',') !== want[c].join(','))
+      E('تبويباتُ بابِ «' + c + '»: ' + (CHAPS[c].ids||[]).join(' · '));
+  });
+
+  /* كلُّ درسٍ: وسمٌ عربيٌّ، وصفحةٌ في الكتاب، وموضعٌ في العلاجيّ */
+  const remIds = REM.map(t => t.id);
+  Object.keys(LESSON).forEach(id => {
+    const c = CFG[id];
+    if (!c) { E('درسُ «' + id + '» مفقودٌ من CFG'); return; }
+    if (!c.label || /[A-Za-z_]{4,}/.test(c.label)) E('وسمُ «' + id + '» لا يصلح لتقريرِ الأب: ' + c.label);
+    if (!c.pg) E('درسُ «' + id + '» بلا رقمِ صفحةٍ من الكتاب');
+    if (remIds.indexOf(id) < 0) E('درسُ «' + id + '» ليس في العلاجيِّ — فلا يُرصَد ضعفُه فيه أبدًا');
+    const g = c.gens || [];
+    if (g.length !== 1 || !g[0] || g[0].__bank !== LESSON[id])
+      E('درسُ «' + id + '» لا يسحب من بنكِه ' + LESSON[id]);
+  });
+  REM.forEach(t => {
+    if (!LESSON[t.id]) E('موضوعٌ في العلاجيِّ بلا درس: ' + t.id);
+    if (!t.tip || String(t.tip).length < 120) E('نصيحةُ «' + t.id + '» قصيرةٌ لا تُغني عن مراجعة');
+    if (!t.yt) E('درسُ «' + t.id + '» بلا بحثِ شرحٍ مرئيّ');
+  });
+
+  /* شاملُ كلِّ بابٍ من بنوكِ بابِه وحدَها — ولا بنكَ يتخلّف */
+  Object.keys(BOOK).forEach(id => {
+    const c = CFG[id];
+    if (!c) { E('شاملُ «' + id + '» مفقودٌ من CFG'); return; }
+    const got = (c.gens || []).map(g => g && g.__bank).filter(Boolean).sort();
+    const exp = BOOK[id].slice().sort();
+    if (got.join(',') !== exp.join(','))
+      E('شاملُ «' + id + '» يسحب من ' + (got.join(' · ') || 'لا شيء') + ' والمتوقَّع ' + exp.join(' · '));
+    if (c.n !== 12) E('أسئلةُ شاملِ «' + id + '» ' + c.n + ' لا اثنا عشر');
+  });
+  const allIds = ctx.ALL_IDS || [];
+  if (allIds.slice().sort().join(',') !== 'af,ah,at')
+    E('ALL_IDS «' + allIds.join(' · ') + '» — ومن تخلّف عنها لا يُغذّي العلاجيّ');
+
+  /* ولا فتريَّ هنا: لم تصلني ورقةُ معلّمٍ في هذه المادّة */
+  if (/renderFatri|FATRI_/.test(html))
+    E('ظهر فتريٌّ في الصفحةِ ولا ورقةَ معلّمٍ بُنِي عليها');
+
+  /* ولا اسمَ مادّةٍ أخرى في نصٍّ يقرأه الابن: بُنِيت هذه الصفحةُ من
+     آلةِ science5.html، فخرجت أوّلَ مرّةٍ تقول «📖 في كتاب العلوم: ص ١٦». */
+  if (/في كتاب العلوم/.test(html))
+    E('الصفحةُ تُحيل الابنَ إلى «كتاب العلوم» — وهي الدراساتُ الإسلاميّة');
+  if (/🔬 العلوم — /.test(html))
+    E('ترويسةُ العلومِ بقيت في صفحةِ الإسلاميّة');
+
+  /* وبطاقتُها في صفحةِ أسامة، وإلّا فصفحةٌ لا يصل إليها أحد */
+  const hp = path.join(ROOT, 'home.html');
+  if (fs.existsSync(hp) && !/href:"islamic5\.html"/.test(fs.readFileSync(hp, 'utf8')))
+    out.push({ sev:'خطأ', file:'home.html', msg:'لا بطاقةَ للدراسات الإسلاميّة — الصفحةُ موجودةٌ ولا رابطَ إليها' });
+
+  return out;
+}
+
 /* ═══ لا تَكتُبُ صفحةٌ محلّيّةٌ في قاعدةِ الأبناء ═════════════════════
    في ١٧ أكتوبر ٢٠٢٦ عددتُ محاولاتِ حسن في «اختبار المذكّرة» فوجدتُ في
    الجدولِ ٧٣ صفًّا ليست لأحدٍ منهم: ١٦ بندًا أو أكثرَ أُجيبت كاملةً في
