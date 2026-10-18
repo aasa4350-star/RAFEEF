@@ -425,6 +425,63 @@
         sum += m[field] * n; w += n; sess++;
       });
       return w ? { pct: Math.round(sum / w), n: w, sessions: sess } : null;
+    },
+
+    /* ═══ حفظُ كلماتِ المنهجِ وجملِه — «احفظ · ثبّت · جمل» ═══════════
+       سؤال الأب (١٨ أكتوبر ٢٠٢٦): «وين أحصل حفظ الكلمات والجمل حقّت
+       المنهج عندي في التقرير؟».
+
+       وكان لا يجده: اسمُ الجلسة «تثبيت إنجليزي و1 🔁» لا يبدأ باسمِ
+       مادّةٍ ولا بـ«كلمات» ولا «قراءة»، فيسقط في child.html إلى دلوِ
+       «الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو…)» — وهو آخرُ
+       مكانٍ يفتّش فيه أبٌ عن حفظِ ابنِه لمنهجه. وفي report.html يظهر
+       سطرًا واحدًا بين ألفٍ وخمسمئةِ جلسةٍ في «سجلّ الجلسات»، ومهارتُه
+       «حفظ: مفردات الكتاب» تسقط بين «الأضعف» و«الأقوى» فلا تُعرض.
+
+       فهذه الدالّةُ تجمعها في مكانٍ واحدٍ تقرؤه الصفحتان: جولاتُ كلِّ
+       وحدةٍ ونسبتُها وآخرُ عهدٍ بها، والكلماتُ التي يتعثّر فيها مرّةً
+       بعد مرّة (meta.missed) — وهي أنفعُ ما في الباب: بها يعرف الأبُ
+       أيَّ كلماتٍ يُراجع مع ابنه الليلة. */
+    /* الصفوفُ القديمةُ لا تحمل عنوانَ الوحدة (أُضيف ١٨ أكتوبر ٢٠٢٦)،
+       وصفحاتُ التقريرِ لا تُحمّل كتبَ الأبناء — فلا يُعرَض «u1» للأب. */
+    studyUnitName: function(id){
+      var s = String(id || "");
+      if(s === "w") return "Welcome";
+      var m = /^u(\d+)$/.exec(s);
+      if(!m) return s;
+      var ar = ["", "الأولى", "الثانية", "الثالثة", "الرابعة", "الخامسة",
+                "السادسة", "السابعة", "الثامنة", "التاسعة", "العاشرة"];
+      return "الوحدة " + (ar[+m[1]] || m[1]);
+    },
+
+    studyUnits: function(rows, student){
+      var self = this;
+      var byUnit = {}, miss = {}, nMemo = 0, nSent = 0, tag = null, last = 0;
+      (rows || []).forEach(function(r){
+        var m = (r && r.meta) || {};
+        if (student && r.student !== student) return;
+        if (m.mode !== "memo" && m.mode !== "sentences") return;
+        if (typeof m.total !== "number" || m.total <= 0) return;
+        var id = m.unit || "—";
+        var u = byUnit[id] || (byUnit[id] = { id:id, title:m.unitTitle || self.studyUnitName(id),
+                                              memo:{n:0,c:0,t:0}, sent:{n:0,c:0,t:0}, last:0 });
+        if (m.unitTitle) u.title = m.unitTitle;
+        var k = (m.mode === "memo") ? u.memo : u.sent;
+        k.n++; k.c += (m.correct || 0); k.t += m.total;
+        if (m.mode === "memo") nMemo++; else nSent++;
+        if (m.tag) tag = m.tag;
+        var ts = Date.parse((m.at || r.created_at) || "") || 0;
+        if (ts > u.last) u.last = ts;
+        if (ts > last) last = ts;
+        /* الكلمةُ تُعدّ مرّةً لكلِّ جولةٍ أخطأ فيها — فالتكرارُ هو الدلالة */
+        (m.missed || []).forEach(function(w){ if(w) miss[w] = (miss[w] || 0) + 1; });
+      });
+      var units = Object.keys(byUnit).map(function(k){ return byUnit[k]; })
+        .sort(function(a, b){ return String(a.id).localeCompare(String(b.id)); });
+      if (!units.length) return null;
+      var hard = Object.keys(miss).map(function(w){ return { w:w, n:miss[w] }; })
+        .sort(function(a, b){ return b.n - a.n || a.w.localeCompare(b.w); });
+      return { units:units, hard:hard, memoRounds:nMemo, sentRounds:nSent, tag:tag, last:last };
     }
   };
 })(window);

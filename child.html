@@ -162,6 +162,8 @@ const who = (qs("who")||"").toLowerCase();
 const app = document.getElementById("app");
 
 function pct(c,t){ return t?Math.round(c/t*100):0; }
+/* كلماتُ الكتابِ تُعرَض كما كُتبت — ولا يُدخَل نصٌّ في HTML بلا تهريب */
+function esc(s){ return String(s==null?"":s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
 /* العددُ العربيُّ يُطابِق معدودَه: جولةٌ وجولتان وجولاتٌ وجولة.
    و«2 درسًا» تُقرأ عُجمةً، والأبُ يقرأ ما نكتب. */
 function arCount(n, one, two, few, many){
@@ -382,7 +384,7 @@ async function main(){
        (محاولتان · المتوسط ٦٣٪)». وهذا لا يُفيده في شيء: المقصودُ من
        المقياس مجالاتُه الأربعةُ لا متوسّطُها، فالمتوسّطُ يُخفي أنّ
        اللغويَّ ٨/٨ والعلميَّ الميكانيكيَّ ٣/٨. فصار له قسمُه. */
-    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[];
+    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[], studyAll=[];
     practice.forEach(p=>{
       const t=(p.meta.test||"");
       /* الإخفاءُ أوّلَ الفرزِ لا بعدَه: كانت صفوفُ «التجريبية» تُعزَل قبله
@@ -401,6 +403,13 @@ async function main(){
       else if(t.indexOf("قراءة")===0){ readAll.push(p); }
       /* الإملاء له بطاقتُه — كان يسقط في «الاختبارات التجريبية» (طلب الأب ٢٥ سبتمبر) */
       else if(t.indexOf("إملاء")===0){ dictAll.push(p); }
+      /* ═══ حفظُ كلماتِ المنهجِ وجملِه له قسمُه ═══════════════════════
+         سؤال الأب (١٨ أكتوبر ٢٠٢٦): «وين أحصل حفظ الكلمات والجمل حقّت
+         المنهج عندي في التقرير؟». واسمُ الجلسة «تثبيت إنجليزي و1 🔁»
+         لا يبدأ باسمِ مادّةٍ ولا بـ«كلمات»، فكان يسقط إلى دلوِ
+         «الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو…)» — وهو آخرُ
+         مكانٍ يفتّش فيه أبٌ عن حفظِ ابنِه لمنهجه. */
+      else if(p.meta.mode==="memo" || p.meta.mode==="sentences"){ studyAll.push(p); }
       /* أحدثُ جلسةٍ محتسبة، لا أحدثُ جلسةٍ مطلقًا — انظر RR.curKeep */
       else if(subj && SUBJ_EMOJI[subj]){ currMap[t]=RR.curKeep(currMap[t], p); }
       else { (otherMap[t]=otherMap[t]||[]).push(p); } });
@@ -453,6 +462,31 @@ async function main(){
         `</ul>`+
         (revList?`<div style="font-weight:700;margin:8px 2px 4px;font-size:.9rem">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul class="weak">${revList}</ul>`:``)+
         `</div>`;
+    }
+    // 📚 حفظ كلمات المنهج وجمله — «احفظ · ثبّت · جمل»
+    if(studyAll.length){
+      const S = RR.studyUnits(studyAll, null);
+      if(S){
+        const hard = S.hard.filter(h=>h.n>=2).slice(0,12);
+        html += `<div class="sec-title"><span class="dot"></span> 📚 حفظ كلمات المنهج وجمله</div><div class="card">`+
+          `<div style="color:var(--muted);font-size:.9rem;margin-bottom:8px">من «احفظ · ثبّت · جمل» داخل وحدات الإنجليزي — مادّتها كتابك أنت. `+
+            `<b>${S.memoRounds}</b> جولة تثبيت و<b>${S.sentRounds}</b> جولة جمل.</div><ul class="weak">`+
+          S.units.map(u=>{
+            const c=u.memo.c+u.sent.c, t=u.memo.t+u.sent.t, p=pct(c,t);
+            const bits=[];
+            if(u.memo.n) bits.push(`🔁 ثبّت ${u.memo.n}× · ${pct(u.memo.c,u.memo.t)}%`);
+            if(u.sent.n) bits.push(`🧩 جمل ${u.sent.n}× · ${pct(u.sent.c,u.sent.t)}%`);
+            return `<li><b>${esc(u.title)}</b> — <span style="color:${p<60?'var(--bad)':(p<80?'#b45309':'var(--good)')}">${p}%</span> `+
+              `<span class="cnt">${bits.join(' · ')}${u.last?' · '+saTime(new Date(u.last).toISOString()):''}</span></li>`;
+          }).join("")+`</ul>`+
+          (hard.length
+            ? `<div style="font-weight:700;margin:10px 2px 4px;font-size:.9rem">📌 كلمات تتعثّر فيها مرّة بعد مرّة — راجعها:</div>`+
+              `<div style="display:flex;flex-wrap:wrap;gap:6px">`+
+              hard.map(h=>`<span dir="ltr" style="background:var(--bad-bg);color:var(--bad);border-radius:9px;padding:4px 9px;font-weight:800;font-size:.86rem">${esc(h.w)} ×${h.n}</span>`).join("")+
+              `</div>`
+            : (S.hard.length ? `<div style="color:var(--good);font-weight:700;margin-top:8px;font-size:.9rem">✅ ما فيه كلمة تعثّرت فيها أكثر من مرّة.</div>` : ``))+
+          `</div>`;
+      }
     }
     // 📖 القراءة (فهم المقروء)
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل القراءة اليوم بس ما بان إلا

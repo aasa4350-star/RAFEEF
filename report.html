@@ -327,6 +327,46 @@ function vocabByMode(student){
   });
   return { rows:rows, by:by, learned:learned, vocTotal:vocTotal, untrusted:untrusted };
 }
+/* ═══ 📚 حفظ كلمات المنهج وجمله ════════════════════════════════════
+   سؤال الأب (١٨ أكتوبر ٢٠٢٦): «وين أحصل حفظ الكلمات والجمل حقّت
+   المنهج عندي في التقرير؟» — ولم يكن يجده إلّا سطرًا بين ألفٍ وخمسمئةِ
+   جلسةٍ في «سجلّ الجلسات». فصارت له بطاقةٌ باسمه.
+   والتجميعُ في report-rules.js فتقرؤه هذه الصفحةُ وchild.html معًا. */
+function studyCardHtml(student){
+  var s = (window.RR && RR.studyUnits) ? RR.studyUnits(ALL, student) : null;
+  if(!s) return '<div class="card"><h2>📚 حفظ كلمات المنهج وجمله</h2>'+
+    '<p class="note">ما فتح «احفظ · ثبّت · جمل» بعد — تجده داخل كلّ وحدةٍ في صفحة الإنجليزي.</p></div>';
+
+  var rows = s.units.map(function(u){
+    var all = { c:u.memo.c+u.sent.c, t:u.memo.t+u.sent.t };
+    var p = pct(all.c, all.t);
+    var bits = [];
+    if(u.memo.n) bits.push('🔁 ثبّت: '+u.memo.n+' جولة · '+pct(u.memo.c,u.memo.t)+'%');
+    if(u.sent.n) bits.push('🧩 جمل: '+u.sent.n+' جولة · '+pct(u.sent.c,u.sent.t)+'%');
+    return '<li><span class="pill '+cls(p)+'">'+p+'%</span>'+
+      '<span class="nm">'+esc(u.title)+
+        '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+
+          bits.join(' · ')+(u.last?' · آخر مرّة '+saDate(new Date(u.last).toISOString()):'')+'</span></span>'+
+      '<span class="frac">'+all.c+'/'+all.t+'</span></li>';
+  }).join("");
+
+  /* الكلماتُ التي تعثّر فيها في جولتين فأكثر — هي موضعُ المراجعةِ الليلة */
+  var hard = s.hard.filter(function(h){ return h.n >= 2; }).slice(0, 12);
+  var hardHtml = hard.length
+    ? '<p class="note" style="margin-top:10px">📌 <b>كلماتٌ يتعثّر فيها مرّةً بعد مرّة</b> — راجعها معه:</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+
+      hard.map(function(h){
+        return '<span style="background:var(--bad-bg);color:var(--bad);border-radius:9px;padding:4px 9px;'+
+               'font-weight:800;font-size:.86rem" dir="ltr">'+esc(h.w)+' ×'+h.n+'</span>'; }).join("")+
+      '</div>'
+    : (s.hard.length ? '<p class="note" style="margin-top:10px">✅ ما فيه كلمةٌ تعثّر فيها أكثر من مرّة.</p>' : '');
+
+  return '<div class="card"><h2>📚 حفظ كلمات المنهج وجمله</h2>'+
+    '<p class="note">من «احفظ · ثبّت · جمل» داخل وحدات الإنجليزي — مادّتها كتابه هو. '+
+    '<b>'+s.memoRounds+'</b> جولة تثبيتٍ و<b>'+s.sentRounds+'</b> جولة جمل.</p>'+
+    '<ul class="sk">'+rows+'</ul>'+ hardHtml +'</div>';
+}
+
 function vocabCardHtml(student){
   var v = vocabByMode(student), by = v.by, learned = v.learned, vocTotal = v.vocTotal, untrusted = v.untrusted;
   if(!v.rows.length)
@@ -752,6 +792,7 @@ function render(){
           : 'التسجيل التفصيلي بدأ حديثًا — خلّه يحلّ اختبارات وارجع بعد يومين.')+
       (d.skipped ? '<br><br>⚠️ فيه '+d.skipped+' جلسة مستبعدة (خروج من الصفحة أو سرعة مريبة).' : '')+'</div>'+
       sc+
+      studyCardHtml(current)+
       vocabCardHtml(current)+
       writingCardHtml(current)+
       talkCardHtml(current)+
@@ -788,6 +829,7 @@ function render(){
     (thin.length ? '<div class="card"><h2>🕓 تحتاج أسئلة أكثر قبل الحكم</h2>'+
        '<p class="note">أقلّ من '+MIN_N+' أسئلة — الرقم فيها غير موثوق.</p>'+listHtml(thin, true)+'</div>' : '')+
     sessionsCardHtml(current)+
+    studyCardHtml(current)+
     vocabCardHtml(current)+
     repeatCardHtml(d)+
     writingCardHtml(current)+

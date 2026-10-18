@@ -222,7 +222,7 @@
         });
       }
       function finish(){
-        if(window.saveScore) saveScore(label, right, n, pid, { mode: "memo", unit: id, dur: Math.round((Date.now() - t0) / 1000),
+        if(window.saveScore) saveScore(label, right, n, pid, { mode: "memo", unit: id, tag: TAG(), unitTitle: (unit && unit.title) || id, dur: Math.round((Date.now() - t0) / 1000),
           skills: { "حفظ: مفردات الكتاب": { c: right, t: n } },
           missed: Object.keys(firstTry).filter(function(k){ return !firstTry[k]; }) });
         box.innerHTML = '<div class="st-card"><div class="st-big">'+(right === n ? '🌟' : '👍')+' '+right+' / '+n+'</div>'+
@@ -319,7 +319,7 @@
       }
       function finish(){
         var n = list.length;
-        if(window.saveScore) saveScore(label, right, n, pid, { mode: "sentences", unit: id, dur: Math.round((Date.now() - t0) / 1000), skills: SK });
+        if(window.saveScore) saveScore(label, right, n, pid, { mode: "sentences", unit: id, tag: TAG(), unitTitle: (unit && unit.title) || id, dur: Math.round((Date.now() - t0) / 1000), skills: SK });
         box.innerHTML = '<div class="st-card"><div class="st-big">'+(right === n ? '🌟' : '👍')+' '+right+' / '+n+'</div>'+
           '<div class="st-act"><button data-more>جولة ثانية ▶</button><button class="ghost" data-home>رجوع</button></div></div>';
         box.querySelector("[data-more]").onclick = round;

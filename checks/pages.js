@@ -335,6 +335,7 @@ function run(){
   issues.push(...localNoWrite());
   issues.push(...islamic5Path());
   issues.push(...readingScore());
+  issues.push(...studyCardPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -2349,6 +2350,74 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ حفظُ كلماتِ المنهجِ له مكانٌ باسمِه في التقرير ═══════════════
+   سؤال الأب (١٨ أكتوبر ٢٠٢٦): «وين أحصل حفظ الكلمات والجمل حقّت
+   المنهج عندي في التقرير؟».
+
+   وكان لا يجده: اسمُ الجلسة «تثبيت إنجليزي و1 🔁» لا يبدأ باسمِ مادّةٍ
+   ولا بـ«كلمات» ولا «قراءة»، فيسقط في child.html إلى دلوِ «الاختبارات
+   التجريبية (قدرات/تحصيلي/STEP/كانجرو…)»، وفي report.html يصير سطرًا
+   بين ألفٍ وخمسمئةِ جلسةٍ في «سجلّ الجلسات».
+
+   وهذا بابٌ يُفقَد بالصمت: البطاقةُ تُحذَف أو يُعاد الصفُّ إلى الدلوِ
+   العامّ ولا يَظهر خطأٌ في شيء — تبقى الصفحتان تعملان، ويبقى الأبُ
+   لا يجد ما يسأل عنه. */
+function studyCardPath(){
+  const out = [];
+  const R = 'report-rules.js', rp = path.join(ROOT, R);
+  if (!fs.existsSync(rp)) return out;
+  const rr = fs.readFileSync(rp, 'utf8');
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  if (!/studyUnits:\s*function\(rows, student\)\{/.test(rr))
+    E(R, 'RR.studyUnits مفقودة — وهي التجميعُ الذي تقرؤه الصفحتان معًا');
+  if (!/m\.mode !== "memo" && m\.mode !== "sentences"/.test(rr))
+    E(R, 'RR.studyUnits لا تَفرز صفوفَ «ثبّت» و«جمل» — فتدخلها صفوفُ أبوابٍ أخرى');
+  if (!/\(m\.missed \|\| \[\]\)\.forEach/.test(rr))
+    E(R, 'الكلماتُ المتعثّرةُ لا تُجمَع — وهي أنفعُ ما في الباب للأب');
+  if (!/studyUnitName:\s*function\(id\)/.test(rr))
+    E(R, 'لا اسمَ بديلٌ للوحدة — فتُعرَض «u1» للأب في الصفوفِ القديمة');
+
+  /* الوحدةُ تحفظ وسمَها وعنوانَها، وإلّا عُرض «u1» إلى الأبد */
+  const S = 'study-en4.js', sp = path.join(ROOT, S);
+  if (fs.existsSync(sp)) {
+    const st = fs.readFileSync(sp, 'utf8');
+    const n = (st.match(/tag: TAG\(\), unitTitle:/g) || []).length;
+    if (n !== 2) E(S, 'وسمُ الكتابِ وعنوانُ الوحدةِ يُحفظان في ' + n + ' موضعٍ لا اثنين (ثبّت وجمل)');
+  }
+
+  /* تقريرُ الأب: بطاقةٌ باسمِها، مركّبةٌ في المسارَين */
+  const P = 'report.html', pp = path.join(ROOT, P);
+  if (fs.existsSync(pp)) {
+    const rh = fs.readFileSync(pp, 'utf8');
+    if (!/function studyCardHtml\(student\)\{/.test(rh))
+      E(P, 'بطاقةُ «حفظ كلمات المنهج وجمله» مفقودة');
+    const mounts = (rh.match(/studyCardHtml\(current\)/g) || []).length;
+    if (mounts !== 2)
+      E(P, 'البطاقةُ مركّبةٌ في ' + mounts + ' مسارٍ لا اثنين — ومسارُ «بلا تفصيل مهارات» هو حالُ الابنِ الجديد');
+    if (!/RR\.studyUnits/.test(rh))
+      E(P, 'البطاقةُ لا تقرأ RR.studyUnits — فتختلف أرقامُها عن صفحةِ الابن');
+  }
+
+  /* صفحةُ الابن: دلوٌ خاصٌّ قبل أن يبلغ الدلوَ العامّ */
+  const C = 'child.html', cp2 = path.join(ROOT, C);
+  if (fs.existsSync(cp2)) {
+    const ch = fs.readFileSync(cp2, 'utf8');
+    if (!/studyAll\.push\(p\)/.test(ch))
+      E(C, 'صفوفُ «ثبّت» و«جمل» لا تُفرَز — فتسقط في «الاختبارات التجريبية»');
+    /* والفرزُ قبل otherMap لا بعده، وإلّا لم يُغنِ شيئًا */
+    const iStudy = ch.indexOf('studyAll.push(p)');
+    const iOther = ch.indexOf('(otherMap[t]=otherMap[t]||[]).push(p)');
+    if (iStudy >= 0 && iOther >= 0 && iStudy > iOther)
+      E(C, 'فرزُ الحفظِ يأتي بعد الدلوِ العامّ — فلا يصله صفٌّ أبدًا');
+    if (!/📚 حفظ كلمات المنهج وجمله/.test(ch))
+      E(C, 'لا قسمَ باسمِ «حفظ كلمات المنهج وجمله» في صفحةِ الابن');
+    if (!/RR\.studyUnits\(studyAll/.test(ch))
+      E(C, 'القسمُ لا يقرأ RR.studyUnits');
+  }
+  return out;
+}
+
 /* ═══ قراءةُ القطعة: درجةٌ تقيس القارئَ، وإجاباتٌ لا تضيع ═══════════
    بلاغ حسن (١٨ أكتوبر ٢٠٢٦): «أقرأها كاملة وتطلع كلّها خضراء إلّا
    كلمتين، وأتفاجأ أنّ نسبة القراءة ٣٢٪ · وأحلّ جميع الأسئلة ويطلع
