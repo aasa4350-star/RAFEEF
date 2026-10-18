@@ -12,6 +12,16 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
+<!-- احفظ · ثبّت · جمل — طلبُ الأب (١٨ أكتوبر ٢٠٢٦): «نفس سعود وحسن» -->
+<script src="book-en8.js?v=20261018"></script>
+<script src="study-en4.js?v=20261018"></script>
+<script>
+/* الوحدةُ في study-en4.js تخدم أيَّ كتاب: تقرأ window.STUDY_BOOK،
+   ومفتاحُ تخزينِ التكرارِ المتباعدِ يحمل window.STUDY_TAG مع اسمِ الابن
+   — فلا يلتقي «u1» من كتابين. */
+window.STUDY_BOOK = window.BOOK_EN8 || null;
+window.STUDY_TAG  = "en8";
+</script>
 <style>
   :root{
     --accent:#7c3aed; --accent-deep:#5b21b6;
@@ -80,9 +90,17 @@ var SUPA_KEY = APP_CONFIG.supaKey;
    دونه (RR.usable). فلا يضيع جهدُ الطفل ولا يُحسب مرّتين. */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
-function saveScore(test, correct, total, pid){
+/* ═══ الوسيطُ الخامسُ كان يسقط صامتًا ═══════════════════════════════
+   صفحةُ رفيفَ وحدَها بقيت على التوقيعِ القديم (أربعةُ وسائط)، وبقيّةُ
+   الصفحاتِ تأخذ extra فتُدمجه في meta. فلمّا رُكِّب لها «احفظ·ثبّت·جمل»
+   (١٨ أكتوبر ٢٠٢٦) كانت جولةُ التثبيتِ تُحفَظ بلا وحدةٍ ولا تفصيلِ
+   مهارات: صفٌّ بلا mode ولا unit ولا skills — وهو عينُ ما كان يطبع
+   «[بلا تفصيل مهارات]» في تقريرِ الأب. فصار كغيرِه. */
+function saveScore(test, correct, total, pid, extra){
   try{
-    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:{ kind:"practice", test:test, correct:correct, total:total, pid:pid||null } };
+    var meta = { kind:"practice", test:test, correct:correct, total:total, pid:pid||null };
+    if(extra) for(var __k in extra) meta[__k]=extra[__k];
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[], meta:meta };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
@@ -1147,6 +1165,8 @@ if(!NAMES[who]){
     function savePartial(){ var n=Object.keys(answered).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; saveScore(c.label, correct, n, pid); }
     sec._leave=savePartial; sec._done=function(){ return saved; };
     sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); render(id); });
+    /* احفظ · ثبّت · جمل فوق أسئلةِ الوحدة — انظر study-en4.js */
+    if(window.STUDY && STUDY.has(id)) STUDY.mount(sec, id);
   }
 
   function drawChap(){

@@ -1078,7 +1078,10 @@ function bookStudyPath(){
   const out = [];
   const SPEC = [
     { book:'book-en4.js', global:'BOOK_EN4', tag:'en4', page:'english.html' },
-    { book:'book-en9.js', global:'BOOK_EN9', tag:'en9', page:'english9.html' }
+    { book:'book-en9.js', global:'BOOK_EN9', tag:'en9', page:'english9.html' },
+    /* طلبُ الأب (١٨ أكتوبر ٢٠٢٦): «نفس سعود وحسن» لأسامة ورفيف */
+    { book:'book-en5.js', global:'BOOK_EN5', tag:'en5', page:'english5.html' },
+    { book:'book-en8.js', global:'BOOK_EN8', tag:'en8', page:'english8.html' }
   ];
   let man = null;
   const manPath = path.join(ROOT, 'pdf', 'manifest.json');

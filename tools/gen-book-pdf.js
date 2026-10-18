@@ -13,7 +13,7 @@
  *
  * التشغيل:
  *   NODE_PATH=/opt/node22/lib/node_modules node tools/gen-book-pdf.js
- *   ويُعاد كلّما تغيّر book-en4.js أو book-en9.js.
+ *   ويُعاد كلّما تغيّر ملفٌّ من book-en*.js.
  */
 const fs = require('fs');
 const path = require('path');
@@ -30,7 +30,11 @@ const BOOKS = [
   { file:'book-en4.js', global:'BOOK_EN4', tag:'en4', kid:'سعود',
     grade:'الصف الرابع الابتدائي', term:'الفصل الدراسي الأول — الوحدات 1–4' },
   { file:'book-en9.js', global:'BOOK_EN9', tag:'en9', kid:'حسن',
-    grade:'الصف الثالث المتوسط · SuperGoal 3', term:'الفصل الدراسي الأول — الوحدات 1–6' }
+    grade:'الصف الثالث المتوسط · SuperGoal 3', term:'الفصل الدراسي الأول — الوحدات 1–6' },
+  { file:'book-en5.js', global:'BOOK_EN5', tag:'en5', kid:'أسامة',
+    grade:'الصف الخامس الابتدائي · SuperGoal 4', term:'الفصل الدراسي الأول — Welcome والوحدات 1–4' },
+  { file:'book-en8.js', global:'BOOK_EN8', tag:'en8', kid:'رفيف',
+    grade:'الصف الثاني المتوسط · SuperGoal 2', term:'الوحدات 1–8' }
 ];
 
 function esc(s){
