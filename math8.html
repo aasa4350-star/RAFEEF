@@ -12,6 +12,7 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
+<script src="fatri-save.js?v=20261019"></script>
 <style>
   :root{
     --accent:#7c3aed; --accent-deep:#5b21b6;
@@ -1711,7 +1712,11 @@ if(!NAMES[who]){
       if(!force && !done) return;
       if(savedN >= marks() && saved && !done) return;
       savedN = marks(); saved = true; if(done) sec._frag=false;
-      saveScore("رياضيات م٢ — الفتري 📝", marks(), FATRI_TOTAL, pid, meta());
+      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
+      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
+            answered: Object.keys(answered).length, items: FATRI_MCQ,
+            essay: FATRI_ESSAY, done: done, meta: meta() });
+      saveScore("رياضيات م٢ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
     }
     sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
       var i=+qEl.dataset.i, ans=items[i][2];

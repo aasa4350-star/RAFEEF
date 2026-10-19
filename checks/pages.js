@@ -336,6 +336,7 @@ function run(){
   issues.push(...islamic5Path());
   issues.push(...readingScore());
   issues.push(...studyCardPath());
+  issues.push(...fatriPartialSave());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -1056,8 +1057,13 @@ function fatriEn5Path(){
     if (!/TICK, 2/.test(src)) E('قسمُ القراءةِ لا يُولّد بندَي ✓/✗');
   }
   if (!/var TOTAL = 20;/.test(src)) E('الدرجةُ ليست من ٢٠');
-  if (src.indexOf('saveScore("إنجليزي خ٥ — الفتري 📝", correct, TOTAL') < 0)
-    E('الدرجةُ لا تُحفَظ من ٢٠ باسمِ الاختبارِ الصحيح');
+  /* ═══ الناقصُ يُحفَظ بما أجابه ═══════════════════════════════════
+     صار الحفظُ يمرُّ على FATRI.row (fatri-save.js) فتُحسَب درجةُ من لم
+     يُكمِل من بنودِه هو لا من الورقةِ كلِّها — انظر تعليلَ الملفّ. */
+  if (src.indexOf('saveScore("إنجليزي خ٥ — الفتري 📝", __fr.got, __fr.total') < 0)
+    E('الدرجةُ لا تُحفَظ من مخرَجِ FATRI.row باسمِ الاختبارِ الصحيح');
+  if (!/FATRI\.row\(\{ got: correct, markTotal: TOTAL,/.test(src))
+    E('الفتري لا يمرُّ على قاعدةِ الحفظِ الناقص — فتعود «٠ من ٢٠» لمن أجاب عن سؤال');
   /* نصُّ السؤالِ الإنجليزيُّ يُعزَل، وإلّا رُسمت النقطتان في الطرفِ الخطأ */
   if (!/function stemLtr\(/.test(src) || !/stemLtr\(q\.stem\)/.test(src))
     E('نصُّ السؤالِ غيرُ معزولٍ يساريًّا — تُرسم «:Complete» بدل «Complete:»');
@@ -1689,8 +1695,11 @@ function fatriOne(f, SP){
         E('وسمُ الفصلِ (__lesson) سقط من حفظِ الفتري — فيفقد تقريرُ الأبِ تفصيلَ الفصول');
     }
   }
-  if (!/FATRI_TOTAL\b/.test(src) || src.indexOf('saveScore("' + SP.label + '", marks(), FATRI_TOTAL') < 0)
-    E('الدرجةُ لا تُحفَظ من عشرين باسمِ الاختبارِ الصحيح');
+  if (!/FATRI_TOTAL\b/.test(src) || src.indexOf('saveScore("' + SP.label + '", __fr.got, __fr.total') < 0)
+    E('الدرجةُ لا تُحفَظ من مخرَجِ FATRI.row باسمِ الاختبارِ الصحيح');
+  /* والناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
+  if (!/FATRI\.row\(\{ got: marks\(\), markTotal: FATRI_TOTAL,/.test(src))
+    E('الفتري لا يمرُّ على قاعدةِ الحفظِ الناقص — فتعود «٠ من عشرين» لمن أجاب عن سؤال');
   /* ═══ فحوصُ المقاليِّ تُطبَّق على من له مقاليٌّ وحدَه ══════════════
      أسامةُ رُفع مقاليُّه بطلبِ أبيه، فمطالبتُه بحفظِ نصٍّ لا وجودَ له
      خطأٌ في الحارسِ لا في الصفحة. وبالمقابل: من أُلغي مقاليُّه يجب
@@ -2350,6 +2359,87 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ الاختبارُ الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها ═══
+   كشفها تشخيصُ سعودٍ في الإنجليزي (١٨ أكتوبر ٢٠٢٦): بدأ الفتريَّ ٢٢
+   مرّةً وترك خمسَ عشرةَ منها بعد سؤالٍ أو سؤالين، فحُفظت له «٠ من ٢٠»
+   لكلِّ قُصاصة، فهبط متوسّطُه المعروضُ إلى ٣١٪ وهو في المكتملاتِ ٧٠٪.
+   وقياسُ القاعدةِ يومَها: ستّةٌ من ثلاثةَ عشرَ اختبارًا فتريًّا مظلومة.
+
+   وهذا عطبٌ لا صوتَ له: الصفحةُ تعمل، والدرجةُ تُحفَظ، والرقمُ كذب.
+   فيُحرَس في مواضعِه الثلاثةَ عشرَ جميعًا — ولو نُسي موضعٌ واحدٌ ظلَّ
+   اختبارٌ كاملٌ يَظلم صاحبَه. */
+function fatriPartialSave(){
+  const out = [];
+  const F = 'fatri-save.js', fp = path.join(ROOT, F);
+  if (!fs.existsSync(fp)) return [{ sev:'خطأ', file:F, msg:'ملفُّ قاعدةِ الحفظِ الناقصِ مفقود' }];
+  const rule = fs.readFileSync(fp, 'utf8');
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  if (!/var MIN = 3;/.test(rule))
+    E(F, 'عتبةُ الثلاثِ سقطت — وصفٌّ بدرجة «١ / ١» يرفع المتوسّطَ بغير حقّ');
+  if (!/kind:"activity", sect:"fatri"/.test(rule))
+    E(F, 'ما دون العتبةِ لم يَعُد أثرًا — فيدخل المتوسّطَ ويُسقطه');
+  if (!/got: 0, total: 0,/.test(rule))
+    E(F, 'صفُّ الأثرِ يحمل درجةً — وهو لا يُحسَب درجةً');
+  if (!/var per = items \? \(\(tot - essay\) \/ items\) : 0;/.test(rule))
+    E(F, 'درجةُ البندِ لا تُحسَب بعدَ نزعِ المقاليّات — فيُحاسَب على ما لم يبلغه');
+  if (!/if\(o\.done \|\| \(items && n >= items\)\)/.test(rule))
+    E(F, 'المكتملُ لم يَعُد يُحفَظ كاملًا');
+
+  /* المواضعُ الثلاثةَ عشر: كلُّ حفظٍ يمرُّ على القاعدة */
+  const SITES = [
+    ['fatri-en4.js',  'إنجليزي خ٤ — الفتري 📝'],
+    ['fatri-en5.js',  'إنجليزي خ٥ — الفتري 📝'],
+    ['math4.html',    'رياضيات خ٤ — الفتري 📝'],
+    ['math5.html',    'رياضيات خ٥ — الفتري 📝'],
+    ['math8.html',    'رياضيات م٢ — الفتري 📝'],
+    ['math9.html',    'رياضيات م٣ — الفتري 📝'],
+    ['science4.html', 'علوم خ٤ — الفتري 📝'],
+    ['science5.html', 'علوم خ٥ — الفتري 📝'],
+    ['science8.html', 'علوم م٢ — الفتري 📝'],
+    ['science8.html', 'علوم م٢ — نماذج الفتري 📚'],
+    ['science9.html', 'علوم م٣ — الفتري 📝'],
+    ['science9.html', 'علوم م٣ — اختبار المذكّرة 📒'],
+    ['english9.html', 'إنجليزي م٣ — الفتري 📝']
+  ];
+  for (const [f, label] of SITES) {
+    const p = path.join(ROOT, f);
+    if (!fs.existsSync(p)) { E(f, 'مفقود'); continue; }
+    const src = fs.readFileSync(p, 'utf8');
+    if (src.indexOf('saveScore("' + label + '", __fr.got, __fr.total') < 0)
+      E(f, 'حفظُ «' + label + '» لا يمرُّ على FATRI.row — فتعود «٠ من الورقةِ كلِّها» لمن أجاب عن سؤال');
+    if (src.indexOf('answered: Object.keys(answered).length') < 0)
+      E(f, 'عددُ ما أجابه لا يُمرَّر إلى القاعدة');
+  }
+
+  /* ═══ والماضي: قُصاصةٌ محفوظةٌ لا تُعرَض آخرَ ورقةٍ حلَّها ═══
+     الصفوفُ القديمةُ لا تُعدَّل، والمفتاحُ المنشورُ لا يَحذِف. فكانت
+     صفحةُ سعودٍ تقول «خ٤ — الفتري 📝: 0/20» وآخرُ ورقةٍ أتمَّها 16/20. */
+  const RRF = 'report-rules.js', rrp = path.join(ROOT, RRF);
+  if (fs.existsSync(rrp)) {
+    const rr = fs.readFileSync(rrp, 'utf8');
+    if (!/fatriPart:\s*function\(row\)/.test(rr))
+      E(RRF, 'RR.fatriPart مفقودة — فلا يُعرَف صفُّ القُصاصةِ من صفِّ الورقة');
+    if (!/if \(this\.fatriPart\(cur\) && !this\.fatriPart\(p\) && ok\(p\)\) return p;/.test(rr))
+      E(RRF, 'curKeep لا تُفضّل الورقةَ التامّةَ على القُصاصة — فتبقى «٠ من ٢٠» آخرَ ما يراه الأب');
+    if (!/var of = \(typeof m\.mcqTotal === "number" && m\.mcqTotal\) \? m\.mcqTotal : m\.total;/.test(rr))
+      E(RRF, 'عددُ بنودِ الورقةِ يُقرأ من درجتِها — فورقةُ عشرةِ بنودٍ بعشرين درجةً تُعَدُّ كلُّها قُصاصة');
+  }
+
+  /* والملفُّ محمَّلٌ في كلِّ صفحةٍ تَحفظ */
+  const PAGES = ['math4.html','math5.html','math8.html','math9.html','science4.html',
+                 'science5.html','science8.html','science9.html','english9.html',
+                 'english.html','english5.html'];
+  for (const p of PAGES) {
+    const q = path.join(ROOT, p);
+    if (!fs.existsSync(q)) continue;
+    const src = fs.readFileSync(q, 'utf8');
+    if (src.indexOf('src="fatri-save.js') < 0)
+      E(p, 'لا تُحمّل fatri-save.js — فـFATRI غيرُ معرَّفةٍ ويسقط الحفظُ كلُّه');
+  }
+  return out;
+}
+
 /* ═══ حفظُ كلماتِ المنهجِ له مكانٌ باسمِه في التقرير ═══════════════
    سؤال الأب (١٨ أكتوبر ٢٠٢٦): «وين أحصل حفظ الكلمات والجمل حقّت
    المنهج عندي في التقرير؟».

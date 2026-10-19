@@ -281,7 +281,11 @@
         if(!force && !done) return;
         if(savedN >= correct && saved && !done) return;
         savedN = correct; saved = true;
-        if(window.saveScore) saveScore("إنجليزي خ٥ — الفتري 📝", correct, TOTAL, pid, meta());
+        /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
+        var __fr = FATRI.row({ got: correct, markTotal: TOTAL,
+              answered: Object.keys(answered).length, items: items.length,
+              essay: 0, done: done, meta: meta() });
+        if(window.saveScore) saveScore("إنجليزي خ٥ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
       }
       sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
         var k = +qEl.dataset.i, it = items[k];

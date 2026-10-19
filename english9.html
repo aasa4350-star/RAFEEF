@@ -12,6 +12,7 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
+<script src="fatri-save.js?v=20261019"></script>
 <script src="pace.js?v=20261009"></script>
 <script src="book-en9.js?v=20261009"></script>
 <script src="study-en4.js?v=20261009"></script>
@@ -4641,7 +4642,11 @@ if(!NAMES[who]){
       if(!force && !done) return;
       if(savedN >= marks() && saved && !done) return;
       savedN = marks(); saved = true; if(done) sec._frag=false;
-      saveScore("إنجليزي م٣ — الفتري 📝", marks(), FATRI_TOTAL, pid, meta());
+      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
+      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
+            answered: Object.keys(answered).length, items: FATRI_MCQ,
+            essay: FATRI_ESSAY, done: done, meta: meta() });
+      saveScore("إنجليزي م٣ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
       if(done && window.PACE) PACE.box(sec, who, Math.round((Date.now()-t0)/1000), FATRI_MCQ, fastN, correct);
     }
     sec.querySelectorAll(".q[data-i]").forEach(function(qEl){

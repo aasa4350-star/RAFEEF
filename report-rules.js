@@ -312,9 +312,32 @@
        يُخفي أنّه فتح الدرسَ وعمل فيه.
 
        والصفوفُ تأتي من الأحدثِ إلى الأقدم، فالأوّلُ المحتسبُ هو الأحدث. */
+    /* ═══ قُصاصةُ فتريٍّ: بدأه وترك بعد بندٍ أو بندين ═══════════════
+       تشخيصُ سعودٍ في الإنجليزي (١٨ أكتوبر ٢٠٢٦): بدأ الفتريَّ ٢٢ مرّةً
+       وترك خمسَ عشرةَ منها بعد سؤالٍ أو سؤالين — يضغط «اختبار جديد»
+       حتّى تعجبه الورقة. وكانت تُحفَظ «٠ من ٢٠» لأنّ المقامَ درجةُ
+       الورقةِ كاملةً مهما أجاب.
+       والحفظُ أُصلح (fatri-save.js) فصار الناقصُ يُحفَظ بما أجابه،
+       وما دون الثلاثِ أثرًا لا درجة. وهذه للماضي: صفوفٌ محفوظةٌ لا
+       تُعدَّل — فلا تُعرَض قُصاصةٌ على أنّها آخرُ ورقةٍ حلَّها. */
+    fatriPart: function(row){
+      var m = (row && row.meta) || {};
+      if (m.partial) return true;
+      if (!/الفتري|المذكّرة|نماذج الفتري/.test(String(m.test || ""))) return false;
+      var sk = m.sections || m.skills;
+      if (!sk) return false;
+      var ans = 0, k;
+      for (k in sk) if (sk[k] && typeof sk[k].t === "number") ans += sk[k].t;
+      /* عددُ بنودِ الورقة: mcqTotal حيث حُفظ، وإلّا فدرجةٌ لكلِّ بند */
+      var of = (typeof m.mcqTotal === "number" && m.mcqTotal) ? m.mcqTotal : m.total;
+      return !!(of && ans && ans < of);
+    },
+
     curKeep: function(cur, p){
       var ok = function(x){ return !(x && x.meta && x.meta.trusted === false); };
       if (!cur) return p;
+      /* والقُصاصةُ لا تُزيح ورقةً أتمَّها — ولو كانت أحدثَ منها */
+      if (this.fatriPart(cur) && !this.fatriPart(p) && ok(p)) return p;
       if (ok(cur)) return cur;
       return ok(p) ? p : cur;
     },
