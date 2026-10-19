@@ -334,6 +334,7 @@ function run(){
   issues.push(...mawhibaTimed());
   issues.push(...localNoWrite());
   issues.push(...islamic5Path());
+  issues.push(...lughati8Path());
   issues.push(...readingScore());
   issues.push(...studyCardPath());
   issues.push(...fatriPartialSave());
@@ -2686,6 +2687,152 @@ function islamic5Path(){
   const hp = path.join(ROOT, 'home.html');
   if (fs.existsSync(hp) && !/href:"islamic5\.html"/.test(fs.readFileSync(hp, 'utf8')))
     out.push({ sev:'خطأ', file:'home.html', msg:'لا بطاقةَ للدراسات الإسلاميّة — الصفحةُ موجودةٌ ولا رابطَ إليها' });
+
+  return out;
+}
+
+/* ═══ لغتي الخالدة — ثاني متوسّط (رفيف) ══════════════════════════════
+   بُنِيت في ١٩ أكتوبر ٢٠٢٦ من خريطةِ الكتابِ التي أرسلها الأب. وهي
+   مبنيّةٌ على آلةِ islamic5.html، وتلك مبنيّةٌ على آلةِ science5.html،
+   فخطرُها أنّ اسمَ مادّةٍ أخرى يبقى في نصٍّ تقرأه البنت: خرجت
+   islamic5.html أوّلَ مرّةٍ تقول «📖 في كتاب العلوم» لهذا السبب.
+
+   وأسئلةُ هذه الصفحةِ على المهاراتِ الأربعِ في كلِّ وحدة: الإملاءُ
+   والصنفُ والأسلوبُ والنحو. أمّا نصوصُ القراءةِ والاستماعِ والتحليلِ
+   الأدبيِّ فلم تصلني صفحاتُها، فأسماؤها في مدخلِ كلِّ وحدةٍ بلا
+   أسئلة — والحارسُ يُلزِم بذكرِها لئلّا تضيعَ البنتُ بين الكتابِ
+   والصفحة. */
+function lughati8Path(){
+  const out = [];
+  const F = 'lughati8.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) { out.push({ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }); return out; }
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  const html = fs.readFileSync(p, 'utf8');
+
+  const ctx = makeCtx();
+  const { inline, srcs } = scripts(html);
+  for (const s of srcs){
+    const q = path.join(ROOT, s);
+    if (fs.existsSync(q)) { try { vm.runInContext(fs.readFileSync(q,'utf8'), ctx); } catch(e){} }
+  }
+  for (const src of inline){ try { vm.runInContext(src, ctx); } catch(e){} }
+
+  /* المهاراتُ الأربعُ × ثلاثُ وحدات */
+  const SKILL = { I:'إملاء', S:'صنف', A:'أسلوب', N:'نحو' };
+  const UNITS = ['1','2','3'];
+  const BANKS = [];
+  UNITS.forEach(u => Object.keys(SKILL).forEach(s => BANKS.push(s + u)));
+  const LESSON = {};                                  /* درسٌ ← بنكُه */
+  BANKS.forEach(n => { LESSON[n.toLowerCase()] = n; });
+  const MIN = 16;                     /* أقلُّ ما يُقبَل لئلّا تحفظَ البنك */
+
+  const key = t => String(t).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+  const seen = {};
+  let total = 0;
+  BANKS.forEach(n => {
+    const bk = ctx[n];
+    if (!Array.isArray(bk)) { E('بنكُ ' + n + ' غيرُ موجود'); return; }
+    total += bk.length;
+    if (bk.length < MIN) E('بنكُ ' + n + ' فيه ' + bk.length + ' سؤالًا — وأقلُّ ما يُقبَل ' + MIN);
+    bk.forEach((q, i) => {
+      if (!Array.isArray(q) || !Array.isArray(q[1]) || q[1].length !== 3)
+        { E(n + '#' + i + ': الخياراتُ ليست ثلاثة'); return; }
+      const o = q[1].map(x => key(x));
+      if (new Set(o).size !== 3) E(n + '#' + i + ': خياران متطابقان');
+      if (o.some(x => !x)) E(n + '#' + i + ': خيارٌ فارغ');
+      if (key(q[2]).length < 15) E(n + '#' + i + ': شرحٌ ناقصٌ أو مفقود');
+      const k = key(q[0]);
+      if (seen[k]) E('سؤالٌ واحدٌ في بنكين (' + seen[k] + ' و' + n + '): ' + k.slice(0, 45));
+      else seen[k] = n;
+    });
+  });
+  if (total < 200) E('مجموعُ أسئلةِ المادّةِ ' + total + ' — والمرصودُ أكثرُ من ٢٠٠');
+
+  const CFG = ctx.CFG, CHAPS = ctx.CHAPS, REM = ctx.REMTOPICS;
+  if (!CFG || !CHAPS || !Array.isArray(REM)) { E('CFG أو CHAPS أو REMTOPICS لم تُقرأ'); return out; }
+
+  /* الوحداتُ الثلاثُ وتبويباتُها — أربعُ مهاراتٍ ثمّ شاملُ الوحدة */
+  const chapIds = Object.keys(CHAPS);
+  if (chapIds.join(',') !== 'u1,u2,u3')
+    E('وحداتُ الكتابِ «' + chapIds.join(' · ') + '» والمتوقَّع ثلاثًا: u1 وu2 وu3');
+  UNITS.forEach(u => {
+    const c = CHAPS['u' + u];
+    if (!c) return;
+    const want = ['i','s','a','n'].map(s => s + u).concat(['x' + u]);
+    if ((c.ids || []).join(',') !== want.join(','))
+      E('تبويباتُ الوحدةِ ' + u + ': ' + (c.ids||[]).join(' · ') + ' والمتوقَّع ' + want.join(' · '));
+  });
+
+  /* نصوصُ كلِّ وحدةٍ مذكورةٌ في مدخلِها — فهي في الكتابِ ولا أسئلةَ عليها،
+     فلو سقطت أسماؤها ظنّت البنتُ أنّ الصفحةَ تُغني عن قراءتِها. */
+  const TEXTS = {
+    u1: ['وسائل النقل', 'رسّام القلب', 'التلفاز', 'تقنيٌّ', 'هاتفٌ دقيقٌ'],
+    u2: ['أمانته', 'الصدقة والكوب', 'جحا والوليمة', 'الضيف الثقيل', 'الخطّاط'],
+    u3: ['أسامة بن زيد', 'لقمان', 'سعود الفيصل', 'عمر بن الخطّاب', 'أسماء بنت أبي بكر']
+  };
+  Object.keys(TEXTS).forEach(c => {
+    const u = (CHAPS[c] && CHAPS[c].unit) || '';
+    if (!u) { E('مدخلُ الوحدةِ ' + c + ' فارغ'); return; }
+    TEXTS[c].forEach(t => { if (u.indexOf(t) < 0) E('نصُّ «' + t + '» غيرُ مذكورٍ في مدخلِ ' + c); });
+  });
+
+  /* كلُّ درسٍ: وسمٌ عربيٌّ، وصفحةٌ في الكتاب، وموضعٌ في العلاجيّ */
+  const remIds = REM.map(t => t.id);
+  Object.keys(LESSON).forEach(id => {
+    const c = CFG[id];
+    if (!c) { E('درسُ «' + id + '» مفقودٌ من CFG'); return; }
+    if (!c.label || /[A-Za-z_]{4,}/.test(c.label)) E('وسمُ «' + id + '» لا يصلح لتقريرِ الأب: ' + c.label);
+    if (!/^لغتي م٢ — /.test(String(c.label || '')))
+      E('وسمُ «' + id + '» لا يبدأ بـ«لغتي م٢ — » فلا يُفرَز في المادّةِ الصحيحةِ في التقرير: ' + c.label);
+    if (!c.pg) E('درسُ «' + id + '» بلا رقمِ صفحةٍ من الكتاب');
+    if (remIds.indexOf(id) < 0) E('درسُ «' + id + '» ليس في العلاجيِّ — فلا يُرصَد ضعفُها فيه أبدًا');
+    const g = c.gens || [];
+    if (g.length !== 1 || !g[0] || g[0].__bank !== LESSON[id])
+      E('درسُ «' + id + '» لا يسحب من بنكِه ' + LESSON[id]);
+  });
+  REM.forEach(t => {
+    if (!LESSON[t.id]) E('موضوعٌ في العلاجيِّ بلا درس: ' + t.id);
+    if (!t.tip || String(t.tip).length < 120) E('نصيحةُ «' + t.id + '» قصيرةٌ لا تُغني عن مراجعة');
+    if (!t.yt) E('درسُ «' + t.id + '» بلا بحثِ شرحٍ مرئيّ');
+  });
+
+  /* شاملُ كلِّ وحدةٍ من بنوكِ وحدتِها الأربعةِ — ولا بنكَ يتخلّف */
+  UNITS.forEach(u => {
+    const id = 'x' + u, c = CFG[id];
+    if (!c) { E('شاملُ الوحدةِ ' + u + ' مفقودٌ من CFG'); return; }
+    const got = (c.gens || []).map(g => g && g.__bank).filter(Boolean).sort();
+    const exp = Object.keys(SKILL).map(s => s + u).sort();
+    if (got.join(',') !== exp.join(','))
+      E('شاملُ «' + id + '» يسحب من ' + (got.join(' · ') || 'لا شيء') + ' والمتوقَّع ' + exp.join(' · '));
+    if (c.n !== 12) E('أسئلةُ شاملِ «' + id + '» ' + c.n + ' لا اثنا عشر');
+  });
+  const allIds = ctx.ALL_IDS || [];
+  if (allIds.slice().sort().join(',') !== 'x1,x2,x3')
+    E('ALL_IDS «' + allIds.join(' · ') + '» — ومن تخلّف عنها لا يُغذّي العلاجيّ');
+
+  /* وحفظُ العلاجيِّ باسمِ هذه الصفحةِ وحدَها، وإلّا خلط ضعفَها بمادّةٍ أخرى */
+  if (!/var REM_PAGE="lughati8", REM_LABEL="لغتي";/.test(html))
+    E('REM_PAGE أو REM_LABEL ليسا للغتي — فحفظُ ضعفِها يختلط بمادّةٍ أخرى');
+
+  /* ولا فتريَّ هنا: لم تصلني ورقةُ معلّمٍ في هذه المادّة */
+  if (/renderFatri|FATRI_/.test(html))
+    E('ظهر فتريٌّ في الصفحةِ ولا ورقةَ معلّمٍ بُنِي عليها');
+
+  /* ولا اسمَ مادّةٍ أخرى في نصٍّ تقرأه البنت — غيرَ شريطِ موادِّها */
+  [[/في كتاب العلوم/, '«كتاب العلوم»'],
+   [/في كتاب الدراسات/, '«كتاب الدراسات الإسلاميّة»'],
+   [/🔬 العلوم — /, 'ترويسةُ العلوم'],
+   [/🕌 الدراسات الإسلاميّة — /, 'ترويسةُ الإسلاميّة'],
+   [/\bislamic5\b/, 'اسمُ صفحةِ الإسلاميّة'],
+   [/\bscience5\b/, 'اسمُ صفحةِ العلوم']
+  ].forEach(([re, nm]) => { if (re.test(html)) E('بقي في صفحةِ لغتي ' + nm); });
+  if (!/📖 في كتاب لغتي: /.test(html))
+    E('لا تُحيل البنتَ إلى كتابِ لغتي — وهي تفتح الدرسَ حين تُخطئ فيه');
+
+  /* وبطاقتُها في صفحةِ رفيف، وإلّا فصفحةٌ لا يصل إليها أحد */
+  const hp = path.join(ROOT, 'home.html');
+  if (fs.existsSync(hp) && !/href:"lughati8\.html"/.test(fs.readFileSync(hp, 'utf8')))
+    out.push({ sev:'خطأ', file:'home.html', msg:'لا بطاقةَ للغتي الثاني المتوسّط — الصفحةُ موجودةٌ ولا رابطَ إليها' });
 
   return out;
 }
