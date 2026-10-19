@@ -1,5 +1,2277 @@
 [
     {
+        "id": "42d6624f-a40a-4997-90a4-fe51300f81da",
+        "created_at": "2026-10-19T17:20:44.447016+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:20:46.597Z",
+            "cid": "1792430446597_f7j5fzrhaup",
+            "dur": 77,
+            "pid": "mvfirgts_2xo3xl",
+            "kind": "practice",
+            "test": "\u0639\u0631\u0628\u064a \u0627\u062e\u062a\u0628\u0631 \u0646\u0641\u0633\u0643 \ud83d\udd4c",
+            "total": 8,
+            "skills": {
+                "\u0627\u0644\u0625\u0645\u0644\u0627\u0621": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0623\u0633\u0627\u0644\u064a\u0628": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0646\u062d\u0648 \u0648\u0627\u0644\u0625\u0639\u0631\u0627\u0628": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0635\u0631\u0641 \u0648\u0627\u0644\u0627\u0634\u062a\u0642\u0627\u0642": {
+                    "c": 3,
+                    "t": 3
+                }
+            },
+            "correct": 8
+        }
+    },
+    {
+        "id": "6425b047-b583-4895-8857-bbbb1cc9e5b9",
+        "created_at": "2026-10-19T17:19:21.635248+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 11,
+        "en_total": 12,
+        "ma_correct": 12,
+        "ma_total": 12,
+        "wrong": [
+            {
+                "q": "Choose the correct sentence:",
+                "picked": "By 2020, she graduate",
+                "correct": "By 2020, she had graduated",
+                "subject": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a"
+            }
+        ],
+        "meta": {
+            "at": "2026-10-19T17:19:24.215Z",
+            "cid": "1792430364215_i0tl0keqd4o",
+            "per": [
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 1.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.2,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.7,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 2.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 6.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 7.4,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "en",
+                    "dt": 4.9,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 6.8,
+                    "ok": false
+                },
+                {
+                    "c": 0,
+                    "s": "en",
+                    "dt": 4.3,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "en",
+                    "dt": 2,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": null,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 3,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 8.2,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 2.8,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 4,
+                    "ok": true
+                },
+                {
+                    "c": 2,
+                    "s": "ma",
+                    "dt": 1.1,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 7.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 2.3,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 12.1,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 9,
+                    "ok": true
+                },
+                {
+                    "c": 0,
+                    "s": "ma",
+                    "dt": 6.5,
+                    "ok": true
+                },
+                {
+                    "c": 1,
+                    "s": "ma",
+                    "dt": 1.5,
+                    "ok": true
+                }
+            ],
+            "pid": "mvfinpo8_1goitl",
+            "away": 0,
+            "fast": 2,
+            "exits": 0,
+            "paper": {
+                "en": [
+                    {
+                        "q": "He suggested ___ a break.",
+                        "opts": [
+                            "take",
+                            "taking",
+                            "to take"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Choose the synonym of \"buy\":",
+                        "opts": [
+                            "borrow",
+                            "purchase",
+                            "sell"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Choose the synonym of \"job\":",
+                        "opts": [
+                            "rest",
+                            "work",
+                            "play"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Look! You ___ now.",
+                        "opts": [
+                            "are helping",
+                            "helps",
+                            "help"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "___ finishing his work, he went home.",
+                        "opts": [
+                            "After",
+                            "During",
+                            "While"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "The opposite of \"temporary\" is:",
+                        "opts": [
+                            "permanent",
+                            "short",
+                            "weak"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "___ you ever eaten sushi?",
+                        "opts": [
+                            "Have",
+                            "Has",
+                            "Did"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "We ___ dinner when you called.",
+                        "opts": [
+                            "have",
+                            "were having",
+                            "had"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "She is good ___ it.",
+                        "opts": [
+                            "of",
+                            "at",
+                            "for"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "Choose the correct sentence:",
+                        "opts": [
+                            "By 2020, she has graduated",
+                            "By 2020, she had graduated",
+                            "By 2020, she graduate"
+                        ],
+                        "chosen": 2,
+                        "correct": 1
+                    },
+                    {
+                        "q": "The opposite of \"old\" is:",
+                        "opts": [
+                            "new",
+                            "near",
+                            "easy"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "Choose the synonym of \"happy\":",
+                        "opts": [
+                            "angry",
+                            "sad",
+                            "glad"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    }
+                ],
+                "ma": [
+                    {
+                        "q": "\u0645\u0633\u0627\u062d\u0629 \u062f\u0627\u0626\u0631\u0629 \u0646\u0635\u0641 \u0642\u0637\u0631\u0647\u0627 10 (\u03c0\u22483.14)",
+                        "opts": [
+                            "100",
+                            "314",
+                            "31.4"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u062d\u0644: 5x + 8 = 18",
+                        "opts": [
+                            "x=2",
+                            "x=3",
+                            "x=1"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: (\u22123) \u00d7 (\u22124)",
+                        "opts": [
+                            "12",
+                            "\u221212",
+                            "7"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: (\u22124)\u00b3",
+                        "opts": [
+                            "\u221260",
+                            "64",
+                            "\u221264"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "\u0643\u0645 \u064a\u0633\u0627\u0648\u064a %25 \u0645\u0646 80\u061f",
+                        "opts": [
+                            "16",
+                            "20",
+                            "25"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u062d\u0644: 6x + 1 = 55",
+                        "opts": [
+                            "x=8",
+                            "x=10",
+                            "x=9"
+                        ],
+                        "chosen": 2,
+                        "correct": 2
+                    },
+                    {
+                        "q": "\u0645\u0639\u0627\u062f\u0644\u0629 \u0645\u0633\u062a\u0642\u064a\u0645 \u0645\u064a\u0644\u0647 2 \u0648\u064a\u0642\u0637\u0639 y \u0639\u0646\u062f 3",
+                        "opts": [
+                            "y=3x+2",
+                            "y=2x+3",
+                            "y=2x\u22123"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 100 \u2212 3\u00b2",
+                        "opts": [
+                            "91",
+                            "97",
+                            "94"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0628\u0633\u0651\u0637: (x + 4)\u00b2",
+                        "opts": [
+                            "x\u00b2+4x+16",
+                            "x\u00b2+8x+16",
+                            "x\u00b2+16"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    },
+                    {
+                        "q": "\u062d\u0644: 2(x + 3) = 16",
+                        "opts": [
+                            "x = 5",
+                            "x = 8",
+                            "x = 4"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 7\u00b2",
+                        "opts": [
+                            "49",
+                            "14",
+                            "42"
+                        ],
+                        "chosen": 0,
+                        "correct": 0
+                    },
+                    {
+                        "q": "\u0627\u062d\u0633\u0628: 3\u00b2",
+                        "opts": [
+                            "12",
+                            "9",
+                            "6"
+                        ],
+                        "chosen": 1,
+                        "correct": 1
+                    }
+                ],
+                "date": "2026-10-19T17:19:24.214Z",
+                "en_total": 12,
+                "ma_total": 12,
+                "en_correct": 11,
+                "ma_correct": 12
+            },
+            "skills": {
+                "have / has": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0633\u0633": {
+                    "c": 5,
+                    "t": 5
+                },
+                "\u0627\u0644\u0623\u0636\u062f\u0627\u062f": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0644\u0645\u0633\u0627\u062d\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0631\u0627\u062f\u0641\u0627\u062a": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u062d\u0631\u0648\u0641 \u0627\u0644\u062c\u0631\u0651": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0631\u0628\u0637": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062d\u0644\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a": {
+                    "c": 4,
+                    "t": 4
+                },
+                "\u0627\u0644\u0645\u0628\u0646\u064a \u0644\u0644\u0645\u062c\u0647\u0648\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0635\u062f\u0631 \u0648\u0635\u064a\u063a\u0629 ing": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0646\u0633\u0628\u0629 \u0627\u0644\u0645\u0626\u0648\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0623\u0639\u062f\u0627\u062f \u0627\u0644\u0633\u0627\u0644\u0628\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0636\u0627\u0631\u0639 \u0627\u0644\u0645\u0633\u062a\u0645\u0631": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u0645\u064a\u064a\u0632 \u0627\u0644\u062c\u0645\u0644\u0629 \u0627\u0644\u0635\u062d\u064a\u062d\u0629": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "avg_sec": 4.6,
+            "trusted": true,
+            "total_sec": 101
+        }
+    },
+    {
+        "id": "adb2e61b-0dfd-475b-8518-a1afc3e6bf06",
+        "created_at": "2026-10-19T17:18:00.356216+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:18:03.668Z",
+            "cid": "1792430283668_pbbqrkqz99d",
+            "kind": "writing-drill",
+            "level": 2,
+            "total": 6,
+            "correct": 4
+        }
+    },
+    {
+        "id": "590286e7-afbe-4d06-83c3-f570186fe08d",
+        "created_at": "2026-10-19T17:17:43.07866+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:17:45.539Z",
+            "cid": "1792430265539_21dooff3d9y",
+            "cefr": "A2+ \u0646\u062d\u0648 B1",
+            "kind": "writing",
+            "pass": true,
+            "text": "In my opinion, students should use phones at school in some situations. First, phones can help students learn because they can search for information and use educational apps. Second, phones are useful in emergencies because students can contact their parents quickly if necessary. However, students should not use their phones during lessons unless the teacher allows it. This helps them focus on their studies and avoid distractions. In conclusion, phones can be helpful at school when they are used responsibly and for educational purpose",
+            "bands": {
+                "Content": 4,
+                "Language": 4,
+                "Organisation": 5,
+                "Communicative Achievement": 5
+            },
+            "level": 2,
+            "sents": 6,
+            "topic": "Should students use phones at school?",
+            "total": 20,
+            "words": 84,
+            "correct": 18
+        }
+    },
+    {
+        "id": "a537fe46-f009-4300-812c-03885d3e5f2d",
+        "created_at": "2026-10-19T17:14:14.601867+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:14:17.273Z",
+            "cid": "1792430057273_5scg5rsji6p",
+            "pid": "mvfikgow_51nlui",
+            "kind": "practice",
+            "test": "\u0625\u0644\u0642\u0627\u0621 \u2014 \u0634\u0627\u0645\u0644 \u0641\u0662",
+            "total": 10,
+            "correct": 10
+        }
+    },
+    {
+        "id": "ad603cb5-6113-4001-b3b3-f4b65f319fce",
+        "created_at": "2026-10-19T17:13:49.223149+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:13:52.441Z",
+            "cid": "1792430032441_4uthd7ltgxc",
+            "pid": "mvfiju18_3wq1r7",
+            "kind": "practice",
+            "test": "\u0625\u0644\u0642\u0627\u0621 \u2014 \u0634\u0627\u0645\u0644 \u0641\u0661",
+            "total": 10,
+            "correct": 8
+        }
+    },
+    {
+        "id": "79c6f1d1-c04b-472b-a873-eb5cf10f828b",
+        "created_at": "2026-10-19T17:13:28.419446+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:13:31.160Z",
+            "cid": "1792430011160_ghsfc2g28i8",
+            "pid": "mvfijje0_232mek",
+            "kind": "practice",
+            "test": "\u0625\u0644\u0642\u0627\u0621 \u2014 1-2 \u0627\u0644\u062a\u062d\u0636\u064a\u0631 \u0648\u0627\u0644\u062c\u0645\u0647\u0648\u0631",
+            "total": 8,
+            "correct": 7
+        }
+    },
+    {
+        "id": "8abfcb52-7ada-472c-9945-f6e61c17140f",
+        "created_at": "2026-10-19T17:13:13.678207+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:13:16.986Z",
+            "cid": "1792429996986_3i68w17vj4x",
+            "pid": "mvfij789_18jka3",
+            "kind": "practice",
+            "test": "\u0625\u0644\u0642\u0627\u0621 \u2014 1-1 \u0645\u0627 \u0627\u0644\u0625\u0644\u0642\u0627\u0621 \u0648\u0623\u0646\u0648\u0627\u0639\u0647",
+            "total": 8,
+            "correct": 8
+        }
+    },
+    {
+        "id": "9c9143f1-5b7c-4de8-9b84-591523dcd219",
+        "created_at": "2026-10-19T17:12:46.768145+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:12:49.474Z",
+            "cid": "1792429969474_ey61r675wa",
+            "pid": "mvfigkik_17qlsi",
+            "kind": "practice",
+            "test": "\u062a\u0642\u0648\u064a\u0629 \u0627\u0644\u062a\u0641\u0643\u064a\u0631 \ud83e\udde0",
+            "items": [
+                {
+                    "r": 0,
+                    "s": "\u0646\u0633\u0628\u0629 \u0627\u0644\u0632\u064a\u0627\u062f\u0629",
+                    "ms": 6,
+                    "ok": 0
+                },
+                {
+                    "r": 0,
+                    "s": "\u0646\u0633\u0628\u0629 \u0627\u0644\u0632\u064a\u0627\u062f\u0629",
+                    "ms": 14,
+                    "ok": 1
+                },
+                {
+                    "r": 0,
+                    "s": "\u0645\u062d\u064a\u0637 \u0627\u0644\u0645\u0631\u0628\u0651\u0639",
+                    "ms": 33,
+                    "ok": 0
+                },
+                {
+                    "r": 0,
+                    "s": "\u0627\u0644\u062e\u0635\u0645",
+                    "ms": 13,
+                    "ok": 0
+                },
+                {
+                    "r": 0,
+                    "s": "\u0627\u0644\u062e\u0635\u0645",
+                    "ms": 6,
+                    "ok": 1
+                },
+                {
+                    "r": 1,
+                    "s": "\u0631\u0641\u0639 \u0627\u0644\u0645\u0639\u062f\u0651\u0644",
+                    "ms": 2,
+                    "ok": 1
+                },
+                {
+                    "r": 1,
+                    "s": "\u0623\u0639\u0645\u0627\u0631 \u0628\u0639\u062f \u0633\u0646\u0648\u0627\u062a",
+                    "ms": 18,
+                    "ok": 1
+                },
+                {
+                    "r": 1,
+                    "s": "\u0645\u0642\u0627\u0631\u0646\u0629 \u0639\u0631\u0636\u064a\u0646",
+                    "ms": 11,
+                    "ok": 0
+                }
+            ],
+            "msAvg": 13,
+            "total": 8,
+            "skills": {
+                "\u0627\u0644\u062e\u0635\u0645": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0631\u0641\u0639 \u0627\u0644\u0645\u0639\u062f\u0651\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u062d\u064a\u0637 \u0627\u0644\u0645\u0631\u0628\u0651\u0639": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0645\u0642\u0627\u0631\u0646\u0629 \u0639\u0631\u0636\u064a\u0646": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0646\u0633\u0628\u0629 \u0627\u0644\u0632\u064a\u0627\u062f\u0629": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0623\u0639\u0645\u0627\u0631 \u0628\u0639\u062f \u0633\u0646\u0648\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "tSkill": 20,
+            "correct": 4,
+            "tReason": 45,
+            "targeted": true
+        }
+    },
+    {
+        "id": "3fc019a3-0404-4310-8990-77a23dd4ce85",
+        "created_at": "2026-10-19T17:10:43.098867+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:10:46.322Z",
+            "cid": "1792429846322_vdzpo8sld2j",
+            "dur": 19,
+            "pid": "mvfifulb_6qd731",
+            "fast": 11,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 \u0634\u0627\u0645\u0644 \u0641\u0663",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "P32#11",
+                    "j": 2,
+                    "ms": 2394,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "P31#17",
+                    "j": 1,
+                    "ms": 1888,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "P32#2",
+                    "j": 2,
+                    "ms": 1370,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P33#11",
+                    "j": 2,
+                    "ms": 1496,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P31#7",
+                    "j": 2,
+                    "ms": 1410,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P32#19",
+                    "j": 2,
+                    "ms": 1997,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "P31#6",
+                    "j": 1,
+                    "ms": 1235,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P32#8",
+                    "j": 0,
+                    "ms": 1521,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "P33#18",
+                    "j": 1,
+                    "ms": 1233,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "P32#5",
+                    "j": 0,
+                    "ms": 1641,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P31#16",
+                    "j": 0,
+                    "ms": 1276,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P33#8",
+                    "j": 1,
+                    "ms": 1118,
+                    "ok": 1
+                }
+            ],
+            "total": 12,
+            "skills": {
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 3-1 \u0627\u0644\u062a\u0633\u0627\u0631\u0639": {
+                    "c": 3,
+                    "t": 4
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 3-3 \u0627\u0644\u0633\u0642\u0648\u0637 \u0627\u0644\u062d\u0631\u0651": {
+                    "c": 2,
+                    "t": 3
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 3-2 \u0627\u0644\u062d\u0631\u0643\u0629 \u0628\u062a\u0633\u0627\u0631\u0639 \u062b\u0627\u0628\u062a": {
+                    "c": 2,
+                    "t": 5
+                }
+            },
+            "correct": 7,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "2ce4a1ea-bcc7-4f38-b2b0-f1e4ce0e2fee",
+        "created_at": "2026-10-19T17:10:20.662081+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:10:23.999Z",
+            "cid": "1792429823999_4fu8ny82b93",
+            "dur": 23,
+            "pid": "mvfif9nk_44xkmm",
+            "fast": 9,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 \u0634\u0627\u0645\u0644 \u0641\u0662",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "P23#6",
+                    "j": 1,
+                    "ms": 1359,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P23#18",
+                    "j": 2,
+                    "ms": 1292,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P23#14",
+                    "j": 2,
+                    "ms": 1209,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P22#1",
+                    "j": 2,
+                    "ms": 1433,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P24#11",
+                    "j": 1,
+                    "ms": 5212,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "P23#11",
+                    "j": 1,
+                    "ms": 1841,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P23#9",
+                    "j": 0,
+                    "ms": 1276,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P21#8",
+                    "j": 0,
+                    "ms": 1713,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P21#4",
+                    "j": 0,
+                    "ms": 1506,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P21#10",
+                    "j": 1,
+                    "ms": 2018,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P21#3",
+                    "j": 0,
+                    "ms": 2635,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "P23#12",
+                    "j": 0,
+                    "ms": 1897,
+                    "ok": 1
+                }
+            ],
+            "total": 12,
+            "skills": {
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 2-1 \u062a\u0635\u0648\u064a\u0631 \u0627\u0644\u062d\u0631\u0643\u0629": {
+                    "c": 3,
+                    "t": 4
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 2-2 \u0627\u0644\u0645\u0648\u0642\u0639 \u0648\u0627\u0644\u0632\u0645\u0646": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 2-4 \u0627\u0644\u0633\u0631\u0639\u0629 \u0627\u0644\u0645\u062a\u062c\u0647\u0629": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 2-3 \u0645\u0646\u062d\u0646\u0649 \u0627\u0644\u0645\u0648\u0642\u0639 \u0648\u0627\u0644\u0632\u0645\u0646": {
+                    "c": 6,
+                    "t": 6
+                }
+            },
+            "correct": 10,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "3c0129d7-074e-4e49-b6ee-08d88bbf5c32",
+        "created_at": "2026-10-19T17:09:52.521975+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:09:55.648Z",
+            "cid": "1792429795648_yvpe099t0d",
+            "dur": 24,
+            "pid": "mvfien4x_2l4tof",
+            "fast": 5,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 \u0634\u0627\u0645\u0644 \u0641\u0661",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "P11#16",
+                    "j": 1,
+                    "ms": 2010,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P12#7",
+                    "j": 2,
+                    "ms": 2074,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P11#17",
+                    "j": 1,
+                    "ms": 2620,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P11#10",
+                    "j": 0,
+                    "ms": 2197,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "P11#6",
+                    "j": 0,
+                    "ms": 3520,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "P11#18",
+                    "j": 0,
+                    "ms": 2416,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P11#1",
+                    "j": 1,
+                    "ms": 1025,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P11#3",
+                    "j": 1,
+                    "ms": 1424,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "P11#9",
+                    "j": 1,
+                    "ms": 1749,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "P12#18",
+                    "j": 2,
+                    "ms": 2190,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "P11#15",
+                    "j": 0,
+                    "ms": 1569,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "P11#14",
+                    "j": 2,
+                    "ms": 1428,
+                    "ok": 1
+                }
+            ],
+            "total": 12,
+            "skills": {
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 1-2 \u0627\u0644\u0642\u064a\u0627\u0633": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621 \u0661\u062b \u2014 1-1 \u0627\u0644\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0648\u0627\u0644\u0641\u064a\u0632\u064a\u0627\u0621": {
+                    "c": 8,
+                    "t": 10
+                }
+            },
+            "correct": 9,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "ab7bdec3-9416-4dfc-bf63-43476b17ca1f",
+        "created_at": "2026-10-19T17:09:18.700598+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:09:22.043Z",
+            "cid": "1792429762043_311lrj91rwh",
+            "dur": 17,
+            "pid": "mvfie2p5_2n4q2p",
+            "fast": 11,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0623\u062d\u064a\u0627\u0621 \u0661\u062b \u2014 \u0634\u0627\u0645\u0644 \u0641\u0661",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "B12#3",
+                    "j": 0,
+                    "ms": 1215,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "B11#1",
+                    "j": 2,
+                    "ms": 1159,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "B12#7",
+                    "j": 1,
+                    "ms": 1142,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "B12#12",
+                    "j": 0,
+                    "ms": 1434,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "B11#16",
+                    "j": 0,
+                    "ms": 1720,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "B12#5",
+                    "j": 2,
+                    "ms": 1529,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "B12#13",
+                    "j": 0,
+                    "ms": 1411,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "B11#12",
+                    "j": 1,
+                    "ms": 1229,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "B11#7",
+                    "j": 2,
+                    "ms": 1324,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "B11#0",
+                    "j": 1,
+                    "ms": 1376,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "B12#11",
+                    "j": 1,
+                    "ms": 1210,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "B11#18",
+                    "j": 0,
+                    "ms": 2357,
+                    "ok": 1
+                }
+            ],
+            "total": 12,
+            "skills": {
+                "\u0623\u062d\u064a\u0627\u0621 \u0661\u062b \u2014 1-2 \u0637\u0628\u064a\u0639\u0629 \u0627\u0644\u0639\u0644\u0645 \u0648\u0637\u0631\u0627\u0626\u0642\u0647": {
+                    "c": 6,
+                    "t": 6
+                },
+                "\u0623\u062d\u064a\u0627\u0621 \u0661\u062b \u2014 1-1 \u0645\u062f\u062e\u0644 \u0625\u0644\u0649 \u0639\u0644\u0645 \u0627\u0644\u0623\u062d\u064a\u0627\u0621": {
+                    "c": 6,
+                    "t": 6
+                }
+            },
+            "correct": 12,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "226a1eff-67cb-4fef-be5d-f3a5f4ca184e",
+        "created_at": "2026-10-19T17:08:56.017196+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:08:59.208Z",
+            "cid": "1792429739208_1h196vgpej1",
+            "dur": 24,
+            "pid": "mvfidg27_2h0acn",
+            "fast": 9,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 \u0634\u0627\u0645\u0644 \u0641\u0661",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "C11#19",
+                    "j": 0,
+                    "ms": 1498,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "C14#11",
+                    "j": 1,
+                    "ms": 1485,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C13#3",
+                    "j": 2,
+                    "ms": 1442,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C14#10",
+                    "j": 2,
+                    "ms": 1799,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C13#11",
+                    "j": 2,
+                    "ms": 1774,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C13#8",
+                    "j": 0,
+                    "ms": 1333,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C11#8",
+                    "j": 0,
+                    "ms": 2843,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C14#15",
+                    "j": 2,
+                    "ms": 4677,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C13#16",
+                    "j": 1,
+                    "ms": 1481,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "C13#5",
+                    "j": 2,
+                    "ms": 2228,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C12#5",
+                    "j": 2,
+                    "ms": 1236,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C13#1",
+                    "j": 0,
+                    "ms": 1812,
+                    "ok": 1
+                }
+            ],
+            "total": 12,
+            "skills": {
+                "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-1 \u0642\u0635\u0651\u0629 \u0645\u0627\u062f\u0651\u062a\u064a\u0646": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-4 \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0639\u0644\u0645\u064a\u0651": {
+                    "c": 3,
+                    "t": 3
+                },
+                "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-3 \u0627\u0644\u0637\u0631\u0627\u0626\u0642 \u0627\u0644\u0639\u0644\u0645\u064a\u0651\u0629": {
+                    "c": 5,
+                    "t": 6
+                },
+                "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-2 \u0627\u0644\u0643\u064a\u0645\u064a\u0627\u0621 \u0648\u0627\u0644\u0645\u0627\u062f\u0651\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 11,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "b33aaf97-5a2e-4500-80e5-5e32130377f9",
+        "created_at": "2026-10-19T17:08:08.351012+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:08:11.477Z",
+            "cid": "1792429691477_vv7mcm7tr5",
+            "dur": 23,
+            "pid": "mvficfe9_1yyigf",
+            "fast": 7,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-1 \u0642\u0635\u0651\u0629 \u0645\u0627\u062f\u0651\u062a\u064a\u0646",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "C11#10",
+                    "j": 0,
+                    "ms": 3134,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C11#7",
+                    "j": 0,
+                    "ms": 1906,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C11#3",
+                    "j": 0,
+                    "ms": 1785,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C11#9",
+                    "j": 2,
+                    "ms": 1897,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C11#4",
+                    "j": 2,
+                    "ms": 1788,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "C11#5",
+                    "j": 1,
+                    "ms": 1619,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C11#6",
+                    "j": 0,
+                    "ms": 1836,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "C11#12",
+                    "j": 2,
+                    "ms": 2007,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "C11#11",
+                    "j": 1,
+                    "ms": 1287,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "C11#14",
+                    "j": 0,
+                    "ms": 6137,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0643\u064a\u0645\u064a\u0627\u0621 \u0661\u062b \u2014 1-1 \u0642\u0635\u0651\u0629 \u0645\u0627\u062f\u0651\u062a\u064a\u0646": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 10,
+            "preview": true,
+            "trusted": true
+        }
+    },
+    {
+        "id": "01cc25cf-f031-4f1e-8602-6f0b8979bcc5",
+        "created_at": "2026-10-19T17:07:12.839639+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:07:15.689Z",
+            "cid": "1792429635689_9u1lqci4ucs",
+            "dur": 77,
+            "pid": "mvfia35a_40xfki",
+            "why": "fast",
+            "fast": 2,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0663 \u2014 Unit 3",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "u3Ing",
+                    "j": 1,
+                    "ms": 21488,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "u3RealTalk",
+                    "j": 2,
+                    "ms": 3575,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u3Michael",
+                    "j": 0,
+                    "ms": 6864,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "u3Adnan",
+                    "j": 1,
+                    "ms": 1974,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "u3RealTalk",
+                    "j": 2,
+                    "ms": 3972,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u3Intensifier",
+                    "j": -1,
+                    "ms": 25348,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u3Vocab",
+                    "j": 1,
+                    "ms": 2027,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "u3Read",
+                    "j": 0,
+                    "ms": 5553,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u3Listen",
+                    "j": 2,
+                    "ms": 1155,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u3TimeComma",
+                    "j": 1,
+                    "ms": 4838,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0646\u0635\u0651 \u0623\u0628\u0647\u0627": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0646\u0635\u0651 \u0645\u0633\u0645\u0648\u0639": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u062d\u0648\u0627\u0631 \u0639\u062f\u0646\u0627\u0646": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u062d\u0648\u0627\u0631 \u0645\u0627\u064a\u0643\u0644": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0643\u062a\u0627\u0628\u0629: \u0641\u0627\u0635\u0644\u0629 \u062c\u0645\u0644\u0629 \u0627\u0644\u0632\u0645\u0646": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u062a\u0648\u0643\u064a\u062f (so / really)": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0645\u0639\u0627\u0646\u064a \u0627\u0644\u0648\u062d\u062f\u0629 \u0627\u0644\u062b\u0627\u0644\u062b\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0635\u064a\u0627\u063a\u0629 \u2011ing \u0648\u062a\u0636\u0639\u064a\u0641 \u0627\u0644\u062d\u0631\u0641": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u062a\u0639\u0628\u064a\u0631\u0627\u062a \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 (Real Talk)": {
+                    "c": 2,
+                    "t": 2
+                }
+            },
+            "correct": 6,
+            "secPerQ": 7.7,
+            "trusted": false
+        }
+    },
+    {
+        "id": "e2b67691-3012-495c-adbe-941b646f9ee2",
+        "created_at": "2026-10-19T17:05:51.678048+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:05:54.906Z",
+            "cid": "1792429554906_5ts6e8npl4y",
+            "dur": 95,
+            "pid": "mvfi7yk3_36pul0",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0663 \u2014 Unit 2",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "u2IrregPast",
+                    "j": 0,
+                    "ms": 21177,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u2King",
+                    "j": 1,
+                    "ms": 3544,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u2Vocab",
+                    "j": 1,
+                    "ms": 4485,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "u2RealTalk",
+                    "j": 0,
+                    "ms": 4025,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "u2News",
+                    "j": 1,
+                    "ms": 13764,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u2News",
+                    "j": 1,
+                    "ms": 3902,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u2PastTime",
+                    "j": -1,
+                    "ms": 13648,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u2PastQ",
+                    "j": -1,
+                    "ms": 9902,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "u2Falcons",
+                    "j": 2,
+                    "ms": 17443,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u2IrregPast",
+                    "j": 1,
+                    "ms": 3381,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0646\u0635\u0651 \u062e\u0628\u0631\u064a\u0651": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0646\u0635\u0651 \u0627\u0644\u0635\u0642\u0648\u0631": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0645\u0627\u0636\u064a \u0627\u0644\u0634\u0627\u0630\u0651": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0646\u0635\u0651 \u0627\u0644\u0645\u0644\u0643 \u0633\u0644\u0645\u0627\u0646": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0638\u0631\u0648\u0641 \u0627\u0644\u0632\u0645\u0646 \u0627\u0644\u0645\u0627\u0636\u064a": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0645\u0639\u0627\u0646\u064a \u0627\u0644\u0648\u062d\u062f\u0629 \u0627\u0644\u062b\u0627\u0646\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u062c\u0648\u0627\u0628 \u0627\u0644\u0642\u0635\u064a\u0631 \u0641\u064a \u0627\u0644\u0645\u0627\u0636\u064a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u062a\u0639\u0628\u064a\u0631\u0627\u062a \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 (Real Talk)": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 7,
+            "secPerQ": 9.5,
+            "trusted": true
+        }
+    },
+    {
+        "id": "53234227-a116-4d0e-8b98-48cd2cd29e14",
+        "created_at": "2026-10-19T17:04:13.896796+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:04:16.418Z",
+            "cid": "1792429456418_amn26fugn1",
+            "dur": 69,
+            "pid": "mvfi6ev2_2zuzig",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0663 \u2014 Unit 1",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "u1SurveySent",
+                    "j": 1,
+                    "ms": 34130,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "u1Vocab",
+                    "j": 0,
+                    "ms": 3516,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u1AllBothPos",
+                    "j": 1,
+                    "ms": 4288,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "u1FreqCompare",
+                    "j": 0,
+                    "ms": 2978,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u1Survey",
+                    "j": -1,
+                    "ms": 7829,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u1Freq",
+                    "j": 1,
+                    "ms": 2259,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "u1People",
+                    "j": 1,
+                    "ms": 2117,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "u1Survey",
+                    "j": -1,
+                    "ms": 5218,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u1Cohesion",
+                    "j": 1,
+                    "ms": 4465,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "u1Freq",
+                    "j": 1,
+                    "ms": 2164,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0663 \u2014 Unit 1": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0645\u0648\u0636\u0639 all / both \u0641\u064a \u0627\u0644\u062c\u0645\u0644\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0642\u0631\u0627\u0621\u0629 \u062c\u062f\u0648\u0644 \u0627\u0633\u062a\u0628\u064a\u0627\u0646": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0645\u0639\u0627\u0646\u064a \u0627\u0644\u0648\u062d\u062f\u0629 \u0627\u0644\u0623\u0648\u0644\u0649": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0645\u0642\u0627\u0631\u0646\u0629 \u0638\u0631\u0648\u0641 \u0627\u0644\u062a\u0643\u0631\u0627\u0631": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0638\u0631\u0648\u0641 \u0627\u0644\u062a\u0643\u0631\u0627\u0631 \u0648\u0646\u0633\u0628\u062a\u0647\u0627": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0645\u0631\u062c\u0639 \u0627\u0644\u0636\u0645\u064a\u0631 \u0641\u064a \u0627\u0644\u0646\u0635\u0651": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628: \u0623\u0634\u062e\u0627\u0635 \u0627\u0644\u0648\u062d\u062f\u0629 \u0648\u0623\u0648\u0635\u0627\u0641\u0647\u0645": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 9,
+            "secPerQ": 6.9,
+            "trusted": true
+        }
+    },
+    {
+        "id": "d297c030-670f-4f3d-bb3a-beac05901f0e",
+        "created_at": "2026-10-19T17:03:04.662339+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:03:07.452Z",
+            "cid": "1792429387452_k5l7q8x6k8c",
+            "dur": 7,
+            "pid": "mvfi695t_1xcv1l",
+            "why": "fast",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u0645\u0663 \u2014 \u062c\u0631\u0639\u0629: \u0635\u064a\u0627\u063a\u0629 \u0627\u0644\u0633\u0624\u0627\u0644",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "exAskQ",
+                    "j": 0,
+                    "ms": 4181,
+                    "ok": 0
+                }
+            ],
+            "total": 1,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: \u0635\u064a\u0627\u063a\u0629 \u0627\u0644\u0633\u0624\u0627\u0644 \u0644\u062c\u0632\u0621\u064d \u0645\u0639\u064a\u0651\u0646": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "secPerQ": 7,
+            "trusted": false
+        }
+    },
+    {
+        "id": "44e67ef3-5f1c-41c9-b8c8-265a8e332bf6",
+        "created_at": "2026-10-19T17:02:12.045527+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:02:13.949Z",
+            "cid": "1792429333949_35tdszfbwkf",
+            "dur": 286,
+            "pid": "mvfhz4wk_5dug80",
+            "fast": 1,
+            "kind": "practice",
+            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
+            "total": 12,
+            "wrong": [
+                "<b>Grammar \u2014 Capitalization / Punctuation:</b> Choose the sentence with correct possessive punctuation.",
+                "<b>Grammar \u2014 Pronouns:</b> The center updated ___ website this week.",
+                "<b>Grammar \u2014 Past Tenses:</b> We ___ to leave when the rain suddenly started.",
+                "<b>Grammar \u2014 Past Tenses:</b> He ___ very nervous during his first speaking practice, but he became confident later."
+            ],
+            "skills": {
+                "Vocabulary": {
+                    "c": 2,
+                    "t": 2
+                },
+                "Grammar \u2014 Pronouns": {
+                    "c": 0,
+                    "t": 1
+                },
+                "Grammar \u2014 Past Tenses": {
+                    "c": 1,
+                    "t": 3
+                },
+                "Grammar \u2014 Present Tenses": {
+                    "c": 1,
+                    "t": 1
+                },
+                "Grammar \u2014 Verb + to / ing / base": {
+                    "c": 1,
+                    "t": 1
+                },
+                "Grammar \u2014 Prepositions / Articles": {
+                    "c": 2,
+                    "t": 2
+                },
+                "Grammar \u2014 Capitalization / Punctuation": {
+                    "c": 1,
+                    "t": 2
+                }
+            },
+            "correct": 8,
+            "secPerQ": 23.8,
+            "stretch": true
+        }
+    },
+    {
+        "id": "7636cebe-cdc2-4616-b96c-b6a5fa3dc1de",
+        "created_at": "2026-10-19T17:00:26.417692+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T17:00:29.182Z",
+            "cid": "1792429229182_jt5ro1vzypk",
+            "dur": 181,
+            "pid": "mvfhz4wg_3t9a31",
+            "fast": 10,
+            "kind": "practice",
+            "test": "\u062a\u062d\u0635\u064a\u0644\u064a",
+            "total": 12,
+            "wrong": [
+                "<b>\u0643\u064a\u0645\u064a\u0627\u0621:</b> \u062d\u0627\u0644\u0629 \u0627\u0644\u0645\u0627\u0621 \u0627\u0644\u0635\u0644\u0628\u0629 \u062a\u0633\u0645\u0651\u0649:"
+            ],
+            "skills": {
+                "\u0623\u062d\u064a\u0627\u0621": {
+                    "c": 4,
+                    "t": 4
+                },
+                "\u0641\u064a\u0632\u064a\u0627\u0621": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0643\u064a\u0645\u064a\u0627\u0621": {
+                    "c": 3,
+                    "t": 4
+                },
+                "\u0631\u064a\u0627\u0636\u064a\u0627\u062a": {
+                    "c": 3,
+                    "t": 3
+                }
+            },
+            "correct": 11,
+            "secPerQ": 15.1,
+            "stretch": true
+        }
+    },
+    {
+        "id": "8fafa457-5a91-4a4a-999e-a390fbc71c0e",
+        "created_at": "2026-10-19T16:59:35.324979+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T16:59:38.194Z",
+            "cid": "1792429178194_6qepsj0uuuo",
+            "dur": 130,
+            "pid": "mvfhz4we_2f5mfg",
+            "fast": 5,
+            "kind": "practice",
+            "test": "\u0642\u062f\u0631\u0627\u062a \u0643\u0645\u064a",
+            "total": 10,
+            "wrong": [],
+            "skills": {
+                "\u062c\u0645\u0639 \u0627\u0644\u0643\u0633\u0648\u0631": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0646\u0633\u0628\u0629 \u0627\u0644\u0646\u0642\u0635": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0639\u062f\u0651\u0644 \u0627\u0644\u0639\u0645\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0643\u062a\u0644\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0623\u0637\u0648\u0627\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u062f\u0627\u0626\u0631\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u0645\u062b\u0644\u0651\u062b": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0646\u0633\u0628\u0629 \u0627\u0644\u0645\u0626\u0648\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0646\u0638\u0631\u064a\u0629 \u0641\u064a\u062b\u0627\u063a\u0648\u0631\u0633": {
+                    "c": 2,
+                    "t": 2
+                }
+            },
+            "correct": 10,
+            "secPerQ": 13,
+            "stretch": false
+        }
+    },
+    {
+        "id": "2417fc7b-ca20-4651-93ee-5ea070dff8a1",
+        "created_at": "2026-10-19T16:58:31.986913+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T16:58:34.792Z",
+            "cid": "1792429114792_ljdklj3qt4",
+            "dur": 67,
+            "pid": "mvfhz4wb_1p1uf2",
+            "fast": 7,
+            "kind": "practice",
+            "test": "\u0642\u062f\u0631\u0627\u062a \u0644\u0641\u0638\u064a",
+            "total": 13,
+            "wrong": [
+                "<b>\u0645\u0631\u0627\u062f\u0641:</b> \u0645\u0631\u0627\u062f\u0641 \u00ab\u0644\u0628\u064a\u0628\u00bb:",
+                "<b>\u0636\u062f\u0651:</b> \u0636\u062f\u0651 \u00ab\u0633\u0631\u064a\u0639\u00bb:"
+            ],
+            "skills": {
+                "\u0636\u062f\u0651": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0645\u0631\u0627\u062f\u0641": {
+                    "c": 3,
+                    "t": 4
+                },
+                "\u0645\u0639\u0646\u0649 \u0643\u0644\u0645\u0629": {
+                    "c": 4,
+                    "t": 4
+                },
+                "\u062a\u0646\u0627\u0638\u0631 \u0644\u0641\u0638\u064a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0633\u062a\u064a\u0639\u0627\u0628 \u0645\u0642\u0631\u0648\u0621": {
+                    "c": 2,
+                    "t": 2
+                }
+            },
+            "correct": 11,
+            "secPerQ": 5.2,
+            "stretch": false
+        }
+    },
+    {
+        "id": "6f22118c-4cd8-4a5f-932c-d11bdf4bbccb",
+        "created_at": "2026-10-19T15:35:54.20597+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T15:35:53.160Z",
+            "cid": "1792424153160_fkob8zbo049",
+            "dur": 100,
+            "pid": "mvff039t_9ejy9q",
+            "tag": "en5",
+            "kind": "practice",
+            "mode": "memo",
+            "test": "\u062a\u062b\u0628\u064a\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \u06483 \ud83d\udd01",
+            "unit": "u3",
+            "total": 10,
+            "missed": [
+                "actor",
+                "manager",
+                "mechanic"
+            ],
+            "skills": {
+                "\u062d\u0641\u0638: \u0645\u0641\u0631\u062f\u0627\u062a \u0627\u0644\u0643\u062a\u0627\u0628": {
+                    "c": 7,
+                    "t": 10
+                }
+            },
+            "correct": 7,
+            "unitTitle": "Unit 3 \u2014 Job Paths"
+        }
+    },
+    {
+        "id": "ddcbae0f-0a25-405f-9d3c-8baa52d5304e",
+        "created_at": "2026-10-19T15:33:45.376523+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T15:33:44.887Z",
+            "cid": "1792424024887_fai0jtt4y3u",
+            "dur": 36,
+            "pid": "mvfeypcx_4byn3f",
+            "tag": "en5",
+            "kind": "practice",
+            "mode": "memo",
+            "test": "\u062a\u062b\u0628\u064a\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a w \ud83d\udd01",
+            "unit": "w",
+            "total": 10,
+            "missed": [],
+            "skills": {
+                "\u062d\u0641\u0638: \u0645\u0641\u0631\u062f\u0627\u062a \u0627\u0644\u0643\u062a\u0627\u0628": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 10,
+            "unitTitle": "Welcome!"
+        }
+    },
+    {
+        "id": "4aada633-c5b8-4485-bc41-558dff800b64",
+        "created_at": "2026-10-19T15:33:07.430911+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T15:33:07.099Z",
+            "cid": "1792423987099_rvnq78rw0si",
+            "dur": 37,
+            "pid": "mvfexvcf_3qkqkk",
+            "tag": "en5",
+            "kind": "practice",
+            "mode": "memo",
+            "test": "\u062a\u062b\u0628\u064a\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a w \ud83d\udd01",
+            "unit": "w",
+            "total": 10,
+            "missed": [],
+            "skills": {
+                "\u062d\u0641\u0638: \u0645\u0641\u0631\u062f\u0627\u062a \u0627\u0644\u0643\u062a\u0627\u0628": {
+                    "c": 10,
+                    "t": 10
+                }
+            },
+            "correct": 10,
+            "unitTitle": "Welcome!"
+        }
+    },
+    {
+        "id": "50db1e1a-81c8-4eeb-96d6-509969e187b9",
+        "created_at": "2026-10-19T15:32:27.581871+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T15:32:27.337Z",
+            "cid": "1792423947337_tvzvphmdc5k",
+            "dur": 43,
+            "pid": "mvfeww5y_2vy4sa",
+            "tag": "en5",
+            "kind": "practice",
+            "mode": "memo",
+            "test": "\u062a\u062b\u0628\u064a\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a w \ud83d\udd01",
+            "unit": "w",
+            "total": 10,
+            "missed": [
+                "festival"
+            ],
+            "skills": {
+                "\u062d\u0641\u0638: \u0645\u0641\u0631\u062f\u0627\u062a \u0627\u0644\u0643\u062a\u0627\u0628": {
+                    "c": 9,
+                    "t": 10
+                }
+            },
+            "correct": 9,
+            "unitTitle": "Welcome!"
+        }
+    },
+    {
         "id": "9a5b10b6-8110-48fb-aa97-04296de0d255",
         "created_at": "2026-10-19T14:15:04.821779+00:00",
         "student": "\u062d\u0633\u0646",
@@ -516,257 +2788,6 @@
         }
     },
     {
-        "id": "547e685f-ba65-44a1-b30d-088753cbf2af",
-        "created_at": "2026-10-19T14:09:47.980859+00:00",
-        "student": "\u062d\u0633\u0646",
-        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-19T14:09:42.925Z",
-            "cid": "1792418982925_96qjknd6oqu",
-            "dur": 140,
-            "mcq": 18,
-            "pid": "mvfbweok_1w9axc",
-            "fast": 5,
-            "kind": "practice",
-            "rgMs": 3000,
-            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gSolutionSet",
-                    "j": 1,
-                    "ms": 9244,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gOneStepDiv",
-                    "j": 1,
-                    "ms": 4183,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gOneStepSub",
-                    "j": 1,
-                    "ms": 8234,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gConsecInt",
-                    "j": 2,
-                    "ms": 25157,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gMultiStepNeg",
-                    "j": 0,
-                    "ms": 2847,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVarParens",
-                    "j": 2,
-                    "ms": 2010,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gStepsOrder9",
-                    "j": 0,
-                    "ms": 2830,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gAbsNumLinePick",
-                    "j": 0,
-                    "ms": 22868,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gAbsExpr",
-                    "j": 2,
-                    "ms": 5095,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gDomainRange",
-                    "j": 0,
-                    "ms": 1697,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gFuncValueQuad",
-                    "j": 2,
-                    "ms": 3294,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gFuncCombo",
-                    "j": 1,
-                    "ms": 4651,
-                    "ok": 0
-                },
-                {
-                    "a": 0,
-                    "g": "gYIntercept",
-                    "j": 0,
-                    "ms": 6893,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gIsLinear",
-                    "j": 2,
-                    "ms": 5672,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gZero",
-                    "j": 2,
-                    "ms": 5224,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gZeroContext",
-                    "j": 2,
-                    "ms": 2801,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gRateTable4",
-                    "j": 0,
-                    "ms": 3686,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gDistTimeGraph",
-                    "j": 2,
-                    "ms": 10992,
-                    "ok": 0
-                },
-                {
-                    "a": 2,
-                    "g": "gIsArithmetic",
-                    "j": 2,
-                    "ms": 5016,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gNextTerms",
-                    "j": 1,
-                    "ms": 3915,
-                    "ok": 1
-                }
-            ],
-            "total": 20,
-            "skills": {
-                "\u063521 \u0645\u062b\u0627\u0644 2": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0627\u0644\u0645\u0642\u0637\u0639 \u0627\u0644\u0635\u0627\u062f\u064a": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0635\u0641\u0631 \u0627\u0644\u062f\u0627\u0644\u0629 \u0627\u0644\u062e\u0637\u0651\u064a\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063534: \u062e\u0637\u0648\u0627\u062a \u062d\u0644\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0623\u064a\u0651 \u0627\u0644\u0645\u062a\u062a\u0627\u0628\u0639\u0627\u062a \u062d\u0633\u0627\u0628\u064a\u0629\u061f": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0627\u0644\u062d\u062f\u0648\u062f \u0627\u0644\u062b\u0644\u0627\u062b\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063521: \u062e\u0627\u0635\u064a\u0651\u0629 \u0627\u0644\u0636\u0631\u0628 \u0641\u064a \u0627\u0644\u0645\u0633\u0627\u0648\u0627\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u064a\u0645\u0629 \u062f\u0627\u0644\u0629 \u063a\u064a\u0631 \u062e\u0637\u0651\u064a\u0629 (\u062a\u0631\u0628\u064a\u0639\u064a\u0629)": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0662-\u0662: \u0635\u0641\u0631 \u0627\u0644\u062f\u0627\u0644\u0651\u0629 \u0641\u064a \u0645\u0648\u0642\u0641\u064d \u062d\u064a\u0627\u062a\u064a\u0651": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0623\u064a\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a \u062e\u0637\u0651\u064a\u0629\u061f (\u0648\u0627\u062d\u062f\u0629 \u0641\u0642\u0637)": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063515: \u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u062d\u0644\u0651 \u0645\u0646 \u0645\u062c\u0645\u0648\u0639\u0629 \u062a\u0639\u0648\u064a\u0636": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u062a\u0631\u0643\u064a\u0628 \u0642\u064a\u0645\u062a\u064a\u0646: \u062f(a) + \u062f(b) \u0623\u0648 \u062f(a) \u2212 \u062f(b)": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u063530 \u062a\u0645\u0631\u064a\u0646: c = a\u0633 \u2212 b \u0645\u0639 \u0645\u064f\u0639\u0627\u0645\u0650\u0644\u064d \u0633\u0627\u0644\u0628": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0627\u0644\u0645\u062c\u0627\u0644 \u0623\u0648 \u0627\u0644\u0645\u062f\u0649 \u0644\u0645\u062c\u0645\u0648\u0639\u0629 \u0623\u0632\u0648\u0627\u062c \u0645\u0631\u062a\u0628\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063541: \u062d\u0633\u0627\u0628 \u0642\u064a\u0645\u0629 \u0639\u0628\u0627\u0631\u0629\u064d \u0641\u064a\u0647\u0627 \u0642\u064a\u0645\u064c \u0645\u0637\u0644\u0642\u0629": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063529: \u0623\u0639\u062f\u0627\u062f \u0645\u062a\u062a\u0627\u0644\u064a\u0629 (\u0635\u062d\u064a\u062d\u0629/\u0641\u0631\u062f\u064a\u0629/\u0632\u0648\u062c\u064a\u0629)": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u063534 \u0645\u062b\u0627\u0644 2: \u0623\u0642\u0648\u0627\u0633\u064c \u0641\u064a \u0627\u0644\u0637\u0631\u0641\u064a\u0646 \u21d0 \u062e\u0627\u0635\u064a\u0651\u0629 \u0627\u0644\u062a\u0648\u0632\u064a\u0639": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u0645\u0639\u062f\u0651\u0644\u064f \u0627\u0644\u062a\u063a\u064a\u0651\u0631\u0650 \u0645\u0646 \u062c\u062f\u0648\u0644\u064d \u0628\u0623\u0631\u0628\u0639\u0629\u0650 \u0635\u0641\u0648\u0641": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u062a\u0645\u062b\u064a\u0644\u064f \u0627\u0644\u0645\u0633\u0627\u0641\u0629\u0650 \u0645\u0639 \u0627\u0644\u0632\u0645\u0646 \u2014 \u062a\u0631\u062c\u0645\u062a\u064f\u0647 \u0625\u0644\u0649 \u0643\u0644\u0627\u0645": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u0623\u064a\u064f\u0651 \u062e\u0637\u0648\u0637\u0650 \u0627\u0644\u0623\u0639\u062f\u0627\u062f\u0650 \u064a\u0645\u062b\u0651\u0644 \u062d\u0644\u064e\u0651 \u0645\u0639\u0627\u062f\u0644\u0629\u0650 \u0627\u0644\u0642\u064a\u0645\u0629\u0650 \u0627\u0644\u0645\u0637\u0644\u0642\u0629": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 18,
-            "secPerQ": 7,
-            "trusted": true,
-            "mcqTotal": 20
-        }
-    },
-    {
         "id": "c366f5ee-96fa-49a5-afc8-b6b72cb2d998",
         "created_at": "2026-10-19T14:09:47.980859+00:00",
         "student": "\u062d\u0633\u0646",
@@ -1013,6 +3034,257 @@
             },
             "correct": 18,
             "secPerQ": 6.8,
+            "trusted": true,
+            "mcqTotal": 20
+        }
+    },
+    {
+        "id": "547e685f-ba65-44a1-b30d-088753cbf2af",
+        "created_at": "2026-10-19T14:09:47.980859+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-19T14:09:42.925Z",
+            "cid": "1792418982925_96qjknd6oqu",
+            "dur": 140,
+            "mcq": 18,
+            "pid": "mvfbweok_1w9axc",
+            "fast": 5,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gSolutionSet",
+                    "j": 1,
+                    "ms": 9244,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gOneStepDiv",
+                    "j": 1,
+                    "ms": 4183,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gOneStepSub",
+                    "j": 1,
+                    "ms": 8234,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gConsecInt",
+                    "j": 2,
+                    "ms": 25157,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gMultiStepNeg",
+                    "j": 0,
+                    "ms": 2847,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gVarParens",
+                    "j": 2,
+                    "ms": 2010,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gStepsOrder9",
+                    "j": 0,
+                    "ms": 2830,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gAbsNumLinePick",
+                    "j": 0,
+                    "ms": 22868,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gAbsExpr",
+                    "j": 2,
+                    "ms": 5095,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gDomainRange",
+                    "j": 0,
+                    "ms": 1697,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gFuncValueQuad",
+                    "j": 2,
+                    "ms": 3294,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gFuncCombo",
+                    "j": 1,
+                    "ms": 4651,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "gYIntercept",
+                    "j": 0,
+                    "ms": 6893,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gIsLinear",
+                    "j": 2,
+                    "ms": 5672,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gZero",
+                    "j": 2,
+                    "ms": 5224,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gZeroContext",
+                    "j": 2,
+                    "ms": 2801,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gRateTable4",
+                    "j": 0,
+                    "ms": 3686,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gDistTimeGraph",
+                    "j": 2,
+                    "ms": 10992,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "gIsArithmetic",
+                    "j": 2,
+                    "ms": 5016,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gNextTerms",
+                    "j": 1,
+                    "ms": 3915,
+                    "ok": 1
+                }
+            ],
+            "total": 20,
+            "skills": {
+                "\u063521 \u0645\u062b\u0627\u0644 2": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u0642\u0637\u0639 \u0627\u0644\u0635\u0627\u062f\u064a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0635\u0641\u0631 \u0627\u0644\u062f\u0627\u0644\u0629 \u0627\u0644\u062e\u0637\u0651\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063534: \u062e\u0637\u0648\u0627\u062a \u062d\u0644\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u064a\u0651 \u0627\u0644\u0645\u062a\u062a\u0627\u0628\u0639\u0627\u062a \u062d\u0633\u0627\u0628\u064a\u0629\u061f": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u062d\u062f\u0648\u062f \u0627\u0644\u062b\u0644\u0627\u062b\u0629 \u0627\u0644\u062a\u0627\u0644\u064a\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063521: \u062e\u0627\u0635\u064a\u0651\u0629 \u0627\u0644\u0636\u0631\u0628 \u0641\u064a \u0627\u0644\u0645\u0633\u0627\u0648\u0627\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u064a\u0645\u0629 \u062f\u0627\u0644\u0629 \u063a\u064a\u0631 \u062e\u0637\u0651\u064a\u0629 (\u062a\u0631\u0628\u064a\u0639\u064a\u0629)": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0662-\u0662: \u0635\u0641\u0631 \u0627\u0644\u062f\u0627\u0644\u0651\u0629 \u0641\u064a \u0645\u0648\u0642\u0641\u064d \u062d\u064a\u0627\u062a\u064a\u0651": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0623\u064a\u0651 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a \u062e\u0637\u0651\u064a\u0629\u061f (\u0648\u0627\u062d\u062f\u0629 \u0641\u0642\u0637)": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063515: \u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u062d\u0644\u0651 \u0645\u0646 \u0645\u062c\u0645\u0648\u0639\u0629 \u062a\u0639\u0648\u064a\u0636": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u062a\u0631\u0643\u064a\u0628 \u0642\u064a\u0645\u062a\u064a\u0646: \u062f(a) + \u062f(b) \u0623\u0648 \u062f(a) \u2212 \u062f(b)": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u063530 \u062a\u0645\u0631\u064a\u0646: c = a\u0633 \u2212 b \u0645\u0639 \u0645\u064f\u0639\u0627\u0645\u0650\u0644\u064d \u0633\u0627\u0644\u0628": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u0645\u062c\u0627\u0644 \u0623\u0648 \u0627\u0644\u0645\u062f\u0649 \u0644\u0645\u062c\u0645\u0648\u0639\u0629 \u0623\u0632\u0648\u0627\u062c \u0645\u0631\u062a\u0628\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063541: \u062d\u0633\u0627\u0628 \u0642\u064a\u0645\u0629 \u0639\u0628\u0627\u0631\u0629\u064d \u0641\u064a\u0647\u0627 \u0642\u064a\u0645\u064c \u0645\u0637\u0644\u0642\u0629": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063529: \u0623\u0639\u062f\u0627\u062f \u0645\u062a\u062a\u0627\u0644\u064a\u0629 (\u0635\u062d\u064a\u062d\u0629/\u0641\u0631\u062f\u064a\u0629/\u0632\u0648\u062c\u064a\u0629)": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u063534 \u0645\u062b\u0627\u0644 2: \u0623\u0642\u0648\u0627\u0633\u064c \u0641\u064a \u0627\u0644\u0637\u0631\u0641\u064a\u0646 \u21d0 \u062e\u0627\u0635\u064a\u0651\u0629 \u0627\u0644\u062a\u0648\u0632\u064a\u0639": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u0645\u0639\u062f\u0651\u0644\u064f \u0627\u0644\u062a\u063a\u064a\u0651\u0631\u0650 \u0645\u0646 \u062c\u062f\u0648\u0644\u064d \u0628\u0623\u0631\u0628\u0639\u0629\u0650 \u0635\u0641\u0648\u0641": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u062a\u0645\u062b\u064a\u0644\u064f \u0627\u0644\u0645\u0633\u0627\u0641\u0629\u0650 \u0645\u0639 \u0627\u0644\u0632\u0645\u0646 \u2014 \u062a\u0631\u062c\u0645\u062a\u064f\u0647 \u0625\u0644\u0649 \u0643\u0644\u0627\u0645": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645: \u0623\u064a\u064f\u0651 \u062e\u0637\u0648\u0637\u0650 \u0627\u0644\u0623\u0639\u062f\u0627\u062f\u0650 \u064a\u0645\u062b\u0651\u0644 \u062d\u0644\u064e\u0651 \u0645\u0639\u0627\u062f\u0644\u0629\u0650 \u0627\u0644\u0642\u064a\u0645\u0629\u0650 \u0627\u0644\u0645\u0637\u0644\u0642\u0629": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 18,
+            "secPerQ": 7,
             "trusted": true,
             "mcqTotal": 20
         }
@@ -212049,2004 +214321,6 @@
                 "General questions": {
                     "c": 0,
                     "t": 1
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "a1765110-7719-4874-beb2-abf03243df34",
-        "created_at": "2026-10-13T12:34:09.640671+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:34:09.520Z",
-            "cid": "1791894849520_k5ia5ei31o",
-            "dur": 8,
-            "pid": "mv6nx8lm_1165h6c",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 0
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 0
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "24ad0f15-5ec5-4f42-9444-838224e8f2e0",
-        "created_at": "2026-10-13T12:34:01.646682+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:34:01.542Z",
-            "cid": "1791894841542_8k2l7ok48qg",
-            "dur": 16,
-            "pid": "mv6nww7y_10f4z07",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 3,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "3412e4a8-3701-4b92-8f88-0a432de7a125",
-        "created_at": "2026-10-13T12:33:45.613296+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:33:45.496Z",
-            "cid": "1791894825496_h4nc3wfa1tr",
-            "dur": 14,
-            "pid": "mv6nwlkf_9917ih",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 2,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "c8f44e02-18cd-4224-a5ab-4c53dce1e554",
-        "created_at": "2026-10-13T12:33:31.804521+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:33:31.688Z",
-            "cid": "1791894811688_gurwv7s6g7p",
-            "dur": 16,
-            "pid": "mv6nw9d7_84css2",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 3,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "8f0f8462-1955-45f2-8892-87c5a4ac53bd",
-        "created_at": "2026-10-13T12:33:15.991931+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:33:15.880Z",
-            "cid": "1791894795880_at7iqbtd0y",
-            "dur": 10,
-            "pid": "mv6nw1gh_7iz7p6",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 2,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "778071f2-24a2-4724-987e-98d7841d3660",
-        "created_at": "2026-10-13T12:33:05.79436+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:33:05.627Z",
-            "cid": "1791894785627_wmqqfgujs3",
-            "dur": 34,
-            "pid": "mv6nvb11_6ymvoj",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Vocabulary": {
-                    "c": 4,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 6,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Vocabulary": {
-                    "c": 4,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "71b21c97-b8f5-4214-8959-5605ca272818",
-        "created_at": "2026-10-13T12:32:31.485904+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:32:31.376Z",
-            "cid": "1791894751376_t6uufemdl9k",
-            "dur": 19,
-            "pid": "mv6nuwlh_5hanwk",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 3,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "9d211261-cf32-4ab4-92f7-2fb74db30aa8",
-        "created_at": "2026-10-13T12:32:12.771555+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:32:12.674Z",
-            "cid": "1791894732674_kfnb260q0aq",
-            "dur": 2,
-            "pid": "mv6nuve3_443197",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "cd6914f3-88f5-4e88-a5dd-39995aeaccd5",
-        "created_at": "2026-10-13T12:32:11.216625+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:32:11.112Z",
-            "cid": "1791894731112_9loxvv5abt8",
-            "dur": 1,
-            "pid": "mv6nuuay_3n9tw5",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "a17aa99e-c672-4ddd-9663-486778ce2726",
-        "created_at": "2026-10-13T12:32:09.800774+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:32:09.699Z",
-            "cid": "1791894729699_zj5n0mo6ieg",
-            "dur": 2,
-            "pid": "mv6nusq3_2t3w5n",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "260fce50-f406-4163-a21c-3715d19e4abe",
-        "created_at": "2026-10-13T12:32:07.881527+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:32:07.655Z",
-            "cid": "1791894727655_o5apnbzcipq",
-            "dur": 7,
-            "pid": "mv6nunhq_1rhp21",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "eb24e378-269a-47dc-a581-e2a9aa74e4c9",
-        "created_at": "2026-10-13T12:19:15.976746+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:19:15.729Z",
-            "cid": "1791893955729_wx81cbpth6g",
-            "dur": 35,
-            "pid": "mv6ndih3_37vwa8w",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 2,
-                    "t": 3
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 7,
-            "sections": {
-                "Grammar": {
-                    "c": 2,
-                    "t": 3
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "0b1a3c45-11be-40da-a5e1-227366e07370",
-        "created_at": "2026-10-13T12:18:41.138111+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:18:40.929Z",
-            "cid": "1791893920929_64b0jegtjkf",
-            "dur": 25,
-            "pid": "mv6nczbg_35pq4hw",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 5,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "0c25f23a-0b16-44bc-9b30-7cf42056d400",
-        "created_at": "2026-10-13T12:18:16.60982+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:18:16.392Z",
-            "cid": "1791893896392_5m3burey09x",
-            "dur": 14,
-            "pid": "mv6nco7d_34l2mjv",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 3,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "daae15cf-1565-4e6a-8446-db59a7406f3f",
-        "created_at": "2026-10-13T12:18:01.897371+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:18:01.718Z",
-            "cid": "1791893881718_qai0n4eklci",
-            "dur": 2,
-            "pid": "mv6ncm92_32nyd72",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "a0c407e1-2c20-45b5-b99f-c52a32d87973",
-        "created_at": "2026-10-13T12:17:59.666406+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:17:59.456Z",
-            "cid": "1791893879456_qt7orebqp4",
-            "dur": 31,
-            "pid": "mv6nbycy_31lgual",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 4,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 7,
-            "sections": {
-                "Grammar": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 4,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "bbb8df85-bbd2-4887-83a4-fee0450f7397",
-        "created_at": "2026-10-13T12:17:28.678899+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:17:28.493Z",
-            "cid": "1791893848493_symspy3u2kd",
-            "dur": 10,
-            "pid": "mv6nbqq6_30pgchz",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 2,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "88cbadca-000c-42a2-b37a-2b992b28dbf0",
-        "created_at": "2026-10-13T12:17:18.820278+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:17:18.601Z",
-            "cid": "1791893838601_lnwe7qi6fo",
-            "dur": 11,
-            "pid": "mv6nbilc_29unloq",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 2,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "3eca1d4d-c948-4f34-a611-899beefb4964",
-        "created_at": "2026-10-13T12:17:08.194212+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:17:08.061Z",
-            "cid": "1791893828061_qr0i3d5mpo",
-            "dur": 74,
-            "pid": "mv6n9xqr_28j5kp3",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 3,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Controlled Writing": {
-                    "c": 1,
-                    "t": 1
-                },
-                "Reading short sentence": {
-                    "c": 4,
-                    "t": 4
-                }
-            },
-            "correct": 14,
-            "sections": {
-                "Grammar": {
-                    "c": 3,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Controlled Writing": {
-                    "c": 1,
-                    "t": 1
-                },
-                "Reading short sentence": {
-                    "c": 4,
-                    "t": 4
-                }
-            }
-        }
-    },
-    {
-        "id": "5cc5c62b-497b-4129-b71f-e8ab2fca0b44",
-        "created_at": "2026-10-13T12:17:03.427771+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:17:02.970Z",
-            "cid": "1791893822970_mviw9wbimk",
-            "dur": 69,
-            "pid": "mv6n9xqr_28j5kp3",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 3,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Controlled Writing": {
-                    "c": 1,
-                    "t": 1
-                },
-                "Reading short sentence": {
-                    "c": 4,
-                    "t": 4
-                }
-            },
-            "correct": 14,
-            "sections": {
-                "Grammar": {
-                    "c": 3,
-                    "t": 4
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 1,
-                    "t": 4
-                },
-                "Controlled Writing": {
-                    "c": 1,
-                    "t": 1
-                },
-                "Reading short sentence": {
-                    "c": 4,
-                    "t": 4
-                }
-            }
-        }
-    },
-    {
-        "id": "35591621-1bdf-499b-be2a-7949692d388c",
-        "created_at": "2026-10-13T12:15:54.660867+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:15:54.382Z",
-            "cid": "1791893754382_ps7f4ia3n5t",
-            "dur": 9,
-            "pid": "mv6n9qst_273pe35",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 2,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 2
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "7654be88-bba4-4112-b636-d92ca9af5304",
-        "created_at": "2026-10-13T12:15:45.590486+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:15:45.384Z",
-            "cid": "1791893745384_javid5njw1g",
-            "dur": 2,
-            "pid": "mv6n9p4a_266pzcl",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "954c84a1-e7db-4533-b92d-a435679aa7b2",
-        "created_at": "2026-10-13T12:15:43.429729+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:15:43.205Z",
-            "cid": "1791893743205_eziuhlcpqiq",
-            "dur": 14,
-            "pid": "mv6n9elx_25xdtzi",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 3,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 1,
-                    "t": 3
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "aaccb3f0-96dd-47f0-b76c-616cda82305b",
-        "created_at": "2026-10-13T12:15:29.810352+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:15:29.584Z",
-            "cid": "1791893729584_7q5iugphgfj",
-            "dur": 30,
-            "pid": "mv6n8r40_24lh2hl",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 2,
-                    "t": 4
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 4,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 2,
-                    "t": 4
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "a7097f07-db6a-4e1d-9ae2-7924bd46a6c2",
-        "created_at": "2026-10-13T12:14:59.466076+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:14:59.133Z",
-            "cid": "1791893699133_ny2sho8s18s",
-            "dur": 36,
-            "pid": "mv6n7zkr_23zk7q0",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 5,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "126291f8-62e8-45de-8faf-b6c78cc516ed",
-        "created_at": "2026-10-13T12:14:23.649019+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:14:23.446Z",
-            "cid": "1791893663446_s59i4nc94kd",
-            "dur": 3,
-            "pid": "mv6n7x9e_22lznnh",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 0,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Vocabulary": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Orthography": {
-                    "c": 0,
-                    "t": 1
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            }
-        }
-    },
-    {
-        "id": "e2b13097-b2ca-4de3-b57b-600d477b8a3b",
-        "created_at": "2026-10-13T12:14:20.685851+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-13T12:14:20.437Z",
-            "cid": "1791893660437_nn5fy41tsgp",
-            "dur": 36,
-            "pid": "mv6n75l9_21k6e0l",
-            "kind": "practice",
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u062e\u0665 \u2014 \u0627\u0644\u0641\u062a\u0631\u064a \ud83d\udcdd",
-            "model": "\u0648\u0631\u0642\u0629 \u0627\u0644\u0645\u0639\u0644\u0651\u0645",
-            "total": 20,
-            "skills": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Controlled Writing": {
-                    "c": 0,
-                    "t": 0
-                },
-                "Reading short sentence": {
-                    "c": 0,
-                    "t": 0
-                }
-            },
-            "correct": 5,
-            "sections": {
-                "Grammar": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Vocabulary": {
-                    "c": 3,
-                    "t": 5
-                },
-                "Orthography": {
-                    "c": 2,
-                    "t": 2
-                },
-                "General questions": {
-                    "c": 0,
-                    "t": 0
                 },
                 "Controlled Writing": {
                     "c": 0,
