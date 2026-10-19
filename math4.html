@@ -12,7 +12,6 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
-<script src="fatri-save.js?v=20261019"></script>
 <style>
   :root{
     --accent:#059669; --accent-deep:#047857;
@@ -666,12 +665,10 @@ function gMakeTable(){
 var F1 = [gPlaceValue, gPlaceName, gCompare, gOrder, gRound];
 
 /* ═══ وُسِّع بنكُ الجمعِ والطرح ═══════════════════════════════════════
-   صار فتريُّ سعودٍ عشرةَ أسئلةٍ على هذا الفصلِ وحدَه (٨ أكتوبر)، والبنكُ
-   خمسةُ أنواع — فكلُّ نوعٍ يأتي مرّتين بأرقامٍ مختلفة. قال الأب: «وسّع
-   البنك». فصار سبعةَ عشرَ نوعًا، ويأخذ الفتري نوعًا لكلّ سؤالٍ على حدة
-   (genDistinct)، فلا يتكرّر نوعٌ في الجولةِ الواحدة وتختلف الجولةُ عن
-   أختها. والأنواعُ كلُّها من الفصلِ نفسِه: خصائصُ الجمعِ والتقديرُ
-   والجمعُ والطرحُ وما يُبنى عليها من مسائلَ كلاميّةٍ وعددٍ مفقود. */
+   كان البنكُ خمسةَ أنواعٍ فكان النوعُ يأتي مرّتين بأرقامٍ مختلفة، فقال
+   الأب (٨ أكتوبر ٢٠٢٦): «وسّع البنك». فصار سبعةَ عشرَ نوعًا، كلُّها من
+   الفصلِ نفسِه: خصائصُ الجمعِ والتقديرُ والجمعُ والطرحُ وما يُبنى عليها
+   من مسائلَ كلاميّةٍ وعددٍ مفقود. */
 
 /* خاصية التجميع */
 function gAssoc(){
@@ -804,40 +801,6 @@ function gWordTwoStep4(){
     mn(fmt(a+b)+" − "+fmt(c)+" = "+fmt(r))+"."];
 }
 
-/* ═══ الفتري: نوعٌ مختلفٌ لكلِّ سؤال ═══════════════════════════════════
-   ‏genN يختار المولّدَ عشوائيًّا في كلّ مرّة، فيتكرّر النوعُ وإن اختلفت
-   أرقامُه — ويزيد الاحتمالُ كلّما صغُر البنك. ولمّا صار الفتري عشرةَ
-   أسئلةٍ من بنكِ فصلٍ واحد، رأى الأبُ النوعَ يتكرّر فقال: «وسّع البنك».
-   فوُسِّع البنك، وأُضيف هذا: نخلط البنكَ ونأخذ سؤالًا واحدًا من كلّ
-   مولّدٍ على حدة — فالعشرةُ عشرةُ أنواعٍ لا محالة، وتختلف الجولةُ عن
-   أختها لأنّ الخلطَ يُعيد الاختيار.
-
-   وإن لم يفِ البنكُ بالعدد (مولّداتٌ ترمي أو تُرجع null) أُكمل بالطريقةِ
-   المعتادة — فلا يخرج الاختبارُ ناقصَ الأسئلةِ ناقصَ الدرجة. */
-function genDistinct(gens, n){
-  var pool = gens.slice(); shuffle(pool);
-  var out=[], seen={}, i, t, q;
-  for(i=0; i<pool.length && out.length<n; i++){
-    for(t=0; t<25; t++){
-      try{ q = pool[i](); }catch(e){ continue; }
-      if(!q || seen[q[0]]) continue;
-      seen[q[0]]=1;
-      try{ q.__g = pool[i].name||""; q.__gf = pool[i]; }catch(e){}
-      out.push(q); break;
-    }
-  }
-  var guard=0, f, q2;
-  while(out.length<n && guard++ < n*40){
-    f = gp(gens);
-    try{ q2 = f(); }catch(e){ continue; }
-    if(!q2 || seen[q2[0]]) continue;
-    seen[q2[0]]=1;
-    try{ q2.__g = f.name||""; q2.__gf = f; }catch(e){}
-    out.push(q2);
-  }
-  return out;
-}
-
 var F2 = [gComm, gPropName, gEstimate, gAdd, gSub,
           gAssoc, gMentalAdd, gEstimateSubK, gEstimateHundred, gAddThree, gSubZeros,
           gMissingAddend, gMissingSub, gCheckSub, gWordAdd4, gWordSub4, gWordTwoStep4];
@@ -925,8 +888,7 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="lughati.html?who='+who+'">📗 لغتي</a></div>'+
     '<div class="unit">📘 مطابق لكتاب الرياضيات (الفصل الدراسي الأول)</div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
-      '<button data-tab="f1" aria-selected="false">1) القيمة المنزلية</button>'+
+      '<button data-tab="f1" aria-selected="true">1) القيمة المنزلية</button>'+
       '<button data-tab="f2" aria-selected="false">2) الجمع والطرح</button>'+
       '<button data-tab="f3" aria-selected="false">3) البيانات</button>'+
       '<button data-tab="f4" aria-selected="false">4) الأنماط والجبر</button>'+
@@ -936,9 +898,8 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
-    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel" id="f1"></section>'+
+    '<section class="panel active" id="f1"></section>'+
     '<section class="panel" id="f2"></section>'+
     '<section class="panel" id="f3"></section>'+
     '<section class="panel" id="f4"></section>'+
@@ -948,8 +909,6 @@ if(!NAMES[who]){
     '<section class="panel" id="rem"></section>'+
     '<footer>الرياضيات · الصف الرابع · الفصل الأول · أرقام جديدة كل مرة — من إعداد المعلّم</footer>';
 
-  var FATRI_AR = { f1:"القيمة المنزلية", f2:"الجمع والطرح", f3:"البيانات",
-                   f4:"الأنماط والجبر", f5:"الضرب × رقم", f6:"الضرب × رقمين" };
   var CFG = {
     all: {gens:ALL, n:15, intro:"اختبار شامل: القيمة المنزلية + الجمع والطرح + الضرب — <b>أرقام جديدة كل مرة</b>.", label:"رياضيات — شامل"},
     f1:  {gens:F1,  n:10, intro:"<b>الفصل 1 — القيمة المنزلية:</b> القيمة والمنزلة، المقارنة، الترتيب، التقريب.", label:"رياضيات ف1 — القيمة المنزلية"},
@@ -1166,128 +1125,6 @@ if(!NAMES[who]){
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
 
-
-  /* ═══════════════════════════════════════════════════════════════════
-     الاختبار الفتري 📝 — سعود (٧ أكتوبر ٢٠٢٦)
-     ═══════════════════════════════════════════════════════════════════
-     بنيتُه أوّلًا على فصولِ صفحتِه الستّةِ كلِّها، ثمّ حدّد الأبُ
-     المقرَّر: «القيمةُ المنزليّة · الجمعُ والطرح · البيانات» — ثلاثةٌ
-     لا ستّة. فضُيِّق عليها، وخرجت «الأنماطُ والجبر» و«الضربُ في رقم»
-     و«الضربُ في رقمين» ومعها السؤالُ المقاليُّ القديمُ لأنّه كان ضربًا.
-
-     والتوزيعُ خمسةٌ وخمسةٌ وستّة: فبنكا الفصلَين الأوّلَين خمسةُ
-     مولّداتٍ لكلٍّ، فيُستوفيان كلُّهما بلا تكرار، والثالثُ اثنا عشرَ
-     مولّدًا فيُؤخَذ منه ستّة. والمجموعُ ستّةَ عشرَ ومقاليٌّ بأربع =
-     عشرون، كإخوتِه الثلاثة.
-
-     والمقاليُّ جدولُ بياناتٍ يُقرأ ثمّ يُجمع ثمّ يُطرح ثمّ يُكتب
-     بالصيغةِ التحليليّة — فيمسّ الفصولَ الثلاثةَ في مسألةٍ واحدة. */
-  /* ═══ رُفع السؤالُ المقاليُّ — طلبُ الأب (٨ أكتوبر) ════════════════
-     والدرجةُ تبقى عشرين فلا تُنقَص إلى ستَّ عشرة. فصار سبعةٌ للقيمةِ
-     المنزليّةِ وسبعةٌ للجمعِ والطرحِ وستّةٌ للبيانات — والبياناتُ كما
-     كانت لأنّ نصيبَها وافٍ، والزيادةُ على الفصلَين الحسابيَّين وهما
-     صُلبُ المقرَّر. */
-  /* ═══ حُصِر في الجمعِ والطرحِ وحدَه، وصار السؤالُ بدرجتين ═══════════
-     طلبُ الأب (٨ أكتوبر ٢٠٢٦): «بالنسبة لسعود وأسامة، الاختبار الفتري
-     عندهم هو الفصل الثاني اللي هو الجمع والطرح فقط. حط ١٠ أسئلة فقط من
-     ٢٠ درجة، ولا تكتب اسم الدرس في الاختبار».
-
-     فالمقرَّرُ فصلٌ واحد، والأسئلةُ عشرةٌ لا عشرون، والدرجةُ تبقى عشرين
-     — فالسؤالُ بدرجتين. وهذا أوّلُ اختبارٍ هنا تختلف فيه الدرجةُ عن عددِ
-     الأسئلة، فمِن ثَمَّ FATRI_MARK ولا يُحسب المجموعُ من العددِ وحدَه.
-
-     ورُفع اسمُ الدرسِ من فوقِ السؤالِ ومن سطرِ المقرَّرِ في المقدّمة —
-     وبقي الوسمُ في الحفظ (__lesson) فلا يفقد تقريرُ الأبِ تفصيلَه. */
-  var FATRI_IDS = ["f2"];
-  var FATRI_PER = { f2:10 };
-  var FATRI_MCQ = 10;
-  var FATRI_MARK = 2;                          /* درجتان لكلّ سؤال */
-  var FATRI_ESSAY = 0;                         /* لا مقاليَّ في اختبارِه */
-  var FATRI_TOTAL = FATRI_MCQ * FATRI_MARK;    /* ٢٠ */
-
-  function renderFatri(){
-    var sec = document.getElementById("fatri");
-    var items = [];
-    FATRI_IDS.forEach(function(id){
-      var got = genDistinct(CFG[id].gens, FATRI_PER[id] || 3);
-      got.forEach(function(q){ q.__lesson = FATRI_AR[id] || id; items.push(q); });
-    });
-    var html =
-      '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
-        '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — الرياضيات</div>'+
-        '<b>١٠ أسئلة · ٢٠ درجة</b> — درجتان لكلّ سؤال.'+
-        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
-      '</div>';
-    items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+' <span style="color:var(--muted);font-weight:600">· درجتان</span></div>'+
-        '<div class="stem">'+q[0]+'</div><div class="opts">'+
-        q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
-        '</div><div class="explain">'+q[3]+'</div></div>';
-    });
-    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
-      '<button class="reset">اختبار جديد 🔄</button>';
-    sec.innerHTML = html; if(typeof mergeMath==="function") mergeMath(sec);
-
-    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
-    sec._pid = pid; sec._frag = true;
-    var answered={}, correct=0, savedN=0, saved=false;
-    var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
-    var scoreEl = sec.querySelector("[data-score]");
-    function marks(){ return correct * FATRI_MARK; }
-    function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
-    function meta(){
-      return { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-               /* ═══ لا استبعادَ بسرعةِ النقرِ هنا ═══════════════════════
-                  طلبُ الأب (٧ أكتوبر ٢٠٢٦) بعد أن رأى حسنًا يُستبعَد وقد
-                  أصاب ١٣ من ١٣: «شِلّ الخاصّية هذي منهم كلّهم ما عدا فهد».
-                  وكانت باقيةً في اختبارات الفتري الأربعة سهوًا، فتُسقِط
-                  الجلسةَ من المعدَّلِ في صفحةِ الأبِ بلا أن يطلبَ ذلك.
-                  وتبقى fast وdur محفوظتين فيرى الأبُ السرعةَ إن أرادها،
-                  ولكن لا يُبنى عليها حكمٌ يحذف درجةَ ابنِه. */
-               trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ };
-    }
-    function save(force){
-      var done = Object.keys(answered).length === FATRI_MCQ;
-      if(!force && !done) return;
-      if(savedN >= marks() && saved && !done) return;
-      savedN = marks(); saved = true; if(done) sec._frag=false;
-      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
-      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
-            answered: Object.keys(answered).length, items: FATRI_MCQ,
-            essay: FATRI_ESSAY, done: done, meta: meta() });
-      saveScore("رياضيات خ٤ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
-    }
-    sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
-      var i=+qEl.dataset.i, ans=items[i][2];
-      qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click", function(){
-          if(answered[i]) return; answered[i]=1;
-          var now=Date.now(), ms=now-lastTs; lastTs=now; if(ms<RG_MS) fastN++;
-          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          var ok = (+btn.dataset.j===ans);
-          if(ok){ btn.classList.add("correct"); correct++; }
-          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          /* اسمُ الفصلِ هو الوسم — ولا يُطبَع اسمُ دالّةٍ في تقريرِ الأب */
-          var sk = items[i].__lesson || "غير محدّد";
-          var s = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); s.t++; if(ok) s.c++;
-          ITEMS.push({ g:(items[i].__g||""), ok:(ok?1:0), ms:ms, j:+btn.dataset.j, a:ans });
-          qEl.querySelector(".explain").classList.add("show");
-          draw(); save();
-        });
-      });
-    });
-    function savePartial(){
-      if(Object.keys(answered).length < 1) return;
-      save(true);
-    }
-    sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ; };
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
-    draw();
-  }
-
   document.querySelectorAll(".tabs button").forEach(function(b){
     b.addEventListener("click", function(){
       var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave();
@@ -1296,15 +1133,12 @@ if(!NAMES[who]){
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
       if(id==="rem"){ renderRem(); }
-      else if(id==="fatri"){ if(!pan.innerHTML || (pan._done && pan._done())) renderFatri(); }
       else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });
-  /* يُنادى بعد تعريفِ ثوابتِ الفتري لا قبلَها — ‏var يرفع الإعلانَ لا
-     القيمة، فنداؤه قبلَها يرمي وتبقى اللوحةُ فارغةً بلا رسالة. (وقعت في math5.) */
   (function(){
     var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab;
-    if(first === "fatri") renderFatri(); else render(first);
+    render(first);
   })();
 
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ var cur=document.querySelector(".panel.active"); if(cur && typeof cur._leave==="function") cur._leave(); } });

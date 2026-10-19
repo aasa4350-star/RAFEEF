@@ -11,7 +11,6 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
-<script src="fatri-save.js?v=20261019"></script>
 <style>
   :root{
     --accent:#0891b2; --accent-deep:#0e7490;
@@ -535,8 +534,7 @@ if(!NAMES[who]){
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="math4.html?who='+who+'">🔢 الرياضيات</a></div>'+
     '<div class="unit">📘 <b>المخلوقات الحية</b> · <b>التغذية والصحة</b> · <b>الأنظمة البيئية</b></div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
-      '<button data-tab="cells" aria-selected="false">الخلية 🔬</button>'+
+      '<button data-tab="cells" aria-selected="true">الخلية 🔬</button>'+
       '<button data-tab="clas" aria-selected="false">التصنيف 🌿</button>'+
       '<button data-tab="inv" aria-selected="false">اللافقاريات 🐛</button>'+
       '<button data-tab="vert" aria-selected="false">الفقاريات 🐟</button>'+
@@ -547,9 +545,8 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
-    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel" id="cells"></section>'+
+    '<section class="panel active" id="cells"></section>'+
     '<section class="panel" id="clas"></section>'+
     '<section class="panel" id="inv"></section>'+
     '<section class="panel" id="vert"></section>'+
@@ -571,111 +568,6 @@ if(!NAMES[who]){
     eco:  {gens:ECOG,  n:8,  intro:"<b>النظام البيئي:</b> المكوّنات الحية وغير الحية، البيئات، العلاقات، والمحافظة على الحياة الفطرية.", label:"علوم و3 — النظام البيئي"},
     food: {gens:FOODG, n:8,  intro:"<b>السلاسل والشبكات الغذائية:</b> المنتِج والمستهلك والمحلِّل، ومصدر الطاقة (الشمس).", label:"علوم و3 — السلاسل الغذائية"}
   };
-
-  /* ═══ الاختبارُ الفتريُّ — علوم سعود ═══════════════════════════════
-     أرسل الأبُ (١١ أكتوبر ٢٠٢٦) صورةَ فهرسِ كتابِه مخطَّطًا عليها
-     فصلان من الوحدةِ الأولى «المخلوقات الحيّة»:
-       الفصل الأوّل: ممالكُ المخلوقات الحيّة — الخلايا · تصنيفُ المخلوقات
-       الفصل الثاني: المملكةُ الحيوانيّة — اللافقاريّات · الفقاريّات
-                                           · أجهزةُ أجسامِ الحيوانات
-
-     و«أجهزةُ أجسامِ الحيوانات» (الدرسُ الثالثُ من الفصلِ الثاني) لا بنكَ
-     لها في هذه الصفحةِ أصلًا — فهي خارجُ الورقةِ اليومَ، وقيل ذلك للأبِ
-     صراحةً ولم تُطوَ. فإن أُضيف بنكُها فسطرٌ واحدٌ هنا يُدخلها.
-
-     والشكلُ هو الذي طلبه لسعود في الرياضيات (٧ أكتوبر): عشرةُ أسئلةٍ من
-     عشرين درجة — درجتان للسؤال — وبلا اسمِ الدرسِ فوقَ السؤال. والوسمُ
-     يبقى في الحفظِ فلا يفقد تقريرُ الأبِ تفصيلَه.
-
-     والتوزيعُ خمسةٌ لكلِّ فصل، وداخلَ الفصلِ بحسبِ سعةِ بنكِه. */
-  var FATRI_IDS = ["cells","cells","cells","clas","clas","inv","inv","vert","vert","vert"];
-  var FATRI_MCQ = FATRI_IDS.length;            /* ١٠ */
-  var FATRI_MARK = 2;                          /* درجتان لكلّ سؤال */
-  var FATRI_ESSAY = 0;                         /* لا مقاليَّ في اختبارِه */
-  var FATRI_TOTAL = FATRI_MCQ * FATRI_MARK;    /* ٢٠ */
-  /* الوسمُ في الحفظِ فقط — لا يُعرَض على الشاشة */
-  var FATRI_AR = { cells:"1-1 الخلايا", clas:"1-2 تصنيف المخلوقات الحيّة",
-                   inv:"2-1 الحيوانات اللافقاريّة", vert:"2-2 الحيوانات الفقاريّة" };
-
-  function renderFatri(){
-    var sec = document.getElementById("fatri");
-    var items = [], need = {};
-    FATRI_IDS.forEach(function(id){ need[id] = (need[id]||0) + 1; });
-    var drawn = {};
-    Object.keys(need).forEach(function(id){ drawn[id] = genDistinct(CFG[id].gens, need[id]); });
-    FATRI_IDS.forEach(function(id){
-      var q = drawn[id].shift();
-      if(!q) return;
-      q.__lesson = FATRI_AR[id] || id;
-      items.push(q);
-    });
-
-    var html =
-      '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
-        '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — العلوم</div>'+
-        '<b>١٠ أسئلة · ٢٠ درجة</b> — درجتان لكلّ سؤال.'+
-        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
-      '</div>';
-    items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+
-        ' <span style="color:var(--muted);font-weight:600">· درجتان</span></div>'+
-        '<div class="stem">'+q[0]+'</div><div class="opts">'+
-        q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
-        '</div><div class="explain">'+q[3]+'</div></div>';
-    });
-    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
-      '<button class="reset">اختبار جديد 🔄</button>';
-    sec.innerHTML = html;
-
-    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
-    sec._pid = pid; sec._frag = true;
-    var answered={}, correct=0, savedN=0, saved=false;
-    var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
-    var scoreEl = sec.querySelector("[data-score]");
-    function marks(){ return correct * FATRI_MARK; }
-    function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
-    function meta(){
-      /* لا استبعادَ بسرعةِ النقر — طلبُ الأب (٧ أكتوبر) */
-      return { dur: Math.round((Date.now()-t0)/1000), fast: fastN, trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ };
-    }
-    function save(force){
-      var done = Object.keys(answered).length === FATRI_MCQ;
-      if(!force && !done) return;
-      if(savedN >= marks() && saved && !done) return;
-      savedN = marks(); saved = true; if(done) sec._frag=false;
-      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
-      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
-            answered: Object.keys(answered).length, items: FATRI_MCQ,
-            essay: FATRI_ESSAY, done: done, meta: meta() });
-      saveScore("علوم خ٤ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
-    }
-    sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
-      var i=+qEl.dataset.i, ans=items[i][2];
-      qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click", function(){
-          if(answered[i]) return; answered[i]=1;
-          var now=Date.now(), ms=now-lastTs; lastTs=now; if(ms<RG_MS) fastN++;
-          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          var ok = (+btn.dataset.j===ans);
-          if(ok){ btn.classList.add("correct"); correct++; }
-          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          var sk = items[i].__lesson || "غير محدّد";
-          var sv = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); sv.t++; if(ok) sv.c++;
-          ITEMS.push({ g:(items[i].__g||""), ok:(ok?1:0), ms:ms, j:+btn.dataset.j, a:ans });
-          qEl.querySelector(".explain").classList.add("show");
-          draw(); save();
-        });
-      });
-    });
-    function savePartial(){ if(Object.keys(answered).length < 1) return; save(true); }
-    sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ; };
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
-    draw();
-  }
-
   function render(id){
     var c = CFG[id], sec = document.getElementById(id);
     var items = genN(c.gens, c.n);
@@ -864,12 +756,11 @@ if(!NAMES[who]){
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
   /* أوّلُ ما يُفتح: اللسانُ المختارُ في الشريط. ويمرّ على نفسِ التفريعِ
-     لا على render مباشرةً — فالفتري ليس له مدخلةٌ في CFG، وندّاؤه به
-     كان يرمي فتبقى اللوحةُ فارغةً بلا رسالةٍ تدلّ. */
+     لا على render مباشرةً — فالعلاجيُّ ليس له مدخلةٌ في CFG، وندّاؤه
+     به كان يرمي فتبقى اللوحةُ فارغةً بلا رسالةٍ تدلّ. */
   (function(){
     var id = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab;
     if(id==="rem") renderRem();
-    else if(id==="fatri") renderFatri();
     else render(id);
   })();
 
@@ -881,7 +772,6 @@ if(!NAMES[who]){
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
       if(id==="rem"){ renderRem(); }
-      else if(id==="fatri"){ if(!pan.innerHTML || (pan._done && pan._done())) renderFatri(); }
       else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });

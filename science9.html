@@ -1350,7 +1350,7 @@ function bankGen(bank, key){
   return f;
 }
 /* تُدمَج مكمّلاتُ أوراقِ المعلّم في بنوكِ دروسِها قبل بناء المولّدات،
-   فتدخل في الدرسِ وفي الشاملِ وفي الفتريِّ بلا تكرارِ تعريف. */
+   فتدخل في الدرسِ وفي الشاملِ وفي المذكّرةِ بلا تكرارِ تعريف. */
 L2 = L2.concat(L2X); L3 = L3.concat(L3X);
 EQ = EQ.concat(EQX); VOLC = VOLC.concat(VOLCX);
 
@@ -1432,25 +1432,14 @@ if(!NAMES[who]){
          ids:["cell","all3"]}
   };
 
-  /* ═══ الاختبارُ الفتريُّ — علوم حسن ═══════════════════════════════
-     أرسل الأبُ عشرَ صورٍ من أوراقِ معلّمِه (١١ أكتوبر ٢٠٢٦) وقال: «حطّ
-     له اختبار فتري بناءً على الصور». والأوراقُ ثلاثةُ محاور:
-       ورقةُ عملِ الفصلِ الأوّلِ ومراجعتُه    ← طبيعةُ العلم
-       ورقةُ عملِ الفصلِ الثاني ومراجعتُه وواجباتُ الدرسِ الثالث ← تغيّراتُ الأرض
-       تطبيقاتُ وواجباتُ «أنشطة في الخلية»   ← الخليّة
-
-     والأوزانُ بحسبِ ما في يدِ المعلّم: ورقتان لكلِّ محور، فالتوزيعُ
-     متقاربٌ — سبعةٌ لطبيعةِ العلم وسبعةٌ لتغيّراتِ الأرضِ وستٌّ للخليّة.
-
-     والدرجةُ عشرون كما في بقيّةِ اختباراتِ الفتريّ، فالسؤالُ بدرجة. */
-  CHAPS = Object.assign({ fatri:{ name:"📝 الفتري", ids:["fatri"],
-    unit:'📝 <b>الاختبار الفتري</b> — طبيعة العلم · تغيّرات الأرض · أنشطة في الخلية · ١٤ سؤالًا ومقاليّان · ٢٠ درجة' },
+  /* ═══ اختبارُ المذكّرةِ أوّلًا — بابٌ وحيدٌ في فصلِه ═══════════════
+     مصدرُه مذكّرةُ المعلّمِ وحدَها لا كتابُ الوزارة. */
+  CHAPS = Object.assign({
     muth:{ name:"📒 المذكّرة", ids:["muth"],
     unit:'📒 <b>اختبار المذكّرة</b> — من مذكّرة المعلّم: طبيعة العلم · الزلازل والبراكين والصفائح · أنشطة في الخلية · ٢٠ سؤالًا وأربعةُ مقاليّات · ٣٢ درجة' } }, CHAPS);
-  CFG.fatri = { tab:"الفتري 📝", gens:[], n:0, intro:"", label:"علوم م٣ — الفتري 📝" };
   CFG.muth  = { tab:"المذكّرة 📒", gens:[], n:0, intro:"", label:"علوم م٣ — اختبار المذكّرة 📒" };
 
-  var curCh = "fatri", curId = "fatri";
+  var curCh = "muth", curId = "muth";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -1636,212 +1625,10 @@ if(!NAMES[who]){
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
 
-  var FATRI_IDS = ["l1","l1","l2","l2","l3",
-                   "eq","eq","volc","volc","plate","plate",
-                   "cell","cell","cell"];
-  var FATRI_MCQ = FATRI_IDS.length;         /* ١٤ */
-  /* ═══ سؤالان مقاليّان — طلبُ الأب (١١ أكتوبر ٢٠٢٦) ═══════════════════
-     وهما شكلُ ما في ورقةِ معلّمِه بعينِه: ورقتُه فيها مرّتين «تُعطى
-     تجربةٌ فحدِّد الفرضيةَ والمتغيّرَ المستقلَّ والتابعَ وثابتَين»،
-     وفيها جدولا مقارنةٍ (بناءٌ ضوئيٌّ مقابلَ تنفّسٍ خلويّ، وتنفّسٌ
-     خلويٌّ مقابلَ تخمّر). فواحدٌ من كلِّ شكل.
-     ثلاثُ درجاتٍ لكلٍّ، فالمجموعُ عشرون كما كان. */
-  var FATRI_ESSAY = 6;                      /* ٣ لكلِّ مقاليّ */
-  var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;  /* ٢٠ */
-  /* الوسمُ في الحفظِ فقط — لا يُعرَض فوقَ السؤال */
-  var FATRI_AR = { l1:"1-1 أسلوب العلم", l2:"1-2 عمل العلم", l3:"1-3 العلم والتقنية",
-                   eq:"2-1 الزلازل", volc:"2-2 البراكين", plate:"2-3 الصفائح",
-                   cell:"أنشطة في الخلية" };
-
-  /* ═══ بنكُ المقاليّ ═══════════════════════════════════════════════
-     نوعان كما في ورقةِ معلّمِه: تحليلُ تجربةٍ (متغيّراتٌ وثوابت)،
-     ومقارنةُ عمليّتَين. ولكلّ نوعٍ أكثرُ من نصٍّ فلا يحفظ الجوابَ
-     بإعادةِ الاختبار. */
-  var ESSAY_EXP = [
-    { stem:"في تجربةٍ لدراسة <b>أثر كمّيّة الملح المذاب</b> في <b>الزمن الذي يستغرقه مكعّبُ ثلجٍ ليذوب</b>، وضع باحثٌ مكعّباتٍ متماثلةً من الثلج في أكوابٍ متساويةٍ بها ماءٌ بكمّيّةٍ واحدةٍ ودرجةِ حرارةٍ واحدة، وأذاب في كلّ كوبٍ كمّيّةً مختلفةً من الملح.<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين.",
-      model:"<b>الفرضية:</b> كلّما زادت كمّيّةُ الملحِ المذابِ قلّ الزمنُ الذي يستغرقه المكعّبُ ليذوب.<br><b>المتغيّر المستقلّ:</b> كمّيّةُ الملح — هي ما غيّره الباحثُ بنفسه.<br><b>المتغيّر التابع:</b> زمنُ ذوبانِ المكعّب — هو ما قاسه.<br><b>الثوابت:</b> حجمُ مكعّبِ الثلج · كمّيّةُ الماء · درجةُ حرارةِ الماءِ والغرفة · نوعُ الكوب (أيُّ اثنين)." },
-    { stem:"في تجربةٍ لدراسة <b>أثر حجم قطعة السكّر</b> في <b>سرعة ذوبانها</b>، وضع باحثٌ كمّيّاتٍ متساويةً من السكّر — مرّةً قطعةً كاملةً ومرّةً مجزّأةً ومرّةً مسحوقًا — في أكوابٍ متماثلةٍ بها الماءُ نفسُه، وقاس زمنَ الذوبان.<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين، ونوعَ البحث.",
-      model:"<b>الفرضية:</b> كلّما صغُرت قطعُ السكّر (زادت مساحةُ سطحِها) قلّ زمنُ ذوبانِها.<br><b>المتغيّر المستقلّ:</b> حجمُ قطعةِ السكّر (مساحةُ سطحِها).<br><b>المتغيّر التابع:</b> زمنُ الذوبان.<br><b>الثوابت:</b> كتلةُ السكّر · كمّيّةُ الماء · درجةُ حرارةِ الماء · التحريكُ من عدمِه (أيُّ اثنين).<br><b>نوع البحث:</b> تجريبيّ." },
-    { stem:"في تجربةٍ لدراسة العلاقة بين <b>درجة الحرارة</b> و<b>ضغط الغاز</b>، وضع سلمانُ كمّيّةً متساويةً من غازٍ ما في ثلاثة أوعيةٍ متساويةِ الحجم، وقاس الضغطَ عند "+en("٢٥")+" و"+en("٣٠")+" و"+en("٣٥")+" درجةً مئويّة.<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين.",
-      model:"<b>الفرضية:</b> كلّما ارتفعت درجةُ حرارة الغاز ارتفع ضغطُه (والعكس).<br><b>المتغيّر المستقلّ:</b> درجةُ الحرارة — هو ما غيّره الباحثُ بنفسه.<br><b>المتغيّر التابع:</b> ضغطُ الغاز — هو ما قاسه ويتأثّر بالتغيير.<br><b>الثوابت:</b> نوعُ الغاز · كمّيّةُ الغاز · حجمُ الوعاء (أيُّ اثنين)." },
-    { stem:"في تجربةٍ عمليّةٍ لدراسة <b>أثر كمّيّة الماء</b> في كمّيّة <b>الرغوة</b> المتكوّنة من الصابون:<br>اكتب: الفرضيةَ المناسبة، والمتغيّرَ المستقلّ، والمتغيّرَ التابع، وثابتَين.",
-      model:"<b>الفرضية:</b> كلّما زادت كمّيّةُ الماء زادت كمّيّةُ الرغوة المتكوّنة.<br><b>المتغيّر المستقلّ:</b> كمّيّةُ الماء.<br><b>المتغيّر التابع:</b> كمّيّةُ الرغوة.<br><b>الثوابت:</b> نوعُ الصابون · كمّيّتُه · نوعُ الإناء · مدّةُ التحريك وقوّتُه (أيُّ اثنين)." }
-  ];
-  /* ═══ ثلاثةُ نصوصٍ رُفِعت وستّةٌ حلّت محلَّها (١٦ أكتوبر ٢٠٢٦) ═══════
-     قال الأب: «الأسئلة المقالية هذي وكذلك سؤال التخمر — شلها لأنها
-     تكرّرت عليه كثير». فرُفِع من بنكِ التجربةِ نصُّ السماد، ومن بنكِ
-     المقارنةِ نصّا «البناء الضوئي ↔ التنفّس الخلوي» و«التنفّس الخلوي
-     ↔ التخمّر».
-
-     ولو اكتُفِي بالرفعِ لبقي في بنكِ المقارنةِ نصٌّ واحدٌ — فيأتيه في
-     كلِّ اختبارٍ بلا استثناء، وهو أسوأُ ممّا اشتكى منه. فسببُ التكرارِ
-     صغرُ البنكِ لا هذه النصوصُ بأعيانها. فوُسِّع من مذكّرةِ معلّمِه
-     نفسِها: جداولُ الصدوعِ والموجاتِ والبراكينِ وحدودِ الصفائح. */
-  var ESSAY_CMP = [
-    { stem:"<b>قارن</b> بين <b>النقل السلبيّ</b> و<b>النقل النشط</b> عبر الغشاء الخلويّ من حيث: الحاجةُ إلى الطاقة، واتّجاهُ الحركة بالنسبة لتدرّج التركيز، ومثالٌ على كلٍّ منهما.",
-      model:"<b>النقل السلبيّ:</b> لا يحتاج طاقة · يسير <b>مع</b> تدرّج التركيز (من الأعلى إلى الأدنى) · أمثلته: الانتشار، والخاصيّة الأسموزيّة، والانتشار المدعوم.<br><b>النقل النشط:</b> يحتاج طاقة · يسير <b>عكس</b> تدرّج التركيز (من الأدنى إلى الأعلى) · ومنه البلعمةُ والإخراجُ الخلويُّ لنقل الجزيئات الضخمة." },
-    { stem:"<b>قارن</b> بين <b>أنواع الصدوع الثلاثة</b> (عاديّ · عكسيّ · جانبيّ) من حيث: القوّةُ المؤثّرة، وحركةُ الصفائح، واتّجاهُ الحركة.",
-      model:"<b>العاديّ:</b> قوّةُ <b>شدّ</b> · حركةٌ <b>تباعديّة</b> · الاتّجاهُ إلى <b>أسفل</b>.<br><b>العكسيّ:</b> قوّةُ <b>ضغط</b> · حركةٌ <b>تقاربيّة</b> · الاتّجاهُ إلى <b>أعلى</b>.<br><b>الجانبيّ (الضربيّ):</b> قوّةُ <b>قصّ</b> · حركةٌ <b>انزلاقيّة</b> · الاتّجاهُ <b>معاكس</b> — كتلتان تنزلقان جنبًا إلى جنب." },
-    { stem:"<b>قارن</b> بين <b>الموجات الزلزاليّة الثلاث</b> (الأوليّة · الثانويّة · السطحيّة) من حيث: الرمزُ، وحركةُ الجزيئات، ونوعُ الموجة، وحجمُ الدمار.",
-      model:"<b>الأوليّة:</b> رمزُها "+en("P")+" · الجزيئاتُ أمامًا وخلفًا · موجةٌ <b>طوليّة</b> · دمارُها <b>ضعيف</b> — وهي أسرعُها فتصل أوّلًا.<br><b>الثانويّة:</b> رمزُها "+en("S")+" · الجزيئاتُ أعلى وأسفل · موجةٌ <b>مستعرضة</b> · دمارُها <b>متوسّط</b> — ولا تعبر السوائل.<br><b>السطحيّة:</b> رمزُها "+en("L")+" · حركةٌ <b>التفافيّةٌ دائريّة</b> · طوليّةٌ ومستعرضةٌ معًا · دمارُها <b>قويّ</b> — وهي أبطؤها وأشدُّها." },
-    { stem:"<b>قارن</b> بين <b>أنواع البراكين الثلاثة</b> (الدرعيّة · المخروطيّة · المركّبة) من حيث: الحجمُ النسبيّ، وطبيعةُ الثوران، ولزوجةُ اللابة، ومثالٌ عليها.",
-      model:"<b>الدرعيّة:</b> الحجمُ <b>كبير</b> · الثورانُ <b>هادئ</b> · اللابةُ <b>قليلةُ اللزوجة</b> (بازلتيّة) · مثالُها <b>حرّة ثنيان</b>.<br><b>المخروطيّة:</b> الحجمُ <b>صغير</b> · الثورانُ <b>قويٌّ</b> قصير · أكثرُ خرجِها مقذوفاتٌ صلبة.<br><b>المركّبة:</b> الحجمُ <b>متوسّط</b> · الثورانُ <b>قويٌّ ثمّ هادئ</b> متناوبًا · اللابةُ <b>عاليةُ اللزوجة</b> · مثالُها <b>جبل القدر</b> بالمدينة." },
-    { stem:"<b>قارن</b> بين <b>حدود الصفائح الثلاثة</b> (متباعدة · متقاربة · منزلقة) من حيث: حركةُ الصفيحتَين، ونوعُ الصدعِ الناتج، وما يتكوّن عندها.",
-      model:"<b>المتباعدة:</b> تبتعدان · صدعٌ <b>عاديّ</b> · تتكوّن أوديةٌ أخدوديّةٌ وحفرُ انهدامٍ وشقوقٌ بركانيّة — ومنها البحرُ الأحمر.<br><b>المتقاربة:</b> تتصادمان · صدعٌ <b>عكسيّ</b> · تتكوّن مناطقُ الطرحِ والسلاسلُ الجبليّةُ والبراكينُ المركّبة.<br><b>المنزلقة:</b> تنزلقان جنبًا إلى جنب · صدعٌ <b>جانبيّ</b> · <b>لا براكينَ</b> عندها وإنّما زلازلُ كثيرة." },
-    { stem:"<b>قارن</b> بين <b>البحث الوصفيّ</b> و<b>البحث التجريبيّ</b> من حيث: ما يعتمد عليه كلٌّ منهما، ومتى يُلجَأ إليه، ومثالٌ على كلٍّ منهما.",
-      model:"<b>الوصفيّ:</b> يعتمد على <b>الملاحظة</b> وجمعِ البياناتِ ووصفِها · يُلجَأ إليه حين <b>يصعب إجراءُ التجربة</b> (موضوعٌ أكبرُ من المختبر، أو تجربةٌ تضرّ، أو زمنٌ أطولُ من عمرِ الباحث) · مثالُه: دراسةُ سلوكِ حيوانٍ في بيئتِه.<br><b>التجريبيّ:</b> يعتمد على <b>التجربة</b> و<b>اختبارِ الفرضيّة</b> · يُلجَأ إليه حين يمكن ضبطُ المتغيّرات · مثالُه: تجربةُ أثرِ الحرارةِ في ضغطِ الغاز." }
-  ];
-
-  function renderFatri(){
-    var sec = panelOf("fatri");
-    var ESS = [ gp(ESSAY_EXP), gp(ESSAY_CMP) ];
-    var items = [], need = {};
-    FATRI_IDS.forEach(function(id){ need[id] = (need[id]||0) + 1; });
-    var drawn = {};
-    Object.keys(need).forEach(function(id){ drawn[id] = genDistinct(CFG[id].gens, need[id]); });
-    FATRI_IDS.forEach(function(id){
-      var q = drawn[id].shift();
-      if(!q) return;
-      q.__lesson = FATRI_AR[id] || id;
-      items.push(q);
-    });
-
-    var html =
-      '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
-        '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — العلوم</div>'+
-        '<b>١٤ سؤالًا ومقاليّان · ٢٠ درجة</b> — درجةٌ لكلّ سؤالِ اختيار، وثلاثٌ لكلّ مقاليّ.'+
-        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
-      '</div>';
-    items.forEach(function(q,i){
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+
-        ' <span style="color:var(--muted);font-weight:600">· درجة</span></div>'+
-        '<div class="stem">'+q[0]+'</div><div class="opts">'+
-        q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
-        '</div><div class="explain">'+q[3]+'</div></div>';
-    });
-    /* المقاليّان: الحلُّ النموذجيُّ لا يظهر قبل أن يكتب — وإلّا نقله */
-    ESS.forEach(function(E, k){
-      html += '<div class="q" data-essay="'+k+'"><div class="num">سؤال '+(items.length+1+k)+
-        ' <span style="color:var(--muted);font-weight:600">· مقالي · ٣ درجات</span></div>'+
-        '<div class="stem">'+E.stem+'</div>'+
-        '<textarea data-etext="'+k+'" rows="6" placeholder="اكتب جوابك هنا..." style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:1rem;line-height:1.9;background:var(--bg);color:var(--ink)"></textarea>'+
-        '<button data-eshow="'+k+'" style="margin-top:8px;background:var(--accent);color:#fff;border:0;padding:11px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">✅ خلّصت — أرني الحلّ النموذجي</button>'+
-        '<div data-emodel="'+k+'" style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:12px 14px;line-height:2"></div>'+
-        '<div data-erub="'+k+'" style="display:none;margin-top:10px"></div></div>';
-    });
-    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
-      '<button class="reset">اختبار جديد 🔄</button>';
-    sec.innerHTML = html;
-
-    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
-    sec._pid = pid; sec._frag = true;
-    var answered={}, correct=0, savedN=0, saved=false;
-    var essayMark=[null,null], essayText=["",""];
-    var RG_MS = 3000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
-    var scoreEl = sec.querySelector("[data-score]");
-    function essaySum(){ return (essayMark[0]||0) + (essayMark[1]||0); }
-    function essayDone(){ return essayMark[0]!=null && essayMark[1]!=null; }
-    function marks(){ return correct + essaySum(); }
-    function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
-    function meta(){
-      /* ═══ لا حارسَ تأنٍّ هنا ═══════════════════════════════════════
-         طلبُ الأب (٩ أكتوبر ٢٠٢٦) حصره في مادّتَين: «حطّ له نفس فهد في
-         مادة الرياضيات والإنجليزي». فالعلومُ خارجَه، ولا يُوسَّع بلا
-         طلبٍ ولا قياسٍ على مادّتها. وتبقى dur وfast محفوظتَين فيُقرآن. */
-      return { dur: Math.round((Date.now()-t0)/1000), fast: fastN, trusted: true,
-               skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-               mcq: correct, mcqTotal: FATRI_MCQ,
-               /* نصُّ المقاليّ ودرجتُه الذاتيّةُ يقرؤهما تقريرُ الأبِ
-                  (home.html وchild.html) فيراجع تقديرَ ابنِه بنفسه.
-                  والنصّان يُدمجان بفاصلٍ ظاهرٍ لأنّ العقدَ حقلٌ واحد. */
-               essay: essayText.map(function(t,i){ return "("+(i+1)+") "+t; }).join("\n\n").slice(0, 1200),
-               essaySelf: essaySum(), essayMax: FATRI_ESSAY };
-    }
-    function save(force){
-      var done = Object.keys(answered).length === FATRI_MCQ && essayDone();
-      if(!force && !done) return;
-      if(savedN >= marks() && saved && !done) return;
-      savedN = marks(); saved = true; if(done) sec._frag=false;
-      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
-      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
-            answered: Object.keys(answered).length, items: FATRI_MCQ,
-            essay: FATRI_ESSAY, done: done, meta: meta() });
-      saveScore("علوم م٣ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
-    }
-    sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
-      var i=+qEl.dataset.i, ans=items[i][2];
-      qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click", function(){
-          if(answered[i]) return; answered[i]=1;
-          var now=Date.now(), ms=now-lastTs; lastTs=now; if(ms<RG_MS) fastN++;
-          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          var ok = (+btn.dataset.j===ans);
-          if(ok){ btn.classList.add("correct"); correct++; }
-          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          var sk = items[i].__lesson || "غير محدّد";
-          var sv = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); sv.t++; if(ok) sv.c++;
-          ITEMS.push({ g:(items[i].__g||""), ok:(ok?1:0), ms:ms, j:+btn.dataset.j, a:ans });
-          qEl.querySelector(".explain").classList.add("show");
-          draw(); save();
-        });
-      });
-    });
-    /* ═══ مسارُ المقاليّ ═══════════════════════════════════════════════
-       النموذجُ لا يُعرَض قبل أن يكتب عشرةَ أحرفٍ على الأقلّ، وإلّا نقله
-       ولم يُفد. ثمّ يضع درجتَه بنفسِه مقارنًا بالنموذج — وهو تقديرٌ
-       ذاتيٌّ يراجعه أبوه في التقرير، لأنّ تصحيحَ المقاليِّ آليًّا
-       تخمين. */
-    ESS.forEach(function(E, k){
-      var eBtn = sec.querySelector('[data-eshow="'+k+'"]');
-      var eTa  = sec.querySelector('[data-etext="'+k+'"]');
-      if(!eBtn || !eTa) return;
-      eBtn.addEventListener("click", function(){
-        essayText[k] = (eTa.value||"").trim();
-        if(essayText[k].length < 10){
-          eBtn.textContent = "✍️ اكتب جوابك أوّلًا";
-          setTimeout(function(){ eBtn.textContent = "✅ خلّصت — أرني الحلّ النموذجي"; }, 1800);
-          return;
-        }
-        eTa.readOnly = true; eBtn.disabled = true; eBtn.style.opacity = ".5";
-        var m = sec.querySelector('[data-emodel="'+k+'"]');
-        m.style.display = "block"; m.innerHTML = E.model;
-        var r = sec.querySelector('[data-erub="'+k+'"]');
-        r.style.display = "block";
-        r.innerHTML = '<div style="font-weight:800;margin-bottom:8px">⚖️ قارن جوابك بالنموذج وضع درجتك بصدق:</div>'+
-          '<div class="row" style="display:flex;gap:7px;flex-wrap:wrap">'+
-          [[3,"كامل — كلّ المطلوب صحيح"],[2,"أكثره صحيح"],[1,"جزءٌ يسير"],[0,"ما ضبط شي"]]
-            .map(function(x){ return '<button data-em="'+x[0]+'" style="flex:1;min-width:130px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit">'+x[0]+' — '+x[1]+'</button>'; }).join('')+
-          '</div><div style="color:var(--muted);font-size:.88rem;margin-top:8px;font-weight:600">درجتك هذي تطلع لأبوك مع نصّ جوابك — فيراجعها.</div>';
-        r.querySelectorAll("[data-em]").forEach(function(b){
-          b.addEventListener("click", function(){
-            if(essayMark[k]!=null) return;
-            essayMark[k] = +b.dataset.em;
-            r.querySelectorAll("[data-em]").forEach(function(x){ x.disabled=true; x.style.opacity=".45"; });
-            b.style.background="var(--accent)"; b.style.color="#fff"; b.style.opacity="1";
-            draw(); save();
-          });
-        });
-      });
-    });
-
-    function savePartial(){
-      essayText = essayText.map(function(t,i){
-        var ta = sec.querySelector('[data-etext="'+i+'"]');
-        return t || ((ta && ta.value)||"").trim();
-      });
-      if(Object.keys(answered).length < 1 && !essaySum()) return;
-      save(true);
-    }
-    sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ && essayDone(); };
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
-    draw();
-  }
-
   /* ═══ 📒 اختبارُ المذكّرة — طلبُ الأب (١٦ أكتوبر ٢٠٢٦) ═══════════════
      «حطّها تحت مسمّى اختبار المذكّرة، وحطّ ٤ أسئلة مقالي نفس المقالي
-     اللي موجود بالصور». فهو اختبارٌ مستقلٌّ عن الفتريِّ لا بديلٌ عنه،
-     ومصدرُه مذكّرةُ المعلّمِ وحدَها لا كتابُ الوزارة.
+     اللي موجود بالصور». ومصدرُه مذكّرةُ المعلّمِ وحدَها لا كتابُ
+     الوزارة.
 
      عشرون سؤالَ اختيارٍ بدرجة، وأربعةُ مقاليّاتٍ بثلاثِ درجاتٍ لكلٍّ،
      فالمجموعُ اثنتان وثلاثون. والتوزيعُ بثقلِ المذكّرةِ نفسِها:
@@ -2016,7 +1803,6 @@ if(!NAMES[who]){
     pan.classList.add("active");
     curId = id;
     if(id==="rem"){ renderRem(); }
-    else if(id==="fatri"){ if(!pan.innerHTML || (pan._done && pan._done())) renderFatri(); }
     else if(id==="muth"){ if(!pan.innerHTML || (pan._done && pan._done())) renderMuth(); }
     else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
   }

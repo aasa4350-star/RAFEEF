@@ -14,8 +14,6 @@
 <script src="pace.js?v=20261015"></script>
 <script src="mic-help.js?v=20260906-2"></script>
 <script src="attempts-queue.js"></script>
-<script src="fatri-save.js?v=20261019"></script>
-<script src="fatri-en5.js?v=20261009"></script>
 <!-- احفظ · ثبّت · جمل — طلبُ الأب (١٨ أكتوبر ٢٠٢٦): «نفس سعود وحسن» -->
 <script src="book-en5.js?v=20261018"></script>
 <script src="study-en4.js?v=20261018"></script>
@@ -568,8 +566,7 @@ if(!NAMES[who]){
        فيقرأ أسامةُ في شاشةٍ واحدةٍ أنّ مقرَّرَه ثمانٍ وأنّه أربع. */
     '<div class="unit">📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: <span class="en">Welcome</span> والوحدات <span class="en">1–4</span></div>'+
     '<div class="tabs" role="tablist">'+
-            '<button data-tab="fatri" aria-selected="true">الفتري 📝</button>'+
-      '<button data-tab="w" aria-selected="false">W) Welcome</button>'+
+      '<button data-tab="w" aria-selected="true">W) Welcome</button>'+
       '<button data-tab="u1" aria-selected="false">1) Personal Interests</button>'+
       '<button data-tab="u2" aria-selected="false">2) House Designs</button>'+
       '<button data-tab="u3" aria-selected="false">3) Job Paths</button>'+
@@ -577,9 +574,8 @@ if(!NAMES[who]){
       '<button data-tab="all" aria-selected="false">اختبار شامل 📝</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
-    '<section class="panel active" id="fatri"></section>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel" id="w"></section>'+
+    '<section class="panel active" id="w"></section>'+
     '<section class="panel" id="u1"></section>'+
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
@@ -837,15 +833,9 @@ if(!NAMES[who]){
   }
   /* نبدأ بالتبويب المختار في الأزرار لا باسمٍ مكتوب — وإلّا تخلّفت
      اللوحة عن الترتيب كما وقع حين صار «الشامل» آخرًا. */
-  /* ═══ الفتري أوّلَ ما تُفتح الصفحة ════════════════════════════════
-     طلبُ الأب (٩ أكتوبر ٢٠٢٦) بملفِّ المعلّم: «حطّ نفس النموذج هذا فتري
-     لأسامة في الإنجليزي». وهو اختبارُه القريب، فيُقدَّم كما قُدِّم فتريُّ
-     إخوتِه في صفحاتِ الرياضيات. */
   (function(){
-    var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"fatri"}}).dataset.tab;
-    if(first === "fatri"){
-      if(window.FATRI_EN5) FATRI_EN5.render(document.getElementById("fatri"));
-    } else render(first);
+    var first = (document.querySelector('.tabs [aria-selected="true"]')||{dataset:{tab:"all"}}).dataset.tab;
+    render(first);
   })();
 
   document.querySelectorAll(".tabs button").forEach(function(b){
@@ -856,7 +846,6 @@ if(!NAMES[who]){
       document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
       var id=b.dataset.tab; var pan=document.getElementById(id); pan.classList.add("active");
       if(id==="rem"){ renderRem(); }
-      else if(id==="fatri"){ if(window.FATRI_EN5 && (!pan.innerHTML || (pan._done && pan._done()))) FATRI_EN5.render(pan); }
       else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
     });
   });

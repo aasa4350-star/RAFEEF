@@ -316,20 +316,16 @@ function run(){
   issues.push(...listenPath());
   issues.push(...fragmentPath());
   issues.push(...pacePath());
-  issues.push(...fatriPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
   issues.push(...engVideoPath());
   issues.push(...bookStudyPath());
   issues.push(...rulesPdfPath());
-  issues.push(...modelsSc8Path());
   issues.push(...dosePath());
   issues.push(...math7Link());
   issues.push(...mawhiba3BookPath());
   issues.push(...mawhibaMechGens());
-  issues.push(...fatriEn5Path());
-  issues.push(...fatriEn4Path());
   issues.push(...muthPath());
   issues.push(...mawhibaTimed());
   issues.push(...localNoWrite());
@@ -601,14 +597,6 @@ function remedialPath(){
 
    وثلاثُ وصلاتٍ لا تنفع واحدةٌ منها وحدَها: القياسُ في الصفحة،
    والوسمُ في الصفّ، والفصلُ في التقريرَين. */
-/* ═══ الاختبار الفتري 📝 ═══════════════════════════════════════════
-   طلبُ الأب (٦ أكتوبر ٢٠٢٦) لاختبار حسنٍ يومَ الأحد: خمسةَ عشرَ سؤالًا،
-   الدرجةُ من عشرين، سؤالٌ واحدٌ مقاليّ، واسمُه «الفتري». ومقرَّرُه
-   بصورةِ الفهرس: الفصلان الأوّلُ والثاني كاملَين، ومن الثالثِ الدرسُ
-   ٣-١ وحدَه.
-
-   وثلاثةُ أرقامٍ لا تُترك للصدفة: عددُ الأسئلة، ومجموعُ الدرجات،
-   ونطاقُ الدروس — فزيادةُ درسٍ من الثالثِ تُدخله في اختبارٍ لا يدخله. */
 /* ═══ معلّمُ التحصيليِّ باسمِه ═══════════════════════════════════════
    طلبُ فهدٍ (٧ أكتوبر ٢٠٢٦): «حط ناصر العبدالكريم ٢٠٢٦» في مقاطعِ
    التحصيليّ. والبحثُ العامُّ يُخرج عشراتِ المقاطعِ من سنواتٍ ومستوياتٍ
@@ -887,201 +875,6 @@ function paceCurriculum(){
    و«النموذج» هو هذه الأقسامُ بأوزانِها — فلو تغيّر وزنُ قسمٍ أو سقط قسمٌ
    لم يعد الاختبارُ نموذجَ معلّمِه، ولا يظهر ذلك في الصفحة: تبقى عشرون
    بندًا وتبقى الدرجةُ عشرين. فيُقرأ الجدولُ من الملفِّ ويُقارن بالورقة. */
-/* ═══ 📝 الفتري — إنجليزي سعود (english.html + fatri-en4.js) ═══════════
-   أرسل الأبُ (١٧ أكتوبر ٢٠٢٦) ورقتَي معلّمِه وقال «هذا اختبار سعود فتري».
-   وأقسامُ ورقتِه الستّةُ ودرجاتُها هي نفسُها ورقةَ أسامة.
-
-   وأربعةٌ تنكسر هنا بلا صوت:
-     ١) يُفصَل الملفُّ عن الصفحةِ أو يُزال التبويبُ، فيبقى الفتري في
-        المستودعِ ولا يفتحه أحد.
-     ٢) يتغيّر مجموعُ درجاتِ الأقسامِ فتُعرَض عشرون بندًا والدرجةُ من غيرِها.
-     ٣) يسقط بندُ was/were أو بندُ المقارنة — وهما ما كشفت الورقةُ أنّ
-        المعلّمَ يختبرهما ولا مولّدَ لهما في الفصلِ الأوّل.
-     ٤) يُستدعى مولّدٌ من وحدةٍ خارجَ الفصلِ الأوّل، فيُسأل عمّا لم يدرسْه.
-   ═══════════════════════════════════════════════════════════════════ */
-function fatriEn4Path(){
-  const out = [];
-  const f = 'fatri-en4.js', page = 'english.html';
-  const fp = path.join(ROOT, f), pp = path.join(ROOT, page);
-  if (!fs.existsSync(fp)) return [{ sev:'خطأ', file:f, msg:'ملفُّ فتريِّ إنجليزيِّ سعودٍ مفقود' }];
-  const src = fs.readFileSync(fp, 'utf8');
-  const E  = m => out.push({ sev:'خطأ', file:f, msg:m });
-  const EP = m => out.push({ sev:'خطأ', file:page, msg:m });
-
-  /* الأقسامُ الستّةُ ودرجاتُها تجمع عشرين */
-  const lit = EXTRACT.literalAfter(src, /var\s+SECTS\s*=/, '[', ']');
-  let sects = null;
-  try { sects = lit ? EXTRACT.evalLiteral(lit, 'SECTS') : null; } catch(e){}
-  if (!Array.isArray(sects)) E('أقسامُ الورقةِ (SECTS) لا تُقرَأ');
-  else {
-    const WANT = [['gq','General questions',4], ['cw','Controlled Writing',1],
-                  ['rs','Reading short sentence',4], ['gr','Grammar',4],
-                  ['vo','Vocabulary',5], ['or','Orthography',2]];
-    if (sects.length !== WANT.length) E('أقسامُ الورقةِ ' + sects.length + ' لا ستّة');
-    WANT.forEach((w, i) => {
-      const g = sects[i];
-      if (!g) return;
-      if (g[0] !== w[0] || g[1] !== w[1])
-        E('القسمُ ' + (i+1) + ' «' + g[1] + '» والمطلوبُ «' + w[1] + '»');
-      if (g[2] !== w[2]) E('درجةُ «' + w[1] + '» ' + g[2] + ' والمطلوبُ ' + w[2]);
-    });
-    const sum = sects.reduce((a, x) => a + (+x[2] || 0), 0);
-    if (sum !== 20) E('مجموعُ درجاتِ الأقسامِ ' + sum + ' لا عشرون');
-    if (!/var TOTAL = 20;/.test(src)) E('الدرجةُ الكلّيّةُ ليست عشرين');
-  }
-
-  /* النمطانِ اللذانِ لا مولّدَ لهما — وهما سببُ بناءِ هذا الملفّ */
-  for (const [re, nm] of [[/var WASWERE = \[/, 'was/were'], [/var COMPAR = \[/, 'المقارنة -er']])
-    if (!re.test(src)) E('بنكُ ' + nm + ' مفقود — وهو ممّا يختبره المعلّمُ ولا مولّدَ له في الفصلِ الأوّل');
-  if (!/opts: wwo\.map/.test(src)) E('بندُ was/were لا يدخل الورقة');
-  if (!/ans: cpo\.indexOf\(comparative\(cp\[1\]\)\)/.test(src))
-    E('جوابُ بندِ المقارنةِ ليس صيغةَ -er');
-
-  /* لا يُسأل عمّا لم يدرسْه: مولّداتُ الوحداتِ ٥–٨ ممنوعة */
-  const OUT_OF_TERM = ['gNature','gNatureAr','gVing','gCould','gAil','gModal',
-                       'gIndef','gWild','gRel','gComp','gWeatherV','gGoing','gToBeW'];
-  const called = (src.match(/"g[A-Za-z0-9]+"/g) || []).map(x => x.replace(/"/g, ''));
-  const bad = OUT_OF_TERM.filter(x => called.indexOf(x) >= 0);
-  if (bad.length)
-    E('مولّداتٌ من خارجِ الفصلِ الأوّلِ تُستدعى: ' + bad.join('، ') + ' — فيُسأل عمّا لم يدرسْه');
-
-  /* ═══ جدولُ was/were يُفحَص هنا كذلك ═══════════════════════════════
-     يُسحَب منه بندٌ واحدٌ من ثمانية، فجولةُ المتصفّحِ قد لا ترى المعطوب —
-     ونجت بذلك طفرةٌ جعلت جمعًا مفردًا (١٧ أكتوبر). فيُقرَأ الجدولُ كلُّه:
-     المسنَدُ إليه جمعٌ ⟸ were، وإلّا ⟸ was. */
-  {
-    const WW = EXTRACT.literalAfter(src, /var\s+WASWERE\s*=/, '[', ']');
-    let rows = null;
-    try { rows = WW ? EXTRACT.evalLiteral(WW, 'WASWERE') : null; } catch(e){}
-    if (!Array.isArray(rows)) E('جدولُ was/were لا يُقرَأ');
-    else {
-      const PL = /\b(children|parents|books|those|they|we|you|boys|girls|cars|students)\b/i;
-      if (rows.length < 6) E('جدولُ was/were ' + rows.length + ' صفًّا — صغيرٌ فيتكرّر على الطالب');
-      rows.forEach(r => {
-        if (!Array.isArray(r) || r.length !== 2) return E('صفٌّ في WASWERE ليس [جملة, جواب]');
-        if (r[1] !== 'was' && r[1] !== 'were') return E('جوابٌ في WASWERE ليس was ولا were: ' + r[1]);
-        const want = PL.test(String(r[0]).replace('____', '')) ? 'were' : 'was';
-        if (r[1] !== want)
-          E('was/were: «' + r[0] + '» جوابُها «' + r[1] + '» والصواب «' + want + '»');
-      });
-    }
-  }
-
-  /* ═══ جدولُ صورةِ المفرداتِ يُفحَص هنا لا في المتصفّح ══════════════
-     الورقةُ تسحب ثلاثًا من خمسَ عشرةَ عشوائيًّا، فجولةٌ واحدةٌ في
-     المتصفّحِ قد لا ترى المعطوبَ أصلًا — ونجت بذلك طفرةٌ قلبت كلمةَ
-     الصورةِ بمشتّتِها (١٧ أكتوبر). والجدولُ ثابتٌ فيُقرأ كلُّه هنا. */
-  {
-    const PV = EXTRACT.literalAfter(src, /var\s+PICVOC\s*=/, '[', ']');
-    let rows = null;
-    try { rows = PV ? EXTRACT.evalLiteral(PV, 'PICVOC') : null; } catch(e){}
-    if (!Array.isArray(rows)) E('جدولُ صورةِ المفرداتِ (PICVOC) لا يُقرَأ');
-    else {
-      const WANT = { '🥁':'drums', '🦜':'parrot', '⚠️':'danger', '👴':'grandpa',
-                     '🚌':'bus', '🍕':'pizza', '📷':'camera', '🎈':'balloon',
-                     '🐱':'kitten', '😢':'afraid', '🤝':'helpful', '🤸':'exciting',
-                     '🎸':'guitar', '🚲':'cycling', '🎣':'fishing' };
-      if (rows.length < 12) E('جدولُ صورةِ المفرداتِ ' + rows.length + ' صفًّا — صغيرٌ فيتكرّر على الطالب');
-      rows.forEach(r => {
-        if (!Array.isArray(r) || r.length !== 3) return E('صفٌّ في PICVOC ليس [رمز, صحيح, مشتّت]');
-        if (r[1] === r[2]) E('الصحيحُ والمشتّتُ سواءٌ في صورة ' + r[0]);
-        if (WANT[r[0]] && r[1] !== WANT[r[0]])
-          E('صورةُ ' + r[0] + ' جوابُها «' + r[1] + '» والصواب «' + WANT[r[0]] + '»');
-      });
-    }
-  }
-
-  /* موصولٌ بالصفحةِ فعلًا */
-  if (!fs.existsSync(pp)) return out;
-  const ps = fs.readFileSync(pp, 'utf8');
-  if (ps.indexOf('src="' + f) < 0)                EP('لا تُحمّل ' + f);
-  if (!/data-tab="fatri"/.test(ps))               EP('لا تبويبَ للفتري');
-  if (!/id="fatri"/.test(ps))                     EP('لا لوحةَ للفتري');
-  if (!/FATRI_EN4\.render\(/.test(ps))            EP('لوحةُ الفتري لا تُرسَم');
-  /* ولا يكفي أن تُرسَم عند التحميل: من خرج منها ورجع يجب أن تُرسَم له */
-  if (!/id==="fatri"\)\{[^}]*FATRI_EN4\.render\(pan\)/.test(ps))
-    EP('لوحةُ الفتري لا تُرسَم عند النقرِ على تبويبِها — من خرج منها ورجع وجدها فارغة');
-  if (!/data-tab="fatri" aria-selected="true"/.test(ps))
-    EP('الفتري ليس أوّلَ تبويبٍ مفتوح — وورقةُ المعلّمِ هي ما يُمتحَن فيه');
-  if (!/saveScore\("إنجليزي خ٤ — الفتري 📝"/.test(src))
-    E('نتيجةُ الفتري لا تُحفَظ باسمِها — فلا تتمايز في تقريرِ الأب');
-  return out;
-}
-
-function fatriEn5Path(){
-  const out = [];
-  const f = 'fatri-en5.js', page = 'english5.html';
-  const fp = path.join(ROOT, f), pp = path.join(ROOT, page);
-  if (!fs.existsSync(fp)){ out.push({ sev:'خطأ', file:f, msg:'ملفُّ الفتري مفقود' }); return out; }
-  const src = fs.readFileSync(fp, 'utf8');
-  const E  = m => out.push({ sev:'خطأ', file:f, msg:m });
-  const EP = m => out.push({ sev:'خطأ', file:page, msg:m });
-
-  /* الورقةُ كما وصلت — الاسمُ والدرجةُ وعددُ البنود */
-  const WANT = [
-    ['gq', 'General questions',      4],
-    ['cw', 'Controlled Writing',     1],
-    ['rs', 'Reading short sentence', 4],
-    ['gr', 'Grammar',                4],
-    ['vo', 'Vocabulary',             5],
-    ['or', 'Orthography',            2]
-  ];
-  const m = /var SECTS = \[([\s\S]*?)\n  \];/.exec(src);
-  if (!m) E('جدولُ الأقسامِ (SECTS) لا يُقرأ');
-  else {
-    const rows = [...m[1].matchAll(/\["(\w+)",\s*"([^"]+)",\s*(\d+)\]/g)]
-      .map(g => [g[1], g[2], +g[3]]);
-    if (rows.length !== WANT.length)
-      E('أقسامُ الفتري ' + rows.length + ' والنموذجُ ' + WANT.length);
-    WANT.forEach((w, i) => {
-      const r = rows[i];
-      if (!r) return;
-      if (r[0] !== w[0] || r[1] !== w[1])
-        E('القسم ' + (i+1) + ' «' + r[1] + '» والنموذجُ «' + w[1] + '»');
-      else if (r[2] !== w[2])
-        E('درجةُ «' + w[1] + '» ' + r[2] + ' والنموذجُ ' + w[2]);
-    });
-    const sum = rows.reduce((a, r) => a + r[2], 0);
-    if (sum !== 20) E('مجموعُ درجاتِ الأقسامِ ' + sum + ' والورقةُ من ٢٠');
-    /* كلُّ قسمٍ يُولَّد بعددِ درجتِه — وإلّا اختلّ الوزنُ بلا أثرٍ ظاهر */
-    rows.forEach(r => {
-      const pat = r[0] === 'cw' ? /pick\(REORDER, 1\)/
-                : r[0] === 'gq' ? /pick\(QA, 4\)/
-                : r[0] === 'or' ? /pick\(SPELL, 2\)/
-                : null;
-      if (pat && !pat.test(src))
-        E('قسم «' + r[1] + '» لا يُولّد ' + r[2] + ' بندًا كما في النموذج');
-    });
-    if (!/gen\(\[[^\]]*\],\s*2,\s*"rs"/.test(src)) E('قسمُ القراءةِ لا يُولّد بندَي الاختيار');
-    if (!/gen\(\[[^\]]*\],\s*4,\s*"gr"/.test(src)) E('قسمُ القواعدِ لا يُولّد أربعةَ بنود');
-    if (!/gen\(\[[^\]]*\],\s*5,\s*"vo"/.test(src)) E('قسمُ المفرداتِ لا يُولّد خمسةَ بنود');
-    if (!/TICK, 2/.test(src)) E('قسمُ القراءةِ لا يُولّد بندَي ✓/✗');
-  }
-  if (!/var TOTAL = 20;/.test(src)) E('الدرجةُ ليست من ٢٠');
-  /* ═══ الناقصُ يُحفَظ بما أجابه ═══════════════════════════════════
-     صار الحفظُ يمرُّ على FATRI.row (fatri-save.js) فتُحسَب درجةُ من لم
-     يُكمِل من بنودِه هو لا من الورقةِ كلِّها — انظر تعليلَ الملفّ. */
-  if (src.indexOf('saveScore("إنجليزي خ٥ — الفتري 📝", __fr.got, __fr.total') < 0)
-    E('الدرجةُ لا تُحفَظ من مخرَجِ FATRI.row باسمِ الاختبارِ الصحيح');
-  if (!/FATRI\.row\(\{ got: correct, markTotal: TOTAL,/.test(src))
-    E('الفتري لا يمرُّ على قاعدةِ الحفظِ الناقص — فتعود «٠ من ٢٠» لمن أجاب عن سؤال');
-  /* نصُّ السؤالِ الإنجليزيُّ يُعزَل، وإلّا رُسمت النقطتان في الطرفِ الخطأ */
-  if (!/function stemLtr\(/.test(src) || !/stemLtr\(q\.stem\)/.test(src))
-    E('نصُّ السؤالِ غيرُ معزولٍ يساريًّا — تُرسم «:Complete» بدل «Complete:»');
-
-  if (!fs.existsSync(pp)) return out;
-  const psrc = fs.readFileSync(pp, 'utf8');
-  if (psrc.indexOf('src="fatri-en5.js') < 0) EP('لا تُحمّل fatri-en5.js');
-  if (!/data-tab="fatri"/.test(psrc))        EP('لا تبويبَ للفتري');
-  if (!/id="fatri"/.test(psrc))              EP('لا لوحةَ للفتري');
-  if (!/FATRI_EN5\.render\(/.test(psrc))     EP('لوحةُ الفتري لا تُرسَم');
-  if (!/data-tab="fatri" aria-selected="true"/.test(psrc))
-    EP('الفتري ليس التبويبَ المفتوحَ أوّلًا');
-  if (!/function stemLtr\(/.test(psrc) || !/stemLtr\(q\[0\]\)/.test(psrc))
-    EP('نصُّ سؤالِ الوحداتِ غيرُ معزولٍ يساريًّا — تُرسم «:Complete» بدل «Complete:»');
-  return out;
-}
-
 function bookStudyPath(){
   const out = [];
   const SPEC = [
@@ -1248,54 +1041,6 @@ function rulesPdfPath(){
     /* ── وزرُّ الطباعةِ في الصفحة ── */
     if (!/<script src="rules-print\.js/.test(raw))
       E(f, 'لها ورقةُ قواعدَ ولا زرَّ طباعةٍ فيها — الورقةُ في مجلّدٍ لا يصل إليه أحد');
-
-    /* ═══ ورقةُ المقرَّرِ الفتريِّ ══════════════════════════════════════
-       طلبُ الأب: «قواعد الرياضيات دروس حسن اختبار الفتري فقط».
-       وثلاثةٌ تنكسر بلا صوت: يُضيَّق المقرَّرُ أو يُوسَّع (FATRI_IDS)
-       ولا تتبعه الورقة فيذاكر ما لا يُسأل عنه أو يفوته ما يُسأل؛ ودرسٌ
-       في المقرَّرِ بلا قاعدةٍ فيسقط من الورقةِ وحدَه؛ وورقةٌ مفقودةٌ
-       وزرُّها في الشاشة. */
-    let FA = null;
-    try { FA = RULES.readFatri(raw, f); } catch(e){ FA = null; }
-    if (FA){
-      if (FA.missing.length)
-        E(f, 'دروسٌ في مقرَّرِ الفتريِّ بلا قاعدةٍ فتسقط من ورقته: ' + FA.missing.join('، '));
-      const ffile = 'rules-' + tag + '-fatri.pdf';
-      const frec = R.pages && R.pages[tag + '-fatri'];
-      if (!frec) E('pdf/manifest.json', 'لا سجلَّ لورقةِ فتريِّ ' + tag + ' — شغّل tools/gen-rules-pdf.js');
-      else {
-        if (frec.hash !== FA.digest)
-          E('pdf/' + ffile, 'تغيّر مقرَّرُ الفتريِّ أو قواعدُه في ' + f +
-                            ' بعد توليدِ الورقة — شغّل tools/gen-rules-pdf.js');
-        if (frec.lessons !== FA.count)
-          E('pdf/' + ffile, 'ورقةُ الفتريِّ فيها ' + frec.lessons + ' درسًا والمقرَّرُ ' + FA.count +
-                            ' — شغّل tools/gen-rules-pdf.js');
-      }
-      if (!fs.existsSync(path.join(PDFDIR, ffile)))
-        E('pdf/', 'ورقةُ فتريٍّ مفقودة: ' + ffile);
-    }
-  }
-
-  /* ═══ وقائمةُ أزرارِ الفتريِّ تقابل ما وُلِّد ═══════════════════════
-     جُرِّب أوّلًا أن يُستدَلَّ على وجودِ الفتريِّ بتبويبِه في الشاشة،
-     فأخطأ في الجهتَين: math8 وmath9 تبنيان تبويبَهما وقتَ التشغيل فلا
-     يَبين في المصدر، وenglish5 فيها تبويبُ فتريٍّ ومقرَّرُه في ملفٍّ
-     آخرَ لا دروسَ له — فكان الزرُّ يفتح ٤٠٤. فصارت القائمةُ صريحةً في
-     rules-print.js وتُقابَل هنا بالملفّات. */
-  const fatriOnDisk = fs.readdirSync(PDFDIR)
-    .filter(x => /^rules-.+-fatri\.pdf$/.test(x))
-    .map(x => x.replace(/^rules-|-fatri\.pdf$/g, '')).sort();
-  const psrc = fs.readFileSync(path.join(ROOT, 'rules-print.js'), 'utf8');
-  const plit = EXTRACT.literalAfter(psrc, /(?:var|let|const)\s+FATRI_PAGES\s*=/, '[', ']');
-  let plisted = null;
-  try { plisted = plit ? EXTRACT.evalLiteral(plit, 'FATRI_PAGES') : null; } catch(e){}
-  if (!plisted) E('rules-print.js', 'FATRI_PAGES غيرُ موجودة — لا زرَّ لورقةِ الفتري');
-  else {
-    const P = plisted.slice().sort();
-    const extra = P.filter(k => fatriOnDisk.indexOf(k) < 0);
-    const gone  = fatriOnDisk.filter(k => P.indexOf(k) < 0);
-    if (extra.length) E('rules-print.js', 'زرُّ فتريٍّ لورقةٍ غيرِ موجودة: ' + extra.join('، '));
-    if (gone.length)  E('rules-print.js', 'ورقةُ فتريٍّ بلا زرٍّ يفتحها: ' + gone.join('، '));
   }
 
   /* ولا صفحةَ تحمل الزرَّ بلا ورقة */
@@ -1397,344 +1142,6 @@ function engVideoPath(){
   return out;
 }
 
-function fatriPath(){
-  /* صفحتان الآن: حسنٌ (ثالث متوسط) ورفيف (ثاني متوسط) — ولكلٍّ مقرَّرُه
-     وعددُ أسئلتِه، والمجموعُ عشرون في كلتيهما. */
-  const SPEC = {
-    /* ضُيِّق إلى الفصلَين الأوّلِ والثاني بصورةِ الفهرسِ (٨ أكتوبر):
-       لا يدخله شيءٌ من الفصلِ الثالثِ ألبتّة، ولا مقاليٌّ مبنيٌّ عليه. */
-    /* ورُفع مقاليُّه (٨ أكتوبر) فصارت عشرين سؤالًا: سؤالان لكلّ درسٍ
-       إلّا الافتتاحيَّين (١-١ و٢-١) فسؤالٌ لكلٍّ. */
-    'math9.html': { ids:['h1','h2','h3','h4','h5','r1','r2','r3','r4','r5','r6'], mcq:20, essay:0,
-                    countMap:{h1:1,h2:2,h3:2,h4:2,h5:2,r1:1,r2:2,r3:2,r4:2,r5:2,r6:2},
-                    label:'رياضيات م٣ — الفتري 📝', ban:/"t\d"|"v\d"|"s\d"/, banMsg:'درسٌ من الفصلِ الثالثِ فما بعدَه — خارجُ المقرَّر',
-                    /* أنماطُ أوراقِ معلّمِه — أضافها الأبُ (٨ أكتوبر) بصورِ الأوراق */
-                    teacherGens:{ H5:['gAbsFromNumLine','gAbsNumLinePick'],
-                                  R2:['gFuncTableYN','gMapDiagram','gFuncGraphYN'],
-                                  R3:['gGraphToEquation','gXInterceptSI','gStandardFromPS'],
-                                  R5:['gRateTable4','gSlopeUnknownZero','gDistTimeGraph'] } },
-    /* ورُفع مقاليُّها (٨ أكتوبر): عشرون سؤالًا — سؤالٌ لكلّ درسٍ
-       وزيادةٌ على أربعةٍ يُبنى عليها ما بعدَها. */
-    'math8.html': { ids:['n1','n2','n3','n4','n5','n6','n7','n8','n9','r1','r2','r3','r4','r5','r6','r7'], mcq:20, essay:0,
-                    countMap:{n1:1,n2:1,n3:1,n4:2,n5:1,n6:2,n7:1,n8:1,n9:1,r1:2,r2:1,r3:1,r4:1,r5:2,r6:1,r7:1},
-                    label:'رياضيات م٢ — الفتري 📝', ban:/"t\d"|"v\d"|"s\d"/, banMsg:'درسٌ من الفصلِ الثالثِ فما بعدَه — خارجُ المقرَّر' },
-    /* أسامةُ فصولٌ لا دروس: خمسةُ فصولٍ × ثلاثةِ أسئلةٍ + مقاليٌّ بخمس.
-       والشطبُ في صورةِ الأبِ أخرج «العبارات والمعادلات» (f5)، ولم يُذكر
-       «الكسور الاعتياديّة» (f6) فبقي خارجًا. */
-    /* أسامةُ بلا مقاليّ — طلبُ الأب (٧ أكتوبر): «شِلّ السؤال المقالي».
-       والدرجةُ تبقى عشرين، فأربعةٌ لكلّ فصلٍ بدل ثلاثة. */
-    /* ═══ حُصِر في الجمعِ والطرحِ وحدَه (٨ أكتوبر): عشرةُ أسئلةٍ بدرجتين
-       لكلٍّ — فأوّلُ اختبارٍ هنا تختلف درجتُه عن عددِ أسئلتِه. ═══ */
-    'math5.html': { ids:['f2'], mcq:10, mark:2, essay:0, per:10, noLessonTag:true, distinctTypes:true,
-                    label:'رياضيات خ٥ — الفتري 📝', ban:/"pv"|"f1"|"f3"|"f4"|"f5"|"f6"|"all"/, banMsg:'فصلٌ خارجَ مقرَّرِ أسامة (المقرَّرُ الجمعُ والطرحُ وحدَه)' },
-    /* سعودٌ ستّةُ فصولٍ بتوزيعٍ غيرِ متساوٍ (٣ ٣ ٢ ٣ ٣ ٢ = ١٦)، لأنّ
-       بنكَي «البيانات» و«الضربِ في رقمين» أصغرُ من غيرِهما. */
-    /* حدّد الأبُ مقرَّرَ سعود (٧ أكتوبر): القيمةُ المنزليّةُ والجمعُ
-       والطرحُ والبيانات — ثلاثةٌ لا ستّة. والتوزيعُ يتبع بنكَ كلٍّ:
-       الأوّلان خمسةُ مولّداتٍ لكلٍّ فيُستوفيان، والثالثُ اثنا عشر. */
-    /* ═══ علومُ أسامة ═══════════════════════════════════════════════
-       أرسل الأبُ (١١ أكتوبر ٢٠٢٦) صورةَ فهرسِ الكتابِ مخطَّطًا عليها
-       ثلاثةَ فصول: الأوّل (ص ٢٢) والثاني (ص ٥٤) والثالث (ص ٨٢) — أي
-       الوحدةُ الأولى كاملةً وأوّلُ فصلٍ من الثانية. والشكلُ هو شكلُ
-       فتريِّه في الرياضيات: عشرةُ أسئلةٍ بدرجتين، وبلا اسمِ الدرس. */
-    /* ═══ إنجليزيُّ حسن ═══════════════════════════════════════════════
-       صورةُ فهرسِ كتابِه (١٢ أكتوبر ٢٠٢٦) تُظهر الجزءَ الأوّل:
-       Unit 1 Lifestyles · Unit 2 Life Stories · Unit 3 When Are You
-       Traveling? · EXPANSION Units 1–3، وتنقطع عند Unit 4.
-       وطلب الأبُ عشرين سؤالًا منها مقاليّان، فثمانيةَ عشرَ اختيارًا
-       بدرجةٍ ومقاليّان بدرجة — والمجموعُ عشرون كبقيّةِ اختباراتِه. */
-    'english9.html': { ids:['u1','u2','u3','exp'], mcq:18, essay:2,
-                    essayQ:2,
-                    countMap:{u1:5, u2:5, u3:5, exp:3},
-                    genPat:/^[A-Za-z_][A-Za-z0-9_]*$/,
-                    noLessonTag:true, distinctTypes:true,
-                    label:'إنجليزي م٣ — الفتري 📝',
-                    ban:/"u[4-9]"|"u1[0-2]"|"exp2"|"allu/,
-                    banMsg:'وحدةٌ خارجَ مقرَّرِ حسن (الوحداتُ ١–٣ ومراجعتُها وحدَها)' },
-    /* ═══ علومُ رفيف ═══════════════════════════════════════════════
-       صورتا فهرسِ كتابِها (١٢ أكتوبر ٢٠٢٦) تبدآن بالوحدةِ الأولى
-       وتنتهيان عند دروسِ الفصلِ الثالث: طبيعةُ العلم، والمخاليطُ
-       والمحاليل، وحالاتُ المادّة — سبعةُ دروس. ولم يكن عليهما تخطيطٌ
-       كفهارسِ إخوتها، فالمقرَّرُ مقروءٌ من مدى الصورتَين. */
-    'science8.html': { ids:['n1','n2','s1','s2','m1','m2','m3'], mcq:20, essay:0,
-                    countMap:{n1:3, n2:3, s1:3, s2:3, m1:3, m2:3, m3:2},
-                    bankName:{n1:'N1', n2:'N2', s1:'S1', s2:'S2', m1:'M1', m2:'M2', m3:'M3'},
-                    noLessonTag:true, distinctTypes:true, bankItems:true,
-                    label:'علوم م٢ — الفتري 📝', ban:/"e\d"|"d\d"|"g\d"|"all"/,
-                    banMsg:'درسٌ خارجَ مقرَّرِ رفيف (الفصولُ الثلاثةُ الأولى وحدَها)' },
-    /* ═══ علومُ حسن ═══════════════════════════════════════════════
-       عشرُ صورٍ من أوراقِ معلّمِه (١١ أكتوبر ٢٠٢٦): ورقةُ عملِ الفصلِ
-       الأوّلِ ومراجعتُه (طبيعةُ العلم)، وورقةُ عملِ الفصلِ الثاني
-       ومراجعتُه وواجباتُ درسِ الصفائح (تغيّراتُ الأرض)، وتطبيقاتُ
-       وواجباتُ «أنشطة في الخلية».
-       والخليّةُ لم يكن لها في الصفحةِ حرفٌ واحدٌ قبل ذلك اليوم، وهي
-       ستٌّ من عشرين في الورقة — فلو سقط بنكُها عاد ثلثُ الاختبارِ
-       فارغًا بلا صوت. */
-    'science9.html': { ids:['l1','l2','l3','eq','volc','plate','cell'], mcq:14, essay:6,
-                    essayQ:2,
-                    countMap:{l1:2, l2:2, l3:1, eq:2, volc:2, plate:2, cell:3},
-                    bankName:{l1:'L1', l2:'L2', l3:'L3', eq:'EQ', volc:'VOLC', plate:'PLATE', cell:'CELL'},
-                    noLessonTag:true, distinctTypes:true, bankItems:true,
-                    label:'علوم م٣ — الفتري 📝' },
-    /* ═══ علومُ سعود ═══════════════════════════════════════════════
-       صورةُ فهرسِ كتابِه (١١ أكتوبر ٢٠٢٦) وعليها فصلان من الوحدةِ
-       الأولى: «ممالكُ المخلوقات الحيّة» (الخلايا · التصنيف) و«المملكةُ
-       الحيوانيّة» (اللافقاريّات · الفقاريّات · أجهزةُ أجسامِ الحيوانات).
-       والدرسُ الثالثُ لا بنكَ له في الصفحة، فهو خارجُ الورقةِ حتّى
-       يُكتَب بنكُه — وقيل ذلك للأبِ ولم يُطوَ.
-       وأسماءُ البنوكِ تخالف معرِّفاتِ الدروسِ هنا (clas ← CLASSIFY). */
-    'science4.html': { ids:['cells','clas','inv','vert'], mcq:10, mark:2, essay:0,
-                    countMap:{cells:3, clas:2, inv:2, vert:3},
-                    bankName:{cells:'CELLS', clas:'CLASSIFY', inv:'INVERT', vert:'VERT'},
-                    noLessonTag:true, distinctTypes:true, bankItems:true,
-                    label:'علوم خ٤ — الفتري 📝', ban:/"nutri"|"health"|"eco"|"food"|"all"/,
-                    banMsg:'درسٌ خارجَ مقرَّرِ سعود (الفصلان الأوّلُ والثاني وحدَهما) دخل الفتري' },
-    'science5.html': { ids:['l11','l12','l21','l22','l31','l32'], mcq:10, mark:2, essay:0,
-                    countMap:{l11:2,l12:2,l21:2,l22:1,l31:2,l32:1},
-                    noLessonTag:true, distinctTypes:true, bankItems:true,
-                    label:'علوم خ٥ — الفتري 📝', ban:/"l4\d"|"l5\d"|"l6\d"|"all\d"/,
-                    banMsg:'درسٌ خارجَ مقرَّرِ أسامة (الفصولُ الأوّلُ والثاني والثالثُ وحدَها) دخل الفتري' },
-    'math4.html': { ids:['f2'], mcq:10, mark:2, essay:0, perMap:{f2:10}, noLessonTag:true, distinctTypes:true,
-                    label:'رياضيات خ٤ — الفتري 📝', ban:/"f1"|"f3"|"f4"|"f5"|"f6"|"fw"|"all"/, banMsg:'فصلٌ خارجَ مقرَّرِ سعود (المقرَّرُ الجمعُ والطرحُ وحدَه)' }
-  };
-  const out = [];
-  for (const f of Object.keys(SPEC)) out.push(...fatriOne(f, SPEC[f]));
-  return out;
-}
-function fatriOne(f, SP){
-  const out = [];
-  const p = path.join(ROOT, f);
-  if (!fs.existsSync(p)) return out;
-  const src = fs.readFileSync(p, 'utf8');
-  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
-  const m = /var FATRI_IDS = \[([^\]]*)\];/.exec(src);
-  if (!m){ E('قائمةُ دروسِ الفتري مفقودة'); return out; }
-  const ids = m[1].split(',').map(x => x.trim().replace(/"/g,'')).filter(Boolean);
-  if (SP.countMap){
-    /* قائمةٌ فيها الدرسُ مكرّرًا بعددِ أسئلتِه — نعدّ التكرارَ ونقارنه */
-    const cnt = {};
-    ids.forEach(x => { cnt[x] = (cnt[x]||0) + 1; });
-    const mism = [];
-    Object.keys(SP.countMap).forEach(k => {
-      if ((cnt[k]||0) !== SP.countMap[k]) mism.push(k + '=' + (cnt[k]||0) + ' والمطلوبُ ' + SP.countMap[k]);
-    });
-    if (mism.length) E('توزيعُ الأسئلةِ على الدروسِ تغيّر: ' + mism.join('، '));
-    if (ids.length !== SP.mcq) E('أسئلةُ الفتري ' + ids.length + ' والمطلوبُ ' + SP.mcq);
-  } else if (SP.perMap){
-    /* توزيعٌ غيرُ متساوٍ: نقرؤه من الكودِ ونجمعه */
-    const pm = /var FATRI_PER = \{([^}]*)\};/.exec(src);
-    if (!pm) E('توزيعُ أسئلةِ الفصولِ (FATRI_PER) مفقود');
-    else {
-      let sum = 0, mism = [];
-      Object.keys(SP.perMap).forEach(k => {
-        const g = new RegExp(k + '\\s*:\\s*(\\d+)').exec(pm[1]);
-        const v = g ? +g[1] : 0; sum += v;
-        if (v !== SP.perMap[k]) mism.push(k + '=' + v + ' والمطلوبُ ' + SP.perMap[k]);
-      });
-      if (mism.length) E('توزيعُ الأسئلةِ على الفصولِ تغيّر: ' + mism.join('، '));
-      if (sum !== SP.mcq) E('مجموعُ أسئلةِ الفصولِ ' + sum + ' والمطلوبُ ' + SP.mcq);
-      /* ═══ والعددُ المعلَن يطابق المجموع ══════════════════════════════
-         ‏FATRI_MCQ مكتوبٌ بيدٍ في هذه الصفحة، لا محسوبًا من الطول.
-         فلو خالف مجموعَ التوزيعِ لعُرضت عشرون سؤالًا والدرجةُ من ستّ
-         عشرة — ولا يُخطئ شيءٌ ظاهر. */
-      const dm = /var FATRI_MCQ = (\d+);/.exec(src);
-      if (dm && +dm[1] !== sum)
-        E('العددُ المعلَن ' + dm[1] + ' يخالف مجموعَ التوزيع ' + sum + ' — تُعرَض أسئلةٌ والدرجةُ من غيرِ عددِها');
-    }
-  } else {
-    const per = SP.per || 1;
-    if (per > 1 && !new RegExp('var FATRI_PER = ' + per + ';').test(src))
-      E('عددُ أسئلةِ الفصلِ الواحدِ ليس ' + per);
-    if (ids.length * per !== SP.mcq)
-      E('أسئلةُ الفتري ' + (ids.length*per) + ' والمطلوبُ ' + SP.mcq);
-  }
-  const want = SP.ids;
-  const extra = ids.filter(x => want.indexOf(x) < 0);
-  if (extra.length) E('دروسٌ خارجَ مقرَّر الفتري: ' + [...new Set(extra)].join('، '));
-  const missing = want.filter(x => ids.indexOf(x) < 0);
-  if (missing.length) E('دروسٌ من المقرَّرِ غائبةٌ عن الفتري: ' + missing.join('، '));
-  /* ban اختياريّ: صفحةٌ مقرَّرُها دروسُها كلُّها لا شيءَ يُمنَع فيها
-     (science9)، وكان الفحصُ يفترض وجودَه فيسقط بـTypeError ويُعطّل
-     فحصَ الصفحاتِ كلِّها — لا فحصَ هذه الصفحةِ وحدَها. */
-  if (SP.ban && SP.ban.test(m[1])) E('دخل الفتريَّ ' + SP.banMsg);
-  /* ═══ نصُّ المقرَّرِ المعروضُ يطابق القائمةَ ══════════════════════
-     ضُيِّق مقرَّرُ حسنٍ فبقي في المقدّمةِ سطرٌ يقول «ومن الفصل الثالث
-     الدرس ٣-١» وهو قد خرج — فيقرأ الطالبُ شيئًا ويُختبَر في غيرِه.
-     فالنصُّ لا يذكر فصلًا ليس في القائمة. */
-  if (SP.ban && SP.ban.test('"t1"') && /المقرَّر:[\s\S]{0,400}الفصل الثالث: <b>/.test(src))
-    E('مقدّمةُ الفتري تُعلن درسًا من الفصلِ الثالثِ وهو خارجُ القائمة');
-  /* ═══ كلُّ عددٍ يُعرَض للطالبِ يطابق عددَ أسئلتِه ══════════════════
-     وقع مرّتين في يومٍ واحد (٨ أكتوبر): سطرُ «الوحدة» فوق اللوحة بقي
-     يقول «١٥ سؤالًا ومن الفصل الثالث» في صفحةِ حسن و«١٧ سؤالًا» في
-     صفحةِ رفيف، بعد أن صارت الأسئلةُ عشرين في كلتيهما — ومقدّمةُ اللوحةِ
-     تحته تقول الصواب. فيقرأ الطالبُ رقمين متناقضَين في شاشةٍ واحدة، ولا
-     يُخطئ شيءٌ ظاهر ولا تنقص درجةٌ، فلا يُكشف إلّا بعينٍ تقرأ الشاشة.
-     وهذا الحارسُ يقرؤها: كلُّ «ن سؤالًا» في موضعٍ معروضٍ عن الفتري يجب
-     أن يساوي عددَ أسئلتِه. */
-  const arN = n => String(n).split('').map(d => '٠١٢٣٤٥٦٧٨٩'[+d]).join('');
-  const um = /fatri:\s*\{[\s\S]{0,1200}?unit:\s*'([^']*)'/.exec(src);
-  const im = /function renderFatri\(\)\{[\s\S]{0,4000}?sec\.innerHTML/.exec(src);
-  const shown = [];
-  if (um) shown.push(['سطرِ الوحدةِ فوق لوحةِ الفتري', um[1]]);
-  if (im) shown.push(['مقدّمةِ لوحةِ الفتري', im[0]]);
-  /* ═══ العددُ المعروضُ: الاختياراتُ وحدَها أو هي والمقاليّات ═══════
-     ورقةٌ فيها مقاليّاتٌ يصحّ أن تُعلن «٢٠ سؤالًا» وهي ثمانيةَ عشرَ
-     اختيارًا ومقاليّان — وهو ما طلبه الأبُ لإنجليزيِّ حسنٍ بنصِّه.
-     فكان الفحصُ يقبل عددَ الاختياراتِ وحدَه فصاح على إعلانٍ صادق. */
-  const okCounts = [arN(SP.mcq)];
-  if (SP.essayQ) okCounts.push(arN(SP.mcq + SP.essayQ));
-  for (const [where, text] of shown)
-    for (const g of String(text).matchAll(/([٠-٩]+)\s*(?:سؤالًا|أسئلة)/g))
-      if (okCounts.indexOf(g[1]) < 0)
-        E('العددُ المعروضُ في ' + where + ' «' + g[0].trim() + '» والأسئلةُ ' + okCounts.join(' أو ') +
-          ' — رقمان متناقضان في شاشةٍ واحدة');
-  if (SP.ban && SP.ban.test('"t1"') && um && /الفصل الثالث|من الثالث/.test(um[1]))
-    E('سطرُ الوحدةِ فوق اللوحةِ يُعلن درسًا من الفصلِ الثالثِ وهو خارجُ القائمة');
-
-  /* ═══ أنماطُ ورقةِ المعلّمِ تبقى في بنوكِ دروسِ الفتري ════════════════
-     أرسل الأبُ (٨ أكتوبر) صورَ أوراقٍ وزّعها معلّمُ حسنٍ على صفّه وقال
-     «حطّ أسئلة مشابهة لها في الفتري». والأنماطُ مربوطةٌ ببنوكِ الدروسِ لا
-     بالفتريِّ مباشرةً — فحذفُ اسمٍ من مصفوفةِ بنكٍ يُخرجه من الاختبارِ
-     بلا أثرٍ ظاهر: الاختبارُ يبقى عشرين سؤالًا وتبقى الدرجةُ عشرين. */
-  if (SP.teacherGens){
-    const banks = {};
-    for (const bm of src.matchAll(/^var ([A-Z]+\d*) = \[(.+)\];/gm))
-      banks[bm[1]] = bm[2].split(',').map(x => x.trim());
-    for (const bank of Object.keys(SP.teacherGens))
-      for (const g of SP.teacherGens[bank])
-        if ((banks[bank] || []).indexOf(g) < 0)
-          E('نمطُ ورقةِ المعلّمِ ' + g + ' ليس في بنكِ ' + bank + ' — خرج من الفتري بلا أثرٍ ظاهر');
-  }
-
-  /* المجموعُ عشرون في الصفحتين */
-  if (!new RegExp('var FATRI_ESSAY = ' + SP.essay + ';').test(src))
-    E('درجةُ المقاليِّ ليست ' + SP.essay);
-  const MARK = SP.mark || 1;
-  if (SP.mcq * MARK + SP.essay !== 20) E('مجموعُ الدرجاتِ ليس عشرين');
-  /* ═══ الدرجةُ تُحسب بدرجةِ السؤالِ لا بعددِ الأسئلة ══════════════════
-     صار سؤالُ سعودٍ وأسامةَ بدرجتين (٨ أكتوبر)، فلو حُسب المجموعُ من
-     العددِ وحدَه ظهرت «٠ / ١٠» على الشاشةِ وحُفظت الدرجةُ من عشرٍ —
-     ويرى الأبُ في تقريرِه نصفَ ما اتّفق عليه ولا يُخطئ شيءٌ ظاهر. */
-  if (SP.essay > 0){
-    if (!/var FATRI_TOTAL = FATRI_MCQ \+ FATRI_ESSAY;/.test(src)) E('مجموعُ الدرجاتِ لا يُحسب من جزأيه');
-  } else if (MARK > 1){
-    if (!new RegExp('var FATRI_MARK = ' + MARK + ';').test(src))
-      E('درجةُ السؤالِ ليست ' + MARK);
-    if (!/var FATRI_TOTAL = FATRI_MCQ \* FATRI_MARK;/.test(src))
-      E('مجموعُ الدرجاتِ لا يُضرب في درجةِ السؤال — فتُعرَض الدرجةُ من عددِ الأسئلةِ لا من عشرين');
-    if (!/function marks\(\)\{ return correct \* FATRI_MARK; \}/.test(src))
-      E('الدرجةُ المحسوبةُ ما زالت عددَ الصحيحِ لا مضروبًا في درجةِ السؤال');
-  } else {
-    if (!/var FATRI_TOTAL = FATRI_MCQ;/.test(src)) E('مجموعُ الدرجاتِ ليس عددَ الأسئلةِ في اختبارٍ بلا مقاليّ');
-  }
-
-  /* ═══ نوعٌ مختلفٌ لكلِّ سؤالٍ في الفتري ══════════════════════════════
-     رأى الأبُ (٨ أكتوبر) النوعَ يتكرّر في فتريِّ سعودٍ وأسامةَ — والبنكُ
-     خمسةُ أنواعٍ والأسئلةُ عشرة — فقال: «وسّع البنك». فوُسِّع إلى سبعةَ
-     عشرَ نوعًا، وصار الفتري يأخذ سؤالًا من كلّ مولّدٍ على حدة
-     (genDistinct) لا عشوائيًّا (genN).
-
-     وهما شرطان لا واحد: لو رجع السحبُ عشوائيًّا تكرّر النوعُ وإن كبُر
-     البنك، ولو صغُر البنكُ عن عددِ الأسئلةِ تكرّر وإن كان السحبُ متمايزًا.
-     والعطبُ في الحالتين صامت: الاختبارُ عشرةُ أسئلةٍ والدرجةُ عشرون. */
-  if (SP.distinctTypes){
-    if (!/function genDistinct\(/.test(src))
-      E('دالّةُ «نوعٌ لكلّ سؤال» (genDistinct) مفقودة');
-    const rfd = /function renderFatri\(\)\{[\s\S]*?\n  \}\n/.exec(src);
-    if (rfd && !/genDistinct\(CFG\[id\]\.gens/.test(rfd[0]))
-      E('الفتري يسحب أسئلتَه عشوائيًّا فيتكرّر النوعُ في الجولةِ الواحدة');
-    for (const id of SP.ids){
-      const nm = (SP.bankName && SP.bankName[id]) || id.toUpperCase();
-      /* ═══ شكلان للبنوك ═══════════════════════════════════════════
-         صفحاتُ الرياضيات بنوكُها دوالُّ مولّدةٌ مسمّاة (gXxx)، فالتنوّعُ
-         عددُ الدوالّ. وصفحاتُ العلومِ بنكُها مصفوفةُ أسئلةٍ جاهزةٍ ومولّدٌ
-         واحدٌ يسحب منها (bankGen)، فالتنوّعُ عددُ الأسئلةِ في المصفوفة.
-         وكان الفحصُ يعرف الشكلَ الأوّلَ وحدَه فعدَّ بنوكَ العلومِ صفرًا. */
-      const need = SP.countMap ? (SP.countMap[id] || 1) : SP.mcq;
-      let cnt;
-      if (SP.bankItems){
-        const lit = EXTRACT.literalAfter(src, new RegExp('(?:var|let|const)\\s+' + nm + '\\s*='), '[', ']');
-        if (!lit){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
-        let d=0, q=null, esc=false; cnt=1;
-        for (let i=0;i<lit.length;i++){ const ch=lit[i];
-          if (q){ if(esc){esc=false;continue;} if(ch==='\\'){esc=true;continue;} if(ch===q)q=null; continue; }
-          if (ch==='"'||ch==="'"||ch==='`'){ q=ch; continue; }
-          if (ch==='['||ch==='{'||ch==='('){ d++; continue; }
-          if (ch===']'||ch==='}'||ch===')'){ d--; continue; }
-          if (ch===',' && d===1) cnt++;
-        }
-      } else {
-        const bm = new RegExp('var ' + nm + ' = \\[([\\s\\S]*?)\\];').exec(src);
-        if (!bm){ E('تعذّرت قراءةُ بنكِ ' + nm); continue; }
-        /* أسماءُ المولّداتِ تختلف بين الصفحات: صفحاتُ الرياضيات تبدؤها
-           بـg (gSlope)، وصفحاتُ الإنجليزيِّ باسمِ الوحدة (u1Freq · exTigers).
-           فالنمطُ من الجدول، وبلا ذلك عُدّت بنوكُ الإنجليزيِّ صفرًا. */
-        const GP = SP.genPat || /^g[A-Za-z0-9_]+$/;
-        cnt = bm[1].split(',').map(x => x.trim()).filter(x => GP.test(x)).length;
-      }
-      if (cnt < need)
-        E('بنكُ ' + nm + ' فيه ' + cnt + ' نوعًا والمطلوبُ ' + need +
-          ' — فلا بدّ أن يتكرّر النوعُ في الجولةِ الواحدة');
-    }
-  }
-
-  /* ═══ اسمُ الدرسِ لا يُطبَع فوقَ السؤال، ويبقى في الحفظ ═════════════
-     طلبُ الأب (٨ أكتوبر): «ولا تكتب اسم الدرس في الاختبار» — فطباعتُه
-     فوقَ السؤالِ تدلُّ الطفلَ على الطريقةِ قبل أن يفكّر. ويبقى الوسمُ
-     في الميتا (__lesson) لأنّ تفصيلَ الفصولِ في تقريرِ الأبِ مبنيٌّ عليه،
-     فرفعُه من العرضِ لا يعني رفعَه من الحفظ. */
-  if (SP.noLessonTag){
-    const rf = /function renderFatri\(\)\{[\s\S]*?\n  \}\n/.exec(src);
-    const body = rf ? rf[0] : '';
-    if (!body) E('تعذّرت قراءةُ لوحةِ الفتري للتحقّقِ من اسمِ الدرس');
-    else {
-      if (/class="num"[\s\S]{0,240}?__lesson/.test(body))
-        E('اسمُ الدرسِ مطبوعٌ فوقَ السؤالِ في الفتري — وقد طلب الأبُ رفعَه');
-      if (/<b>المقرَّر:<\/b>[\s\S]{0,160}?FATRI_AR/.test(body))
-        E('اسمُ الدرسِ مكتوبٌ في سطرِ المقرَّرِ بمقدّمةِ الفتري — وقد طلب الأبُ رفعَه');
-      if (!/__lesson \|\| "غير محدّد"/.test(body))
-        E('وسمُ الفصلِ (__lesson) سقط من حفظِ الفتري — فيفقد تقريرُ الأبِ تفصيلَ الفصول');
-    }
-  }
-  if (!/FATRI_TOTAL\b/.test(src) || src.indexOf('saveScore("' + SP.label + '", __fr.got, __fr.total') < 0)
-    E('الدرجةُ لا تُحفَظ من مخرَجِ FATRI.row باسمِ الاختبارِ الصحيح');
-  /* والناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
-  if (!/FATRI\.row\(\{ got: marks\(\), markTotal: FATRI_TOTAL,/.test(src))
-    E('الفتري لا يمرُّ على قاعدةِ الحفظِ الناقص — فتعود «٠ من عشرين» لمن أجاب عن سؤال');
-  /* ═══ فحوصُ المقاليِّ تُطبَّق على من له مقاليٌّ وحدَه ══════════════
-     أسامةُ رُفع مقاليُّه بطلبِ أبيه، فمطالبتُه بحفظِ نصٍّ لا وجودَ له
-     خطأٌ في الحارسِ لا في الصفحة. وبالمقابل: من أُلغي مقاليُّه يجب
-     ألّا تبقى في صفحتِه بقايا منه — فنتحقّق من ذهابِها. */
-  if (SP.essay > 0){
-    /* الصفحاتُ تكتب المقاليَّ بشكلَين: واحدٌ (essayText) أو أكثر
-       (essayText[k])، فيُفحَص الأثرُ لا هجاءٌ بعينِه — وإلّا صاح
-       الحارسُ على تنفيذٍ صحيحٍ وسكت عن حذفٍ بصياغةٍ أخرى. */
-    if (!/essayText(\[[^\]]*\])?\.length < 10/.test(src))
-      E('الحلُّ النموذجيُّ يظهر قبل أن يكتب — فينقله');
-    if (!/essay:\s*essayText/.test(src) || !/essaySelf:\s*essay/.test(src))
-      E('نصُّ المقاليِّ أو درجتُه الذاتيّةُ لا تُحفَظ — فلا يراجعها الأب');
-  } else {
-    /* ═══ البقايا تُفتَّش في ورقةِ الفتري وحدَها ═══════════════════════
-       كان الفحصُ يمرّ على الملفِّ كلِّه، فلمّا أُضيف تبويبُ «نماذج
-       المعلِّمين» إلى science8.html — وفيه مقاليّاتُ الأوراقِ الحقيقيّة —
-       صاح الحارسُ على ورقةٍ لا مقاليَّ فيها أصلًا. والمقصودُ أنّ من
-       أُلغي مقاليُّ فتريِّه لا تبقى في ورقتِه بقايا منه، لا أن تخلو
-       الصفحةُ كلُّها من كلمةِ «مقالي». */
-    const rfe = /function renderFatri\(\)\{[\s\S]*?\n  \}\n/.exec(src);
-    if (/data-essay|fatriEssay|essayMark/.test(rfe ? rfe[0] : src))
-      E('بقايا السؤالِ المقاليِّ في ورقةِ فتريٍّ أُلغي منها — إمّا يظهر ناقصًا أو يرمي');
-    if (!/var FATRI_ESSAY = 0;/.test(src))
-      E('المقاليُّ مرفوعٌ من العرضِ ودرجتُه ما زالت تُحسب');
-  }
-  /* ويُعرَضان في التقريرَين */
-  for (const rf of ['home.html', 'child.html']){
-    const rp = path.join(ROOT, rf);
-    if (!fs.existsSync(rp)) continue;
-    if (!/meta\.essay &&/.test(fs.readFileSync(rp, 'utf8')))
-      out.push({ sev:'خطأ', file:rf, msg:'نصُّ المقاليِّ يُحفَظ ولا يُعرَض — فالدرجةُ الذاتيّةُ بلا مراجعة' });
-  }
-  return out;
-}
 function pacePath(){
   const out = [], f = 'practice.html';
   const p = path.join(ROOT, f);
@@ -2026,95 +1433,6 @@ function typedAnswers(){
   return out;
 }
 
-/* ═══ نماذجُ المعلِّمين في علومِ رفيف ═══════════════════════════════════
-   طلبُ الأب (١٢ أكتوبر ٢٠٢٦): «انسخ نفس النماذج هذي بالضبط وحطها
-   بالفتري». والمادّةُ منقولةٌ باليدِ من ملفٍّ مصوَّرٍ لا نصَّ فيه، فعطبُها
-   صامتٌ بطبعِه: فهرسُ إجابةٍ خارجَ عددِ الخيارات يجعل السؤالَ بلا إجابةٍ
-   صحيحةٍ أبدًا، وخيارٌ صحيحٌ مكرَّرٌ حرفيًّا يجعل النقرَ على الصوابِ خطأً.
-   وكلاهما يمرّ بلا صياحٍ على الشاشة — فيُفحَصان هنا.
-
-   ويُفحَص الوصلُ أيضًا: ملفٌّ لا تحمّله الصفحةُ أو تبويبٌ لا لوحةَ له
-   يعني زرًّا يفتح فراغًا. */
-function modelsSc8Path(){
-  const out = [];
-  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
-  const MF = 'models-sc8.js', PG = 'science8.html';
-  const mp = path.join(ROOT, MF), pp = path.join(ROOT, PG);
-  if (!fs.existsSync(mp) || !fs.existsSync(pp)) return out;
-
-  const src = fs.readFileSync(pp, 'utf8');
-  if (src.indexOf('src="' + MF) < 0)
-    E(PG, 'ملفُّ النماذجِ غير محمَّلٍ في الصفحة — فالتبويبُ يفتح فراغًا');
-  if (!/function renderModels\(\)/.test(src))
-    E(PG, 'دالّةُ عرضِ النماذج (renderModels) مفقودة');
-  if (!/id==="models"[\s\S]{0,120}renderModels\(\)/.test(src))
-    E(PG, 'لوحةُ النماذجِ غير موصولةٍ بـshowPanel — فالتبويبُ لا يعرض شيئًا');
-  if (!/fatri:\s*\{[^}]*ids:\s*\[[^\]]*"models"/.test(src))
-    E(PG, 'تبويبُ النماذجِ غير مُدرَجٍ في فصلِ الفتري — فلا يُرى');
-  if (!/CFG\.models\s*=/.test(src))
-    E(PG, 'تعريفُ تبويبِ النماذج (CFG.models) مفقود — فيرمي عند الرسم');
-  if (src.indexOf('saveScore("علوم م٢ — نماذج الفتري 📚"') < 0)
-    E(PG, 'درجةُ النماذجِ لا تُحفَظ باسمٍ مستقلٍّ — فتختلط بالفتريِّ المولَّد');
-
-  let MODELS = null;
-  try {
-    const box = { window:{} };
-    require('vm').createContext(box);
-    require('vm').runInContext(fs.readFileSync(mp, 'utf8'), box, { timeout: 8000 });
-    MODELS = box.window.SC8_MODELS;
-  } catch(e){ E(MF, 'تعذّرت قراءةُ ملفِّ النماذج: ' + e.message); return out; }
-
-  if (!Array.isArray(MODELS) || !MODELS.length){
-    E(MF, 'قائمةُ النماذجِ فارغةٌ أو ليست مصفوفة'); return out;
-  }
-  const seenId = new Set();
-  let mcqN = 0, essN = 0;
-  for (const M of MODELS){
-    const tag = (M && M.name) || '(بلا اسم)';
-    if (!M || !M.id || !M.name || !M.head || !Array.isArray(M.secs) || !M.secs.length){
-      E(MF, tag + ' — نموذجٌ ناقصُ الترويسةِ أو بلا أقسام'); continue;
-    }
-    if (seenId.has(M.id)) E(MF, M.id + ' — مُعرِّفُ نموذجٍ مكرَّر');
-    seenId.add(M.id);
-    for (const s of M.secs){
-      if (!s || !s.t || !Array.isArray(s.q) || !s.q.length){
-        E(MF, tag + ' — قسمٌ بلا عنوانٍ أو بلا أسئلة'); continue;
-      }
-      for (const q of s.q){
-        if (q && q.open){
-          essN++;
-          if (!q.stem || !q.model || String(q.model).trim().length < 10)
-            E(MF, tag + ' — مقاليٌّ بلا نصٍّ أو بلا حلٍّ نموذجيّ');
-          continue;
-        }
-        mcqN++;
-        if (!Array.isArray(q) || q.length !== 4){
-          E(MF, tag + ' — سؤالٌ ليس على شكلِ [نصّ, خيارات, الصحيح, شرح]'); continue;
-        }
-        if (!q[0] || !String(q[0]).trim()){ E(MF, tag + ' — سؤالٌ بلا نصّ'); continue; }
-        if (!Array.isArray(q[1]) || q[1].length < 2){
-          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» خياراتُه أقلُّ من اثنَين'); continue;
-        }
-        if (typeof q[2] !== 'number' || q[2] < 0 || q[2] >= q[1].length){
-          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» فهرسُ الإجابةِ خارجَ الخيارات: ' + q[2]); continue;
-        }
-        /* خيارٌ صحيحٌ مكرَّرٌ حرفيًّا: تنقر الصوابَ فيُحسَب خطأً.
-           والتكرارُ في خيارٍ خاطئٍ يُترَك — ففي ورقةِ أحدِ المعلِّمين
-           تكرّر خيارٌ خاطئٌ مرّتَين، ونُقل كما هو عمدًا. */
-        if (q[1].filter(x => x === q[1][q[2]]).length !== 1)
-          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» الخيارُ الصحيحُ مكرَّرٌ حرفيًّا فلا يُميَّز');
-        if (!q[3] || !String(q[3]).trim())
-          E(MF, tag + ' — «' + String(q[0]).slice(0,34) + '» بلا سطرِ شرح');
-      }
-    }
-  }
-  if (mcqN < 200)
-    out.push({ sev:'تنبيه', file:MF, msg:'أسئلةُ الاختيارِ ' + mcqN + ' فقط — كان المنقولُ ساعةَ البناءِ ٢٨٢' });
-  if (!essN)
-    out.push({ sev:'تنبيه', file:MF, msg:'لا مقاليَّ في النماذجِ كلِّها — وأوراقُ المعلِّمين فيها «علّل» و«قارن»' });
-  return out;
-}
-
 /* ═══ جرعتا حسن المركَّزتان ═══════════════════════════════════════════
    طلبُ الأب (١٥ أكتوبر ٢٠٢٦): «جرعة حسن سوّها».
 
@@ -2361,14 +1679,14 @@ function mawhiba3BookPath(){
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
 /* ═══ الاختبارُ الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها ═══
-   كشفها تشخيصُ سعودٍ في الإنجليزي (١٨ أكتوبر ٢٠٢٦): بدأ الفتريَّ ٢٢
+   كشفها تشخيصُ سعودٍ في الإنجليزي (١٨ أكتوبر ٢٠٢٦): بدأ اختبارَه ٢٢
    مرّةً وترك خمسَ عشرةَ منها بعد سؤالٍ أو سؤالين، فحُفظت له «٠ من ٢٠»
    لكلِّ قُصاصة، فهبط متوسّطُه المعروضُ إلى ٣١٪ وهو في المكتملاتِ ٧٠٪.
-   وقياسُ القاعدةِ يومَها: ستّةٌ من ثلاثةَ عشرَ اختبارًا فتريًّا مظلومة.
 
    وهذا عطبٌ لا صوتَ له: الصفحةُ تعمل، والدرجةُ تُحفَظ، والرقمُ كذب.
-   فيُحرَس في مواضعِه الثلاثةَ عشرَ جميعًا — ولو نُسي موضعٌ واحدٌ ظلَّ
-   اختبارٌ كاملٌ يَظلم صاحبَه. */
+   وكانت القاعدةُ تُحرَس في ثلاثةَ عشرَ موضعًا؛ ولمّا نُزعت اختباراتُ
+   الفتريِّ كلُّها (١٩ أكتوبر ٢٠٢٦) بقي لها موضعٌ واحد: اختبارُ مذكّرةِ
+   حسنٍ في العلوم — وهو طويلٌ (٢٤ بندًا) فالقُصاصةُ فيه أرجحُ لا أندر. */
 function fatriPartialSave(){
   const out = [];
   const F = 'fatri-save.js', fp = path.join(ROOT, F);
@@ -2387,21 +1705,9 @@ function fatriPartialSave(){
   if (!/if\(o\.done \|\| \(items && n >= items\)\)/.test(rule))
     E(F, 'المكتملُ لم يَعُد يُحفَظ كاملًا');
 
-  /* المواضعُ الثلاثةَ عشر: كلُّ حفظٍ يمرُّ على القاعدة */
+  /* والموضعُ الباقي: كلُّ حفظٍ يمرُّ على القاعدة */
   const SITES = [
-    ['fatri-en4.js',  'إنجليزي خ٤ — الفتري 📝'],
-    ['fatri-en5.js',  'إنجليزي خ٥ — الفتري 📝'],
-    ['math4.html',    'رياضيات خ٤ — الفتري 📝'],
-    ['math5.html',    'رياضيات خ٥ — الفتري 📝'],
-    ['math8.html',    'رياضيات م٢ — الفتري 📝'],
-    ['math9.html',    'رياضيات م٣ — الفتري 📝'],
-    ['science4.html', 'علوم خ٤ — الفتري 📝'],
-    ['science5.html', 'علوم خ٥ — الفتري 📝'],
-    ['science8.html', 'علوم م٢ — الفتري 📝'],
-    ['science8.html', 'علوم م٢ — نماذج الفتري 📚'],
-    ['science9.html', 'علوم م٣ — الفتري 📝'],
-    ['science9.html', 'علوم م٣ — اختبار المذكّرة 📒'],
-    ['english9.html', 'إنجليزي م٣ — الفتري 📝']
+    ['science9.html', 'علوم م٣ — اختبار المذكّرة 📒']
   ];
   for (const [f, label] of SITES) {
     const p = path.join(ROOT, f);
@@ -2415,7 +1721,8 @@ function fatriPartialSave(){
 
   /* ═══ والماضي: قُصاصةٌ محفوظةٌ لا تُعرَض آخرَ ورقةٍ حلَّها ═══
      الصفوفُ القديمةُ لا تُعدَّل، والمفتاحُ المنشورُ لا يَحذِف. فكانت
-     صفحةُ سعودٍ تقول «خ٤ — الفتري 📝: 0/20» وآخرُ ورقةٍ أتمَّها 16/20. */
+     صفحةُ سعودٍ تقول «خ٤ — الفتري 📝: 0/20» وآخرُ ورقةٍ أتمَّها 16/20.
+     واختباراتُ الفتريِّ نُزعت، وصفوفُها باقيةٌ لا تُحذَف — فيبقى. */
   const RRF = 'report-rules.js', rrp = path.join(ROOT, RRF);
   if (fs.existsSync(rrp)) {
     const rr = fs.readFileSync(rrp, 'utf8');
@@ -2428,9 +1735,7 @@ function fatriPartialSave(){
   }
 
   /* والملفُّ محمَّلٌ في كلِّ صفحةٍ تَحفظ */
-  const PAGES = ['math4.html','math5.html','math8.html','math9.html','science4.html',
-                 'science5.html','science8.html','science9.html','english9.html',
-                 'english.html','english5.html'];
+  const PAGES = ['science9.html'];
   for (const p of PAGES) {
     const q = path.join(ROOT, p);
     if (!fs.existsSync(q)) continue;
@@ -3101,7 +2406,7 @@ function muthPath(){
   /* ═══ ما رفعه الأبُ لا يعود صامتًا ══════════════════════════════════
      «الأسئلة المقالية هذي وكذلك سؤال التخمر — شلها لأنها تكرّرت عليه
      كثير» (١٦ أكتوبر). والعلّةُ تكرارُها على حسنٍ لا موضعُها، فلا تعود
-     في الفتريِّ ولا في المذكّرة. */
+     في المذكّرة. */
   const DROPPED = [
     ['أثر كمّيّة السماد', 'مقاليُّ السمادِ والفول'],
     ['قارن</b> بين <b>البناء الضوئيّ</b> و<b>التنفّس الخلويّ', 'مقارنةُ البناءِ الضوئيِّ بالتنفّسِ الخلويّ'],
@@ -3110,14 +2415,15 @@ function muthPath(){
   for (const [needle, label] of DROPPED)
     if (src.indexOf(needle) >= 0)
       E(label + ' عاد إلى الصفحة — وقد رفعه الأبُ بطلبِه لتكرارِه على حسن');
-  /* ولا يبقى بنكُ مقارنةِ الفتريِّ نصًّا واحدًا بعد الرفع */
-  {
-    const lit = EXTRACT.literalAfter(src, /var\s+ESSAY_CMP\s*=/, '[', ']');
-    const n = lit ? (lit.match(/\{\s*stem:/g) || []).length : 0;
-    if (n < 3) E('بنكُ مقارنةِ الفتريِّ فيه ' + n + ' نصًّا — فيأتي الطالبَ النصُّ نفسُه كلَّ مرّة');
-    const l2 = EXTRACT.literalAfter(src, /var\s+ESSAY_EXP\s*=/, '[', ']');
-    const n2 = l2 ? (l2.match(/\{\s*stem:/g) || []).length : 0;
-    if (n2 < 3) E('بنكُ تجربةِ الفتريِّ فيه ' + n2 + ' نصًّا — فيتكرّر على الطالب');
+  /* ═══ ونصُّ المقاليِّ يُعرَض للأبِ لا يُختصَر في رقم ═══════════════
+     يضع حسنٌ درجةَ مقاليّهِ بنفسِه، فلو عُرض الرقمُ وحدَه لم يُعرَف
+     أصادقٌ تقديرُه أم متساهل. (كان هذا الحارسُ مع حارسِ الفتريِّ،
+     فنُقل إلى هنا حين نُزع الفتريُّ في ١٩ أكتوبر ٢٠٢٦.) */
+  for (const rf of ['home.html', 'child.html']){
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) continue;
+    if (!/meta\.essay &&/.test(fs.readFileSync(rp, 'utf8')))
+      out.push({ sev:'خطأ', file:rf, msg:'نصُّ المقاليِّ يُحفَظ ولا يُعرَض — فالدرجةُ الذاتيّةُ بلا مراجعة' });
   }
   return out;
 }

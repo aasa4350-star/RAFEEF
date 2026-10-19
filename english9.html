@@ -12,7 +12,6 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
-<script src="fatri-save.js?v=20261019"></script>
 <script src="pace.js?v=20261009"></script>
 <script src="book-en9.js?v=20261009"></script>
 <script src="study-en4.js?v=20261009"></script>
@@ -4262,20 +4261,6 @@ if(!NAMES[who]){
     TERM2_IDS.forEach(function(k){ delete CFG[k]; });
   }
 
-  /* ═══ الاختبارُ الفتريُّ — إنجليزي حسن ═══════════════════════════
-     أرسل الأبُ (١٢ أكتوبر ٢٠٢٦) صورةَ فهرسِ كتابِه وقال: «هذا اختبار
-     حسن الفتري إنجليزي — حطّ ٢٠ سؤال منها سؤالين مقالي».
-     والصورةُ تُظهر: Unit 1 Lifestyles · Unit 2 Life Stories ·
-     Unit 3 When Are You Traveling? · EXPANSION Units 1–3،
-     وتنقطع عند Unit 4 — فالمقرَّرُ هو الجزءُ الأوّل.
-
-     وعددُ الأسئلةِ عشرون كما طلب: ثمانيةَ عشرَ اختيارًا ومقاليّان.
-     والدرجةُ عشرون كبقيّةِ اختباراتِه، فالسؤالُ بدرجةٍ والمقاليُّ
-     بدرجة. وإن أراد وزنًا أثقلَ للمقاليِّ فالعددُ ينزل عن عشرين. */
-  CHAPS = Object.assign({ fatri:{ name:"📝 الفتري", ids:["fatri"],
-    unit:'📝 <b>الاختبار الفتري</b> — <span class=ltr>Units 1–3 + Expansion</span> · ١٨ سؤال اختيار ومقاليّان · ٢٠ درجة' } }, CHAPS);
-  CFG.fatri = { tab:"الفتري 📝", gens:[], n:0, intro:"", label:"إنجليزي م٣ — الفتري 📝" };
-
   /* ═══ الجرعةُ المركَّزة ═══════════════════════════════════════════════
      بابان اثنان، كلٌّ منهما قاعدةٌ واحدةٌ تُشرَح فوقَ الورقةِ ثمّ تُجرَّب
      في ثلاثةِ أشكال. والشرحُ فوقُ مقصودٌ: الجرعةُ تعليمٌ قبل أن تكون
@@ -4307,7 +4292,9 @@ if(!NAMES[who]){
       '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">…until he will finish</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">…until he finishes</span><br>'+
       '<b>لا تقل</b> <span class=ltr style="color:var(--bad)">…when they will be on vacation</span> &nbsp;·&nbsp; <b>قل</b> <span class=ltr style="color:var(--good)">…when they are on vacation</span></div>' };
 
-  var curCh = "fatri", curId = "fatri";
+  /* وتُفتح الجرعةُ أوّلًا: هي أوّلُ بابٍ في الشريطِ وهي من قياسِ أخطائِه
+     هو. وكان يُفتح الفتريُّ قبلَها، ونُزع في ١٩ أكتوبر ٢٠٢٦. */
+  var curCh = "dose", curId = "doseq";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -4542,178 +4529,6 @@ if(!NAMES[who]){
     var rr=sec.querySelector("[data-remreset]"); if(rr) rr.addEventListener("click",function(){ REMTOPICS.forEach(function(t){ try{localStorage.removeItem(remKey(t.id));}catch(e){} }); renderRem(); });
   }
 
-  /* التوزيع: خمسةٌ لكلّ وحدةٍ وثلاثةٌ للمراجعة = ثمانيةَ عشر، ومقاليّان. */
-  var FATRI_IDS = ["u1","u1","u1","u1","u1",
-                   "u2","u2","u2","u2","u2",
-                   "u3","u3","u3","u3","u3",
-                   "exp","exp","exp"];
-  var FATRI_MCQ = FATRI_IDS.length;           /* ١٨ */
-  var FATRI_ESSAY = 2;                        /* درجةٌ لكلّ مقاليّ */
-  var FATRI_TOTAL = FATRI_MCQ + FATRI_ESSAY;  /* ٢٠ */
-  var FATRI_AR = { u1:"Unit 1 — Lifestyles", u2:"Unit 2 — Life Stories",
-                   u3:"Unit 3 — Traveling", exp:"Expansion 1–3" };
-
-  /* ═══ المقاليّان ═══════════════════════════════════════════════════
-     كتابةٌ قصيرةٌ بالإنجليزيّة على نحوِ ما في الكتاب: الوحدةُ الأولى
-     عاداتٌ وظروفُ تكرار، والثانيةُ ماضٍ وسيرةٌ، والثالثةُ خططُ سفرٍ
-     بالمضارع المستمرّ و‏going to. ولكلٍّ ثلاثةُ نصوصٍ يُسحَب منها واحدٌ
-     فلا يحفظ الجوابَ بإعادةِ الاختبار. */
-  var ESSAY_A = [
-    { stem:'<span class=ltr><b>Write 3–4 sentences about your daily routine.</b> Use at least two frequency adverbs (always · usually · often · sometimes · never) and put them in the right place.</span>',
-      model:'<span class=ltr>I <b>always</b> wake up at six o\'clock. I <b>usually</b> have breakfast with my family. I <b>often</b> study after school, but I <b>never</b> sleep late on school days. My father <b>is always</b> busy in the morning.</span><br><b>انتبه:</b> ظرفُ التكرار <b>قبل</b> الفعل العاديّ و<b>بعد</b> فعل الكون.' },
-    { stem:'<span class=ltr><b>Write 3–4 sentences comparing your lifestyle with your brother\'s.</b> Use frequency adverbs and the simple present.</span>',
-      model:'<span class=ltr>My brother <b>usually</b> plays football, but I <b>rarely</b> play it. He <b>always</b> studies at night, while I <b>often</b> study in the afternoon. We <b>both</b> like reading. He <b>is never</b> late for school.</span><br><b>انتبه:</b> الغائبُ المفردُ يأخذ <span class=ltr>s</span>، وظرفُ التكرارِ موضعُه يختلف مع فعل الكون.' },
-    { stem:'<span class=ltr><b>Write 3–4 sentences about healthy and unhealthy habits.</b> Use the simple present and frequency adverbs.</span>',
-      model:'<span class=ltr>Healthy people <b>usually</b> eat vegetables and fruit. They <b>always</b> drink a lot of water. They <b>never</b> eat fast food every day. They <b>often</b> walk or exercise for thirty minutes.</span><br><b>انتبه:</b> الجمعُ لا يأخذ <span class=ltr>s</span> في الفعل.' }
-  ];
-  var ESSAY_B = [
-    { stem:'<span class=ltr><b>Write 3–4 sentences about a trip you are planning.</b> Use the present continuous for arrangements and <b>be going to</b> for plans.</span>',
-      model:'<span class=ltr>I <b>am traveling</b> to Makkah next Friday. My family <b>is coming</b> with me. We <b>are going to visit</b> my uncle there. We <b>are going to stay</b> for three days.</span><br><b>انتبه:</b> المضارعُ المستمرُّ لترتيبٍ مؤكّدٍ بزمنٍ محدَّد، و<span class=ltr>going to</span> لخطّةٍ مقرَّرة.' },
-    { stem:'<span class=ltr><b>Write 3–4 sentences about an important event in your life.</b> Use the simple past and time expressions (last · ago · in).</span>',
-      model:'<span class=ltr>I <b>started</b> middle school three years <b>ago</b>. I <b>met</b> my best friend <b>in</b> 2024. We <b>won</b> a competition <b>last</b> year. It <b>was</b> a great day for me.</span><br><b>انتبه:</b> <span class=ltr>ago</span> بعد المدّة، و<span class=ltr>last</span> قبل الزمنِ بلا <span class=ltr>the</span>، والأفعالُ الشاذّةُ تُحفظ.' },
-    { stem:'<span class=ltr><b>Write 3–4 sentences about the life of a person you admire.</b> Use the simple past (born · studied · worked · became).</span>',
-      model:'<span class=ltr>He <b>was born</b> in Riyadh in 1980. He <b>studied</b> medicine at King Saud University. He <b>worked</b> in a big hospital for ten years. He <b>became</b> a famous doctor.</span><br><b>انتبه:</b> <span class=ltr>was/were born</span> مبنيٌّ للمجهول دائمًا، و<span class=ltr>in</span> مع السنوات.' }
-  ];
-
-  function renderFatri(){
-    var sec = panelOf("fatri");
-    var ESS = [ gp(ESSAY_A), gp(ESSAY_B) ];
-    var items = [], need = {};
-    FATRI_IDS.forEach(function(id){ need[id] = (need[id]||0) + 1; });
-    var drawn = {};
-    Object.keys(need).forEach(function(id){ drawn[id] = genDistinct(CFG[id].gens, need[id]); });
-    FATRI_IDS.forEach(function(id){
-      var q = drawn[id].shift();
-      if(!q) return;
-      q.__lesson = FATRI_AR[id] || id;
-      items.push(q);
-    });
-
-    var html =
-      '<div class="intro" style="border:1.5px solid var(--accent);background:var(--card)">'+
-        '<div style="font-size:1.12rem;font-weight:800;margin-bottom:6px">📝 الاختبار الفتري — الإنجليزي</div>'+
-        '<b>٢٠ سؤالًا · ٢٠ درجة</b> — ثمانيةَ عشرَ اختيارًا ومقاليّان، درجةٌ لكلّ سؤال.'+
-        '<div style="margin-top:6px;color:var(--muted);font-weight:600">تأنَّ — ما فيه وقتٌ يلاحقك هنا.</div>'+
-      '</div>';
-    items.forEach(function(q,i){
-      /* بلا اسمِ الوحدةِ فوقَ السؤال — كبقيّةِ اختباراتِ الفتريّ */
-      html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+
-        ' <span style="color:var(--muted);font-weight:600">· درجة</span></div>'+
-        '<div class="stem">'+q[0]+'</div><div class="opts">'+
-        q[1].map(function(o,j){ return '<button data-j="'+j+'">'+o+'</button>'; }).join('')+
-        '</div><div class="explain">'+q[3]+'</div></div>';
-    });
-    ESS.forEach(function(E, k){
-      html += '<div class="q" data-essay="'+k+'"><div class="num">سؤال '+(items.length+1+k)+
-        ' <span style="color:var(--muted);font-weight:600">· مقالي · درجة</span></div>'+
-        '<div class="stem">'+E.stem+'</div>'+
-        '<textarea data-etext="'+k+'" rows="5" dir="ltr" placeholder="Write your answer here..." style="width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-family:inherit;font-size:1rem;line-height:1.9;background:var(--bg);color:var(--ink);text-align:left"></textarea>'+
-        '<button data-eshow="'+k+'" style="margin-top:8px;background:var(--accent);color:#fff;border:0;padding:11px 18px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit">✅ خلّصت — أرني الحلّ النموذجي</button>'+
-        '<div data-emodel="'+k+'" style="display:none;margin-top:10px;background:var(--bg);border-radius:12px;padding:12px 14px;line-height:2"></div>'+
-        '<div data-erub="'+k+'" style="display:none;margin-top:10px"></div></div>';
-    });
-    html += '<div class="scorebar"><span data-score dir="ltr">0 / '+FATRI_TOTAL+'</span></div>'+
-      '<button class="reset">اختبار جديد 🔄</button>';
-    sec.innerHTML = html;
-
-    var pid = (sec._pid && sec._frag) ? sec._pid : newPid();
-    sec._pid = pid; sec._frag = true;
-    var answered={}, correct=0, savedN=0, saved=false;
-    var essayMark=[null,null], essayText=["",""];
-    var RG_MS = 2000, t0=Date.now(), lastTs=t0, fastN=0, SKILLS={}, ITEMS=[];
-    var scoreEl = sec.querySelector("[data-score]");
-    function essaySum(){ return (essayMark[0]||0) + (essayMark[1]||0); }
-    function essayDone(){ return essayMark[0]!=null && essayMark[1]!=null; }
-    function marks(){ return correct + essaySum(); }
-    function draw(){ scoreEl.textContent = marks()+" / "+FATRI_TOTAL; }
-    function meta(){
-      var m = { dur: Math.round((Date.now()-t0)/1000), fast: fastN,
-                skills: SKILLS, items: ITEMS, rgMs: RG_MS,
-                mcq: correct, mcqTotal: FATRI_MCQ,
-                essay: essayText.map(function(t,i){ return "("+(i+1)+") "+t; }).join("\n\n").slice(0, 1200),
-                essaySelf: essaySum(), essayMax: FATRI_ESSAY };
-      /* حارسُ التأنّي يسري على حسنٍ في الإنجليزيّ — انظر pace.js */
-      if(window.PACE) PACE.stamp(m, who, m.dur, FATRI_MCQ, fastN, correct);
-      else m.trusted = true;
-      return m;
-    }
-    function save(force){
-      var done = Object.keys(answered).length === FATRI_MCQ && essayDone();
-      if(!force && !done) return;
-      if(savedN >= marks() && saved && !done) return;
-      savedN = marks(); saved = true; if(done) sec._frag=false;
-      /* الناقصُ يُحفَظ بما أجابه لا بدرجةِ الورقةِ كلِّها — fatri-save.js */
-      var __fr = FATRI.row({ got: marks(), markTotal: FATRI_TOTAL,
-            answered: Object.keys(answered).length, items: FATRI_MCQ,
-            essay: FATRI_ESSAY, done: done, meta: meta() });
-      saveScore("إنجليزي م٣ — الفتري 📝", __fr.got, __fr.total, pid, __fr.meta);
-      if(done && window.PACE) PACE.box(sec, who, Math.round((Date.now()-t0)/1000), FATRI_MCQ, fastN, correct);
-    }
-    sec.querySelectorAll(".q[data-i]").forEach(function(qEl){
-      var i=+qEl.dataset.i, ans=items[i][2];
-      qEl.querySelectorAll(".opts button").forEach(function(btn){
-        btn.addEventListener("click", function(){
-          if(answered[i]) return; answered[i]=1;
-          var now=Date.now(), ms=now-lastTs; lastTs=now; if(ms<RG_MS) fastN++;
-          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled=true; });
-          var ok = (+btn.dataset.j===ans);
-          if(ok){ btn.classList.add("correct"); correct++; }
-          else { btn.classList.add("wrong"); qEl.querySelectorAll(".opts button")[ans].classList.add("correct"); }
-          var sk = items[i].__lesson || "غير محدّد";
-          var sv = SKILLS[sk] || (SKILLS[sk]={c:0,t:0}); sv.t++; if(ok) sv.c++;
-          ITEMS.push({ g:(items[i].__g||""), ok:(ok?1:0), ms:ms, j:+btn.dataset.j, a:ans });
-          qEl.querySelector(".explain").classList.add("show");
-          draw(); save();
-        });
-      });
-    });
-    /* المقاليّ: النموذجُ لا يظهر قبل أن يكتب — وإلّا نقله */
-    ESS.forEach(function(E, k){
-      var eBtn = sec.querySelector('[data-eshow="'+k+'"]');
-      var eTa  = sec.querySelector('[data-etext="'+k+'"]');
-      if(!eBtn || !eTa) return;
-      eBtn.addEventListener("click", function(){
-        essayText[k] = (eTa.value||"").trim();
-        if(essayText[k].length < 10){
-          eBtn.textContent = "✍️ اكتب جوابك أوّلًا";
-          setTimeout(function(){ eBtn.textContent = "✅ خلّصت — أرني الحلّ النموذجي"; }, 1800);
-          return;
-        }
-        eTa.readOnly = true; eBtn.disabled = true; eBtn.style.opacity = ".5";
-        var m = sec.querySelector('[data-emodel="'+k+'"]');
-        m.style.display = "block"; m.innerHTML = E.model;
-        var r = sec.querySelector('[data-erub="'+k+'"]');
-        r.style.display = "block";
-        r.innerHTML = '<div style="font-weight:800;margin-bottom:8px">⚖️ قارن جوابك بالنموذج وضع درجتك بصدق:</div>'+
-          '<div style="display:flex;gap:7px;flex-wrap:wrap">'+
-          [[1,"جملٌ صحيحةٌ والقاعدةُ مضبوطة"],[0,"فيه أخطاءٌ في القاعدة"]]
-            .map(function(x){ return '<button data-em="'+x[0]+'" style="flex:1;min-width:150px;padding:11px 8px;border-radius:12px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit">'+x[0]+' — '+x[1]+'</button>'; }).join('')+
-          '</div><div style="color:var(--muted);font-size:.88rem;margin-top:8px;font-weight:600">درجتك هذي تطلع لأبوك مع نصّ جوابك — فيراجعها.</div>';
-        r.querySelectorAll("[data-em]").forEach(function(b){
-          b.addEventListener("click", function(){
-            if(essayMark[k]!=null) return;
-            essayMark[k] = +b.dataset.em;
-            r.querySelectorAll("[data-em]").forEach(function(x){ x.disabled=true; x.style.opacity=".45"; });
-            b.style.background="var(--accent)"; b.style.color="#fff"; b.style.opacity="1";
-            draw(); save();
-          });
-        });
-      });
-    });
-    function savePartial(){
-      essayText = essayText.map(function(t,i){
-        var ta = sec.querySelector('[data-etext="'+i+'"]');
-        return t || ((ta && ta.value)||"").trim();
-      });
-      if(Object.keys(answered).length < 1 && !essaySum()) return;
-      save(true);
-    }
-    sec._leave = savePartial;
-    sec._done = function(){ return Object.keys(answered).length===FATRI_MCQ && essayDone(); };
-    sec.querySelector(".reset").addEventListener("click", function(){ savePartial(); renderFatri(); });
-    draw();
-  }
-
   function showPanel(id){
     leaveCur();
     document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
@@ -4721,7 +4536,6 @@ if(!NAMES[who]){
     pan.classList.add("active");
     curId = id;
     if(id==="rem"){ renderRem(); }
-    else if(id==="fatri"){ if(!pan.innerHTML || (pan._done && pan._done())) renderFatri(); }
     else if(!pan.innerHTML || (pan._done && pan._done())) render(id);
   }
   function drawTabs(){

@@ -18,9 +18,6 @@
   })();
   if(!TAG) return;
 
-  /* الصفحاتُ التي لها ورقةُ مقرَّرٍ فتريّ — يحرسها checks/pages.js */
-  var FATRI_PAGES = ["math4", "math5", "math8", "math9", "english9", "science4", "science5", "science8", "science9"];
-
   function link(bar, mark, file, text, title){
     if(bar.querySelector("[" + mark + "]")) return;
     var a = document.createElement("a");
@@ -39,20 +36,6 @@
     if(bar.querySelector("[data-rules-pdf]")) return true;
     link(bar, "data-rules-pdf", "rules-" + TAG + ".pdf", "🖨️ قواعد الدروس",
          "ورقةٌ للطباعة فيها قاعدةُ كلِّ درسٍ في هذه المادّة");
-    /* ═══ وورقةُ المقرَّرِ الفتريِّ وحدَه ═══════════════════════════════
-       طلبُ الأب (١٠ أكتوبر ٢٠٢٦): «أبي قواعد الرياضيات دروس حسن اختبار
-       الفتري فقط» — فورقةُ المادّةِ تُذاكِر ما لا يُسأل عنه.
-
-       ولا يُوضَع الزرُّ إلّا حيث وُلِّدت ورقةٌ فعلًا. وجُرِّب أوّلًا أن
-       يُستدَلَّ عليه بتبويبِ «الفتري» في الشاشة، فأخطأ في الجهتَين:
-       math8 وmath9 تبنيان تبويبَهما من CHAPS وقتَ التشغيل، وenglish5
-       فيها تبويبُ فتريٍّ ومقرَّرُه في ملفٍّ آخرَ (fatri-en5.js) لا
-       دروسَ له في REMTOPICS — فكان الزرُّ يفتح ٤٠٤.
-       فالقائمةُ صريحةٌ هنا، ويقابلها حارسُ checks/pages.js بملفّات
-       pdf/rules-*-fatri.pdf — فلا زرَّ بلا ورقةٍ ولا ورقةَ بلا زرّ. */
-    if(FATRI_PAGES.indexOf(TAG) >= 0)
-      link(bar, "data-fatri-pdf", "rules-" + TAG + "-fatri.pdf", "📝 قواعد الفتري",
-           "قواعدُ دروسِ مقرَّرِ الاختبارِ الفتريِّ وحدَها");
     return true;
   }
 

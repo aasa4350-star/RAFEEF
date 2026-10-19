@@ -772,7 +772,7 @@ async function loadReport(){
         html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+(avg==null?"—":avg+'%')+'</span></div><ul class="weak">'+
           arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             /* ═══ السؤالُ المقاليُّ يُقرأ لا يُختصر في رقم ══════════════
-               الاختبارُ الفتريُّ فيه سؤالٌ مقاليٌّ يضع الابنُ درجتَه فيه
+               بعضُ الاختباراتِ فيها سؤالٌ مقاليٌّ يضع الابنُ درجتَه فيه
                بنفسِه. فلو عُرض الرقمُ وحدَه لم يُعرَف أصادقٌ تقديرُه أم
                متساهل. فيُعرَض نصُّ حلّه كما كتبه ودرجتُه الذاتيّة،
                ليراجعها أبوه — فالتقديرُ الذاتيُّ تعلُّمٌ والمراجعةُ ضمانُه. */
