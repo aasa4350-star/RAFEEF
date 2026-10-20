@@ -1127,7 +1127,7 @@ function renderSet(id, items, intro, regen, label){
 
   // ===== المؤقّت =====
   var tb = sec.querySelector("[data-timer]");
-  var remaining = secsAll, tId = null, started = false, ended = false, savedN = 0, pid = newPid();
+  var remaining = secsAll, tId = null, started = false, ended = false, savedN = 0, pid = newPid(), traced = false;
   var over = 0;   /* ثواني التجاوز في موهبة — تُعرَض ولا تَقطع */
   function finish(auto){
     /* ⚠️ كان الشرط «if(ended) return» — والحفظ الجزئيّ يرفع ended. فمن
@@ -1216,10 +1216,40 @@ function renderSet(id, items, intro, regen, label){
     })();
   }
   // حفظ جزئي: لو بدّل القسم أو طلع قبل ما يكمّل، نحفظ اللي جاوبه (عشان لا يضيع تعبه)
+  /* ═══ ما دون العتبةِ أثرٌ لا درجة ═══════════════════════════════════
+     سؤال الأب (٢٠ أكتوبر ٢٠٢٦): «حسن يقول مختبر ٣ مرات اليوم ستيب»
+     والقاعدةُ فيها محاولةٌ واحدة. والسببُ هذا السطرُ نفسُه: ما دون
+     ثلاثِ إجاباتٍ لا يُحفَظ — ولا أثرَ له أبدًا. فمن فتح ستيب وأجاب
+     عن سؤالٍ أو سؤالَين ثمّ بدّل التبويبَ، ذهبت جولتُه كأنّها لم تكن،
+     وهو يعدّها اختبارًا وأبوه لا يراها.
+
+     وهي علّةُ ٢٦ أغسطس نفسُها («حسن دخل اختبر نفسك وحلّ الأسئلة بس ما
+     طلع عندي») عولجت في صفحةِ الاختباراتِ ولم تُعالَج هنا.
+
+     والعتبةُ تبقى: صفٌّ بدرجة «١ / ١» يرفع المتوسّطَ بغير حقّ. فالوسطُ
+     هو وسطُ fatri-save.js: ما دونها يُحفَظ أثرًا بلا درجة
+     (kind="activity") — لا يدخل متوسّطًا ولا تشخيصًا ولا يُنقِص
+     مستوًى، ويبقى الخبرُ محفوظًا: فتح وأجاب عن بندَين ثمّ خرج. */
+  function saveTrace(n){
+    try{
+      if(!label || n < 1 || n >= 3 || traced) return;
+      traced = true;
+      var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0,
+        ma_correct:0, ma_total:0, wrong:[],
+        meta:{ kind:"activity", sect:"try", test:label, partial:true,
+               answered:n, of:total, right:correct, correct:0, total:0,
+               pid:pid||null, at:new Date().toISOString() } };
+      if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+      fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+        headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY,
+                  "Content-Type":"application/json", "Prefer":"return=minimal" },
+        body: JSON.stringify(body) });
+    }catch(e){}
+  }
   function savePartial(){
     if(ended) return;
     var n = Object.keys(answered).length;
-    if(n<3 || !label || n<=savedN) return;
+    if(n<3 || !label || n<=savedN){ saveTrace(n); return; }
     savedN = n;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
     saveScore(label, correct, n, wrongs, skills, pid, __timing());

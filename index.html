@@ -667,7 +667,26 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
             `</ul></div>`;
         }
         return out; })()}
-        ${(function(){ var acts=actBy[name]||[]; return acts.length
+        ${(function(){
+          /* ═══ فتح وما كمّل ═══════════════════════════════════════════
+             سؤال الأب (٢٠ أكتوبر ٢٠٢٦): «حسن يقول مختبر ٣ مرات اليوم
+             ستيب» والقاعدةُ فيها واحدة. وكانت الجولةُ التي يُجاب فيها
+             عن أقلَّ من ثلاثةِ أسئلةٍ لا تُحفَظ ولا تترك أثرًا — فيقول
+             الابنُ «اختبرت» ولا يجد أبوه شيئًا. فصارت تُحفَظ أثرًا بلا
+             درجة (practice.html · saveTrace)، وهذا موضعُ عرضِها.
+
+             ولا تدخل متوسّطًا ولا تشخيصًا: هي kind="activity" مستثناةٌ
+             في أعلى الملفّ مع بقيّةِ الأنشطة. */
+          var tries=(actBy[name]||[]).filter(function(a){ return a.meta && a.meta.sect==="try"; });
+          if(!tries.length) return "";
+          return `<div class="weak"><div class="wt">🚪 فتح وما كمّل <span class="cnt">(ما تدخل المعدّل)</span>:</div><ul>`+
+            tries.slice(0,8).map(function(a){ var m=a.meta;
+              return `<li>${m.test||"—"}: أجاب <b>${m.answered}</b> من ${m.of}`+
+                     (m.right!=null?` · صحّ ${m.right}`:``)+
+                     ` <span class="cnt">${saTime(RR.when(a))}</span></li>`; }).join("")+
+            `</ul></div>`;
+        })()}
+        ${(function(){ var acts=(actBy[name]||[]).filter(function(a){ return !(a.meta && a.meta.sect==="try"); }); return acts.length
           ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>{ var dur=(a.meta.event!=="video"&&a.meta.secs)?(" · ⏱️ "+(a.meta.secs>=60?(Math.floor(a.meta.secs/60)+"د "+(a.meta.secs%60)+"ث"):(a.meta.secs+"ث"))):""; return `<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}${dur}</span></li>`; }).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
         ${rows.length? `<div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>`:``}
