@@ -1095,7 +1095,25 @@ function renderSet(id, items, intro, regen, label){
   sec.innerHTML = html;
   var answered = {}, correct = 0, total = items.length, wrongs = [];
   /* زمنُ الجلسةِ وعددُ الإجاباتِ المتسرّعة — انظر FAST_SEC أعلاه */
-  var __t0 = Date.now(), __lastTs = __t0, __fastN = 0;
+  /* ═══ ساعةُ القسمِ تبدأ عند فتحِه لا عند بناءِ الصفحة ═══════════════
+     سؤال الأب (٢٠ أكتوبر ٢٠٢٦) عن درجةِ حسنٍ الكاملة. وفي أثناء قراءةِ
+     أرقامِ ذلك اليوم بان أنّ المعروضَ منها معطوب: أقسامُ الصفحةِ تُبنى
+     كلُّها لحظةَ فتحِها (buildAll)، وهذه الساعةُ كانت تبدأ مع البناء —
+     فصار وقتُ كلِّ قسمٍ يضمُّ وقتَ ما قبله. وبانت في البيانات: أربعةُ
+     أقسامٍ في جلسةِ ١٢:٣٨ «بدايتُها» الثانيةُ نفسُها، ومثلُها جلسةُ
+     ١٦:٣٦ — ودُرُّها متصاعدٌ تصاعدًا تامًّا (٦١ · ١١٧ · ١٥٤ · ٢٤٦).
+
+     وضررُه ضِعفان:
+       · يقرأ الأبُ «٢٧ ثانيةً للسؤال» وحقيقتُها ستّ — فيَحسَبه متأنّيًا.
+       · وحارسُ النقرِ يُستبعِد الجلسةَ متى نزل متوسّطُها عن العتبة،
+         والوقتُ المنفوخُ يرفعه فوقَها — فالنقرُ في الأقسامِ المتأخّرةِ
+         لا يُمسَك أبدًا. وهو أخطرُ من العرض.
+
+     وصفحاتُ المنهجِ سليمةٌ: كلُّ لوحةٍ فيها تُبنى عند فتحِها.
+
+     ويُقاس من أوّلِ فتحةٍ لا من كلِّ فتحة: من عاد إلى قسمٍ بدأه لا
+     تُصفَّر ساعتُه، وإلّا صار الخروجُ والعودةُ بابًا لإخفاءِ النقر. */
+  var __t0 = Date.now(), __lastTs = __t0, __fastN = 0, __entered = false;
   function __timing(){ return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN }; }
   var skills = {};   /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة */
   function mark(i, ok){
@@ -1256,7 +1274,13 @@ function renderSet(id, items, intro, regen, label){
   }
   sec._leave = savePartial;
   sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };
+  /* ويُنادى قبلَ كلِّ شرطٍ: القسمُ بلا توقيتٍ تُقاس سرعتُه كذلك */
+  sec._enter = function(){
+    if(__entered || ended) return;
+    __entered = true; __t0 = Date.now(); __lastTs = __t0;
+  };
   sec._start = function(){
+    sec._enter();
     if(started || !secsAll || ended) return; started = true;
     tId = setInterval(function(){
       remaining--;
@@ -2343,6 +2367,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     if(b.dataset.tab==="w"){ renderWriting(); }
     if(b.dataset.tab==="full" && typeof renderFullMock==="function"){ renderFullMock(); }
     if(b.dataset.tab==="mwf" && typeof renderMwFull==="function"){ renderMwFull(); }
+    if(typeof pan._enter === "function") pan._enter(); // ساعةُ القسمِ تبدأ من هنا
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
 });
