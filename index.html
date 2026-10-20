@@ -105,6 +105,23 @@
   details.subj[open]>summary .chev{transform:rotate(180deg)}
   details.subj .sbody{padding:9px 12px 11px}
   details.subj .sbody ul{margin:0;padding-inline-start:20px}
+  /* ═══ وكلُّ قسمٍ في البطاقةِ كذلك ═══════════════════════════════════
+     طلب الأب (٢٠ أكتوبر ٢٠٢٦): «سكرها كلها حتى تحصيلي وستيب كل شي».
+     فالطيُّ صار طبقتَين: القسمُ (القراءة · النطق · التجريبية …) ثمّ
+     المادّةُ أو الاختبارُ داخلَه. والقسمُ يُبنى من .weak بعد الرسمِ لا
+     في النصّ — فيشمل ما يُضاف من أقسامٍ لاحقًا بلا أن يُنسى واحد. */
+  details.sect{border:1px solid var(--line);border-radius:14px;margin-top:12px;background:var(--card)}
+  details.sect>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 13px;cursor:pointer;list-style:none;border-radius:14px}
+  details.sect>summary::-webkit-details-marker{display:none}
+  details.sect>summary::marker{content:""}
+  details.sect>summary:hover{background:var(--bg)}
+  details.sect[open]>summary{border-bottom:1px solid var(--line);border-radius:14px 14px 0 0}
+  details.sect[open]>summary .chev{transform:rotate(180deg)}
+  details.sect>summary .wt{margin:0;font-size:.9rem}
+  details.sect .secbody{padding:4px 13px 12px}
+  details.sect .secbody>.weak{margin-top:0}
+  details.sect .secbody ul{margin:0;padding-inline-start:20px}
   .subjsum{display:flex;align-items:center;gap:8px;min-width:0}
   .subjsum .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .subjmeta{display:flex;align-items:center;gap:8px;flex:0 0 auto;color:var(--muted);
@@ -513,7 +530,7 @@ function azureQuotaHtml(rows){
                ${weak.fixed.map(w=>`<li>${w.key} <span class="cnt">(×${w.n})</span></li>`).join("")}</ul>`
             : ``}
         </div>`}
-        ${(function(){ var pr=shownPractice(SLUG[name], practiceBy[name]); if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var lateTxt=function(p){ var mn=(window.RR&&RR.lateMin(p))||0; return (mn&&fresh(p))?' · 🕓 وصلت متأخّرة '+mn+' دقيقة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var currMap={},otherMap={},prevAll=[],vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[],pronAll=[]; pr.forEach(function(p){ var t=(p.meta.test||""); if(RR.isPreview(p)){ prevAll.push(p); return; } if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var subj=RR.subjectOf(t); if(p.meta.kindPron===true){ pronAll.push(p); return; } if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(subj && SUBJ_EMOJI[subj]){ /* أحدثُ جلسةٍ محتسبة لا أحدثُ جلسةٍ مطلقًا — RR.curKeep */ currMap[t]=RR.curKeep(currMap[t], p); } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var okArr=arr.filter(function(p){return p.meta.trusted!==false;}); var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/okArr.length):null; out+=`<details class="subj" data-subj="${name}|${subj}"><summary><span class="subjsum"><span>${SUBJ_EMOJI[subj]}</span><span class="nm">${subj}</span></span><span class="subjmeta"><span>${arr.length} اختبارًا</span><span class="cnt">المتوسط ${avg==null?"—":avg+"%"}</span><span class="chev">▾</span></span></summary><div class="sbody"><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var un=(p.meta.trusted===false)?` <span style="color:var(--bad)">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"})</span>`:``; return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span>${lateTxt(p)}${un}</li>`; }).join("")}</ul></div></details>`; }); out+=`</div>`; }
+        ${(function(){ var pr=shownPractice(SLUG[name], practiceBy[name]); if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var lateTxt=function(p){ var mn=(window.RR&&RR.lateMin(p))||0; return (mn&&fresh(p))?' · 🕓 وصلت متأخّرة '+mn+' دقيقة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var currMap={},otherMap={},prevAll=[],vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[],pronAll=[]; pr.forEach(function(p){ var t=(p.meta.test||""); if(RR.isPreview(p)){ prevAll.push(p); return; } if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var subj=RR.subjectOf(t); if(p.meta.kindPron===true){ pronAll.push(p); return; } if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(subj && SUBJ_EMOJI[subj]){ /* أحدثُ جلسةٍ محتسبة لا أحدثُ جلسةٍ مطلقًا — RR.curKeep */ currMap[t]=RR.curKeep(currMap[t], p); } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak" data-fold-word="مادة"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var okArr=arr.filter(function(p){return p.meta.trusted!==false;}); var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/okArr.length):null; out+=`<details class="subj" data-subj="${name}|${subj}"><summary><span class="subjsum"><span>${SUBJ_EMOJI[subj]}</span><span class="nm">${subj}</span></span><span class="subjmeta"><span>${arr.length} اختبارًا</span><span class="cnt">المتوسط ${avg==null?"—":avg+"%"}</span><span class="chev">▾</span></span></summary><div class="sbody"><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var un=(p.meta.trusted===false)?` <span style="color:var(--bad)">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"})</span>`:``; return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span>${lateTxt(p)}${un}</li>`; }).join("")}</ul></div></details>`; }); out+=`</div>`; }
 /* ═══ مواد فوق الصفّ — طلب الأب (١٤ سبتمبر ٢٠٢٦) ═══
    «ما أبيها تُحتسب الكيمياء والأحياء، لكن أبي نتيجة اختباراتها تطلع
    لي في صفحتي». فقسمٌ مستقلٌّ مكتوبٌ عليه أنّه خارج التقييم، وصفوفه
@@ -523,7 +540,7 @@ if(prevAll.length){
   var prevSubj={};
   Object.keys(prevBy).forEach(function(t){ var sj=t.split(" ")[0]; (prevSubj[sj]=prevSubj[sj]||[]).push(t); });
   var PREV_ICO={"كيمياء":"⚗️","أحياء":"🧬","فيزياء":"🧲"};
-  out+=`<div class="weak" style="border-inline-start:3px solid #b45309">
+  out+=`<div class="weak" data-fold-word="مادة" style="border-inline-start:3px solid #b45309">
     <div class="wt">🔭 مواد فوق الصفّ <span class="cnt">(استطلاع — لا تدخل التقييم ولا تُنقص المستوى)</span></div>`;
   Object.keys(prevSubj).sort().forEach(function(sj){
     var names=prevSubj[sj].sort();
@@ -549,7 +566,7 @@ if(prevAll.length){
    كانجرو — ولم يكن يظهر من أيٍّ منها إلا واحدة. لم يكن خاصًّا بالقراءة؛
    كان في كل اختبارٍ متكرّر غير منهجيّ. صار otherMap يجمع كل المحاولات لا
    يستبدلها، والعرض يُظهر آخر خمسًا لكل اسمٍ مع العدد والمتوسط. */
-if(Object.keys(otherMap).length){ out+=`<div class="weak"><div class="wt">📊 الاختبارات التجريبية${kindsLabel(Object.keys(otherMap))}:</div>${Object.keys(otherMap).map(function(t){ var arr=otherMap[t].slice().sort(function(a,b){return (a.created_at<b.created_at)?1:-1;}); var avg=Math.round(arr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/arr.length); return `<div style="margin:4px 0 2px;font-weight:700">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul>${arr.slice(0,5).map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${lateTxt(p)}${untrustedTxt(p)}</li>`; }).join("")}</ul>`; }).join("")}</div>`; } if(vocabAll.length){ var vLearned=0,vTotal=300,vTotSet=false; vocabAll.forEach(function(p){ if(p.meta.learned!=null&&p.meta.learned>vLearned)vLearned=p.meta.learned; if(p.meta.vocTotal&&!vTotSet){vTotal=p.meta.vocTotal;vTotSet=true;} }); vTotal=Math.max(vTotal,vLearned); var vocabWk=vocabAll.filter(function(p){return !window.RR||RR.recentVocab(p);}); if(!vocabWk.length) vocabWk=vocabAll.slice(0,1); var rev=vocabWk.filter(function(p){return p.meta.mode==="review";}); var revT=rev.filter(function(p){return p.meta.trusted!==false;}),vocabT=vocabWk.filter(function(p){return p.meta.trusted!==false;}); var rW=revT.reduce(function(s,p){return s+(p.meta.total||0);},0),rC=revT.reduce(function(s,p){return s+(p.meta.correct||0);},0); var allW=vocabT.reduce(function(s,p){return s+(p.meta.total||0);},0),allC=vocabT.reduce(function(s,p){return s+(p.meta.correct||0);},0); var untrustedN=vocabWk.filter(function(p){return p.meta.trusted===false&&fresh(p);}).length; var lpct=vTotal?Math.round(vLearned/vTotal*100):0,rpct=rW?Math.round(rC/rW*100):0,apct=allW?Math.round(allC/allW*100):0; var isFlag=function(p){ return fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2)); }; var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; }; var flagged=vocabWk.filter(isFlag), show=vocabWk.filter(function(p){return !isFlag(p);}).slice(0,3).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8); var revList=show.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var dt=(p.meta.dur==null)?' · ⏱️ —':durTxt(p); var ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(RR.when(p))} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join(""); var byDay={}; vocabT.forEach(function(p){ var f=saTime(RR.when(p)); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; }); var days=Object.keys(byDay).sort().reverse().slice(0,6); var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span class="cnt">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
+if(Object.keys(otherMap).length){ out+=`<div class="weak" data-fold-word="اختبار"><div class="wt">📊 الاختبارات التجريبية${kindsLabel(Object.keys(otherMap))}:</div>${Object.keys(otherMap).map(function(t){ var arr=otherMap[t].slice().sort(function(a,b){return (a.created_at<b.created_at)?1:-1;}); var avg=Math.round(arr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/arr.length); return `<details class="subj" data-subj="${name}|تجريبي ${t}"><summary><span class="subjsum"><span class="nm">${t}</span></span><span class="subjmeta"><span>${arr.length} محاولة</span><span class="cnt">المتوسط ${avg}%</span><span class="chev">▾</span></span></summary><div class="sbody"><ul>${arr.slice(0,5).map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${lateTxt(p)}${untrustedTxt(p)}</li>`; }).join("")}</ul></div></details>`; }).join("")}</div>`; } if(vocabAll.length){ var vLearned=0,vTotal=300,vTotSet=false; vocabAll.forEach(function(p){ if(p.meta.learned!=null&&p.meta.learned>vLearned)vLearned=p.meta.learned; if(p.meta.vocTotal&&!vTotSet){vTotal=p.meta.vocTotal;vTotSet=true;} }); vTotal=Math.max(vTotal,vLearned); var vocabWk=vocabAll.filter(function(p){return !window.RR||RR.recentVocab(p);}); if(!vocabWk.length) vocabWk=vocabAll.slice(0,1); var rev=vocabWk.filter(function(p){return p.meta.mode==="review";}); var revT=rev.filter(function(p){return p.meta.trusted!==false;}),vocabT=vocabWk.filter(function(p){return p.meta.trusted!==false;}); var rW=revT.reduce(function(s,p){return s+(p.meta.total||0);},0),rC=revT.reduce(function(s,p){return s+(p.meta.correct||0);},0); var allW=vocabT.reduce(function(s,p){return s+(p.meta.total||0);},0),allC=vocabT.reduce(function(s,p){return s+(p.meta.correct||0);},0); var untrustedN=vocabWk.filter(function(p){return p.meta.trusted===false&&fresh(p);}).length; var lpct=vTotal?Math.round(vLearned/vTotal*100):0,rpct=rW?Math.round(rC/rW*100):0,apct=allW?Math.round(allC/allW*100):0; var isFlag=function(p){ return fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2)); }; var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; }; var flagged=vocabWk.filter(isFlag), show=vocabWk.filter(function(p){return !isFlag(p);}).slice(0,3).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8); var revList=show.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var dt=(p.meta.dur==null)?' · ⏱️ —':durTxt(p); var ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(RR.when(p))} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join(""); var byDay={}; vocabT.forEach(function(p){ var f=saTime(RR.when(p)); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; }); var days=Object.keys(byDay).sort().reverse().slice(0,6); var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span class="cnt">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
 out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليزي):</div><ul>${vLearned>0?`<li>📚 <b>حفظ: ${vLearned}/${vTotal} كلمة</b> (${lpct}%)</li>`:``}${vocabBoxes(vocabAll)}${dayList}<li>📊 جلسات الكلمات هذا الأسبوع (المحتسبة): <b>${allC}/${allW} (${apct}%)</b> · ${vocabT.length} جلسة</li>${untrustedN?`<li style="color:var(--bad)">🚫 جلسات غير محتسبة (خرج لتطبيق ثاني): <b>${untrustedN}</b></li>`:``}</ul>${revList?`<div class="wt" style="margin-top:6px">📖 جلسات الكلمات — آخر ${window.RR?RR.VOCAB_DAYS:7} أيام:</div><ul>${revList}</ul>`:``}</div>`; }
         /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل القراءة اليوم بس ما بان
            إلا حق أمس» — أثناء الفحص تبيّن أنّ «قراءة إنجليزي 📖» (تُحفظ
@@ -714,11 +731,64 @@ function readOpenSubj(){
 function writeOpenSubj(a){ try{ localStorage.setItem(SUBJ_KEY, JSON.stringify(a)); }catch(e){} }
 var OPEN_SUBJ = readOpenSubj();
 
+/* ── طيُّ الأقسامِ: يُبنى من .weak بعد الرسم ───────────────────────────
+   طلب الأب (٢٠ أكتوبر ٢٠٢٦): «سكرها كلها حتى تحصيلي وستيب كل شي».
+
+   ولِمَ يُبنى هنا لا في النصّ: الأقسامُ أحدَ عشرَ قسمًا تُكتَب في أحدَ
+   عشرَ موضعًا متفرّقًا بأشكالٍ مختلفة، فلو طُوي كلٌّ منها في موضعِه
+   لاختلفت صياغتُه ونُسي القسمُ الثاني عشرَ حين يُضاف. فيُقرأ العنوانُ
+   (.wt) ويُجعَل سطرًا مطويًّا، وما بعده جوفًا — فما يُضاف غدًا يُطوى
+   معها بلا تعديل.
+
+   والعدُّ في السطرِ المطويّ: أقسامُ المواد والتجريبيِّ تُعدُّ موادَّها
+   (data-fold-word)، وغيرُها يُعدُّ بنودَه. */
+function foldSections(root){
+  Array.prototype.forEach.call(root.querySelectorAll(".kidbody"), function(kb){
+    var kid = (kb.closest("details[data-kid]") || {}).dataset;
+    kid = kid ? kid.kid : "";
+    Array.prototype.slice.call(kb.children).forEach(function(el){
+      if(el.tagName !== "DIV" || !el.classList.contains("weak")) return;
+      var wt = el.querySelector(":scope > .wt");
+      if(!wt) return;                       /* قسمٌ بلا عنوانٍ لا يُطوى */
+      var title = wt.innerHTML.replace(/\s*:\s*$/, "");
+
+      /* العدُّ: موادُّ القسمِ إن كانت، وإلّا بنودُه. و‏arCount تُلحِق
+         العددَ بنفسِها فيما فوق الاثنين، فلا يُلصَق هنا مرّةً ثانية. */
+      var FOLD_WORD = {
+        "مادة":   ["مادّة واحدة", "مادّتان", "مواد", "مادّةً"],
+        "اختبار": ["اختبار واحد", "اختباران", "اختبارات", "اختبارًا"],
+        "بند":    ["بند واحد", "بندان", "بنود", "بندًا"]
+      };
+      var word = el.getAttribute("data-fold-word");
+      var n = word ? el.querySelectorAll("details.subj").length : el.querySelectorAll("li").length;
+      var f = FOLD_WORD[word] || FOLD_WORD["بند"];
+      var cnt = n ? arCount(n, f[0], f[1], f[2], f[3]) : "";
+
+      var d = document.createElement("details");
+      d.className = "sect";
+      d.setAttribute("data-sect", kid + "|" + wt.textContent.replace(/\s*:\s*$/, "").trim());
+      var sm = document.createElement("summary");
+      sm.innerHTML = '<span class="wt">' + title + '</span>' +
+                     '<span class="subjmeta">' + (cnt ? '<span>' + cnt + '</span>' : '') +
+                     '<span class="chev">▾</span></span>';
+      var body = document.createElement("div");
+      body.className = "secbody";
+      el.parentNode.insertBefore(d, el);
+      d.appendChild(sm);
+      d.appendChild(body);
+      body.appendChild(el);               /* القسمُ نفسُه يصير جوفَ الطيّ */
+      wt.remove();                        /* عنوانُه انتقل إلى السطرِ المطويّ */
+    });
+  });
+}
+
 function wireSubjects(){
+  var content = document.getElementById("content");
+  foldSections(content);
   Array.prototype.forEach.call(
-    document.getElementById("content").querySelectorAll('details.subj[data-subj]'),
+    content.querySelectorAll('details.subj[data-subj], details.sect[data-sect]'),
     function(el){
-      var k = el.getAttribute("data-subj");
+      var k = el.getAttribute("data-subj") || el.getAttribute("data-sect");
       if(OPEN_SUBJ.indexOf(k) >= 0) el.open = true;
       el.addEventListener("toggle", function(){
         var i = OPEN_SUBJ.indexOf(k);
