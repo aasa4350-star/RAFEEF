@@ -2148,6 +2148,7 @@ if(!STUDENTS[who]){
       <button role="tab" aria-selected="false" data-tab="ma">الرياضيات</button>
       <button role="tab" aria-selected="false" data-tab="arb">العربية 🕌</button>
       <button role="tab" aria-selected="false" data-tab="rem">علاجي 💪</button>
+      <button role="tab" aria-selected="false" data-tab="myerr">أخطائي 🎯</button>
       <button role="tab" aria-selected="false" data-tab="res">النتيجة 🏁</button>
       <button role="tab" aria-selected="false" data-tab="log">محاولاتي 📚</button>
     </div>
@@ -2156,6 +2157,7 @@ if(!STUDENTS[who]){
     <section class="panel" id="ma" role="tabpanel"></section>
     <section class="panel" id="arb" role="tabpanel"></section>
     <section class="panel" id="rem" role="tabpanel"></section>
+    <section class="panel" id="myerr" role="tabpanel"></section>
     <section class="panel" id="res" role="tabpanel"></section>
     <section class="panel" id="log" role="tabpanel"></section>
     <footer><a href="reading.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📖 تمارين القراءة والاستماع</a> · <a href="practice.html?who=${who}" style="color:var(--accent);font-weight:700;text-decoration:none">📊 قدرات وتحصيلي (تجريبي)</a></footer>`;
@@ -2978,6 +2980,281 @@ if(!STUDENTS[who]){
     });
   }
 
+
+  /* ═══ 🎯 أخطائي — السؤالُ الذي أخطأ فيه يعود بنصِّه حتّى يُتقِنه ═══════
+     سؤال الأب (٢٠ أكتوبر ٢٠٢٦) عن «إذا 2x + y = 7 و x − y = 2» في قائمة
+     أخطاء حسن: «هذي من زمان ما تغيّرت… هل لا زال ما يعرفها؟». وكان
+     الجواب نعم: أصابها في ١٠ و١١ أغسطس ثمّ أخطأها في ٢٥ أغسطس و٢٨
+     سبتمبر و١٧ أكتوبر — واختار «2» مرّتين، وهو الرقمُ المكتوبُ في
+     المعادلة الثانية. فهو لا يحلّ، يسحب رقمًا يراه.
+
+     فقال: «سوّه» لقسمٍ يجمع أخطاءه ويعيدها عليه <b>بنصّها مع الشرح</b>،
+     ولا يخرج السؤالُ من الطابور حتّى يجيبه صحيحًا <b>مرّتين</b>.
+
+     ولِمَ قسمٌ جديدٌ وفي الصفحة صندوقُ أخطاءٍ (missAdd/missDue)؟ لأنّ
+     ذاك يخدم غرضًا آخر: يعيد <b>نوع</b> السؤال بكلماتٍ جديدةٍ متى عرف
+     مولّدَه، ويسكن ذاكرةَ الجهاز وحدَه — فلا يتبع الابنَ إلى جهازٍ آخر
+     ولا يراه الأبُ في تقريره. وهذا القسمُ يعيد <b>السؤالَ بعينه</b>،
+     ومصدرُه الخادمُ، وتقدّمُه محفوظٌ فيه.
+
+     والإتقانُ مرّتان في <b>جولتين مختلفتين</b> لا في جولةٍ واحدة:
+     إجابتان صحيحتان متتاليتان في دقيقةٍ واحدةٍ ذاكرةٌ قصيرةٌ لا إتقان.
+     وإن أخطأه مرّةً أخرى في «اختبر نفسك» بعد أن أتقنه، عاد من جديد —
+     لأنّ الرصيدَ لا يُحتسب إلّا ممّا جاء بعد آخرِ خطأ. */
+  var ME_SECT = "myerr", ME_RETIRE = 2, ME_ROUND = 8, ME_ROWS = 60;
+  var meBuilt = false, meQueue = [], meLost = 0, meTotal = 0;
+
+  function meKey(stem){
+    return String(stem || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  }
+  /* فهرسُ البنوكِ المنسَّقة: منه يأتي الشرحُ ونصُّ الخيارات */
+  var ME_BANK = null;
+  function meBank(){
+    if(ME_BANK) return ME_BANK;
+    ME_BANK = {};
+    ["en","ma"].forEach(function(id){
+      try{
+        pool(id).forEach(function(q){
+          if(!q || !q[0] || !q[1]) return;
+          var k = meKey(q[0]);
+          if(!ME_BANK[k]) ME_BANK[k] = { q:[q[0], q[1].slice(), q[2], q[3]], sub:id };
+        });
+      }catch(e){}
+    });
+    return ME_BANK;
+  }
+
+  /* ═══ بناءُ الطابورِ من الخادمِ لا من الجهاز ═══════════════════════
+     ثلاثةُ أشياء تُقرأ: أخطاؤه (wrong)، وأوراقُ جلساتِه (meta.paper)
+     لنستعيد منها الخيارات، ورصيدُ ما أتقنه في هذا القسمِ من قبل. */
+  async function meFetch(){
+    var rows = [], mine = [];
+    /* ═══ يُقيَّد الطلبُ بجلساتِ «اختبر نفسك» لا بأحدثِ الصفوفِ مطلقًا ═══
+       سجلُّ الابنِ فيه ألوفُ صفوفِ الكلماتِ والنطقِ والقراءة، وأحدثُ
+       جلسةِ اختبارٍ عند أسامةَ ترتيبُها ١٨٣٨ من آخرِ صفوفِه — فطلبُ
+       «أحدثِ مئةٍ وخمسين» كان يرجع بلا جلسةِ اختبارٍ واحدة، فيُقال له
+       «ما عندك أخطاء» وله مئةٌ وستّةَ عشرَ سؤالًا أخطأ فيها.
+       وجلسةُ «اختبر نفسك» وحدَها هي التي لها مجموعٌ في المادّتين. */
+    var base = SUPA_URL + "/rest/v1/attempts?select=wrong,meta,created_at&student=eq." +
+               encodeURIComponent(S.name) + "&or=(en_total.gt.0,ma_total.gt.0)&order=created_at.desc&limit=";
+    try{
+      var r = await fetch(base + ME_ROWS, { headers:{ apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY } });
+      var j = await r.json(); if(Array.isArray(j)) rows = j;
+    }catch(e){}
+    try{
+      var r2 = await fetch(SUPA_URL + "/rest/v1/attempts?select=meta,created_at&student=eq." +
+          encodeURIComponent(S.name) + "&meta->>sect=eq." + ME_SECT + "&order=created_at.desc&limit=120",
+        { headers:{ apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY } });
+      var j2 = await r2.json(); if(Array.isArray(j2)) mine = j2;
+    }catch(e){}
+    return { rows: rows, mine: mine };
+  }
+
+  function meBuild(rows, mine){
+    var bank = meBank(), when = function(x){
+      var t = Date.parse((x.meta && x.meta.at) || x.created_at || "");
+      return isFinite(t) ? t : 0;
+    };
+    /* ١) آخرُ مرّةٍ أخطأ فيها كلَّ سؤال، وكم مرّةً أخطأه */
+    var miss = {};
+    rows.forEach(function(x){
+      if(x.meta && x.meta.sect === ME_SECT) return;      /* جولاتُ هذا القسمِ ليست مصدرًا */
+      var t = when(x);
+      (x.wrong || []).forEach(function(w){
+        var k = meKey(w && w.q); if(!k) return;
+        var e = miss[k] || (miss[k] = { n:0, last:0, sub:(w.subject === "إنجليزي" ? "en" : "ma") });
+        e.n++; if(t > e.last) e.last = t;
+      });
+    });
+    meTotal = Object.keys(miss).length;
+    if(!meTotal) return [];
+
+    /* ٢) رصيدُ الإتقان: الإجاباتُ الصحيحةُ في هذا القسمِ بعدَ آخرِ خطأ،
+          وكلُّ جولةٍ تُحتسب مرّةً واحدةً مهما تكرّر السؤالُ فيها. */
+    var credit = {};
+    mine.forEach(function(x){
+      var t = when(x), once = {};
+      ((x.meta && x.meta.okKeys) || []).forEach(function(k){
+        var e = miss[k]; if(!e) return;
+        if(t <= e.last) return;                          /* أتقنه ثمّ أخطأه بعدُ — لا يُحتسب */
+        /* الجولةُ الواحدةُ رصيدٌ واحدٌ مهما تكرّر السؤالُ فيها: إجابتان
+           صحيحتان في دقيقةٍ واحدةٍ ذاكرةٌ قصيرةٌ لا إتقان. والكتابةُ
+           تمنع التكرارَ أصلًا، وهذا يمنعه عند القراءةِ أيضًا — فصفٌّ
+           قديمٌ أو مُعادٌ لا يُخرِج سؤالًا قبل أوانِه. */
+        if(once[k]) return;
+        once[k] = 1;
+        credit[k] = (credit[k] || 0) + 1;
+      });
+    });
+
+    /* ٣) ما يُعاد: له خياراتٌ نعرفها، ولم يبلغ الإتقانَ بعد */
+    var paper = {};
+    rows.forEach(function(x){
+      var pp = x.meta && x.meta.paper; if(!pp) return;
+      ["en","ma"].forEach(function(sec){
+        (pp[sec] || []).forEach(function(it){
+          if(!it || !it.q || !it.opts || it.correct == null) return;
+          var k = meKey(it.q);
+          if(!paper[k]) paper[k] = { opts: it.opts.slice(), correct: it.correct, sub: sec };
+        });
+      });
+    });
+
+    meLost = 0;
+    var out = [];
+    Object.keys(miss).forEach(function(k){
+      var e = miss[k], got = credit[k] || 0;
+      if(got >= ME_RETIRE) return;                        /* أتقنه */
+      var b = bank[k], p = paper[k], opts, ci, exp = "", sub = e.sub;
+      if(b){ opts = b.q[1].slice(); ci = b.q[2]; exp = b.q[3] || ""; sub = b.sub; }
+      else if(p){ opts = p.opts.slice(); ci = p.correct; sub = p.sub; }
+      else { meLost++; return; }                          /* لا خياراتٍ نعرفها — لا نُلفِّق سؤالًا */
+      if(!opts || opts.length < 2 || ci == null || !opts[ci]){ meLost++; return; }
+      out.push({ key:k, stem:(b ? b.q[0] : k), opts:opts, ci:ci, exp:exp,
+                 sub:sub, n:e.n, got:got, last:e.last });
+    });
+    /* الأكثرُ خطأً أوّلًا، ثمّ الأحدثُ خطأً */
+    out.sort(function(a,b){ return (b.n - a.n) || (b.last - a.last); });
+    return out;
+  }
+
+  /* ═══ مقاعدُ الجولة: الأحدثُ خطأً أوّلًا، ثمّ قرعةٌ تُدوِّر ═══════════
+     طابورُ حسنٍ مئةٌ وثمانون سؤالًا والجولةُ ثمانية. فلو رُتِّب بالأكثرِ
+     خطأً وحدَه خرجت الجولةُ نفسُها في كلِّ مرّة — ثمانيةٌ ثابتةٌ لا
+     تتغيّر، وما أخطأه أمسِ مدفونٌ خلف ما أخطأه في أغسطس. وهو عينُ
+     شكوى الأب: «هذي من زمان ما تغيّرت».
+
+     فالقاعدة: نحصر الملعبَ في أحدثِ ما أخطأ (ME_POOL سؤالًا بترتيبِ
+     تاريخِ الخطأ) — فما أخطأه قريبًا يدور عليه سريعًا، وما أخطأه قبل
+     شهورٍ ينتظر حتّى يفرغ الأحدث. ثمّ من هذا الملعبِ: نصفُ المقاعدِ
+     للأكثرِ خطأً فيه، والنصفُ بقرعةٍ من بقيّتِه — فتختلف الجولةُ عن
+     أختها ولا يُدفَن سؤالٌ أبدًا. */
+  var ME_POOL = 24;
+  function meRound(queue, n){
+    if(queue.length <= n) return queue.slice();
+    var recent = queue.slice().sort(function(a,b){ return b.last - a.last; }).slice(0, Math.max(n, ME_POOL));
+    var byN = recent.slice().sort(function(a,b){ return (b.n - a.n) || (b.last - a.last); });
+    var half = Math.max(1, Math.floor(n / 2));
+    var take = byN.slice(0, half), seen = {};
+    take.forEach(function(x){ seen[x.key] = 1; });
+    var rest = recent.filter(function(x){ return !seen[x.key]; });
+    for(var i=rest.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=rest[i]; rest[i]=rest[j]; rest[j]=t; }
+    return take.concat(rest.slice(0, n - take.length));
+  }
+
+  function meShuffle(it){
+    var o = it.opts.slice(), right = o[it.ci];
+    for(var i=o.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; }
+    return { opts:o, ci:o.indexOf(right) };
+  }
+
+  async function meSave(pid, okKeys, asked, right){
+    var payload = { student:S.name, grade:S.grade, en_correct:0, en_total:0,
+      ma_correct:0, ma_total:0, wrong:[],
+      meta:{ kind:"activity", sect:ME_SECT, test:"أخطائي 🎯", pid:pid,
+             at:new Date().toISOString(), asked:asked, right:right,
+             okKeys:okKeys.slice(0, 60), left:Math.max(0, meQueue.length - okKeys.length) } };
+    try{
+      if(window.AQ){ await AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, payload, function(){}); return; }
+      await fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+        headers:{ apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY,
+                  "Content-Type":"application/json", Prefer:"return=minimal" },
+        body: JSON.stringify(payload) });
+    }catch(e){}
+  }
+
+  async function renderMyErr(){
+    var sec = document.getElementById("myerr");
+    sec.innerHTML = '<div class="block-title"><span class="dot"></span> أخطائي 🎯</div>' +
+      '<div class="review"><p class="hint" style="padding:14px">⏳ أجمع أسئلتك اللي غلطت فيها...</p></div>';
+    var got = await meFetch();
+    meQueue = meBuild(got.rows, got.mine);
+    meBuilt = true;
+
+    if(!meTotal){
+      sec.innerHTML = '<div class="block-title"><span class="dot"></span> أخطائي 🎯</div>' +
+        '<div class="review"><p class="hint" style="padding:14px">ما عندك أخطاء محفوظة بعد — حلّ اختبارًا أوّلًا وبيظهر هنا كل سؤال تغلط فيه.</p></div>';
+      return;
+    }
+    if(!meQueue.length){
+      sec.innerHTML = '<div class="block-title"><span class="dot"></span> أخطائي 🎯</div>' +
+        '<div class="review"><p class="hint" style="padding:14px">🎉 ما بقي عليك شي — كل سؤال غلطت فيه جاوبته صح مرّتين.' +
+        (meLost ? '<br><span style="color:var(--muted);font-size:.88rem">(' + meLost + ' سؤالًا ما قدرت أعيده: خياراته ما انحفظت.)</span>' : '') +
+        '</p></div>';
+      return;
+    }
+
+    var round = meRound(meQueue, ME_ROUND).map(function(it){
+      var s = meShuffle(it);
+      return { it:it, opts:s.opts, ci:s.ci, missed:false, done:false };
+    });
+    var pid = newPid(), okKeys = [], asked = 0, right = 0, saved = false;
+
+    var html = '<div class="block-title"><span class="dot"></span> أخطائي 🎯</div>' +
+      '<div class="review" style="padding:14px;line-height:1.95">' +
+      'هذي أسئلتك اللي غلطت فيها — <b>بنصّها</b>. ' +
+      'السؤال ما يطلع من القائمة إلا لما تجاوبه صح <b>مرّتين في جولتين مختلفتين</b>.' +
+      '<div style="margin-top:8px;color:var(--muted);font-size:.9rem">باقي عليك <b>' + meQueue.length +
+      '</b> سؤالًا · في هذي الجولة <b>' + round.length + '</b>' +
+      (meLost ? ' · (' + meLost + ' ما قدرت أعيده: خياراته ما انحفظت)' : '') + '</div></div>';
+
+    round.forEach(function(r, i){
+      var it = r.it, en = (it.sub === "en");
+      html += '<div class="q" data-i="' + i + '"><div class="num">سؤال ' + (i+1) +
+        ' <span class="revb">🔁 غلطت فيه ' + it.n + ' مرّة</span>' +
+        '<span style="color:var(--muted);font-weight:600;font-size:.8rem"> · ' +
+          (it.got >= 1 ? 'باقي صحّ واحد' : 'باقي صحّان') + '</span></div>' +
+        '<div class="stem ' + (en ? 'ltr' : '') + '">' + frx(it.stem) + '</div><div class="opts">';
+      r.opts.forEach(function(o, j){
+        html += '<button class="' + (en ? 'ltr' : '') + '" data-j="' + j + '">' + frx(o) + '</button>';
+      });
+      html += '</div><div class="explain"' + (it.sub === "ma" ? ' dir="ltr"' : '') + '>' +
+        (it.exp ? frx(it.exp) : ('<b>الإجابة الصحيحة: ' + frx(r.opts[r.ci]) + '</b>')) + '</div></div>';
+    });
+    html += '<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ' + round.length + '</span>' +
+      '<div class="track"><div class="fill" data-fill></div></div></div>' +
+      '<button class="reset">جولة ثانية 🔄</button>';
+    sec.innerHTML = html;
+
+    var scoreEl = sec.querySelector("[data-score]"), fillEl = sec.querySelector("[data-fill]");
+    function draw(){
+      scoreEl.textContent = right + " / " + round.length;
+      fillEl.style.width = (asked / round.length * 100) + "%";
+    }
+    function finish(){
+      if(saved) return; saved = true;
+      meSave(pid, okKeys, asked, right);
+    }
+    sec.querySelectorAll(".q").forEach(function(qEl){
+      var i = +qEl.dataset.i, r = round[i];
+      qEl.querySelectorAll(".opts button").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          if(r.done) return; r.done = true; asked++;
+          var ok = (+btn.dataset.j === r.ci);
+          qEl.querySelectorAll(".opts button").forEach(function(b){ b.disabled = true; });
+          if(ok){
+            btn.classList.add("correct"); right++;
+            if(okKeys.indexOf(r.it.key) < 0) okKeys.push(r.it.key);
+          } else {
+            btn.classList.add("wrong");
+            qEl.querySelectorAll(".opts button")[r.ci].classList.add("correct");
+          }
+          qEl.querySelector(".explain").classList.add("show");
+          draw();
+          if(asked === round.length) finish();
+        });
+      });
+    });
+    draw();
+    sec.querySelector(".reset").addEventListener("click", function(){ finish(); renderMyErr(); });
+    /* ومن خرج في منتصف الجولةِ لا يضيع ما أصابه */
+    if(!sec._meLeave){
+      sec._meLeave = true;
+      document.addEventListener("visibilitychange", function(){ if(document.hidden && asked) finish(); });
+      window.addEventListener("pagehide", function(){ if(asked) finish(); });
+    }
+  }
+
   ["en","ma"].forEach(build);
   renderResults();
   document.querySelectorAll('.tabs button').forEach(b=>{
@@ -2990,6 +3267,7 @@ if(!STUDENTS[who]){
       if(b.dataset.tab==="log") renderLog();
       if(b.dataset.tab==="arb") renderArb();
       if(b.dataset.tab==="rem") renderRemedial();
+      if(b.dataset.tab==="myerr" && !meBuilt) renderMyErr();
       if(b.dataset.tab==="wr") renderWriting();
     });
   });
