@@ -87,6 +87,28 @@
   .weak ul{margin:0;padding-inline-start:20px}
   .weak li{margin-bottom:6px;font-size:.92rem}
   .weak .cnt{color:var(--bad);font-weight:700}
+  /* ═══ وكلُّ مادّةٍ مطويّةٌ تُفتَح بالضغط ═══════════════════════════
+     طلب الأب (٢٠ أكتوبر ٢٠٢٦): «يبي كل مادة تكون مقفلة… مثلا العلوم
+     أضغط عليه تطلع لي اختباراته، أضغط مرة ثانية يسكر. نفس نظام
+     الخمسة الطلاب». فهو النظامُ نفسُه الذي في بطاقاتِ الأبناء
+     (details.card) مصغَّرًا: سطرٌ يحمل الخلاصةَ ويُفتَح على التفصيل.
+
+     والسطرُ المطويُّ يُغني عن فتحِه في الغالب: فيه المتوسّطُ وعددُ
+     الاختبارات — فلا يفتح إلّا ما يريد أن يقرأ تفصيلَه. */
+  details.subj{border:1px solid var(--line);border-radius:13px;margin:6px 0;background:var(--bg)}
+  details.subj>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 12px;cursor:pointer;list-style:none;font-weight:700;font-size:.93rem;border-radius:13px}
+  details.subj>summary::-webkit-details-marker{display:none}
+  details.subj>summary::marker{content:""}
+  details.subj>summary:hover{background:var(--card)}
+  details.subj[open]>summary{border-bottom:1px solid var(--line);border-radius:13px 13px 0 0}
+  details.subj[open]>summary .chev{transform:rotate(180deg)}
+  details.subj .sbody{padding:9px 12px 11px}
+  details.subj .sbody ul{margin:0;padding-inline-start:20px}
+  .subjsum{display:flex;align-items:center;gap:8px;min-width:0}
+  .subjsum .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .subjmeta{display:flex;align-items:center;gap:8px;flex:0 0 auto;color:var(--muted);
+    font-weight:600;font-size:.82rem;font-variant-numeric:tabular-nums}
   .hist{margin-top:12px;font-size:.85rem;color:var(--muted)}
   .hist span{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:8px;
     padding:3px 9px;margin:3px 3px 0 0;font-variant-numeric:tabular-nums}
@@ -491,7 +513,7 @@ function azureQuotaHtml(rows){
                ${weak.fixed.map(w=>`<li>${w.key} <span class="cnt">(×${w.n})</span></li>`).join("")}</ul>`
             : ``}
         </div>`}
-        ${(function(){ var pr=shownPractice(SLUG[name], practiceBy[name]); if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var lateTxt=function(p){ var mn=(window.RR&&RR.lateMin(p))||0; return (mn&&fresh(p))?' · 🕓 وصلت متأخّرة '+mn+' دقيقة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var currMap={},otherMap={},prevAll=[],vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[],pronAll=[]; pr.forEach(function(p){ var t=(p.meta.test||""); if(RR.isPreview(p)){ prevAll.push(p); return; } if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var subj=RR.subjectOf(t); if(p.meta.kindPron===true){ pronAll.push(p); return; } if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(subj && SUBJ_EMOJI[subj]){ /* أحدثُ جلسةٍ محتسبة لا أحدثُ جلسةٍ مطلقًا — RR.curKeep */ currMap[t]=RR.curKeep(currMap[t], p); } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var okArr=arr.filter(function(p){return p.meta.trusted!==false;}); var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/okArr.length):null; out+=`<div style="margin:4px 0 2px;font-weight:700">${SUBJ_EMOJI[subj]} ${subj} <span class="cnt">(المتوسط ${avg==null?"—":avg+"%"})</span></div><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var un=(p.meta.trusted===false)?` <span style="color:var(--bad)">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"})</span>`:``; return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span>${lateTxt(p)}${un}</li>`; }).join("")}</ul>`; }); out+=`</div>`; }
+        ${(function(){ var pr=shownPractice(SLUG[name], practiceBy[name]); if(!pr.length) return ""; var SUBJ_EMOJI={"لغتي":"📗","إنجليزي":"🔤","رياضيات":"🔢","علوم":"🔬","عربي":"🕌"}; var fresh=function(p){ return !window.RR || RR.freshFlag(p); }; var untrustedTxt=function(p){ return (p.meta.trusted===false&&fresh(p))?' 🚫 غير محتسبة':''; }; var lateTxt=function(p){ var mn=(window.RR&&RR.lateMin(p))||0; return (mn&&fresh(p))?' · 🕓 وصلت متأخّرة '+mn+' دقيقة':''; }; var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total&&spw<2&&fresh(p))?' ⚠️ سريع جدًا':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits&&fresh(p)){ s+=' · 🚪 خرج '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️'; } return s; }; var currMap={},otherMap={},prevAll=[],vocabAll=[],readAll=[],writingAll=[],writingDrill=[],talkAll=[],pronAll=[]; pr.forEach(function(p){ var t=(p.meta.test||""); if(RR.isPreview(p)){ prevAll.push(p); return; } if(p.meta.kind==="writing"){ writingAll.push(p); return; } if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; } if(p.meta.kind==="talk"){ talkAll.push(p); return; } var subj=RR.subjectOf(t); if(p.meta.kindPron===true){ pronAll.push(p); return; } if(t.indexOf("كلمات")===0){ vocabAll.push(p); } else if(t.indexOf("قراءة")===0){ readAll.push(p); } else if(subj && SUBJ_EMOJI[subj]){ /* أحدثُ جلسةٍ محتسبة لا أحدثُ جلسةٍ مطلقًا — RR.curKeep */ currMap[t]=RR.curKeep(currMap[t], p); } else { (otherMap[t]=otherMap[t]||[]).push(p); } }); var out=""; var bySubj={}; Object.keys(currMap).forEach(function(t){ var subj=RR.subjectOf(t); if(subj) (bySubj[subj]=bySubj[subj]||[]).push(currMap[t]); }); if(Object.keys(bySubj).length){ out+=`<div class="weak"><div class="wt">📚 تقرير المنهج الدراسي:</div>`; ["لغتي","إنجليزي","رياضيات","علوم","عربي"].forEach(function(subj){ var arr=bySubj[subj]; if(!arr||!arr.length) return; arr.sort(function(a,b){return (a.meta.test<b.meta.test)?-1:1;}); var okArr=arr.filter(function(p){return p.meta.trusted!==false;}); var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pctOf(p.meta.correct,p.meta.total);},0)/okArr.length):null; out+=`<details class="subj" data-subj="${name}|${subj}"><summary><span class="subjsum"><span>${SUBJ_EMOJI[subj]}</span><span class="nm">${subj}</span></span><span class="subjmeta"><span>${arr.length} اختبارًا</span><span class="cnt">المتوسط ${avg==null?"—":avg+"%"}</span><span class="chev">▾</span></span></summary><div class="sbody"><ul>${arr.map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var un=(p.meta.trusted===false)?` <span style="color:var(--bad)">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"})</span>`:``; return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span>${lateTxt(p)}${un}</li>`; }).join("")}</ul></div></details>`; }); out+=`</div>`; }
 /* ═══ مواد فوق الصفّ — طلب الأب (١٤ سبتمبر ٢٠٢٦) ═══
    «ما أبيها تُحتسب الكيمياء والأحياء، لكن أبي نتيجة اختباراتها تطلع
    لي في صفحتي». فقسمٌ مستقلٌّ مكتوبٌ عليه أنّه خارج التقييم، وصفوفه
@@ -507,14 +529,16 @@ if(prevAll.length){
     var names=prevSubj[sj].sort();
     var all=[]; names.forEach(function(t){ all=all.concat(prevBy[t]); });
     var avg=Math.round(all.reduce(function(x,p){ return x+pctOf(p.meta.correct,p.meta.total); },0)/all.length);
-    out+=`<div style="margin:6px 0 2px;font-weight:700">${PREV_ICO[sj]||"📘"} ${sj} <span class="cnt">(${all.length} جلسة · المتوسط ${avg}%)</span></div><ul>`;
+    /* وهي موادُّ كبقيّتِها، فتُطوى مثلَها — وإلّا انطوت العلومُ
+       وبقيت الأحياءُ مفتوحةً في البطاقةِ نفسِها. */
+    out+=`<details class="subj" data-subj="${name}|فوق ${sj}"><summary><span class="subjsum"><span>${PREV_ICO[sj]||"📘"}</span><span class="nm">${sj}</span></span><span class="subjmeta"><span>${all.length} جلسة</span><span class="cnt">المتوسط ${avg}%</span><span class="chev">▾</span></span></summary><div class="sbody"><ul>`;
     names.forEach(function(t){
       var arr=prevBy[t].slice().sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; });
       var lesson=t.replace(/^\S+\s+\S+\s*—\s*/,"");   /* «كيمياء ١ث — 1-1 …» ⇐ «1-1 …» */
       out+=arr.slice(0,3).map(function(p){ var pc=pctOf(p.meta.correct,p.meta.total);
         return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span>${lateTxt(p)}</li>`; }).join("");
     });
-    out+=`</ul>`;
+    out+=`</ul></div></details>`;
   });
   out+=`</div>`;
 }
@@ -673,6 +697,37 @@ function readOpen(){
 function writeOpen(a){ try{ localStorage.setItem(OPEN_KEY, JSON.stringify(a)); }catch(e){} }
 var OPEN = readOpen();
 
+/* ── وطيُّ المواد داخلَ البطاقة ────────────────────────────────────
+   طلب الأب (٢٠ أكتوبر ٢٠٢٦): «يبي كل مادة تكون مقفلة… أضغط عليه
+   تطلع لي اختباراته، أضغط مرة ثانية يسكر». فهي بطاقاتُ الأبناءِ
+   نفسُها مصغَّرة، ولها مفتاحُ تخزينٍ مستقلٌّ لئلّا يختلط اسمُ مادّةٍ
+   باسمِ ابن: المفتاحُ «الابن|المادّة».
+
+   والمادّةُ تُفتَح بعد البناءِ لا في بنائِه (لا سمةَ open في النصّ):
+   فالحالةُ تُقرأ مرّةً واحدةً هنا، فلو تعطّل التخزينُ خرجت المواد
+   كلُّها مطويّةً — وهو المطلوبُ أصلًا. */
+var SUBJ_KEY = "rafeef_open_subj_v1";
+function readOpenSubj(){
+  try{ var a = JSON.parse(localStorage.getItem(SUBJ_KEY) || "[]"); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function writeOpenSubj(a){ try{ localStorage.setItem(SUBJ_KEY, JSON.stringify(a)); }catch(e){} }
+var OPEN_SUBJ = readOpenSubj();
+
+function wireSubjects(){
+  Array.prototype.forEach.call(
+    document.getElementById("content").querySelectorAll('details.subj[data-subj]'),
+    function(el){
+      var k = el.getAttribute("data-subj");
+      if(OPEN_SUBJ.indexOf(k) >= 0) el.open = true;
+      el.addEventListener("toggle", function(){
+        var i = OPEN_SUBJ.indexOf(k);
+        if(el.open){ if(i < 0) OPEN_SUBJ.push(k); } else if(i >= 0){ OPEN_SUBJ.splice(i, 1); }
+        writeOpenSubj(OPEN_SUBJ);
+      });
+    });
+}
+
 function syncToggleAll(){
   var btn = document.getElementById("toggleAll");
   var ds  = document.getElementById("content").querySelectorAll('details[data-kid]');
@@ -698,6 +753,7 @@ function wireCards(){
       catch(e){ el.scrollIntoView(); }
     });
   });
+  wireSubjects();
   syncToggleAll();
 }
 document.getElementById("toggleAll").addEventListener("click", function(){
