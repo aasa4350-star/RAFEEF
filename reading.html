@@ -400,6 +400,35 @@ try{
 
 /* بصمة قصيرة ومستقرّة لنصّ القطعة (لا نحفظ النصّ كاملًا في كل محاولة).
    تُستعمل في التقرير لقياس كم مرّة تكرّرت القطعة على الطفل. */
+/* ═══ ما يقرؤه بصوته: الفقرةُ الأولى لا القطعةُ كلُّها ═══════════════
+   بلاغُ الأب (٢١ أكتوبر ٢٠٢٦): «قرأ حسنٌ القطعةَ مرّتين ولم يلتقط
+   الصوت». وصفّاه محفوظان: ‏ss=631 و705 (الجلسةُ فُتحت)، وsd=null
+   وrz=0 (لم يُكشَف كلامٌ ولا وصلت نتيجةٌ جزئيّة)، وcx=null (بلا
+   إلغاءٍ ولا خطأ)، وdeadAudio=0 (فالدورةُ لم تَرجع أصلًا).
+
+   وقد جُرّب النصُّ الطويلُ على الخدمةِ مباشرةً — ١٥٩ كلمةً و٨٣٩ حرفًا —
+   فقبلته وردّت في أقلَّ من ثانية. فطولُ المرجعِ ليس العلّة.
+
+   لكنّ مراجعةَ المسارِ كشفت ما أحدثه التطويلُ فعلًا:
+   - مهلةُ الأمانِ العامّةُ ١٥٠ث (_to أسفلَ ‎_paRunLong). وقطعةٌ من ١٦٠
+     كلمةً تُقرأ جهرًا في دقيقتين أو أكثر، فالمهلةُ تقطع عليه قراءتَه
+     وهو في وسطها. وكانت قطعُه ٣٢ كلمةً فلا تبلغ المهلةَ أبدًا.
+   - والقطعةُ تُقرأ على دورات، وكلُّ دورةٍ تُقاس على المرجعِ كلِّه مع
+     ‏enableMiscue — وهو ما أنزل درجتَه إلى ٣٢٪ في بلاغ ١٨ أكتوبر.
+     وكلّما طال المرجعُ اشتدَّ أثرُه.
+
+   فالقطعةُ تطول للفهمِ كما طلب، والمقروءُ بصوته فقرةٌ واحدة. */
+function readAloudRef(txt){
+  var s = String(txt||"").trim();
+  var first = (s.split(/\n{2,}/)[0] || "").trim() || s;
+  var w = first.split(/\s+/).filter(Boolean);
+  if(w.length <= 70) return first;
+  /* وتُقطَع عند آخرِ نهايةِ جملةٍ قبل السبعين لا في وسطِ جملة */
+  var cut = w.slice(0, 70).join(" ");
+  var m = cut.match(/^[\s\S]*[.!?؟]/);
+  return (m ? m[0] : cut).trim();
+}
+
 function passageId(txt){
   var s=String(txt||""), h=5381;
   for(var i=0;i<s.length;i++){ h=((h*33) ^ s.charCodeAt(i)) >>> 0; }
@@ -684,6 +713,9 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
   var MAX_RESUMES=8, MAX_CONSEC_NOMATCH=2;
   var _cycTo=null, _dead=0;   /* حارسُ الدورة الميّتة وعددُها المتتالي */
   var _cycSeq=0;   /* عدّادُ الدورات — للتشخيص */
+  var _runT0=Date.now();      /* بدءُ القراءة — لقياسِ ما مكثه قبل الإخفاق */
+  var _trail=[];              /* أثرُ الدورات: _st يُمحى عند كلِّ دورةٍ جديدة */
+  var _refW=String(refText||"").trim().split(/\s+/).filter(Boolean).length;
   var _deadAudio=0;           /* دوراتٌ فُتحت ولم يصلها صوت — إخفاقُ فتحٍ لا سكوت */
   var _partialOnly=0;         /* دوراتٌ سُمع فيها كلامٌ ولم تُرجع الخدمة نتيجة */
   var _maxRz=0;               /* أطول دورةٍ نجحت — للمقارنة بالفاشلة */
@@ -730,7 +762,13 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       }
       /* ولو لم تردّ أزور بحرفٍ فالمرحلة وحدها تدلّ — فلا يُحفظ صفٌّ أجوف */
       saveMicFail("passage", _lastWhy, _st, _stage(), { heard:_heardAny,
-        partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq });
+        partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq,
+        /* ‏أربعةٌ كانت غائبةً فعميت التشخيصَ في بلاغ ٢١ أكتوبر: كم مكث
+           قبل الإخفاق، وهل أنهاها بنفسه أم قطعته المهلة، وكم كلمةً كان
+           مرجعُه، وأثرُ الدورات — فـ_st يُمحى عند كلِّ دورةٍ جديدة. */
+        secs:Math.round((Date.now()-_runT0)/1000), stopped:_userStopped,
+        capped:(!_userStopped && (Date.now()-_runT0) >= _capMs-1500),
+        refW:_refW, trail:_trail.slice(0,12) });
       if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon();
     }
     if(!allWords.length){ _noWords(); return; }
@@ -865,6 +903,12 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     return false;
   }
   function _cycle(consecNoMatch){
+    /* كان _cycSeq يُعلَن ويُحفَظ ولا يُزاد أبدًا، فيقرأ المشخِّصُ
+       «cycles:0» في كلِّ إخفاقٍ ويحسب أنّ الدورةَ لم تبدأ. وهو رقمٌ
+       يضلّل لا يُعين. ومعه أثرٌ مختصرٌ لكلِّ دورةٍ لأنّ _st يُمحى عند
+       كلِّ دورةٍ جديدة، فلا يبقى من تاريخ القراءةِ إلّا آخرُها. */
+    _cycSeq++;
+    if(_trail.length < 12) _trail.push({ i:_cycSeq, t:Math.round((Date.now()-_runT0)/1000) });
     if(_fin || _userStopped) return;
     var cfg, audio, pa, cr=azureCreds();
     try{
@@ -1054,7 +1098,14 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
                function(){ if(_fin) return; _fin=true; clearTimeout(_to); _releaseBusy();
                            micFail(statusEl, btn, onFail); _closeRec(); });
   }
-  _to = setTimeout(finish, 150000); // أمان عام: يوقف تلقائيًا بعد دقيقتين ونصف (يشمل الإعادات)
+  /* ═══ مهلةُ الأمانِ تتبع طولَ المقروءِ لا رقمًا ثابتًا ═══════════════
+     كانت ١٥٠ث ثابتة، وهي وافيةٌ لقطعةٍ من ثلاثين كلمة. ولمّا طالت
+     القطعُ (٢١ أكتوبر) صارت المهلةُ تقطع القراءةَ في وسطها. فتُحسَب
+     من عددِ كلماتِ المرجع: ثانيتان وشيءٌ للكلمةِ وهو بطءُ قارئٍ
+     متعثّر، وستّون ثانيةً فوقها للتردّدِ والإعادة. ولا تقلُّ عن
+     ١٥٠ث ولا تزيد على ستِّ دقائق. */
+  var _capMs = Math.min(360000, Math.max(150000, _refW*2200 + 60000));
+  _to = setTimeout(finish, _capMs);
   startRec("");
 }
 function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail){
@@ -1696,12 +1747,24 @@ if(!META[who] || !DATA[who]){
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
+    /* المقروءُ بصوته فقرةٌ واحدةٌ لا القطعةُ كلُّها — انظر readAloudRef */
+    var readRef = readAloudRef(passage);
+    var partRead = readRef.length < passage.trim().length - 4;
     var lockMsg = azureConfigured()
-      ? '🔒 الخطوة ١: استمع للنص (🔊 استمع للنص). الخطوة ٢: اقرأ القطعة كاملة بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة.'
+      ? ('🔒 الخطوة ١: استمع للنص (🔊 استمع للنص). الخطوة ٢: اقرأ ' +
+         (partRead ? '<b>الفقرة الأولى فقط</b> (المظلَّلة)' : 'القطعة كاملة') +
+         ' بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة.' +
+         (partRead ? ' وبقيّة القطعة تقرأها بعينك للأسئلة.' : ''))
       : '🔒 استمع للنص كاملًا (🔊 استمع للنص) وبعدها تُفتح الأسئلة.';
+    /* وتُظلَّل الفقرةُ المقروءةُ حتّى لا يقرأ غيرَها ثمّ يُقال له «خلّصت» */
+    var passHtml = passage;
+    if(partRead && canRead && passage.indexOf(readRef) === 0)
+      passHtml = '<span data-readpart style="background:var(--good-bg);border-radius:6px;' +
+                 'box-shadow:0 0 0 4px var(--good-bg)">' + readRef + '</span>' +
+                 passage.slice(readRef.length);
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+azBtnHtml()+'</div>'+
-      '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passage+'</div>'+
+      '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passHtml+'</div>'+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
       EXIT_WARN_HTML+
@@ -1755,7 +1818,7 @@ if(!META[who] || !DATA[who]){
       azureTTS(passage, ar, "-22%", onListened); // صوت بشري عصبي مبطّأ شوي للأطفال (يرجع لصوت المتصفح لو تعذّر Azure)
     });
     // قراءة القطعة عبر Azure فقط (🎙️ قيّم نطقي) — التسجيل المستمر يفتح الأسئلة بعد القراءة
-    var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(passage, ar, azpfb, azP, onRead, true, unlockNoMic); }); }
+    var azP=azBtnEl; if(azP){ var azpfb=sec.querySelector("[data-mic-wrap] .pfb"); azP.addEventListener("click",function(){ azureAssess(readRef, ar, azpfb, azP, onRead, true, unlockNoMic); }); }
     var ans={}, correct=0, saved=false, savedN=0, attId=newPid(), total=questions.length, scoreEl=sec.querySelector("[data-score]");
     var skills={};   /* تسجيل تفصيلي حسب نوع سؤال الاستيعاب */
     function markComp(i, ok){ var g=compSkill(questions[i][0]); var s2=skills[g]||(skills[g]={c:0,t:0}); s2.t++; if(ok) s2.c++; }

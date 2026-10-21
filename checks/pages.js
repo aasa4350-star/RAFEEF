@@ -341,6 +341,7 @@ function run(){
   issues.push(...sectionClockPath());
   issues.push(...sentencesPath());
   issues.push(...readingPoolPath());
+  issues.push(...readAloudPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3207,6 +3208,80 @@ function readingPoolPath(){
     if (MW[w] > 0 && a.length < MK)
       E(F, tag + ': ' + a.length + ' قطعةً والصمّامُ ' + MK + ' — فالبنكُ جاع');
   }
+  return out;
+}
+
+/* ═══ المقروءُ بصوتِه ومهلتُه ═══════════════════════════════════════
+   بلاغُ الأب (٢١ أكتوبر ٢٠٢٦): «قرأ حسنٌ القطعةَ مرّتين ولم يلتقط
+   الصوت». وتطويلُ القطعِ في اليومِ نفسِه جعل القراءةَ الجهريّةَ تتجاوز
+   مهلةَ الأمانِ الثابتةَ (١٥٠ث)، وجعل كلَّ دورةِ تعرّفٍ تُقاس على مرجعٍ
+   من مئةٍ وستّين كلمة. فصار المقروءُ بصوته فقرةً واحدة، وصارت المهلةُ
+   تتبع طولَه. وهذا الحارسُ يمنع عودةَ الحالَين. */
+function readAloudPath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ── الدالّةُ تُنتزَع وتُشغَّل على عيّنات ── */
+  const m = /function readAloudRef\(txt\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!m) E('readAloudRef لا تُنتزَع — فالمقروءُ بصوته لا يُفحَص');
+  else {
+    let fn;
+    try { const sb = {}; vm.createContext(sb);
+      vm.runInContext('f = function(txt){' + m[1] + '\n};', sb); fn = sb.f; }
+    catch(e){ E('readAloudRef لا تُشغَّل: ' + String(e.message).slice(0,60)); }
+    if (fn){
+      const W = s => String(s).trim().split(/\s+/).filter(Boolean).length;
+      const para = n => new Array(n).fill('word').join(' ') + '.';
+      const PROBE = [
+        { nm:'قطعةٌ ثلاثُ فقراتٍ طويلة', in: para(55)+'\n\n'+para(60)+'\n\n'+para(50),
+          ok: r => r === para(55), why:'تُرجَع الفقرةُ الأولى وحدَها' },
+        /* وهذه تُميّز: مجموعُها دون السبعين، فلو أُهمل فاصلُ الفقراتِ
+           رجع النصُّ كلُّه ولم يُنقِذه فرعُ القطع. والأولى وحدَها لا
+           تُميّز لأنّ القطعَ عند آخرِ نهايةِ جملةٍ قبل السبعين يُصادف
+           آخرَ الفقرةِ الأولى فيُخفي العطب. */
+        { nm:'فقرتان قصيرتان', in: para(20)+'\n\n'+para(22),
+          ok: r => r === para(20), why:'فاصلُ الفقراتِ يُحترَم وإن قصُر المجموع' },
+        { nm:'قطعةٌ قصيرةٌ فقرةً واحدة', in: para(18),
+          ok: r => r === para(18), why:'القصيرةُ تُقرأ كلُّها' },
+        { nm:'فقرةٌ واحدةٌ طويلةٌ جدًّا', in: para(40)+' '+para(40)+' '+para(40),
+          ok: r => W(r) <= 70 && /[.!?؟]$/.test(r), why:'تُقطَع عند سبعين وعند نهايةِ جملة' },
+        { nm:'بلا نصّ', in: '', ok: r => r === '', why:'لا ترمي' }
+      ];
+      for (const t of PROBE){
+        let r; try { r = fn(t.in); } catch(e){ r = '«رمت ' + String(e.message).slice(0,30) + '»'; }
+        if (!t.ok(r))
+          E('readAloudRef — ' + t.nm + ': ' + t.why + '، والناتجُ ' + W(r) + ' كلمةً «' +
+            String(r).slice(0,36) + '…»');
+      }
+    }
+  }
+
+  /* ── وهي التي تُرسَل لأزور، والمظلَّلُ هو هي ── */
+  if (!/azureAssess\(readRef,/.test(src))
+    E('قطعةُ القراءةِ تُرسَل كاملةً لتقييمِ النطقِ لا readRef — فيُقاس على ما لم يُطلَب منه');
+  if (!/var readRef = readAloudRef\(passage\)/.test(src))
+    E('readRef لا يُشتقُّ من القطعة');
+  if (!/data-readpart/.test(src))
+    E('الفقرةُ المقروءةُ لا تُظلَّل — فيقرأ القطعةَ كلَّها ويُقاس على فقرة');
+  if (/'<div class="txt"[^>]*>'\+passage\+/.test(src))
+    E('النصُّ يُعرَض من passage لا passHtml — فالتظليلُ لا يصل الشاشة');
+
+  /* ── ومهلةُ الأمانِ ليست رقمًا ثابتًا ── */
+  if (/_to = setTimeout\(finish, 150000\)/.test(src))
+    E('مهلةُ الأمانِ عادت ١٥٠ث ثابتة — وقطعةٌ طويلةٌ تُقطَع على قارئِها في وسطها');
+  if (!/_capMs = Math\.min\([\s\S]{0,60}_refW/.test(src))
+    E('مهلةُ الأمانِ لا تُشتقُّ من عددِ كلماتِ المرجع');
+
+  /* ── وأرقامُ التشخيصِ تُملأ فعلًا ── */
+  if (!/_cycSeq\+\+/.test(src))
+    E('_cycSeq يُحفَظ ولا يُزاد — فيقرأ المشخِّصُ «cycles:0» دائمًا ويحسب أنّ الدورةَ لم تبدأ');
+  ['secs:', 'stopped:', 'refW:', 'trail:'].forEach(k => {
+    if (!new RegExp(k.replace(':','\\s*:')).test(src))
+      E('صفُّ إخفاقِ المايكِ بلا «' + k.replace(':','') + '» — وغيابُه هو الذي أعمى تشخيصَ ٢١ أكتوبر');
+  });
   return out;
 }
 
