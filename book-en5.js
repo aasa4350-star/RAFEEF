@@ -13,6 +13,13 @@
    ⚠️ ولم تصلني صفحاتُ كتابِه مصوَّرةً كما وصلت صفحاتُ سعودٍ وحسن، فإن
    أرسلها الأبُ طُوبِقت حرفًا بحرفٍ كما صار في كتابَيهما.
 
+   وفي ٢١ أكتوبر ٢٠٢٦ صوّر الأبُ صفحةَ Scope and Sequence، ففيها عمودُ
+   SAMPLE LANGUAGE وهو جملُ الكتابِ نفسِه. فنُقِلت حرفًا بحرفٍ في قسمٍ
+   اسمُه «جمل الكتاب» — منفصلٍ عن «جمل الوحدة» لأنّ تلك مكتوبةٌ على
+   القواعدِ لا منقولةٌ من الصفحة. والوحدةُ التمهيديّةُ بلا عمودِ جملٍ في
+   الجدول فبقيت بلا قسمٍ منقول. وما زالت صفحاتُ المحادثةِ مطلوبةً:
+   جملُ الجدولِ ستٌّ إلى عشرِ كلماتٍ، والقصيرُ نادرٌ عنده.
+
    تقرؤها english5.html في أقسامِ «احفظ» و«ثبّت» و«جمل» داخلَ كلِّ وحدة.
    كلُّ عنصر: [الإنجليزي, المعنى بالعربي]. */
 window.BOOK_EN5 = {
@@ -100,6 +107,12 @@ window.BOOK_EN5 = {
      ["We visited the fair last week.", "زرنا المعرض الأسبوع الماضي."],
      ["This room is very untidy.", "هذه الغرفة غير مرتّبةٍ أبدًا."],
      ["Carving wood is not easy.", "نحتُ الخشب ليس سهلًا."]
+   ]},
+   { "t": "جمل الكتاب", "items": [
+     ["I go nearly every day.", "أذهب كلَّ يومٍ تقريبًا."],
+     ["Yesterday, I didn't go.", "أمسِ لم أذهب."],
+     ["I want to go to the fair again!", "أريد أن أذهب إلى المعرضِ مرّةً أخرى!"],
+     ["My cousin is playing at the fair right now.", "ابنُ عمّي يلعب في المعرضِ الآن."]
    ]}
   ]
  },
@@ -138,6 +151,13 @@ window.BOOK_EN5 = {
      ["Of course you can come with us.", "بالطبع تستطيع أن تأتي معنا."],
      ["I wonder what is inside.", "أتساءل ما الذي بالداخل."],
      ["The box is empty.", "الصندوق فارغ."]
+   ]},
+   { "t": "جمل الكتاب", "items": [
+     ["I will look for the key.", "سأبحث عن المفتاح."],
+     ["We won't come here again.", "لن نأتيَ إلى هنا مرّةً أخرى."],
+     ["I am going to sleep at Luna's house tonight.", "سأنام في بيتِ لونا اللّيلة."],
+     ["I will tell my dad you don't like fish.", "سأخبر أبي أنّك لا تحبُّ السمك."],
+     ["Add a few strawberries and a little cereal using a spoon.", "أضِف قليلًا من الفراولةِ وقليلًا من الحبوبِ بملعقة."]
    ]}
   ]
  },
@@ -175,6 +195,13 @@ window.BOOK_EN5 = {
      ["She may travel next month.", "ربّما تسافر الشهر القادم."],
      ["The singer is on the stage.", "المغنّي على خشبة المسرح."],
      ["He wants a good job.", "يريد وظيفةً جيّدة."]
+   ]},
+   { "t": "جمل الكتاب", "items": [
+     ["I'm not going to work in an office.", "لن أعملَ في مكتب."],
+     ["She may be a pilot because she likes flying.", "ربّما تصير طيّارةً لأنّها تحبُّ الطيران."],
+     ["Julian might not be a pilot because he's scared of planes.", "ربّما لا يصير جوليان طيّارًا لأنّه يخاف الطائرات."],
+     ["This is a theater, isn't it?", "هذا مسرحٌ، أليس كذلك؟"],
+     ["I can come, can't I?", "أستطيع أن آتيَ، أليس كذلك؟"]
    ]}
   ]
  },
@@ -211,6 +238,12 @@ window.BOOK_EN5 = {
      ["The bread smells wonderful.", "رائحة الخبز رائعة."],
      ["Fetch me a spoon, please.", "أحضِرْ لي ملعقةً من فضلك."],
      ["A healthy diet has fruit and vegetables.", "النظام الغذائيّ الصحّيّ فيه فاكهةٌ وخُضار."]
+   ]},
+   { "t": "جمل الكتاب", "items": [
+     ["You should get your ingredients ready first.", "ينبغي أن تجهّزَ مكوّناتِك أوّلًا."],
+     ["You had better not leave the cookies in the oven too long!", "الأولى ألّا تتركَ البسكويت في الفرنِ طويلًا!"],
+     ["We add more water if the sauce is too thick.", "نضيف ماءً أكثر إذا كانت الصلصةُ ثخينةً جدًّا."],
+     ["If it doesn't taste great, I stir in more salt.", "إذا لم يكن طعمُه رائعًا قلّبتُ فيه ملحًا أكثر."]
    ]}
   ]
  }
