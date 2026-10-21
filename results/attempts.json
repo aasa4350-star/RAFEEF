@@ -1,5 +1,75 @@
 [
     {
+        "id": "2289d490-d7ed-4b5b-b67c-aaa032a66ed1",
+        "created_at": "2026-10-21T16:50:56.278009+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-21T16:50:57.325Z",
+            "cid": "1792601457325_62zpkths29a",
+            "dur": 48,
+            "pid": "mviclfmf_28bzjy",
+            "kind": "activity",
+            "sect": "sent",
+            "test": "\u062c\u0645\u0644 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83e\udde9",
+            "asked": 4,
+            "level": 4,
+            "right": 2,
+            "total": 0,
+            "okKeys": [
+                "She grew up abroad.",
+                "When are you traveling?"
+            ],
+            "skills": {
+                "\u062c\u0645\u0644: \u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0643\u0644\u0645\u0627\u062a": {
+                    "c": 2,
+                    "t": 4
+                }
+            },
+            "correct": 0
+        }
+    },
+    {
+        "id": "72e2b0dc-9e88-494f-9354-5987203913ca",
+        "created_at": "2026-10-21T16:50:05.772414+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-21T16:50:06.729Z",
+            "cid": "1792601406729_7mvyi3svc22",
+            "dur": 43,
+            "pid": "mvickgmw_1ndxlg",
+            "kind": "activity",
+            "sect": "sent",
+            "test": "\u062c\u0645\u0644 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83e\udde9",
+            "asked": 4,
+            "level": 4,
+            "right": 2,
+            "total": 0,
+            "okKeys": [
+                "When are you traveling?",
+                "She grew up abroad."
+            ],
+            "skills": {
+                "\u062c\u0645\u0644: \u062a\u0631\u062a\u064a\u0628 \u0627\u0644\u0643\u0644\u0645\u0627\u062a": {
+                    "c": 2,
+                    "t": 4
+                }
+            },
+            "correct": 0
+        }
+    },
+    {
         "id": "02221704-2d81-49fe-a64b-090100b86651",
         "created_at": "2026-10-21T15:54:40.314521+00:00",
         "student": "\u0631\u0641\u064a\u0641",
@@ -252428,92 +252498,6 @@
             ],
             "correct": 8,
             "learned": 760,
-            "learning": 690,
-            "vocTotal": 910,
-            "unrecalled": 70
-        }
-    },
-    {
-        "id": "ca930a86-3a91-43aa-8e19-bb5184bac924",
-        "created_at": "2026-10-14T11:07:06.175248+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-14T11:07:05.738Z",
-            "cid": "1791976025738_fautkjq3lo6",
-            "dur": 165,
-            "pid": "mv805rpk_8f7j5v",
-            "kind": "practice",
-            "mode": "new",
-            "reps": 2,
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "fixed": 1,
-            "known": 0,
-            "total": 10,
-            "missed": [
-                {
-                    "t": "bwlief",
-                    "w": "belief",
-                    "fx": 1,
-                    "seen": true
-                },
-                {
-                    "t": "benfit",
-                    "w": "benefit",
-                    "seen": true
-                }
-            ],
-            "correct": 8,
-            "learned": 760,
-            "learning": 690,
-            "vocTotal": 910,
-            "unrecalled": 70
-        }
-    },
-    {
-        "id": "0a1ca796-5fce-4fb5-8cc7-74ab8ca2e7f0",
-        "created_at": "2026-10-14T11:06:55.577184+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-14T11:06:54.911Z",
-            "cid": "1791976014911_z4ywc67es1j",
-            "dur": 154,
-            "pid": "mv805rpk_8f7j5v",
-            "away": 0,
-            "kind": "practice",
-            "mode": "new",
-            "reps": 2,
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "exits": 0,
-            "fixed": 0,
-            "known": 0,
-            "total": 10,
-            "missed": [
-                {
-                    "t": "bwlief",
-                    "w": "belief",
-                    "seen": true
-                },
-                {
-                    "t": "benfit",
-                    "w": "benefit",
-                    "seen": true
-                }
-            ],
-            "correct": 8,
-            "learned": 760,
-            "trusted": true,
             "learning": 690,
             "vocTotal": 910,
             "unrecalled": 70
