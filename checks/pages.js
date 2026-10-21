@@ -339,6 +339,7 @@ function run(){
   issues.push(...myErrPath());
   issues.push(...tryTracePath());
   issues.push(...sectionClockPath());
+  issues.push(...sentencesPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -1683,6 +1684,91 @@ function mawhiba3BookPath(){
      ٤) يسقط التنبيهُ بأنّ الزمنَ اجتهادٌ لا رقمٌ رسميّ، فيُقرَأ كأنّه
         زمنُ موهبةَ المعتمَد.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══ 🧩 الجمل — جملُ كتابِه يرتّبها بنفسِه ═════════════════════════════
+   نقاشُ الأب (٢٠–٢١ أكتوبر ٢٠٢٦): «وش رايك لو نحط لهم جمل يحفظونها…
+   الأربعة إنجليزي من كتبهم وتنفعهم في التعبير وكذلك محادثة»، ثمّ:
+   «أبدا».
+
+   وقراءةُ تقاريرِهم هي التي رسمت الشكل: ترتيبُ الكلماتِ (بناء) ضعيفٌ
+   عندهم بخلافِ إكمالِ الفراغ (استرجاع) — سعودٌ ١/٨ وحسنٌ ٦/١٦ — وهو
+   عينُ ما يُحتاج في التعبيرِ والمحادثة. فالصفحةُ ترتيبُ كلماتٍ لا غير.
+
+   وأربعةٌ تنكسر هنا بلا صوت:
+     ١) تُبنى الجملُ من كتابِ ابنٍ آخر، فيُسأل عمّا لم يدرسْه.
+     ٢) يسقط التدرّجُ بالطول، فيُستقبَل رابعٌ ابتدائيٌّ بجملةٍ من عشرِ
+        كلماتٍ — وهو ما أهرب سعودًا من القسمِ القديمِ بعد محاولتَين.
+     ٣) تسقط عتبةُ الإتقان، فتخرج الجملةُ بصحّةٍ واحدةٍ أو بصحّتَين في
+        دقيقةٍ واحدة.
+     ٤) تُحفَظ الجولةُ بدرجة، فتدخل متوسّطَ الإنجليزيِّ وهي تدريب. */
+function sentencesPath(){
+  const out = [];
+  const F = 'sentences.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ── كلُّ ابنٍ وكتابُه ── */
+  const BOOK = { saud:'BOOK_EN4', osama:'BOOK_EN5', rafeef:'BOOK_EN8', hasan:'BOOK_EN9' };
+  const bm = /var BOOKS  = \{([^}]*)\}/.exec(src);
+  if (!bm) E('جدولُ الكتبِ لا يُقرأ');
+  else for (const kid of Object.keys(BOOK))
+    if (!new RegExp(kid + ':"' + BOOK[kid] + '"').test(bm[1]))
+      E('كتابُ ' + kid + ' ليس ' + BOOK[kid] + ' — فيُسأل عمّا لم يدرسْه');
+  for (const f of ['book-en4.js','book-en5.js','book-en8.js','book-en9.js'])
+    if (src.indexOf('src="' + f) < 0) E('لا تُحمّل ' + f + ' — فابنُه يفتح الصفحةَ فارغة');
+
+  /* ── التدرّجُ بطولِ الجملة، ومستوًى يُشتقُّ لا يُكتَب ── */
+  if (!/LEVELS = \[4, 6, 8, 99\]/.test(src))
+    E('سلّمُ الأطوالِ ليس ٤ ثمّ ٦ ثمّ ٨ — والتدرّجُ هو ما يمنع هروبَ الصغير');
+  const lv = /function levelOf\(all, credit\)\{([\s\S]*?)\n  \}/.exec(src);
+  if (!lv) E('levelOf لا تُقرَأ');
+  else {
+    if (!/s\.n <= L && \(credit\[s\.en\]\|\|0\) < RETIRE/.test(lv[1]))
+      E('المستوى لا يُشتقُّ من غيرِ المتقَنِ في طولِه — فإمّا يجمد أو يقفز');
+    if (!/if\(left\.length\) return/.test(lv[1]))
+      E('المستوى لا يرتفع حين يفرغ ما دونه');
+  }
+  /* ولا تُعرَض جملةٌ أطولُ من مستواه */
+  if (!/s\.n <= L/.test(src)) E('لا قيدَ على طولِ الجملةِ المعروضة');
+
+  /* ── الإتقانُ صحّتان في جولتَين ── */
+  if (!/RETIRE = 2,/.test(src)) E('عتبةُ الإتقانِ ليست صحّتَين');
+  const cr = /function creditOf\(rows\)\{([\s\S]*?)\n  \}/.exec(src);
+  if (!cr) E('creditOf لا تُقرَأ');
+  else if (!/if\(once\[k\]\) return;/.test(cr[1]) || !/once\[k\] = 1;/.test(cr[1]))
+    E('الجولةُ الواحدةُ تُحتسب رصيدَين — فتخرج الجملةُ بصحّتَين في دقيقة');
+  if (!/if\(okKeys\.indexOf\(s\.en\) < 0\) okKeys\.push\(s\.en\);/.test(src))
+    E('الكتابةُ لا تمنع تكرارَ المفتاحِ في الجولةِ الواحدة');
+
+  /* ── التمرينُ بناءٌ لا استرجاع ── */
+  if (!/built\.map\(function\(p\)\{ return p\.w; \}\)\.join\(" "\) === target\.join\(" "\)/.test(src))
+    E('الترتيبُ لا يُقابَل بالجملةِ الأصليّةِ كاملةً');
+  if (!/🔀 رتّب الكلمات/.test(src)) E('لوحةُ الترتيبِ غيرُ معنونة');
+
+  /* ── والحفظُ نشاطٌ بلا درجة، موسومٌ فيراه الأب ── */
+  if (!/kind:"activity", sect:SECT, test:"جمل إنجليزي 🧩"/.test(src))
+    E('الجولةُ لا تُحفَظ نشاطًا موسومًا — فتدخل متوسّطَ الإنجليزيِّ أو تغيب عن التقرير');
+  if (!/correct:0, total:0/.test(src))
+    E('الجولةُ تحمل درجةً — وهي تدريبٌ لا اختبار');
+  if (!/okKeys:okKeys\.slice\(0,40\)/.test(src)) E('okKeys لا تُحفَظ — فلا رصيدَ للإتقان');
+  if (!/meta->>sect=eq\." \+ SECT/.test(src))
+    E('الرصيدُ لا يُقرأ من الخادم — فلا يتبع الابنَ إلى جهازٍ آخر');
+
+  /* ── وبطاقتُها عند الأربعةِ جميعًا ── */
+  const hp = path.join(ROOT, 'home.html');
+  if (fs.existsSync(hp)){
+    const h = fs.readFileSync(hp, 'utf8');
+    const lit = EXTRACT.literalAfter(h, /(?:var|let|const)\s+SUBJECTS\s*=/, '{', '}');
+    for (const kid of Object.keys(BOOK)){
+      const mine = lit && EXTRACT.literalAfter(lit, new RegExp('(?:^|[{,])\\s*' + kid + '\\s*:\\s*'), '[', ']');
+      if (!mine) { E('قائمةُ ' + kid + ' في home.html لا تُقرأ'); continue; }
+      if (!/sentences\.html/.test(mine))
+        E('لا بطاقةَ للجملِ عند ' + kid + ' — والقسمُ القديمُ هُجِر لأنّه بلا بطاقة');
+    }
+  }
+  return out;
+}
+
 /* ═══ ساعةُ القسمِ تبدأ عند فتحِه لا عند بناءِ الصفحة ════════════════════
    بان في أثناء قراءةِ أرقامِ ٢٠ أكتوبر ٢٠٢٦ أنّ وقتَ كلِّ قسمٍ في
    صفحةِ القدراتِ يضمُّ وقتَ ما قبلَه: أقسامُها تُبنى كلُّها لحظةَ فتحِ

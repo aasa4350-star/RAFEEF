@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>الجمل — إنجليزي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="config.js"></script>
+<script src="gate.js"></script>
+<script src="attempts-queue.js"></script>
+<script src="book-en4.js?v=20261008"></script>
+<script src="book-en5.js?v=20261018"></script>
+<script src="book-en8.js?v=20261018"></script>
+<script src="book-en9.js?v=20261009"></script>
+<style>
+  :root{
+    --accent:#0e7490; --accent-deep:#155e75;
+    --bg:#f5fafb; --card:#ffffff; --ink:#0f172a; --muted:#5b6b7a;
+    --line:#dde8ec; --good:#15803d; --good-bg:#e7f6ec; --warn:#b45309;
+    --bad:#b91c1c; --bad-bg:#fdecec;
+    --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.07);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#07161a;--card:#0f1f26;--ink:#e6f1f5;--muted:#93a8b4;--line:#1f3a4460;
+      --accent:#67e8f9;--accent-deep:#22d3ee;
+      --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.45);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.9}
+  .wrap{max-width:720px;margin:0 auto;padding:20px 16px 64px}
+  header.top{background:linear-gradient(135deg,var(--accent-deep),var(--accent));color:#fff;border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+  header.top .eyebrow{font-size:.82rem;opacity:.92;margin:0 0 6px}
+  header.top h1{margin:0;font-size:1.5rem;font-weight:800}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .bar a{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 14px;
+    border-radius:12px;font-weight:700;text-decoration:none;font-size:.92rem;box-shadow:var(--shadow)}
+  .locked{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center;color:var(--muted)}
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;
+    box-shadow:var(--shadow);margin-bottom:12px;font-size:.96rem}
+  .lv{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .lv span{border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:.82rem;color:var(--muted);font-weight:700}
+  .lv span.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .lv span.done{background:var(--good-bg);color:var(--good);border-color:var(--good)}
+  /* ═══ أصنافُ التمرينِ نفسُها التي في study-en4.js، فالشكلُ واحدٌ
+     في الصفحتَين ولا يتعلّم الطفلُ واجهتَين لعملٍ واحد ═══ */
+  .st-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+  .st-big{font-size:1.45rem;font-weight:800;text-align:center;margin:6px 0 12px}
+  .st-big.en{direction:ltr}
+  .st-opts{display:grid;gap:8px}
+  .st-opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit}
+  .st-opts button.en{direction:ltr}
+  .st-opts button.ok{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:800}
+  .st-opts button.no{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .st-prog{font-size:.85rem;color:var(--muted);text-align:center;margin-bottom:8px}
+  .st-chips{display:flex;flex-wrap:wrap;gap:8px;direction:ltr;justify-content:center;min-height:48px;padding:8px;border-radius:12px}
+  .st-chips.built{background:var(--bg);border:1.5px dashed var(--line)}
+  .st-chips button{border:1.5px solid var(--accent);background:var(--card);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .st-fb{text-align:center;font-weight:800;margin-top:10px;min-height:1.6em}
+  .st-act{display:flex;gap:8px;margin-top:12px}
+  .st-act button{flex:1;border:0;background:var(--accent);color:#fff;padding:11px;border-radius:12px;font-weight:800;cursor:pointer;font-family:inherit}
+  .st-act button.ghost{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+  .st-hint{color:var(--muted);text-align:center;font-size:.95rem}
+  .st-sp{border:0;background:var(--accent);color:#fff;border-radius:9px;padding:5px 11px;cursor:pointer;font-size:.95rem;font-family:inherit}
+  footer{color:var(--muted);text-align:center;font-size:.84rem;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   🧩 الجمل — جملُ كتابِه يرتّبها بنفسِه حتّى يبنيَها
+   ═══════════════════════════════════════════════════════════════════
+   نقاشُ الأب (٢٠–٢١ أكتوبر ٢٠٢٦): «وش رايك لو نحط لهم جمل يحفظونها»،
+   ثمّ حدّد: «الأربعة، إنجليزي من كتبهم، وتنفعهم في التعبير وكذلك
+   المحادثة».
+
+   وقراءةُ تقاريرِهم قبل البناءِ غيّرت الشكلَ مرّتين:
+
+   ١) القسمُ موجودٌ أصلًا داخلَ وحداتِ الإنجليزيّ (study-en4.js · 🧩 جمل)
+      ومهجور: سبعُ جلساتٍ عند الأربعةِ جميعًا مقابل ١١٣٤ جلسةَ كلمات.
+      وسببُه ظاهرٌ: للكلماتِ بطاقةٌ في الرئيسيّة وللجملِ لا — فيمشي
+      الطفلُ على أقصرِ طريق. فهذه صفحةٌ لها بطاقتُها.
+
+   ٢) وتفصيلُ جلساتِهم كشف أين ينكسرون بالضبط:
+        إكمالُ الفراغ  — سعود ٤/٨ · حسن ١١/١٦ · رفيف ٤/٤
+        ترتيبُ الكلماتِ — سعود ١/٨ · حسن ٦/١٦ · رفيف ٣/٤
+      والفرقُ ليس صدفة: إكمالُ الفراغِ <b>استرجاع</b> (يختار كلمةً
+      يعرفها)، وترتيبُ الكلماتِ <b>بناء</b> (يركّب الجملةَ بنفسه).
+      والذي ينفع في التعبيرِ والمحادثةِ هو البناءُ لا الاسترجاع — فهذه
+      الصفحةُ ترتيبُ كلماتٍ أوّلًا وأخيرًا.
+
+   ٣) وسعودٌ هرب من القسمِ بعد محاولتَين (٢٥٪ ثمّ ٣٨٪) ولم يعد عشرةَ
+      أيّام. وثمانُ كلماتٍ في جملةٍ واحدةٍ كثيرةٌ على رابعٍ ابتدائيّ.
+      فالتدرّجُ هنا بطولِ الجملة: يبدأ بما طولُه أربعُ كلماتٍ فأقلّ،
+      ولا يرى الأطولَ حتّى يُتقِنَ الأقصر.
+
+   والمستوى يُشتقُّ من بنكِه لا يُكتَب له: أوّلُ مستوًى فيه جملةٌ لم
+   يُتقِنها بعد. فمن بنكُه فقيرٌ في القصيرِ (حسنٌ عنده أربعُ جملٍ بأربعِ
+   كلمات) يجتازه في جولةٍ ويرتفع، ومن عنده إحدى وستّون (سعود) يمكث
+   فيه حتّى يستحقّ ما بعده. فلا رقمَ مكتوبًا بيدٍ يصير كذبًا حين
+   يتغيّر الكتاب.
+
+   والإتقانُ صحّتان في جولتَين مختلفتَين — قاعدةُ «أخطائي» نفسُها:
+   صحّتان متتاليتان في دقيقةٍ ذاكرةٌ قصيرةٌ لا إتقان. والرصيدُ في
+   الخادمِ لا في الجهاز، فيتبعه إلى أيِّ جهازٍ ويراه الأبُ في تقريره.
+
+   وللمحادثةِ نصيبُها: بعدَ كلِّ جملةٍ تُنطَق ويُعرَض معناها، فجملُ
+   كتبِهم في هذه السنِّ صيغُ محادثةٍ جاهزة (Nice to meet you · I'm
+   sorry I'm late) — تُحفَظ كما هي وتُقال.
+   ═══════════════════════════════════════════════════════════════════ */
+(function(){
+  var SUPA_URL = (window.APP_CONFIG||{}).supaUrl, SUPA_KEY = (window.APP_CONFIG||{}).supaKey;
+  var NAMES  = { saud:"سعود", osama:"أسامة", rafeef:"رفيف", hasan:"حسن" };
+  var GRADES = { saud:"رابع ابتدائي", osama:"خامس ابتدائي", rafeef:"ثاني متوسط", hasan:"ثالث متوسط" };
+  var BOOKS  = { saud:"BOOK_EN4", osama:"BOOK_EN5", rafeef:"BOOK_EN8", hasan:"BOOK_EN9" };
+  var PAGE   = { saud:"english.html", osama:"english5.html", rafeef:"english8.html", hasan:"english9.html" };
+
+  var SECT = "sent", RETIRE = 2, DOSE = 5, LEVELS = [4, 6, 8, 99];
+
+  function qs(k){ return new URLSearchParams(location.search).get(k); }
+  var who = (qs("who")||"").toLowerCase(), name = NAMES[who] || "";
+  var app = document.getElementById("app");
+
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function words(s){ return String(s).trim().split(/\s+/).filter(Boolean); }
+  function isSentence(e){ return /[.?!]$/.test(e) && words(e).length >= 3; }
+  var __PIDN = 0;
+  function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
+
+  /* ── النطقُ: صوتُ المتصفّحِ يكفي هنا، والجملُ قصيرةٌ معروفةُ اللفظ ── */
+  function say(t){
+    try{
+      if(!window.speechSynthesis) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(String(t));
+      u.lang = "en-US"; u.rate = .9;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  /* ═══ جملُ كتابِه: تُقسَم عند « — » فكلُّ شطرٍ جملةٌ قائمةٌ بنفسِها ═══
+     وهي القاعدةُ نفسُها في study-en4.js حرفًا بحرف، فلا يختلف ما يراه
+     هنا عمّا يراه داخلَ وحدتِه. */
+  function allSentences(){
+    var B = window[BOOKS[who]];
+    if(!B) return [];
+    var seen = {}, out = [];
+    Object.keys(B).forEach(function(u){
+      var unit = B[u] || {};
+      (unit.sections||[]).forEach(function(s){
+        (s.items||[]).forEach(function(it){
+          var e = String((it&&it[0])||"");
+          if(!isSentence(e) && !/ — /.test(e)) return;
+          e.split(/ — /).forEach(function(p){
+            p = p.trim();
+            if(!isSentence(p) || /[\/…→]/.test(p) || words(p).length > 10 || seen[p]) return;
+            seen[p] = 1;
+            out.push({ en: p, ar: String((it&&it[1])||""), unit: u,
+                       title: unit.title || u, n: words(p).length });
+          });
+        });
+      });
+    });
+    return out;
+  }
+
+  /* ═══ الرصيدُ من الخادم: جولاتُه السابقةُ في هذه الصفحة ═══ */
+  function creditOf(rows){
+    var c = {};
+    (rows||[]).forEach(function(r){
+      var m = (r && r.meta) || {}, once = {};
+      (m.okKeys || []).forEach(function(k){
+        if(once[k]) return;          /* الجولةُ الواحدةُ رصيدٌ واحد */
+        once[k] = 1;
+        c[k] = (c[k] || 0) + 1;
+      });
+    });
+    return c;
+  }
+  function fetchMine(){
+    return fetch(SUPA_URL + "/rest/v1/attempts?select=meta,created_at&student=" +
+        "eq." + encodeURIComponent(name) + "&meta->>sect=eq." + SECT +
+        "&order=created_at.desc&limit=160",
+      { headers:{ apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY } })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ return Array.isArray(j) ? j : []; })
+      .catch(function(){ return []; });
+  }
+
+  /* ═══ المستوى: أوّلُ طولٍ فيه جملةٌ لم تُتقَن بعد ═══ */
+  function levelOf(all, credit){
+    for(var i = 0; i < LEVELS.length; i++){
+      var L = LEVELS[i];
+      var left = all.filter(function(s){ return s.n <= L && (credit[s.en]||0) < RETIRE; });
+      if(left.length) return { lv: L, pool: left, i: i };
+    }
+    return { lv: LEVELS[LEVELS.length-1], pool: [], i: LEVELS.length-1 };
+  }
+
+  function save(pid, okKeys, asked, right, lv, t0, skills){
+    var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0,
+      ma_correct:0, ma_total:0, wrong:[],
+      meta:{ kind:"activity", sect:SECT, test:"جمل إنجليزي 🧩", pid:pid,
+             at:new Date().toISOString(), asked:asked, right:right, level:lv,
+             okKeys:okKeys.slice(0,40), dur:Math.round((Date.now()-t0)/1000),
+             skills:skills, correct:0, total:0 } };
+    try{
+      if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
+      fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
+        headers:{ apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY,
+                  "Content-Type":"application/json", Prefer:"return=minimal" },
+        body: JSON.stringify(body) });
+    }catch(e){}
+  }
+
+  /* ═══ الشاشة ═══ */
+  if(!name){
+    app.innerHTML = '<div class="locked">افتح الرابط مع اسم الابن، مثل: ?who=rafeef</div>';
+    return;
+  }
+  var ALL = allSentences();
+  app.innerHTML =
+    '<header class="top"><p class="eyebrow">'+esc(GRADES[who]||"")+' · من كتابك</p>'+
+    '<h1>🧩 الجمل — '+esc(name)+'</h1></header>'+
+    '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a>'+
+    '<a href="'+PAGE[who]+'?who='+who+'">🔤 الإنجليزي</a>'+
+    '<a href="talk.html?who='+who+'">🗣️ محادثة</a></div>'+
+    '<div id="body"></div>'+
+    '<footer>جملٌ من كتابك · ترتيبُ الكلماتِ يبني الجملةَ لا يستعيدها</footer>';
+  var body = document.getElementById("body");
+
+  if(!ALL.length){
+    body.innerHTML = '<div class="locked">ما لقيت جملًا في كتابك بعد.</div>';
+    return;
+  }
+
+  body.innerHTML = '<div class="intro">⏳ أجهّز جرعتك...</div>';
+  fetchMine().then(function(rows){ start(creditOf(rows)); });
+
+  function start(credit){
+    var st = levelOf(ALL, credit);
+    var doneN = ALL.filter(function(s){ return (credit[s.en]||0) >= RETIRE; }).length;
+
+    function home(){
+      var chips = LEVELS.map(function(L, i){
+        var inL = ALL.filter(function(s){ return s.n <= L; }).length;
+        var leftL = ALL.filter(function(s){ return s.n <= L && (credit[s.en]||0) < RETIRE; }).length;
+        var cls = (L === st.lv) ? "on" : (!leftL && inL ? "done" : "");
+        return '<span class="'+cls+'">'+(L>=99 ? "الكل" : "حتى "+L+" كلمات")+'</span>';
+      }).join("");
+      body.innerHTML =
+        '<div class="intro">جملٌ من كتابك — <b>رتّب كلماتها بنفسك</b>. '+
+        'والجملة ما تخرج من القائمة إلا لما ترتّبها صح <b>مرّتين في جولتين مختلفتين</b>.'+
+        '<div class="lv">'+chips+'</div>'+
+        '<div class="st-hint" style="text-align:right;margin-top:8px">'+
+        'أتقنت <b>'+doneN+'</b> من '+ALL.length+' جملة · باقي في مستواك <b>'+st.pool.length+'</b></div></div>'+
+        '<div class="st-card"><div class="st-hint">جرعة اليوم: '+Math.min(DOSE, st.pool.length)+' جمل</div>'+
+        '<div class="st-act"><button data-go>ابدأ ▶</button></div></div>';
+      body.querySelector("[data-go]").onclick = round;
+    }
+
+    if(!st.pool.length){
+      body.innerHTML = '<div class="intro">🌟 أتقنت جمل كتابك كلها — '+ALL.length+' جملة.<br>'+
+        '<span class="st-hint">تقدر تراجعها من <a href="'+PAGE[who]+'?who='+who+'">صفحة الإنجليزي</a>.</span></div>';
+      return;
+    }
+
+    function round(){
+      /* الأقصرُ أوّلًا داخلَ المستوى، ومن بدأه ولم يُتقِنه يُقدَّم */
+      var pool = st.pool.slice().sort(function(a,b){
+        var ca = credit[a.en]||0, cb = credit[b.en]||0;
+        return (cb - ca) || (a.n - b.n);
+      });
+      var head = pool.slice(0, DOSE * 3);
+      var list = shuf(head).slice(0, Math.min(DOSE, pool.length));
+      var i = 0, right = 0, okKeys = [], pid = newPid(), t0 = Date.now(), saved = false;
+      var SK = { "جمل: ترتيب الكلمات": { c:0, t:0 } };
+
+      function finish(){
+        if(saved) return; saved = true;
+        save(pid, okKeys, i, right, st.lv, t0, SK);
+      }
+      function next(){
+        if(i >= list.length) return done();
+        ex(list[i]);
+      }
+      function done(){
+        finish();
+        body.innerHTML = '<div class="st-card"><div class="st-big">'+(right===list.length?'🌟':'👍')+' '+right+' / '+list.length+'</div>'+
+          '<div class="st-hint">'+(right===list.length
+            ? 'ممتاز — كل جملة رتّبتها صح.'
+            : 'اللي غلطت فيه بيرجع لك في الجولة الجاية.')+'</div>'+
+          '<div class="st-act"><button data-more>جولة ثانية ▶</button>'+
+          '<button class="ghost" data-home>رجوع</button></div></div>';
+        body.querySelector("[data-more]").onclick = function(){
+          fetchMine().then(function(rows){ credit = creditOf(rows); st = levelOf(ALL, credit);
+            doneN = ALL.filter(function(s){ return (credit[s.en]||0) >= RETIRE; }).length;
+            if(!st.pool.length) return start(credit);
+            round(); });
+        };
+        body.querySelector("[data-home]").onclick = function(){
+          fetchMine().then(function(rows){ start(creditOf(rows)); });
+        };
+      }
+
+      function ex(s){
+        var target = words(s.en);
+        var pool2 = shuf(target.map(function(w,k){ return { w:w, k:k }; }));
+        if(pool2.every(function(p,k){ return p.k === k; }) && pool2.length > 1) pool2.reverse();
+        var built = [], fin = false;
+        var got = credit[s.en] || 0;
+        body.innerHTML =
+          /* الكسرُ يُعزَل يساريًّا، وإلّا قُرئ «٥ / ١» في سياقٍ عربيّ */
+          '<div class="st-prog" dir="ltr">'+(i+1)+' / '+list.length+'</div>'+
+          '<div class="st-card"><div class="st-hint">🔀 رتّب الكلمات لتكوّن الجملة'+
+            (got >= 1 ? ' · <b>باقي صح واحد</b>' : '')+'</div>'+
+          '<div class="st-hint" style="margin:6px 0 10px">'+esc(s.ar)+'</div>'+
+          '<div class="st-chips built" data-built></div>'+
+          '<div class="st-chips" data-pool style="margin-top:10px"></div>'+
+          '<div class="st-fb"></div>'+
+          '<div class="st-act"><button data-chk>تحقّق ✅</button>'+
+          '<button class="ghost" data-clr>امسح</button></div></div>';
+        var bEl = body.querySelector("[data-built]"), pEl = body.querySelector("[data-pool]");
+        var fb = body.querySelector(".st-fb");
+        function draw(){
+          bEl.innerHTML = built.map(function(p,k){ return '<button data-b="'+k+'">'+esc(p.w)+'</button>'; }).join("");
+          pEl.innerHTML = pool2.map(function(p,k){ return built.indexOf(p) < 0 ? '<button data-p="'+k+'">'+esc(p.w)+'</button>' : ''; }).join("");
+          bEl.querySelectorAll("[data-b]").forEach(function(b){ b.onclick = function(){ if(fin) return; built.splice(+b.dataset.b,1); draw(); }; });
+          pEl.querySelectorAll("[data-p]").forEach(function(b){ b.onclick = function(){ if(fin) return; built.push(pool2[+b.dataset.p]); draw(); }; });
+        }
+        draw();
+        body.querySelector("[data-clr]").onclick = function(){ if(fin) return; built = []; draw(); };
+        body.querySelector("[data-chk]").onclick = function(){
+          if(fin){ i++; next(); return; }
+          if(built.length < target.length){
+            fb.style.color = "var(--warn)"; fb.textContent = "رتّب كل الكلمات أولًا"; return;
+          }
+          fin = true;
+          var ok = built.map(function(p){ return p.w; }).join(" ") === target.join(" ");
+          SK["جمل: ترتيب الكلمات"].t++;
+          if(ok){ SK["جمل: ترتيب الكلمات"].c++; right++;
+                  if(okKeys.indexOf(s.en) < 0) okKeys.push(s.en); }
+          fb.style.color = ok ? "var(--good)" : "var(--bad)";
+          fb.innerHTML = (ok ? "✅ صح!" : "❌ الصحيح:") +
+            '<div dir="ltr" style="margin-top:4px">'+esc(s.en)+'</div>'+
+            '<div style="margin-top:6px"><button class="st-sp" data-say>🔊 اسمعها</button></div>';
+          say(s.en);
+          var sp = body.querySelector("[data-say]"); if(sp) sp.onclick = function(){ say(s.en); };
+          body.querySelector("[data-chk]").textContent = "التالي ▶";
+          body.querySelector("[data-clr]").style.display = "none";
+        };
+      }
+
+      /* ومن خرج في منتصفِ الجولةِ لا يضيع ما أصابه */
+      document.addEventListener("visibilitychange", function(){ if(document.hidden && i) finish(); });
+      window.addEventListener("pagehide", function(){ if(i) finish(); });
+      next();
+    }
+
+    home();
+  }
+})();
+</script>
+</body>
+</html>
