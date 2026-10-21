@@ -127,7 +127,13 @@
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
   function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function words(s){ return String(s).trim().split(/\s+/).filter(Boolean); }
-  function isSentence(e){ return /[.?!]$/.test(e) && words(e).length >= 3; }
+  /* نسخةٌ من قاعدةِ study-en4.js، وحارسُ checks/pages.js يقابل النسخَ
+     بالسلوكِ لا بالنصّ: العتبةُ كلمتان لا ثلاث («What's wrong?»)،
+     والقالبُ يُردُّ بعلامتِه، وسطرُ السؤالِ وجوابِه لا يُردّ. */
+  function isSentence(e){
+    if(!/[.?!]$/.test(e) || words(e).length < 2) return false;
+    return / — /.test(e) || !/[\/…→]/.test(e);
+  }
   var __PIDN = 0;
   function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
 

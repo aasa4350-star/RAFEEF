@@ -890,6 +890,53 @@ function bookStudyPath(){
     { book:'book-en5.js', global:'BOOK_EN5', tag:'en5', page:'english5.html' },
     { book:'book-en8.js', global:'BOOK_EN8', tag:'en8', page:'english8.html' }
   ];
+  /* ── قاعدةُ «ما هو جملة» مكتوبةٌ أربعَ مرّات ──
+     في study-en4.js (الشاشة) وsentences.html (الجمل) وtools/gen-book-pdf.js
+     (الورق) وفي هذا الحارس. وقد تفرّقت فعلًا: كانت العتبةُ ثلاثًا في
+     الأربعة ثمّ صارت كلمتين، ولو تُرِك واحدٌ لطبع الورقُ غيرَ ما تعرضه
+     الشاشةُ بلا أثرٍ ظاهر. فتُقرأ النسخُ وتُقارَن نصًّا. */
+  {
+    /* تُقابَل بالسلوكِ لا بالنصّ: تُنتزَع الدالّةُ من كلِّ ملفٍّ وتُشغَّل على
+       عيّناتٍ تمثّل كلَّ حالةٍ فرّقت النسخَ يومًا. فاختلافُ الصياغةِ مسموح،
+       واختلافُ الحكمِ لا. */
+    const PROBE = [
+      ["What's wrong?",                          true,  'جملةٌ من كلمتين'],
+      ["Don't laugh.",                           true,  'أمرٌ من كلمتين'],
+      ["He plays football every Saturday.",      true,  'جملةٌ تامّة'],
+      ["How often…?",                            false, 'قالبٌ بنقاطٍ — مفردة'],
+      ["Can you / he / she / they …?",           false, 'قالبٌ بشَرطةٍ مائلة — مفردة'],
+      ["Do they visit? — Yes, they do. / No.",   true,  'سؤالٌ وجوابُه — جملة'],
+      ["origami",                                false, 'كلمةٌ بلا خاتمة'],
+      ["Hello.",                                 false, 'كلمةٌ واحدةٌ بخاتمة']
+    ];
+    const RULE = [
+      ['study-en4.js',          'study-en4.js'],
+      ['sentences.html',        'sentences.html'],
+      ['tools/gen-book-pdf.js', path.join('tools','gen-book-pdf.js')],
+    ];
+    for (const [nm, rel] of RULE){
+      const fp = path.join(ROOT, rel);
+      if (!fs.existsSync(fp)){ out.push({ sev:'خطأ', file:nm, msg:'مفقود' }); continue; }
+      const t = fs.readFileSync(fp, 'utf8');
+      const m = /function isSentence\(e\)\{([\s\S]*?)\n\s*\}/.exec(t);
+      if (!m){ out.push({ sev:'خطأ', file:nm, msg:'قاعدةُ «ما هو جملة» لا تُنتزَع — فلا تُقابَل بالنسخِ الأخرى' }); continue; }
+      let fn;
+      try {
+        const sb = {}; vm.createContext(sb);
+        vm.runInContext('function words(s){ return String(s).trim().split(/\\s+/).filter(Boolean); }\n' +
+                        'f = function(e){' + m[1] + '\n};', sb);
+        fn = sb.f;
+      } catch(e){ out.push({ sev:'خطأ', file:nm, msg:'قاعدةُ الجملةِ لا تُشغَّل: ' + String(e.message).slice(0,60) }); continue; }
+      for (const [s, want, why] of PROBE){
+        let got; try { got = !!fn(s); } catch(e){ got = null; }
+        if (got !== want)
+          out.push({ sev:'خطأ', file:nm, msg:'قاعدةُ الجملةِ تخالف أخواتِها — «' + s + '» (' + why +
+            ') تُعَدُّ ' + (got ? 'جملةً' : 'مفردةً') + ' والمنتظَرُ ' + (want ? 'جملة' : 'مفردة') +
+            '؛ فالشاشةُ والورقُ يفترقان بلا أثرٍ ظاهر' });
+      }
+    }
+  }
+
   let man = null;
   const manPath = path.join(ROOT, 'pdf', 'manifest.json');
   if (fs.existsSync(manPath)){ try { man = JSON.parse(fs.readFileSync(manPath,'utf8')); } catch(e){} }
@@ -907,7 +954,12 @@ function bookStudyPath(){
     if (!book || typeof book !== 'object'){ E(S.global + ' غير معرَّف'); continue; }
 
     /* ── شكلُ المادّة ── */
-    const isSent = e => /[.?!]$/.test(e) && String(e).trim().split(/\s+/).length >= 3;
+    /* القاعدةُ هنا هي قاعدةُ study-en4.js نفسُها — وهي مقابَلةٌ بالعيّناتِ
+       أعلاه. فلو فرَّقتا لوَسَم الحارسُ ما تقبله الوحدةُ أو سكت عمّا تردّه. */
+    const isSent = e => {
+      if (!/[.?!]$/.test(e) || String(e).trim().split(/\s+/).length < 2) return false;
+      return / — /.test(e) || !/[\/…→]/.test(e);
+    };
     const ids = Object.keys(book);
     for (const id of ids){
       const u = book[id];
@@ -930,6 +982,13 @@ function bookStudyPath(){
           if (!/^قاعدة/.test(it[1]) && !/^(منتظم|شاذ):/.test(it[1])
               && !isSent(it[0]) && /[A-Za-z]/.test(it[1]))
             E('معنًى فيه نصٌّ لاتينيٌّ يُعرَض خيارًا في «ثبّت» فيلتبس: «' + it[0] + '» ← «' + it[1] + '»');
+          /* ‏study-en4.js تفرز بـisSentence: ما لم يُعدَّ جملةً يسقط في قائمةِ
+             الكلمات. فجملةٌ قصيرةٌ («Hello everybody.» كلمتان) أو بلا نقطةٍ
+             تظهر بين المفردات بزرِّ 🔊 بدل أن تدخل تمرينَ الترتيب — وهو عطبٌ
+             صامت: القسمُ معنونٌ «جمل» والعنصرُ ليس جملةً عندَ الوحدة. */
+          if (/جمل/.test(sec.t) && /[.?!]$/.test(it[0]) && !isSent(it[0]))
+            E('في «' + sec.t + '» (' + id + ') عنصرٌ يُختَم كالجملةِ ولا تعدُّه الوحدةُ جملةً، '
+              + 'فيسقط بين المفردات: «' + it[0] + '»');
         });
       });
     }

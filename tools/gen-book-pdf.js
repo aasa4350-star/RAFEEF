@@ -40,7 +40,13 @@ const BOOKS = [
 function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function isSentence(e){ return /[.?!]$/.test(e) && String(e).trim().split(/\s+/).length >= 3; }
+/* العتبةُ كلمتان والقوالبُ تُستبعَد بعلامتِها — نسخةٌ من قاعدةِ
+   study-en4.js. فلو خالفتها لطُبِعت الجملةُ في عمودِ المفرداتِ على
+   الورقِ وهي جملةٌ على الشاشة. وحارسُ checks/pages.js يقابل النسخَ. */
+function isSentence(e){
+  if(!/[.?!]$/.test(e) || String(e).trim().split(/\s+/).length < 2) return false;
+  return / — /.test(e) || !/[\/…→]/.test(e);
+}
 function isRule(a){ return /^قاعدة/.test(a); }
 
 const CSS = `

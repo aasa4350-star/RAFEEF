@@ -17,7 +17,19 @@
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
   function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function words(s){ return String(s).trim().split(/\s+/).filter(Boolean); }
-  function isSentence(e){ return /[.?!]$/.test(e) && words(e).length >= 3; }
+  /* ‏كانت العتبةُ ثلاثَ كلماتٍ، فكانت «What's wrong?» و«Don't laugh.»
+     و«You're welcome.» تسقط من الجملِ إلى قائمةِ المفردات: تُعرَض بزرِّ
+     🔊 ولا تدخل تمرينَ الترتيب. وهي أقصرُ ما عندهم وأحوجُ ما يُدرَّب.
+     فصارت كلمتين.
+
+     والقالبُ («How often…?» و«Can you / he / she …?») ليس جملةً فيبقى
+     في المفردات؛ وكان يسقط من القائمتَين معًا فلا يُرى أصلًا. أمّا سطرُ
+     السؤالِ وجوابِه المفصولُ بـ« — » فجملتان وإن حمل شَرطةً مائلةً في
+     شِقِّه الثاني، فلا يُردُّ بعلامتِها وإلّا نزل كاملًا بين المفردات. */
+  function isSentence(e){
+    if(!/[.?!]$/.test(e) || words(e).length < 2) return false;
+    return / — /.test(e) || !/[\/…→]/.test(e);
+  }
   /* ═══ النطقُ يعمل في أيّ صفحةٍ تُركَّب فيها الوحدة ═══════════════════
      صفحةُ سعودٍ فيها azureSpeak وspeakEN، وصفحةُ حسنٍ ليس فيها واحدٌ
      منهما — فلو بقي النداءُ عليهما وحدَهما لظهر زرُّ 🔊 ولم يَنطق، وهو
