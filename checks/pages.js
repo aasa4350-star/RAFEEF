@@ -340,6 +340,7 @@ function run(){
   issues.push(...tryTracePath());
   issues.push(...sectionClockPath());
   issues.push(...sentencesPath());
+  issues.push(...readingPoolPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3056,6 +3057,156 @@ function skillLabels(){
   if (missing.length)
     out.push({ sev:'تنبيه', file:f, msg: missing.length + ' مولّدًا بلا وصفٍ عربيّ (' +
       missing.slice(0,4).join(' ') + (missing.length>4?' …':'') + ') — شغّل tools/gen-skill-labels.js' });
+  return out;
+}
+
+/* ═══ بنكُ قطعِ القراءةِ بعد الدمج ═══════════════════════════════════
+   شكوى الأب (٢١ أكتوبر ٢٠٢٦): «قطعُ حسنٍ قصيرةٌ ومكرّرة». والتكرارُ كان
+   حقيقيًّا ولم يُره أحد: البنكُ موزّعٌ على أربعةِ ملفّاتٍ تُدمَج في
+   reading.html، فلا أحدَ يرى القائمةَ مجتمعةً إلّا الطفل. فكان فيها
+   نسختان من Renewable تتشابهان ٧٤٪، ومثلُهما Volunteering وCritical
+   thinking، ونسختان للمكتبةِ والجملِ عند أسامة.
+
+   فيُعاد هنا الدمجُ نفسُه ثمّ يُفحَص الناتج:
+   - ألّا تتشابه قطعتان لطفلٍ واحدٍ في لغةٍ واحدةٍ تشابهًا شديدًا.
+   - أن يكون لكلِّ مرفوعٍ في READING_DROP ما يطابقه (وإلّا فالرفعُ لغوٌ
+     يظنُّ قارئُه أنّ الموضوعَ رُفِع وهو باقٍ).
+   - أن تبلغ قطعُ حسنٍ عتبةَ الطولِ التي طلبها الأب.
+   - وأن يكون كلُّ سؤالٍ صحيحَ البنيةِ: ثلاثةُ خياراتٍ متمايزة، وفهرسُ
+     الصواب في المدى. وهذا يُفحَص هنا لأنّ خيارًا مكرّرًا يجعل للسؤالِ
+     جوابَين ولا يظهر في الصفحة: يُعرَض ويُقبَل أحدُهما ويُخطَّأ الآخر. */
+function readingPoolPath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  /* ── البنوكُ تُحمَّل كلُّها ── */
+  /* وstep-reading.js معها: قطعُ فهدٍ تأتي منه لا من DATA، فلو استُبدِل
+     بقائمةٍ فارغةٍ لمرّ بنكُه كلُّه بلا فحصٍ وهو لا يُرى. */
+  const BANKS = ['reading-bank.js', 'reading-bank2.js', 'reading-long.js', 'step-reading.js'];
+  const sb = { window:{} }; vm.createContext(sb);
+  for (const b of BANKS){
+    const bp = path.join(ROOT, b);
+    if (!fs.existsSync(bp)){ E(b, 'مفقود'); continue; }
+    if (src.indexOf('src="' + b + '"') < 0) E(F, 'لا تُحمّل ' + b + ' — فبنكُه لا يصل الطفل');
+    try { vm.runInContext(fs.readFileSync(bp, 'utf8'), sb); }
+    catch(e){ E(b, 'لا يُقوَّم: ' + String(e.message).slice(0,70)); }
+  }
+
+  /* ── القائمةُ تُبنى بكودِ الصفحةِ نفسِه لا بنسخةٍ منه ──
+     أوّلُ صياغةٍ أعادت الدمجَ هنا، فنجا منها تخريبٌ عطّل الدمجَ في
+     الصفحة: الحارسُ كان يفحص قائمةً يبنيها بنفسِه فلا يَشعر. فيُقتطَع
+     من إعلانِ DATA إلى ما قبلَ passageId — وفيه الجدولُ وكتلُ الدمجِ
+     الأربع — ويُشغَّل كما هو. فما تراه الصفحةُ هو ما يُفحَص. */
+  const dm = /(?:var|let|const)\s+DATA\s*=\s*\{/.exec(src);
+  const at = dm ? dm.index : -1;
+  const stop = src.indexOf('function passageId(');
+  if (at < 0 || stop < at)
+    return (E(F, 'كتلةُ DATA والدمجِ لا تُنتزَع — تغيّر موضعُ passageId أو إعلانُ DATA'), out.concat());
+  let DATA;
+  try {
+    vm.runInContext(src.slice(at, stop).replace(/\bconst\s+DATA\s*=/, 'var DATA ='), sb);
+    DATA = sb.DATA;
+  } catch(e){ return (E(F, 'كتلةُ الدمجِ لا تُقوَّم: ' + String(e.message).slice(0,70)), out.concat()); }
+  if (!DATA) return (E(F, 'DATA فارغةٌ بعد الدمج'), out.concat());
+
+  const W = sb.window;
+  const words = s => String(s||'').trim().split(/\s+/).filter(Boolean);
+  const MW = W.READING_MINWORDS || {}, MK = W.READING_MINKEEP || 16;
+
+  /* مرفوعٌ لا يطابق شيئًا: الرفعُ لغوٌ، ويظنُّ قارئُ القائمةِ أنّ
+     الموضوعَ رُفِع وهو ما زال يُعرَض على الطفل. ويُفحَص قبل الدمجِ
+     لأنّ الصفحةَ قد رفعتْه فعلًا. */
+  const DR = W.READING_DROP || {};
+  const RAW = {};
+  { const sb2 = { window:{} }; vm.createContext(sb2);
+    for (const b of BANKS){ const bp = path.join(ROOT, b);
+      if (fs.existsSync(bp)) { try { vm.runInContext(fs.readFileSync(bp,'utf8'), sb2); } catch(e){} } }
+    try {
+      vm.runInContext(src.slice(at, stop).replace(/\bconst\s+DATA\s*=/, 'var DATA =')
+        .replace(/window\.READING_DROP/g, 'null').replace(/window\.READING_MINWORDS/g, 'null'), sb2);
+      for (const w in sb2.DATA) for (const lg in sb2.DATA[w])
+        RAW[w+'/'+lg] = ((sb2.DATA[w][lg]||{}).pass||[]).map(x => String(x[0]||''));
+    } catch(e){}
+  }
+  for (const w in DR) for (const lg in DR[w]){
+    const pool = RAW[w+'/'+lg] || [];
+    for (const [pre, why] of DR[w][lg])
+      if (!pool.some(t => t.indexOf(pre) === 0))
+        E('reading-long.js', 'مرفوعٌ بلا مطابق — «' + String(pre).slice(0,40) +
+          '…» (' + why + ') لا يطابق قطعةً عند ' + w + '/' + lg + '، فالموضوعُ ما زال يُعرَض');
+  }
+
+  /* وعتبةٌ لا تبلغها قطعةٌ واحدةٌ إعدادٌ خاطئ: الصمّامُ يُنقِذ القائمةَ
+     فلا يظهر العطب، والبنكُ قد انكمش إلى الصمّامِ بلا أن يقصد أحد. */
+  for (const w in MW){
+    const min = MW[w]; if (!(min > 0) || !DATA[w]) continue;
+    for (const lg in DATA[w]){
+      const pool = RAW[w+'/'+lg] || [];
+      if (pool.length && !pool.some(t => words(t).length >= min))
+        E('reading-long.js', 'عتبةُ ' + w + '/' + lg + ' هي ' + min +
+          ' كلمةً ولا تبلغها قطعةٌ واحدة — فالصمّامُ وحدَه يحمل القائمة');
+    }
+  }
+
+  /* ── والناتجُ يُفحَص ── */
+  const norm = s => String(s).replace(/[ً-ْ]/g,'').replace(/[^\p{L}\p{N}\s]/gu,' ')
+                      .toLowerCase().split(/\s+/).filter(Boolean);
+  for (const w in DATA) for (const lg in DATA[w]){
+    const a = (DATA[w][lg] && DATA[w][lg].pass) || [];
+    if (!a.length) continue;
+    const tag = w + '/' + lg;
+
+    if (a.length < 8)
+      E(F, tag + ': ' + a.length + ' قطعةٍ فقط — تدور عليه بسرعةٍ فيقيس الاختبارُ الحفظَ لا الفهم');
+
+    for (let x = 0; x < a.length; x++){
+      const t = String(a[x][0] || ''), qs = a[x][1];
+      if (!t.trim()){ E(F, tag + ': قطعةٌ بلا نصّ'); continue; }
+      if (!Array.isArray(qs) || qs.length < 3){
+        E(F, tag + ': «' + t.slice(0,32) + '…» فيها ' + ((qs&&qs.length)||0) + ' أسئلةٍ — أقلُّها ثلاثة'); continue; }
+      qs.forEach((q2, qi) => {
+        const stem = q2 && q2[0], opts = q2 && q2[1], right = q2 && q2[2];
+        if (!stem || !Array.isArray(opts) || opts.length < 3)
+          return E(F, tag + ' · «' + t.slice(0,28) + '…» سؤال ' + (qi+1) + ': أقلُّ من ثلاثةِ خيارات');
+        if (!(right >= 0 && right < opts.length))
+          return E(F, tag + ' · «' + t.slice(0,28) + '…» سؤال ' + (qi+1) + ': فهرسُ الصوابِ خارجَ المدى');
+        const seen2 = new Set(opts.map(o => String(o).trim()));
+        if (seen2.size !== opts.length)
+          E(F, tag + ' · سؤال «' + String(stem).slice(0,34) + '…»: خياران متطابقان — فللسؤالِ جوابان ' +
+            'ويُخطَّأ أحدُهما');
+      });
+    }
+
+    for (let x = 0; x < a.length; x++) for (let y = x+1; y < a.length; y++){
+      const A = String(a[x][0]), B = String(a[y][0]);
+      if (A === B){ E(F, tag + ': قطعتان متطابقتان تمامًا — «' + A.slice(0,40) + '…»'); continue; }
+      const sA = new Set(norm(A)), nB = norm(B);
+      const ov = nB.filter(z => sA.has(z)).length / Math.max(sA.size, nB.length);
+      if (ov >= 0.55)
+        E(F, tag + ': قطعتان متشابهتان ' + Math.round(ov*100) + '٪ — «' + A.slice(0,34) +
+          '…» و«' + B.slice(0,34) + '…» فيراها الطفلُ موضوعًا مكرّرًا');
+    }
+
+    /* الطلبُ نفسُه، لا ما يقوله الإعداد: لو هُبِطت READING_MINWORDS
+       لمرّت القصيرةُ وما شكا الحارسُ شيئًا، لأنّه يتبع الإعدادَ الذي
+       خُرِّب. فعتبةُ حسنٍ مكتوبةٌ هنا مستقلّةً — هي طلبُ الأب لا إعداد. */
+    const NEED = { hasan: { en: 100, ar: 70 } };
+    const need = (NEED[w] || {})[lg];
+    if (need > 0){
+      const shortOnes = a.filter(x => words(x[0]).length < need);
+      if (shortOnes.length)
+        E(F, tag + ': ' + shortOnes.length + ' قطعةً دون ' + need + ' كلمةً تصل الطفل — ' +
+          'وطلبُ الأب (٢١ أكتوبر ٢٠٢٦) أن تكون قطعُ حسنٍ طويلة. أقصرُها «' +
+          String(shortOnes.sort((x,y)=>words(x[0]).length-words(y[0]).length)[0][0]).slice(0,34) + '…»');
+      if (a.length < 12)
+        E(F, tag + ': ' + a.length + ' قطعةً فقط بعد الرفعِ والعتبة — تدور عليه فتتكرّر');
+    }
+    if (MW[w] > 0 && a.length < MK)
+      E(F, tag + ': ' + a.length + ' قطعةً والصمّامُ ' + MK + ' — فالبنكُ جاع');
+  }
   return out;
 }
 

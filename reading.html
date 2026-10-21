@@ -65,7 +65,10 @@
   .fb.no{color:var(--bad);font-weight:700}
   .fb .corr{color:var(--good);font-weight:700}
   .passage{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
-  .passage .txt{font-size:1.1rem;line-height:2.1;margin-top:12px}
+  /* pre-line: القطعُ الطويلةُ في reading-long.js مقسومةٌ فقراتٍ بسطرٍ فارغ،
+     ولولاه لالتصق النصُّ كتلةً واحدةً يصعب على القارئِ تتبُّعُها. والقطعُ
+     القديمةُ سطرٌ واحدٌ فلا يغيّرها شيء. */
+  .passage .txt{font-size:1.1rem;line-height:2.1;margin-top:12px;white-space:pre-line}
   .opts{display:grid;gap:8px;margin-top:10px}
   .opts button{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:12px 14px;border-radius:12px;font-size:1.02rem;cursor:pointer;font-family:inherit}
   .opts button.correct{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
@@ -82,6 +85,7 @@
 <div class="wrap" id="app"></div>
 <script src="reading-bank.js"></script>
 <script src="reading-bank2.js"></script>
+<script src="reading-long.js"></script>
 <script src="reading-xq.js"></script>
 <script src="vocab-bank.js"></script>
 <script>
@@ -339,6 +343,59 @@ try{
       _src.dictation.forEach(function(x){ if(!_seen[x]){ _seen[x]=1; _dst.dictation.push(x); } });
     }
   } } }
+}catch(e){}
+
+// القطعُ الطويلةُ (reading-long.js) — طلبُ الأب (٢١ أكتوبر ٢٠٢٦): قطعُ حسنٍ
+// قصيرةٌ ومكرّرة. وسطُ قطعِه كان ٣٢ كلمةً وقطعُ فهدٍ ٥٩، فزِيدت قطعٌ
+// ١٠٠–١٨٠ كلمةً أكثرُها قصصٌ سرديّة.
+try{
+  var _LG = window.READING_LONG;
+  if(_LG){ for(var _w3 in _LG){ for(var _lg3 in _LG[_w3]){
+    var _s3 = _LG[_w3][_lg3], _d3 = DATA[_w3] && DATA[_w3][_lg3];
+    if(!_s3 || !_d3) continue;
+    if(Array.isArray(_s3.pass) && Array.isArray(_d3.pass)) _d3.pass = _d3.pass.concat(_s3.pass);
+  } } }
+}catch(e){}
+
+/* رفعُ القطعِ المذكورةِ في READING_DROP — بعد الدمجِ كلِّه، لأنّ المرفوعَ
+   قد يأتي من أيِّ بنكٍ منها. والرفعُ هنا لا في ملفِّ البنكِ نفسِه حتّى
+   يبقى سببُه مكتوبًا ويُراجَع في مكانٍ واحد. */
+try{
+  var _DR = window.READING_DROP;
+  if(_DR){ for(var _w4 in _DR){ for(var _lg4 in _DR[_w4]){
+    var _pre = (_DR[_w4][_lg4]||[]).map(function(x){ return String(x[0]); });
+    var _d4 = DATA[_w4] && DATA[_w4][_lg4];
+    if(!_d4 || !Array.isArray(_d4.pass) || !_pre.length) continue;
+    _d4.pass = _d4.pass.filter(function(p){
+      var t = String(p[0]||"");
+      for(var i=0;i<_pre.length;i++){ if(t.indexOf(_pre[i]) === 0) return false; }
+      return true;
+    });
+  } } }
+}catch(e){}
+
+/* عتبةُ الطولِ (READING_MINWORDS) — تُطبَّق آخرَ شيء. القائمةُ تُقرَأ
+   بالدور، فالقصيرةُ الباقيةُ تظهر بقدرِ ما تظهر الطويلة؛ ورفعُها هو
+   الذي يجعل «قطعًا طويلة» أمرًا محسوسًا لا إضافةً في القائمة.
+   والصمّامُ: لا تنزل القائمةُ عن READING_MINKEEP، فتُبقى أطولُ القطع. */
+try{
+  var _MW = window.READING_MINWORDS, _MK = window.READING_MINKEEP || 16;
+  if(_MW){ for(var _w5 in _MW){
+    var _min = _MW[_w5]; if(!(_min > 0) || !DATA[_w5]) continue;
+    for(var _lg5 in DATA[_w5]){
+      var _d5 = DATA[_w5][_lg5];
+      if(!_d5 || !Array.isArray(_d5.pass) || _d5.pass.length <= _MK) continue;
+      var _wc = function(p){ return String(p[0]||"").trim().split(/\s+/).filter(Boolean).length; };
+      var _keep = _d5.pass.filter(function(p){ return _wc(p) >= _min; });
+      if(_keep.length < _MK){
+        _keep = _d5.pass.slice().sort(function(a,b){ return _wc(b) - _wc(a); }).slice(0, _MK);
+        /* ونُعيدها إلى ترتيبِ البنكِ الأصليّ: ترتيبُ القائمةِ هو مفتاحُ
+           «ما قُرئ» في pickIndex، فخلطُه يخلط سجلَّ ما رآه الطفل. */
+        _keep = _d5.pass.filter(function(p){ return _keep.indexOf(p) >= 0; });
+      }
+      _d5.pass = _keep;
+    }
+  } }
 }catch(e){}
 
 /* بصمة قصيرة ومستقرّة لنصّ القطعة (لا نحفظ النصّ كاملًا في كل محاولة).
