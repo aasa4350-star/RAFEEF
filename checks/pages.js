@@ -342,6 +342,7 @@ function run(){
   issues.push(...sentencesPath());
   issues.push(...readingPoolPath());
   issues.push(...readAloudPath());
+  issues.push(...verbalBankPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3297,6 +3298,129 @@ function readAloudPath(){
     if (!new RegExp(k.replace(':','\\s*:')).test(src))
       E('صفُّ إخفاقِ المايكِ بلا «' + k.replace(':','') + '» — وغيابُه هو الذي أعمى تشخيصَ ٢١ أكتوبر');
   });
+  return out;
+}
+
+/* ═══ بنكُ القسمِ اللفظيِّ بعد الدمج ═══════════════════════════════
+   طلبُ الأب (٢٢ أكتوبر ٢٠٢٦) بعد تشخيصِ قدراتِ حسن: «وسّع بنوكَ
+   المرادفِ والضدِّ ومعنى الكلمة».
+
+   والبنكُ يُكتب في ملفَّين — practice.html وpractice-bank.js — ويُدمَجان
+   عند التشغيل. فلا أحدَ يرى القائمةَ مجتمعةً، وقد وقع فيها:
+   - كلماتٌ مكتوبةٌ في الملفَّين معًا («إقبال» و«أمانة» و«السداد»
+     و«الوطيس») فتُسحَب ضِعفَ غيرِها ويظنُّها الطفلُ تكرارًا.
+   - ومدخلاتٌ جوابُها عبارةٌ ومشتّتاها كلمتان، فيُعرَف الجوابُ بطولِه
+     وحدَه بلا قراءة — أربعٌ وعشرون منها في «معنى كلمة».
+   كلاهما لا يظهر في الصفحة: السؤالُ يُعرَض سليمًا ويُجاب. */
+function verbalBankPath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F), bp = path.join(ROOT, 'practice-bank.js');
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  /* ── الدمجُ يُنتزَع ويُشغَّل: لا يكفي أن يُقرأ نصُّه ── */
+  const mm = /function _vMerge\(base, add, key\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!mm) E(F, '_vMerge لا تُنتزَع — فالدمجُ لا يُفحَص');
+  else {
+    let fn;
+    try { const sb2 = {}; vm.createContext(sb2);
+      vm.runInContext('f = function(base, add, key){' + mm[1] + '\n};', sb2); fn = sb2.f; }
+    catch(e){ E(F, '_vMerge لا تُشغَّل: ' + String(e.message).slice(0,60)); }
+    if (fn){
+      const k1 = x => String(x[0]);
+      const r = fn([['a','الأصل'],['b','2']], [['a','الوافد'],['c','3']], k1);
+      if (!Array.isArray(r) || r.length !== 3)
+        E(F, '_vMerge لا تُسقِط المكرّر — الناتجُ ' + (r && r.length) + ' والمنتظَرُ ثلاثة');
+      else if (r[0][1] !== 'الأصل')
+        E(F, '_vMerge تُرجّح الوافدَ على الأصل — فتبديلُ مدخلةٍ في البنكِ الإضافيّ يطمس ما في الصفحة');
+      /* والمفتاحان يُنتزَعان من الصفحةِ أيضًا: تبديلُ _vK3 إلى الكلمةِ
+         الأولى وحدَها يحذف تناظراتٍ مختلفةً تشترك في طرفها الأوّل،
+         ولا يظهر ذلك إن اختبرنا _vMerge بمفتاحٍ من عندنا. */
+      const kx = /var _vK3 = (function\(x\)\{[^}]*\});/.exec(src);
+      if (!kx) E(F, '_vK3 لا تُنتزَع');
+      else {
+        let k3; try { const s5 = {}; vm.createContext(s5); vm.runInContext('f=' + kx[1] + ';', s5); k3 = s5.f; }
+        catch(e){ E(F, '_vK3 لا تُشغَّل'); }
+        if (k3){
+          const r3 = fn([['ماء','عطش','طعام','جوع']], [['ماء','سمكة','طائر','هواء']], k3);
+          if (!r3 || r3.length !== 2)
+            E(F, 'مفتاحُ التناظرِ لا يميّز تناظرَين يشتركان في أوّلِ كلمة — فيُحذف أحدُهما');
+        }
+      }
+    }
+  }
+  /* ولا تُمسّ القوائمُ بعد الدمج: الحارسُ يقيس حجمَها من الملفّ، فقصٌّ
+     بعد الدمجِ (slice) ينكمش به البنكُ ولا يشعر. فلا يُسمَح إلّا
+     بإعلانِها ودمجِها. */
+  ['VA','VS','VO','VM','VC','VR'].forEach(n => {
+    const asg = (src.match(new RegExp('(^|[^\\w.])' + n + '\\s*=[^=]', 'gm')) || []).length;
+    if (asg > 2)
+      E(F, n + ': أُسنِد إليها ' + asg + ' مرّات — والمنتظَرُ إعلانٌ ودمجٌ فقط؛ ' +
+        'إسنادٌ ثالثٌ قد يقصّ البنكَ بعد قياسِه');
+  });
+  ['VA','VS','VO','VM','VC','VR'].forEach(n => {
+    if (!new RegExp('\\b' + n + ' = _vMerge\\(' + n + ',').test(src))
+      E(F, n + ' تُدمَج بلا _vMerge — فالمكرّرُ بين الملفَّين يعود');
+  });
+
+  /* ── القوائمُ تُقرأ من الملفَّين وتُدمَج كما تُدمَج في الصفحة ── */
+  function arr(name){
+    const m = new RegExp('var ' + name + '\\s*=\\s*\\[').exec(src);
+    if (!m) return null;
+    let i = src.indexOf('[', m.index), d = 0, end = -1, q = null;
+    for (; i < src.length; i++){
+      const c = src[i];
+      if (q){ if (c === '\\') i++; else if (c === q) q = null; continue; }
+      if (c === '"' || c === "'"){ q = c; continue; }
+      if (c === '[') d++; else if (c === ']'){ d--; if (!d){ end = i; break; } }
+    }
+    if (end < 0) return null;
+    try { const sb3 = {}; vm.createContext(sb3);
+      vm.runInContext('A=' + src.slice(src.indexOf('[', m.index), end + 1) + ';', sb3); return sb3.A; }
+    catch(e){ return null; }
+  }
+  let PX = {};
+  if (fs.existsSync(bp)){
+    try { const sb4 = { window:{} }; vm.createContext(sb4);
+      vm.runInContext(fs.readFileSync(bp,'utf8'), sb4); PX = sb4.window.PRACTICE_EXTRA || {}; }
+    catch(e){ E('practice-bank.js', 'لا يُقوَّم: ' + String(e.message).slice(0,60)); }
+  } else E('practice-bank.js', 'مفقود');
+
+  const MIN = { VS:140, VO:140, VM:140, VA:80, VC:50, VR:45 };
+  let total = 0;
+  for (const name of ['VA','VS','VO','VM','VC','VR']){
+    const base = arr(name);
+    if (!base){ E(F, name + ' لا تُقرَأ'); continue; }
+    const key = name === 'VA' ? (x => [x[0],x[1],x[2]].join('|')) : (x => String(x[0]));
+    const seen = {}, merged = [], dup = [];
+    base.concat(PX[name] || []).forEach(x => {
+      const k = key(x); if (seen[k]){ dup.push(k); return; } seen[k] = 1; merged.push(x);
+    });
+    total += merged.length;
+    if (dup.length)
+      E(F, name + ': ' + dup.length + ' مدخلةً مكتوبةً مرّتين بين الملفَّين (' +
+        [...new Set(dup)].slice(0,5).join('، ') + ') — تُسحَب ضِعفَ غيرِها');
+    if (merged.length < MIN[name])
+      E(F, name + ': ' + merged.length + ' سؤالًا والحدُّ ' + MIN[name] +
+        ' — بنكٌ بهذا الصِّغَر يقيس الحفظَ لا القدرة');
+
+    if (['VS','VO','VM'].indexOf(name) < 0) continue;
+    merged.forEach((x, i) => {
+      if (!Array.isArray(x) || x.length !== 4 || x.some(y => typeof y !== 'string' || !y.trim()))
+        return E(F, name + '[' + i + ']: ليست [كلمة، جواب، مشتّت، مشتّت] تامّة');
+      if (x[1] === x[2] || x[1] === x[3] || x[2] === x[3])
+        return E(F, name + ' · «' + x[0] + '»: خياران متطابقان — فللسؤالِ جوابان');
+      /* الجوابُ عبارةٌ والمشتّتان كلمتان: يُعرَف بطولِه بلا قراءة.
+         ويُشترَط فارقٌ حقيقيٌّ لا حرفان، فالكلماتُ القصيرةُ تتفاوت. */
+      const a = x[1].length, d = Math.max(x[2].length, x[3].length);
+      if (a / d > 1.6 && a - d >= 4)
+        E(F, name + ' · «' + x[0] + '»: الجوابُ أطولُ من مشتّتَيه (' + a + ' مقابل ' + d +
+          ' حرفًا) — يُختار بطولِه لا بمعناه');
+    });
+  }
+  if (total && total < 600)
+    E(F, 'بنكُ القسمِ اللفظيِّ ' + total + ' سؤالًا — والحدُّ ستّمئة');
   return out;
 }
 
