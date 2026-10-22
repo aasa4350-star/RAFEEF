@@ -343,6 +343,7 @@ function run(){
   issues.push(...readingPoolPath());
   issues.push(...readAloudPath());
   issues.push(...verbalBankPath());
+  issues.push(...quantDosePath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3421,6 +3422,136 @@ function verbalBankPath(){
   }
   if (total && total < 600)
     E(F, 'بنكُ القسمِ اللفظيِّ ' + total + ' سؤالًا — والحدُّ ستّمئة');
+  return out;
+}
+
+/* ═══ الجرعةُ الكمّيّة ═══════════════════════════════════════════════
+   طلبُ الأب (٢٢ أكتوبر ٢٠٢٦): «جرعة للنقاط الكمية الأربع».
+
+   وأخطرُ ما فيها أن يتباعد الشرحُ عن المولّد: أوّلُ صياغةٍ علّمته
+   «خصم ٢٥٪ على ٨٠ ⇐ ٢٠»، ومولّدُ الخصمِ مع ٢٥٪ يجعل السعرَ مضاعفًا
+   لأربعةٍ بين ١٦ و٧٢ — فالثمانون لا تخرج أبدًا. فكان يحفظ حالةً لن
+   يراها، ولا يظهر ذلك في الصفحة: الشرحُ يُقرأ والأسئلةُ تُحَلّ.
+
+   فيُشغَّل كلُّ مولّدٍ هنا ويُقابَل بجدولِ الأمثلة: أيخرج السؤالُ بهذا
+   النصّ؟ وأصوابُه هو المكتوب؟ وأالخطأُ المحذَّرُ منه خيارٌ معروضٌ فعلًا؟ */
+function quantDosePath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ── الوصلُ بالصفحة ── */
+  if (!/TABS\.push\(\["qd"/.test(src)) E('تبويبُ الجرعةِ الكمّيّةِ غيرُ مُدرَجٍ في TABS');
+  if (!/who === "hasan"/.test(src)) E('الجرعةُ غيرُ مقصورةٍ على من قِيس — ولا تُفرَض على من لم يُقَس');
+  const rs = /renderSet\("qd",\s*doseQuant\((\d+)\)/.exec(src);
+  if (!rs) E('الجرعةُ لا تُرسَم من doseQuant');
+  else if (+rs[1] < 10) E('أسئلةُ الجرعةِ ' + rs[1] + ' — ودونَ عشرةٍ لا تُثبّت قاعدة');
+  /* ويُشترَط نداؤها داخلَ الشرحِ لا مجرّدُ وجودِ اسمِها: أوّلُ صياغةٍ
+     بحثت عن «doseQExHtml()» فطابقت سطرَ تعريفِها نفسَه، فنجا رفعُ
+     الجدولِ من الشرح. */
+  if (!/\+\s*doseQExHtml\(\)\s*\+/.test(src))
+    E('جدولُ «لا تقل / قل» غيرُ مُدرَجٍ في شرحِ الجرعة — فهي تكرارُ أسئلةٍ لا تعليم');
+  if (!/QUANT_AR\.indexOf\(name\)/.test(src))
+    E('مولّداتُ الجرعةِ تُطلَب بأرقامٍ لا بأسماء — فترتيبُ QUANT إن تغيّر صارت تدرّب غيرَ ما قِيس');
+
+  /* ── المولّداتُ تُشغَّل ── */
+  const sb = {}; vm.createContext(sb);
+  function take(name, kind){
+    const m = new RegExp('(?:var|function)\\s+' + name + '\\s*[=(]').exec(src);
+    if (!m) return false;
+    let i = src.indexOf(kind === 'arr' ? '[' : '{', m.index), d = 0, end = -1, q = null;
+    const O = kind === 'arr' ? '[' : '{', C = kind === 'arr' ? ']' : '}';
+    for (; i < src.length; i++){
+      const c = src[i];
+      if (q){ if (c === '\\') i++; else if (c === q) q = null; continue; }
+      if (c === '"' || c === "'"){ q = c; continue; }
+      if (c === O) d++; else if (c === C){ d--; if (!d){ end = i; break; } }
+    }
+    if (end < 0) return false;
+    const body = src.slice(src.indexOf(O, m.index), end + 1);
+    try { vm.runInContext(kind === 'arr' ? ('var ' + name + ' = ' + body + ';')
+                                         : ('function ' + name + src.slice(m.index + m[0].length - 1, end + 1)), sb);
+          return true; } catch(e){ return false; }
+  }
+  for (const h of ['ri','gp','opt3'])
+    if (!take(h, 'fn')) { E('المساعدُ ' + h + ' لا يُنتزَع — فالمولّداتُ لا تُشغَّل'); return out; }
+  for (const a of ['QUANT','QUANT_AR','DOSE_Q_EX','DOSE_Q_SETS'])
+    if (!take(a, 'arr')) { E(a + ' لا تُنتزَع'); return out; }
+
+  const QUANT = sb.QUANT, AR = sb.QUANT_AR, EX = sb.DOSE_Q_EX, SETS = sb.DOSE_Q_SETS;
+  if (!Array.isArray(QUANT) || QUANT.length !== AR.length)
+    E('QUANT وQUANT_AR مختلفتا الطول (' + QUANT.length + ' و' + AR.length + ') — فاسمُ المهارةِ يزلّ عن مولّدِها');
+
+  /* كلُّ مهارةٍ في الأبواب موجودةٌ فعلًا */
+  const inDose = {};
+  SETS.forEach(s => s[1].forEach(n => {
+    inDose[n] = 1;
+    if (AR.indexOf(n) < 0) E('بابُ «' + s[0] + '» يشير إلى مهارةٍ لا وجودَ لها: «' + n + '»');
+  }));
+  if (SETS.length < 4) E('أبوابُ الجرعةِ ' + SETS.length + ' — وطلبُ الأب أربعُ نقاط');
+
+  /* ── وdoseQuant تُشغَّل لا تُقرَأ ──
+     قراءةُ DOSE_Q_SETS وحدَها لا تكفي: الدالّةُ قد تقصّها (slice) فتعالج
+     بابًا واحدًا والجدولُ أربعة، ولا يظهر ذلك في نصِّ البيانات. */
+  if (!take('doseIdx','fn') || !take('genQuant','fn') || !take('doseQuant','fn'))
+    E('doseQuant لا تُنتزَع — فتوزيعُها لا يُفحَص');
+  else {
+    const seen = {}, name2door = {};
+    SETS.forEach(s => s[1].forEach(n => { name2door[n] = s[0]; }));
+    let err = null;
+    for (let i = 0; i < 25 && !err; i++){
+      let q; try { q = sb.doseQuant(12); } catch(e){ err = e.message; break; }
+      if (!Array.isArray(q) || q.length !== 12){ err = 'ترجع ' + (q && q.length) + ' سؤالًا لا اثنَي عشر'; break; }
+      q.forEach(x => {
+        const d = name2door[x.gen];
+        if (!d) err = err || ('تسحب من خارجِ أبوابِها: «' + x.gen + '»');
+        else seen[d] = (seen[d] || 0) + 1;
+      });
+    }
+    if (err) E('doseQuant: ' + err);
+    else {
+      const got = Object.keys(seen).length;
+      if (got !== SETS.length)
+        E('doseQuant تسحب من ' + got + ' بابٍ والجدولُ فيه ' + SETS.length +
+          ' — فالجرعةُ تعالج بعضَ النقاطِ وتترك بقيّتَها (' + Object.keys(seen).join('، ') + ')');
+      const v = Object.values(seen), hi = Math.max(...v), lo = Math.min(...v);
+      if (lo && hi / lo > 1.5)
+        E('توزيعُ الجرعةِ غيرُ متوازن: ' + JSON.stringify(seen));
+    }
+  }
+
+  /* وكلُّ مهارةٍ في الجرعةِ نسبتُها مكتوبةٌ في التعليقِ فوقَها */
+  const note = /جرعةُ حسنٍ الكمّيّة[\s\S]{0,2600}/.exec(src);
+  if (!note) E('تعليقُ الجرعةِ مفقود — فلا يُعرَف على أيِّ قياسٍ بُنيت');
+  else Object.keys(inDose).forEach(n => {
+    const row = new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '[^\\n]*٪').test(note[0]);
+    if (!row) E('مهارةٌ في الجرعةِ بلا نسبةٍ مكتوبةٍ بجانبِها: «' + n + '» — فلا يُعرَف أضعفٌ هي أم مقابلة');
+  });
+
+  /* ── وجدولُ الأمثلةِ يُقابَل بالمولّد ── */
+  (EX || []).forEach(e => {
+    const [skill, qtext, wrong, right] = e;
+    if (e.length !== 5) return E('مثالٌ ناقصُ الحقول: «' + skill + '»');
+    const k = AR.indexOf(skill);
+    if (k < 0) return E('مثالٌ لمهارةٍ لا وجودَ لها: «' + skill + '»');
+    let hit = null;
+    for (let i = 0; i < 40000 && !hit; i++){
+      let q; try { q = QUANT[k](); } catch(err){ return E('مولّدُ «' + skill + '» يرمي: ' + String(err.message).slice(0,50)); }
+      if (q && q[0] === qtext) hit = q;
+    }
+    if (!hit)
+      return E('مثالُ «' + skill + '» لا يخرج من مولّدِه أبدًا — يُعلَّم حالةً لن يراها: «' + String(qtext).slice(0,56) + '»');
+    const got = Number(hit[1][hit[2]]);
+    if (got !== Number(right))
+      E('مثالُ «' + skill + '»: الصوابُ المكتوبُ ' + right + ' والمولّدُ يقول ' + got);
+    if (hit[1].map(Number).indexOf(Number(wrong)) < 0)
+      E('مثالُ «' + skill + '»: الخطأُ المحذَّرُ منه (' + wrong + ') ليس من خياراتِ السؤال (' +
+        hit[1].join('، ') + ') — فالتحذيرُ من خطأٍ لا يقع');
+    if (Number(wrong) === Number(right))
+      E('مثالُ «' + skill + '»: الخطأُ والصوابُ واحد');
+  });
   return out;
 }
 
