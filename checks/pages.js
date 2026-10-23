@@ -3199,7 +3199,9 @@ function readingPoolPath(){
        خُرِّب. فعتبةُ حسنٍ مكتوبةٌ هنا مستقلّةً — هي طلبُ الأب لا إعداد. */
     /* ورفيفُ دونَه بسنةٍ دراسيّة، فعتبتُها دونَ عتبتِه — طلبُ الأب
        (٢٢ أكتوبر ٢٠٢٦): «حطّ لرفيف نفس حسن في القطعة». */
-    const NEED = { hasan: { en: 100, ar: 70 }, rafeef: { en: 80, ar: 60 } };
+    const NEED = { hasan: { en: 100, ar: 70 }, rafeef: { en: 80, ar: 60 },
+                   /* وفهدٌ أعلاهم: ثالثُ ثانويٍّ يستعدّ لستيب */
+                   fahad: { en: 140 } };
     const need = (NEED[w] || {})[lg];
     if (need > 0){
       const shortOnes = a.filter(x => words(x[0]).length < need);
