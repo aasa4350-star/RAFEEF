@@ -344,6 +344,7 @@ function run(){
   issues.push(...readAloudPath());
   issues.push(...verbalBankPath());
   issues.push(...quantDosePath());
+  issues.push(...writingPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3552,6 +3553,133 @@ function quantDosePath(){
     if (Number(wrong) === Number(right))
       E('مثالُ «' + skill + '»: الخطأُ والصوابُ واحد');
   });
+  return out;
+}
+
+/* ═══ مصحّحُ التعبيرِ وسجلُّه ═══════════════════════════════════════
+   سؤالُ الأب (٢٢ أكتوبر ٢٠٢٦): «كيف حسن في التعبير؟» — فظهر عطبان:
+
+   ١) المصحّحُ قائمةُ فحصٍ شكليّةٍ وحدَها (حرفٌ كبير، نقطة، تنوّعُ
+      مفردات) لا يقرأ صحّةَ اللغةِ أصلًا. فتخرج الدرجةُ تقول «الشكلُ
+      مضبوط» ويقرؤها الأبُ «اللغةُ سليمة».
+
+   ٢) الصفحةُ تعيد المسوّدةَ إلى الصندوقِ عند الفتح، وعلامةُ «آخرِ ما
+      حُفِظ» في الذاكرةِ وحدَها فتُمحى مع التحميل. فيضغط الطفلُ «قيّم
+      كتابتي» فيُحفَظ صفٌّ جديدٌ بنصٍّ قديم: إحدى عشرةَ تسليمةً في
+      سجلِّ حسنٍ وفيها خمسةُ نصوصٍ فقط.
+
+   والحارسُ يُحمّل الوحدةَ ويُشغّلها: الإنذارُ الكاذبُ يعلّم خطأً وهو
+   أسوأُ من السكوت، فتُجرَّب القواعدُ على الصحيحِ قبل الخاطئ. */
+function writingPath(){
+  const out = [];
+  const F = 'writing-en.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الوحدةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  let W;
+  try {
+    const sb = { window:{}, document:{ addEventListener:function(){} }, navigator:{},
+                 localStorage:{ getItem:() => null, setItem:function(){} } };
+    sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(src, sb);
+    W = sb.window.WritingEN;
+  } catch(e){ return (E('لا تُحمَّل: ' + String(e.message).slice(0,70)), out); }
+  if (!W || typeof W.grammar !== 'function' || typeof W.grade !== 'function')
+    return (E('grammarIssues أو gradeWriting غيرُ مكشوفتَين — فالمصحّحُ لا يُفحَص'), out);
+
+  /* ── الصحيحُ أوّلًا: صفرُ إنذار ── */
+  const OK = [
+    'a university student went to an hour-long class.',
+    'He is a European teacher and an honest man.',
+    'She goes to school and he has a book.',
+    'There are many people in the city.',
+    'I had had enough of that.',
+    'This is more interesting than more water or more paper.',
+    'He did not go, and I want to go.',
+    'He can go now; she may go later.',
+    'We need much water and many books.',
+    'The news is good and the traffic is heavy.',
+    'It was a one-way street with a useful sign.',
+    'My teacher gave me more homework and good advice.',
+    'People are waiting; the police are here.',
+    'A unique idea and a unit of work.',
+    'I read a lot of books because the environment matters.',
+    'Reading improves vocabulary and builds knowledge every day.',
+    'In addition, the crowded streets increase pollution and make the air less clean.'
+  ];
+  OK.forEach(s => {
+    let r; try { r = W.grammar(s); } catch(e){ return E('grammarIssues ترمي: ' + String(e.message).slice(0,50)); }
+    if (r && r.length)
+      E('إنذارٌ كاذبٌ على جملةٍ صحيحة: «' + s.slice(0,48) + '» ⇐ ' +
+        r.map(x => x.bad + ' [' + x.why + ']').join(' · ') + ' — والإنذارُ الكاذبُ يعلّم خطأً');
+  });
+
+  /* ── ثمّ الخاطئ: يُمسَك ── */
+  const BAD = [
+    ['a apple','a قبل حرف علّة'], ['an book','an قبل حرف ساكن'], ['a hour','a قبل h صامتة'],
+    ['He have a car.','هو/هي + فعل بلا s'], ['She go to school.','هو/هي + فعل بلا s'],
+    ['I did went there.','did + فعل ماضٍ'], ['I want to went home.','to + فعل ماضٍ'],
+    ['He can to swim.','فعل مساعد + to'], ['This is more better.','more + صيغة تفضيل'],
+    ['People is happy.','جمع + فعل مفرد'], ['I need informations.','جمعُ اسمٍ لا يُجمَع'],
+    ['There is many cars.','there is + جمع'], ['Too much people came.','much + اسم معدود'],
+    ['I saw the the dog.','كلمة مكرّرة'], ['I read alot.','alot'], ['becuase it rained','إملاء شائع الخطأ']
+  ];
+  BAD.forEach(([s, why]) => {
+    const r = W.grammar(s) || [];
+    if (!r.some(x => x.why === why))
+      E('خطأٌ أفلت: «' + s + '» — المنتظَرُ «' + why + '» والناتجُ ' +
+        (r.length ? r.map(x => x.why).join('، ') : 'لا شيء'));
+  });
+
+  /* ── وسقفُ درجةِ اللغةِ يعمل ── */
+  const lang = g => { const s = (g.subs || []).filter(x => x.en === 'Language')[0]; return s ? s.band : null; };
+  const CLEAN = 'Reading is very useful for students. First, it improves vocabulary and builds knowledge. ' +
+                'Second, it helps people understand other cultures. However, some students do not read enough. ' +
+                'In conclusion, reading every day is a good habit that everyone should keep.';
+  const DIRTY = 'Reading is very useful for students. He have a book and she go to school. ' +
+                'There is many informations in a apple. I did went to the the library becuase i like it.';
+  try {
+    const gc = W.grade(CLEAN, 2, 'A2'), gd = W.grade(DIRTY, 2, 'A2');
+    const nc = (W.grammar(CLEAN) || []).length, nd = (W.grammar(DIRTY) || []).length;
+    if (nc !== 0) E('النصُّ المرجعيُّ السليمُ فيه ' + nc + ' إنذارًا كاذبًا');
+    if (nd < 5) E('النصُّ المرجعيُّ المليءُ بالأخطاءِ أُمسِك منه ' + nd + ' فقط');
+    if (lang(gd) === null) E('مقياسُ Language غيرُ موجودٍ في الدرجة');
+    else {
+      if (lang(gd) > 2)
+        E('درجةُ اللغةِ ' + lang(gd) + '/٥ مع ' + nd + ' خطأَ قواعدَ — والسقفُ اثنان عند ثلاثةٍ فأكثر');
+      if (!(lang(gc) > lang(gd)))
+        E('درجةُ اللغةِ لا تفرّق بين نصٍّ سليمٍ ونصٍّ فيه ' + nd + ' خطأً (' +
+          lang(gc) + ' و' + lang(gd) + ')');
+      /* ═══ والأخطاءُ تُعرَض له لا تُخصَم منه وحسب ═══════════════════
+         السقفُ وحدَه لا يكفي: لو رُفِع فحصُ القواعدِ من قائمةِ مقياسِ
+         اللغةِ بقيت الدرجةُ منخفضةً والطفلُ لا يدري أين أخطأ — وهو
+         عقابٌ بلا تعليم، وهذي الجرعةُ تعليمٌ قبل أن تكون درجة.
+         فيُشترَط بندٌ مرفوضٌ يحمل الخطأَ نفسَه وتصويبَه. */
+      const shown = (gd.checks || []).filter(c => c && c.ok === false &&
+        /أخطاء قواعد/.test(String(c.label || '')));
+      if (!shown.length)
+        E('أخطاءُ القواعدِ تُخصَم ولا تُعرَض — فالدرجةُ تنزل ولا يعرف الطفلُ أين أخطأ');
+      else {
+        const hint = String(shown[0].hint || '');
+        const sample = (W.grammar(DIRTY) || [])[0];
+        if (sample && hint.indexOf(sample.bad) < 0)
+          E('بندُ أخطاءِ القواعدِ بلا الخطأِ نفسِه («' + sample.bad + '») — فلا يُعرَف ما يُصحَّح');
+        if (sample && hint.indexOf(sample.good) < 0)
+          E('بندُ أخطاءِ القواعدِ بلا التصويب («' + sample.good + '») — والمقابلةُ هي التعليم');
+      }
+    }
+  } catch(e){ E('gradeWriting ترمي: ' + String(e.message).slice(0,60)); }
+
+  /* ── وسجلُّ التسليم: النصُّ الواحدُ لا يُحفَظ مرّتين ── */
+  if (!/var savedKey = "wen_saved_"/.test(src))
+    E('بصمةُ آخرِ ما حُفِظ لا تُخزَّن — فإعادةُ المسوّدةِ بعد التحميلِ تُحفَظ عملًا جديدًا');
+  if (!/_lastSaved = localStorage\.getItem\(savedKey\)/.test(src))
+    E('البصمةُ لا تُقرأ عند الفتح — وهي تُمحى مع كلِّ تحميلٍ فتعود العلّة');
+  if (!/if\(now && now === _lastSaved\) return false;/.test(src))
+    E('saveParagraph تحفظ النصَّ نفسَه مرّةً ثانية');
+  if (!/if\(!saveParagraph\(g, false\)/.test(src))
+    E('زرُّ «قيّم كتابتي» لا يُخبر الطفلَ أنّ نصَّه لم يُحفَظ — فيحسب أنّه سلّم عملًا جديدًا');
   return out;
 }
 

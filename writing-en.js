@@ -885,6 +885,68 @@ function band(passed, total){
 var CHATSPEAK = ["u","ur","r","plz","pls","thx","gonna","wanna","gotta","lol","omg","bcz","bcoz","cuz","idk","btw","asap","4u","2u"];
 var SEQ_WORDS = ["first","firstly","then","next","after that","finally","lastly","in conclusion","to sum up"];
 
+/* ═══ أخطاءُ القواعدِ الشائعة ═══════════════════════════════════════
+   سؤالُ الأب (٢٢ أكتوبر ٢٠٢٦): «كيف حسن في التعبير؟» — وكان المصحّحُ
+   قائمةَ فحصٍ شكليّةً وحدَها: حرفٌ كبيرٌ أوّلَ الجملة، ونقطةٌ في آخرها،
+   وتنوّعُ مفردات. فلا يفحص صحّةَ اللغةِ أصلًا، وتخرج الدرجةُ تقول
+   «الشكل مضبوط» فيقرؤها الأبُ «اللغة سليمة».
+
+   والقواعدُ هنا عاليةُ الثقةِ وحدَها: الإنذارُ الكاذبُ يعلّمه خطأً وهو
+   أسوأُ من السكوت. ولذلك لا تُستعمل أنماطٌ عامّةٌ تصيب الصحيح:
+   ‏«more + [a-z]+er» كانت تُنذر على ‎more water‎ و‎more paper‎، فصارت
+   قائمةَ صيغِ تفضيلٍ معلومةً لا نمطًا.
+
+   وقد جُرّبت على نصوصِ حسنٍ الخمسةِ وعلى خمسَ عشرةَ جملةً صحيحةً فيها
+   المواضعُ الملتبسة (‎a university‎ · ‎an hour‎ · ‎a European‎ ·
+   ‎I had had‎ · ‎much water‎ · ‎the news is‎) فلم تُنذر على واحدة،
+   وأمسكت ستَّ عشرةَ جملةً خاطئةً كلَّها. */
+var WCMP = "better|worse|easier|bigger|smaller|faster|slower|older|younger|cheaper|taller|shorter|stronger|weaker|happier|richer|safer|nicer|higher|lower|longer|harder|simpler";
+var GRAMMAR = [
+  [/\ba\s+(?!u[nbs]|eu|one\b)[aeiou][a-z]+/gi, "a قبل حرف علّة", "an"],
+  [/\ba\s+(hour|honest|honou?r|heir)\b/gi, "a قبل h صامتة", "an"],
+  [/\ban\s+(?!hour|honest|honou?r|heir)[b-df-hj-np-tv-z][a-z]{2,}/gi, "an قبل حرف ساكن", "a"],
+  [/\b(he|she|it)\s+(have|do|go|like|make|take|say|want|need|think|know|live|work|play|study|help|watch|read|write)\b/gi,
+   "هو/هي + فعل بلا s", "he has · she goes"],
+  [/\b(did|didn't)\s+(not\s+)?(went|was|were|had|saw|took|made|came|got|said|ate|wrote|knew)\b/gi,
+   "did + فعل ماضٍ", "did + المصدر: did go"],
+  [/\bto\s+(went|saw|took|came|made|got|was|were|ate|wrote|knew|did)\b/gi,
+   "to + فعل ماضٍ", "to + المصدر: to go"],
+  [/\b(can|could|will|would|should|must|may|might)\s+to\s+[a-z]+/gi,
+   "فعل مساعد + to", "can go لا can to go"],
+  [new RegExp("\\bmore\\s+(" + WCMP + ")\\b", "gi"), "more + صيغة تفضيل", "better لا more better"],
+  [new RegExp("\\bmost\\s+(" + WCMP + ")\\b", "gi"), "most + صيغة تفضيل", "best لا most best"],
+  [/\b(people|children|men|women|police)\s+(is|was|has)\b/gi, "جمع + فعل مفرد", "people are"],
+  [/\b(information|advice|knowledge|homework|furniture|equipment|luggage|progress)s\b/gi,
+   "جمعُ اسمٍ لا يُجمَع", "information لا informations"],
+  [/\bthere\s+(is|was)\s+(many|several|a lot of|lots of|two|three|four|five|some)\b/gi,
+   "there is + جمع", "there are many"],
+  [/\bmuch\s+(people|students|friends|books|cars|problems|ideas|things|places|hours|days)\b/gi,
+   "much + اسم معدود", "many"],
+  [/\b(\w+)\s+\1\b/gi, "كلمة مكرّرة", "احذف إحداهما"],
+  [/\balot\b/gi, "alot", "a lot"],
+  [/\b(becuase|becasue|becouse|recieve|seperate|definately|enviroment|goverment|beatiful|intersting|succesful|diffrent|allways|thier|freind)\b/gi,
+   "إملاء شائع الخطأ", "راجع تهجئتها"]
+];
+/* صحيحةٌ وإن تكرّرت، فلا تُعدّ تكرارًا */
+var WDUP_OK = /^(had|that|very|really|no|new|out)$/i;
+function grammarIssues(text){
+  var t = String(text||""), out = [], seen = {};
+  for(var i=0; i<GRAMMAR.length && out.length<12; i++){
+    var r = GRAMMAR[i], re = new RegExp(r[0].source, r[0].flags), m;
+    while((m = re.exec(t)) && out.length < 12){
+      if(r[1] === "كلمة مكرّرة" && WDUP_OK.test(m[1])) continue;
+      /* ‏«an MP» صحيحةٌ: الاختصارُ يُنطَق أوّلُه حرفَ علّة */
+      if(r[1] === "an قبل حرف ساكن" && /^an\s+[A-Z]{1,4}$/.test(m[0])) continue;
+      var frag = m[0].trim();
+      if(frag.length > 42) frag = frag.slice(0,42) + "…";
+      var k = r[1] + "|" + frag.toLowerCase();
+      if(seen[k]) continue; seen[k] = 1;
+      out.push({ bad:frag, why:r[1], good:r[2] });
+    }
+  }
+  return out;
+}
+
 function gradeWriting(text, level, targetOrCefr, prompt){
   var cef = (typeof targetOrCefr==="object" && targetOrCefr) ? targetOrCefr
           : (CEFR[targetOrCefr] || (level>=2 ? CEFR.A2 : CEFR.A1));
@@ -933,6 +995,7 @@ function gradeWriting(text, level, targetOrCefr, prompt){
   }
 
   /* ---------- 3) Language: الصحّة والثروة ---------- */
+  var gIssues = grammarIssues(text);
   var badCap=[], i;
   for(i=0;i<sents.length;i++){
     var m=sents[i].match(/[A-Za-z]/);
@@ -962,7 +1025,13 @@ function gradeWriting(text, level, targetOrCefr, prompt){
     {ok: words.length>=15 && ttr>=0.55, label:"تنوّع المفردات: "+Math.round(ttr*100)+"%"+trI("Vocabulary range"),
      hint:"استعمل مرادفاتٍ وكلماتٍ أوسع بدل تكرار نفس الكلمة."},
     {ok: varied, label:"تنوّع أطوال الجمل"+trI("Varied sentence length"),
-     hint:"نوّع: جملة قصيرة ثمّ أطول — لا تجعلها كلّها بالطول نفسه."}
+     hint:"نوّع: جملة قصيرة ثمّ أطول — لا تجعلها كلّها بالطول نفسه."},
+    {ok: any && gIssues.length===0,
+     label:(gIssues.length ? ("أخطاء قواعد: "+gIssues.length) : "بلا أخطاء قواعد شائعة")+trI("Common grammar errors"),
+     hint: gIssues.length ? ('<br>'+gIssues.slice(0,6).map(function(g){
+       return '❌ <span dir="ltr" style="unicode-bidi:isolate">'+g.bad+'</span> — '+g.why+
+              ' ⇐ <b dir="ltr" style="unicode-bidi:isolate">'+g.good+'</b>';
+     }).join('<br>')) : ""}
   ];
 
   /* ---------- 4) Communicative Achievement: مناسبة الأسلوب ---------- */
@@ -988,6 +1057,19 @@ function gradeWriting(text, level, targetOrCefr, prompt){
     sub("اللغة","Language",langChecks),
     sub("مناسبة الأسلوب","Communicative Achievement",comChecks)
   ];
+  /* ═══ سقفُ «اللغة» ما دامت فيه أخطاءُ قواعد ═══════════════════════
+     الفحصُ الواحدُ لا يكفي: درجةُ اللغةِ مبنيّةٌ على نسبةِ الفحوصِ
+     المتحقّقة، فنصٌّ فيه خمسةُ أخطاءٍ يخسر فحصًا من سبعةٍ فتبقى درجتُه
+     أربعةً من خمسة. وهذا هو ما شكا منه الأب: الدرجةُ تقول «سليمة» ولا
+     تقرأ القواعدَ أصلًا. فما فيه خطأٌ لا يبلغ الخمسةَ، وما فيه ثلاثةٌ
+     فأكثرُ لا يبلغ الثلاثةَ — وهي عتبةُ النجاح. */
+  (function(){
+    var lang = subs.filter(function(s){ return s.en === "Language"; })[0];
+    if(!lang || !gIssues.length) return;
+    var cap = gIssues.length >= 3 ? 2 : 3;
+    if(lang.band > cap) lang.band = cap;
+    lang.capped = gIssues.length;
+  })();
   var totalBand = subs.reduce(function(a,s){ return a+s.band; },0);   /* من ٢٠ كنظام كامبردج */
   var pass = subs.every(function(s){ return s.band>=3; });
 
@@ -1410,16 +1492,37 @@ function render(el, ctx){
      فصرنا نُقيّم ونحفظ تلقائيًّا عند المغادرة (التقييم محلّيٌّ بالكامل، لا
      يحتاج شبكة)، ونضع auto:true تمييزًا لها. ونحرس من التكرار بمقارنة النصّ
      الأخير المحفوظ، فلا يتكرّر صفٌّ حفظته بنفسها بالزرّ. */
+  /* ═══ النصُّ الواحدُ لا يُحفَظ مرّتين ═══════════════════════════════
+     سؤالُ الأب (٢٢ أكتوبر ٢٠٢٦) عن تعبيرِ حسن: في القاعدةِ إحدى عشرةَ
+     تسليمةً وفيها خمسةُ نصوصٍ فقط — والستُّ الباقيةُ إعادةٌ حرفيّةٌ
+     بالنصِّ نفسِه والدرجةِ نفسِها، مرّتان منها في يومٍ واحدٍ بينهما
+     أربعُ ساعات.
+
+     والعلّةُ هنا لا في الطفل: الصفحةُ تحفظ المسوّدةَ في المتصفّحِ
+     وتعيدها إلى الصندوقِ عند الفتح (draftKey أدناه)، و_lastSaved
+     مقيمٌ في الذاكرةِ وحدَها فيُمحى مع كلِّ تحميل. فيفتح الطفلُ
+     الموضوعَ نفسَه، فيجد نصَّه أمامه، فيضغط «قيّم كتابتي» — فيُحفَظ
+     صفٌّ جديدٌ بنصٍّ قديم. فيقرأ الأبُ أحدَ عشرَ عملًا وهي خمسة.
+
+     فصارت بصمةُ آخرِ ما حُفِظ تُخزَّن مع المسوّدةِ نفسِها، فتعيش بعد
+     التحميل. والتقييمُ يُعرَض كما هو — إنّما لا يُضاف صفٌّ ما لم
+     يتغيّر النصّ. */
+  var savedKey = "wen_saved_" + ctx.who + "_" + pIdx;
   var _lastSaved = "";
+  try{ _lastSaved = localStorage.getItem(savedKey) || ""; }catch(e){}
   var MIN_AUTO_WORDS = 8;
   function _norm(x){ return String(x||"").replace(/\s+/g," ").trim(); }
   function saveParagraph(g, auto){
+    var now = _norm(ta.value);
+    if(now && now === _lastSaved) return false;    /* نفسُ النصِّ: لا صفَّ جديد */
     var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
-    _lastSaved = _norm(ta.value);
+    _lastSaved = now;
+    try{ localStorage.setItem(savedKey, now); }catch(e){}
     ctx.save({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
                bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
                auto:(auto===true)||undefined,
                text:ta.value.slice(0,1500) });
+    return true;
   }
   function autoSaveParagraph(){
     var t=_norm(ta.value);
@@ -1471,9 +1574,16 @@ function render(el, ctx){
          '🎙️ باقي عليك <b>'+(READ_REQ-readDone())+'</b> من خمس جملٍ إجباريّةٍ في «الجزء الثالث — اقرأ بصوتك».'+
          trs("You still have "+(READ_REQ-readDone())+" of 5 required sentences to read aloud in Part 3.")+'</div>';
     }
+    /* ولا يُترَك في حَيرةٍ: إن لم يُحفَظ صفٌّ قيل له لماذا صراحةً —
+       وإلّا ظنَّ أنّ عملَه ضاع، أو حسب أنّه سلّم عملًا جديدًا. */
+    if(!saveParagraph(g, false) && g.words > 0){
+      h += '<div style="margin-top:10px;background:var(--bg);border:1.5px solid var(--warn);border-radius:11px;'+
+           'padding:10px 12px;font-weight:700;color:var(--warn);font-size:.92rem">'+
+           '📝 هذي نفسُ الفقرةِ التي حُفظت آخرَ مرّة، فما أضفتُ عملًا جديدًا لوالدك. '+
+           'عدّل فيها أو اكتب غيرَها ليُحسَب لك عملٌ جديد.'+
+           trs("Same text as last time — nothing new was recorded. Change it to log new work.")+'</div>';
+    }
     feed.innerHTML=h;
-
-    saveParagraph(g, false);
   });
 
   /* ---- الجزء الثالث: القراءة بصوته ---- */
@@ -1554,5 +1664,8 @@ function render(el, ctx){
   }
 }
 
-window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN };
+/* grammarIssues مكشوفةٌ للفحصِ الآليّ: قواعدُها تُجرَّب على جملٍ
+   صحيحةٍ وخاطئةٍ معًا، والإنذارُ الكاذبُ أسوأُ من السكوت. */
+window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN,
+                     grammar:grammarIssues, _rules:GRAMMAR };
 })();
