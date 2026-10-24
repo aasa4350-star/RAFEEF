@@ -345,6 +345,7 @@ function run(){
   issues.push(...verbalBankPath());
   issues.push(...quantDosePath());
   issues.push(...writingPath());
+  issues.push(...vocabOwnPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3685,6 +3686,153 @@ function writingPath(){
   return out;
 }
 
+/* ═══ كلماتُ الابنِ تُعرَف بالكلمةِ لا بالموضع ═════════════════════════
+   سؤالُ الأب (٢٤ أكتوبر ٢٠٢٦): «شف سعود في حفظ الكلمات». وقِياسُ سجلِّه
+   كشف أنّ عدّادَه يكذب عليه: تقدُّمُه محفوظٌ رقمًا («حفظتُ ٣٨٠»)، فلمّا
+   تقدّمت مفرداتُ مقرَّرِه في ٨ أكتوبر صار الرقمُ يعني أوّلَ ٣٨٠ من قائمةٍ
+   أوّلُها مئةُ كلمةٍ من كتابِه لم يرَها قطّ — فحُسِبت محفوظةً وحُرِم منها،
+   وفي مقابلها ١٠٣ كلماتٍ يعرفها سقطت خارج العدّاد فلم تعد تُراجَع. ودَينُه
+   في سجلِّه ارتفع من ٢٢ إلى ١١٧ بلا جلسةٍ واحدةٍ بينهما.
+
+   وهذا الحارسُ يُشغّل كودَ الصفحةِ نفسَه (ownedList · nextNewWords ·
+   srDebt · freshCount وبناءَ VOCAB_LIST) على حالةٍ مُصطنَعةٍ تُحاكي
+   وضعَه، فلا يفحص نسخةً من المنطق بل المنطقَ الذي يراه الطفل. */
+function vocabOwnPath(){
+  const out = [], F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* يقتطع تعريفًا كاملًا بموازنةِ الأقواس — فما يُفحَص هو كودُ الصفحة */
+  function grab(head){
+    const i = src.indexOf(head);
+    if (i < 0) return null;
+    let j = src.indexOf('{', i), d = 0;
+    if (j < 0) return null;
+    for (let k = j; k < src.length; k++){
+      if (src[k] === '{') d++;
+      else if (src[k] === '}'){ d--; if (!d) return src.slice(i, k+1); }
+    }
+    return null;
+  }
+  const NEED = ['var VOCAB_LIST = (function(){', 'function ownedList(', 'function ownedCount(',
+                'function nextNewWords(', 'function freshCount(', 'function srDebt(',
+                'function isFreshWord(', 'function srRecalled('];
+  const parts = {};
+  for (const h of NEED){
+    const g = grab(h);
+    if (!g) return (E('لا يُنتزَع «' + h + '» — تغيّر اسمُه أو حُذف، فلا يُفحَص اختيارُ الكلمات'), out);
+    parts[h] = g + (h.indexOf('var ') === 0 ? ')();' : '');
+  }
+  const stale = /var\s+POS_STALE\s*=\s*([^;]+);/.exec(src);
+  if (!stale) return (E('POS_STALE غائبة — موضعُ الكلمةِ يحكم كلماتِ سعودٍ من جديد'), out);
+  const num = (rx, what) => { const m = rx.exec(src); if (!m) E(what + ' لا تُقرأ'); return m ? +m[1] : 0; };
+  const STEP = num(/var VOC_STEP = (\d+)/, 'VOC_STEP');
+  const MBOX = num(/var MASTERED_BOX = (\d+)/, 'MASTERED_BOX');
+  const FWIN = num(/var FRESH_WINDOW = (\d+)/, 'FRESH_WINDOW');
+
+  /* ── حالةٌ مُصطنَعةٌ تُحاكي وضعَ سعود ──
+     قائمةٌ عامّةٌ من ستّين، ومقرَّرٌ من عشرين تتقدّم عليها. وذاكرتُه:
+     كلماتٌ من آخرِ العامّة (تسقط خارجَ العدّاد بعد الترتيب الجديد)،
+     وأربعٌ من المقرَّر، وواحدةٌ عُرضت ولم تُسترجَع. */
+  const GEN = [], CRS = [];
+  for (let i = 0; i < 60; i++) GEN.push(['g' + i, ['ع' + i]]);
+  for (let i = 0; i < 20; i++) CRS.push(['c' + i, ['م' + i]]);
+  const SR = {};
+  const KNOWN = ['g50','g51','g52','g53','g54','g55','c0','c1','c2','c3'];
+  KNOWN.forEach(k => SR[k] = { b:2, c:3, n:3, t:Date.now() - 4*86400000 });
+  SR['g59'] = { b:0, c:0, n:1, t:0 };                /* عُرضت ولم تُسترجَع */
+  const OWNED = KNOWN.concat(['g59']);
+
+  function world(who, en4){
+    const sb = { window:{ VOCAB_EN4: en4 }, who:who, VOCAB300: GEN.slice(),
+                 VOC_STEP: STEP, MASTERED_BOX: MBOX, FRESH_WINDOW: FWIN,
+                 getSR: () => { const o = {}; for (const k in SR) o[k] = SR[k]; return o; },
+                 Date: Date, Math: Math, JSON: JSON };
+    vm.createContext(sb);
+    try {
+      vm.runInContext(parts['var VOCAB_LIST = (function(){'], sb);
+      vm.runInContext('var VOC_TOTAL = VOCAB_LIST.length;', sb);
+      vm.runInContext('var POS_STALE = ' + stale[1] + ';', sb);
+      for (const h of NEED) if (h.indexOf('function') === 0) vm.runInContext(parts[h], sb);
+    } catch(e){ E('كودُ الاختيارِ لا يُقوَّم: ' + String(e.message).slice(0,70)); return null; }
+    return sb;
+  }
+
+  /* ١) سعودٌ: كلماتُه ما له ذاكرةٌ فيه، حيث وقع في القائمة */
+  const S = world('saud', CRS);
+  if (!S) return out;
+  if (!S.POS_STALE) E('POS_STALE مطفأةٌ لسعودٍ ومقرَّرُه مُقدَّم — موضعُه سيحكم كلماتِه');
+  const own = S.ownedList(999).map(w => w[0]);
+  const miss = OWNED.filter(w => own.indexOf(w) < 0);
+  if (miss.length) E('كلماتٌ في ذاكرتِه خرجت من بركتِه: ' + miss.join(' ') + ' — لا تعود إليه في مراجعة');
+  const ghost = own.filter(w => !SR[w]);
+  if (ghost.length) E('كلماتٌ لم تُعرَض عليه دخلت بركتَه: ' + ghost.slice(0,6).join(' '));
+  if (S.ownedCount(999) !== OWNED.length)
+    E('عدُّ كلماتِه ' + S.ownedCount(999) + ' والصوابُ ' + OWNED.length);
+  /* والعدَّادُ القديمُ لا يرفعه: ٤٠ موضعًا لا تعني أربعين كلمة */
+  if (S.ownedCount(40) !== OWNED.length)
+    E('العدَّادُ القديمُ ما زال يحكم عدَّ كلماتِه (' + S.ownedCount(40) + ')');
+
+  /* ٢) دَينُه على ما عُرض عليه وحده */
+  if (S.srDebt(999) !== 1)
+    E('دَينُه ' + S.srDebt(999) + ' والصوابُ ١ — تُحسَب عليه كلماتٌ لم تُعرَض (وهي علّةُ ١١٧)');
+
+  /* ٣) الدفعةُ الجديدةُ من مقرَّرِه، ولم يرَها */
+  const nx = S.nextNewWords(999).map(w => w[0]);
+  if (nx.length !== STEP) E('الدفعةُ الجديدة ' + nx.length + ' والمنتظَر ' + STEP);
+  const seen = nx.filter(w => SR[w]);
+  if (seen.length) E('الدفعةُ الجديدةُ فيها ما مرّ عليه: ' + seen.join(' '));
+  const notCourse = nx.filter(w => w[0] !== 'c');
+  if (notCourse.length) E('الدفعةُ الجديدةُ ليست من مقرَّرِه: ' + notCourse.join(' ') + ' — وتقديمُ المقرَّرِ هو مقصودُ الترتيب');
+
+  /* ٤) غيرُ الثابتةِ تُعَدُّ على كلماتِه لا على أوّلِ العدّاد */
+  if (S.freshCount(999) < 1) E('خانةُ «ما ثبتت بعد» فارغةٌ وفيه كلمةٌ عُرضت ولم تُسترجَع');
+  if (S.freshCount(999) > OWNED.length) E('«ما ثبتت بعد» تتجاوز عددَ كلماتِه');
+
+  /* ٥) وبقيّةُ الأولادِ قائمتُهم كما كانت: الموضعُ يصفُ كلماتِهم */
+  const H = world('hasan', null);
+  if (!H) return out;
+  if (H.POS_STALE) E('POS_STALE مشتعلةٌ لحسنٍ وقائمتُه لم تتغيّر');
+  const hown = H.ownedList(30).map(w => w[0]);
+  if (hown.length !== 30 || hown[0] !== 'g0' || hown[29] !== 'g29')
+    E('بركةُ حسنٍ لم تبق أوّلَ ثلاثين موضعًا (' + hown.length + ')');
+  if (H.srDebt(30) !== 30) E('دَينُ حسنٍ ' + H.srDebt(30) + ' والمنتظَر ٣٠ — تغيّر حسابُه وقائمتُه لم تتغيّر');
+  const hnx = H.nextNewWords(30).map(w => w[0]);
+  if (hnx[0] !== 'g30' || hnx.length !== STEP)
+    E('دفعةُ حسنٍ الجديدةُ ليست ما يلي عدّادَه (' + hnx.join(' ') + ')');
+
+  /* ٦) والصفحةُ تستعمل هذه الأدواتِ فعلًا — لا تُعرَّف وتُهمَل */
+  const uses = [
+    [/ownedList\(learned\)\.forEach/, 'خانةُ «ما ثبتت بعد» ما زالت تُبنى من أوّلِ العدّاد'],
+    [/var fullPool = ownedList\(learned\);/, 'بركةُ «راجع المحفوظ» ما زالت تُبنى من أوّلِ العدّاد'],
+    [/else V = nextNewWords\(learned\);/, 'الدفعةُ الجديدةُ ما زالت تُقطَع بالموضع'],
+    [/var owned = ownedCount\(learned\);/, 'الرسمُ لا يحسب كلماتِه فيعود الرقمُ المعروضُ كاذبًا'],
+    [/isFreshWord\(st, i, owned\)/, '«الجديد» يُقاس بالعدّادِ القديمِ لا بعددِ كلماتِه'],
+    [/isFreshWord\(srs\[w\[0\]\], i, owned\)/, 'استثناءُ «الجديد» من المراجعةِ يُقاس بالعدّادِ القديم'],
+    [/حفظت <span dir="ltr">'\+owned\+'/, 'شريطُ التقدّمِ يعرض العدّادَ لا عددَ كلماتِه'],
+    [/var cur=vocLearnedNum\(\);/, 'رسالةُ التصفيرِ تعرض العدّادَ القديم']
+  ];
+  for (const [rx, msg] of uses) if (!rx.test(src)) E(msg);
+  /* ومواضعُ الحفظِ ثلاثةٌ لا واحد (الجزئيّ · الجديد · المراجعة)، فلو
+     فُحِص وجودُ واحدٍ منها نجا تخريبُ البقيّة: فيُعَدّ ويُشترط ألّا
+     يبقى موضعٌ يحمل العدّادَ القديم. */
+  const count = rx => (src.match(rx) || []).length;
+  const SAVES = 3;
+  if (count(/learned:vocLearnedNum\(\)/g) !== SAVES)
+    E('مواضعُ حفظِ الكلماتِ التي تكتب عددَ كلماتِه ' + count(/learned:vocLearnedNum\(\)/g) + ' والمنتظَر ' + SAVES + ' — موضعٌ يكتب العدّادَ القديمَ فيكذب تقريرُ الأب');
+  if (/learned:\s*getLearned\(\)/.test(src))
+    E('موضعُ حفظٍ ما زال يكتب العدّادَ القديمَ في الصفّ');
+  if (count(/srKnown\(ownedList\(getLearned\(\)\)\)/g) !== SAVES)
+    E('أرقامُ التقريرِ (رسخت · قيد التثبيت) لا تُحسَب من كلماتِه في المواضعِ الثلاثةِ كلِّها');
+  if (/srKnown\(VOCAB_LIST\.slice/.test(src) || /srLearning\(VOCAB_LIST\.slice/.test(src))
+    E('أرقامُ التقريرِ تُحسَب من أوّلِ العدّاد');
+  /* ولا يُسجَّل الجديدُ بمجرّدِ العرض: «جديد» هو الوضعُ الافتراضيُّ عند
+     فتحِ الصفحة، فتسجيلُه يَعُدُّ عشرًا معروضةً على من لم يفتح القسم. */
+  if (/else \{ V = nextNewWords\(learned\);[\s\S]{0,400}?srShow\(V\)/.test(src))
+    E('الدفعةُ الجديدةُ تُسجَّل بمجرّدِ عرضِها — فمجرّدُ فتحِ الصفحةِ يُثقِل دَينَه');
+  return out;
+}
 module.exports = run;
 if (require.main === module){
   const r = run();
