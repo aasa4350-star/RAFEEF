@@ -1,8 +1,159 @@
-/* كلماتُ كتابِ الإنجليزي للصفّ الرابع وجملُه — الفصلُ الدراسيُّ الأوّل (الوحدات 1–4).
-   نُقلت من صفحاتِ الكتابِ نفسِه (صوّرها الأب ٨ أكتوبر ٢٠٢٦)، لا من بنكِ الأسئلة.
+/* كلماتُ كتابِ الإنجليزي للصفّ الرابع وجملُه — الفصلُ الدراسيُّ الأوّل
+   (وحدةُ الترحيبِ والوحداتُ 1–4).
+   نُقلت من صفحاتِ الكتابِ نفسِه (صوّرها الأب ٨ أكتوبر ٢٠٢٦، ووحدةَ
+   الترحيبِ — الصفحاتِ ٤–٩ — في ٢٥ منه)، لا من بنكِ الأسئلة.
    تقرؤها english.html في أقسامِ «احفظ» و«ثبّت» و«جمل» داخل كلِّ وحدة.
    كلُّ عنصر: [الإنجليزي, المعنى بالعربي]. */
 window.BOOK_EN4 = {
+ "w": {
+  "title": "Welcome!",
+  "ar": "وحدة الترحيب",
+  "sections": [
+   { "t": "كلمات الصورة — Look and find (ص 4)",
+     "items": [
+      ["balloons","بالونات"],
+      ["bus","حافلة"],
+      ["camera","كاميرا"],
+      ["photo","صورة"],
+      ["playground","ملعب المدرسة"],
+      ["poster","ملصق"],
+      ["school bus","حافلة المدرسة"],
+      ["celebration","احتفال"]
+     ] },
+   { "t": "صفات الوحدة (ص 6)",
+     "items": [
+      ["afraid","خائف"],
+      ["brilliant","بارع / رائع"],
+      ["dangerous","خَطِر"],
+      ["different","مختلف"],
+      ["exciting","مثير"],
+      ["naughty","مشاغب"],
+      ["surprised","مندهش"],
+      ["terrible","فظيع"],
+      ["excellent","ممتاز"],
+      ["celebrate","يحتفل"]
+     ] },
+   { "t": "الأعداد الترتيبية 1st–20th (ص 6)",
+     "items": [
+      ["first (1st)","الأوّل"],
+      ["second (2nd)","الثاني"],
+      ["third (3rd)","الثالث"],
+      ["fourth (4th)","الرابع"],
+      ["fifth (5th)","الخامس"],
+      ["seventh (7th)","السابع"],
+      ["tenth (10th)","العاشر"],
+      ["twelfth (12th)","الثاني عشر"],
+      ["thirteenth (13th)","الثالث عشر"],
+      ["sixteenth (16th)","السادس عشر"],
+      ["eighteenth (18th)","الثامن عشر"],
+      ["twentieth (20th)","العشرون"]
+     ] },
+   { "t": "جمل الكتاب — الحوار (ص 6)",
+     "items": [
+      ["How was your first vacation abroad?","كيف كانت أوّل إجازة لك في الخارج؟"],
+      ["It was brilliant!","كانت رائعة!"],
+      ["And exciting!","ومثيرة!"],
+      ["Let's climb that wall!","لنتسلّق ذلك الجدار!"],
+      ["I'm surprised at you, Glo.","أنا مندهش منك يا جلو."],
+      ["That's a dangerous idea!","هذي فكرة خَطِرة!"],
+      ["It's more dangerous than other games!","هي أخطر من الألعاب الأخرى!"],
+      ["It's a terrible game!","إنّها لعبة فظيعة!"],
+      ["I'm afraid of heights!","أنا أخاف من المرتفعات!"],
+      ["Can I go second?","هل أكون الثاني؟"],
+      ["Don't be naughty, Glo!","لا تكن مشاغبًا يا جلو!"],
+      ["It's the fifth time. Let's play a different game!","هذي المرّة الخامسة. لنلعب لعبة مختلفة!"],
+      ["Yes! Let's act out stories!","نعم! لنمثّل قصصًا!"],
+      ["Oh, no! Time for class!","آه لا! حان وقت الحصّة!"]
+     ] },
+   { "t": "جمل الكتاب — الصفات (ص 7)",
+     "items": [
+      ["My little brother is very naughty.","أخي الصغير مشاغب جدًّا."],
+      ["I don't like the taste of cheese. It's terrible.","لا أحبّ طعم الجبن. إنّه فظيع."],
+      ["I got ten presents from my friends! I was happy and surprised.","حصلت على عشر هدايا من أصدقائي! كنت سعيدًا ومندهشًا."],
+      ["There was a shark near me when I was in the water. I was afraid.","كان هناك قرش قربي وأنا في الماء. كنت خائفًا."],
+      ["When I go on vacation, I think it's exciting.","حين أذهب في إجازة أجدها مثيرة."],
+      ["Which food do you think smells terrible?","أيّ طعام ترى رائحته فظيعة؟"],
+      ["I think fish smells terrible!","أرى أنّ رائحة السمك فظيعة!"],
+      ["What are you afraid of?","ممّ تخاف؟"],
+      ["Who is naughty in your family?","من المشاغب في عائلتك؟"],
+      ["What is exciting at school?","ما المثير في المدرسة؟"],
+      ["What makes you surprised?","ما الذي يجعلك مندهشًا؟"]
+     ] },
+   { "t": "المقارنة والتفضيل (ص 8)",
+     "items": [
+      ["taller","أطول (مقارنة)"],
+      ["tallest","الأطول"],
+      ["longer","أطول (للطول الممتدّ)"],
+      ["smaller","أصغر"],
+      ["biggest","الأكبر"],
+      ["nicest","الألطف"],
+      ["better","أفضل"],
+      ["best","الأفضل"],
+      ["worst","الأسوأ"],
+      ["more difficult","أصعب"],
+      ["more interesting","أكثر إثارة للاهتمام"]
+     ] },
+   { "t": "جمل الكتاب — المقارنة (ص 8)",
+     "items": [
+      ["In the first photo, you can see my best friend at school.","في الصورة الأولى ترى صديقتي المفضّلة في المدرسة."],
+      ["She has longer hair than me, and she is taller, too.","شعرها أطول من شعري، وهي أطول منّي أيضًا."],
+      ["I think she is the nicest girl in our class.","أرى أنّها ألطف فتاة في صفّنا."],
+      ["She is the tallest person I know.","هي أطول شخص أعرفه."],
+      ["Our class is the biggest in our school.","صفّنا هو الأكبر في مدرستنا."],
+      ["The other classes are smaller.","الصفوف الأخرى أصغر."],
+      ["Math is more difficult than geography or history.","الرياضيات أصعب من الجغرافيا أو التاريخ."],
+      ["I think I am the worst student in class!","أظنّ أنّي أسوأ طالب في الصفّ!"],
+      ["She is better at math than me.","هي أفضل منّي في الرياضيات."],
+      ["Who is the tallest student in your class?","من أطول طالب في صفّك؟"],
+      ["What is the nicest thing about your best friend?","ما ألطف شيء في صديقك المفضّل؟"],
+      ["Who has the biggest backpack in your class?","من عنده أكبر حقيبة في صفّك؟"],
+      ["What is the best thing about recess time at school?","ما أفضل شيء في وقت الفسحة؟"],
+      ["What school subjects are more difficult at school?","أيّ المواد أصعب في المدرسة؟"],
+      ["It's my sister. She's taller than all of us!","إنّها أختي. هي أطول منّا كلّنا!"],
+      ["I think math and history are more difficult.","أرى أنّ الرياضيات والتاريخ أصعب."]
+     ] },
+   { "t": "ظروف التكرار (ص 9)",
+     "items": [
+      ["always","دائمًا"],
+      ["usually","عادةً"],
+      ["often","غالبًا"],
+      ["sometimes","أحيانًا"],
+      ["never","أبدًا"],
+      ["My dad often makes dinner.","أبي غالبًا يُعدّ العشاء."],
+      ["We sometimes have celebrations at school.","أحيانًا تكون عندنا احتفالات في المدرسة."],
+      ["Adel never does his homework in the park.","عادل لا يحلّ واجبه في الحديقة أبدًا."],
+      ["I always have art class on Tuesday mornings.","عندي حصّة فنّ دائمًا صباح الثلاثاء."],
+      ["My best friend often goes to the school club on Thursdays.","صديقي المفضّل غالبًا يذهب لنادي المدرسة أيّام الخميس."]
+     ] },
+   { "t": "was / were — الماضي (ص 9)",
+     "items": [
+      ["Sunday was the back to school celebration day!","الأحد كان يوم احتفال العودة للمدرسة!"],
+      ["We were happy at the celebration because it was fun.","كنّا سعداء في الاحتفال لأنّه كان ممتعًا."],
+      ["The celebration wasn't in the classroom.","لم يكن الاحتفال في الفصل."],
+      ["It was on the school playground.","كان في ملعب المدرسة."],
+      ["The food was delicious!","كان الطعام لذيذًا!"],
+      ["There were sandwiches, and there was a big chocolate cake, too.","كانت هناك سندويتشات، وكانت هناك كعكة شوكولاتة كبيرة أيضًا."],
+      ["Our parents weren't at the celebration because they were at work.","لم يكن والدانا في الاحتفال لأنّهما كانا في العمل."],
+      ["It was the best day of school!","كان أفضل يوم في المدرسة!"],
+      ["Where were the students on Sunday? — They were at the school celebration.","أين كان الطلّاب يوم الأحد؟ — كانوا في احتفال المدرسة."],
+      ["Was the celebration in the classroom? — No, it wasn't.","هل كان الاحتفال في الفصل؟ — لا، لم يكن."],
+      ["What was delicious? — The food was delicious.","ما الذي كان لذيذًا؟ — الطعام كان لذيذًا."],
+      ["Who wasn't at the celebration? — Their parents weren't.","من لم يكن في الاحتفال؟ — والداهما."],
+      ["Was the celebration the worst day at school? — No, it was the best day.","هل كان الاحتفال أسوأ يوم في المدرسة؟ — لا، كان أفضل يوم."]
+     ] },
+   { "t": "نشيد العودة للمدرسة (ص 5)",
+     "items": [
+      ["We're back at school. Here we go again.","رجعنا للمدرسة. ها نحن نبدأ من جديد."],
+      ["We're happy to be here!","نحن سعداء بوجودنا هنا!"],
+      ["We have new notebooks, pens, and backpacks, too!","عندنا دفاتر وأقلام وحقائب جديدة أيضًا!"],
+      ["What about you? Get your things and come with us!","وأنت؟ خذ أغراضك وتعال معنا!"],
+      ["We all enjoy school!","كلّنا نستمتع بالمدرسة!"],
+      ["We can make new friends and see old ones, too!","نقدر نصنع أصدقاء جددًا ونرى القدامى أيضًا!"],
+      ["Laugh and learn with our teachers.","نضحك ونتعلّم مع معلّمينا."],
+      ["In our beautiful and special school!","في مدرستنا الجميلة المميّزة!"]
+     ] }
+  ]
+ },
  "u1": {
   "title": "Unit 1 — Family Events",
   "ar": "الوحدة 1: مناسبات العائلة",

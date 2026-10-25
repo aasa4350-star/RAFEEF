@@ -21,6 +21,8 @@ const RULES = require('../tools/lib-rules.js');
 const ROOT = path.join(__dirname, '..');
 
 const LOW_CAPACITY = 12;      /* أقلّ من هذا يُعدّ قابلًا للحفظ */
+/* صفحاتٌ عددُ خياراتها مقصودٌ ثابت — انظر موضعَ استعمالِها أدناه */
+const EXPECT_OPTS = { 'english.html': 3, 'english5.html': 3, 'english8.html': 3, 'english9.html': 3 };
 const TRIALS = 900;
 
 function scripts(html){
@@ -276,6 +278,18 @@ function run(){
         const opts = q[1];
         if (!Array.isArray(opts) || opts.length < 2)
           firstBad = firstBad || 'عدد الخيارات ' + (Array.isArray(opts) ? opts.length : 'ليس مصفوفة');
+        /* ═══ عددُ الخياراتِ المنتظَرُ في هذي الصفحة ═══════════════════
+           الثباتُ وحدَه لا يكفي: كان يُقاس على أوّلِ توليدة، فمن أعطى
+           خيارَين دائمًا مرّ — وخياران قرعةٌ لا سؤال، يُصيبها الطفلُ
+           نصفَ المرّاتِ بلا معرفة. (ظهر في مولّدِ was/were لوحدةِ
+           الترحيبِ عند قياسِ الحارسِ بالتخريب، فنجا منه.)
+
+           ولا يصحّ حدٌّ عامٌّ بثلاثة: في math7.html أسئلةٌ ثنائيّةٌ
+           بطبيعتها (أيُّهما أكبر؟ · هل تشكّلان تناسبًا؟) فخياران فيها
+           هو الصواب. فالعددُ المنتظَرُ يُنَصُّ للصفحةِ التي تقصده،
+           وما لم يُنَصَّ له يُكتفى فيه بالثبات. */
+        else if (EXPECT_OPTS[f] && opts.length !== EXPECT_OPTS[f])
+          firstBad = firstBad || 'الخيارات ' + opts.length + ' والمنتظَرُ في هذي الصفحة ' + EXPECT_OPTS[f];
         /* عدد الخيارات يُشتقّ من أوّل توليدة لا يُفترض:
            الصفحات تستعمل ٣ خيارات، وكانجرو ٤. الخطأ أن يتذبذب داخل المولّد. */
         else if (nOpts === null && (nOpts = opts.length) && false) {}
@@ -3868,7 +3882,13 @@ const EN4_BOOK = {
               'sixth','seventh','eighth','ninth','tenth','eleventh','twelfth',
               'thirteenth','fourteenth','fifteenth','sixteenth','seventeenth',
               'eighteenth','nineteenth','twentieth',
-              'beautiful','dirty','fantastic','favorite','great'],
+              'beautiful','dirty','fantastic','favorite','great',
+              /* ومن صفحاتِ الوحدةِ نفسِها (٤–٩، صوّرها الأب ٢٥ أكتوبر):
+                 كلماتُ صورةِ «Look and find» ومراجعةُ المقارنةِ والتفضيل —
+                 وليست في عمودِ المفرداتِ من صفحةِ Scope and Sequence. */
+              'balloons','bus','camera','photo','playground','poster',
+              'taller','tallest','longer','smaller','biggest','nicest',
+              'better','best','worst','more difficult'],
   'و١ Family Events': ['aunt','cousin','daughter','granddaughter','grandson',
               'grown-up','parent','son','uncle','chatty','helpful','kind','lazy',
               'strong','tired','weak','man','woman'],

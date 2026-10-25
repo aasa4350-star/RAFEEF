@@ -298,6 +298,69 @@ function enTarget(stemEl, ansText){
   function clean(s){ return String(s).replace(/[«»"?؟]/g,"").replace(/\s+/g," ").trim(); }
 }
 
+/* ============ Welcome! — وحدةُ الترحيب ============
+   صوّر الأب صفحاتِ الوحدة (٤–٩) في ٢٥ أكتوبر ٢٠٢٦، وكانت الوحدةُ
+   غائبةً عن صفحةِ سعودٍ كلِّها: لا تبويبَ لها ولا سؤالَ ولا حفظ، وهي
+   أوّلُ ما يدرسه في كتابِه. وقواعدُها في صفحةِ Scope and Sequence
+   مراجعةٌ لثلاثة: الفعلُ to be في الماضي، وظروفُ التكرار، والمقارنةُ
+   والتفضيل — وكلُّها تُمتَحَن.
+   والمادّةُ من صفحاتِ الكتابِ نفسِها كما في book-en4.js. */
+var WADJ = [["afraid","خائف","you feel this when there is danger"],["brilliant","بارع / رائع","very, very good"],
+  ["dangerous","خَطِر","it can hurt you"],["different","مختلف","not the same"],
+  ["exciting","مثير","it makes you feel happy and full of energy"],["naughty","مشاغب","a child who does not behave well"],
+  ["surprised","مندهش","you feel this when something happens that you did not expect"],["terrible","فظيع","very, very bad"],
+  ["excellent","ممتاز","very good indeed"]];
+var WPIC = [["balloons","بالونات","you fill them with air at a party"],["bus","حافلة","a big vehicle that takes many people"],
+  ["camera","كاميرا","you take photos with it"],["photo","صورة","a picture you take with a camera"],
+  ["playground","ملعب المدرسة","the place at school where children play"],["poster","ملصق","a big printed paper you put on a wall"],
+  ["celebration","احتفال","a happy event for a special day"]];
+var WORD_N = [["first","1st"],["second","2nd"],["third","3rd"],["fourth","4th"],["fifth","5th"],["seventh","7th"],
+  ["tenth","10th"],["twelfth","12th"],["thirteenth","13th"],["sixteenth","16th"],["eighteenth","18th"],["twentieth","20th"]];
+/* المقارنةُ والتفضيلُ من نصِّ الكتابِ (ص ٨): لكلِّ صفةٍ صيغتاها */
+var WCOMP = [["tall","taller","tallest"],["long","longer","longest"],["small","smaller","smallest"],
+  ["big","bigger","biggest"],["nice","nicer","nicest"],["good","better","best"],["bad","worse","worst"],
+  ["difficult","more difficult","most difficult"],["interesting","more interesting","most interesting"]];
+var WBE = [["Sunday ___ the back to school celebration day!","was"],
+  ["We ___ happy at the celebration.","were"],
+  ["The celebration ___ in the classroom, it was on the playground.","wasn't"],
+  ["The food ___ delicious!","was"],
+  ["There ___ sandwiches on the table.","were"],
+  ["There ___ a big chocolate cake, too.","was"],
+  ["Our parents ___ at the celebration because they were at work.","weren't"],
+  ["It ___ the best day of school!","was"]];
+/* [الصحيحة، الكلماتُ مبعثرةً كما في الكتاب، خطأٌ ١، خطأٌ ٢]
+   والخطآنِ مكتوبانِ صراحةً لا مشتقَّانِ بقاعدةٍ نصّيّة: الاشتقاقُ كان
+   يُخرِج أحيانًا جملةً تطابق الصحيحةَ فينقص الخيارُ إلى اثنين. وهما
+   الغلطانِ اللذان يقع فيهما الطفلُ فعلًا: ظرفُ التكرارِ بعد الفعل،
+   وتقديمُ الفعلِ على الفاعل. */
+var WFREQ_ORD = [
+  ["My dad often makes dinner.","makes / My dad / dinner / often",
+   "My dad makes often dinner.","Often makes my dad dinner."],
+  ["We sometimes have celebrations at school.","at / school / We / sometimes / celebrations / have",
+   "We have sometimes celebrations at school.","Sometimes have we celebrations at school."],
+  ["Adel never does his homework in the park.","does / his / in / the / Adel / park / homework / never",
+   "Adel does never his homework in the park.","Never does Adel his homework in the park."],
+  ["I always have art class on Tuesday mornings.","I / mornings / always / have / on / Tuesday / class / art",
+   "I have always art class on Tuesday mornings.","Always have I art class on Tuesday mornings."],
+  ["My best friend often goes to the school club on Thursdays.","My / goes / to / the / best friend / on / Thursdays / often / school / club",
+   "My best friend goes often to the school club on Thursdays.","Often goes my best friend to the school club on Thursdays."]];
+function gWAdj(){ var p=gp(WADJ); var o=opt(p[0], dist(WADJ,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[1]+"."]; }
+function gWAdjAr(){ var p=gp(WADJ); var o=opt(p[0], dist(WADJ,p,0)); return ["ما معنى: <b>"+p[1]+"</b>؟", o[0].map(en), o[1], en(p[0])+" — "+p[1]+"."]; }
+function gWPic(){ var p=gp(WPIC); var o=opt(p[0], dist(WPIC,p,0)); return ["Which word means: <b>"+p[2]+"</b>?", o[0].map(en), o[1], en(p[0])+" — "+p[1]+"."]; }
+function gWOrd(){ var p=gp(WORD_N); var o=opt(p[0], dist(WORD_N,p,0)); return ["Which word is "+en(p[1])+"?", o[0].map(en), o[1], en(p[1]+" = "+p[0])+"."]; }
+/* والعكس: من الكلمة إلى الرقم — ففي الكتابِ تمرينان لا واحد */
+function gWOrdNum(){ var p=gp(WORD_N); var o=opt(p[1], dist(WORD_N,p,1)); return ["Which number is "+en("«"+p[0]+"»")+"?", o[0].map(en), o[1], en(p[0]+" = "+p[1])+"."]; }
+function gWComp(){ var p=gp(WCOMP); var o=opt(p[1], [p[2], p[0]]);
+  return ["Complete (comparative): "+en("Math is ___ than history. ("+p[0]+")"), o[0].map(en), o[1],
+    en(p[0]+" → "+p[1]+" (مقارنة) → the "+p[2]+" (تفضيل)")+"."]; }
+function gWSup(){ var p=gp(WCOMP); var o=opt(p[2], [p[1], p[0]]);
+  return ["Complete (superlative): "+en("She is the ___ girl in our class. ("+p[0]+")"), o[0].map(en), o[1],
+    en(p[0]+" → "+p[1]+" (مقارنة) → the "+p[2]+" (تفضيل)")+"."]; }
+function gWBe(){ var p=gp(WBE); var o=opt(p[1], ["was","were","wasn't","weren't"].filter(function(x){ return x!==p[1]; }).slice(0,2));
+  return ["Complete with was / wasn't / were / weren't: "+en(p[0]), o[0].map(en), o[1], "الصحيح: "+en(p[1])+"."]; }
+function gWOrder(){ var p=gp(WFREQ_ORD); var o=opt(p[0], [p[2], p[3]]);
+  return ["Order the words: "+en(p[1]), o[0].map(en), o[1], "ظرفُ التكرارِ بعد الفاعلِ وقبل الفعل: "+en(p[0])+"."]; }
+
 /* ============ Unit 1 — Family Events ============ */
 var FAM = [["aunt","العمّة أو الخالة","your mother's or father's sister"],["uncle","العمّ أو الخال","your mother's or father's brother"],["cousin","ابن العمّ/الخال","the child of your uncle or aunt"],["son","الابن","the boy child of a mother and father"],["daughter","الابنة","the girl child of a mother and father"],["grandson","الحفيد","the son of your son or daughter"],["granddaughter","الحفيدة","the daughter of your son or daughter"],["parent","أحد الوالدين","a mother or a father"],["grandparent","الجدّ أو الجدّة","the mother or father of your parent"],["husband","الزوج","the man a woman is married to"],["wife","الزوجة","the woman a man is married to"]];
 var ADJ1 = [["kind","لطيف","nice and good to other people"],["helpful","متعاون","always ready to help"],["chatty","كثير الكلام","talks a lot"],["lazy","كسول","does not like to work"],["strong","قويّ","has a lot of power"],["weak","ضعيف","has very little power"],["tired","متعب","needs to rest or sleep"]];
@@ -491,6 +554,7 @@ var TOBEW = [
 ];
 function gToBeW(){ var p=gp(TOBEW); var o=opt(p[1],[p[2],p[3]]); return ["Complete (verb to be): "+en(p[0]), o[0], o[1], p[4]]; }
 
+var UW = [gWAdj, gWAdjAr, gWPic, gWOrd, gWOrdNum, gWComp, gWSup, gWBe, gWOrder];
 var U1 = [gFam, gAdj1, gOpp, gFreqM, gFreqFill, gPoss, gWhose];
 var U2 = [gChoreV, gChoreO, gTool, gProg, gCan];
 var U3 = [gVerb3, gPastReg, gPastNeg, gPastQ];
@@ -504,7 +568,9 @@ var U8 = [gWeatherV, gGoing, gToBeW];
    الاختبار الشامل»). مولّداتُ 5–8 باقيةٌ في الصفحة لم تُمسّ؛ تُخفى تبويباتُها
    ويُقصر عليها الشاملُ وعلاجي. عند بدء الفصل الثاني: اجعل TERM2 = true. */
 var TERM2 = false;
-var ALL = U1.concat(U2).concat(U3).concat(U4);
+/* والشاملُ يضمّ الترحيبَ أيضًا: هو وحدةٌ من وحداتِ الفصلِ الأوّل
+   يُمتَحَن فيها، لا مقدّمةً خارجَ المقرَّر. */
+var ALL = UW.concat(U1).concat(U2).concat(U3).concat(U4);
 if(TERM2) ALL = ALL.concat(U5).concat(U6).concat(U7).concat(U8);
 
 /* نَسِم كلّ سؤالٍ باسم مولّده (q.__g) لنعرف من أيّ درسٍ جاء.
@@ -557,9 +623,10 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">'+GRADES[who]+' · English</p><h1>🇬🇧 الإنجليزي — '+name+'</h1></header>'+
     '<div class="bar"><a href="quiz.html?who='+who+'">📝 اختبر نفسك</a><a href="reading.html?who='+who+'">🔊 القراءة والاستماع</a></div>'+
-    '<div class="unit">'+(TERM2 ? '📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)' : '📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: الوحدات 1–4')+'</div>'+
+    '<div class="unit">'+(TERM2 ? '📘 مطابق لكتاب الإنجليزي — 8 وحدات كاملة (Part 1 + Part 2)' : '📘 مطابق لكتاب الإنجليزي — الفصل الدراسي الأول: الترحيب + الوحدات 1–4')+'</div>'+
     '<div class="tabs" role="tablist">'+
-      '<button data-tab="u1" aria-selected="true">1) Family</button>'+
+      '<button data-tab="w" aria-selected="true">W) Welcome</button>'+
+      '<button data-tab="u1" aria-selected="false">1) Family</button>'+
       '<button data-tab="u2" aria-selected="false">2) Chores</button>'+
       '<button data-tab="u3" aria-selected="false">3) Stories</button>'+
       '<button data-tab="u4" aria-selected="false">4) After-School</button>'+
@@ -571,7 +638,8 @@ if(!NAMES[who]){
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
     '<section class="panel" id="all"></section>'+
-    '<section class="panel active" id="u1"></section>'+
+    '<section class="panel active" id="w"></section>'+
+    '<section class="panel" id="u1"></section>'+
     '<section class="panel" id="u2"></section>'+
     '<section class="panel" id="u3"></section>'+
     '<section class="panel" id="u4"></section>'+
@@ -580,10 +648,11 @@ if(!NAMES[who]){
     '<section class="panel" id="u7"></section>'+
     '<section class="panel" id="u8"></section>' : '')+
     '<section class="panel" id="rem"></section>'+
-    '<footer>English · Grade 4 · Part 1 (Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
+    '<footer>English · Grade 4 · Part 1 (Welcome + Units 1–4) · مطابق للكتاب — من إعداد المعلّم</footer>';
 
   var CFG = {
     all: {gens:ALL, n:15, intro:"اختبار شامل على الوحدات 1–4: مفردات وقواعد — <b>أسئلة جديدة كل مرة</b>.", label:"إنجليزي — شامل"},
+    w:   {gens:UW,  n:10, intro:"<b>Welcome!</b> — صفاتُ الوحدة (<span class=en>afraid / brilliant / terrible</span>)، كلماتُ الصورة، الأعدادُ الترتيبيّة <span class=en>1st–20th</span>، والمراجعة: المقارنةُ والتفضيل، ظروفُ التكرار، والفعلُ <span class=en>to be</span> في الماضي.", label:"إنجليزي و0 — Welcome"},
     u1:  {gens:U1,  n:10, intro:"<b>Unit 1 — Family Events:</b> مفردات العائلة والصفات، ظروف التكرار (always/never)، الضمائر الملكية (whose).", label:"إنجليزي و1 — Family"},
     u2:  {gens:U2,  n:10, intro:"<b>Unit 2 — Chores:</b> الأعمال المنزلية، المضارع المستمر (am/is/are)، الطلب بـ Can.", label:"إنجليزي و2 — Chores"},
     u3:  {gens:U3,  n:10, intro:"<b>Unit 3 — Stories:</b> أفعال، الماضي البسيط (إثبات/نفي) والأسئلة والإجابات القصيرة.", label:"إنجليزي و3 — Stories"},
