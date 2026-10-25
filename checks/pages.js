@@ -3915,6 +3915,21 @@ function vocabEn4Path(){
     else ar[a] = w[0];
   });
 
+  /* ═══ ولا يدخل كتابُ الفصلِ الثاني قبل أوانِه ═══════════════════
+     قال الأب (٢٥ أكتوبر ٢٠٢٦): «كتاب الفصل الثاني لا تحطّه نهائيًّا،
+     إلّا لمّا يبدأ — بعد شهرين يمكن». وكانت ههنا ستٌّ وخمسون كلمةً
+     لوحداتٍ أربعٍ قُدّرت تقديرًا، فنُزعت. وهذه عيّنةٌ منها تمنع عودتَها
+     سهوًا — ومن أعادها عمدًا بعد أن يبدأ الفصلُ ويصلَ الكتابُ، رفع
+     هذا السطرَ وعرف لماذا كان. */
+  const TERM2 = ['headache','toothache','stomachache','earache','x-ray','band aid',
+                 'giraffe','kangaroo','panda','polar bear','jungle','waterfall',
+                 'countryside','rainbow','snowy','rainy','cloudy','sunny','windy',
+                 'temperature','season'];
+  const early = TERM2.filter(function(w){ return seen[w.toLowerCase()]; });
+  if (early.length)
+    E('كلماتٌ من كتابِ الفصلِ الثاني دخلت قبل أوانِه (' + early.length + '): ' + early.slice(0,8).join(' · ') +
+      ' — وطلبُ الأب ألّا يُوضَع حتّى يبدأ الفصل');
+
   /* ولا تسقط كلمةٌ يُمتَحَن فيها */
   for (const unit in EN4_BOOK){
     const miss = EN4_BOOK[unit].filter(function(w){ return !seen[w.toLowerCase()]; });
