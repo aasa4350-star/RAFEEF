@@ -67,7 +67,13 @@ window.READING_DROP = {
    وقصيرة». وقطعُه تأتي من step-reading.js لا من بنوكِ القراءة، وعتبتُه
    أعلى: هو ثالثُ ثانويٍّ يستعدّ لستيب، وقطعُه الجديدةُ ١٥٥ كلمةً فأكثر
    بينما القديمةُ ٥٣–٦٧ — فالعتبةُ مئةٌ تفصل بينهما فصلًا نظيفًا. */
-window.READING_MINWORDS = { hasan: 60, rafeef: 60, fahad: 100 };
+/* وسعودٌ معهم (٢٥ أكتوبر ٢٠٢٦): قطعُه أقصرُ قطعِ الموقعِ (وسطُ
+   الإنجليزيِّ ١٩ كلمةً وأطولُها ٢٦، والعربيِّ ١٤ وأطولُها ١٨)، وقطعُه
+   الجديدةُ ٥٦–٦٤ إنجليزيّةً و٤٥–٥٣ عربيّة — والعربيّةُ أقلُّ عددًا
+   وأكثرُ معنًى، فالكلمةُ فيها تحمل ما تحمله كلمتان في الإنجليزيّة.
+   فالعتبةُ أربعون: فوقَ أطولِ قطعةٍ قديمةٍ له بكثير، ودونَ أقصرِ
+   جديدةٍ بخمس. وهو رابعٌ ابتدائيٌّ فلا تُرفَع عليه عتبةُ حسنٍ ولا فهد. */
+window.READING_MINWORDS = { hasan: 60, rafeef: 60, fahad: 100, saud: 40 };
 window.READING_MINKEEP  = 16;
 
 window.READING_LONG = {
@@ -622,5 +628,268 @@ window.READING_LONG = {
   ["ما خلاصة القطعة؟",["الحفظ تجفيف لبيت الجراثيم لا قتل لها","الملح يقتل كل الجراثيم","الطعام المالح لا يفسد أبدا"],0]]]
 
   ] }
+ } ,
+ /* ═══════════════════════════════════════════════════════════════════
+    سعود — رابع ابتدائيّ
+    ═══════════════════════════════════════════════════════════════════
+    قياسُ بنكِه (٢٤ أكتوبر ٢٠٢٦): إنجليزيٌّ ٢٤ قطعةً بين ١٤ و٢٦ كلمةً
+    (الوسطُ ١٩) وعربيٌّ ٢٤ بين ١١ و١٨ (الوسطُ ١٤)، وثلاثةُ أسئلةٍ لكلٍّ —
+    وهي أقصرُ قطعٍ في الموقع. وفهمُه عند السقف: ٨٩٪ في ثلاثٍ وثلاثين
+    جلسةً إنجليزيّةً و٩٧٪ في عشرين عربيّة، فلم تعد تقيس شيئًا. وثلاثُ
+    قطعٍ جاءته مرّتين، وبنكُه أربعٌ وعشرون وجلساتُه ثلاثٌ وثلاثون.
+
+    وأرسل الأب (٢٥ أكتوبر) عمودَ READING من صفحةِ Scope and Sequence،
+    وفيه أنواعُ نصوصِ كتابِه الثمانيةُ ومهارةُ كلٍّ منها:
+      و١ — قصّةٌ عن صورةِ عائلة (التنبّؤ من الصور) · وصفُ صورةٍ مفضّلة
+      و٢ — قصّةٌ عن مساعدةِ الجدَّين (تحديدُ أفعالِ الشخصيّات) ·
+            نصٌّ عن روتينِ الأسر (القراءةُ للتفصيل)
+      و٣ — قصّةُ مغامرةٍ في الملعب (تحديدُ أحداثِ الشخصيّات) ·
+            مسرحيّةٌ مدرسيّة (إكمالُ معلوماتٍ عن نصّ)
+      و٤ — قصّةُ رحلةٍ إلى المول (تحديدُ الأحداثِ وترتيبُها) ·
+            مدوّنةٌ عن الهوايات (تحديدُ التفاصيل)
+    وثلاثةُ موضوعاتٍ من عمودِ التعلّمِ المتكامل: الدرعيّة · النظافة ·
+    ألعابُ الماضي.
+
+    فهذه ثماني عشرةَ قطعةً إنجليزيّةً وثماني عشرةَ عربيّة، كلٌّ ٥٠–٨٠
+    كلمةً وأربعةُ أسئلةٍ لا ثلاثة — على أنواعِ كتابِه ومهاراتِه، لا على
+    موضوعاتٍ عامّة. ولم تُنسَخ من الكتابِ شيئًا: الكتابُ أعطى النوعَ
+    والمهارةَ والمستوى، والنصوصُ جديدة.
+
+    وطولُها خمسون كلمةً لا مئةٌ وخمسون كما لحسن: هو رابعٌ ابتدائيّ،
+    والعتبةُ (READING_MINWORDS) خمسٌ وأربعون — تكفي لرفعِ قطعِه القصيرةِ
+    كلِّها وتبقي الثمانيَ عشرةَ الجديدةَ وحدَها.
+
+    والعربيُّ بلا شكلٍ كاملٍ كنصفِ بنكِه القائم — وقراءةُ غيرِ المشكولِ
+    مهارةٌ يحتاجها في هذا الصفّ. */
+ saud: {
+  en: { pass: [
+
+["Last Friday my aunt brought an old photo to our house. In the photo, a young man stood beside a small blue car. He was holding a baby. My mother laughed and said, \"That baby is me!\" The young man was my grandfather, and the car was his first car. We put the photo on the wall in the hall.",
+ [["Who brought the old photo?",["the writer's aunt","the writer's teacher","the writer's brother"],0],
+  ["What was the young man holding?",["a baby","a camera","a ball"],0],
+  ["Who was the baby in the photo?",["the writer's mother","the writer","the aunt"],0],
+  ["Where did they put the photo?",["on the wall in the hall","in a box under the bed","inside the car"],0]]],
+
+["Reem opened her grandmother's box and found a photo of ten children in front of a school. All the children wore white shirts. \"Which one is you?\" Reem asked. Her grandmother pointed at a tall girl standing at the back. \"I was the tallest in my class,\" she said, \"and I was always late.\" Reem could not stop laughing.",
+ [["Where did Reem find the photo?",["in her grandmother's box","under her bed","at her school"],0],
+  ["How many children were in the photo?",["ten","two","twenty"],0],
+  ["Where was her grandmother standing?",["at the back","in front of the door","beside the teacher"],0],
+  ["What did the grandmother say about herself?",["she was the tallest and always late","she was the shortest in the class","she was never late"],0]]],
+
+["My favorite photo is small and a little dirty, but I love it. It shows my brother and me on the first day of Eid. We are wearing new clothes and we are standing in front of my grandfather's door. My brother is laughing because his new shoes were too big for him. I keep the photo inside my school book.",
+ [["How does the writer describe the photo?",["small and a little dirty","big and new","dark and torn"],0],
+  ["When was the photo taken?",["on the first day of Eid","on the last day of school","in the winter"],0],
+  ["Why is the brother laughing?",["his new shoes were too big","he found some money","he won a game"],0],
+  ["Where does the writer keep the photo?",["inside a school book","on the wall","in his pocket"],0]]],
+
+["This is my favorite photo of my family. We are sitting on a carpet in the desert. My father is making tea, my mother is reading, and my little sister is sleeping beside the fire. Behind us there is a high sand hill. It was very cold that night, but nobody wanted to go home early.",
+ [["Where is the family sitting?",["on a carpet in the desert","in the kitchen","on a boat"],0],
+  ["What is the father doing?",["making tea","reading a book","sleeping"],0],
+  ["What is behind the family?",["a high sand hill","a tall building","the sea"],0],
+  ["How was the weather that night?",["very cold","very hot","rainy"],0]]],
+
+["Every Thursday Turki goes to his grandparents' house. First he makes the bed in the small room. Then he sweeps the floor and takes out the trash. His grandfather says, \"Can you water the garden for me?\" Turki fills the bucket slowly, because it is heavy. After the work they drink tea together, and his grandmother tells him an old story.",
+ [["When does Turki visit his grandparents?",["every Thursday","every day","once a month"],0],
+  ["What does he do first?",["he makes the bed","he waters the garden","he drinks tea"],0],
+  ["Why does he fill the bucket slowly?",["because it is heavy","because it is broken","because he is afraid"],0],
+  ["What happens after the work?",["they drink tea and his grandmother tells a story","he goes home at once","he washes the dishes"],0]]],
+
+["Lama's grandmother broke her arm, so she could not wash the dishes or clear the table. Lama came after school every day for two weeks. She washed the dishes carefully and set the table before dinner. On the last day her grandmother said, \"You did not help me because I asked you. You helped me before I asked.\"",
+ [["What happened to the grandmother?",["she broke her arm","she lost her keys","she moved to a new house"],0],
+  ["How long did Lama come?",["two weeks","two days","two months"],0],
+  ["What did Lama do after school?",["she washed the dishes and set the table","she cut the grass","she cooked the dinner"],0],
+  ["What did the grandmother mean?",["Lama helped without being asked","Lama worked too slowly","Lama wanted money"],0]]],
+
+["In many families everybody has a job at home. In Badr's family, his father feeds the animals before sunrise. His mother cuts the grass on Saturday. Badr and his sister wash the dishes after dinner, one day each. Nobody does everything, and nobody does nothing. Badr says the work finishes quickly when all of them work together.",
+ [["When does Badr's father feed the animals?",["before sunrise","after dinner","on Saturday"],0],
+  ["Who cuts the grass?",["his mother","his father","his sister"],0],
+  ["How do Badr and his sister wash the dishes?",["one day each","together every day","never"],0],
+  ["What does Badr say about the work?",["it finishes quickly when they all work together","it is too hard for them","it is only his mother's job"],0]]],
+
+["Here are two families. The first family wakes up at five o'clock, because the children walk to a school far away. The second family wakes up at half past six, because their school is near. Both families eat breakfast together, and the children in both families get dressed before they eat. The clocks are different, but the habits are the same.",
+ [["Why does the first family wake up at five?",["their school is far away","they like the morning","they have animals"],0],
+  ["When does the second family wake up?",["half past six","five o'clock","seven o'clock"],0],
+  ["What do both families do?",["they eat breakfast together","they walk to school","they wake up at five"],0],
+  ["What does the text say at the end?",["the clocks are different but the habits are the same","both families are always late","both schools are near"],0]]],
+
+["Yesterday Ziad and Hind found a small door under the stairs of the playground. Ziad pushed it and it opened. Inside there was a box of old footballs, a broken clock, and a cat with three kittens. Hind did not shout, because the kittens were sleeping. The children closed the door quietly and told the school guard about it.",
+ [["What did the children find under the stairs?",["a small door","a lost ball","a bag of money"],0],
+  ["What was inside?",["old footballs, a broken clock and a cat with kittens","books and pencils","nothing at all"],0],
+  ["Why did Hind not shout?",["the kittens were sleeping","she was afraid of the dark","she could not speak"],0],
+  ["What did the children do at the end?",["they told the school guard","they took the footballs home","they ran away"],0]]],
+
+["The children were playing in the playground when the ball went over the wall. Salem climbed on a box to look. On the other side there was an old man watering his plants. He picked up the ball, smiled, and threw it back to them. After that the children visited him every week, and he taught them the names of all his plants.",
+ [["Where did the ball go?",["over the wall","into the street","under a car"],0],
+  ["What was the old man doing?",["watering his plants","sleeping in the sun","fixing a car"],0],
+  ["What did he do with the ball?",["he threw it back","he kept it","he hid it"],0],
+  ["What happened after that day?",["the children visited him every week","they never went back","they lost the ball again"],0]]],
+
+["Our class wrote a play about a lost camel. Maha was the camel, Faisal was the farmer, and I was the narrator. On the first night I forgot my words. Faisal said his line again, slowly, and then I remembered. Nobody in the hall knew. After the play our teacher said that a good team hides the small mistakes of its friends.",
+ [["What was the play about?",["a lost camel","a lost key","a school trip"],0],
+  ["What was the writer's part in the play?",["the narrator","the camel","the farmer"],0],
+  ["What did Faisal do when the writer forgot?",["he said his line again slowly","he laughed loudly","he stopped the play"],0],
+  ["What did the teacher say?",["a good team hides the small mistakes of its friends","the play was too long","the writer must practise alone"],0]]],
+
+["Last Thursday we went to the mall, because my mother had to buy a gift. First we ate lunch. Then we walked to the toy shop, but it was closed. After that we took the lift to the top floor and looked down at the lights. When we got home, my little brother was asleep, and he was still holding the empty gift bag.",
+ [["Why did the family go to the mall?",["his mother had to buy a gift","to watch a film","to meet a friend"],0],
+  ["What did they do first?",["they ate lunch","they went to the toy shop","they took the lift"],0],
+  ["Why did they not go into the toy shop?",["it was closed","it was too full","it was very far"],0],
+  ["What was the little brother doing at home?",["sleeping and holding the empty bag","crying for a toy","eating his dinner"],0]]],
+
+["I will never forget our trip to the old market. The streets were narrow and the shops were small. A man was selling dates from a big basket, and he gave me one to taste. It was sweet and soft. My father bought a kilo of them. On the way home the whole car smelled of dates, and I ate three more.",
+ [["Where did they go?",["to the old market","to the zoo","to the sea"],0],
+  ["What was the man selling?",["dates","bread","shoes"],0],
+  ["How did the date taste?",["sweet and soft","salty and hard","very dry"],0],
+  ["What happened on the way home?",["the car smelled of dates","they lost the basket","it started to rain"],0]]],
+
+["Hello! My name is Jana and my hobby is making models. Last month I made a small bridge from wood and glue. It took me nine days. I worked slowly and carefully, and I broke two pieces, but I did not stop. Now the bridge is on my desk. Next month I want to make a model of our house.",
+ [["What is Jana's hobby?",["making models","painting pictures","cooking"],0],
+  ["What did she make last month?",["a small bridge from wood and glue","a paper boat","a kite"],0],
+  ["How long did it take her?",["nine days","nine hours","nine weeks"],0],
+  ["What does she want to make next?",["a model of her house","another bridge","a wooden chair"],0]]],
+
+["My name is Rakan. People think my hobby is strange: I collect old keys. I have forty-one of them in a wooden box. I do not know which doors they opened, and for me that is the best part. My favorite key is long and black. My uncle found it in the sand near our farm, and he gave it to me.",
+ [["What does Rakan collect?",["old keys","old coins","old books"],0],
+  ["How many does he have?",["forty-one","fourteen","four"],0],
+  ["What does he like best about the keys?",["he does not know which doors they opened","they are new and clean","they are made of gold"],0],
+  ["Where was his favorite key found?",["in the sand near the farm","at his school","in the old market"],0]]],
+
+["Diriyah is an old town near Riyadh. Its houses were built from mud, and the walls are thick, so the rooms stay cool in summer. Hundreds of years ago it was an important centre for trade and for learning. Today people walk in its narrow streets and visit its museums. At night the old walls are lit, and the whole town looks golden.",
+ [["Where is Diriyah?",["near Riyadh","near the sea","in the mountains"],0],
+  ["What were the houses built from?",["mud","glass","iron"],0],
+  ["Why do the rooms stay cool in summer?",["the walls are thick","the windows are very big","there are trees inside"],0],
+  ["How does the town look at night?",["golden, because the old walls are lit","dark and empty","white with snow"],0]]],
+
+["Washing your hands is a small action with a big result. Most germs travel on hands, not through the air. Doctors say you should wash with soap for twenty seconds, which is the time it takes to count slowly to twenty. Water alone is not enough, because soap lifts the oil that the germs hide in. Dry your hands well afterwards.",
+ [["How do most germs travel?",["on hands","through the air","in cold water"],0],
+  ["How long should you wash your hands?",["twenty seconds","two seconds","twenty minutes"],0],
+  ["Why is water alone not enough?",["soap lifts the oil that the germs hide in","water is always cold","water is not clean"],0],
+  ["What should you do after washing?",["dry your hands well","wash them again","run outside quickly"],0]]],
+
+["Before video games, children played in the street with very few things. One old game needed only a stick and a small stone. Another needed nothing but your hands and a good memory. Grandparents say those games taught them to run fast and to agree on the rules without an adult. Some of the games are still played today, with new names.",
+ [["What did one old game need?",["a stick and a small stone","a ball and a net","a screen and a chair"],0],
+  ["What did another game need?",["only hands and a good memory","a big table","a bicycle"],0],
+  ["What do grandparents say the games taught them?",["to run fast and to agree on rules without an adult","to be quiet all day","to count money"],0],
+  ["Are those games played today?",["yes, some of them with new names","no, none of them","only inside schools"],0]]]
+
+  ] },
+  ar: { pass: [
+
+["فتحت أمي علبة قديمة، فوجدنا فيها صورة لا نعرفها. في الصورة رجل شاب يقف أمام باب خشبي، ويحمل طفلا صغيرا. ضحكت أمي وقالت: هذا الطفل أنا! والرجل هو جدي. نظرت إلى الصورة طويلا، ثم علقناها في الصالة. صارت كل مرة أمر بها أبتسم، لأني أعرف الآن كيف كان بيت جدي قبل أن أولد.",
+ [["ماذا وجدوا في العلبة القديمة؟",["صورة لا يعرفونها","كتابا قديما","نقودا"],0],
+  ["من الطفل الصغير في الصورة؟",["الأم","الكاتب","الجد"],0],
+  ["أين علقوا الصورة؟",["في الصالة","في المطبخ","في الغرفة"],0],
+  ["لماذا يبتسم الكاتب كلما مر بالصورة؟",["لأنه عرف كيف كان بيت جده قبل أن يولد","لأن الصورة ملونة","لأن الصورة كبيرة"],0]]],
+
+["صورتي المفضلة صغيرة وقديمة، لكني أحبها أكثر من كل الصور. فيها أنا وأخي في أول يوم عيد، نلبس ثيابا جديدة، ونقف أمام باب جدي. أخي يضحك في الصورة لأن حذاءه كان واسعا عليه، فكان يمشي ببطء شديد. أضع الصورة بين صفحات كتابي، فأراها كل يوم قبل أن أبدأ الدرس.",
+ [["كيف يصف الكاتب صورته المفضلة؟",["صغيرة وقديمة","كبيرة وجديدة","ملونة وواضحة"],0],
+  ["متى أخذت الصورة؟",["في أول يوم عيد","في آخر يوم دراسة","في الصيف"],0],
+  ["لماذا كان الأخ يضحك؟",["لأن حذاءه كان واسعا عليه","لأنه ربح لعبة","لأنه رأى صديقه"],0],
+  ["أين يضع الكاتب الصورة؟",["بين صفحات كتابه","على الجدار","في علبة"],0]]],
+
+["يذهب تركي إلى بيت جديه كل خميس. يبدأ بترتيب السرير في الغرفة الصغيرة، ثم يكنس الأرض ويخرج القمامة. يقول له جده: هل تسقي لي الحديقة؟ فيحمل الدلو ببطء لأنه ثقيل. وبعد أن ينتهي العمل يشربون الشاي معا، وتحكي له جدته قصة قديمة لم يسمعها من قبل.",
+ [["متى يزور تركي جديه؟",["كل خميس","كل يوم","مرة في الشهر"],0],
+  ["بماذا يبدأ عمله؟",["بترتيب السرير","بسقي الحديقة","بشرب الشاي"],0],
+  ["لماذا يحمل الدلو ببطء؟",["لأنه ثقيل","لأنه مكسور","لأنه خائف"],0],
+  ["ماذا يحدث بعد انتهاء العمل؟",["يشربون الشاي وتحكي له جدته قصة","يرجع إلى بيته مباشرة","ينام في الحديقة"],0]]],
+
+["انكسرت يد جدة لمى، فلم تعد تستطيع غسل الصحون ولا إعداد الطاولة. صارت لمى تأتي بعد المدرسة كل يوم مدة أسبوعين. تغسل الصحون بعناية، وتعد الطاولة قبل العشاء، ثم تجلس قليلا عند جدتها. وفي آخر يوم قالت لها جدتها: أنت لم تساعديني لأني طلبت، بل ساعدتني قبل أن أطلب.",
+ [["ماذا حدث للجدة؟",["انكسرت يدها","ضاعت مفاتيحها","سافرت"],0],
+  ["كم مدة جاءت لمى؟",["أسبوعان","يومان","شهران"],0],
+  ["ماذا كانت تعمل لمى؟",["تغسل الصحون وتعد الطاولة","تجز العشب","تطبخ العشاء"],0],
+  ["ما معنى كلام الجدة في آخر يوم؟",["أن لمى ساعدت قبل أن يطلب منها","أن لمى كانت بطيئة","أن لمى تريد هدية"],0]]],
+
+["في بيت بدر لكل واحد عمل. أبوه يطعم الحيوانات قبل شروق الشمس، وأمه تجز العشب يوم السبت، وهو وأخته يغسلان الصحون بعد العشاء، يوما له ويوما لها. لا أحد يعمل كل شيء، ولا أحد يجلس بلا عمل. يقول بدر: العمل ينتهي بسرعة حين نعمل كلنا معا، ويطول حين ينتظر كل واحد غيره.",
+ [["متى يطعم أبو بدر الحيوانات؟",["قبل شروق الشمس","بعد العشاء","يوم السبت"],0],
+  ["من يجز العشب؟",["الأم","الأب","الأخت"],0],
+  ["كيف يغسل بدر وأخته الصحون؟",["يوما له ويوما لها","معا كل يوم","لا يغسلان"],0],
+  ["ماذا يقول بدر عن العمل؟",["ينتهي بسرعة حين يعملون كلهم معا","أنه صعب جدا","أنه عمل أمه وحدها"],0]]],
+
+["يوم الجمعة في بيتنا له ترتيب لا يتغير. نستيقظ متأخرين قليلا، ثم نفطر كلنا على طاولة واحدة. بعد الفطور يرتب كل واحد غرفته، ويخرج أبي ليغسل السيارة. نذهب إلى المسجد، وبعد الصلاة نزور جدي. وفي المساء نجلس في الحوش، ويحكي لنا أبي عن أيام كان فيها مثل عمري.",
+ [["ماذا يفعلون بعد الفطور؟",["يرتب كل واحد غرفته ويغسل الأب السيارة","يخرجون للسوق","ينامون"],0],
+  ["من يزورون بعد الصلاة؟",["الجد","الجيران","المعلم"],0],
+  ["أين يجلسون في المساء؟",["في الحوش","في المطبخ","في السيارة"],0],
+  ["عن ماذا يحكي الأب في المساء؟",["عن أيام كان فيها في عمر ابنه","عن عمله","عن الطقس"],0]]],
+
+["وجد زياد وهند بابا صغيرا تحت درج الملعب. دفعه زياد فانفتح. في الداخل صندوق فيه كرات قديمة، وساعة مكسورة، وقطة معها ثلاثة صغار. أرادت هند أن تصرخ من الفرح، لكنها سكتت لأن الصغار كانوا نائمين. أغلقا الباب بهدوء، وذهبا إلى حارس المدرسة وأخبراه، فوضع للقطة ماء وطعاما.",
+ [["ماذا وجد الطفلان تحت الدرج؟",["بابا صغيرا","كرة ضائعة","مفتاحا"],0],
+  ["ماذا كان في الداخل؟",["كرات قديمة وساعة مكسورة وقطة وصغارها","كتب ودفاتر","لا شيء"],0],
+  ["لماذا سكتت هند ولم تصرخ؟",["لأن صغار القطة كانوا نائمين","لأنها خافت","لأنها تعبت"],0],
+  ["ماذا فعل الطفلان في النهاية؟",["أخبرا حارس المدرسة","أخذا الكرات","أغلقا الباب ونسيا الأمر"],0]]],
+
+["كان الأطفال يلعبون في الملعب، فطارت الكرة فوق الجدار. صعد سالم على صندوق لينظر، فرأى رجلا كبيرا يسقي نباتاته في الجهة الأخرى. رفع الرجل الكرة وابتسم ورماها إليهم. ومن ذلك اليوم صار الأطفال يزورونه كل أسبوع، فيعلمهم أسماء نباتاته، ويعطيهم في آخر الزيارة ورقة نعناع لكل واحد.",
+ [["أين ذهبت الكرة؟",["فوق الجدار","في الشارع","تحت السيارة"],0],
+  ["ماذا كان الرجل يفعل؟",["يسقي نباتاته","ينام","يصلح سيارته"],0],
+  ["ماذا فعل الرجل بالكرة؟",["رماها إليهم","أخذها","خبأها"],0],
+  ["ماذا صار بعد ذلك اليوم؟",["صار الأطفال يزورونه كل أسبوع","لم يرجعوا إلى الملعب","ضاعت الكرة مرة أخرى"],0]]],
+
+["كتب صفنا مسرحية عن ناقة ضاعت في الصحراء. كانت مها الناقة، وفيصل المزارع، وكنت أنا الراوي. في الليلة الأولى نسيت كلامي ووقفت ساكتا. أعاد فيصل جملته ببطء، فتذكرت وأكملت، ولم يشعر أحد في القاعة. قال لنا المعلم بعد المسرحية: الفريق الجيد هو الذي يستر خطأ صاحبه ولا يضحك عليه.",
+ [["عن ماذا كانت المسرحية؟",["عن ناقة ضاعت في الصحراء","عن مفتاح ضائع","عن رحلة مدرسية"],0],
+  ["ما دور الكاتب في المسرحية؟",["الراوي","الناقة","المزارع"],0],
+  ["ماذا فعل فيصل حين نسي صاحبه كلامه؟",["أعاد جملته ببطء","ضحك عليه","أوقف المسرحية"],0],
+  ["ماذا قال المعلم؟",["الفريق الجيد يستر خطأ صاحبه","المسرحية كانت طويلة","يجب أن يتدرب كل واحد وحده"],0]]],
+
+["ذهبنا الخميس الماضي إلى المول، لأن أمي أرادت أن تشتري هدية. أكلنا الغداء أولا، ثم مشينا إلى محل الألعاب فوجدناه مغلقا. بعد ذلك ركبنا المصعد إلى الدور الأخير، ونظرنا من الزجاج إلى أضواء المدينة. وحين رجعنا إلى البيت كان أخي الصغير نائما، وما زال يمسك كيس الهدية الفارغ بيده.",
+ [["لماذا ذهبوا إلى المول؟",["لأن الأم أرادت أن تشتري هدية","لمشاهدة فيلم","لمقابلة صديق"],0],
+  ["ماذا فعلوا أولا؟",["أكلوا الغداء","ذهبوا لمحل الألعاب","ركبوا المصعد"],0],
+  ["لماذا لم يدخلوا محل الألعاب؟",["كان مغلقا","كان بعيدا","كان مزدحما"],0],
+  ["ماذا كان يفعل الأخ الصغير في البيت؟",["نائما ويمسك كيس الهدية الفارغ","يبكي","يأكل"],0]]],
+
+["لن أنسى رحلتنا إلى السوق القديم. كانت الطرق ضيقة والمحلات صغيرة، ورائحة الهيل تملأ المكان. وقف رجل يبيع التمر من سلة كبيرة، فأعطاني واحدة لأتذوقها، فإذا هي حلوة لينة. اشترى أبي كيلو، وفي طريق العودة صارت السيارة كلها تشبه رائحة السوق، وأكلت ثلاث تمرات أخرى قبل أن نصل.",
+ [["إلى أين ذهبوا؟",["إلى السوق القديم","إلى الحديقة","إلى البحر"],0],
+  ["ماذا كان الرجل يبيع؟",["التمر","الخبز","الأحذية"],0],
+  ["كيف كان طعم التمرة؟",["حلوة لينة","مالحة","يابسة"],0],
+  ["ماذا حدث في طريق العودة؟",["صارت رائحة السيارة كرائحة السوق","ضاعت السلة","نزل المطر"],0]]],
+
+["اسمي جنى، وهوايتي صنع المجسمات. في الشهر الماضي صنعت جسرا صغيرا من الخشب والغراء، واستغرق مني تسعة أيام. كنت أعمل ببطء وبعناية، وانكسرت عندي قطعتان، لكني لم أتوقف. الجسر الآن على مكتبي، يراه كل من يدخل غرفتي. وفي الشهر القادم أريد أن أصنع مجسما لبيتنا بالحوش والنخلة التي أمامه.",
+ [["ما هواية جنى؟",["صنع المجسمات","الرسم","الطبخ"],0],
+  ["ماذا صنعت في الشهر الماضي؟",["جسرا صغيرا من الخشب والغراء","قاربا من الورق","طائرة"],0],
+  ["كم استغرق منها؟",["تسعة أيام","تسع ساعات","تسعة أسابيع"],0],
+  ["ماذا تريد أن تصنع في الشهر القادم؟",["مجسما لبيتهم","جسرا آخر","كرسيا"],0]]],
+
+["اسمي راكان، ويقول الناس إن هوايتي غريبة: أنا أجمع المفاتيح القديمة. عندي منها إحدى وأربعون في صندوق خشبي. لا أعرف أي باب كان يفتحه كل مفتاح، وهذا عندي أجمل ما فيها. وأحبها إلي مفتاح طويل أسود، وجده عمي في الرمل قرب مزرعتنا وأعطاني إياه، وقال: احفظه، فله بيت في مكان ما.",
+ [["ماذا يجمع راكان؟",["المفاتيح القديمة","النقود القديمة","الكتب"],0],
+  ["كم مفتاحا عنده؟",["إحدى وأربعون","أربعة عشر","أربعة"],0],
+  ["ما أجمل ما في المفاتيح عنده؟",["أنه لا يعرف أي باب كان يفتحه كل مفتاح","أنها جديدة","أنها ثقيلة"],0],
+  ["أين وجد عمه المفتاح الأسود؟",["في الرمل قرب المزرعة","في السوق","في المدرسة"],0]]],
+
+["الدرعية بلدة قديمة قرب الرياض، بيوتها مبنية من الطين، وجدرانها سميكة، ولذلك تبقى غرفها باردة في الصيف. كانت قبل مئات السنين مركزا مهما للتجارة وطلب العلم، يقصدها الناس من أماكن بعيدة. واليوم يمشي الزوار في طرقها الضيقة ويدخلون متاحفها، وفي الليل تضاء جدرانها القديمة فتبدو البلدة كلها ذهبية اللون.",
+ [["أين تقع الدرعية؟",["قرب الرياض","على البحر","في الجبال"],0],
+  ["مم بنيت بيوتها؟",["من الطين","من الزجاج","من الحديد"],0],
+  ["لماذا تبقى غرفها باردة في الصيف؟",["لأن جدرانها سميكة","لأن نوافذها كبيرة","لأن فيها أشجارا"],0],
+  ["كيف تبدو البلدة في الليل؟",["ذهبية اللون لأن جدرانها تضاء","مظلمة وخالية","بيضاء"],0]]],
+
+["قبل الألعاب الإلكترونية كان الأطفال يلعبون في الحارة بأشياء قليلة جدا. لعبة قديمة لا تحتاج إلا عصا وحجرا صغيرا، وأخرى لا تحتاج إلا يديك وذاكرة جيدة. يقول الأجداد إن تلك الألعاب علمتهم الجري السريع، وعلمتهم أن يتفقوا على القوانين بأنفسهم بلا كبير يحكم بينهم. وبعض هذه الألعاب ما زال يلعب اليوم بأسماء جديدة.",
+ [["ماذا كانت تحتاج اللعبة القديمة الأولى؟",["عصا وحجرا صغيرا","كرة وشبكة","طاولة"],0],
+  ["ماذا كانت تحتاج اللعبة الأخرى؟",["اليدين وذاكرة جيدة","دراجة","حبلا طويلا"],0],
+  ["ماذا يقول الأجداد عن تلك الألعاب؟",["علمتهم الجري والاتفاق على القوانين بأنفسهم","علمتهم السكوت","علمتهم الحساب"],0],
+  ["هل ما زالت تلعب اليوم؟",["نعم، بعضها بأسماء جديدة","لا، اختفت كلها","في المدارس فقط"],0]]],
+
+["في حصة الفن تعلمنا الخط العربي. أعطانا المعلم قلما له سن عريض مائل، وقال: لا تضغط على الورقة، ودع القلم يمشي. كتبت اسمي عشر مرات، وفي كل مرة كان أحسن قليلا من التي قبلها. قال المعلم: الخط الجميل ليس موهبة تولد معك، إنما هو يد تعودت على الصبر.",
+ [["ماذا تعلموا في حصة الفن؟",["الخط العربي","الرسم بالألوان","صنع المجسمات"],0],
+  ["بماذا نصحهم المعلم؟",["ألا يضغطوا على الورقة","أن يكتبوا بسرعة","أن يكتبوا بقلم رفيع"],0],
+  ["كم مرة كتب الطالب اسمه؟",["عشر مرات","مرتين","مرة واحدة"],0],
+  ["ما معنى كلام المعلم في آخر النص؟",["الخط الجميل يحتاج صبرا وتعودا","الخط موهبة لا تتعلم","الخط لا ينفع في شيء"],0]]],
+
+["بدأنا في المدرسة مشروع حديقة صغيرة خلف الفصول. حفرنا الأرض، ووضعنا البذور، وكتبنا على كل عود اسم ما زرعناه. في الأسبوع الأول لم يظهر شيء، فظن بعضنا أن المشروع فشل. وفي الأسبوع الثالث خرجت أوراق خضراء صغيرة. قال المعلم: الأرض لا تتأخر، لكنها لا تستعجل.",
+ [["أين بدأ المشروع؟",["خلف الفصول في المدرسة","في بيت المعلم","في حديقة عامة"],0],
+  ["لماذا كتبوا الأسماء على العيدان؟",["ليعرفوا ما زرعوه في كل مكان","لتزيين الحديقة","ليحفظوا الإملاء"],0],
+  ["ماذا ظن بعضهم في الأسبوع الأول؟",["أن المشروع فشل","أن البذور كثيرة","أن الأرض مبللة"],0],
+  ["ما معنى قول المعلم؟",["النبات يحتاج وقتا ولا ينفع فيه العجلة","الأرض لا تنبت","يجب الزراعة في الشتاء"],0]]],
+
+["ذهبنا إلى المتحف في رحلة المدرسة. كان فيه بيت قديم نقلوه حجرا حجرا، وأدوات كان الناس يستعملونها قبل مئة سنة: رحى لطحن الحب، وقربة للماء، وفانوس صغير. وقفت طويلا عند الفانوس، وفكرت أن الضوء الذي نضغط له زرا اليوم كان قبل مئة سنة يحتاج زيتا وعود ثقاب ويدا حذرة.",
+ [["إلى أين كانت رحلة المدرسة؟",["إلى المتحف","إلى الحديقة","إلى المزرعة"],0],
+  ["ما الذي نقلوه إلى المتحف حجرا حجرا؟",["بيتا قديما","جدار مدرسة","مسجدا"],0],
+  ["ما الأدوات التي ذكرها النص؟",["رحى وقربة وفانوس","حاسوب وهاتف","سيارة ودراجة"],0],
+  ["بماذا فكر الكاتب عند الفانوس؟",["أن الضوء قديما كان يحتاج زيتا وعناية","أن الفانوس جميل الشكل","أن المتحف صغير"],0]]],
+
+["آلمني ضرسي ليلة كاملة، فأخذني أبي في الصباح إلى طبيب الأسنان. كنت خائفا، فسألني الطبيب عن مدرستي حتى نسيت خوفي. نظر إلى ضرسي وقال: فيه ثقب صغير، وسببه الحلوى قبل النوم بلا تنظيف. أصلح الضرس في ربع ساعة، ثم أعطاني فرشاة جديدة وقال: هذه أرخص من كل علاج.",
+ [["لماذا ذهب الكاتب إلى الطبيب؟",["لأن ضرسه آلمه ليلة كاملة","لفحص عينيه","لأخذ دواء للبرد"],0],
+  ["كيف نسي الكاتب خوفه؟",["سأله الطبيب عن مدرسته","أعطاه الطبيب حلوى","نام في الكرسي"],0],
+  ["ما سبب الثقب في الضرس؟",["الحلوى قبل النوم بلا تنظيف","الماء البارد","الخبز"],0],
+  ["ماذا قصد الطبيب بكلامه الأخير؟",["أن التنظيف أسهل وأرخص من العلاج","أن الفرشاة غالية","أن العلاج لا ينفع"],0]]]
+
+  ] }
  }
+
 };
