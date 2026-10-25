@@ -346,6 +346,7 @@ function run(){
   issues.push(...quantDosePath());
   issues.push(...writingPath());
   issues.push(...vocabOwnPath());
+  issues.push(...vocabEn4Path());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3831,6 +3832,77 @@ function vocabOwnPath(){
      فتحِ الصفحة، فتسجيلُه يَعُدُّ عشرًا معروضةً على من لم يفتح القسم. */
   if (/else \{ V = nextNewWords\(learned\);[\s\S]{0,400}?srShow\(V\)/.test(src))
     E('الدفعةُ الجديدةُ تُسجَّل بمجرّدِ عرضِها — فمجرّدُ فتحِ الصفحةِ يُثقِل دَينَه');
+  return out;
+}
+/* ═══ مفرداتُ كتابِ سعودٍ كما في صفحةِ Scope and Sequence ══════════════
+   أرسل الأب صورةَ الصفحةِ (٢٥ أكتوبر ٢٠٢٦)، فإذا ملفُّ المفرداتِ الذي
+   بُني قبلَ وصولِ الكتابِ ناقصٌ ثلاثًا وستّين كلمةً من سبعٍ وتسعين
+   **تُدرَّس** في كتابِه — ومنها وحدةُ الترحيبِ كلُّها، ومراجعةُ الوحدةِ
+   الرابعةِ كلُّها، وأعمالُ المنزلِ كما يعلّمها الكتابُ عباراتٍ تامّة.
+
+   فالقائمةُ ههنا منقولةٌ من الصفحةِ حرفًا بحرف، وهي الحَكَم: من أعاد
+   ترتيبَ الملفِّ أو اختصره فأسقط منها كلمةً، وقف عليه هذا الحارس.
+   وليس فيها عمودُ «يُعرَّض له» (EXPOSURE) لأنّه لا يُمتَحَن فيه —
+   يبقى في الملفِّ ولا يُشترَط هنا. */
+const EN4_BOOK = {
+  'الترحيب': ['afraid','brilliant','dangerous','different','exciting','naughty',
+              'surprised','terrible','first','second','third','fourth','fifth',
+              'sixth','seventh','eighth','ninth','tenth','eleventh','twelfth',
+              'thirteenth','fourteenth','fifteenth','sixteenth','seventeenth',
+              'eighteenth','nineteenth','twentieth',
+              'beautiful','dirty','fantastic','favorite','great'],
+  'و١ Family Events': ['aunt','cousin','daughter','granddaughter','grandson',
+              'grown-up','parent','son','uncle','chatty','helpful','kind','lazy',
+              'strong','tired','weak','man','woman'],
+  'و٢ Chores': ['catch the bus','comic book','get dressed','get undressed',
+              'get on','get off','grandparents','get up','leaf','leaves','ride',
+              'trash can','wake up','clear the table','cut the grass',
+              'feed the animals','make the bed','set the table','sweep the floor',
+              'take out the trash','wash the dishes'],
+  'و٣ Stories': ['call','carry','climb','cry','dream','drop','laugh','prefer',
+              'score','shout','wait','e-mail','fix','invite','need','plant','rob',
+              'stop','water','clap','jump','nice','old','open','young'],
+  'و٤ After-School Fun': ['catch the ball','dress up','go shopping','hide','inside',
+              'make a model','outside','play board games','play video games',
+              'take photos','texting','vlogging','badly','carefully','happily',
+              'loudly','luckily','quickly','quietly','slowly','play sports',
+              'read books','run in the park','see a movie','watch TV','write stories']
+};
+function vocabEn4Path(){
+  const out = [], f = 'vocab-en4.js', p = path.join(ROOT, f);
+  const E = m => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:f, msg:'ملفُّ مفرداتِ مقرَّرِ سعودٍ مفقود' }];
+  const sb = { window:{} }; vm.createContext(sb);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), sb); }
+  catch(e){ return (E('لا يُقوَّم: ' + String(e.message).slice(0,70)), out); }
+  const L = sb.window.VOCAB_EN4;
+  if (!Array.isArray(L) || !L.length) return (E('window.VOCAB_EN4 فارغةٌ أو غائبة'), out);
+
+  /* الصفحةُ تُحمّله، وإلّا حفظ سعودٌ من القائمةِ العامّةِ وحدَها */
+  const rp = path.join(ROOT, 'reading.html');
+  if (fs.existsSync(rp) && fs.readFileSync(rp,'utf8').indexOf('src="' + f + '"') < 0)
+    E('reading.html لا تُحمّله — فيعود سعودٌ يحفظ ما ليس في كتابِه');
+
+  /* الصيغةُ: ["english", ["العربيّة"]] — وخللُها يُعطّل بطاقةً بلا خبر */
+  const seen = {}, ar = {};
+  L.forEach(function(w, i){
+    if (!Array.isArray(w) || w.length !== 2 || typeof w[0] !== 'string' ||
+        !Array.isArray(w[1]) || !w[1].length || typeof w[1][0] !== 'string' ||
+        !w[0].trim() || !w[1][0].trim())
+      return E('المدخلُ ' + (i+1) + ' صيغتُه خاطئة: ' + JSON.stringify(w).slice(0,60));
+    const k = w[0].toLowerCase().trim();
+    if (seen[k]) E('كلمةٌ مكرّرة: ' + w[0]); else seen[k] = 1;
+    const a = w[1][0].trim();
+    if (ar[a]) E('عربيّةٌ واحدةٌ لكلمتَين (' + ar[a] + ' · ' + w[0] + ') — يُسأل عنها فلا يدري أيَّهما يكتب');
+    else ar[a] = w[0];
+  });
+
+  /* ولا تسقط كلمةٌ يُمتَحَن فيها */
+  for (const unit in EN4_BOOK){
+    const miss = EN4_BOOK[unit].filter(function(w){ return !seen[w.toLowerCase()]; });
+    if (miss.length)
+      E(unit + ': سقطت ' + miss.length + ' كلمةً من كتابِه — ' + miss.join(' · '));
+  }
   return out;
 }
 module.exports = run;
