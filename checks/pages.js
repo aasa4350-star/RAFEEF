@@ -3891,7 +3891,11 @@ const EN4_BOOK = {
               'better','best','worst','more difficult'],
   'و١ Family Events': ['aunt','cousin','daughter','granddaughter','grandson',
               'grown-up','parent','son','uncle','chatty','helpful','kind','lazy',
-              'strong','tired','weak','man','woman'],
+              'strong','tired','weak','man','woman',
+              /* ومن صفحاتِ الوحدةِ نفسِها (١٠–٢١، صوّرها الأب ٢٥ أكتوبر):
+                 صفةُ ص١٦ وصيغُ المخاطبةِ في ص١٩ — وليست في عمودِ المفردات. */
+              'shy','father','mother','grandfather','grandmother',
+              'daddy','mommy','auntie','granny'],
   'و٢ Chores': ['catch the bus','comic book','get dressed','get undressed',
               'get on','get off','grandparents','get up','leaf','leaves','ride',
               'trash can','wake up','clear the table','cut the grass',
