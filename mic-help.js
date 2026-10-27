@@ -198,6 +198,85 @@
     return SDK.AudioConfig.fromDefaultMicrophoneInput();
   }
 
+  /* ═══ قياسُ ما يصل من المايكِ فعلًا ══════════════════════════════
+     بلاغ الأب (٢٧ أكتوبر ٢٠٢٦): «حسن الصوت ما يلقط — قراءة القطعة».
+     وسجلُّه قاطع: آخرُ قراءةٍ ناجحةٍ ٢٣ أكتوبر، ثمّ انتقل إلى حاسبٍ
+     بمتصفّحِ Edge فصارت خمسُ محاولاتٍ في ثلاثةِ أيّامٍ كلُّها
+     «session-no-audio»: الجلسةُ تُفتح في سبعِ مئةِ جزءٍ من الثانية،
+     ثمّ لا يصل صوتٌ قطّ — لا speechStartDetected ولا نتيجةٌ جزئيّة،
+     وheard=false في كلِّ دورة. ولو كان الإذنُ ممنوعًا لجاء خطأٌ آخر
+     (no-session)، فالإذنُ مُعطًى والمسارُ صامت: جهازُ الإدخالِ
+     الافتراضيُّ في ويندوز ليس المايكَ الذي يتكلّم فيه، أو هو مكتوم.
+
+     وأسوأُ ما في ذلك أنّه كان يقرأ ثلاثَ عشرةَ ثانيةً إلى إحدى
+     وستّين، ثمّ يُقال له «ما التقطتُ صوتك» — بعد أن ضاعت قراءتُه.
+
+     فههنا قياسٌ مباشر: نفتح مسارًا قصيرًا ونقيس طاقةَ الصوت (RMS).
+     وهو منفصلٌ تمامًا عن مسارِ أزور (لا نُمسك مسارًا ولا نُسلّمه،
+     وتلك تجربةُ ٦ سبتمبر التي قطعت الحوارَ من دورِه الثاني) — ولذلك
+     يُغلَق كلُّ شيءٍ عند الانتهاء: المسارُ والسياقُ الصوتيّ معًا. */
+  var LVL_DEAD = 0.004;   /* دونه صمتٌ رقميٌّ — لا تَبلغه حتّى ضجّةُ الغرفة */
+  var LVL_WEAK = 0.020;   /* دونه صوتٌ ضعيفٌ جدًّا لمن يقرأ جهرًا */
+  function level(ms, onTick, onDone){
+    var out = { peak:0, n:0, err:null }, done = false;
+    function end(){ if(done) return; done = true;
+      if(tm){ clearTimeout(tm); tm = null; }
+      try{ if(st) st.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+      try{ if(ctx && ctx.close) ctx.close(); }catch(e){}
+      try{ onDone(out); }catch(e){}
+    }
+    var ctx = null, st = null, tm = null, t0 = Date.now();
+    var AC = g.AudioContext || g.webkitAudioContext;
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !AC){
+      out.err = "unsupported"; end(); return end; }
+    /* تُطفأ المعالجاتُ الثلاث: كبحُ الضجيجِ قد يُصفّر ضجّةَ الغرفةِ
+       فيبدو المايكُ السليمُ ميّتًا، وهو عكسُ ما نقيس. */
+    navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:false,
+        noiseSuppression:false, autoGainControl:false } })
+    .then(function(s){
+      if(done){ try{ s.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} return; }
+      st = s;
+      try{
+        ctx = new AC();
+        var src = ctx.createMediaStreamSource(s), an = ctx.createAnalyser();
+        an.fftSize = 1024; src.connect(an);
+        var buf = new Uint8Array(an.fftSize);
+        (function tick(){
+          if(done) return;
+          an.getByteTimeDomainData(buf);
+          var sum = 0;
+          for(var i = 0; i < buf.length; i++){ var d = (buf[i] - 128) / 128; sum += d * d; }
+          var rms = Math.sqrt(sum / buf.length);
+          out.n++; if(rms > out.peak) out.peak = rms;
+          if(onTick){ try{ onTick(rms, out.peak); }catch(e){} }
+          if(ms && Date.now() - t0 >= ms){ end(); return; }
+          tm = setTimeout(tick, 100);
+        })();
+      }catch(e){ out.err = String(e && (e.name || e.message) || e); end(); }
+    })
+    .catch(function(e){ out.err = String(e && (e.name || e.message) || e); end(); });
+    return end;
+  }
+
+  /* ما يُقال له حين لا يصل صوت — وهو الحالُ الذي لا تنفع فيه «اقرأ
+     أعلى»: رفعُ الصوتِ على مايكٍ لا يُقرأ منه لا يُغيّر شيئًا. */
+  function deadMicMsg(){
+    var ua = navigator.userAgent || "";
+    var win = /Windows/.test(ua);
+    return '🔇 <b>المايك ما يوصل منه صوت.</b> الجلسة فُتحت وما جاها ولا صوت — '+
+      'يعني المشكلة في اختيار المايك بالجهاز مو في قراءتك.' +
+      (win ? '<div style="font-weight:400;font-size:.88rem;margin-top:6px;line-height:1.9">'+
+        '١) اضغط على <b>🔒 قفل العنوان</b> فوق ← <b>الأذونات</b> ← <b>المايكروفون</b>: '+
+        'اختر المايك الصحيح (مو «Stereo Mix»).<br>'+
+        '٢) ويندوز: <b>الإعدادات</b> ← <b>النظام</b> ← <b>الصوت</b> ← <b>الإدخال</b> — '+
+        'كلّم وشوف الشريط يتحرّك، واختر الجهاز اللي يتحرّك شريطه.<br>'+
+        '٣) <b>الخصوصية والأمان</b> ← <b>المايكروفون</b> ← فعّل الوصول للتطبيقات والمتصفّح.<br>'+
+        '٤) لو عندك سمّاعة برأس: تأكّد مو مكتومة من زرّها.</div>'
+      : '<div style="font-weight:400;font-size:.88rem;margin-top:6px;line-height:1.9">'+
+        'افتح إعدادات الصوت في جهازك واختر مايكًا يتحرّك شريطه وأنت تتكلّم، '+
+        'وتأكّد أنّه مو مكتوم.</div>');
+  }
+
   function ensure(statusEl, onReady, onDenied){
     /* الإذنُ يُطلب مرّةً واحدة في عمر الصفحة، ثمّ نمضي فورًا. وهذا ليس
        تحسينًا للسرعة: طلبُ getUserMedia قبل كلّ دورٍ يفتح مسارًا ثمّ
@@ -300,7 +379,8 @@
     g.addEventListener("beforeunload", release);
   }catch(e){}
 
-  g.MIC = { inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
+  g.MIC = {
+    level: level, deadMicMsg: deadMicMsg, LVL_DEAD: LVL_DEAD, LVL_WEAK: LVL_WEAK, inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
             ensure:ensure, stream:stream, release:release, releaseSoon:releaseSoon,
             keep:keep, audioConfig:audioConfig, why:why, env:env, build:BUILD };
 })(window);

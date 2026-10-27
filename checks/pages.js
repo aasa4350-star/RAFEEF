@@ -361,6 +361,7 @@ function run(){
   issues.push(...writingPath());
   issues.push(...vocabOwnPath());
   issues.push(...vocabEn4Path());
+  issues.push(...micLevelPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -3972,6 +3973,77 @@ function vocabEn4Path(){
     if (miss.length)
       E(unit + ': سقطت ' + miss.length + ' كلمةً من كتابِه — ' + miss.join(' · '));
   }
+  return out;
+}
+/* ═══ المايكُ الصامتُ يُكشَف ولا تُترَك القراءةُ تضيع ═══════════════
+   بلاغ الأب (٢٧ أكتوبر ٢٠٢٦): «حسن الصوت ما يلقط — قراءة القطعة».
+   وسجلُّه: آخرُ قراءةٍ ناجحةٍ ٢٣ أكتوبر، ثمّ انتقل إلى حاسبٍ بمتصفّحِ
+   Edge فخمسُ محاولاتٍ في ثلاثةِ أيّامٍ كلُّها «session-no-audio» —
+   الجلسةُ تُفتح ولا يصلها صوتٌ قطّ، وheard=false في كلِّ دورة. ومكث
+   بين ثلاثَ عشرةَ ثانيةً وإحدى وستّين يقرأ قبل أن يُقال له ذلك.
+
+   فالعلاجُ ثلاثةٌ يُفحَص كلُّها: مقياسٌ لِما يصل من المايك، وزرٌّ
+   يختبره قبل القراءة، وحارسٌ يقطع في تسعِ ثوانٍ إن كان صامتًا. */
+function micLevelPath(){
+  const out = [], F = 'mic-help.js', R2 = 'reading.html';
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  const mp = path.join(ROOT, F), rp = path.join(ROOT, R2);
+  if (!fs.existsSync(mp) || !fs.existsSync(rp)) return [{ sev:'خطأ', file:F, msg:'ملفٌّ مفقود' }];
+  const mh = fs.readFileSync(mp, 'utf8'), rd = fs.readFileSync(rp, 'utf8');
+
+  /* ── ١) المقياسُ يُقوَّم ويُصدَّر ويقيس فعلًا ── */
+  const sb = { window:{}, navigator:{ userAgent:'' } }; sb.window.navigator = sb.navigator;
+  vm.createContext(sb);
+  try { vm.runInContext(mh, sb); } catch(e){ return (E(F, 'لا يُقوَّم: ' + String(e.message).slice(0,70)), out); }
+  const MICo = sb.window.MIC;
+  if (!MICo) return (E(F, 'window.MIC غائبة'), out);
+  for (const k of ['level', 'deadMicMsg', 'LVL_DEAD', 'LVL_WEAK'])
+    if (MICo[k] === undefined) E(F, 'MIC.' + k + ' غائبة — المقياسُ لا يصل الصفحة');
+  if (typeof MICo.level !== 'function') E(F, 'MIC.level ليست دالّة');
+  /* العتبتان بينهما فرقٌ معتبَر، ودونَ ما يبلغه صوتُ قارئٍ جهرًا */
+  if (!(MICo.LVL_DEAD > 0 && MICo.LVL_DEAD < MICo.LVL_WEAK && MICo.LVL_WEAK < 0.2))
+    E(F, 'عتبتا المستوى غيرُ مرتّبتَين: ' + MICo.LVL_DEAD + ' / ' + MICo.LVL_WEAK);
+  /* ومقياسٌ بلا جهازٍ يرجع خطأً ولا يرمي — فلا يُعطّل القراءة */
+  try {
+    let got = null; MICo.level(10, null, o => { got = o; });
+    if (!got || got.err !== 'unsupported') E(F, 'المقياسُ بلا جهازٍ لا يرجع خطأً نظيفًا');
+  } catch(e){ E(F, 'المقياسُ يرمي حين لا جهاز: ' + String(e.message).slice(0,50)); }
+  /* ورسالةُ العطبِ تدلُّ على الإجراءِ لا تقول «ارفع صوتك» */
+  const dm = String(MICo.deadMicMsg('') || '');
+  if (!/[؀-ۿ]/.test(dm)) E(F, 'رسالةُ المايكِ الميّتِ بلا عربيّة');
+  if (/اقرأ أعلى|ارفع صوتك/.test(dm))
+    E(F, 'رسالةُ المايكِ الميّتِ تنصح برفعِ الصوت — وهو لا ينفع في مايكٍ لا يُقرأ منه');
+  /* الإغلاقُ التامّ: مسارٌ وسياقٌ — وإلّا بقي مؤشّرُ التسجيلِ مضاءً */
+  if (!/t\.stop\(\);/.test(mh) || !/ctx\.close\(\)/.test(mh))
+    E(F, 'المقياسُ لا يُغلق المسارَ والسياقَ الصوتيّ');
+  if (!/noiseSuppression:false/.test(mh))
+    E(F, 'كبحُ الضجيجِ مُشتغِلٌ في المقياس — قد يُصفّر ضجّةَ الغرفةِ فيبدو المايكُ السليمُ ميّتًا');
+
+  /* ── ٢) الصفحةُ: زرٌّ وحارسٌ وحفظُ الرقم ── */
+  const need = [
+    [/function micTestBtnHtml\(\)/,            'زرُّ «اختبر المايك» غيرُ معرَّف'],
+    [/azBtnHtml\(\)\+micTestBtnHtml\(\)/,      'الزرُّ لا يُركَّب في شريطِ القطعة'],
+    [/wireMicTest\(sec\.querySelector\("\[data-mic-wrap\]"\)\)/, 'الزرُّ غيرُ موصول'],
+    [/if\(window\.__paBusy\)\{ box\.style\.display="block";/,    'الاختبارُ يُزاحم تسجيلًا جاريًا — وتلك علّةُ ٦ سبتمبر'],
+    [/_showListening\(retry\); _lvlStart\(\);/, 'المقياسُ لا يبدأ مع التسجيل'],
+    [/clearTimeout\(_to\); _lvlEnd\(\);/,       'المقياسُ لا يُغلَق عند انتهاءِ القراءة'],
+    [/if\(_IOS \|\| !window\.MIC \|\| !MIC\.level \|\| _lvlStop\) return;/,
+       'الحارسُ غيرُ مقصورٍ على غيرِ آيفون — ومسارٌ ثانٍ مع أزور على سفاري قطع المحادثةَ في ٦ سبتمبر'],
+    [/if\(_lvlErr \|\| !_lvlN\) return;/,       'يحكم بالعطبِ وهو لم يَقِس شيئًا'],
+    [/if\(_lvlPeak >= MIC\.LVL_DEAD\) return;/, 'يقطع القراءةَ وإن وصل صوتٌ من المايك'],
+    [/if\(_fin \|\| _userStopped \|\| _heardAny\) return;/,
+       'يقطع القراءةَ وأزور سمعته — فالصوتُ يصل والعلّةُ في مكانٍ آخر'],
+    [/_deadMic = true; _userStopped = true; finish\(\);/, 'الحارسُ لا يقطع القراءة'],
+    [/lvl:Math\.round\(_lvlPeak\*1000\), lvlN:_lvlN/, 'المستوى لا يُحفَظ في صفِّ الإخفاق — فيعمى التشخيصُ من جديد'],
+    [/if\(_deadMic\)\{/,                        'رسالةُ المايكِ الميّتِ لا تسبق بقيّةَ الرسائل']
+  ];
+  for (const [rx, msg] of need) if (!rx.test(rd)) E(R2, msg);
+
+  /* ومهلةُ الحارسِ معقولة: لا تقطعُ قارئًا يتروّى، ولا تتركه يقرأ دقيقة */
+  const mt = /\}, (\d+)\);\s*\}catch\(e\)\{ _lvlStop = null; \}/.exec(rd);
+  const wait = mt ? +mt[1] : 0;
+  if (!(wait >= 6000 && wait <= 15000))
+    E(R2, 'مهلةُ حارسِ الصمت ' + (wait || '؟') + 'ms — والمرادُ بين ستِّ ثوانٍ وخمسَ عشرة');
   return out;
 }
 module.exports = run;
