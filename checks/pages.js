@@ -3900,7 +3900,11 @@ const EN4_BOOK = {
               'get on','get off','grandparents','get up','leaf','leaves','ride',
               'trash can','wake up','clear the table','cut the grass',
               'feed the animals','make the bed','set the table','sweep the floor',
-              'take out the trash','wash the dishes'],
+              'take out the trash','wash the dishes',
+              /* ومن صفحاتِ الوحدةِ نفسِها (٣٠–٣٣، صوّرها الأب ٢٧ أكتوبر):
+                 «leave» من تمرينِ Word Work، وكلماتُ صفحةِ النظافةِ
+                 التي تُسأل في مراجعةِ الوحدة. */
+              'leave','bus stop','cleanliness','germs','bacteria','dust','flu','mosquito'],
   'و٣ Stories': ['call','carry','climb','cry','dream','drop','laugh','prefer',
               'score','shout','wait','e-mail','fix','invite','need','plant','rob',
               'stop','water','clap','jump','nice','old','open','young'],
