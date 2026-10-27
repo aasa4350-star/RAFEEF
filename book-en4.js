@@ -14,6 +14,8 @@ window.BOOK_EN4 = {
       ["balloons","بالونات"],
       ["bus","حافلة"],
       ["camera","كاميرا"],
+      ["drums","طبول"],
+      ["guitar","جيتار"],
       ["photo","صورة"],
       ["playground","ملعب المدرسة"],
       ["poster","ملصق"],
@@ -1296,6 +1298,7 @@ window.BOOK_EN4 = {
       ["We always catch the bus home.","نركب الحافلة للبيت دائمًا."],
       ["We can help Mom and Dad after we do our homework.","نقدر نساعد أمّي وأبي بعد أن نحلّ واجبنا."],
       ["We help them make dinner, take out the trash, and wash the dishes.","نساعدهما في إعداد العشاء وإخراج القمامة وغسل الصحون."],
+      ["I read or listen to music after dinner.","أقرأ أو أستمع للموسيقى بعد العشاء."],
       ["My brother usually plays catch with my dad outside.","أخي عادةً يلعب التقاط الكرة مع أبي في الخارج."],
       ["I go to sleep at 9 p.m. On weekends, I can stay up a bit later.","أنام التاسعة مساءً. وفي نهاية الأسبوع أقدر أسهر قليلًا."],
       ["I live with my mom and my dad. My dad works a lot, so I help my mom around the house.","أعيش مع أمّي وأبي. أبي يعمل كثيرًا، فأساعد أمّي في البيت."],
@@ -1968,7 +1971,92 @@ window.BOOK_EN4 = {
       "يلعب كرة القدم / يسقي النباتات / يتسلق شجرة / يرسل بريدًا / يدعو الأصدقاء"
      ]
     ]
-   }
+   },
+   { "t": "القراءة: مسرحيّة «Welcome to our great land!» (ص 42)",
+     "items": [
+      ["Characters: Saudi students, foreign students, and a tour guide.","الشخصيّات: طلّابٌ سعوديّون، وطلّابٌ أجانب، ومرشدٌ سياحيّ."],
+      ["One day, a group of foreign students arrived in Saudi.","ذات يومٍ وصلت مجموعةٌ من الطلّابِ الأجانبِ إلى السعوديّة."],
+      ["A group of Saudi students welcomed them to the country.","ورحّبت بهم مجموعةٌ من الطلّابِ السعوديّين في البلد."],
+      ["Welcome to the Kingdom of Saudi Arabia, the great and blessed land.","أهلًا بكم في المملكة العربيّة السعوديّة، الأرضِ العظيمةِ المباركة."],
+      ["Where the two Holy Mosques stand.","حيث يقوم الحرمان الشريفان."],
+      ["We're happy to be here to learn about your land.","نحن سعداء بوجودنا هنا لنتعلّم عن بلدكم."],
+      ["Please accept our gifts and tell us about your plan!","تفضّلوا بقبول هدايانا وحدّثونا عن خطّتكم!"],
+      ["The Saudi students start to explain what the Vision 2030 means.","بدأ الطلّابُ السعوديّون يشرحون ما تعنيه رؤية ٢٠٣٠."],
+      ["The future will be strong and bright for all the children of the land.","سيكون المستقبل قويًّا مشرقًا لكلّ أبناء هذي الأرض."],
+      ["The vision will come true and all will be good and right!","ستتحقّق الرؤية ويكون كلُّ شيءٍ طيّبًا صحيحًا!"],
+      ["With the faith of the nation, with health and education, the vision will come true.","بإيمان الأمّة، وبالصحّة والتعليم، ستتحقّق الرؤية."],
+      ["The ships will come and go, from all over the globe.","ستأتي السفن وتذهب، من كلّ أنحاء الكرة الأرضيّة."],
+      ["Businesses big and small, the Kingdom they will call the leader of them all!","الأعمال كبيرها وصغيرها، ستسمّي المملكة قائدتها جميعًا!"],
+      ["The foreign students shake hands with the Saudi students and celebrate together.","يصافح الطلّابُ الأجانبُ الطلّابَ السعوديّين ويحتفلون معًا."],
+      ["We stopped here to show you the famous ancient city of Al-Ula.","توقّفنا هنا لنُريَكم مدينةَ العُلا الأثريّةَ المشهورة."],
+      ["We planned the trip around the country very carefully.","خطّطنا للرحلة في أنحاء البلد بعنايةٍ شديدة."],
+      ["The foreign students arrived in Saudi. (arrive)","وصل الطلّابُ الأجانبُ إلى السعوديّة."],
+      ["A group of Saudi students welcomed them to the country. (welcome)","رحّبت بهم مجموعةٌ من الطلّابِ السعوديّين."],
+      ["The foreign students asked them what they planned for the future of Saudi. (plan)","سألوهم عمّا خطّطوا له لمستقبل السعوديّة."],
+      ["All students celebrated together. (celebrate)","احتفل الطلّابُ جميعًا معًا."],
+      ["The tour guide said that they stopped to see Al-Ula. (stop)","قال المرشدُ إنّهم توقّفوا ليروا العُلا."]
+     ] },
+   { "t": "مضاعفةُ الحرفِ الأخير في الماضي (ص 43)",
+     "items": [
+      ["stop → stopped","توقّف — يُضاعَف الحرفُ الأخيرُ قبلَ لاحقةِ الماضي"],
+      ["plan → planned","خطّط — ومثلُه يُضاعَف الحرفُ الأخيرُ قبلَ اللاحقة"],
+      ["clap → clapped","صفّق"],
+      ["drop → dropped","أسقط"],
+      ["rob → robbed","سرق"],
+      ["prefer → preferred","فضّل"],
+      ["The children preferred to stay home last Saturday because they wanted to watch the game.","فضّل الأطفال البقاء في البيت السبت الماضي لأنّهم أرادوا مشاهدة المباراة."],
+      ["My sister dropped the vase of flowers on the floor.","أسقطت أختي مزهريّة الورد على الأرض."],
+      ["The people clapped their hands at the end of the school play.","صفّق الناس في نهاية المسرحيّة المدرسيّة."],
+      ["The man who robbed the house was very mean.","الرجل الذي سرق البيت كان لئيمًا جدًّا."],
+      ["Title: The Kind Man","العنوان: الرجل الطيّب"],
+      ["Characters: an old man and two young friends","الشخصيّات: رجلٌ كبير وصديقان صغيران"],
+      ["Setting: on top of a mountain","المكان: على قمّة جبل"],
+      ["Narrator description: The children shouted for help.","وصف الراوي: صرخ الأطفال طلبًا للمساعدة."],
+      ["Dialogue — old man: Hello, children. Do you need some help?","حوار الرجل الكبير: مرحبًا يا أطفال. هل تحتاجون مساعدة؟"],
+      ["Dialogue — two friends: We climbed the mountain, but we were scared.","حوار الصديقَين: تسلّقنا الجبل، لكنّنا خِفنا."],
+      ["Write a play for your favorite story: title, characters, setting, narrator description, dialogue.","اكتب مسرحيّةً لقصّتك المفضّلة: العنوان والشخصيّات والمكان ووصف الراوي والحوار."]
+     ] },
+   { "t": "التعلّم المتكامل: مارك توين (ص 44)",
+     "items": [
+      ["He is a writer.","هو كاتب."],
+      ["This book is very funny.","هذا الكتاب مضحكٌ جدًّا."],
+      ["These are my favorite book characters.","هذي شخصيّاتُ كتابي المفضّلة."],
+      ["The boy is in trouble because he broke the window.","الولد في ورطةٍ لأنّه كسر النافذة."],
+      ["Mark Twain was an American writer. He lived a long time ago.","كان مارك توين كاتبًا أمريكيًّا. عاش قبل زمنٍ طويل."],
+      ["He was born in 1835, in Missouri, near the Mississippi River.","وُلد سنة ١٨٣٥ في ميسوري، قرب نهر المسيسيبي."],
+      ["His dream was to work on a riverboat.","كان حلمه أن يعمل على قاربٍ نهريّ."],
+      ["When he was older, he worked for a newspaper and on a boat.","ولمّا كبر عمل في صحيفةٍ وعلى قارب."],
+      ["He was very famous for his funny stories and characters.","اشتهر كثيرًا بقصصه وشخصيّاته المضحكة."],
+      ["He preferred to write stories about his adventures and his life as a child.","كان يفضّل كتابة قصصٍ عن مغامراته وحياته طفلًا."],
+      ["His most famous books are The Adventures of Tom Sawyer and The Adventures of Huckleberry Finn.","أشهر كتبه: مغامرات توم سوير ومغامرات هكلبري فين."],
+      ["Tom was a young boy with a lot of imagination, but he didn't like to go to school.","كان توم ولدًا صغيرًا واسع الخيال، لكنّه لم يحبّ الذهاب للمدرسة."],
+      ["He loved to climb trees and get into trouble.","كان يحبّ تسلّق الأشجار والوقوع في الورطات."],
+      ["Huck Finn was a very brave boy. His friends loved and admired him.","كان هَك فين ولدًا شجاعًا جدًّا. أحبّه أصدقاؤه وأُعجبوا به."],
+      ["He was very poor, but this was not a problem for him.","كان فقيرًا جدًّا، لكنّ هذا لم يكن مشكلةً عنده."],
+      ["Mark Twain wanted to make people laugh when they read his books.","أراد مارك توين أن يُضحِك الناس حين يقرؤون كتبه."],
+      ["He was born in Missouri. — Mark Twain","وُلد في ميسوري. — مارك توين"],
+      ["His friends admired him. — Huckleberry Finn","أُعجب به أصدقاؤه. — هكلبري فين"],
+      ["He had a big imagination. — Tom Sawyer","كان واسع الخيال. — توم سوير"],
+      ["He loved to get into trouble. — Tom Sawyer","كان يحبّ الوقوع في الورطات. — توم سوير"],
+      ["He was poor. — Huckleberry Finn","كان فقيرًا. — هكلبري فين"],
+      ["He worked on a boat. — Mark Twain","عمل على قارب. — مارك توين"]
+     ] },
+   { "t": "مراجعة الوحدة والمشروع (ص 45)",
+     "items": [
+      ["dream → dreamed · laugh → laughed · play → played","حلم · ضحك · لعب — في الماضي"],
+      ["stop → stopped · drop → dropped · rob → robbed","توقّف · أسقط · سرق — في الماضي"],
+      ["fixed · needed · invited","أصلح · احتاج · دعا — في الماضي"],
+      ["Ahmed scored a goal yesterday. → Ahmed didn't score a goal yesterday.","سجّل أحمد هدفًا أمس ← لم يسجّل أحمد هدفًا أمس."],
+      ["Did you play at school last week?","هل لعبت في المدرسة الأسبوع الماضي؟"],
+      ["Did you have class last Saturday? — No, I didn't.","هل كان عندك حصّة السبت الماضي؟ — لا."],
+      ["Did you go to school yesterday? — Yes, I did.","هل ذهبت للمدرسة أمس؟ — نعم."],
+      ["We climbed the big tree.","تسلّقنا الشجرة الكبيرة."],
+      ["My dad planted some flowers in the garden yesterday.","زرع أبي بعض الورود في الحديقة أمس."],
+      ["Mark Twain's books are very funny.","كتب مارك توين مضحكةٌ جدًّا."],
+      ["Talk about what you did yesterday.","تحدّث عمّا فعلته أمس."],
+      ["Say two things you did at school yesterday.","اذكر شيئين فعلتهما في المدرسة أمس."],
+      ["Write a school play: think about a story, decide your characters and the setting, then rehearse.","اكتب مسرحيّةً مدرسيّة: اختر قصّة، وحدّد الشخصيّات والمكان، ثمّ تدرّبوا."]
+     ] }
   ]
  },
  "u4": {
@@ -2029,6 +2117,14 @@ window.BOOK_EN4 = {
      [
       "hide and seek",
       "الغميضة"
+     ],
+     [
+      "listen to music",
+      "يستمع للموسيقى"
+     ],
+     [
+      "play the piano",
+      "يعزف البيانو"
      ]
     ]
    },
@@ -2518,7 +2614,91 @@ window.BOOK_EN4 = {
       "كان متعبًا، لذلك نام كثيرًا."
      ]
     ]
-   }
+   },
+   { "t": "القراءة: مدوّنةُ الهوايات (ص 54)",
+     "items": [
+      ["Is playing the piano an easy hobby? — No, it isn't. You have to practice a lot.","هل عزف البيانو هوايةٌ سهلة؟ — لا. لازم تتدرّب كثيرًا."],
+      ["My favorite hobby is playing board games. I think they are exciting.","هوايتي المفضّلة لعب الألعاب اللوحيّة. أراها مثيرة."],
+      ["When I was young, I played games like snakes and ladders.","لمّا كنت صغيرًا لعبت ألعابًا مثل السلّم والثعبان."],
+      ["I played happily with my brothers and grandparents.","لعبت بسعادةٍ مع إخوتي وجدّيّ."],
+      ["I learned a lot of games, and they weren't difficult.","تعلّمت ألعابًا كثيرة، ولم تكن صعبة."],
+      ["Now I love playing difficult games like dominoes.","والآن أحبّ لعب الألعاب الصعبة مثل الدومينو."],
+      ["I always think before I make a move because it's important to play carefully.","أفكّر دائمًا قبل أن ألعب نقلةً لأنّ اللعب بعنايةٍ مهمّ."],
+      ["After school, I play dominoes at a club.","بعد المدرسة ألعب الدومينو في نادٍ."],
+      ["I enjoy playing in competitions on the weekends.","أستمتع باللعب في المسابقات في نهاية الأسبوع."],
+      ["My brothers go to sports competitions. They love running quickly and usually win their races.","إخوتي يذهبون لمسابقات رياضيّة. يحبّون الجري بسرعة وغالبًا يفوزون بسباقاتهم."],
+      ["I love playing the piano. People say it's a difficult instrument.","أحبّ عزف البيانو. يقول الناس إنّها آلةٌ صعبة."],
+      ["Luckily, I play the piano really well.","لحسن الحظّ، أعزف البيانو جيّدًا حقًّا."],
+      ["I started playing when I was five years old. It was difficult because my fingers were small.","بدأت العزف وعمري خمس سنوات. كان صعبًا لأنّ أصابعي كانت صغيرة."],
+      ["I go to piano lessons after school on Tuesdays, but I also practice at home every day.","أذهب لدروس البيانو بعد المدرسة أيّام الثلاثاء، وأتدرّب في البيت كلّ يوم أيضًا."],
+      ["I always play new tunes carefully, so I don't make any mistakes.","أعزف الألحان الجديدة بعنايةٍ دائمًا، فلا أخطئ."],
+      ["My brother loves playing his guitar, but he plays loudly.","أخي يحبّ عزف جيتاره، لكنّه يعزف بصوتٍ عالٍ."],
+      ["I don't like it because you can't hear the piano! I usually ask him to play quietly.","لا يعجبني ذلك لأنّك لا تسمع البيانو! وعادةً أطلب منه أن يعزف بهدوء."],
+      ["This child thinks it is an exciting hobby. — the boy","هذا الطفل يرى أنّها هوايةٌ مثيرة. — الولد"],
+      ["This child says they play very well. — the girl","هذا الطفل يقول إنّه يعزف جيّدًا. — البنت"],
+      ["This child started their hobby when they were younger. — both","هذا الطفل بدأ هوايته وهو أصغر. — كلاهما"],
+      ["This child practices every day. — the girl","هذا الطفل يتدرّب كلّ يوم. — البنت"],
+      ["This child plays carefully. — both","هذا الطفل يلعب بعناية. — كلاهما"],
+      ["This child goes to competitions. — the boy","هذا الطفل يذهب للمسابقات. — الولد"]
+     ] },
+   { "t": "صوغُ الظرفِ من الصفة: ly و ily (ص 55)",
+     "items": [
+      ["quiet → quietly","هادئ ← بهدوء"],
+      ["quick → quickly","سريع ← بسرعة"],
+      ["happy → happily","سعيد ← بسعادة"],
+      ["bad → badly","سيّئ ← بشكلٍ سيّئ"],
+      ["loud → loudly","عالي الصوت ← بصوتٍ عالٍ"],
+      ["careful → carefully","حَذِر ← بعناية"],
+      ["slow → slowly","بطيء ← ببطء"],
+      ["lucky → luckily","محظوظ ← لحسن الحظّ"],
+      ["He wants to win the race, so he's running quickly.","يريد أن يفوز بالسباق، فهو يركض بسرعة."],
+      ["My little brother is sleeping, so we have to talk quietly.","أخي الصغير نائم، فعلينا أن نتكلّم بهدوء."],
+      ["She isn't good at playing the piano. She plays badly.","هي ليست جيّدةً في عزف البيانو. تعزف بشكلٍ سيّئ."],
+      ["Put the model plane down carefully. You don't want to drop it and break any parts.","ضع نموذج الطائرة بعناية. لا تريد أن تُسقطه فتنكسر أجزاؤه."],
+      ["It was dark when the movie finished, so Dad drove home slowly.","كان الظلام حين انتهى الفيلم، فقاد أبي للبيت ببطء."],
+      ["They were playing happily outside in the yard, catching a ball.","كانوا يلعبون بسعادةٍ في الحوش، يلتقطون كرة."],
+      ["What activities did your parents do after school? When did they start?","أيّ أنشطةٍ كان والداك يفعلانها بعد المدرسة؟ ومتى بدآ؟"],
+      ["He / She enjoyed … because …","هو/هي استمتع بـ… لأنّ…"],
+      ["Write about your parents' after-school activities.","اكتب عن أنشطة والديك بعد المدرسة."]
+     ] },
+   { "t": "التعلّم المتكامل: ألعابٌ من الماضي (ص 56)",
+     "items": [
+      ["These are all games that people played in the past, but they are still popular today.","هذي كلّها ألعابٌ لعبها الناس قديمًا، وما زالت مشهورةً اليوم."],
+      ["Hopscotch: nine numbered squares are drawn in chalk on the ground outside.","الحجلة: تسعُ مربّعاتٍ مرقّمةٍ تُرسم بالطباشير على الأرض في الخارج."],
+      ["Players throw a small marker onto a square and then hop carefully on one foot on each open square.","يرمي اللاعبون علامةً صغيرةً على مربّع ثمّ يحجلون بعنايةٍ على قدمٍ واحدةٍ في كلّ مربّعٍ خالٍ."],
+      ["When they get to their marker, they pick it up.","وحين يصلون إلى علامتهم يلتقطونها."],
+      ["Hopscotch was played in 3,000 B.C.","لُعبت الحجلة سنة ٣٠٠٠ قبل الميلاد."],
+      ["Blind man's bluff is like tag and is played outside.","الغمّيضة تشبه المسكة وتُلعب في الخارج."],
+      ["One player is blindfolded and tries to catch one of the other players.","يُعصَب أحد اللاعبين ويحاول أن يمسك أحد الآخرين."],
+      ["The other players run away quickly.","والآخرون يهربون بسرعة."],
+      ["They try to get the blindfolded person to change direction so that they aren't caught.","يحاولون أن يجعلوا المعصوبَ يغيّر اتّجاهه حتّى لا يُمسَكوا."],
+      ["Blind man's bluff was played in ancient Greece.","لُعبت الغمّيضة في اليونان القديمة."],
+      ["Dodgeball is played with lots of people. One person has the ball.","كرة الحرق تُلعب بأشخاصٍ كثيرين. واحدٌ منهم معه الكرة."],
+      ["They throw the ball and try to hit someone else in the game.","يرمي الكرة ويحاول أن يصيب غيره في اللعبة."],
+      ["Dodgeball was played more than 200 years ago in Africa. It was played with big rocks then.","لُعبت كرة الحرق قبل أكثر من مئتَي سنةٍ في أفريقيا. وكانت تُلعب بصخورٍ كبيرةٍ حينها."],
+      ["How do players mark a square in hopscotch? — They throw a small marker onto a square.","كيف يُعلّم اللاعبون مربّعًا في الحجلة؟ — يرمون علامةً صغيرةً عليه."],
+      ["How do players move to the next square? — They hop on one foot.","كيف ينتقلون للمربّع التالي؟ — يحجلون على قدمٍ واحدة."],
+      ["How is blind man's bluff different from tag? — One player is blindfolded.","بمَ تختلف الغمّيضة عن المسكة؟ — أحد اللاعبين معصوب العينين."],
+      ["What was used to play dodgeball 200 years ago? — Big rocks.","بمَ كانت تُلعب كرة الحرق قبل مئتَي سنة؟ — بصخورٍ كبيرة."],
+      ["Research a Saudi game from the past. Interview your grandparents.","ابحث عن لعبةٍ سعوديّةٍ قديمة. واسأل جدّيك عنها."],
+      ["What did your grandparents play when they were children? Did they play at school?","ماذا كان جدّاك يلعبان في صغرهما؟ وهل لعباها في المدرسة؟"]
+     ] },
+   { "t": "مراجعة الوحدة والمشروع (ص 57)",
+     "items": [
+      ["I wanted to ride my bike, but it started to rain.","أردت أن أركب دراجتي، لكنّها بدأت تمطر."],
+      ["I like to go swimming on Saturdays.","أحبّ الذهاب للسباحة أيّام السبت."],
+      ["He went to school by bus.","ذهب للمدرسة بالحافلة."],
+      ["Did you see the movie last night? It was great.","هل شاهدت الفيلم ليلة أمس؟ كان رائعًا."],
+      ["The adverbs are: happily, quickly, slowly, carefully.","الظروف هي: بسعادة، بسرعة، ببطء، بعناية."],
+      ["The opposite of loudly is quietly.","ضدّ «بصوتٍ عالٍ» هو «بهدوء»."],
+      ["The opposite of inside is outside.","ضدّ «في الداخل» هو «في الخارج»."],
+      ["Hopscotch is a game played with a blindfold. — False, that is blind man's bluff.","الحجلة لعبةٌ تُلعب بعصابة عين. — خطأ، تلك هي الغمّيضة."],
+      ["Max slept ten hours because he was tired.","نام ماكس عشر ساعاتٍ لأنّه كان متعبًا."],
+      ["Name three games that are played today and were played in the past.","اذكر ثلاث ألعابٍ تُلعب اليوم وكانت تُلعب قديمًا."],
+      ["What word do you use when you record yourself and upload the video to the internet? — Vlogging.","أيّ كلمةٍ تستعملها حين تصوّر نفسك وترفع المقطع على الإنترنت؟ — التدوين المرئيّ."],
+      ["What are the advantages of working in a group?","ما فوائد العمل في مجموعة؟"],
+      ["Create a video game: decide what happens, design your characters, and create a storyboard.","صمّم لعبةً إلكترونيّة: حدّد ما يحدث فيها، وصمّم شخصيّاتها، واصنع لوحةً قصصيّة."]
+     ] }
   ]
  }
 };

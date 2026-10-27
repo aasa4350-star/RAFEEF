@@ -3886,7 +3886,7 @@ const EN4_BOOK = {
               /* ومن صفحاتِ الوحدةِ نفسِها (٤–٩، صوّرها الأب ٢٥ أكتوبر):
                  كلماتُ صورةِ «Look and find» ومراجعةُ المقارنةِ والتفضيل —
                  وليست في عمودِ المفرداتِ من صفحةِ Scope and Sequence. */
-              'balloons','bus','camera','photo','playground','poster',
+              'balloons','bus','camera','photo','playground','poster','drums','guitar',
               'taller','tallest','longer','smaller','biggest','nicest',
               'better','best','worst','more difficult'],
   'و١ Family Events': ['aunt','cousin','daughter','granddaughter','grandson',
@@ -3907,12 +3907,20 @@ const EN4_BOOK = {
               'leave','bus stop','cleanliness','germs','bacteria','dust','flu','mosquito'],
   'و٣ Stories': ['call','carry','climb','cry','dream','drop','laugh','prefer',
               'score','shout','wait','e-mail','fix','invite','need','plant','rob',
-              'stop','water','clap','jump','nice','old','open','young'],
+              'stop','water','clap','jump','nice','old','open','young',
+              /* ومن صفحاتِ الوحدةِ (٤٢–٤٥، صوّرها الأب ٢٧ أكتوبر): كلماتُ
+                 تمرينِ ص٤٤ الأربع، ومفرداتُ بناءِ المسرحيّةِ في ص٤٣. */
+              'writer','funny','trouble','narrator','setting'],
   'و٤ After-School Fun': ['catch the ball','dress up','go shopping','hide','inside',
               'make a model','outside','play board games','play video games',
               'take photos','texting','vlogging','badly','carefully','happily',
               'loudly','luckily','quickly','quietly','slowly','play sports',
-              'read books','run in the park','see a movie','watch TV','write stories']
+              'read books','run in the park','see a movie','watch TV','write stories',
+              /* ومن صفحاتِ الوحدةِ (٥٤–٥٧): مفرداتُ مدوّنةِ الهوايات وصفحةِ
+                 الألعابِ القديمة. و«listen to music» و«play the piano» من
+                 عمودِ المراجعةِ نفسِه، أُدخِلتا بإذنِ الأب (٢٧ أكتوبر). */
+              'listen to music','play the piano','hobby','competition','practice',
+              'hopscotch','blindfold']
 };
 function vocabEn4Path(){
   const out = [], f = 'vocab-en4.js', p = path.join(ROOT, f);
