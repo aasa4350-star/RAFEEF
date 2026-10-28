@@ -277,6 +277,16 @@
         'وتأكّد أنّه مو مكتوم.</div>');
   }
 
+  /* صوتٌ يصل لكنّه أخفُّ من أن تُقيّمه أزور. وهذا ضدُّ deadMicMsg تمامًا:
+     هناك المايكُ لا يُقرأ منه فرفعُ الصوتِ عبث، وهنا هو الدواءُ عينُه.
+     وُضع لعلّةِ حسنٍ في أكتوبر: ستّةُ أيّامٍ من «ما وصلني صوت» وسببُها
+     مايكٌ واطٍ لا ميّت، ولم تنكشف إلّا حين ضغط زرَّ الاختبار. فالصفحةُ
+     تقولها له الآن من نفسِها وهو يقرأ، لا بعد أن تضيع المحاولة. */
+  function weakMicMsg(){
+    return '🔉 <b>صوتك واطي</b> — قرّب الجهاز من فمك وارفع صوتك شوي، '+
+           'عشان خدمة التقييم تقدر تسمعك. كمّل قراءتك ولا توقف.';
+  }
+
   function ensure(statusEl, onReady, onDenied){
     /* الإذنُ يُطلب مرّةً واحدة في عمر الصفحة، ثمّ نمضي فورًا. وهذا ليس
        تحسينًا للسرعة: طلبُ getUserMedia قبل كلّ دورٍ يفتح مسارًا ثمّ
@@ -380,7 +390,7 @@
   }catch(e){}
 
   g.MIC = {
-    level: level, deadMicMsg: deadMicMsg, LVL_DEAD: LVL_DEAD, LVL_WEAK: LVL_WEAK, inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
+    level: level, deadMicMsg: deadMicMsg, weakMicMsg: weakMicMsg, LVL_DEAD: LVL_DEAD, LVL_WEAK: LVL_WEAK, inAppBrowser:inAppBrowser, diagnose:diagnose, fail:fail, waitSDK:waitSDK,
             ensure:ensure, stream:stream, release:release, releaseSoon:releaseSoon,
             keep:keep, audioConfig:audioConfig, why:why, env:env, build:BUILD };
 })(window);

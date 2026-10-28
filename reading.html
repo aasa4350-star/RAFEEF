@@ -772,6 +772,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
      عينُ ما قطع المحادثةَ من دورِها الثاني في ٦ سبتمبر، وتلك تجربةٌ
      لا تُعاد. وإخفاقُ المقياسِ نفسِه لا يُعطّل القراءة: يُهمَل. */
   var _lvlPeak=0, _lvlN=0, _lvlErr=null, _lvlStop=null, _lvlTo=null, _deadMic=false;
+  var _lvlWeakTo=null, _lvlPolls=0, _weakWarn=false;
   var _IOS = /iP(hone|od|ad)/.test(navigator.userAgent||"") ||
              (/Macintosh/.test(navigator.userAgent||"") && navigator.maxTouchPoints > 1);
   function _lvlStart(){
@@ -786,10 +787,36 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
         if(_lvlPeak >= MIC.LVL_DEAD) return;      /* يصل صوتٌ — العلّةُ في مكانٍ آخر */
         _deadMic = true; _userStopped = true; finish();
       }, 9000);
+      _lvlWarnPoll();
     }catch(e){ _lvlStop = null; }
+  }
+  /* ═══ تحذيرُ الصوتِ الواطي ═══
+     الحارسُ أعلاه يقطع القراءةَ على المايكِ الميّت. وبينه وبين السليمِ
+     منزلةٌ ثالثة: صوتٌ يصل وأزورُ لا تُقيّمه. تلك علّةُ حسنٍ في أكتوبر،
+     قرأ عليها ستّةَ أيّامٍ ثمّ يُقال له «ما وصلني صوت» بعد الدقيقة.
+     فنقولها له في الثانيةِ الرابعةِ ونصف وهو يقرأ، ولا نقطع عليه.
+
+     و MIC.level تُرجع أعلى ما بلغه الصوتُ منذ البدءِ لا صوتَ اللحظة،
+     فمتى تجاوز الحدَّ مرّةً لم يرجع دونه — فالتحذيرُ يُرفع رفعًا
+     نهائيًّا أوّلَ ما يُسمَع له صوتٌ مجزئ، ولا يرتجف بين ظهورٍ وخفاء. */
+  function _lvlWarnPoll(){
+    _lvlWeakTo = setTimeout(function(){
+      _lvlWeakTo = null; _lvlPolls++;
+      if(_fin || _userStopped) return;
+      var el = statusEl.querySelector("[data-lvlwarn]");
+      if(el){
+        /* ولا نُكذّب أذنَه: إن كانت أزورُ سمعته فالصوتُ كافٍ مهما قاس
+           مقياسُنا، فنسكت. وكذلك إن أخفق المقياسُ أو لم يَقِس بعد. */
+        var weak = !_lvlErr && _lvlN > 0 && !_heardAny && _lvlPeak < MIC.LVL_WEAK;
+        if(weak) _weakWarn = true;
+        el.innerHTML = weak ? MIC.weakMicMsg() : "";
+      }
+      _lvlWarnPoll();
+    }, _lvlPolls ? 1500 : 4500);
   }
   function _lvlEnd(){
     if(_lvlTo){ clearTimeout(_lvlTo); _lvlTo = null; }
+    if(_lvlWeakTo){ clearTimeout(_lvlWeakTo); _lvlWeakTo = null; }
     if(_lvlStop){ try{ _lvlStop(); }catch(e){} _lvlStop = null; }
   }
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
@@ -835,7 +862,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       saveMicFail("passage", _lastWhy, _st, _stage(), { heard:_heardAny,
         /* أعلى مستوًى وصل من المايك (×١٠٠٠) وعددُ العيّنات — بهما
            يُفصَل «المايكُ صامت» عن «أزور لم تردّ» بلا تخمين. */
-        lvl:Math.round(_lvlPeak*1000), lvlN:_lvlN, lvlErr:_lvlErr, deadMic:_deadMic,
+        lvl:Math.round(_lvlPeak*1000), lvlN:_lvlN, lvlErr:_lvlErr, deadMic:_deadMic, weakWarn:_weakWarn,
         partOnly:_partialOnly, dead:_dead, deadAudio:_deadAudio, cycles:_cycSeq,
         /* ‏أربعةٌ كانت غائبةً فعميت التشخيصَ في بلاغ ٢١ أكتوبر: كم مكث
            قبل الإخفاق، وهل أنهاها بنفسه أم قطعته المهلة، وكم كلمةً كان
@@ -962,6 +989,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
        جوال — فليست علّة سفاري كما ظننتُ. */
     statusEl.innerHTML = head+'🎙️ اقرأ القطعة كاملة بصوت واضح على راحتك... (<b data-readcnt>'+allWords.length+'</b> كلمة)'+
       '<div data-livetxt class="en" style="font-weight:700;font-size:.92rem;color:var(--muted);margin:6px 0;min-height:1.2em"></div>'+
+      '<div data-lvlwarn style="font-weight:400;font-size:.9rem;color:var(--warn);line-height:1.8;margin:4px 0"></div>'+
       '<button data-stopread class="say small" style="background:#dc2626;border-color:#dc2626;color:#fff;margin-top:6px">⏹️ خلّصت القراءة</button>';
     var sb = statusEl.querySelector("[data-stopread]"); if(sb) sb.addEventListener("click", function(){ _userStopped=true; finish(); });
   }
