@@ -4085,13 +4085,14 @@ function lughati9UnitsPath(){
      آخرَ انكشف هنا. */
   const MAP = {
     u1: { imla:'IMLA',  ismf:'ISMF',  qasam:'QASAM', hal:'HAL',    adab:'ADAB' },
-    u2: { imla:'IMLA2', ismf:'ISMF2', qasam:'SHART', hal:'TAMYIZ', adab:null },
-    u3: { imla:'IMLA3', ismf:'MUB',   qasam:'TAFDIL',hal:'IST',    adab:null }
+    u2: { imla:'IMLA2', ismf:'ISMF2', qasam:'SHART', hal:'TAMYIZ', adab:'ADAB2' },
+    u3: { imla:'IMLA3', ismf:'MUB',   qasam:'TAFDIL',hal:'IST',    adab:'ADAB3' }
   };
   /* اسمُ البنكِ في الوسمِ قد يُختصر (MUB عن MUBALAGHA)، فنحتاج اسمَ
      المتغيّرِ أيضًا لنقرأ أسئلتَه. */
   const VAR = { IMLA2:'IMLA2', ISMF2:'ISMF2', SHART:'SHART', TAMYIZ:'TAMYIZ',
-                IMLA3:'IMLA3', MUB:'MUBALAGHA', TAFDIL:'TAFDIL', IST:'ISTITHNA' };
+                IMLA3:'IMLA3', MUB:'MUBALAGHA', TAFDIL:'TAFDIL', IST:'ISTITHNA',
+                ADAB2:'ADAB2', ADAB3:'ADAB3' };
   const MIN = 14;                     /* أقلُّ ما يُقبَل لئلّا يُحفَظ البنك */
 
   const CFGU = ctx.CFGU, REMU = ctx.REMTOPICS_U, REM1 = ctx.REMTOPICS;
@@ -4152,8 +4153,11 @@ function lughati9UnitsPath(){
       E('دروسُ الوحدةِ ' + u + ': ' + ids.join(' · ') + ' والمتوقَّع all وimla وismf وqasam وhal وadab');
     Object.keys(MAP[u]).forEach(id => {
       const want = MAP[u][id], c = C[id];
+      /* وصلت صورتا ص١٤٤ «الجبل الأشمّ» وص٢٣٢ «ضوء الأمن» (٢٨ أكتوبر)،
+         فلكلِّ وحدةٍ تحليلُها الأدبيّ. ويبقى الشرطُ قائمًا لوحدةٍ تُضاف
+         غدًا بلا نصّ: إمّا بنكٌ من نصِّها، وإمّا لا تبويب. */
       if (want === null){
-        if (c) E('الوحدةُ ' + u + ': درسُ «' + id + '» معروضٌ ونصُّه لم يصل من الكتاب (ص١٤٤ وص٢٣٢)');
+        if (c) E('الوحدةُ ' + u + ': درسُ «' + id + '» معروضٌ ونصُّه لم يصل من الكتاب');
         return;
       }
       if (!c) { E('الوحدةُ ' + u + ': درسُ «' + id + '» مفقودٌ من CFGU'); return; }
@@ -4181,7 +4185,9 @@ function lughati9UnitsPath(){
     const T = REMU[u];
     if (!Array.isArray(T)) { E('علاجيُّ الوحدةِ ' + u + ' مفقود'); return; }
     const ids = T.map(t => t.id).sort().join(',');
-    const need = ['imla','ismf','qasam','hal'].sort().join(',');
+    /* يُشتقُّ من دروسِ الوحدةِ نفسِها: كلُّ درسٍ له بنكٌ يجب أن يُرصَد
+       ضعفُه في العلاجيّ، والدرسُ الذي لا بنكَ له لا يُنتظَر فيه شيء. */
+    const need = Object.keys(MAP[u]).filter(id => MAP[u][id]).sort().join(',');
     if (ids !== need) E('مواضيعُ علاجيِّ ' + u + ': ' + ids + ' والمنتظَرُ ' + need);
     T.forEach(t => {
       if (!MAP[u][t.id]) E('موضوعٌ في علاجيِّ ' + u + ' بلا درس: ' + t.id);
