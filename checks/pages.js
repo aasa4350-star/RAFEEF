@@ -3304,7 +3304,36 @@ function readAloudPath(){
           why:'تُجمَع الجملُ حتّى تقارب الحدَّ ولا يُكتفى بأقصرِها' },
         { nm:'فقرةٌ أولى فوق الحدِّ بقليل', in: para(30)+' '+para(30)+'\n\n'+para(40),
           ok: r => r === para(30), why:'تُقطَع عند الجملةِ الأولى لا في وسطِ الثانية' },
-        { nm:'بلا نصّ', in: '', ok: r => r === '', why:'لا ترمي' }
+        { nm:'بلا نصّ', in: '', ok: r => r === '', why:'لا ترمي' },
+        /* ═══ بادئةٌ حرفيّةٌ لا نصٌّ مُعادُ البناء ═══
+           الرسمُ يُظلّل بشرطِ ‎passage.indexOf(readRef) === 0. فإن أعادت
+           هذه الدالّةُ بناءَ النصِّ بوصلِ الجملِ بفراغٍ واحدٍ سقط الشرطُ
+           في كلِّ قطعةٍ فيها علامةُ إغلاقٍ بعد نقطةٍ — ‎«is you?"» —
+           فلا تظليلَ البتّة، ويُقال للطفل «اقرأ المظلَّل» ولا مظلَّل.
+           سقطت بها قطعةٌ من ثمانيَ عشرةَ عند سعود (٢٨ أكتوبر). */
+        { nm:'اقتباسٌ بعد علامةِ وقف',
+          in: 'Reem opened the box and found a photo. All the children wore white shirts. "Which one is you?" Reem asked. ' + para(40),
+          ok: r => r && ('Reem opened the box and found a photo. All the children wore white shirts. "Which one is you?" Reem asked. ' + para(40)).indexOf(r) === 0,
+          why:'المُرجَعُ بادئةٌ حرفيّةٌ من القطعة' },
+        /* والاقتطاعُ يقع بعد علامةِ الإغلاقِ لا قبلها: «...you?» ثمّ
+           اقتباسٌ معلَّقٌ وحدَه خارجَ المظلَّلِ يبدو عطبًا للعين، والمرجعُ
+           المرسَلُ لأزور ينتهي ناقصًا. والعيّنةُ مقطوعةٌ عند الاقتباسِ
+           عمدًا: جملةٌ أولى من عشرين كلمةً (فوق أدنى المقدار) وتاليةٌ
+           تتجاوز الحدَّ، فالوقفُ عندها قطعًا. */
+        { nm:'الاقتطاعُ عند علامةِ الإغلاق',
+          in: '"' + new Array(20).fill('word').join(' ') + '?" ' + para(40),
+          ok: r => /\?"$/.test(String(r).trim()),
+          why:'علامةُ الإغلاقِ تبقى مع جملتها' },
+        { nm:'فراغان بين جملتَين',
+          in: 'One two three four five.  Six seven eight nine ten. ' + para(40),
+          ok: r => r && ('One two three four five.  Six seven eight nine ten. ' + para(40)).indexOf(r) === 0,
+          why:'المُرجَعُ بادئةٌ حرفيّةٌ وإن تعدّدت الفراغات' },
+        /* وفيها فراغان داخلَ أوّلِ خمسٍ وثلاثين كلمة: بدونهما يُصادف
+           الوصلُ الصوابَ فلا تُميّز العيّنةُ شيئًا. */
+        { nm:'جملةٌ أولى طويلةٌ جدًّا — والفرعُ الاحتياطيّ',
+          in: 'one  two ' + para(80) + ' ' + para(10),
+          ok: r => r && ('one  two ' + para(80) + ' ' + para(10)).indexOf(r) === 0,
+          why:'حتّى فرعُ القطعِ عند الحدِّ يُرجِع بادئةً حرفيّة' }
       ];
       for (const t of PROBE){
         let r; try { r = fn(t.in); } catch(e){ r = '«رمت ' + String(e.message).slice(0,30) + '»'; }
@@ -3315,6 +3344,52 @@ function readAloudPath(){
     }
   }
 
+  /* ═══ وعلى القطعِ الحقيقيّةِ لا على عيّناتٍ وحدَها ═══
+     العيّناتُ أعلاه كلُّها نظيفةُ العلامات، ولذلك مرَّ العطبُ سنةً. */
+  {
+    const m2 = /function readAloudRef\(txt\)\{([\s\S]*?)\n\}/.exec(src);
+    const lp = path.join(ROOT, 'reading-long.js');
+    if (m2 && fs.existsSync(lp)){
+      let fn2 = null;
+      try { const sb = {}; vm.createContext(sb);
+        vm.runInContext('f = function(txt){' + m2[1] + '\n};', sb); fn2 = sb.f; } catch(e){}
+      let pool = null;
+      try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+        vm.runInContext(fs.readFileSync(lp, 'utf8'), sb);
+        pool = sb.window.READING_LONG; } catch(e){}
+      if (fn2 && pool){
+        let n = 0, bad = 0;
+        Object.keys(pool).forEach(who => Object.keys(pool[who] || {}).forEach(lang => {
+          ((pool[who][lang] || {}).pass || []).forEach((p, i) => {
+            const txt = String((p || [])[0] || '').trim();
+            if (!txt) return;
+            n++;
+            let r; try { r = fn2(txt); } catch(e){ r = null; }
+            if (!r || txt.indexOf(r) !== 0){
+              bad++;
+              if (bad <= 3) E('قطعةُ ' + who + '/' + lang + '#' + i +
+                ': المقروءُ جهرًا ليس بادئةً حرفيّةً منها — فلا تُظلَّل شيئًا ويُقال له «اقرأ المظلَّل» («' +
+                txt.slice(0, 40) + '…»)');
+            }
+          });
+        }));
+        if (!n) E('لم تُقرأ قطعةٌ واحدةٌ من reading-long.js — الفحصُ لا يفحص');
+      }
+    }
+  }
+
+  /* ── وما تقوله الشاشةُ أثناء التسجيلِ وبعده يطابق ما تفعل ── */
+  if (!/function _partRead\(\)[\s\S]{0,160}data-readpart/.test(src))
+    E('_partRead لا تسأل الشاشةَ عن التظليل — فتُجيب جوابًا ثابتًا مهما كانت القطعة');
+  if (/'🎙️ اقرأ القطعة كاملة بصوت واضح/.test(src))
+    E('شاشةُ التسجيلِ تقول «اقرأ القطعة كاملة» بلا شرطٍ — والمقيَّسُ فقرةٌ واحدة');
+  if (!/_partRead\(\) \? 'اقرأ <b>الفقرة المظلَّلة/.test(src))
+    E('شاشةُ التسجيلِ لا توجّهه إلى الفقرةِ المظلَّلةِ حين يكون المقيَّسُ فقرة');
+  if (!/_partRead\(\) \? '<div[\s\S]{0,240}هذي درجةُ/.test(src))
+    E('النتيجةُ لا تقول إنّ الدرجةَ للفقرةِ المظلَّلةِ وحدَها — فيُظنُّ التسجيلُ انقطع');
+  if (!/partRead && canRead[\s\S]{0,300}تقرأه <b>بصوتك<\/b>/.test(src))
+    E('لا سطرَ ملاصقٌ للقطعةِ يفسّر التظليل — ورسالةُ القفلِ تختفي بعد أن يُفتح');
+
   /* ── وهي التي تُرسَل لأزور، والمظلَّلُ هو هي ── */
   if (!/azureAssess\(readRef,/.test(src))
     E('قطعةُ القراءةِ تُرسَل كاملةً لتقييمِ النطقِ لا readRef — فيُقاس على ما لم يُطلَب منه');
@@ -3322,6 +3397,12 @@ function readAloudPath(){
     E('readRef لا يُشتقُّ من القطعة');
   if (!/data-readpart/.test(src))
     E('الفقرةُ المقروءةُ لا تُظلَّل — فيقرأ القطعةَ كلَّها ويُقاس على فقرة');
+  /* والتظليلُ يُرى: خلفيّةُ ‎--good-bg وحدَها باهتةٌ لا تكاد تبين على
+     شاشةٍ فيها وهج — وصورةُ الأب (٢٨ أكتوبر) شاهدةٌ على ذلك. */
+  if (!/data-readpart[\s\S]{0,220}border-bottom:2px solid var\(--good\)/.test(src))
+    E('التظليلُ بلا حدٍّ قاطعٍ يُرى — ولا يكاد يبين على شاشةٍ فيها وهج');
+  if (!/data-readpart[\s\S]{0,300}box-decoration-break:clone/.test(src))
+    E('التظليلُ لا يُستنسخ على الأسطر — فينقطع فيما بين السطرَين');
   if (/'<div class="txt"[^>]*>'\+passage\+/.test(src))
     E('النصُّ يُعرَض من passage لا passHtml — فالتظليلُ لا يصل الشاشة');
 

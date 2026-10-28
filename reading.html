@@ -442,23 +442,38 @@ function readAloudRef(txt){
   /* تُجمَع جملٌ كاملةٌ حتّى يقارب المجموعُ الحدَّ. وأوّلُ صياغةٍ قطعت عند
      آخرِ نهايةِ جملةٍ قبل الحدِّ فأعطت في إحدى القطعِ عشرَ كلماتٍ وحدَها —
      ومقطعٌ بهذا القِصَرِ لا يُقاس عليه نطق. فالجمعُ لا القطع. */
-  var parts = first.match(/[^.!?؟]+[.!?؟]+/g) || [];
-  var out = "", n = 0;
-  for(var i = 0; i < parts.length; i++){
-    var p = parts[i].trim(), pn = p.split(/\s+/).filter(Boolean).length;
+  /* ═══ والمُرجَعُ بادئةٌ حرفيّةٌ من القطعة، قطعًا ═══════════════════
+     بلاغ الأب (٢٨ أكتوبر ٢٠٢٦): «يطلع نصُّ القطعةِ بالأخضرِ ويوقف
+     التسجيلُ إلى هنا». وكان التظليلُ يسقط سقوطًا تامًّا في قطعةٍ من
+     ثمانيَ عشرة: الرسمُ يُظلّل بشرطِ ‎passage.indexOf(readRef) === 0،
+     وكانت هذه الدالّةُ تُعيد بناءَ النصِّ بوصلِ الجملِ بفراغٍ واحد.
+     فجملةٌ تنتهي بعلامةٍ ثمّ علامةُ اقتباس — ‎«is you?"» — يقطعها
+     التعبيرُ قبل الاقتباسِ فيصير الوصلُ ‎«is you? "»، ولا يطابق
+     الأصلَ، فلا تظليلَ البتّة؛ ويُقال للطفل «اقرأ المظلَّل» ولا مظلَّل.
+
+     فلا وصلَ بعد اليوم: نحسب موضعَ نهايةِ آخرِ جملةٍ أخذناها ونقتطع
+     من الأصلِ نفسِه. وعلاماتُ الإغلاقِ تُضَمُّ إلى جملتها. */
+  function _cut(str, k){            /* بادئةُ أوّلِ k كلمةً، من الأصل */
+    var rx = /\S+/g, mm, i = 0, e = 0;
+    while(i < k && (mm = rx.exec(str))){ e = mm.index + mm[0].length; i++; }
+    return str.slice(0, e);
+  }
+  var re = /[^.!?؟]+[.!?؟]+["»”'\)\]]*/g, m, end = 0, n = 0, took = 0;
+  while((m = re.exec(first))){
+    var p = m[0].trim(), pn = p.split(/\s+/).filter(Boolean).length;
     /* بلغنا أدنى ما يُقاس عليه والتاليةُ تتجاوز الحدَّ: نقف */
-    if(out && n >= 18 && n + pn > 35) break;
+    if(took && n >= 18 && n + pn > 35) break;
     /* ودونَ الأدنى نمضي وإن تجاوزنا الحدَّ قليلًا — فجملةٌ أولى من أربعِ
        كلماتٍ («The immune system learns.») كانت تخرج وحدَها فلا تُقاس.
        ولا نتجاوز الخمسَ والخمسين بحال. */
-    if(out && n + pn > 55) break;
-    out = out ? (out + " " + p) : p; n += pn;
+    if(took && n + pn > 55) break;
+    end = m.index + m[0].length; n += pn; took++;
     if(n >= 35) break;
   }
   /* وجملةٌ أولى وحدَها فوق الخمسِ والخمسين: نرجع إلى الحدِّ قطعًا، فإطالةُ
      الجهرِ أضرُّ من كسرةٍ في جملةٍ طويلةٍ أصلًا. */
-  if(!out || n > 55) return w.slice(0, 35).join(" ").trim();
-  return out;
+  if(!took || n > 55) return _cut(first, 35).trim();
+  return first.slice(0, end).trim();
 }
 
 function passageId(txt){
@@ -959,6 +974,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
       : '';
     statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+(flu!=null?' · طلاقة '+flu:'')+(comp!=null?' · اكتمال '+comp:'')+(wpm!=null?' · سرعة '+wpm+' كلمة/دقيقة':'')+slowNote+
       '<div style="direction:'+(isAr?"rtl":"ltr")+';text-align:'+(isAr?"right":"left")+';margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+
+      (_partRead() ? '<div style="font-size:.84rem;color:var(--good);margin-top:6px;font-weight:700">'+
+        '🟩 هذي درجةُ <b>الفقرة المظلَّلة</b> وحدها — ما انقطع التسجيل. وبقيّةُ القطعة تقرأها بعينك للأسئلة.</div>' : '')+
       '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
     // نطق الكلمة لحدها عند الضغط عليها — عشان يتعلّم الكلمات الغلط
     statusEl.querySelectorAll(".rword").forEach(function(sp){ sp.addEventListener("click", function(){ var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
@@ -978,16 +995,24 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail){
     _closeRec();
     MIC.releaseSoon();   /* المايك يُغلق بعد مهلةٍ قصيرة إن لم يُستأنف */
   }
+  /* بلاغ الأب (٢٨ أكتوبر ٢٠٢٦) بصورةِ سعود: «يطلع نصُّ القطعةِ بالأخضر
+     ويوقف التسجيلُ إلى هنا». والتسجيلُ لم يقف: المقيَّسُ جهرًا فقرةٌ
+     واحدةٌ بحكم readAloudRef، والمظلَّلُ بالأخضرِ هو هي. لكنّ الشاشةَ
+     كانت تقول له في أثناء التسجيلِ «اقرأ القطعةَ كاملة» — فيقرأ اثنتَين
+     وستّين كلمةً ثمّ يرى ثلاثًا وعشرين ملوّنةً فيظنّ التسجيلَ انقطع.
+     فالعطبُ في القولِ لا في العمل، ويُصلَح بأن تقول الشاشةُ ما تفعل. */
+  function _partRead(){ try{ return !!document.querySelector("[data-readpart]"); }catch(e){ return false; } }
   function _showListening(mode){
     statusEl.style.color="var(--muted)";
     var head = (mode==="resume") ? '' : (mode ? '🔄 نجرّب مرة ثانية — ' : '');
+    var what = _partRead() ? 'اقرأ <b>الفقرة المظلَّلة بالأخضر</b>' : 'اقرأ القطعة كاملة';
     /* ═══ يرى ما تسمعه أزور وهو يقرأ ═══
        صفوف ٦ سبتمبر لقراءة القطعة تقول ss=1935 · sd=9676 · rz=17: أزور
        سمعته وأرسلت سبع عشرة نتيجةً جزئيّة ثمّ تعلّقت. وكان يقرأ القطعة
        كاملةً أمام شاشةٍ لا تتحرّك إلّا بعدّادٍ يقف على صفر، فلا يدري
        أوصل صوته أم لا. وتسعةٌ من هذه الإخفاقات على حاسب حسن لا على
        جوال — فليست علّة سفاري كما ظننتُ. */
-    statusEl.innerHTML = head+'🎙️ اقرأ القطعة كاملة بصوت واضح على راحتك... (<b data-readcnt>'+allWords.length+'</b> كلمة)'+
+    statusEl.innerHTML = head+'🎙️ '+what+' بصوت واضح على راحتك... (<b data-readcnt>'+allWords.length+'</b> كلمة)'+
       '<div data-livetxt class="en" style="font-weight:700;font-size:.92rem;color:var(--muted);margin:6px 0;min-height:1.2em"></div>'+
       '<div data-lvlwarn style="font-weight:400;font-size:.9rem;color:var(--warn);line-height:1.8;margin:4px 0"></div>'+
       '<button data-stopread class="say small" style="background:#dc2626;border-color:#dc2626;color:#fff;margin-top:6px">⏹️ خلّصت القراءة</button>';
@@ -1930,12 +1955,17 @@ if(!META[who] || !DATA[who]){
     var passHtml = passage;
     if(partRead && canRead && passage.indexOf(readRef) === 0)
       passHtml = '<span data-readpart style="background:var(--good-bg);border-radius:6px;' +
-                 'box-shadow:0 0 0 4px var(--good-bg)">' + readRef + '</span>' +
+                 'box-shadow:0 0 0 3px var(--good-bg);border-bottom:2px solid var(--good);' +
+                 '-webkit-box-decoration-break:clone;box-decoration-break:clone">' + readRef + '</span>' +
                  passage.slice(readRef.length);
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+azBtnHtml()+micTestBtnHtml()+'</div>'+
       '<div data-mictest style="display:none;margin-top:8px"></div>'+
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passHtml+'</div>'+
+      ((partRead && canRead)
+        ? '<div style="font-size:.84rem;color:var(--good);font-weight:700;margin-top:6px">'+
+          '🟩 المظلَّل بالأخضر تقرأه <b>بصوتك</b> · وباقي القطعة تقرأه <b>بعينك</b> للأسئلة</div>'
+        : '')+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
       EXIT_WARN_HTML+
