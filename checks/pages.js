@@ -362,6 +362,7 @@ function run(){
   issues.push(...vocabOwnPath());
   issues.push(...vocabEn4Path());
   issues.push(...micLevelPath());
+  issues.push(...lughati9UnitsPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -4044,6 +4045,179 @@ function micLevelPath(){
   const wait = mt ? +mt[1] : 0;
   if (!(wait >= 6000 && wait <= 15000))
     E(R2, 'مهلةُ حارسِ الصمت ' + (wait || '؟') + 'ms — والمرادُ بين ستِّ ثوانٍ وخمسَ عشرة');
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   وحدات لغتي — ثالث متوسط: ثلاثُ وحداتٍ في صفحةٍ واحدة
+   ──────────────────────────────────────────────────────────────────
+   أرسل الأب جدولَ محتوياتِ كتابِ حسنٍ (٢٨ أكتوبر ٢٠٢٦)، وكانت الصفحةُ
+   تحمل الوحدةَ الأولى وحدَها. فأُضيفت الثانيةُ والثالثةُ ببنوكِهما،
+   واختيارُ الوحدةِ صار صفًّا فوق صفِّ الدروس. وهذا الحارسُ يحرس أربعةً:
+
+   ١) أنّ كلَّ درسٍ يسحب من بنكِ وحدتِه لا من بنكِ وحدةٍ أخرى — فلو
+      اختلط لرأى حسنٌ «الحال» في درسِ «التمييز» وظنّ الصفحةَ تكذب.
+   ٢) أنّ «علاجي» يتبع الوحدةَ المفتوحة؛ وإلّا التقى «نحو» من وحدةٍ
+      بـ«نحو» من أخرى فاختلط ضعفُ التمييزِ بضعفِ الحال.
+   ٣) أنّ التحليلَ الأدبيَّ مُخفًى في الوحدتَين اللتَين لم تصل نصوصُهما
+      (ص١٤٤ و٢٣٢) — لا معروضًا فارغًا.
+   ٤) ألّا يُحَلَّ سؤالٌ بالطول: أن يكون الصوابُ أطولَ من مشتّتَيه طولًا
+      يُفرزه به مَن لا يعرف القاعدة. وقعتُ فيها في خمسةٍ وثلاثين سؤالًا
+      من مئةٍ واثني عشر، فأُصلحت، وهذا يمنع رجوعَها.
+   ══════════════════════════════════════════════════════════════════ */
+function lughati9UnitsPath(){
+  const out = [];
+  const F = 'lughati9.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) { out.push({ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }); return out; }
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  const html = fs.readFileSync(p, 'utf8');
+
+  const ctx = makeCtx();
+  const { inline, srcs } = scripts(html);
+  for (const s of srcs){
+    const q = path.join(ROOT, s);
+    if (fs.existsSync(q)) { try { vm.runInContext(fs.readFileSync(q,'utf8'), ctx); } catch(e){} }
+  }
+  for (const src of inline){ try { vm.runInContext(src, ctx); } catch(e){} }
+
+  /* الدرسُ ← بنكُه، في كلِّ وحدة. الأسماءُ هي أسماءُ البنوكِ في الصفحةِ
+     نفسِها (q.__bank يأتي من bankGen)، فلو أُعيد توجيهُ درسٍ إلى بنكٍ
+     آخرَ انكشف هنا. */
+  const MAP = {
+    u1: { imla:'IMLA',  ismf:'ISMF',  qasam:'QASAM', hal:'HAL',    adab:'ADAB' },
+    u2: { imla:'IMLA2', ismf:'ISMF2', qasam:'SHART', hal:'TAMYIZ', adab:null },
+    u3: { imla:'IMLA3', ismf:'MUB',   qasam:'TAFDIL',hal:'IST',    adab:null }
+  };
+  /* اسمُ البنكِ في الوسمِ قد يُختصر (MUB عن MUBALAGHA)، فنحتاج اسمَ
+     المتغيّرِ أيضًا لنقرأ أسئلتَه. */
+  const VAR = { IMLA2:'IMLA2', ISMF2:'ISMF2', SHART:'SHART', TAMYIZ:'TAMYIZ',
+                IMLA3:'IMLA3', MUB:'MUBALAGHA', TAFDIL:'TAFDIL', IST:'ISTITHNA' };
+  const MIN = 14;                     /* أقلُّ ما يُقبَل لئلّا يُحفَظ البنك */
+
+  const CFGU = ctx.CFGU, REMU = ctx.REMTOPICS_U, REM1 = ctx.REMTOPICS;
+  if (!CFGU || !REMU || !Array.isArray(REM1)) { E('CFGU أو REMTOPICS_U لم تُقرأ'); return out; }
+  const units = Object.keys(CFGU);
+  if (units.join(',') !== 'u1,u2,u3')
+    E('وحداتُ الصفحةِ «' + units.join(' · ') + '» والمتوقَّع ثلاثًا: u1 وu2 وu3');
+
+  /* عنوانُ كلِّ وحدةٍ وصفحاتُها في الكتاب — من جدولِ المحتويات */
+  const AR = ctx.UNIT_AR || {}, PG = ctx.UNIT_PG || {};
+  const WANT_PG = { u1:'13–105', u2:'111–197', u3:'201–289' };
+  ['u1','u2','u3'].forEach(u => {
+    if (!AR[u] || !/[؀-ۿ]/.test(String(AR[u]))) E('عنوانُ الوحدةِ ' + u + ' مفقودٌ أو غيرُ عربيّ');
+    if (PG[u] !== WANT_PG[u])
+      E('صفحاتُ الوحدةِ ' + u + ' «' + (PG[u]||'؟') + '» والكتابُ يقول «' + WANT_PG[u] + '»');
+  });
+
+  const key = t => String(t).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+
+  /* ═══ البنوكُ الثمانيةُ الجديدةُ: بنيةٌ سليمةٌ ولا دلالةَ طول ═══ */
+  const seen = {};
+  ['u2','u3'].forEach(u => {
+    Object.keys(MAP[u]).forEach(id => {
+      const tag = MAP[u][id];
+      if (!tag) return;
+      const bk = ctx[VAR[tag]];
+      if (!Array.isArray(bk)) { E('بنكُ ' + VAR[tag] + ' (' + u + '/' + id + ') غيرُ موجود'); return; }
+      if (bk.length < MIN) E('بنكُ ' + VAR[tag] + ' فيه ' + bk.length + ' سؤالًا — وأقلُّ ما يُقبَل ' + MIN);
+      bk.forEach((q, i) => {
+        const nm = VAR[tag] + '#' + (i + 1);
+        if (!Array.isArray(q) || !Array.isArray(q[1]) || q[1].length !== 3)
+          { E(nm + ': الخياراتُ ليست ثلاثة'); return; }
+        const o = q[1].map(key);
+        if (new Set(o).size !== 3) E(nm + ': خياران متطابقان');
+        if (o.some(x => !x)) E(nm + ': خيارٌ فارغ');
+        if (key(q[2]).length < 15) E(nm + ': شرحٌ ناقصٌ أو مفقود');
+        const k = key(q[0]);
+        if (seen[k]) E('سؤالٌ واحدٌ في بنكَين (' + seen[k] + ' و' + VAR[tag] + '): ' + k.slice(0, 45));
+        else seen[k] = VAR[tag];
+        /* ═══ دلالةُ الطول ═══
+           الصوابُ أوّلُ الخيارات قبل الخلط. فإن جاوز أطولَ مشتّتَيه
+           بمرّةٍ وثُمانِ مرّةٍ وبخمسةٍ وعشرين حرفًا، فُرز بالطولِ وحده. */
+        const L = o.map(x => x.length), mx = Math.max(L[1], L[2]), mn = Math.min(L[1], L[2]);
+        if (L[0] > mx * 1.8 && L[0] - mx > 25)
+          E(nm + ': الصوابُ ' + L[0] + ' حرفًا وأطولُ مشتّتٍ ' + mx + ' — يُحَلُّ بالطولِ لا بالقاعدة');
+        if (mn > L[0] * 1.8 && mn - L[0] > 25)
+          E(nm + ': الصوابُ ' + L[0] + ' حرفًا وأقصرُ مشتّتٍ ' + mn + ' — يُحَلُّ بالطولِ لا بالقاعدة');
+      });
+    });
+  });
+
+  /* ═══ كلُّ درسٍ يسحب من بنكِ وحدتِه، وشاملُها من أربعتِها ═══ */
+  ['u1','u2','u3'].forEach(u => {
+    const C = CFGU[u];
+    if (!C) return;
+    const ids = Object.keys(C);
+    if (ids.join(',') !== 'all,imla,ismf,qasam,hal,adab')
+      E('دروسُ الوحدةِ ' + u + ': ' + ids.join(' · ') + ' والمتوقَّع all وimla وismf وqasam وhal وadab');
+    Object.keys(MAP[u]).forEach(id => {
+      const want = MAP[u][id], c = C[id];
+      if (want === null){
+        if (c) E('الوحدةُ ' + u + ': درسُ «' + id + '» معروضٌ ونصُّه لم يصل من الكتاب (ص١٤٤ وص٢٣٢)');
+        return;
+      }
+      if (!c) { E('الوحدةُ ' + u + ': درسُ «' + id + '» مفقودٌ من CFGU'); return; }
+      const g = c.gens || [];
+      if (g.length !== 1 || !g[0] || g[0].__bank !== want)
+        E('الوحدةُ ' + u + ': درسُ «' + id + '» يسحب من «' +
+          ((g[0] && g[0].__bank) || '؟') + '» والصوابُ «' + want + '»');
+      if (!c.label || !/^لغتي م٣ — /.test(String(c.label)))
+        E('الوحدةُ ' + u + ': وسمُ «' + id + '» لا يبدأ بـ«لغتي م٣ — » فلا يُفرَز في التقرير: ' + c.label);
+      if (!c.n || c.n < 8) E('الوحدةُ ' + u + ': درسُ «' + id + '» عددُ أسئلتِه ' + c.n);
+    });
+    /* الشاملُ يسحب من بنوكِ وحدتِه الأربعةِ ولا بنكَ يتخلّف */
+    const al = (C.all && C.all.gens) || [];
+    const got = al.map(g => g && g.__bank).sort().join(',');
+    /* وشاملُ الأولى خمسةٌ لأنّ نصَّها الأدبيَّ وصل، وشاملُ الأخرَيَين أربعة */
+    const need = ['imla','ismf','qasam','hal','adab']
+      .map(id => MAP[u][id]).filter(Boolean).sort().join(',');
+    if (got !== need)
+      E('شاملُ الوحدةِ ' + u + ' يسحب من «' + got + '» والمنتظَرُ «' + need + '»');
+  });
+
+  /* ═══ «علاجي» يتبع الوحدةَ، وكلُّ موضوعٍ له درسٌ ونصيحةٌ وشرحٌ مرئيّ ═══ */
+  if (typeof ctx.remTopics !== 'function') E('remTopics() مفقودة — فالعلاجيُّ لا يتبع الوحدة');
+  ['u2','u3'].forEach(u => {
+    const T = REMU[u];
+    if (!Array.isArray(T)) { E('علاجيُّ الوحدةِ ' + u + ' مفقود'); return; }
+    const ids = T.map(t => t.id).sort().join(',');
+    const need = ['imla','ismf','qasam','hal'].sort().join(',');
+    if (ids !== need) E('مواضيعُ علاجيِّ ' + u + ': ' + ids + ' والمنتظَرُ ' + need);
+    T.forEach(t => {
+      if (!MAP[u][t.id]) E('موضوعٌ في علاجيِّ ' + u + ' بلا درس: ' + t.id);
+      if (!t.name || /[A-Za-z]{4,}/.test(String(t.name))) E('اسمُ موضوعِ «' + t.id + '» في ' + u + ' لا يصلح للأب');
+      if (!t.tip || String(t.tip).length < 120) E('نصيحةُ «' + t.id + '» في ' + u + ' قصيرةٌ لا تُغني عن مراجعة');
+      if (!t.yt) E('موضوعُ «' + t.id + '» في ' + u + ' بلا بحثِ شرحٍ مرئيّ');
+    });
+  });
+  /* ولا يُخلَط اسمُ موضوعٍ بين وحدتَين: «نحو: التمييز» لا «نحو: الحال» */
+  const nm1 = {}; REM1.forEach(t => { nm1[t.id] = t.name; });
+  ['u2','u3'].forEach(u => (REMU[u]||[]).forEach(t => {
+    if (nm1[t.id] && nm1[t.id] === t.name)
+      E('موضوعُ «' + t.id + '» في ' + u + ' يحمل اسمَ الوحدةِ الأولى نفسَه «' + t.name + '» — فيختلط الضعفان');
+  }));
+
+  /* ═══ وما لا يُقرأ من السياقِ وحدَه: صفُّ الوحداتِ وسلوكُ applyUnit ═══ */
+  const need = [
+    [/<button data-unit="u1"/, 'صفُّ الوحداتِ مفقودٌ من الصفحة — فلا سبيلَ إلى الثانيةِ والثالثة'],
+    [/data-unit="u2"[\s\S]{0,400}data-unit="u3"/, 'الوحدتان الثانيةُ والثالثةُ ليستا في صفِّ الوحدات'],
+    [/UNIT_KEY\s*=\s*"lg9_unit_"\s*\+\s*who/, 'الوحدةُ لا تُحفَظ لكلِّ ابنٍ وحدَه'],
+    [/localStorage\.setItem\(UNIT_KEY, UNIT\)/, 'الوحدةُ المختارةُ لا تُحفَظ — فترجع الأولى كلَّ مرّة'],
+    [/if\(_u && CFGU\[_u\]\) UNIT = _u;/, 'الوحدةُ المحفوظةُ لا تُستعاد (أو تُستعاد بلا تحقّق)'],
+    /* مقصورةٌ على applyUnit: السطرُ الأوّلُ «var CFG = CFGU[UNIT];» يحمل
+       النصَّ نفسَه، فمرساةٌ مرسلةٌ تُمسِكه وتنجو طفرةُ applyUnit. */
+    [/function applyUnit\(\)\{\s*CFG = CFGU\[UNIT\];/, 'applyUnit لا يُحوّل CFG إلى الوحدةِ المختارة'],
+    [/ab\.style\.display = CFG\.adab \? "" : "none";/, 'تبويبُ الأدبيِّ لا يُخفى في وحدةٍ بلا نصّ'],
+    [/function remTopics\(\)\{ return \(UNIT === "u1"\) \? REMTOPICS : \(REMTOPICS_U\[UNIT\] \|\| \[\]\); \}/,
+       'remTopics لا تُفرّق بين الوحدات كما كُتبت'],
+    [/renderRem[\s\S]{0,600}remTopics\(\)/, 'renderRem لا يقرأ remTopics() — فالعلاجيُّ يبقى على الوحدةِ الأولى'],
+    [/querySelectorAll\("\.tabs button\[data-tab\]"\)/,
+       'مستمعُ التبويباتِ غيرُ مقصورٍ على [data-tab] — فزرُّ الوحدةِ يُحسَب درسًا'],
+    [/\.tabs \[data-tab\]\[aria-selected="true"\]/,
+       'أوّلُ رسمٍ يقرأ aria-selected بلا [data-tab] — فيقع على زرِّ الوحدة']
+  ];
+  for (const [rx, msg] of need) if (!rx.test(html)) E(msg);
+
   return out;
 }
 module.exports = run;
