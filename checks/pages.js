@@ -4771,8 +4771,69 @@ function quranTilawaPath(){
   if (wCl < 300) E('كلماتُ سورةِ ق بعد التنقية ' + wCl + ' — أقلُّ ممّا تحتمله السورة');
 
   /* ═══ (٣) لا يُعرَض إلّا لمن وُثِّق نصُّ سورتِه ═══ */
-  if (!/var QSURAH = \{ saud:50 \};/.test(src))
-    E('قائمةُ سورِ الأبناءِ تغيّرت — ولا تُفتح التلاوةُ إلّا لمن نُزّل نصُّه وتُحقِّق بمصدرَين');
+  /* ═══ قائمةُ السورِ في ملفٍّ واحدٍ تقرؤه الصفحتان ═══
+     لو كُتبت في كلٍّ على حِدةٍ لافترقتا، فدلّت صفحةُ القرآنِ ابنًا
+     على تبويبٍ لا يُفتَح له. ولا يُزاد فيها ابنٌ حتى يُنزَّل نصُّ
+     سورتِه ويُقابَل بمصدرَين. */
+  const wp = path.join(ROOT, 'quran-who.js');
+  if (!fs.existsSync(wp)) E('قائمةُ سورِ الأبناءِ مفقودة');
+  else {
+    const wsrc = fs.readFileSync(wp, 'utf8');
+    let W = null;
+    try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+      vm.runInContext(wsrc, sb); W = sb.window.QSURAH; } catch(e){}
+    if (!W || typeof W !== 'object')
+      out.push({ sev:'خطأ', file:'quran-who.js', msg:'القائمةُ لا تُقرأ' });
+    else {
+      if (W.saud !== 50)
+        out.push({ sev:'خطأ', file:'quran-who.js', msg:'سورةُ سعودٍ ' + W.saud + ' و«ق» هي ٥٠' });
+      /* ولا ابنَ في القائمةِ بلا نصٍّ موثَّقٍ مُنزَّلٍ في المستودع */
+      Object.keys(W).forEach(function(k){
+        if (!fs.existsSync(path.join(ROOT, 'quran-' + W[k] + '.js')))
+          out.push({ sev:'خطأ', file:'quran-who.js',
+            msg:'«' + k + '» في القائمةِ ونصُّ سورتِه (' + W[k] + ') غيرُ منزَّل — يُسأل تسميعَ ما لم يُوثَّق' });
+      });
+      /* ويوافق ما في صفحةِ مراجعةِ الحفظ: سورةٌ واحدةٌ لا سورتان */
+      const qh = path.join(ROOT, 'quran.html');
+      if (fs.existsSync(qh)){
+        const qs = fs.readFileSync(qh, 'utf8');
+        const nm = { 50:'ق' };
+        Object.keys(W).forEach(function(k){
+          const want = nm[W[k]];
+          if (!want) return;
+          const row = new RegExp(k + ':\\s*\\{name:"([^"]+)"').exec(qs);
+          if (row && row[1] !== want)
+            out.push({ sev:'خطأ', file:'quran-who.js',
+              msg:'«' + k + '» يسمّع «' + want + '» وصفحةُ حفظِه تقول «' + row[1] + '»' });
+        });
+      }
+    }
+  }
+  if (!/var QSURAH = window\.QSURAH \|\| \{\};/.test(src))
+    E('قائمةُ السورِ مكتوبةٌ في الصفحةِ لا مقروءةٌ من ملفِّها — فتفترق عن صفحةِ القرآن');
+  ['reading.html','quran.html'].forEach(function(f){
+    const fp = path.join(ROOT, f);
+    if (fs.existsSync(fp) && !/<script src="quran-who\.js"><\/script>/.test(fs.readFileSync(fp,'utf8')))
+      out.push({ sev:'خطأ', file:f, msg:'قائمةُ سورِ الأبناءِ غيرُ محمَّلةٍ في الصفحة' });
+  });
+  /* ═══ وبابُ التلاوةِ من صفحةِ القرآن ═══
+     بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): «ما حصلت التلاوة، يطلعني لتطبيق
+     قرآني» — فتحَ صفحةَ القرآنِ يطلبها، والقسمُ في صفحةِ القراءة. */
+  if (!/\(function\(\)\{\s*\n\s*try\{\s*\n\s*var want = String\(location\.hash/.test(src))
+    E('الرابطُ لا يفتح تبويبًا بعينِه — فالدالُّ عليه من صفحةِ القرآنِ يقع في الإملاء');
+  const qh2 = path.join(ROOT, 'quran.html');
+  if (fs.existsSync(qh2)){
+    const qs = fs.readFileSync(qh2, 'utf8');
+    const QE = m => out.push({ sev:'خطأ', file:'quran.html', msg:m });
+    if (!/href="reading\.html\?who='\+who\+'#tilawa"/.test(qs))
+      QE('لا بابَ إلى التلاوةِ من صفحةِ القرآن — وهي الصفحةُ التي يُفتَح فيها القرآن');
+    if (!/\(window\.QSURAH && QSURAH\[who\] \?/.test(qs))
+      QE('بابُ التلاوةِ يُعرَض لمن لا تبويبَ له — فيقع في صفحةٍ لا يجد فيها ما دُلَّ عليه');
+    if (/لا نبنيه هنا<\/small>/.test(qs))
+      QE('ما زالت تقول عن تسميعِ الحفظِ «لا نبنيه هنا» وقد بُني');
+    if (!/تجويد/.test(qs))
+      QE('لا تُفرّق بين ما بنيناه (تحقُّقُ الحفظ) وما لم نبنِه (التجويد)');
+  }
   if (!/\(QSURAH\[who\] \? '<button data-tab="tilawa"/.test(src))
     E('تبويبُ التلاوةِ غيرُ مشروطٍ بسورةِ الابن');
   if (!/\(QSURAH\[who\] \? '<section class="panel" id="tilawa">/.test(src))

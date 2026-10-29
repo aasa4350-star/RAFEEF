@@ -15,6 +15,7 @@
 <script src="step-reading.js"></script>
 <script src="listen-bank.js?v=20261005"></script>
 <script src="vocab-en4.js"></script>
+<script src="quran-who.js"></script>
 <script src="quran-50.js"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
@@ -1478,7 +1479,7 @@ function micFail(statusEl, btn, onFail){ MIC.fail(statusEl, btn, { tail:KEEP_GOI
    سورةُ كلِّ ابنٍ من quran.html (صفحةُ مراجعةِ الحفظ). ولا تظهر إلّا
    لمن نُزّل نصُّ سورتِه وتحقّق بمصدرَين — فلا نسأله تسميعَ نصٍّ لم
    يُوثَّق. وسعودٌ أوّلُهم (سورةُ ق) بقرارِ الأب في ٢٩ أكتوبر ٢٠٢٦. */
-var QSURAH = { saud:50 };
+var QSURAH = window.QSURAH || {};
 /* العلاماتُ تُعرَض ولا تُرسَل: أزورُ تعدُّ «ۚ» و«ۖ» كلماتٍ مستقلّةً،
    فيصير مرجعُ ثلاثِ آياتٍ ثلاثًا وعشرين كلمةً بدل إحدى وعشرين. */
 var Q_MARKS = /[\u0617-\u061A\u06D6-\u06ED\u0640]/g;
@@ -3749,6 +3750,19 @@ if(!META[who] || !DATA[who]){
       document.getElementById(b.dataset.tab).classList.add("active");
     });
   });
+  /* ═══ التبويبُ يُفتَح من الرابط ═══════════════════════════════
+     بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): فتح صفحةَ القرآنِ يطلب التلاوةَ فلم
+     يجدها، وهي تبويبٌ في صفحةِ القراءة. فصارت صفحةُ القرآنِ تدلُّ
+     عليها بـ‎#tilawa، ولا يُفتَح إلّا تبويبٌ قائمٌ فعلًا — فمن لا
+     سورةَ له لا تبويبَ له فلا يُفتَح له شيء. */
+  (function(){
+    try{
+      var want = String(location.hash || "").replace(/[^a-z]/gi, "");
+      if(!want) return;
+      var b = document.querySelector('.tabs button[data-tab="' + want + '"]');
+      if(b) b.click();
+    }catch(e){}
+  })();
 }
 </script>
 </body>

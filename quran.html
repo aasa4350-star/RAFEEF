@@ -8,6 +8,7 @@
 <title>القرآن — مراجعة الحفظ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="gate.js"></script>
+<script src="quran-who.js"></script>
 <style>
   :root{
     --accent:#0e9f6e; --accent-deep:#057a55;
@@ -120,7 +121,21 @@ if(!NAMES[who] || !SURAH[who]){
       '<header class="top"><p class="eyebrow">القرآن الكريم · مراجعة الحفظ</p><h1>📖 القرآن — '+name+'</h1></header>'+
       '<div class="bar"><a href="home.html?who='+who+'">🏠 الرئيسية</a></div>'+
       '<div class="card" style="text-align:center;font-weight:800;font-size:1.05rem">سورتك الحالية: سورة '+S.name+'<div style="font-weight:400;font-size:.85rem;color:var(--muted);margin-top:4px">صفحات <span class="en">'+S.start+'–'+S.end+'</span> من المصحف (الجزء <span class="en">'+S.juz+'</span>) · <span class="en">'+totalPages+'</span> صفحة</div></div>'+
-      '<a class="tarteel" href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">🎙️ افتح تطبيق Quranly — سمّع حفظك بصوتك<small>يتابع تلاوتك آيةً آية ويصحّح أخطاءك — تطبيقٌ متخصّص، لا نبنيه هنا</small></a>'+
+      /* ═══ بابان لا بابٌ واحد ═══════════════════════════════════
+         بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): «ما حصلت التلاوة، يطلعني لتطبيق
+         قرآني» — فتح هذه الصفحةَ يطلب التلاوةَ فوجد إحالةً إلى تطبيق،
+         والقسمُ مبنيٌّ تبويبًا في صفحةِ القراءة. فههنا بابُه.
+
+         وكانت هذه البطاقةُ تقول «تطبيقٌ متخصّص، لا نبنيه هنا» — وهي
+         صدقت يومَها وما عادت تصدق كلَّها: فما بنيناه تحقُّقٌ من
+         الحفظِ كلمةً كلمة، وما لم نبنِه تصحيحُ التجويد — فأزور تُرجع
+         زمنَ كلِّ صوتٍ ولا تُسمّي الحروف، فالإدغامُ والإخفاءُ
+         والإقلابُ لا يُحكَم فيها. فيُقال كلٌّ في بابه. */
+      (window.QSURAH && QSURAH[who] ?
+        '<a class="tarteel" href="reading.html?who='+who+'#tilawa">📖 سمّع حفظك هنا — تحقُّقٌ من الحفظ'+
+          '<small>تقرأ من حفظك والصفحةُ تُقابله بنصِّ المصحف: ما وصل أخضر وما سقط أحمر. '+
+          'وهذا تحقُّقُ حفظٍ لا تصحيحَ تجويد.</small></a>' : '')+
+      '<a class="tarteel" style="background:linear-gradient(135deg,#475569,#64748b)" href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">🎙️ وللتجويد: تطبيق Quranly<small>يصحّح أحكامَ التلاوة — وهذا ما لا نبنيه هنا ولا نقدر عليه</small></a>'+
       '<div class="storelinks"><a href="'+TARTEEL_IOS+'" target="_blank" rel="noopener">آيفون (App Store)</a><a href="'+TARTEEL_ANDROID+'" target="_blank" rel="noopener">أندرويد (Google Play)</a></div>'+
 
       '<div class="sec-title"><span class="dot"></span> 📅 مراجعة اليوم ('+dueList.length+')</div>'+
