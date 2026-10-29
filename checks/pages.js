@@ -3387,7 +3387,8 @@ function readAloudPath(){
            طلاقتُه بالمرجع: ٤٠ ⇐ ٧٣ · ٤١ ⇐ ٦٧ · ٤٦ ⇐ ٢٨ · ٥١ ⇐ ٣٧.
            فالهاويةُ بين ٤١ و٤٦، والسقفُ ٤٢ والصلبُ ٤٥ يقعان بينهما.
            ولا تُقاس قطعةٌ له على ما فوق الخمسةِ والأربعين بحال. */
-        const HCAP = /READ_CAP = \{[^}]*hasan:\s*\{\s*floor:\s*(\d+),\s*cap:\s*(\d+),\s*hard:\s*(\d+)/.exec(src);
+        const HFULL = /hasan:\s*\{\s*full:\s*true/.test(src);
+        const HCAP = /READ_CAP = \{[^}]*hasan:\s*\{[^}]*floor:\s*(\d+),\s*cap:\s*(\d+),\s*hard:\s*(\d+)/.exec(src);
         /* ═══ والعامُّ مكتوبٌ مرّتَين، فلا يفترقان ═══
            القيمُ الافتراضيّةُ في READ_DEF، وتُعاد في readAloudRef نفسِها
            لأنّها تُنتزَع وتُشغَّل وحدَها في هذا الفحص. فلو تغيّرت إحداهما
@@ -3418,19 +3419,39 @@ function readAloudPath(){
             E('سقفُ حسنٍ ' + cap + ' — وصفوفُه تضعه بين ٣٨ و٤٤ (طلاقتُه ٦٧–٧٣ عند ٤٠–٤١، و٢٨ عند ٤٦)');
           if (!(hard > cap && hard <= 45))
             E('السقفُ الصلبُ لحسنٍ ' + hard + ' — وفوق الخمسةِ والأربعين تنهار طلاقتُه إلى ٢٨');
-          /* وعلى قطعِه الحقيقيّةِ: لا قطعةَ تتجاوز سقفَه الصلب */
+          /* وعلى قطعِه الحقيقيّة */
           const hp = (pool.hasan || {});
-          let over = 0, under = 0, mx = 0;
+          let over = 0, under = 0, mx = 0, notFull = 0;
           Object.keys(hp).forEach(lang => ((hp[lang] || {}).pass || []).forEach(p => {
             const txt = String((p || [])[0] || '').trim(); if (!txt) return;
-            let r; try { r = fn2(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){ r = ''; }
+            const tw = txt.split(/\s+/).filter(Boolean).length;
+            let r; try { r = fn2(txt, { full:HFULL, floor:floor, cap:cap, hard:hard }); } catch(e){ r = ''; }
             const rw = String(r).trim().split(/\s+/).filter(Boolean).length;
             if (rw > mx) mx = rw;
-            if (rw > hard) over++;
-            if (rw < floor && txt.split(/\s+/).filter(Boolean).length >= floor) under++;
+            if (HFULL){ if (String(r).trim() !== txt) notFull++; }
+            else {
+              if (rw > hard) over++;
+              if (rw < floor && tw >= floor) under++;
+            }
           }));
           if (over) E('حسن: ' + over + ' قطعةً يُقاس عليها فوق سقفِه الصلب (أطولُها ' + mx + ' كلمة)');
           if (under) E('حسن: ' + under + ' قطعةً يُقاس عليها دون أدنى مقدارِه (' + floor + ' كلمة)');
+          /* ═══ وهو يقرأ قطعتَه كاملةً بقرارِ الأب (٢٩ أكتوبر) ═══
+             فلا يُقتطَع منها شيء، ومهلةُ الأمانِ تسع أطولَها بمهلة:
+             أبطأُ ما قُيس عليه ١٫٥١ ثانيةً للكلمة، فنشترط ٢ ثانية. */
+          if (!HFULL)
+            E('حسن لا يقرأ قطعتَه كاملة — وهو قرارُ الأب في ٢٩ أكتوبر، فلا يُردُّ إلّا بقرارٍ مثلِه');
+          if (HFULL){
+            if (notFull) E('حسن: ' + notFull + ' قطعةً تُقتطَع وهو مأمورٌ بقراءتِها كاملة');
+            const CAPMS = /_capMs = Math\.min\((\d+), Math\.max\((\d+), _refW\*(\d+) \+ (\d+)\)\)/.exec(src);
+            if (!CAPMS) E('مهلةُ الأمانِ غيرُ مكتوبةٍ كما يُتوقَّع — ولا تُفحَص وهو يقرأ قطعةً كاملة');
+            else {
+              const ms = Math.min(+CAPMS[1], Math.max(+CAPMS[2], mx * (+CAPMS[3]) + (+CAPMS[4])));
+              if (ms < mx * 2000)
+                E('مهلةُ الأمانِ ' + Math.round(ms/1000) + 'ث وأطولُ قطعةٍ لحسنٍ ' + mx +
+                  ' كلمةً — فتُقطَع عليه قراءتُه قبل أن يُتمّها (يحتاج ' + Math.round(mx*2) + 'ث)');
+            }
+          }
         }
         /* ولا يُقاس نطقُه على مقطعٍ دون أدنى ما يُقاس عليه، ما دامت
            القطعةُ نفسُها أطولَ منه. ستُّ قطعٍ عند رفيفَ خالفته. */

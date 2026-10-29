@@ -474,7 +474,16 @@ try{
    كانت تُقاس على ما دون الخمسةِ والعشرين، وطلاقتُه في شريحةِ ٠–٢٩
    ثلاثٌ وسبعون — فالمدى متّسعٌ أمامه. وبها يصير أقصرُ مقطعٍ خمسةً
    وعشرين ووسيطُه ستًّا وثلاثين وأطولُه ثلاثةً وأربعين. */
-var READ_CAP = { hasan: { floor:25, cap:42, hard:45 } };
+/* ═══ وحسنٌ يقرأ قطعتَه كاملة ═══════════════════════════════════
+   قرارُ الأب (٢٩ أكتوبر ٢٠٢٦): «حسن خلّه يقرأ قطعته كاملة».
+
+   وهو قرارُ تدريبٍ لا قرارُ قياس: المقروءُ جهرًا صار مئةً وخمسين كلمةً
+   بدل ستٍّ وثلاثين، والدرجةُ ستنزل — فصفوفُه تقول إنّ طلاقتَه عند
+   مرجعِ ٤٦ ثمانٍ وعشرون. فالنزولُ وصفُ مهمّةٍ أثقل لا وصفُ قارئٍ ساء،
+   وهذا مكتوبٌ هنا لئلّا يُقرأ الرقمُ يومًا على غيرِ وجهِه.
+
+   وبقيّةُ أرقامِه محفوظةٌ تحتَها: إن رُدَّ يومًا إلى الفقرةِ رجع إليها. */
+var READ_CAP = { hasan: { full:true, floor:25, cap:42, hard:45 } };
 var READ_DEF = { floor:18, cap:35, hard:55 };
 function readCapOf(){
   try{ return READ_CAP[who] || READ_DEF; }catch(e){ return READ_DEF; }
@@ -485,6 +494,9 @@ function readAloudRef(txt, cfg){
   cfg = cfg || (typeof readCapOf === "function" ? readCapOf() : { floor:18, cap:35, hard:55 });
   var FLOOR = cfg.floor, CAP = cfg.cap, HARD = cfg.hard;
   var s = String(txt||"").trim();
+  /* ومَن يقرأ قطعتَه كاملةً فلا اقتطاعَ ولا تظليل: المقروءُ هو القطعة،
+     فتتبعه الشاشةُ والقفلُ والتظليلُ من تلقائها (partRead تصير كاذبة). */
+  if(cfg.full) return s;
   var first = (s.split(/\n{2,}/)[0] || "").trim() || s;
   if(first.split(/\s+/).filter(Boolean).length < FLOOR) first = s;
   var w = first.split(/\s+/).filter(Boolean);
