@@ -3268,12 +3268,12 @@ function readAloudPath(){
   const E = m => out.push({ sev:'خطأ', file:F, msg:m });
 
   /* ── الدالّةُ تُنتزَع وتُشغَّل على عيّنات ── */
-  const m = /function readAloudRef\(txt\)\{([\s\S]*?)\n\}/.exec(src);
+  const m = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
   if (!m) E('readAloudRef لا تُنتزَع — فالمقروءُ بصوته لا يُفحَص');
   else {
     let fn;
     try { const sb = {}; vm.createContext(sb);
-      vm.runInContext('f = function(txt){' + m[1] + '\n};', sb); fn = sb.f; }
+      vm.runInContext('f = function(txt, cfg){' + m[1] + '\n};', sb); fn = sb.f; }
     catch(e){ E('readAloudRef لا تُشغَّل: ' + String(e.message).slice(0,60)); }
     if (fn){
       const W = s => String(s).trim().split(/\s+/).filter(Boolean).length;
@@ -3355,12 +3355,12 @@ function readAloudPath(){
   /* ═══ وعلى القطعِ الحقيقيّةِ لا على عيّناتٍ وحدَها ═══
      العيّناتُ أعلاه كلُّها نظيفةُ العلامات، ولذلك مرَّ العطبُ سنةً. */
   {
-    const m2 = /function readAloudRef\(txt\)\{([\s\S]*?)\n\}/.exec(src);
+    const m2 = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
     const lp = path.join(ROOT, 'reading-long.js');
     if (m2 && fs.existsSync(lp)){
       let fn2 = null;
       try { const sb = {}; vm.createContext(sb);
-        vm.runInContext('f = function(txt){' + m2[1] + '\n};', sb); fn2 = sb.f; } catch(e){}
+        vm.runInContext('f = function(txt, cfg){' + m2[1] + '\n};', sb); fn2 = sb.f; } catch(e){}
       let pool = null;
       try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
         vm.runInContext(fs.readFileSync(lp, 'utf8'), sb);
@@ -3382,6 +3382,56 @@ function readAloudPath(){
           });
         }));
         if (!n) E('لم تُقرأ قطعةٌ واحدةٌ من reading-long.js — الفحصُ لا يفحص');
+
+        /* ═══ سقفُ حسنٍ من صفوفِه هو ═══
+           طلاقتُه بالمرجع: ٤٠ ⇐ ٧٣ · ٤١ ⇐ ٦٧ · ٤٦ ⇐ ٢٨ · ٥١ ⇐ ٣٧.
+           فالهاويةُ بين ٤١ و٤٦، والسقفُ ٤٢ والصلبُ ٤٥ يقعان بينهما.
+           ولا تُقاس قطعةٌ له على ما فوق الخمسةِ والأربعين بحال. */
+        const HCAP = /READ_CAP = \{[^}]*hasan:\s*\{\s*floor:\s*(\d+),\s*cap:\s*(\d+),\s*hard:\s*(\d+)/.exec(src);
+        /* ═══ والعامُّ مكتوبٌ مرّتَين، فلا يفترقان ═══
+           القيمُ الافتراضيّةُ في READ_DEF، وتُعاد في readAloudRef نفسِها
+           لأنّها تُنتزَع وتُشغَّل وحدَها في هذا الفحص. فلو تغيّرت إحداهما
+           دون الأخرى عمل الفحصُ على قيمٍ والصفحةُ على غيرِها. */
+        const DEF = /var READ_DEF = \{ floor:(\d+), cap:(\d+), hard:(\d+) \};/.exec(src);
+        const INL = /\? readCapOf\(\) : \{ floor:(\d+), cap:(\d+), hard:(\d+) \}/.exec(src);
+        if (!DEF) E('READ_DEF غيرُ مكتوبٍ كما يُتوقَّع — فالعامُّ لا يُفحَص');
+        else if (DEF[1] + ',' + DEF[2] + ',' + DEF[3] !== '18,35,55')
+          E('العامُّ صار ' + DEF.slice(1).join('/') + ' — وعيّناتُ هذا الفحصِ كلُّها مبنيّةٌ على ١٨/٣٥/٥٥');
+        if (!INL) E('القيمُ الاحتياطيّةُ داخلَ readAloudRef غيرُ مكتوبةٍ كما يُتوقَّع');
+        else if (DEF && INL.slice(1).join(',') !== DEF.slice(1).join(','))
+          E('الاحتياطيُّ داخلَ readAloudRef (' + INL.slice(1).join('/') + ') يخالف READ_DEF (' +
+            DEF.slice(1).join('/') + ') — فالفحصُ على قيمٍ والصفحةُ على غيرِها');
+
+        /* ولا يكفي وجودُ مدخلِ حسن: لا بدّ أن يُقرأ بالابن، وإلّا بقي
+           الجدولُ مكتوبًا والصفحةُ تعمل بالعامِّ للجميع. */
+        if (!/return READ_CAP\[who\] \|\| READ_DEF;/.test(src))
+          E('readCapOf لا تقرأ السقفَ بالابن — فجدولُ READ_CAP حِبرٌ على ورق');
+        if (!HCAP) E('READ_CAP بلا مدخلٍ لحسن — فسقفُه يرجع إلى العامِّ وصفوفُه تقول غيرَه');
+        else {
+          const floor = +HCAP[1], cap = +HCAP[2], hard = +HCAP[3];
+          /* وأدناه: ثمانيُ قطعٍ كانت تحت الخمسةِ والعشرين، وطلاقتُه في
+             شريحةِ ٠–٢٩ ثلاثٌ وسبعون فالمدى متّسعٌ أمامه. */
+          if (!(floor >= 22 && floor <= 30))
+            E('أدنى مقدارِ حسنٍ ' + floor + ' — وصفوفُه تضعه بين ٢٢ و٣٠');
+          if (floor >= cap) E('أدنى مقدارِ حسنٍ ليس دون سقفِه');
+          if (!(cap >= 38 && cap <= 44))
+            E('سقفُ حسنٍ ' + cap + ' — وصفوفُه تضعه بين ٣٨ و٤٤ (طلاقتُه ٦٧–٧٣ عند ٤٠–٤١، و٢٨ عند ٤٦)');
+          if (!(hard > cap && hard <= 45))
+            E('السقفُ الصلبُ لحسنٍ ' + hard + ' — وفوق الخمسةِ والأربعين تنهار طلاقتُه إلى ٢٨');
+          /* وعلى قطعِه الحقيقيّةِ: لا قطعةَ تتجاوز سقفَه الصلب */
+          const hp = (pool.hasan || {});
+          let over = 0, under = 0, mx = 0;
+          Object.keys(hp).forEach(lang => ((hp[lang] || {}).pass || []).forEach(p => {
+            const txt = String((p || [])[0] || '').trim(); if (!txt) return;
+            let r; try { r = fn2(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){ r = ''; }
+            const rw = String(r).trim().split(/\s+/).filter(Boolean).length;
+            if (rw > mx) mx = rw;
+            if (rw > hard) over++;
+            if (rw < floor && txt.split(/\s+/).filter(Boolean).length >= floor) under++;
+          }));
+          if (over) E('حسن: ' + over + ' قطعةً يُقاس عليها فوق سقفِه الصلب (أطولُها ' + mx + ' كلمة)');
+          if (under) E('حسن: ' + under + ' قطعةً يُقاس عليها دون أدنى مقدارِه (' + floor + ' كلمة)');
+        }
         /* ولا يُقاس نطقُه على مقطعٍ دون أدنى ما يُقاس عليه، ما دامت
            القطعةُ نفسُها أطولَ منه. ستُّ قطعٍ عند رفيفَ خالفته. */
         let tooShort = 0;
