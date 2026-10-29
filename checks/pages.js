@@ -366,6 +366,7 @@ function run(){
   issues.push(...kangBoostPath());
   issues.push(...en5VocabPath());
   issues.push(...listenSkillPath());
+  issues.push(...quranTilawaPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -4691,6 +4692,218 @@ function listenSkillPath(){
   const rest = C['تفصيلٌ آخر'] || 0;
   if (rest > n * 0.25)
     E('«تفصيلٌ آخر» ' + Math.round(100*rest/n) + '٪ من البنك — والمجهولُ لا يُعالَج');
+  return out;
+}
+/* ═══ تلاوةُ القرآن: نصٌّ موثَّقٌ، وتحقُّقُ حفظٍ لا تقييمُ تجويد ═══════
+   طلبُ الأب (٢٩ أكتوبر ٢٠٢٦): «تقدر تسويه لهم تلاوة زي الإنجليزي
+   يقيّم تلاوتهم»، ثمّ «أنا أبي التجويد ضروري». والمقيسُ بأزور من
+   التجويدِ أزمنةٌ لا أحكام: الإدغامُ والإخفاءُ والإقلابُ لا تُرجع
+   لها الخدمةُ أسماءَ حروفٍ أصلًا (جُرّب فرجعت أسماءُ الفونيماتِ
+   فارغةً). فالمبنيُّ اليومَ تسميعُ حفظٍ صِرْف.
+
+   وهذا الحارسُ يحرس أمرَين لا ثالثَ لهما في الخطورة:
+   أوّلًا: النصُّ القرآنيُّ لا يُحرَّر باليدِ ولا يُكتَب من صورة.
+   وثانيًا: لا يُقال للطفلِ على تلاوتِه رقمٌ، ولا يُحفَظ له صفُّ نطقٍ
+   فيُقرأ في تقرير الأبِ درجةَ لسانٍ من تلاوةٍ لم نُقيّمها. */
+function quranTilawaPath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  const EQ = m => out.push({ sev:'خطأ', file:'quran-50.js', msg:m });
+
+  /* ═══ (١) النصُّ نفسُه ═══ */
+  const qp = path.join(ROOT, 'quran-50.js');
+  if (!fs.existsSync(qp)) { EQ('نصُّ السورةِ مفقود'); return out; }
+  const qsrc = fs.readFileSync(qp, 'utf8');
+  if (!/<script src="quran-50\.js"><\/script>/.test(src))
+    E('نصُّ السورةِ غيرُ محمَّلٍ في الصفحة');
+  if (!/لا يُحرَّر باليد/.test(qsrc))
+    EQ('سقطت من الترويسةِ أنّه مولَّدٌ لا يُحرَّر باليد — فيُنقَل يومًا بالعين');
+  if (!/mk-quran\.js/.test(qsrc))
+    EQ('الترويسةُ لا تذكر مُولِّدَه، فلا يُعاد التحقُّق');
+  let S = null;
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(qsrc, sb); S = sb.window.QURAN && sb.window.QURAN[50]; } catch(e){}
+  if (!S || !Array.isArray(S.ayat)) { EQ('النصُّ لا يُقرأ'); return out; }
+  if (S.ayat.length !== 45)
+    EQ('آياتُ سورةِ ق ' + S.ayat.length + ' والصوابُ ٤٥');
+  if (S.name !== 'ق') EQ('اسمُ السورةِ «' + S.name + '»');
+  S.ayat.forEach(function(t, i){
+    if (!String(t||'').trim()) EQ('الآيةُ ' + (i+1) + ' فارغة');
+    if (/[0-9٠-٩]/.test(String(t)))
+      EQ('الآيةُ ' + (i+1) + ' فيها رقم — أرقامُ الآياتِ تُعرَض ولا تُخزَّن في النصّ');
+  });
+  /* البسملةُ ليست من السورة: لو دخلت مقدّمةَ الأولى حُسبت كلماتُها
+     على حفظِه وسُئل عمّا لم يُسمّع. */
+  if (/بِسْمِ\s*ٱ?للَّهِ\s*ٱ?لرَّحْمَٰنِ/.test(String(S.ayat[0]||'')))
+    EQ('البسملةُ داخلَ الآيةِ الأولى');
+
+  /* ═══ (٢) qClean — تُنتزَع وتُشغَّل، لا تُحاكى ═══
+     أزورُ تعدُّ «ۚ» و«ۖ» كلماتٍ مستقلّة، فمرجعُ ثلاثِ آياتٍ يصير
+     ثلاثًا وعشرين كلمةً بدل إحدى وعشرين — فتُحسَب عليه كلماتٌ لم
+     تُنطَق أصلًا، وتهبط «سمّعتَ كذا من كذا» بلا ذنبٍ منه. */
+  const mk = /var Q_MARKS = ([\s\S]*?);\nfunction qClean\(t\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!mk) { E('qClean لا تُنتزَع'); return out; }
+  let qClean = null;
+  try { const sb = {}; vm.createContext(sb);
+    vm.runInContext('var Q_MARKS = ' + mk[1] + ';\nf = function(t){' + mk[2] + '\n};', sb);
+    qClean = sb.f; } catch(e){}
+  if (!qClean) { E('qClean لا تُشغَّل'); return out; }
+  const joined = S.ayat.join(' ');
+  const cleaned = qClean(joined);
+  if (/[ؗ-ؚۖ-ۭـٱ]/.test(cleaned))
+    E('qClean تُبقي علاماتِ وقفٍ أو مدٍّ أو ألفًا وصليّةً — تُحسَب كلماتٍ عند أزور');
+  if (!/[ً-ْ]/.test(cleaned))
+    E('qClean تنزع التشكيل — وبه يُنطَق النصُّ ويُقاس');
+  /* ولا تبتلع كلمةً ولا تُبقي علامةً تُحسَب كلمة: كلماتُ النصِّ هي
+     ما فيه حرفٌ عربيّ، والعلامةُ المنفردةُ ليست كلمةً. فالمنقَّى
+     يساويها عددًا، ولا يبقى فيه مَن لا حرفَ فيه. */
+  const LET = /[ء-يٱ]/;
+  const wRaw = joined.split(/\s+/).filter(t => LET.test(t)).length;
+  const clT  = cleaned.split(/\s+/).filter(Boolean);
+  const wCl  = clT.length;
+  if (wCl !== wRaw) E('كلماتُ السورةِ بعد التنقية ' + wCl + ' وكلماتُها قبلَها ' + wRaw);
+  const noLet = clT.filter(t => !LET.test(t));
+  if (noLet.length)
+    E('بقي في المنقَّى ' + noLet.length + ' رمزًا بلا حرفٍ («' + noLet[0] + '») — تُحسَب كلمةً عند أزور');
+  if (wCl < 300) E('كلماتُ سورةِ ق بعد التنقية ' + wCl + ' — أقلُّ ممّا تحتمله السورة');
+
+  /* ═══ (٣) لا يُعرَض إلّا لمن وُثِّق نصُّ سورتِه ═══ */
+  if (!/var QSURAH = \{ saud:50 \};/.test(src))
+    E('قائمةُ سورِ الأبناءِ تغيّرت — ولا تُفتح التلاوةُ إلّا لمن نُزّل نصُّه وتُحقِّق بمصدرَين');
+  if (!/\(QSURAH\[who\] \? '<button data-tab="tilawa"/.test(src))
+    E('تبويبُ التلاوةِ غيرُ مشروطٍ بسورةِ الابن');
+  if (!/\(QSURAH\[who\] \? '<section class="panel" id="tilawa">/.test(src))
+    E('لوحةُ التلاوةِ غيرُ مشروطةٍ بسورةِ الابن');
+  const st = /var Q_STEP = (\d+);/.exec(src);
+  if (!st) E('مقدارُ المقطعِ غيرُ معرَّف');
+  else if (+st[1] < 2 || +st[1] > 6)
+    E('مقطعُ التلاوةِ ' + st[1] + ' آياتٍ — خارجَ ما يُسمّعه صبيٌّ في جلسة');
+
+  /* ═══ (٤) المعروضُ بعلاماتِه والمُرسَلُ منقًّى ═══ */
+  if (!/azureAssess\(ref, true, fb, rb,/.test(src))
+    E('يُرسَل لأزور غيرُ النصِّ المنقَّى');
+  if (!/azureTTS\(ref, true, "-\d+%"\)/.test(src))
+    E('زرُّ الاستماعِ يُرسَل له نصًّا بعلاماتٍ أو بغيرِ تبطيء');
+  if (!/take\.map\(function\(k\)\{ return S\.ayat\[k\]\+' <span/.test(src))
+    E('النصُّ المعروضُ ليس رسمَ المصحفِ بعلاماته');
+
+  /* ═══ (٥) qmode: لا رقمَ ولا لومَ فقرةٍ مظلَّلة ═══ */
+  if (!/function _partRead\(\)\{ if\(qmode\) return false;/.test(src))
+    E('التلاوةُ تُحسَب «فقرةً مظلَّلة» — واللوحتان في صفحةٍ واحدةٍ فالتظليلُ قائمٌ في القراءة');
+  if (!/var what = qmode \? 'سمّع الآياتِ من حفظك'/.test(src))
+    E('يُقال له وهو يسمّع حفظَه «اقرأ القطعة»');
+  const hd = /var head = qmode\n([\s\S]*?)\n      : \(face/.exec(src);
+  if (!hd) E('رأسُ نتيجةِ التلاوةِ لا يُنتزَع');
+  else {
+    if (/النطق:|طلاقة|اكتمال|كلمة\/دقيقة/.test(hd[1]))
+      E('رأسُ التلاوةِ يحمل درجةً — ولا نُقيّم تجويدًا فلا نُعطيه رقمًا عليه');
+    if (!/readCount\+' من '\+refCount\+' كلمة/.test(hd[1]))
+      E('النتيجةُ لا تقول كم سمّع من كم');
+    if (!/الحفظ/.test(hd[1]) || !/التجويد/.test(hd[1]))
+      E('ما صُرّح له أنّ هذا تحقُّقُ حفظٍ لا تجويد — فيحسب الأخضرَ شهادةَ تجويد');
+  }
+  /* لونان لا أربعة: «وصلت» و«ما وصلت». والقاعدةُ تُنتزَع وتُشغَّل. */
+  const cm = /var wc = qmode \? (.*?)\n/.exec(src);
+  if (!cm) E('قاعدةُ تلوينِ التلاوةِ لا تُنتزَع');
+  else {
+    let f = null;
+    try { const sb = {}; vm.createContext(sb);
+      vm.runInContext('f = function(sc){ return ' + cm[1].replace(/^\(|\)$/g,'') + '; };', sb);
+      f = sb.f; } catch(e){}
+    if (!f) E('قاعدةُ تلوينِ التلاوةِ لا تُشغَّل');
+    else {
+      if (f(null) !== 'var(--bad)') E('الكلمةُ التي لم تصل لونُها «' + f(null) + '»');
+      [0, 40, 59, 60, 79, 80, 100].forEach(function(s){
+        if (f(s) !== 'var(--good)')
+          E('كلمةٌ وصلت بدرجةِ ' + s + ' لونُها «' + f(s) + '» — والتلاوةُ لا تُدرَّج');
+      });
+    }
+  }
+  if (!/qmode\n\s*\? '<div style="font-size:\.8rem;color:var\(--muted\);margin-top:4px;font-weight:400">👆 المس أيَّ كلمةٍ لتسمعها · 🟢 وصلت · 🔴 ما وصلت/.test(src))
+    E('مفتاحُ الألوانِ يذكر درجاتٍ لا وجودَ لها في التلاوة');
+
+  /* ═══ (٦) الصفُّ المحفوظ: تلاوةٌ لا نطق ═══ */
+  if (!/if\(qmode\)\{\n\s*saveTilawa\(\{ words:readCount, refWords:refCount,/.test(src))
+    E('التلاوةُ لا تُحفَظ صفَّ تلاوةٍ خاصًّا بها');
+  const sv = /function saveTilawa\(d\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!sv) E('saveTilawa لا تُنتزَع');
+  else {
+    if (!/kind:"tilawa"/.test(sv[1])) E('صفُّ التلاوةِ بلا نوعٍ يُميّزه');
+    if (/kindPron/.test(sv[1]))
+      E('صفُّ التلاوةِ يُحفَظ نطقًا — فيهبط متوسّطُ «النطق» في تقرير الأب بسببٍ ليس سببَه');
+    ['pron','acc:','flu','comp','wpm'].forEach(function(k){
+      if (sv[1].indexOf(k) >= 0) E('صفُّ التلاوةِ يحمل ' + k + ' — ولا درجةَ لتلاوةٍ لم تُقيَّم');
+    });
+    if (!/surah:/.test(sv[1]) || !/from:/.test(sv[1]) || !/to:/.test(sv[1]))
+      E('صفُّ التلاوةِ لا يذكر أيَّ آياتٍ سمّع — فلا يُعرَف ما راجعه من سورتِه');
+  }
+  if (!/Q_CTX = \{ surah:QSURAH\[who\], name:S\.name, from:take\[0\]\+1/.test(src))
+    E('المقطعُ المعروضُ لا يُسجَّل، فالصفُّ يحفظ آياتٍ غيرَ التي سمّعها');
+  /* ═══ (٧) وفي الصفحاتِ التي تجمع: بطاقةٌ له، ولا يُحسَب اختبارًا ═══
+     لو بقي صفًّا عامًّا لدخل «تقرير المنهج الدراسي» باسمِه نسبةً
+     مئويّةً — فيقرأ الأبُ «تلاوة ٩٠٪» وليس في الدنيا تقييمُ تلاوةٍ
+     بتسعين، وإنّما كلماتٌ وصلت وكلماتٌ سقطت. */
+  ['index.html','home.html','child.html'].forEach(function(f){
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) return;
+    const s2 = fs.readFileSync(fp, 'utf8');
+    /* ومُرشِّحان لا واحد: مُرشِّحٌ يجمعه في بابِ الأنشطة، ومُرشِّحٌ
+       يرفعه من الصفوفِ التي تدخل المتوسّطاتِ والعدّاد. فإن سقط من
+       أحدِهما بقيت الكلمةُ في الملفِّ والعطبُ قائم — وهذا ما نجا من
+       حارسٍ أوّلَ مرّةٍ يكتفي بوجودِ الكلمة. */
+    const HEAD = '(?:function\\s*\\((?:row|x)\\)\\{\\s*return\\s+|(?:row|x)\\s*=>\\s*)';
+    const filt = s2.match(new RegExp('filter\\(' + HEAD + '!\\([\\s\\S]{0,400}?\\)', 'g')) || [];
+    const coll = s2.match(new RegExp('filter\\(' + HEAD + '(?:row|x)\\.meta && \\([\\s\\S]{0,400}?\\)', 'g')) || [];
+    if (!filt.length || !filt.some(t => /tilawa/.test(t)))
+      out.push({ sev:'خطأ', file:f, msg:'صفُّ التلاوةِ غيرُ مرفوعٍ من صفوفِ المتوسّطات — يُحسَب اختبارًا ومحاولةً' });
+    if (!coll.length || !coll.some(t => /tilawa/.test(t)))
+      out.push({ sev:'خطأ', file:f, msg:'صفُّ التلاوةِ لا يُجمَع في بابِ الأنشطة — فلا تجد بطاقتُه صفًّا تعرضه' });
+    if (!/kind==="tilawa"/.test(s2))
+      out.push({ sev:'خطأ', file:f, msg:'صفُّ التلاوةِ غيرُ مستثنًى — يُحسَب اختبارًا في تقرير المنهج' });
+    if (!/tilawaAll/.test(s2))
+      out.push({ sev:'خطأ', file:f, msg:'التلاوةُ تُستثنى ولا تُعرَض — فعملُه يذهب بلا أثر' });
+    if (!/RR\.tilawaLine/.test(s2))
+      out.push({ sev:'خطأ', file:f, msg:'سطرُ التلاوةِ مكتوبٌ بيدٍ لا بقاعدةٍ واحدة — فتختلف الصفحات' });
+    if (!/تجويد/.test(s2))
+      out.push({ sev:'خطأ', file:f, msg:'بطاقةُ التلاوةِ لا تقول إنّ التجويدَ غيرُ مقيس' });
+  });
+  const rp = path.join(ROOT, 'report.html');
+  if (fs.existsSync(rp)){
+    const s3 = fs.readFileSync(rp, 'utf8');
+    const RE = m => out.push({ sev:'خطأ', file:'report.html', msg:m });
+    if (!/function tilawaCardHtml\(student\)\{/.test(s3))
+      RE('لا بطاقةَ تلاوةٍ في التقريرِ المفصَّل — وهو موضعُ نظرِ الأب');
+    if (!/tilawaCardHtml\(current\)/.test(s3) ||
+        (s3.match(/tilawaCardHtml\(current\)/g)||[]).length < 2)
+      RE('بطاقةُ التلاوةِ لا تُعرَض في الحالتَين (مع تفصيلِ المهاراتِ وبدونه)');
+    if (/kind==="tilawa"[\s\S]{0,400}pron/.test(s3))
+      RE('بطاقةُ التلاوةِ تقرأ درجةَ نطقٍ — ولا درجةَ لتلاوةٍ لم تُقيَّم');
+  }
+  const rr = path.join(ROOT, 'report-rules.js');
+  if (fs.existsSync(rr)){
+    const s4 = fs.readFileSync(rr, 'utf8');
+    let R = null;
+    try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+      vm.runInContext(s4, sb); R = sb.window.RR; } catch(e){}
+    if (!R || typeof R.tilawaLine !== 'function' || typeof R.tilawaFull !== 'function')
+      out.push({ sev:'خطأ', file:'report-rules.js', msg:'قاعدةُ سطرِ التلاوةِ غيرُ مُصدَّرة' });
+    else {
+      const line = R.tilawaLine({ surahName:'ق', from:1, to:3, words:19, refWords:21 });
+      if (!/سورة ق/.test(line) || !/1–3/.test(line) || !/19 من 21/.test(line))
+        out.push({ sev:'خطأ', file:'report-rules.js', msg:'سطرُ التلاوةِ لا يقول السورةَ والآياتِ وما سمّع: «' + line + '»' });
+      if (/%/.test(line))
+        out.push({ sev:'خطأ', file:'report-rules.js', msg:'سطرُ التلاوةِ يحمل نسبةً مئويّة — والتلاوةُ لا تُدرَّج' });
+      const rows = [
+        { meta:{ refWords:21, words:21 } }, { meta:{ refWords:21, words:19 } },
+        { meta:{ refWords:0,  words:0  } }, { meta:{ refWords:17, words:18 } }
+      ];
+      if (R.tilawaFull(rows) !== 2)
+        out.push({ sev:'خطأ', file:'report-rules.js', msg:'عدُّ التسميعِ التامِّ ' + R.tilawaFull(rows) + ' والصوابُ ٢' });
+    }
+  }
   return out;
 }
 module.exports = run;

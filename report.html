@@ -629,11 +629,55 @@ function stretchCardHtml(d){
 }
 
 
+/* ═══ 📖 التلاوة — ما سمّعه من حفظِه ═══════════════════════════════
+   طلبُ الأب (٢٩ أكتوبر ٢٠٢٦): «تقدر تسويه لهم تلاوة زي الإنجليزي
+   يقيّم تلاوتهم»، وأُخبر صريحًا أنّ أحكامَ التجويدِ (الإدغامُ
+   والإخفاءُ والإقلابُ والتفخيم) لا تُقاس آليًّا — جُرِّبت أزورُ على
+   نصٍّ قرآنيٍّ فرجعت أزمنةُ كلِّ صوتٍ وأسماءُ الفونيماتِ فارغةً،
+   فالزمنُ يُقاس والحرفُ لا يُسمَّى.
+
+   فالمعروضُ هنا ما يصحُّ قياسُه: أيَّ آياتٍ سمّع، وكم كلمةً وصلت
+   من كلماتِها، وكم تسميعًا تمَّ بلا سقطةٍ واحدة. ولا متوسّطَ نسبٍ
+   هنا: السقطُ في آيةٍ بعينها هو الخبر، لا رقمٌ يُخفيه. */
+function tilawaRows(student){
+  return ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kind==="tilawa"; })
+            .sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); });
+}
+function tilawaCardHtml(student){
+  var rows = tilawaRows(student);
+  if(!rows.length) return "";
+  var full = rows.filter(function(r){ var m=r.meta;
+    return m.refWords>0 && (m.words||0) >= m.refWords; }).length;
+  var sec = rows.reduce(function(s,r){ return s + (r.meta.audioSec||0); }, 0);
+  return '<div class="card"><h2>📖 التلاوة</h2>'+
+    '<p class="note">تحقُّقٌ من <b>الحفظ</b> لا من <b>التجويد</b>: الصفحةُ تُقابل ما سمّعه '+
+    'بنصِّ المصحف وتُلوّن ما وصل وما سقط. وأحكامُ التجويدِ تُعرَض على معلّمه — '+
+    'لا يقيسها البرنامج ولا يُعطيه عليها رقمًا.</p>'+
+    '<div class="stats">'+
+      '<div class="stat"><div class="v">'+rows.length+'</div><div class="l">تسميعًا</div></div>'+
+      '<div class="stat"><div class="v">'+full+'</div><div class="l">تامٌّ بلا نقص</div></div>'+
+      '<div class="stat"><div class="v">'+Math.round(sec/60)+'</div><div class="l">دقيقة تلاوة</div></div>'+
+    '</div>'+
+    '<ul class="sk">'+rows.slice(0,10).map(function(r){
+      var m=r.meta, ok=(m.refWords>0 && (m.words||0)>=m.refWords);
+      return '<li><span class="pill" style="background:'+(ok?'var(--good)':'var(--warn)')+';color:#fff">'+
+        (m.words||0)+'/'+(m.refWords||0)+'</span>'+
+        '<span class="nm">'+(window.RR ? esc(RR.tilawaLine(m)) : 'سورة '+esc(String(m.surahName||'')))+
+        '<span style="display:block;font-weight:400;font-size:.78rem;color:var(--muted)">'+
+          saTime(r.created_at)+(m.audioSec?' · '+m.audioSec+'ث':'')+'</span>'+
+        '</span></li>';
+    }).join("")+'</ul>'+
+    (rows.length>10?'<p class="note">وأقدم منها '+(rows.length-10)+' تسميعًا.</p>':'')+
+  '</div>';
+}
+
 /* ===== 🗣️ النطق (من قسم «قيّم نطقي» في القراءة) =====
    بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا فما أتابع نطقهم».
    صار reading.html يحفظ كلّ تقييم (انظر savePron هناك)، وهنا نعرضه: المتوسّط،
    والاتجاه، وسرعة القراءة كلمة/دقيقة — وهي مؤشّر طلاقةٍ لا تعطيه الدرجة وحدها. */
 function pronRows(student){
+  /* وصفوفُ التلاوةِ ليست صفوفَ نطقٍ أصلًا (kind="tilawa" لا kindPron)،
+     فلا تدخل هذا المتوسّطَ ولو تشابه البابان — انظر tilawaCardHtml. */
   return ALL.filter(function(r){ return r.student===student && r.meta && r.meta.kindPron===true; })
             .sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); });
 }
@@ -797,6 +841,7 @@ function render(){
       writingCardHtml(current)+
       talkCardHtml(current)+
       pronCardHtml(current)+
+      tilawaCardHtml(current)+
       micFailCardHtml(current)+
       azureQuotaHtml()+
       stretchCard;
@@ -835,6 +880,7 @@ function render(){
     writingCardHtml(current)+
     talkCardHtml(current)+
     pronCardHtml(current)+
+    tilawaCardHtml(current)+
     micFailCardHtml(current)+
     azureQuotaHtml()+
     stretchCard+

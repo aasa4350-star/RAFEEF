@@ -242,7 +242,7 @@ async function main(){
      لها هنا إطلاقًا، وجلساتها أيضًا en_total=0/ma_total=0 فتُخفّض
      المستوى زورًا — وسعود فعلًا عنده جلسات محادثة حقيقية اليوم كانت
      تُحسب صفرًا في معدّله بصمت. */
-  const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"));
+  const practice=rows.filter(x=> x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"||x.meta.kind==="tilawa"));
   /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج — صفُّ
      activity لا يدخل متوسّطًا (reading.html/saveActivity، بلاغ ٢٥ سبتمبر). */
   /* ═══ أثرٌ عتيقٌ بجانبِ درجةٍ كاملة ═══════════════════════════════
@@ -265,7 +265,7 @@ async function main(){
   const remActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="rem");
   /* جولاتُ القواعدِ المركَّزة — انظر saveGram في practice.html */
   const gramActs=rows.filter(x=> x.meta && x.meta.kind==="activity" && x.meta.sect==="gram");
-  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")));
+  rows=rows.filter(x=> !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"||x.meta.kind==="tilawa")));
   /* الورقة الناقصة (خرج قبل إكمال المادّتين): تُعرض في السجلّ ولا تُحسب
      في المستوى ولا في المعدّلات — مقامها عدد ما أجاب لا عدد الأسئلة،
      فجلسةُ خمسة أسئلة تُزحزح «المستوى الحالي» كأنّها ورقةٌ كاملة. */
@@ -384,7 +384,7 @@ async function main(){
        (محاولتان · المتوسط ٦٣٪)». وهذا لا يُفيده في شيء: المقصودُ من
        المقياس مجالاتُه الأربعةُ لا متوسّطُها، فالمتوسّطُ يُخفي أنّ
        اللغويَّ ٨/٨ والعلميَّ الميكانيكيَّ ٣/٨. فصار له قسمُه. */
-    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[], studyAll=[];
+    const vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[], studyAll=[], tilawaAll=[];
     practice.forEach(p=>{
       const t=(p.meta.test||"");
       /* الإخفاءُ أوّلَ الفرزِ لا بعدَه: كانت صفوفُ «التجريبية» تُعزَل قبله
@@ -396,6 +396,7 @@ async function main(){
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
+      if(p.meta.kind==="tilawa"){ tilawaAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
       const subj=RR.subjectOf(t);
       if(t.indexOf("موهبة")===0){ mawhibaAll.push(p); }
@@ -675,6 +676,15 @@ async function main(){
         gKeys.slice(0,6).map(k=>{ const e=gBy[k];
           return '<li>'+k+' <span class="cnt">صحّحت '+e.f+(e.r?' · بقي '+e.r:'')+'</span></li>'; }).join("")+
         '</ul><small style="color:var(--muted)">الطابورُ من أخطائك أنت، والسؤالُ لا يخرج حتى تُجيبه صحيحًا.</small></div>';
+    }
+    /* ═══ 📖 التلاوة ═══ وهذه صفحةُ الابنِ نفسِه فالخطابُ له */
+    if(tilawaAll.length){
+      const tlw=tilawaAll.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
+      html+=`<div class="sec-title"><span class="dot"></span> 📖 التلاوة</div><div class="card"><ul class="weak">`+
+        `<li>📖 سمّعت <b>${tlw.length}</b> مرّة · منها <b>${RR.tilawaFull(tlw)}</b> ما سقطت فيها كلمة</li>`+
+        `<li style="font-weight:400">وهذا تحقُّقٌ من <b>حفظك</b> لا من <b>تجويدك</b> — التجويدُ تعرضه على معلّمك.</li>`+
+        tlw.slice(0,5).map(p=>`<li>${RR.tilawaLine(p.meta)} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+        `</ul></div>`;
     }
     if(talkActs.length && !talkAll.length){
       const ta=talkActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);

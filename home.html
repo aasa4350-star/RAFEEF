@@ -385,7 +385,7 @@ async function loadReport(){
      لم تكن تُستثنى هنا أيضًا، وهي محفوظة دائمًا en_total=0/ma_total=0
      فتُخفّض enAvg/maAvg و«المستوى الحالي» زورًا كلّما كتب الابن فقرة
      أو تكلّم في talk.html. هذه هي الصفحة التي يفتحها الابن نفسه. */
-  var practice=rows.filter(function(x){ return x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"); });
+  var practice=rows.filter(function(x){ return x.meta && (x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"||x.meta.kind==="tilawa"); });
   /* أثرُ القراءة: فتح القطعة وأجاب عن أقلَّ من ثلاثةٍ ثمّ خرج. صفُّ
      activity لا يدخل متوسّطًا، ويُعرض في بطاقة القراءة ليعرف الأب أنّه
      فتح القسم فعلًا — انظر reading.html (saveActivity) وبلاغ ٢٥ سبتمبر. */
@@ -399,7 +399,7 @@ async function loadReport(){
      يُعنى به الأبُ ليس عددَ الجولاتِ بل كم خطأً صحّحه فعلًا، فهو
      محفوظٌ في meta.fixed، والباقي في meta.remain من أحدثِ صفّ. */
   var gramActs=rows.filter(function(x){ return x.meta && x.meta.kind==="activity" && x.meta.sect==="gram"; });
-  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk")); });
+  rows=rows.filter(function(x){ return !(x.meta && (x.meta.kind==="micfail"||x.meta.kind==="activity"||x.meta.kind==="practice"||x.meta.kind==="writing"||x.meta.kind==="writing-drill"||x.meta.kind==="talk"||x.meta.kind==="tilawa")); });
 
   var notes=[];
   try{ var nr=await fetch("notes/"+who+".json?t="+Date.now()); if(nr.ok) notes=await nr.json(); }catch(e){}
@@ -454,13 +454,14 @@ async function loadReport(){
        (محاولتان · المتوسط ٦٣٪)». وهذا لا يُفيده في شيء: المقصودُ من
        المقياس مجالاتُه الأربعةُ لا متوسّطُها، فالمتوسّطُ يُخفي أنّ
        اللغويَّ ٨/٨ والعلميَّ الميكانيكيَّ ٣/٨. فصار له قسمُه. */
-    var vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[];
+    var vocabAll=[], readAll=[], dictAll=[], writingAll=[], writingDrill=[], talkAll=[], pronAll=[], prevAll=[], mawhibaAll=[], tilawaAll=[];
     practice.forEach(function(p){
       /* مواد فوق الصفّ تُعزل أوّلًا — تُعرض ولا تدخل أيّ متوسّط */
       if(window.RR && RR.isPreview(p)){ prevAll.push(p); return; }
       if(p.meta.kind==="writing"){ writingAll.push(p); return; }
       if(p.meta.kind==="writing-drill"){ writingDrill.push(p); return; }
       if(p.meta.kind==="talk"){ talkAll.push(p); return; }
+      if(p.meta.kind==="tilawa"){ tilawaAll.push(p); return; }
       if(p.meta.kindPron===true){ pronAll.push(p); return; }
       var t=(p.meta.test||""); var subj=RR.subjectOf(t);
       if(hidden.some(function(rx){ return rx.test(t); })) return;
@@ -746,6 +747,19 @@ async function loadReport(){
         gKeys.slice(0,6).map(function(k){ var e=gBy[k];
           return '<li>'+k+' <span class="cnt">صحّح '+e.f+(e.r?' · بقي '+e.r:'')+'</span></li>'; }).join("")+
         '</ul><small style="color:var(--muted)">الطابورُ من أخطائه هو، والسؤالُ لا يخرج حتى يُجيبه صحيحًا.</small></div>';
+    }
+    /* ═══ 📖 التلاوة — تسميعُ حفظٍ لا تقييمُ تجويد ═══════════════
+       طلبُ الأب (٢٩ أكتوبر ٢٠٢٦). والمعروضُ ما يصحُّ قياسُه آليًّا:
+       أيَّ آياتٍ سمّع وكم كلمةً وصلت — ويُقال صريحًا إنّ التجويدَ
+       ليس مقيسًا، فلا يُقرأ الأخضرُ شهادةَ تجويد. */
+    if(tilawaAll.length){
+      var tlw=tilawaAll.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
+      html+='<div class="sec-title"><span class="dot"></span> 📖 التلاوة</div><div class="card"><ul class="weak">'+
+        '<li>📖 <b>'+tlw.length+'</b> تسميعًا · تامٌّ بلا نقص <b>'+RR.tilawaFull(tlw)+'</b></li>'+
+        '<li style="font-weight:400">تحقُّقٌ من <b>الحفظ</b> لا من <b>التجويد</b> — والتجويدُ يُعرَض على معلّمه.</li>'+
+        tlw.slice(0,5).map(function(p){ return '<li>'+RR.tilawaLine(p.meta)+
+          ' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+        '</ul></div>';
     }
     if(talkActs.length && !talkAll.length){
       var ta=talkActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
