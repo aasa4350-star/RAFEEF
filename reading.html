@@ -1088,10 +1088,25 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
       (_partRead() ? '<div style="font-size:.84rem;color:var(--good);margin-top:6px;font-weight:700">'+
         '🟩 هذي درجةُ <b>الفقرة المظلَّلة</b> وحدها — ما انقطع التسجيل. وبقيّةُ القطعة تقرأها بعينك للأسئلة.</div>' : '')+
       (qmode
-        ? '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أيَّ كلمةٍ لتسمعها · 🟢 وصلت · 🔴 ما وصلت</div>'
+        ? '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أيَّ كلمةٍ لتسمع آيتَها بصوت '+QARI[qariOf()].name+' · 🟢 وصلت · 🔴 ما وصلت <span data-qnow style="color:var(--good);font-weight:700"></span></div>'
         : '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>');
     // نطق الكلمة لحدها عند الضغط عليها — عشان يتعلّم الكلمات الغلط
-    statusEl.querySelectorAll(".rword").forEach(function(sp){ sp.addEventListener("click", function(){ var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
+    /* ═══ وفي التلاوةِ لا تُنطَق كلمةٌ قرآنيّةٌ بمُركِّبِ صوت ═══
+       الكلمةُ المفردةُ من القرآنِ تُلفَظ عند المُركِّبِ بلا مدٍّ ولا
+       وقفٍ كسائرِ الكلام، فيُحفَظ عنه اللحن. فلمسُ الكلمةِ يُشغّل
+       تسجيلَ القارئِ لآيتِها كاملةً — وهو ما يُراجع به حفظَه. */
+    statusEl.querySelectorAll(".rword").forEach(function(sp, wi){ sp.addEventListener("click", function(){
+      if(qmode){
+        var c = Q_CTX || {}, ay = (c.wordAyah || [])[wi];
+        if(!ay || !c.surah) return;
+        QAUDIO.play([{ ayah:ay, url:qAudioUrl(c.surah, ay) }], function(st){
+          var el = statusEl.querySelector("[data-qnow]");
+          if(el) el.textContent = (st === "play") ? ("🔊 الآية " + ay)
+                 : (st === "error") ? "📡 ما وصل التسجيل" : "";
+        });
+        return;
+      }
+      var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — كانت النتيجة
        تُعرض للطفل ثمّ تضيع، فلا الأب يرى مستوى نطقهم ولا نعرف كم استهلكنا من
        حصّة أزور المجانية. صار كلّ تقييمٍ صفًّا مثل بقية الأقسام. */
@@ -1495,6 +1510,63 @@ function qSetPos(n){ try{ localStorage.setItem("q_pos_"+who, String(n)); }catch(
 /* المقطعُ المعروضُ الآن — يُقرأ عند الحفظ ليُكتَب في الصفِّ أيُّ
    آياتٍ سمّعها، فيُعرَف ما راجعه من السورةِ لا عددٌ مجرَّد. */
 var Q_CTX = null;
+
+/* ═══ يُسمَع من قارئٍ لا من مُركِّبِ صوت ═══════════════════════════
+   بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): «غلط كذا، ابيك تحط تلاوة ماهر
+   المعيقلي او ياسر الدوسري بدال القراءة هذي». وهو الصواب: مُركِّبُ
+   أزورَ يلفظ النصَّ عربيّةً معاصرةً — بلا مدٍّ ولا غنّةٍ ولا وقف،
+   ويصل ما يُوقَف عليه. والصبيُّ يسمع فيحفظ ما سمع، فيُعلَّم اللحنَ
+   من حيث أردنا أن نُعينه.
+
+   فالمسموعُ تسجيلُ قارئٍ، آيةً آية. والمصدرُ everyayah.com: لكلِّ
+   آيةٍ ملفٌّ باسمٍ قياسيّ — ثلاثُ خاناتٍ للسورةِ وثلاثٌ للآية.
+   وجُرّب المجلَّدان من هنا قبل كتابتِهما: ق ١ و٤٥ تُرجعان صوتًا،
+   و٤٦ (ولا وجودَ لها) تُرجع ٤٠٤ — فالأسماءُ على ما يُظَنّ.
+
+   والمعيقليُّ هو الأصلُ لأنّه ٦٤ك/ث والدوسريُّ ١٢٨ك/ث، وهذا يُقرأ
+   على بياناتِ الجوّال. والاختيارُ محفوظٌ في جهازِه. */
+var QARI = {
+  maher:   { name:"ماهر المعيقلي", dir:"Maher_AlMuaiqly_64kbps" },
+  dussary: { name:"ياسر الدوسري",  dir:"Yasser_Ad-Dussary_128kbps" }
+};
+var QARI_DEF = "maher";
+function qariOf(){
+  try{ var k = localStorage.getItem("q_qari_"+who); return QARI[k] ? k : QARI_DEF; }
+  catch(e){ return QARI_DEF; }
+}
+function qariSet(k){ try{ if(QARI[k]) localStorage.setItem("q_qari_"+who, k); }catch(e){} }
+function qPad(n, w){ var s = String(n); while(s.length < w) s = "0" + s; return s; }
+function qAudioUrl(surah, ayah, qari){
+  var q = QARI[qari] ? qari : qariOf();
+  return "https://everyayah.com/data/" + QARI[q].dir + "/" +
+         qPad(surah, 3) + qPad(ayah, 3) + ".mp3";
+}
+/* مُشغِّلٌ واحدٌ للصفحةِ كلِّها: يُسلسل الآياتِ ويُخبر بحالِه.
+   وإن تعذّر التسجيلُ فلا بديلَ آليًّا — يُقال له الحقُّ ويسكت،
+   فسماعُ القرآنِ بمُركِّبِ صوتٍ أسوأُ من ألّا يُسمَع. */
+var QAUDIO = (function(){
+  var a = null, list = [], at = 0, st = null;
+  function tell(s, i){ if(st){ try{ st(s, i); }catch(e){} } }
+  function kill(){ if(a){ try{ a.pause(); }catch(e){} a.onended = null; a.onerror = null; a = null; } }
+  function step(){
+    if(at >= list.length){ kill(); list = []; at = 0; tell("end"); return; }
+    a = new Audio(list[at].url);
+    a.onended = function(){ at++; step(); };
+    a.onerror = function(){ kill(); list = []; at = 0; tell("error"); };
+    tell("play", list[at].ayah);
+    try{
+      var p = a.play();
+      if(p && p["catch"]) p["catch"](function(){ kill(); list = []; at = 0; tell("error"); });
+    }catch(e){ kill(); list = []; at = 0; tell("error"); }
+  }
+  return {
+    playing: function(){ return !!a; },
+    stop: function(){ var was = !!a; kill(); list = []; at = 0; if(was) tell("stop"); },
+    play: function(items, onState){
+      this.stop(); st = onState || null; list = (items || []).slice(); at = 0; step();
+    }
+  };
+})();
 
 /* ═══ صفُّ التلاوةِ لا يُخلَط بصفوفِ النطق ═══════════════════════════
    درجةُ أزور على نصٍّ قرآنيٍّ ليست درجتَها على عربيّةٍ معاصرة: المدودُ
@@ -3667,16 +3739,33 @@ if(!META[who] || !DATA[who]){
     var shown = take.map(function(k){ return S.ayat[k]; }).join(" ");
     var ref = qClean(shown);
     var canRec = azureConfigured();
-    Q_CTX = { surah:QSURAH[who], name:S.name, from:take[0]+1, to:take[take.length-1]+1 };
+    /* موضعُ كلِّ كلمةٍ من آيتِها: بها يُعرَف أيُّ تسجيلٍ يُشغَّل حين
+       يلمس كلمةً سقطت — فالتسجيلُ آيةٌ كاملةٌ لا كلمةٌ مفردة. */
+    var wordAyah = [];
+    take.forEach(function(k){
+      qClean(S.ayat[k]).split(/\s+/).filter(Boolean).forEach(function(){ wordAyah.push(k + 1); });
+    });
+    Q_CTX = { surah:QSURAH[who], name:S.name, from:take[0]+1, to:take[take.length-1]+1,
+              ayat:take.map(function(k){ return k + 1; }), wordAyah:wordAyah, qari:qariOf() };
 
     sec.innerHTML =
       '<div class="block-title"><span class="dot"></span> 📖 تلاوة — سورة '+S.name+'</div>'+
       '<p class="hint">سمّع من حفظك، والصفحةُ تتحقّق من <b>الكلمات</b>: ما وصل يطلع أخضر وما سقط أحمر. '+
       'وهذا <b>تحقُّقٌ من الحفظ</b> لا تقييمُ تجويد — التجويدُ يُعرَض على معلّمك.</p>'+
       '<div class="passage" data-q-wrap>'+
-        '<div class="row"><button class="say" data-q-listen>🔊 استمع للآيات</button>'+
+        '<div class="row"><button class="say" data-q-listen>🔊 استمع بصوت '+QARI[qariOf()].name+'</button>'+
           (canRec ? '<button class="say small azbtn" style="background:#0e9f6e;color:#fff;border-color:#0e9f6e" data-q-rec>🎙️ سمّع حفظك</button>' : '')+
           micTestBtnHtml()+'</div>'+
+        /* القارئان اللذان اختارهما الأب، والاختيارُ يبقى في الجهاز */
+        '<div class="row" style="margin-top:6px;font-size:.86rem;align-items:center">'+
+          '<span style="color:var(--muted);font-weight:700">القارئ:</span>'+
+          Object.keys(QARI).map(function(k){
+            var on = (k === qariOf());
+            return '<button class="say small" data-q-qari="'+k+'" style="'+
+              (on ? 'background:var(--good);border-color:var(--good);color:#fff;font-weight:800' : '')+
+              '">'+(on ? '✓ ' : '')+QARI[k].name+'</button>';
+          }).join('')+
+        '</div>'+
         '<div data-mictest style="display:none;margin-top:8px"></div>'+
         '<div class="txt" data-q-txt style="direction:rtl;text-align:right;font-size:1.5rem;line-height:2.6;font-family:\'Traditional Arabic\',\'Scheherazade New\',Tahoma,serif">'+
           take.map(function(k){ return S.ayat[k]+' <span style="color:var(--muted);font-size:.7em">﴿'+(k+1)+'﴾</span>'; }).join(' ')+
@@ -3693,19 +3782,45 @@ if(!META[who] || !DATA[who]){
 
     var fb = sec.querySelector("[data-q-fb]");
     var lb = sec.querySelector("[data-q-listen]");
-    /* يُسمَع النصُّ المُنقَّى لا الخام: علاماتُ الوقفِ والمدِّ تُقرأ عند
-       مُركِّبِ الصوتِ حروفًا فيخرج لفظٌ غريب. ومُبطَّأٌ لأنّه تلاوة. */
-    if(lb) lb.addEventListener("click", function(){ azureTTS(ref, true, "-25%"); });
+    /* زرٌّ واحدٌ يُشغّل ويُوقف، ويقول أيَّ آيةٍ يسمع الآن. وإن تعذّر
+       التسجيلُ قيل له السببُ ولا يُستعاض عنه بمُركِّبِ صوت. */
+    function qLabel(){ return '🔊 استمع بصوت ' + QARI[qariOf()].name; }
+    function qState(st, ayah){
+      if(!lb) return;
+      if(st === "play"){ lb.textContent = '⏸️ إيقاف — الآية ' + ayah;
+        if(fb) fb.innerHTML = '🔊 تسمع الآن الآيةَ <span class="en">' + ayah + '</span> بصوت ' +
+          QARI[qariOf()].name + '.'; return; }
+      lb.textContent = qLabel();
+      if(st === "error" && fb)
+        fb.innerHTML = '<span style="color:var(--bad)">📡 ما قدرتُ أُنزّل التسجيل — تأكّد من الإنترنت ثمّ جرّب.</span>'+
+          '<div style="font-weight:400;font-size:.84rem;color:var(--muted);margin-top:4px">'+
+          'ولن نقرأها لك بصوتٍ آليّ: القرآنُ يُسمَع من قارئ.</div>';
+      else if(fb && st !== "stop") fb.innerHTML = '';
+    }
+    if(lb) lb.addEventListener("click", function(){
+      if(QAUDIO.playing()){ QAUDIO.stop(); return; }
+      QAUDIO.play(take.map(function(k){
+        return { ayah:k+1, url:qAudioUrl(QSURAH[who], k+1) }; }), qState);
+    });
+    /* تبديلُ القارئ: يُوقف ما يجري ثمّ تُعاد البناءُ باسمِه الجديد */
+    sec.querySelectorAll("[data-q-qari]").forEach(function(b){
+      b.addEventListener("click", function(){
+        QAUDIO.stop(); qariSet(b.getAttribute("data-q-qari")); renderTilawa();
+      });
+    });
     var rb = sec.querySelector("[data-q-rec]");
     if(rb) rb.addEventListener("click", function(){
+      QAUDIO.stop();           /* لا يُسجَّل عليه صوتُ القارئ */
       rb.disabled = true;
       azureAssess(ref, true, fb, rb, function(){ rb.disabled = false; },
                   true, function(){ rb.disabled = false; }, 0, true);
     });
     var nx = sec.querySelector("[data-q-next]");
-    if(nx) nx.addEventListener("click", function(){ qSetPos((from + Q_STEP) % n); renderTilawa(); });
+    if(nx) nx.addEventListener("click", function(){ QAUDIO.stop(); qSetPos((from + Q_STEP) % n); renderTilawa(); });
     var rs = sec.querySelector("[data-q-restart]");
-    if(rs) rs.addEventListener("click", function(){ qSetPos(0); renderTilawa(); });
+    if(rs) rs.addEventListener("click", function(){ QAUDIO.stop(); qSetPos(0); renderTilawa(); });
+    /* ولا يبقى القارئُ يتلو وقد غادر اللوحةَ أو بدأ يسمّع */
+    sec._leave = function(){ QAUDIO.stop(); };
     try{ wireMicTest(sec.querySelector("[data-q-wrap]")); }catch(e){}
   }
 

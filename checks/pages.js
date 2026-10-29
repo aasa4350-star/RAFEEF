@@ -4846,8 +4846,66 @@ function quranTilawaPath(){
   /* ═══ (٤) المعروضُ بعلاماتِه والمُرسَلُ منقًّى ═══ */
   if (!/azureAssess\(ref, true, fb, rb,/.test(src))
     E('يُرسَل لأزور غيرُ النصِّ المنقَّى');
-  if (!/azureTTS\(ref, true, "-\d+%"\)/.test(src))
-    E('زرُّ الاستماعِ يُرسَل له نصًّا بعلاماتٍ أو بغيرِ تبطيء');
+  /* ═══ ولا يُسمَع القرآنُ من مُركِّبِ صوت ═══
+     بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): «غلط كذا، ابيك تحط تلاوة ماهر
+     المعيقلي او ياسر الدوسري». والمُركِّبُ يلفظ النصَّ عربيّةً
+     معاصرةً بلا مدٍّ ولا غنّةٍ ولا وقف، فيُحفَظ عنه اللحن. */
+  const tilBlk = /function renderTilawa\(\)\{([\s\S]*?)\n  \}\n/.exec(src);
+  if (!tilBlk) E('لوحةُ التلاوةِ لا تُنتزَع');
+  else if (/azureTTS|speechSynthesis|speak\(/.test(tilBlk[1]))
+    E('القرآنُ يُسمَع من مُركِّبِ صوتٍ في لوحةِ التلاوة');
+  if (!/QAUDIO\.play\(take\.map\(function\(k\)\{\s*\n\s*return \{ ayah:k\+1, url:qAudioUrl\(QSURAH\[who\], k\+1\) \}; \}\), qState\)/.test(src))
+    E('زرُّ الاستماعِ لا يُشغّل تسجيلَ القارئِ لآياتِ المقطع');
+  if (/qmode[\s\S]{0,200}azureTTS\(wt/.test(src))
+    E('لمسُ الكلمةِ القرآنيّةِ يُنطقها بمُركِّبِ صوتٍ مفردةً — بلا مدٍّ ولا وقف');
+  if (!/if\(qmode\)\{\s*\n\s*var c = Q_CTX \|\| \{\}, ay = \(c\.wordAyah \|\| \[\]\)\[wi\];/.test(src))
+    E('لمسُ الكلمةِ لا يُشغّل تسجيلَ آيتِها');
+  /* والقارئان: أسماءُ مجلّداتٍ جُرّبت فأرجعت صوتًا، لا تُخمَّن */
+  const QD = { maher:'Maher_AlMuaiqly_64kbps', dussary:'Yasser_Ad-Dussary_128kbps' };
+  Object.keys(QD).forEach(function(k){
+    if (!new RegExp(k + ':\\s*\\{ name:"[^"]+",\\s*dir:"' + QD[k] + '" \\}').test(src))
+      E('مجلَّدُ القارئِ «' + k + '» ليس ' + QD[k] + ' — وهذا الاسمُ جُرّب فأرجع صوتًا');
+  });
+  /* والرابطُ يُبنى بخاناتٍ مصفوفة: 050001 لا 501 */
+  const ua = /function qAudioUrl\(surah, ayah, qari\)\{([\s\S]*?)\n\}/.exec(src);
+  const up = /function qPad\(n, w\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!ua || !up) E('بناءُ رابطِ التسجيلِ لا يُنتزَع');
+  else {
+    let f = null;
+    try { const sb = { QARI:{ maher:{ dir:QD.maher }, dussary:{ dir:QD.dussary } },
+                       qariOf:function(){ return 'maher'; } };
+      vm.createContext(sb);
+      vm.runInContext('function qPad(n, w){' + up[1] + '\n}\n' +
+                      'f = function(surah, ayah, qari){' + ua[1] + '\n};', sb);
+      f = sb.f; } catch(e){}
+    if (!f) E('بناءُ رابطِ التسجيلِ لا يُشغَّل');
+    else {
+      /* ولا يُسقِط الحارسَ خطأُ تشغيلٍ في الكودِ المفحوص: ما يرميه
+         يُبلَّغ عنه عطبًا. وقد جُرّبت طفرةٌ تطلب قارئًا لا وجودَ له
+         فرمت TypeError، فمات الحارسُ ولم يقل شيئًا — وموتُه صامتًا
+         أسوأُ من العطبِ نفسِه. */
+      const T = function(label, args){
+        try { return { v: f.apply(null, args) }; }
+        catch(e){ E('بناءُ الرابطِ يرمي خطأً عند ' + label + ': ' + (e.message||e)); return null; }
+      };
+      const r1 = T('الآيةِ الأولى', [50, 1]);
+      const want = 'https://everyayah.com/data/' + QD.maher + '/050001.mp3';
+      if (r1 && r1.v !== want) E('رابطُ الآيةِ الأولى «' + r1.v + '» والمنتظَر «' + want + '»');
+      if (r1 && String(r1.v).indexOf('https://') !== 0)
+        E('التسجيلُ يُنزَّل بغيرِ اتّصالٍ موثَّق');
+      const r2 = T('الآيةِ ٤٥', [50, 45]);
+      if (r2 && r2.v !== 'https://everyayah.com/data/' + QD.maher + '/050045.mp3')
+        E('رابطُ الآيةِ ٤٥ خطأ: ' + r2.v);
+      const r3 = T('القارئِ الثاني', [50, 1, 'dussary']);
+      if (r3 && r3.v !== 'https://everyayah.com/data/' + QD.dussary + '/050001.mp3')
+        E('رابطُ القارئِ الثاني خطأ: ' + r3.v);
+      /* واسمٌ لا نملك تسجيلَه يرجع إلى قارئٍ عندنا، ولا يُبنى به
+         رابطٌ إلى مجلَّدٍ لا وجودَ له فيُقال له «ما وصل التسجيل». */
+      const r4 = T('قارئٍ مجهول', [50, 1, 'afasy']);
+      if (r4 && !Object.keys(QD).some(k => String(r4.v).indexOf(QD[k]) > 0))
+        E('قارئٌ لا تسجيلَ له يُبنى له رابطٌ: ' + r4.v);
+    }
+  }
   if (!/take\.map\(function\(k\)\{ return S\.ayat\[k\]\+' <span/.test(src))
     E('النصُّ المعروضُ ليس رسمَ المصحفِ بعلاماته');
 
@@ -4883,8 +4941,16 @@ function quranTilawaPath(){
       });
     }
   }
-  if (!/qmode\n\s*\? '<div style="font-size:\.8rem;color:var\(--muted\);margin-top:4px;font-weight:400">👆 المس أيَّ كلمةٍ لتسمعها · 🟢 وصلت · 🔴 ما وصلت/.test(src))
-    E('مفتاحُ الألوانِ يذكر درجاتٍ لا وجودَ لها في التلاوة');
+  const lg = /qmode\n\s*\? '<div style="font-size:\.8rem[\s\S]{0,500}?<\/div>'/.exec(src);
+  if (!lg) E('مفتاحُ ألوانِ التلاوةِ لا يُنتزَع');
+  else {
+    if (!/🟢 وصلت · 🔴 ما وصلت/.test(lg[0]))
+      E('مفتاحُ الألوانِ يذكر درجاتٍ لا وجودَ لها في التلاوة');
+    if (/نطقها الصحيح|🟡/.test(lg[0]))
+      E('مفتاحُ التلاوةِ يَعِد بنطقِ كلمةٍ مفردةٍ أو بتدريجٍ لا وجودَ له');
+    if (!/لتسمع آيتَها/.test(lg[0]))
+      E('لا يُقال له إنّ اللمسَ يُسمعه الآيةَ كاملةً بصوتِ القارئ');
+  }
 
   /* ═══ (٦) الصفُّ المحفوظ: تلاوةٌ لا نطق ═══ */
   if (!/if\(qmode\)\{\n\s*saveTilawa\(\{ words:readCount, refWords:refCount,/.test(src))
