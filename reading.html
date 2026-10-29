@@ -798,6 +798,10 @@ var READ_DIAG = { maxRz:0, partOnly:0 };
 function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
   var SDK = window.SpeechSDK;
   var allWords=[], segs=[], _fin=false, _to, _userStopped=false, _tries=0, rec=null, _resumes=0;
+  /* التلاوةُ تُعرَّف تعريفًا خامًا ويُجمَع ما سُمع نصًّا — لا تقييمَ
+     نطقٍ فيها، لأنّه يُجبِر التعرّفَ على المرجعِ فلا يرى المُبدَل.
+     (القياسُ كاملًا فوقَ qKeys.) */
+  var allText=[];
   /* ثواني الصوت الفعليّة كما تعدّها أزور (result.duration بوحدة ١٠٠ نانوثانية).
      نجمعها لسببين: قياس استهلاك الحصّة المجانية (٥ ساعات شهريًّا) بدقّة،
      وحساب سرعة القراءة (كلمة/دقيقة) وهي مؤشّر طلاقةٍ حقيقيّ. */
@@ -925,6 +929,56 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
     /* لم نُمسك من قراءته شيئًا. مفصولةٌ عن finish لأنّ المطابقة أدناه
        قد تنتهي إلى الحكم نفسِه (كلّ ما رجع متروكات)، و_fin حينئذٍ
        مرفوعٌ فلا يُستأنف finish من داخله. */
+    /* عرضُ التلاوةِ وحفظُها — مفصولٌ عن مسارِ النطقِ كلِّه فلا
+       يختلط حسابٌ بحساب، ولا يُعرَض له رقمُ نطقٍ ولا طلاقة. */
+    function qFinish(mark, refWordsArr, nOk, nSub, nUnk, heardN){
+      var esc2 = function(x){ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+      var html = refWordsArr.map(function(w, i){
+        var m2 = mark[i], c = (m2.st === "ok") ? "var(--good)" : (m2.st === "sub") ? "var(--warn)" : "#9ca3af";
+        var tip = (m2.st === "sub") ? (" — سمعناها: " + m2.said) : (m2.st === "unk" ? " — ما تبيّنّاها" : "");
+        return '<span class="rword" data-w="'+encodeURIComponent(w)+'" data-st="'+m2.st+'"'+
+          (m2.st === "sub" ? (' data-said="'+encodeURIComponent(m2.said)+'"') : '')+
+          ' title="'+esc2(w + tip)+'" style="color:'+c+';cursor:pointer;border-bottom:1px '+
+          (m2.st === "ok" ? "dotted" : "dashed")+' '+c+'">'+esc2(w)+'</span>';
+      }).join(' ');
+      var subList = refWordsArr.map(function(w, i){
+        return mark[i].st === "sub" ? ('<li><b>'+esc2(w)+'</b> — سمعناها: <span style="color:var(--warn)">'+
+          esc2(mark[i].said)+'</span></li>') : '';
+      }).join('');
+      statusEl.style.color = "";
+      statusEl.innerHTML =
+        '📖 <b style="color:'+(nSub||nUnk ? "var(--warn)" : "var(--good)")+'">وصلت '+nOk+' من '+refWordsArr.length+' كلمة</b>'+
+        (nSub ? ' · <span style="color:var(--warn)">راجِعْ '+nSub+'</span>' : '')+
+        (nUnk ? ' · <span style="color:var(--muted)">ما تبيّنّا '+nUnk+'</span>' : '')+
+        (!nSub && !nUnk ? '<div style="font-weight:400;font-size:.88rem;margin-top:4px">ما سقطت منك كلمة ✅</div>' : '')+
+        '<div style="direction:rtl;text-align:right;margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+html+'</div>'+
+        (subList ? '<div style="margin-top:8px;font-weight:400;font-size:.9rem">'+
+          '<b style="color:var(--warn)">مواضعُ تُراجَع</b> — وقد يكون السمعُ منّا خطأً لا منك:'+
+          '<ul style="margin:4px 18px 0 0;padding:0">'+subList+'</ul></div>' : '')+
+        '<div style="font-size:.8rem;color:var(--muted);margin-top:6px;font-weight:400">'+
+          '👆 المس أيَّ كلمةٍ لتسمع آيتَها بصوت '+QARI[qariOf()].name+
+          ' · 🟢 وصلت · 🟠 راجِعها · ⚪ ما تبيّنّاها'+
+          '<span data-qnow style="color:var(--good);font-weight:700"></span></div>'+
+        '<div style="font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:400">'+
+          'وهذا تحقُّقٌ من <b>الحفظ</b> لا من <b>التجويد</b> — التجويدُ يُعرَض على معلّمك.</div>';
+      /* لمسُ الكلمةِ يُسمعه آيتَها بصوتِ القارئ (لا نطقَ كلمةٍ آليًّا) */
+      statusEl.querySelectorAll(".rword").forEach(function(sp, wi){
+        sp.addEventListener("click", function(){
+          var c3 = Q_CTX || {}, ay = (c3.wordAyah || [])[wi];
+          if(!ay || !c3.surah) return;
+          QAUDIO.play([{ ayah:ay, url:qAudioUrl(c3.surah, ay) }], function(st3){
+            var el3 = statusEl.querySelector("[data-qnow]");
+            if(el3) el3.textContent = (st3 === "play") ? (" 🔊 الآية " + ay)
+                    : (st3 === "error") ? " 📡 ما وصل التسجيل" : "";
+          });
+        });
+      });
+      saveTilawa({ words:nOk, refWords:refWordsArr.length, subs:nSub, unknown:nUnk,
+                   heard:heardN, audioSec:Math.round(_audioSec), cycles:allText.length });
+      if(onDone){ try{ onDone(null, null); }catch(e){} }
+      _closeRec();
+      MIC.releaseSoon();
+    }
     function _noWords(){
       statusEl.style.color="var(--bad)";
       var _m = micFailMsg(_lastWhy);
@@ -979,7 +1033,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
         refW:_refW, trail:_trail.slice(0,12) });
       if(onFail){ try{ onFail(); }catch(e){} } _closeRec(); MIC.releaseSoon();
     }
-    if(!allWords.length){ _noWords(); return; }
+    if(qmode ? !allText.length : !allWords.length){ _noWords(); return; }
     /* ═══ أزور تُقيّم كلَّ دورةٍ على النصِّ كلِّه، والقطعةُ تُقرأ دورات ═══
        بلاغ حسن (١٨ أكتوبر ٢٠٢٦): «أقرأها كاملة وتطلع كلّها خضراء إلّا
        كلمتين، وأتفاجأ أنّ نسبة القراءة ٣٢٪».
@@ -1004,6 +1058,21 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
        القطعة كلِّها: ما قرأه منها، والدرجةُ المركَّبة. */
     var refWordsArr = String(refText||"").trim().split(/\s+/).filter(Boolean);
     var refCount = refWordsArr.length;
+    /* ═══ التلاوةُ تُقابَل بما سُمع، ولا يُحكَم عليه بما لم نتبيّن ═══
+       لكلِّ كلمةٍ حالٌ من ثلاث: وصلت، أو سمعنا مكانَها غيرَها، أو لم
+       نتبيّنها. والثانيةُ ظنٌّ لا حكم: قِيست على تلاوةِ المعيقليِّ
+       نفسِه (ق ١–٢٤) فسألت عن ١٤ كلمةً من ١٩٥ — سبعةٌ في المئةِ من
+       تلاوةٍ لا غلطَ فيها، سماعُنا أخطأ لا القارئ («لوط» سُمعت
+       «نوط»، و«طلع» «قلع»). فنُريه ما سمعناه ليحكم هو. */
+    if(qmode){
+      var heardW = allText.join(" ").split(/\s+/).filter(Boolean);
+      var mark = qAlign(refWordsArr, heardW);
+      var nOk = 0, nSub = 0, nUnk = 0;
+      mark.forEach(function(m2){ if(m2.st === "ok") nOk++; else if(m2.st === "sub") nSub++; else nUnk++; });
+      if(!nOk && !nSub){ _noWords(); return; }
+      qFinish(mark, refWordsArr, nOk, nSub, nUnk, heardW.length);
+      return;
+    }
     function _wkey(w){ return String(w||"").toLowerCase().replace(/[^a-z0-9ء-ي]+/g, ""); }
     var refKeys = refWordsArr.map(_wkey);
     /* ما نطقه فعلًا: لا متروكٌ (وهمُ الدورة) ولا زائدٌ (ليس من النصّ) */
@@ -1054,8 +1123,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
        الشاشةِ حمراء. */
     var wordsHtml = refWordsArr.map(function(w,i){
       var sc=best[i];
-      var wc = qmode ? ((sc==null)?"var(--bad)":"var(--good)")
-             : (sc==null)?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)");
+      var wc=(sc==null)?"#9ca3af":(sc>=80?"var(--good)":sc>=60?"var(--warn)":"var(--bad)");
       return '<span class="rword" data-w="'+encodeURIComponent(w)+'" style="color:'+wc+';cursor:pointer;border-bottom:1px dotted '+wc+'">'+esc(w)+'</span>';
     }).join(' ');
     var face = pron>=80?"🌟":pron>=60?"👍":"💪";
@@ -1074,46 +1142,18 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
     /* ═══ التلاوةُ لا رقمَ لها ═══
        يُعرَض ما طابق وما سقط، ولا تُعرَض دقّةٌ ولا طلاقةٌ ولا نطق —
        فتلك أرقامُ لسانٍ عربيٍّ فصيحٍ لا أرقامُ تجويد. */
-    var head = qmode
-      ? ('📖 <b style="color:'+(readCount>=refCount?"var(--good)":"var(--warn)")+'">سمّعتَ '+
-         readCount+' من '+refCount+' كلمة</b>'+
-         (readCount>=refCount
-           ? '<div style="font-weight:400;font-size:.88rem;margin-top:4px">ما سقطت منك كلمة ✅</div>'
-           : '<div style="font-weight:400;font-size:.88rem;margin-top:4px">الكلماتُ الحمراءُ لم تصل — راجعها ثمّ سمّع مرّةً ثانية.</div>')+
-         '<div style="font-weight:400;font-size:.82rem;color:var(--muted);margin-top:6px">'+
-         'هذا تحقُّقٌ من <b>الحفظ</b> لا من <b>التجويد</b> — التجويدُ يُعرَض على معلّمك.</div>')
-      : (face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+(flu!=null?' · طلاقة '+flu:'')+(comp!=null?' · اكتمال '+comp:'')+(wpm!=null?' · سرعة '+wpm+' كلمة/دقيقة':'')+slowNote);
+    var head = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+(flu!=null?' · طلاقة '+flu:'')+(comp!=null?' · اكتمال '+comp:'')+(wpm!=null?' · سرعة '+wpm+' كلمة/دقيقة':'')+slowNote;
     statusEl.innerHTML = head+
       '<div style="direction:'+(isAr?"rtl":"ltr")+';text-align:'+(isAr?"right":"left")+';margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+wordsHtml+'</div>'+
       (_partRead() ? '<div style="font-size:.84rem;color:var(--good);margin-top:6px;font-weight:700">'+
         '🟩 هذي درجةُ <b>الفقرة المظلَّلة</b> وحدها — ما انقطع التسجيل. وبقيّةُ القطعة تقرأها بعينك للأسئلة.</div>' : '')+
-      (qmode
-        ? '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أيَّ كلمةٍ لتسمع آيتَها بصوت '+QARI[qariOf()].name+' · 🟢 وصلت · 🔴 ما وصلت <span data-qnow style="color:var(--good);font-weight:700"></span></div>'
-        : '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>');
+      '<div style="font-size:.8rem;color:var(--muted);margin-top:4px;font-weight:400">👆 المس أي كلمة لتسمع نطقها الصحيح (خصوصًا <span style="color:var(--bad);font-weight:700">الحمراء</span>) · 🟢 صحيح · 🟡 وسط · 🔴 يحتاج مراجعة</div>';
     // نطق الكلمة لحدها عند الضغط عليها — عشان يتعلّم الكلمات الغلط
-    /* ═══ وفي التلاوةِ لا تُنطَق كلمةٌ قرآنيّةٌ بمُركِّبِ صوت ═══
-       الكلمةُ المفردةُ من القرآنِ تُلفَظ عند المُركِّبِ بلا مدٍّ ولا
-       وقفٍ كسائرِ الكلام، فيُحفَظ عنه اللحن. فلمسُ الكلمةِ يُشغّل
-       تسجيلَ القارئِ لآيتِها كاملةً — وهو ما يُراجع به حفظَه. */
-    statusEl.querySelectorAll(".rword").forEach(function(sp, wi){ sp.addEventListener("click", function(){
-      if(qmode){
-        var c = Q_CTX || {}, ay = (c.wordAyah || [])[wi];
-        if(!ay || !c.surah) return;
-        QAUDIO.play([{ ayah:ay, url:qAudioUrl(c.surah, ay) }], function(st){
-          var el = statusEl.querySelector("[data-qnow]");
-          if(el) el.textContent = (st === "play") ? ("🔊 الآية " + ay)
-                 : (st === "error") ? "📡 ما وصل التسجيل" : "";
-        });
-        return;
-      }
-      var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
+    statusEl.querySelectorAll(".rword").forEach(function(sp){ sp.addEventListener("click", function(){ var wt=decodeURIComponent(sp.getAttribute("data-w")||""); if(wt) azureTTS(wt, isAr, "-30%"); }); });
     /* بلاغ الأب (٣ سبتمبر ٢٠٢٦): «قسم قيّم نطقي ما يحفظ شيئًا» — كانت النتيجة
        تُعرض للطفل ثمّ تضيع، فلا الأب يرى مستوى نطقهم ولا نعرف كم استهلكنا من
        حصّة أزور المجانية. صار كلّ تقييمٍ صفًّا مثل بقية الأقسام. */
-    if(qmode){
-      saveTilawa({ words:readCount, refWords:refCount,
-                   audioSec:Math.round(_audioSec), cycles:segs.length });
-    } else savePron(isAr, {
+    savePron(isAr, {
       /* words = ما طابق النصَّ من قراءته، لا مجموعُ ما رجّعته الدورات.
          وكان المجموعَ، فخرجت ١٣٨ كلمةً في نصٍّ من ٣٣ — وwpm مبنيّةٌ
          عليها فقرأت ٣٧٦ كلمةً في الدقيقة، وهو رقمٌ لا يقوله بشر. */
@@ -1251,8 +1291,10 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
          سفاري — انظر MIC.audioConfig في mic-help.js وبلاغ ٦ سبتمبر ٢٠٢٦. */
       audio = MIC.audioConfig(SDK);
       rec = new SDK.SpeechRecognizer(cfg, audio);
-      pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
-      pa.applyTo(rec);
+      if(!qmode){
+        pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
+        pa.applyTo(rec);
+      }
       _hook(rec);
       /* ═══ لا نُجمّد الطفل دقيقتين ونصفًا أمام شاشةٍ ساكنة ═══
          مهلة الأمان العامّة ١٥٠ ثانية، وهي معقولةٌ لقراءةٍ حقيقيّة.
@@ -1301,7 +1343,18 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
       if(_fin){ _closeRec(); return; }
       var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
       try{
-        if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        if(qmode){
+          var qt = (result && result.text) || "";
+          if(result && result.reason===SDK.ResultReason.RecognizedSpeech && qt.trim()){
+            allText.push(qt.trim());
+            gotWords = true;
+            if(typeof result.duration === "number") _audioSec += result.duration/1e7;
+            window.__micGrace=Date.now()+9000;
+            if(_st.rz > _maxRz) _maxRz = _st.rz;
+            var cnq = statusEl.querySelector("[data-readcnt]");
+            if(cnq) cnq.textContent = allText.join(" ").split(/\s+/).filter(Boolean).length;
+          }
+        } else if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
           var r = SDK.PronunciationAssessmentResult.fromResult(result);
           var ws = (r.detailResult && r.detailResult.Words) || [];
           if(ws.length){
@@ -1503,6 +1556,85 @@ function qClean(t){
                   .replace(/\s+/g, " ").trim();
 }
 function qSurah(){ var n = QSURAH[who]; return (n && window.QURAN && QURAN[n]) ? QURAN[n] : null; }
+
+/* ═══ لماذا لا يُقيَّم نطقُ التلاوةِ بأزور؟ قياسٌ لا رأي ═══════════
+   بلاغُ الأب (٢٩ أكتوبر ٢٠٢٦): «قرأت الأرضَ نطقتها الأراضي، لكن لم
+   يرصدها المصحّح». فقِيس الأمرُ بأزورَ نفسِها على نصٍّ غيرِ قرآنيّ
+   (ولا يُركَّب القرآنُ بمُركِّبِ صوتٍ ولو لتجربة): نطقٌ مُركَّبٌ فيه
+   كلمةٌ واحدةٌ مُبدَلة، والمرجعُ الصحيحُ نفسُه. فكانت الدرجات:
+
+       مطابقٌ تمامًا .................... ١٠٠
+       مفردٌ نُطق جمعًا (كحالِ سعود) ..... ١٠٠   ← لا تُرصَد البتّة
+       «الأولاد» مكانَ «الولد» ........... ٩٧
+       «القطار» مكانَ «الولد» ............ ٦٧
+       كلمةٌ سقطت ....................... ٠    ← تُرصَد جيّدًا
+
+   والسببُ بيّنٌ في الردّ: تقييمُ النطقِ يُجبِر التعرّفَ على المرجع،
+   فالنصُّ المُدرَكُ يرجع نصَّ المرجعِ حرفًا بحرفٍ ولو قال غيرَه. فهو
+   يقيس «أنطقتَ هذه الكلمةَ نطقًا سليمًا» لا «أقلتَ هذه الكلمة».
+
+   وبالتعرُّفِ الخامِ (بلا تقييمِ نطق) رجع «الأراضي» على حقيقتِها.
+   فصارت التلاوةُ تُعرَّف تعريفًا خامًا، والمقابلةُ من عندنا. وقِيست
+   دقّةُ الإدراكِ على تلاوةِ المعيقليِّ نفسِه (ق ١–٢٤، ثمانيةُ مقاطع):
+   ١٧٩ من ١٩٥ كلمةً = ٩٢٪. والثمانيةُ الباقيةُ ليست خطأ الصبيّ، فلا
+   تُحسَب عليه: لها لونُها وقولُها «ما تبيّنّاها». */
+
+/* صورُ الكلمةِ الواحدة: رسمُ المصحفِ غيرُ رسمِ الإملاء، وأزورُ تكتب
+   بالإملائيّ. فالألفُ الخنجريّةُ ألفٌ في «الْكَٰفِرُونَ ⇐ الكافرون»
+   ومحذوفةٌ في «هَٰذَا ⇐ هذا»، والهمزةُ المفردةُ في «الْقُرْءَانِ»
+   لا تُكتَب «القران». فنقبل الصورَ كلَّها ولا نُخطّئه برسمٍ. */
+function qKeys(w){
+  /* ولا يُنزَع التشكيلُ هنا: المصفاةُ الأخيرةُ تُسقط ما ليس حرفًا
+     أصلًا، فنزعُه قبلها كودٌ لا أثرَ له (جُرّب بأربعةِ آلافِ حالةٍ
+     مولَّدةٍ فما اختلف حرف). */
+  var b = String(w||"")
+    .replace(/[آأإٱ]/g, "ا")
+    .replace(/ؤ/g, "و").replace(/ئ/g, "ي")
+    .replace(/ة/g, "ه").replace(/ى/g, "ي");
+  var out = {};
+  [b.replace(/ٰ/g, "ا"), b.replace(/ٰ/g, "")].forEach(function(v){
+    [v, v.replace(/ء/g, ""), v.replace(/ء/g, "ا")].forEach(function(u){
+      var k = u.replace(/[^ء-ي]/g, "");
+      if(k) out[k] = 1;
+      var t = k.replace(/^(و|ف)?ال/, "$1");   /* أداةُ التعريف */
+      if(t) out[t] = 1;
+    });
+  });
+  return out;
+}
+function qShare(a, b){ for(var k in a){ if(b[k]) return true; } return false; }
+/* مقابلةٌ تسلسليّةٌ بين المرجعِ وما سُمع: لكلِّ كلمةٍ من المرجعِ حالٌ
+   واحدة — وصلت، أو قال مكانَها غيرَها، أو لم نتبيّنها. والثالثةُ
+   ليست خطأً عليه بل قصورٌ منّا، فلا تُحسَب في «ما سقط». */
+function qAlign(refW, gotW){
+  var rk = refW.map(qKeys), gk = gotW.map(qKeys);
+  var hit = [], i;
+  for(i = 0; i < refW.length; i++) hit.push(null);
+  var used = [], cur = 0;
+  for(i = 0; i < gotW.length; i++) used.push(false);
+  gk.forEach(function(g, gi){
+    if(!g || !Object.keys(g).length) return;
+    var at = -1, lim = Math.min(rk.length, cur + 8), i2;
+    for(i2 = cur; i2 < lim; i2++){ if(hit[i2] == null && qShare(rk[i2], g)){ at = i2; break; } }
+    if(at < 0){ for(i2 = 0; i2 < rk.length; i2++){ if(hit[i2] == null && qShare(rk[i2], g)){ at = i2; break; } } }
+    if(at < 0) return;
+    hit[at] = gi; used[gi] = true;
+    if(at >= cur) cur = at + 1;
+  });
+  /* ما لم يُطابَق من المرجعِ ويقابله كلامٌ لم يُطابِق شيئًا في موضعِه:
+     تلك كلمةٌ قالها مكانَ كلمة. ونُريه ما سمعناه ليحكم بنفسه. */
+  var out = refW.map(function(w, i3){
+    if(hit[i3] != null) return { st:"ok" };
+    /* ما قيل بين مطابَقتَين محيطتَين بهذا الموضع */
+    var lo = -1, hi = gotW.length;
+    for(var a = i3 - 1; a >= 0; a--){ if(hit[a] != null){ lo = hit[a]; break; } }
+    for(var b2 = i3 + 1; b2 < refW.length; b2++){ if(hit[b2] != null){ hi = hit[b2]; break; } }
+    var cand = [];
+    for(var g2 = lo + 1; g2 < hi; g2++){ if(!used[g2] && gotW[g2]) cand.push(gotW[g2]); }
+    return cand.length ? { st:"sub", said:cand[0] } : { st:"unk" };
+  });
+  return out;
+}
 /* ثلاثُ آياتٍ في المقطع: مرجعٌ نحوَ عشرين كلمةً، وهو مدى سعودٍ المقيس */
 var Q_STEP = 3;
 function qPos(){ try{ return Math.max(0, parseInt(localStorage.getItem("q_pos_"+who)||"0",10)||0); }catch(e){ return 0; } }
@@ -1582,6 +1714,11 @@ function saveTilawa(d){
       kind:"tilawa", surah:c.surah||null, surahName:c.name||null,
       from:c.from||null, to:c.to||null,
       words:d.words||0, refWords:d.refWords||0,
+      /* المواضعُ التي سُئل عنها، وما لم نتبيّنه: يُحفظان ليُقرأ في
+         التقريرِ كم سأل البرنامجُ وكم عجز — فيُعرَف قدرُ ثقتِه فيه. */
+      subs:(typeof d.subs==="number"?d.subs:null),
+      unknown:(typeof d.unknown==="number"?d.unknown:null),
+      heard:(typeof d.heard==="number"?d.heard:null),
       audioSec:d.audioSec||0,
       cycles:(typeof d.cycles==="number"?d.cycles:null)
     });
