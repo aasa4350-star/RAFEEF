@@ -2785,6 +2785,35 @@ if(!META[who] || !DATA[who]){
     var attId = (window.newAttId ? newAttId() : (Date.now().toString(36)+Math.random().toString(36).slice(2,7)));
     var total = items.reduce(function(s,x){ return s+x.q.length; }, 0);
     var correct = 0, answered = 0, savedN = 0, t0 = Date.now();
+    /* ═══ ويُرصَد أيُّ مهارةٍ تخذله، لا الدرجةُ وحدَها ═══════════════
+       تشخيصُ أسامة (٢٩ أكتوبر ٢٠٢٦): فهمُ المسموعِ ٥٩٪، ولا جلسةَ
+       واحدةً من أربعٍ تحمل تفصيلًا — فالقسمُ يقول «ضعيف» ولا يقول في
+       أيِّ شيء. وقسمُ القراءةِ يرصد مهاراتِه منذ زمنٍ بـcompSkill،
+       فيُستعمل هو بعينِه لئلّا يُصنَّف السؤالُ هنا بغيرِ ما يُصنَّف به
+       هناك. وهو خُمسُ درجةِ ستيب، فالعمى فيه غالٍ. */
+    /* وتصنيفُ القراءةِ (compSkill) لا يصلح هنا: جُرّب على البنكِ كلِّه
+       فوقعت أسئلتُه الأربعون في صنفٍ واحدٍ («معلومةٌ صريحة») — رصدٌ لا
+       يقول شيئًا. والاستماعُ يُخطَأ فيه بما يُلتقَط لا بما يُستنتَج:
+       رقمٌ أو وقتٌ أو مكانٌ أو موعدٌ أو شخص. فهذا تصنيفُه هو، وبه تتوزّع
+       الأربعون على تسعةِ أصنافٍ ولا يبقى خارجَها إلّا سؤالٌ واحد. */
+    var LSK = {};
+    function listenSkill(qt){
+      var q = String(qt || "");
+      if(/how (much|many)|what time|how long|how old|price|cost/i.test(q)) return "رقمٌ أو وقت";
+      if(/^where|which (room|place|floor|building)/i.test(q)) return "مكان";
+      if(/^when|what day|which day/i.test(q)) return "يومٌ أو موعد";
+      if(/^who|whose/i.test(q)) return "شخص";
+      if(/^why|reason/i.test(q)) return "السبب";
+      if(/what is the problem|how does .* feel|what.*weather/i.test(q)) return "الحالُ أو المشكلة";
+      if(/(want|ask|order|need|suggest|request)s?\b/i.test(q)) return "الطلبُ أو المقصود";
+      if(/should|must|have to|do next|advice/i.test(q)) return "المطلوبُ عمله";
+      if(/main idea|mainly about|best title|what is the (talk|announcement|conversation) about/i.test(q)) return "الفكرةُ العامّة";
+      return "تفصيلٌ آخر";
+    }
+    function markL(qt, ok){
+      var g = listenSkill(qt), e = LSK[g] || (LSK[g] = { c:0, t:0 });
+      e.t++; if(ok) e.c++;
+    }
     var html = '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> 🎧 فهم المسموع</div>'+
       '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس، وبعدها تنفتح لك الأسئلة. والنصّ يظهر لك بعد ما تجاوب، تقارن فيه.</p>';
     items.forEach(function(it, i){
@@ -2803,7 +2832,8 @@ if(!META[who] || !DATA[who]){
       if(answered < 2 || answered <= savedN) return;
       savedN = answered;
       saveScore("فهم المسموع 🎧", correct, answered,
-        { dur:Math.round((Date.now()-t0)/1000), clips:items.length, pid:attId, lang:"en" });
+        { dur:Math.round((Date.now()-t0)/1000), clips:items.length, pid:attId, lang:"en",
+          skills:LSK });
     }
     sec.querySelectorAll("[data-li]").forEach(function(box){
       var it = items[+box.dataset.li], plays = 0, opened = false;
@@ -2837,6 +2867,7 @@ if(!META[who] || !DATA[who]){
               ex.style.display = "block";
               ex.innerHTML = (good ? '✅ ' : '❌ ') + it.q[qi][2];
               answered++; if(good) correct++;
+              try{ markL(it.q[qi][0], good); }catch(e){}
               scoreEl.textContent = correct + " / " + total;
               /* النصُّ يظهر بعد أن تُجاب أسئلةُ المقطعِ كلُّها — لا قبلها */
               if(qsEl.querySelectorAll("[data-qi][data-done]").length === it.q.length){

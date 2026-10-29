@@ -365,6 +365,7 @@ function run(){
   issues.push(...lughati9UnitsPath());
   issues.push(...kangBoostPath());
   issues.push(...en5VocabPath());
+  issues.push(...listenSkillPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -4637,6 +4638,59 @@ function en5VocabPath(){
   if (clash.length)
     E('vocab-plus.js', clash.length + ' ترجمةً عربيّةً لكلمتَين — فالسؤالُ العربيُّ بجوابَين: ' +
       clash.slice(0, 4).join(' · '));
+  return out;
+}
+/* ══════════════════════════════════════════════════════════════════
+   فهمُ المسموع يرصد مهاراتِه
+   ──────────────────────────────────────────────────────────────────
+   تشخيصُ أسامة (٢٩ أكتوبر ٢٠٢٦): القسمُ ٥٩٪ ولا جلسةَ واحدةً من أربعٍ
+   تحمل تفصيلًا — يقول «ضعيف» ولا يقول في أيِّ شيء. وهو خُمسُ درجةِ
+   ستيب، فالعمى فيه غالٍ.
+
+   وأوّلُ ما جُرّب تصنيفُ القراءةِ (compSkill)، فوقع البنكُ كلُّه — أربعون
+   سؤالًا — في صنفٍ واحد. فالرصدُ لا يكفي أن يوجد: لا بدّ أن يُفرِّق.
+   فهذا الحارسُ يشترط الأمرَين: أن يُرصَد، وأن تتوزّع أسئلةُ البنكِ على
+   أصنافٍ لا على صنفٍ واحد.
+   ══════════════════════════════════════════════════════════════════ */
+function listenSkillPath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  if (!/skills:LSK/.test(src))
+    E('صفُّ فهمِ المسموعِ بلا مهارات — يقول «ضعيف» ولا يقول في أيِّ شيء');
+  if (!/markL\(it\.q\[qi\]\[0\], good\)/.test(src))
+    E('السؤالُ لا يُصنَّف عند الإجابة — فتبقى الخانةُ فارغة');
+  if (/var g = compSkill\(qt\), e = LSK/.test(src))
+    E('فهمُ المسموعِ يستعمل تصنيفَ القراءة — وقد جُرّب فوقع البنكُ كلُّه في صنفٍ واحد');
+
+  /* والتصنيفُ يُفرّق فعلًا على بنكِ الاستماعِ نفسِه */
+  const m = /function listenSkill\(qt\)\{([\s\S]*?)\n    \}/.exec(src);
+  const bp = path.join(ROOT, 'listen-bank.js');
+  if (!m) { E('listenSkill لا تُنتزَع'); return out; }
+  if (!fs.existsSync(bp)) { E('بنكُ الاستماعِ مفقود'); return out; }
+  let fn = null, bank = null;
+  try { const sb = {}; vm.createContext(sb);
+    vm.runInContext('f = function(qt){' + m[1] + '\n};', sb); fn = sb.f; } catch(e){}
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(bp,'utf8'), sb); bank = sb.window.LISTEN_BANK; } catch(e){}
+  if (!fn) { E('listenSkill لا تُشغَّل'); return out; }
+  if (!Array.isArray(bank) || !bank.length) { E('بنكُ الاستماعِ لا يُقرأ'); return out; }
+
+  const C = {}; let n = 0;
+  bank.forEach(c => (c.q || []).forEach(q => { const k = fn(q[0]); C[k] = (C[k]||0) + 1; n++; }));
+  const kinds = Object.keys(C);
+  if (n < 20) E('أسئلةُ بنكِ الاستماعِ ' + n + ' — قليلةٌ لا يُقاس عليها تصنيف');
+  if (kinds.length < 4)
+    E('تصنيفُ الاستماعِ يُخرج ' + kinds.length + ' صنفًا من ' + n + ' سؤالًا — رصدٌ لا يُفرّق');
+  const top = Math.max(...kinds.map(k => C[k]));
+  if (top > n * 0.5)
+    E('صنفٌ واحدٌ يبتلع ' + Math.round(100*top/n) + '٪ من البنك — فالرصدُ لا يدلُّ على موضعِ الضعف');
+  const rest = C['تفصيلٌ آخر'] || 0;
+  if (rest > n * 0.25)
+    E('«تفصيلٌ آخر» ' + Math.round(100*rest/n) + '٪ من البنك — والمجهولُ لا يُعالَج');
   return out;
 }
 module.exports = run;
