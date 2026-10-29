@@ -364,6 +364,7 @@ function run(){
   issues.push(...micLevelPath());
   issues.push(...lughati9UnitsPath());
   issues.push(...kangBoostPath());
+  issues.push(...en5VocabPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -4536,6 +4537,101 @@ function kangBoostPath(){
         E(who + '/' + kind + ': قائمةٌ فارغة — تُحذَف بدل أن تُترك');
     });
   });
+  return out;
+}
+/* ══════════════════════════════════════════════════════════════════
+   ما يختبره الكتابُ لا بدّ أن تُعلّمه آلةُ التثبيت
+   ──────────────────────────────────────────────────────────────────
+   صفوفُ أسامة (٢٩ أكتوبر ٢٠٢٦): نحوُ الوحدةِ الثالثةِ سليمٌ عنده —
+   اللاحقةُ ‑ist ٩٦٪ — ومفرداتُها وحدَها هي العلّة: أسماءُ المهنِ ٥٢٪ ·
+   أماكنُ العملِ ٤٢٪ · المطابقةُ ٤٧٪.
+
+   والسبب أنّ الكلماتِ كانت تُسأل في اختبارِ الوحدةِ ولا تدخل قائمةَ
+   التثبيتِ أصلًا — يُختبَر فيها ولا تُعلَّم. وآلةُ التثبيتِ عنده تعمل
+   (كلماتُ إنجليزي ٨٤٪ من ١٢٠٥ أسئلة)، فالنقصُ كان في المادّةِ لا فيها.
+   والفحصُ على القوائمِ كلِّها أظهر ثلاثًا وثمانين كلمةً كذلك.
+
+   فهذا الحارسُ يمنع رجوعَها: كلُّ كلمةٍ في قوائمِ مفرداتِ english5 لها
+   موضعٌ في قائمةِ التثبيت. ويمنع كذلك التباسَ السؤالِ العربيّ: كلمتان
+   إنجليزيّتان بترجمةٍ عربيّةٍ واحدةٍ تجعلان السؤالَ بلا جوابٍ واحد.
+   ══════════════════════════════════════════════════════════════════ */
+function en5VocabPath(){
+  const out = [];
+  const F = 'english5.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  /* قائمةُ التثبيتِ كما تراها الصفحةُ بعد الدمج */
+  const rp = path.join(ROOT, 'reading.html');
+  const ctx = makeCtx();
+  const { inline, srcs } = scripts(fs.readFileSync(rp, 'utf8'));
+  for (const f of srcs){
+    const q = path.join(ROOT, f);
+    if (fs.existsSync(q)) { try { vm.runInContext(fs.readFileSync(q,'utf8'), ctx); } catch(e){} }
+  }
+  for (const b of inline){ try { vm.runInContext(b, ctx); } catch(e){} }
+  const LIST = ctx.VOCAB_LIST || ctx.VOCAB;
+  if (!Array.isArray(LIST) || LIST.length < 200){
+    E('reading.html', 'قائمةُ التثبيتِ لا تُقرأ — فتغطيةُ مفرداتِ الكتابِ لا تُفحَص');
+    return out;
+  }
+  const have = new Set(LIST.map(w => String(w[0]).toLowerCase().trim()));
+
+  /* قوائمُ مفرداتِ الكتاب: ما يقرؤه مولّدٌ وسمُه «مفردات:». والوسمُ هو
+     الفيصلُ لا شكلُ المصفوفة — جُرّب الشكلُ فأخطأ: STATE_V مدخلُها
+     ‏["like","حالة"] والعمودُ الثاني تصنيفٌ (حالةٌ/حدث) لا ترجمة، فكاد
+     يُعلَّم «like = حالة». ومَن يُضِف قائمةً بلا وسمٍ يُمسكه الشرطُ
+     الذي بعده: لا مولّدَ بلا وسم. */
+  const NAMES = [...new Set([...src.matchAll(/function (g\w+)\(\)\{[^}]*?gp\((\w+)\)/g)]
+    .filter(m => new RegExp('\\b' + m[1] + ':\\s*"مفردات:').test(src))
+    .map(m => m[2]))];
+  if (!NAMES.length){ E(F, 'لا قوائمَ مفرداتٍ تُقرأ — الفحصُ لا يفحص'); return out; }
+
+  let miss = 0, checked = 0;
+  NAMES.forEach(nm => {
+    const m = new RegExp('var ' + nm + ' = (\\[[\\s\\S]*?\\]);\\n').exec(src);
+    if (!m) return;
+    let L = null; try { L = eval(m[1]); } catch(e){ return; }
+    if (!Array.isArray(L)) return;
+    const gone = [];
+    L.forEach(e2 => {
+      if (!Array.isArray(e2) || typeof e2[0] !== 'string') return;
+      checked++;
+      if (!have.has(e2[0].toLowerCase().trim())) gone.push(e2[0]);
+    });
+    if (gone.length){
+      miss += gone.length;
+      E(F, 'قائمةُ ' + nm + ': ' + gone.length + ' كلمةً يسأل عنها الكتابُ ولا تُعلّمها آلةُ التثبيت — ' +
+        gone.slice(0, 6).join('، ') + (gone.length > 6 ? '…' : ''));
+    }
+  });
+  if (!checked) E(F, 'لم تُقرأ كلمةٌ واحدةٌ من قوائمِ المفردات');
+
+  /* ═══ ولا مولّدَ بلا وسم ═══
+     الوسمُ بابُ الفحصِ أعلاه، وهو كذلك ما يظهر في تقريرِ الأب. فمولّدٌ
+     بلا وسمٍ يُسأل عنه الابنُ ولا يُرى في التقريرِ ولا يُفحَص مادّتُه.
+     وهذا ما أمسكه المُطفِّرُ حين أضاف قائمةً ومولّدَها بلا وسم. */
+  const SKILLS = new Set([...src.matchAll(/^\s*(g\w+):\s*"/gm)].map(m => m[1]));
+  const INUNIT = new Set();
+  [...src.matchAll(/var (?:U\d|UW|ALL\w*) = \[([^\]]*)\]/g)].forEach(m =>
+    m[1].split(',').map(x => x.trim()).filter(x => /^g\w+$/.test(x)).forEach(x => INUNIT.add(x)));
+  const unlabelled = [...INUNIT].filter(g => !SKILLS.has(g));
+  if (unlabelled.length)
+    E(F, unlabelled.length + ' مولّدًا بلا وسمِ مهارة — يُسأل عنه ولا يظهر في التقريرِ ولا تُفحَص مادّتُه: ' +
+      unlabelled.slice(0, 6).join('، '));
+
+  /* ولا كلمتَين بترجمةٍ عربيّةٍ واحدة: السؤالُ العربيُّ حينئذٍ بجوابَين */
+  const ar = {}, clash = [];
+  LIST.forEach(w => (w[1] || []).forEach(a => {
+    const k = String(a).trim();
+    if (!k) return;
+    if (ar[k] && ar[k] !== w[0]) clash.push(k + ': «' + ar[k] + '» و«' + w[0] + '»');
+    else ar[k] = w[0];
+  }));
+  if (clash.length)
+    E('vocab-plus.js', clash.length + ' ترجمةً عربيّةً لكلمتَين — فالسؤالُ العربيُّ بجوابَين: ' +
+      clash.slice(0, 4).join(' · '));
   return out;
 }
 module.exports = run;
