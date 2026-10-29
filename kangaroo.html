@@ -66,9 +66,29 @@ var lvl = LVL[who] || 2;
 // عدد أسئلة القسم: رُفع ليقترب من ميزانية الوقت (سعود خلّص القسمين بسرعة).
 // الكبار أكثر من الصغار لأن جلستهم أطول (١٥-٢٠ د مقابل ١٠-١٢ د).
 var QN = (who==="hasan"||who==="rafeef") ? 14 : 12;
-// تركيز مؤقّت على أضعف مهارات الاستدلال الرياضي عند الأربعة (خط الأساس): العدّ وأيام الأسبوع.
-// يُحجَز لها جزء من كل جولة رياضية. للإزالة لاحقًا: فرّغ هذه القائمة.
-var MATH_BOOST = ["gCountTri","gCountSquares","gDigitCount","gWeekday"];
+/* ═══ التركيزُ من قياسِ كلِّ ابنٍ لا قائمةً واحدةً للجميع ═══════════
+   طلبُ الأب (٢٩ أكتوبر ٢٠٢٦) بعد تشخيصِ أسامة.
+
+   كانت قائمةً واحدةً للأربعة: gCountTri · gCountSquares · gDigitCount ·
+   gWeekday، ومعها سؤالان محجوزان لأيّامِ الأسبوعِ في كلِّ جولة. وقياسُ
+   صفوفِهم نقض ذلك:
+
+     أيّامُ الأسبوع: أسامةُ ٧٨٪ من ١٩١ سؤالًا · سعودٌ ٧٨٪ من ٢٠٢
+   فهي أقوى مهاراتِهما في الرياضيِّ، ويُحجَز لها سُدسُ كلِّ جولة. وفي
+   المقابل:
+     معادلاتُ الصور عند أسامة: ٣٤٪ من ١٠٩ أسئلة — بلا حجزٍ أصلًا
+     طيُّ الورق: أسامةُ ٣٢٪ من ٦٨ · سعودٌ ٤٣٪ من ٦١ — والبصريُّ بلا حجز
+
+   فصار الحجزُ لكلِّ ابنٍ من صفوفِه هو، وللبصريِّ كما للرياضيّ. ومَن لا
+   قياسَ له (رفيفُ وحسنٌ لا يفتحان هذي الصفحة) فلا حجزَ له: الجولةُ
+   تُوزَّع كما كانت حتّى يجتمع له قياس. */
+var BOOST = {
+  osama:{ math:["gPicEquation","gDigitCount","gTableRow","gCountSquares"],
+          vis: ["gPaperFold"] },
+  saud: { math:["gOdd","gPrimeOdd","gCountSquares","gFraction"],
+          vis: ["gPaperFold"] }
+};
+function boostOf(kind){ try{ return (BOOST[who]||{})[kind] || []; }catch(e){ return []; } }
 // ذاكرة «لا تُعِد السؤال نفسه» عبر الجلسات: كم بصمةَ سؤالٍ نحفظ لكلّ قسم.
 // كانت ٢٠ للجميع، وهي قصيرةٌ جدًّا على المعرفة العامة (بنكٌ محدود بأسئلة جاهزة)،
 // فكان الطفل يرى السؤال نفسه بعد جولةٍ أو جولتين. البصمة تسعة أحرف فقط،
@@ -1650,13 +1670,11 @@ if(!NAMES[who]){
     var items = fromBook;
     if(need > 0){
       var gen = [];
-      // تركيز: نحجز ~٤٠٪ من جولة الاستدلال الرياضي لمهارات العدّ وأيام الأسبوع (الأضعف).
-      if(kind==="math" && MATH_BOOST.length){
-        // أولوية إضافية لأيام الأسبوع (أعند نقطة): نضمن سؤالين على الأقل في كل جولة.
-        var prio = c.gens.filter(function(f){ return f.name==="gWeekday"; });
-        if(prio.length) gen = genN(prio, 2, seen);
-        var boostGens = c.gens.filter(function(f){ return MATH_BOOST.indexOf(f.name)>=0; });
-        if(boostGens.length) gen = gen.concat(genN(boostGens, Math.ceil(need*0.4)-gen.length, seen));
+      // تركيز: نحجز ~٤٠٪ من الجولة لأضعفِ مهاراتِ هذا الابنِ في هذا القسم.
+      var BG = boostOf(kind);
+      if(BG.length){
+        var boostGens = c.gens.filter(function(f){ return BG.indexOf(f.name)>=0; });
+        if(boostGens.length) gen = genN(boostGens, Math.ceil(need*0.4), seen);
       }
       gen = gen.concat(genN(focusGens(kind, c.gens), need - gen.length, seen));
       /* بعض المولّدات لا تنتج إلا سؤالًا واحدًا في الجولة (مفتاح تكرار ثابت)،

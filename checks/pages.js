@@ -363,6 +363,7 @@ function run(){
   issues.push(...vocabEn4Path());
   issues.push(...micLevelPath());
   issues.push(...lughati9UnitsPath());
+  issues.push(...kangBoostPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -4468,6 +4469,73 @@ function lughati9UnitsPath(){
   ];
   for (const [rx, msg] of need) if (!rx.test(html)) E(msg);
 
+  return out;
+}
+/* ══════════════════════════════════════════════════════════════════
+   تركيزُ كانجرو: لكلِّ ابنٍ من قياسِه هو
+   ──────────────────────────────────────────────────────────────────
+   كانت قائمةً واحدةً للأربعة، ومعها سؤلان محجوزان لأيّامِ الأسبوعِ في
+   كلِّ جولةٍ رياضيّة. وصفوفُهم تقول إنّ أيّامَ الأسبوعِ أقوى مهاراتِهما
+   (أسامةُ ٧٨٪ من ١٩١ سؤالًا · سعودٌ ٧٨٪ من ٢٠٢)، فكان سُدسُ الجولةِ
+   يذهب إلى ما يُحسنانه، ومعادلاتُ الصورِ عند أسامةَ (٣٤٪ من ١٠٩) بلا
+   حجزٍ أصلًا. فهذا الحارسُ يمنع رجوعَ ذلك:
+   ١) الحجزُ يُقرأ بالابنِ لا ثابتًا للجميع.
+   ٢) وكلُّ مولّدٍ محجوزٍ موجودٌ في قسمِه فعلًا — واسمٌ مخطئٌ حجزٌ ضائع.
+   ٣) ولا يُحجَز لما هو قويٌّ عندهما (أيّامُ الأسبوع).
+   ٤) والنصيبُ المحجوزُ معقولٌ: لا يُفرِّط ولا يبتلع الجولة.
+   ══════════════════════════════════════════════════════════════════ */
+function kangBoostPath(){
+  const out = [];
+  const F = 'kangaroo.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  if (/var MATH_BOOST\s*=/.test(src))
+    E('MATH_BOOST رجعت — وهي قائمةٌ واحدةٌ للجميع، وصفوفُ الأبناءِ تختلف');
+  if (!/return \(BOOST\[who\]\s*\|\|\s*\{\}\)\[kind\]\s*\|\|\s*\[\];/.test(src))
+    E('الحجزُ لا يُقرأ بالابنِ وبالقسم — فيعود ثابتًا للجميع');
+  if (!/var BG = boostOf\(kind\);/.test(src))
+    E('الجولةُ لا تسأل عن حجزِ هذا الابنِ في هذا القسم');
+  if (/f\.name==="gWeekday"/.test(src))
+    E('سؤالان ما زالا محجوزَين لأيّامِ الأسبوع — وهي أقوى مهاراتِهما (٧٨٪)');
+
+  /* النصيبُ المحجوز */
+  const fr = /genN\(boostGens, Math\.ceil\(need\*([0-9.]+)\), seen\)/.exec(src);
+  const share = fr ? +fr[1] : 0;
+  if (!(share >= 0.25 && share <= 0.5))
+    E('النصيبُ المحجوزُ ' + (share || '؟') + ' — والمرادُ بين ربعِ الجولةِ ونصفِها');
+
+  /* ما حُجز موجودٌ في قسمِه، وليس فيه ما هو قويٌّ عندهم */
+  const bm = /var BOOST = \{([\s\S]*?)\n\};/.exec(src);
+  if (!bm) { E('BOOST غيرُ مكتوبةٍ كما يُتوقَّع'); return out; }
+  let BOOST = null;
+  try { BOOST = new Function('return {' + bm[1] + '\n};')(); }
+  catch(e){ E('BOOST لا تُقرأ: ' + String(e.message).slice(0,50)); return out; }
+
+  const LISTS = {};
+  ['MATH_GENS','VERB_GENS','GK_GENS','VIS_GENS'].forEach(nm => {
+    const m = new RegExp('var ' + nm + '=\\[([\\s\\S]*?)\\];').exec(src);
+    if (m) LISTS[nm] = m[1].split(',').map(x => x.trim()).filter(Boolean);
+  });
+  const OF = { math:'MATH_GENS', verb:'VERB_GENS', gk:'GK_GENS', vis:'VIS_GENS' };
+  const STRONG = ['gWeekday'];           /* ٧٨٪ عند الاثنَين */
+  const kids = Object.keys(BOOST);
+  if (!kids.length) E('BOOST فارغة — ولأسامةَ وسعودٍ قياسٌ يكفي');
+  kids.forEach(who => {
+    Object.keys(BOOST[who] || {}).forEach(kind => {
+      const list = LISTS[OF[kind]];
+      if (!list) { E('قسمُ «' + kind + '» عند ' + who + ' لا مولّداتِ له'); return; }
+      (BOOST[who][kind] || []).forEach(g => {
+        if (list.indexOf(g) < 0)
+          E(who + '/' + kind + ': «' + g + '» ليس من مولّداتِ القسم — حجزٌ لا يصيب شيئًا');
+        if (STRONG.indexOf(g) >= 0)
+          E(who + '/' + kind + ': «' + g + '» محجوزٌ وهو من أقوى مهاراتِه');
+      });
+      if (!(BOOST[who][kind] || []).length)
+        E(who + '/' + kind + ': قائمةٌ فارغة — تُحذَف بدل أن تُترك');
+    });
+  });
   return out;
 }
 module.exports = run;
