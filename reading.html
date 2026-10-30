@@ -970,6 +970,24 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
        مرفوعٌ فلا يُستأنف finish من داخله. */
     /* عرضُ التلاوةِ وحفظُها — مفصولٌ عن مسارِ النطقِ كلِّه فلا
        يختلط حسابٌ بحساب، ولا يُعرَض له رقمُ نطقٍ ولا طلاقة. */
+    /* لم نتبيّن تسميعَه: لا درجةَ ولا قائمةَ ظنون — سببٌ وما يفعل */
+    function qMuddle(mark, refWordsArr, nOk, nSub, nUnk, heardN){
+      statusEl.style.color = "";
+      statusEl.innerHTML =
+        '🙉 <b style="color:var(--warn)">ما تبيّنتُ تسميعك</b>'+
+        '<div style="font-weight:400;font-size:.9rem;margin-top:6px;line-height:1.9">'+
+        'وصلني من المقطعِ <b>'+nOk+'</b> من <b>'+refWordsArr.length+'</b> كلمة — وهذا قليلٌ '+
+        'لا أبني عليه حكمًا، فلا أعرض عليك مواضعَ أشكُّ فيها وأنا لم أسمع أكثرَ ما قلت.</div>'+
+        '<div style="font-weight:400;font-size:.88rem;color:var(--muted);margin-top:8px;line-height:1.9">'+
+        'جرّب مرّةً ثانية: قرّب الجوّال، وارفع صوتك قليلًا، واقرأ على مهلك.'+
+        '<br>وإن تكرّر فاضغط <b>🎤 اختبر المايك</b> فوق — يقول لك إن كان المايكُ هو العلّة.</div>';
+      saveTilawa({ words:nOk, refWords:refWordsArr.length, subs:nSub, unknown:nUnk,
+                   heard:heardN, muddle:true,
+                   audioSec:Math.round(_audioSec), cycles:allText.length });
+      if(onDone){ try{ onDone(null, null); }catch(e){} }
+      _closeRec();
+      MIC.releaseSoon();
+    }
     function qFinish(mark, refWordsArr, nOk, nSub, nUnk, heardN){
       var esc2 = function(x){ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
       var html = refWordsArr.map(function(w, i){
@@ -980,10 +998,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
           ' title="'+esc2(w + tip)+'" style="color:'+c+';cursor:pointer;border-bottom:1px '+
           (m2.st === "ok" ? "dotted" : "dashed")+' '+c+'">'+esc2(w)+'</span>';
       }).join(' ');
-      var subList = refWordsArr.map(function(w, i){
-        return mark[i].st === "sub" ? ('<li><b>'+esc2(w)+'</b> — سمعناها: <span style="color:var(--warn)">'+
-          esc2(mark[i].said)+'</span></li>') : '';
-      }).join('');
+      /* وقائمةُ المواضعِ لا تطول بلا حدّ: ستّةٌ تكفي لمراجعةٍ،
+         وما زاد يُذكَر عددًا — والقائمةُ الطويلةُ تُيئِس لا تُعين. */
+      var subs = [];
+      refWordsArr.forEach(function(w, i){
+        if(mark[i].st === "sub") subs.push({ w:w, said:mark[i].said }); });
+      var subList = subs.slice(0, 6).map(function(x){
+        return '<li><b>'+esc2(x.w)+'</b> — سمعناها: <span style="color:var(--warn)">'+
+          esc2(x.said)+'</span></li>'; }).join('') +
+        (subs.length > 6 ? '<li style="color:var(--muted)">وأكثرُ منها '+(subs.length-6)+'</li>' : '');
       statusEl.style.color = "";
       statusEl.innerHTML =
         '📖 <b style="color:'+(nSub||nUnk ? "var(--warn)" : "var(--good)")+'">وصلت '+nOk+' من '+refWordsArr.length+' كلمة</b>'+
@@ -1104,11 +1127,25 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
        تلاوةٍ لا غلطَ فيها، سماعُنا أخطأ لا القارئ («لوط» سُمعت
        «نوط»، و«طلع» «قلع»). فنُريه ما سمعناه ليحكم هو. */
     if(qmode){
-      var heardW = allText.join(" ").split(/\s+/).filter(Boolean);
+      /* ضجيجُ التعرُّفِ قد يرجع كلماتٍ لاتينيّةً («Are»، «Call»)،
+         وليست من تلاوتِه في شيء — فلا تُعرَض عليه شاهدًا عليه. */
+      var heardW = allText.join(" ").split(/\s+/).filter(function(x){
+        return x && /[\u0621-\u064A]/.test(x); });
       var mark = qAlign(refWordsArr, heardW);
       var nOk = 0, nSub = 0, nUnk = 0;
       mark.forEach(function(m2){ if(m2.st === "ok") nOk++; else if(m2.st === "sub") nSub++; else nUnk++; });
-      if(!nOk && !nSub){ _noWords(); return; }
+      /* ولا تُقال له رسالةُ مسارِ النطقِ («ما رجّعت الدرجة»): التلاوةُ
+         لا تُقيَّم بالنطقِ أصلًا، والصوابُ أن يُقال إنّا لم نتبيّنه. */
+      if(!nOk && !nSub){ qMuddle(mark, refWordsArr, 0, 0, nUnk, heardW.length); return; }
+      /* ═══ تسميعٌ لم نتبيّن أكثرَه: يُقال الحقُّ ولا تُعرَض ظنون ═══
+         بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): وصلت واحدةٌ من إحدى وعشرين،
+         ثمّ عُرضت عليه قائمةُ «مواضعَ تُراجَع» بطولِ المقطع. وذلك
+         ظنٌّ على ظنّ: إن لم نتبيّن أكثرَ تسميعِه فلا شاهدَ لنا على
+         كلمةٍ بعينها، والصوابُ أن نقول إنّا لم نسمعه ويُعيد. */
+      if(nOk < refWordsArr.length * 0.4){
+        qMuddle(mark, refWordsArr, nOk, nSub, nUnk, heardW.length);
+        return;
+      }
       qFinish(mark, refWordsArr, nOk, nSub, nUnk, heardW.length);
       return;
     }
@@ -1719,16 +1756,25 @@ function qAlign(refW, gotW){
     if(at >= cur) cur = at + 1;
   });
   /* ما لم يُطابَق من المرجعِ ويقابله كلامٌ لم يُطابِق شيئًا في موضعِه:
-     تلك كلمةٌ قالها مكانَ كلمة. ونُريه ما سمعناه ليحكم بنفسه. */
+     تلك كلمةٌ قالها مكانَ كلمة. ونُريه ما سمعناه ليحكم بنفسه.
+
+     ═══ ولا تُنسَب كلمةٌ مسموعةٌ واحدةٌ إلى عشرين موضعًا ═══
+     بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): عُرضت عليه قائمةٌ من إحدى وعشرين
+     بندًا كلُّها «سمعناها: Are». وعلّتُها أنّ المسموعَ كان كلمةً
+     واحدةً لم تُطابِق شيئًا، فأُخذت شاهدًا على كلِّ موضعٍ لم يُطابَق.
+     فصارت الكلمةُ تُستهلَك: تُنسَب إلى موضعٍ واحدٍ لا غير. */
   var out = refW.map(function(w, i3){
     if(hit[i3] != null) return { st:"ok" };
     /* ما قيل بين مطابَقتَين محيطتَين بهذا الموضع */
     var lo = -1, hi = gotW.length;
     for(var a = i3 - 1; a >= 0; a--){ if(hit[a] != null){ lo = hit[a]; break; } }
     for(var b2 = i3 + 1; b2 < refW.length; b2++){ if(hit[b2] != null){ hi = hit[b2]; break; } }
-    var cand = [];
-    for(var g2 = lo + 1; g2 < hi; g2++){ if(!used[g2] && gotW[g2]) cand.push(gotW[g2]); }
-    return cand.length ? { st:"sub", said:cand[0] } : { st:"unk" };
+    for(var g2 = lo + 1; g2 < hi; g2++){
+      if(used[g2] || !gotW[g2]) continue;
+      used[g2] = true;                      /* تُستهلَك فلا تُعاد */
+      return { st:"sub", said:gotW[g2] };
+    }
+    return { st:"unk" };
   });
   return out;
 }
@@ -1820,6 +1866,9 @@ function saveTilawa(d){
       words:d.words||0, refWords:d.refWords||0,
       /* المواضعُ التي سُئل عنها، وما لم نتبيّنه: يُحفظان ليُقرأ في
          التقريرِ كم سأل البرنامجُ وكم عجز — فيُعرَف قدرُ ثقتِه فيه. */
+      /* وما لم نتبيّنه يُوسَم: يُقرأ في التقريرِ ضعفَ سماعٍ لا ضعفَ
+         حفظ — فلا يُحاسَب الصبيُّ على عجزِ الأداة. */
+      muddle:(d.muddle === true ? true : null),
       subs:(typeof d.subs==="number"?d.subs:null),
       unknown:(typeof d.unknown==="number"?d.unknown:null),
       heard:(typeof d.heard==="number"?d.heard:null),
@@ -3992,7 +4041,15 @@ if(!META[who] || !DATA[who]){
     sec.innerHTML =
       '<div class="block-title"><span class="dot"></span> 📖 تلاوة — سورة '+S.name+'</div>'+
       '<p class="hint">سمّع من حفظك، والصفحةُ تتحقّق من <b>الكلمات</b>: ما وصل يطلع أخضر وما سقط أحمر. '+
-      'وهذا <b>تحقُّقٌ من الحفظ</b> لا تقييمُ تجويد — التجويدُ يُعرَض على معلّمك.</p>'+
+      'وهذا <b>تحقُّقٌ من الحفظ</b> لا تقييمُ تجويد — التجويدُ يُعرَض على معلّمك.'+
+      /* ═══ ويُقال له ما لا تقدر عليه الأداةُ قبل أن يظنَّه قادرة ═══
+         قياسٌ بأزور (٣٠ أكتوبر ٢٠٢٦، سؤالُ الأب «المفتوح نطقته مضموم»):
+         غُيّرت حركتان في نطقٍ مُركَّبٍ والمرجعُ صحيح، فرجع التعرُّفُ
+         بالنصِّ نفسِه حرفًا بحرفٍ ورجع تقييمُ النطقِ ١٠٠/١٠٠. وعلّتُه
+         أنّ أزورَ تكتب العربيّةَ بلا تشكيلٍ أصلًا، فالحركةُ ليست في
+         مخرجِها. فلا يُوهَم أنّها تُراجِع إعرابَه. */
+      '<br><b>ولا تُراجَع الحركاتُ</b> (المفتوحُ والمضمومُ والمكسور): الأداةُ تكتب '+
+      'الكلماتِ بلا تشكيل، فالإعرابُ لا يصل إليها — وهو ممّا يُعرَض على معلّمك.</p>'+
       '<div class="passage" data-q-wrap>'+
         '<div class="row"><button class="say" data-q-listen>🔊 استمع بصوت '+QARI[qariOf()].name+'</button>'+
           (canRec ? '<button class="say small azbtn" style="background:#0e9f6e;color:#fff;border-color:#0e9f6e" data-q-rec>🎙️ سمّع حفظك</button>' : '')+

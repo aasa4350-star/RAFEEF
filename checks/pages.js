@@ -5014,8 +5014,26 @@ function quranTilawaPath(){
   if (!/وقد يكون السمعُ منّا/.test(src))
     E('يُنسَب إليه الغلطُ في مواضعِ الشكِّ — وسماعُنا يُخطئ في ٧٪ من تلاوةٍ متقَنة');
   /* ويُعرَض عليه ما سمعناه ليحكم بنفسِه، لا أن يُطالَب بتصديقِنا */
-  if (!/سمعناها[\s\S]{0,160}esc2\(mark\[i\]\.said\)/.test(src))
+  if (!/سمعناها[\s\S]{0,160}esc2\(x\.said\)/.test(src))
     E('لا يُعرَض ما سمعناه في موضعِ الشكّ — فلا يملك مراجعتَه');
+  /* ولا تُنسَب كلمةٌ مسموعةٌ إلى موضعَين: بلاغُ الأب (٣٠ أكتوبر
+     ٢٠٢٦) — قائمةٌ من إحدى وعشرين بندًا كلُّها «سمعناها: Are». */
+  if (!/used\[g2\] = true;/.test(src))
+    E('الكلمةُ المسموعةُ لا تُستهلَك — فتُنسَب إلى كلِّ موضعٍ لم يُطابَق');
+  if (!/\/\[\\u0621-\\u064A\]\/\.test\(x\)/.test(src))
+    E('ضجيجُ التعرُّفِ غيرُ العربيِّ يُعرَض عليه شاهدًا على تلاوته');
+  if (!/if\(nOk < refWordsArr\.length \* 0\.4\)\{/.test(src))
+    E('قلّةُ ما تبيّنّاه لا تمنع عرضَ قائمةِ الظنون');
+  if (!/function qMuddle\(mark, refWordsArr, nOk, nSub, nUnk, heardN\)\{/.test(src))
+    E('لا شاشةَ تقول له إنّا لم نتبيّن تسميعَه');
+  if (/if\(!nOk && !nSub\)\{ _noWords\(\); return; \}/.test(src))
+    E('التلاوةُ تقول له «خدمةُ تقييمِ النطقِ ما رجّعت الدرجة» — وهي لا تُقيَّم بالنطقِ أصلًا');
+  if (!/subs\.slice\(0, 6\)/.test(src))
+    E('قائمةُ المواضعِ تطول بلا حدّ');
+  /* ويُقال له صريحًا ما لا تقدر عليه الأداة: الحركاتُ لا تصل إليها
+     (قياسٌ: غُيّرت حركتان فرجع التعرُّفُ بالنصِّ نفسِه وتقييمُ النطقِ ١٠٠). */
+  if (!/\u0648\u0644\u0627 \u062a\u064f\u0631\u0627\u062c\u064e\u0639 \u0627\u0644\u062d\u0631\u0643\u0627\u062a/.test(src))
+    E('لا يُقال له إنّ الحركاتِ لا تُراجَع — فيظنُّ الأداةَ تُصحّح إعرابَه');
   /* والنصُّ المُدرَكُ يُجمَع فعلًا لا تبقى قائمتُه فارغة */
   if (!/allText\.push\(tx\);/.test(src))
     E('ما سمعه لا يُجمَع — فلا شيءَ يُقابَل بالمرجع');
@@ -5034,6 +5052,8 @@ function quranTilawaPath(){
   if (!/saveTilawa\(\{ words:nOk, refWords:refWordsArr\.length, subs:nSub, unknown:nUnk,/.test(src))
     E('التلاوةُ لا تُحفَظ صفَّ تلاوةٍ خاصًّا بها');
   const sv = /function saveTilawa\(d\)\{([\s\S]*?)\n\}/.exec(src);
+  if (sv && !/muddle:/.test(sv[1]))
+    E('الصفُّ لا يُميّز ما لم نتبيّنه — فيُقرأ ضعفَ حفظٍ وهو ضعفُ سماع');
   if (sv && (!/subs:/.test(sv[1]) || !/unknown:/.test(sv[1])))
     E('صفُّ التلاوةِ لا يحفظ كم موضعًا سُئل عنه وكم عجزنا — فلا يُعرَف قدرُ الثقةِ فيه');
   if (!sv) E('saveTilawa لا تُنتزَع');
@@ -5105,10 +5125,18 @@ function quranTilawaPath(){
         out.push({ sev:'خطأ', file:'report-rules.js', msg:'سطرُ التلاوةِ يحمل نسبةً مئويّة — والتلاوةُ لا تُدرَّج' });
       const rows = [
         { meta:{ refWords:21, words:21 } }, { meta:{ refWords:21, words:19 } },
-        { meta:{ refWords:0,  words:0  } }, { meta:{ refWords:17, words:18 } }
+        { meta:{ refWords:0,  words:0  } }, { meta:{ refWords:17, words:18 } },
+        { meta:{ refWords:21, words:21, muddle:true } }
       ];
       if (R.tilawaFull(rows) !== 2)
         out.push({ sev:'خطأ', file:'report-rules.js', msg:'عدُّ التسميعِ التامِّ ' + R.tilawaFull(rows) + ' والصوابُ ٢' });
+      if (typeof R.tilawaMuddle !== 'function' || R.tilawaMuddle(rows) !== 1)
+        out.push({ sev:'خطأ', file:'report-rules.js',
+          msg:'ما لم تتبيّنه الأداةُ لا يُعَدُّ على حدةٍ — فيُقرأ ضعفَ حفظٍ وهو ضعفُ سماع' });
+      const ml = R.tilawaLine({ surahName:'ق', from:1, to:3, words:1, refWords:21, muddle:true });
+      if (/\u0633\u0645\u0651\u0639 1 \u0645\u0646 21/.test(ml))
+        out.push({ sev:'خطأ', file:'report-rules.js',
+          msg:'صفُّ ما لم نتبيّنه يُقرأ «سمّع ١ من ٢١» — وهو لم يُقَس أصلًا' });
     }
   }
   return out;

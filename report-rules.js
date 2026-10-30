@@ -463,6 +463,8 @@
     tilawaLine: function(meta){
       var m = meta || {}, s = "سورة " + (m.surahName || "—");
       if (m.from) s += " · الآيات " + m.from + ((m.to && m.to !== m.from) ? ("–" + m.to) : "");
+      /* وما لم تتبيّنه الأداةُ لا يُقرأ «سمّع كذا من كذا» فيُظَنَّ ضعفَ حفظ */
+      if (m.muddle) return s + " · ما تبيّنته الأداة (ضعفُ سماعٍ لا حفظ)";
       if (m.refWords) s += " · سمّع " + (m.words || 0) + " من " + m.refWords + " كلمة";
       return s;
     },
@@ -471,8 +473,16 @@
     tilawaFull: function(rows){
       return (rows || []).filter(function(p){
         var m = (p && p.meta) || {};
-        return m.refWords > 0 && (m.words || 0) >= m.refWords;
+        return !m.muddle && m.refWords > 0 && (m.words || 0) >= m.refWords;
       }).length;
+    },
+    /* ═══ تسميعٌ لم تتبيّنه الأداة ═══
+       بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): خرجت «وصلت ١ من ٢١» وهو يُسمّع.
+       وذلك ضعفُ سماعٍ لا ضعفُ حفظ، فلا يُحسَب على الصبيّ: يُعَدُّ
+       على حدةٍ ليُعرَف أنّ الأداةَ هي التي عجزت. */
+    tilawaMuddle: function(rows){
+      return (rows || []).filter(function(p){
+        return p && p.meta && p.meta.muddle === true; }).length;
     },
     /* ═══ ذكاءٌ أم آليّ؟ — سؤال الأب (٨ سبتمبر ٢٠٢٦) ═══
        «اللي يتكلّم معه ذكاء اصطناعيّ أو آليّ؟» والجواب: الاثنان. الأصل
