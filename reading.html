@@ -16,6 +16,7 @@
 <script src="listen-bank.js?v=20261005"></script>
 <script src="vocab-en4.js"></script>
 <script src="quran-who.js"></script>
+<script src="tajweed.js"></script>
 <script src="quran-50.js"></script>
 <script src="azure-config.js"></script>
 <!-- أداة النطق: الإصدار مثبَّتٌ عمدًا لا @latest.
@@ -1667,6 +1668,10 @@ function qariOf(){
   catch(e){ return QARI_DEF; }
 }
 function qariSet(k){ try{ if(QARI[k]) localStorage.setItem("q_qari_"+who, k); }catch(e){} }
+/* ألوانُ التجويد: اختيارٌ يبقى في جهازِه. ومبدئيًّا مُطفأةٌ فالنصُّ
+   أوّلًا يُقرأ، والألوانُ عونٌ لمن أرادها. */
+function tjOn(){ try{ return localStorage.getItem("q_tj_"+who) === "1"; }catch(e){ return false; } }
+function tjSet(v){ try{ localStorage.setItem("q_tj_"+who, v ? "1" : "0"); }catch(e){} }
 function qPad(n, w){ var s = String(n); while(s.length < w) s = "0" + s; return s; }
 function qAudioUrl(surah, ayah, qari){
   var q = QARI[qari] ? qari : qariOf();
@@ -3904,8 +3909,23 @@ if(!META[who] || !DATA[who]){
           }).join('')+
         '</div>'+
         '<div data-mictest style="display:none;margin-top:8px"></div>'+
+        /* زرُّ ألوانِ التجويد: تعليمُ مواضعِ الأحكامِ لا تقييمُ أدائِها */
+        '<div class="row" style="margin-top:6px;font-size:.86rem;align-items:center">'+
+          '<button class="say small" data-q-tj style="'+(tjOn()
+            ? 'background:var(--good);border-color:var(--good);color:#fff;font-weight:800' : '')+'">'+
+            (tjOn() ? '✓ ' : '')+'🎨 ألوان التجويد</button>'+
+          (tjOn() ? '<span style="color:var(--muted);font-size:.8rem">مواضعُ الأحكامِ فقط — والأداءُ يُعرَض على معلّمك</span>' : '')+
+        '</div>'+
+        (tjOn() && window.TAJWEED
+          ? '<div style="margin-top:6px;font-size:.8rem;line-height:2;color:var(--muted)">'+
+            TAJWEED.legend(take.map(function(k){ return S.ayat[k]; }))+'</div>'
+          : '')+
         '<div class="txt" data-q-txt style="direction:rtl;text-align:right;font-size:1.5rem;line-height:2.6;font-family:\'Traditional Arabic\',\'Scheherazade New\',Tahoma,serif">'+
-          take.map(function(k){ return S.ayat[k]+' <span style="color:var(--muted);font-size:.7em">﴿'+(k+1)+'﴾</span>'; }).join(' ')+
+          take.map(function(k){
+            /* الألوانُ تُوضَع على الحرفِ في موضعِه من رسمِ المصحف،
+               فلا يتغيّر النصُّ ولا يُحذَف منه حرف — انظر tajweed.js */
+            var body = (tjOn() && window.TAJWEED) ? TAJWEED.html(S.ayat[k]) : S.ayat[k];
+            return body+' <span style="color:var(--muted);font-size:.7em">﴿'+(k+1)+'﴾</span>'; }).join(' ')+
         '</div>'+
         '<div class="pfb" data-q-fb style="margin-top:10px;font-weight:700;min-height:18px"></div>'+
       '</div>'+
@@ -3952,6 +3972,8 @@ if(!META[who] || !DATA[who]){
       azureAssess(ref, true, fb, rb, function(){ rb.disabled = false; },
                   true, function(){ rb.disabled = false; }, 0, true);
     });
+    var tb = sec.querySelector("[data-q-tj]");
+    if(tb) tb.addEventListener("click", function(){ tjSet(!tjOn()); renderTilawa(); });
     var nx = sec.querySelector("[data-q-next]");
     if(nx) nx.addEventListener("click", function(){ QAUDIO.stop(); qSetPos((from + Q_STEP) % n); renderTilawa(); });
     var rs = sec.querySelector("[data-q-restart]");

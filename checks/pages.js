@@ -367,6 +367,7 @@ function run(){
   issues.push(...en5VocabPath());
   issues.push(...listenSkillPath());
   issues.push(...quranTilawaPath());
+  issues.push(...tajweedPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5036,6 +5037,143 @@ function quranTilawaPath(){
       if (R.tilawaFull(rows) !== 2)
         out.push({ sev:'خطأ', file:'report-rules.js', msg:'عدُّ التسميعِ التامِّ ' + R.tilawaFull(rows) + ' والصوابُ ٢' });
     }
+  }
+  return out;
+}
+/* ═══ ألوانُ التجويد: محرِّكٌ يُشغَّل ويُقابَل بمصحفٍ مُعلَّم ═══════
+   طلبُ الأب (٢٩ أكتوبر ٢٠٢٦): «أنا أبي التجويد ضروري». وهذا تعليمُ
+   مواضعِ الأحكامِ لا تقييمُ أدائِها — فذاك لا تُرجع فيه أزورُ أسماءَ
+   حروفٍ أصلًا.
+
+   والحارسُ لا يُصدّق المحرِّكَ على كلمتِه: يُنتزَع ويُشغَّل على سورةِ
+   ق كاملةً، وتُقابَل أعدادُه بأعدادٍ قُرئت من مصحفٍ مُعلَّمٍ بالأحكام
+   (quran-tajweed) يومَ البناء. فإن تغيّر المحرِّكُ تغيّرت الأعدادُ
+   فسقط الحارس. ويُعاد التنزيلُ والتحقّقُ بـ tj-rules.js متى شُكّ. */
+function tajweedPath(){
+  const out = [];
+  const F = 'tajweed.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'محرِّكُ التجويدِ مفقود' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  let T = null;
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(src, sb); T = sb.window.TAJWEED; } catch(e){}
+  if (!T || typeof T.marks !== 'function') return [{ sev:'خطأ', file:F, msg:'المحرِّكُ لا يُشغَّل' }];
+
+  const qp = path.join(ROOT, 'quran-50.js');
+  if (!fs.existsSync(qp)) return [{ sev:'خطأ', file:F, msg:'نصُّ السورةِ مفقود' }];
+  let AY = null;
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(qp, 'utf8'), sb); AY = sb.window.QURAN[50].ayat; } catch(e){}
+  if (!AY) return [{ sev:'خطأ', file:F, msg:'نصُّ السورةِ لا يُقرأ' }];
+
+  /* ═══ الأعدادُ المقروءةُ من المصحفِ المُعلَّمِ لسورةِ ق ═══
+     (api.alquran.cloud · quran-tajweed · ٣٠ أكتوبر ٢٠٢٦)
+     وقُوبل المحرِّكُ يومَها على ثماني سورٍ فاتّفقنا في ٨٥١ من ٨٥٢. */
+  const WANT = { f:27, a:21, u:5, i:5, c:3, w:3, g:11, q:62 };
+  const got = {};
+  AY.forEach(function(t){ T.marks(t).forEach(function(m){ got[m.r] = (got[m.r]||0) + 1; }); });
+  Object.keys(WANT).forEach(function(k){
+    if ((got[k]||0) !== WANT[k])
+      E('«' + (T.RULES[k]||{}).name + '» في سورةِ ق ' + (got[k]||0) +
+        ' والمصحفُ المُعلَّمُ ' + WANT[k]);
+  });
+  Object.keys(got).forEach(function(k){
+    if (!(k in WANT)) E('حكمٌ لا يعرفه الحَكَمُ: ' + k);
+  });
+
+  /* ═══ وكلُّ حكمٍ يُفحَص بشرطِه على النصِّ نفسِه ═══
+     فلو انقلب شرطٌ بآخرَ لبقيت الأعدادُ ولَفسَد الموضع. */
+  const L = t => T.parse(t);
+  const V = /[َُِ]/, TN = /[ًٌٍ]/;
+  const at = (t, m) => { const l = L(t); for (let i=0;i<l.length;i++) if (l[i].at === m.at) return {l, i}; return null; };
+  const nextOf = (l, i) => {
+    let b = l[i+1];
+    if (b && /ً/.test(l[i].m) && b.ch === 'ا' && l[i+2]) b = l[i+2];
+    return b;
+  };
+  const IKHFA = 'تثجدذزسشصضطظفقك';
+  const bad = {};
+  AY.forEach(function(t){
+    T.marks(t).forEach(function(m){
+      const f = at(t, m); if (!f) { bad['موضع'] = 1; return; }
+      const a = f.l[f.i], b = nextOf(f.l, f.i), nb = f.l[f.i+1];
+      const isN = (a.ch === 'ن' && !V.test(a.m) && !TN.test(a.m) && a.m.indexOf('ّ') < 0) || TN.test(a.m);
+      const okm = {
+        f: () => isN && b && IKHFA.indexOf(b.ch) >= 0,
+        a: () => isN && b && 'ينمو'.indexOf(b.ch) >= 0,
+        u: () => isN && b && 'لر'.indexOf(b.ch) >= 0,
+        i: () => isN && b && b.ch === 'ب',
+        c: () => a.ch === 'م' && nb && nb.ch === 'ب',
+        w: () => a.ch === 'م' && nb && nb.ch === 'م',
+        g: () => (a.ch === 'ن' || a.ch === 'م') && a.m.indexOf('ّ') >= 0,
+        q: () => 'قطبجد'.indexOf(a.ch) >= 0
+      }[m.r];
+      if (!okm || !okm()) bad[m.r] = (bad[m.r]||0) + 1;
+    });
+  });
+  Object.keys(bad).forEach(function(k){
+    E('«' + ((T.RULES[k]||{}).name || k) + '» وقع في ' + bad[k] + ' موضعٍ لا يصحُّ فيه شرطُه');
+  });
+
+  /* ═══ والتلوينُ لا يُغيّر النصَّ ولا يُسقط منه حرفًا ═══ */
+  const strip = h => String(h).replace(/<[^>]*>/g, '')
+    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+  let diff = 0;
+  AY.forEach(function(t){ if (strip(T.html(t)) !== t) diff++; });
+  if (diff) E('تلوينُ ' + diff + ' آيةً يُغيّر نصَّها — والمصحفُ لا يُغيَّر حرفُه');
+  /* ═══ حالاتٌ ليست في سورةِ ق فتُفحَص بنصِّها ═══
+     «قَوْمًۭا مَّآ»: شدّةُ الميمِ أثرُ إدغامِ التنوينِ فيها، لا غنّةٌ
+     مستقلّة — وبينهما ألفٌ لا تُنطَق، فالنظرُ إلى الوراءِ يتخطّاها.
+     (موضعٌ في يس ٦ ويس ٥٨ والملك ٣ و٢٣.) */
+  (function(){
+    const t = '\u0642\u064E\u0648\u0652\u0645\u064B\u06ED\u0627 \u0645\u0651\u064E\u0622';
+    const rs = T.marks(t).map(function(m){ return m.r; });
+    if (rs.indexOf('g') >= 0)
+      E('«قَوْمًۭا مَّآ» تُحسَب غنّةً مستقلّةً — وشدّتُها أثرُ الإدغامِ قبلها');
+    if (rs.indexOf('a') < 0)
+      E('«قَوْمًۭا مَّآ» لا يُرى فيها إدغامُ التنوينِ في الميم');
+  })();
+  /* ولكلِّ موضعٍ قطعةٌ واحدة، ولا يُسقَط حكمٌ وقع على حرفٍ وقع عليه غيرُه */
+  AY.forEach(function(t){
+    const h = T.html(t), n = (h.match(/<span class="tj"/g) || []).length;
+    const u = {}; T.marks(t).forEach(function(m){ u[m.at] = (u[m.at]||0) + 1; });
+    if (n !== Object.keys(u).length)
+      E('عددُ المُلوَّنِ لا يساوي عددَ المواضع — حرفٌ لُوّن مرّتَين أو سقط');
+  });
+  /* «صُمٌّۢ بُكْمٌ»: الميمُ مشدّدةٌ (غنّة) وتنوينُها قبل باءٍ (إقلاب)،
+     فالحكمان حقٌّ ولا يُسقَط أحدُهما — ولا يسع الحرفَ لونان فيُسمَّيان. */
+  (function(){
+    const t = '\u0635\u064F\u0645\u0651\u064D\u06E2 \u0628\u064F\u0643\u0652\u0645\u064C';
+    const rs = T.marks(t).map(function(m){ return m.r; }).sort().join(',');
+    if (rs !== 'g,i')
+      E('«صُمٌّۢ بُكْمٌ» أحكامُها [' + rs + '] والصوابُ غنّةٌ وإقلاب');
+    const h = T.html(t), tag = (h.match(/data-tj="([^"]*)"/) || [, ''])[1];
+    if (tag.split(/\s+/).filter(Boolean).length < 2)
+      E('حرفٌ تحت حكمَين يُذكَر له واحدٌ ويُسقَط الآخر: «' + tag + '»');
+    if (!/title="[^"]*\+/.test(h))
+      E('الحكمان لا يُسمَّيان عند لمسِ الحرف');
+  })();
+  /* والمفتاحُ لا يعرض حكمًا ليس في المقطع */
+  const lg = T.legend([AY[0]]);
+  Object.keys(T.RULES).forEach(function(k){
+    const inAyah = T.marks(AY[0]).some(function(m){ return m.r === k; });
+    if (!inAyah && lg.indexOf(T.RULES[k].name) >= 0)
+      E('مفتاحُ الألوانِ يعرض «' + T.RULES[k].name + '» ولا وجودَ له في المقطع');
+  });
+
+  /* ═══ وفي الصفحة: زرٌّ يُشغّله، وتصريحٌ أنّه مواضعُ لا أداء ═══ */
+  const rp = path.join(ROOT, 'reading.html');
+  if (fs.existsSync(rp)){
+    const rs = fs.readFileSync(rp, 'utf8');
+    const RE = m => out.push({ sev:'خطأ', file:'reading.html', msg:m });
+    if (!/<script src="tajweed\.js"><\/script>/.test(rs)) RE('محرِّكُ التجويدِ غيرُ محمَّل');
+    if (!/\(tjOn\(\) && window\.TAJWEED\) \? TAJWEED\.html\(S\.ayat\[k\]\) : S\.ayat\[k\]/.test(rs))
+      RE('النصُّ لا يُلوَّن بالمحرِّك');
+    if (!/data-q-tj/.test(rs)) RE('لا زرَّ لألوانِ التجويد');
+    if (!/مواضعُ الأحكامِ فقط — والأداءُ يُعرَض على معلّمك/.test(rs))
+      RE('لا يُصرَّح أنّ الألوانَ مواضعُ أحكامٍ لا تقييمَ أداء');
+    if (!/TAJWEED\.legend\(/.test(rs)) RE('لا مفتاحَ للألوان');
   }
   return out;
 }
