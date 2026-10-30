@@ -4868,10 +4868,36 @@ function quranTilawaPath(){
      على المرجع، فالمُبدَلُ القريبُ يرجع بمئةٍ من مئة. فلا يُعاد. */
   if (!/if\(!qmode\)\{\s*\n\s*pa = new SDK\.PronunciationAssessmentConfig/.test(src))
     E('التلاوةُ تُقيَّم بتقييمِ النطق — وقد قِيس فرجع المُبدَلُ القريبُ ١٠٠/١٠٠');
-  if (!/if\(qmode\)\{\s*\n\s*var qt = \(result && result\.text\) \|\| "";/.test(src))
+  if (!/allText\.push\(tx\); _heardAny = true;/.test(src))
     E('التلاوةُ لا تجمع النصَّ المُدرَكَ الخام');
   if (!/var mark = qAlign\(refWordsArr, heardW\);/.test(src))
     E('ما سُمع لا يُقابَل بالمرجع');
+  /* ═══ (٥·أ٢) والتلاوةُ تُسجَّل متّصلةً لا نُطقًا نُطقًا ═══
+     بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): «تعمّدت أقرأ غلط… قوم نطقتها قوام»
+     فلم يُرصَد. وصفوفُه: «دورات ١» وثلاثَ عشرةَ ثانيةً لمقطعٍ يحتاج
+     عشرين — فغلطُه وقع فيما لم يُسجَّل. وعلّتُه أنّ النُّطقَ الواحدَ
+     ينتهي عند أوّلِ سكتةٍ ثمّ يُعاد الفتحُ بعد ٤٥٠ج. */
+  if (!/if\(qmode && !rec\.startContinuousRecognitionAsync\)\{/.test(src) ||
+      !/أداةُ التسجيلِ عندك قديمة/.test(src))
+    E('التلاوةُ بلا مسارٍ متّصلٍ صريح — فقد تنزلق إلى تقييمِ النطقِ صامتةً');
+  if (/qmode[\s\S]{0,120}var qt = \(result && result\.text\)/.test(src))
+    E('بقي للتلاوةِ فرعٌ متقطّعٌ — وما يُقال بين الدورتَين يضيع فيه');
+  if (!/rec\.recognized = function\(sx, e\)\{/.test(src))
+    E('المسارُ المتّصلُ لا يجمع ما يصل منه');
+  if (!/rec\.startContinuousRecognitionAsync\(function\(\)\{ _qBump\(\); \}/.test(src))
+    E('المسارُ المتّصلُ لا يبدأ');
+  if (!/if\(_qCont && r\.stopContinuousRecognitionAsync\)\{/.test(src))
+    E('المسارُ المتّصلُ لا يُوقَف عند الإغلاق — فيبقى المايكُ مفتوحًا');
+  const sil = /var _qCont=false, _qSil=null, _qSilMs=(\d+);/.exec(src);
+  if (!sil) E('مهلةُ السكوتِ في التلاوةِ غيرُ معرَّفة');
+  else if (+sil[1] < 4000 || +sil[1] > 15000)
+    E('مهلةُ السكوتِ ' + sil[1] + 'ج — إمّا تقطع عليه وقفتَه أو تُعلّقه');
+  if (!/if\(allText\.length\)\{ _userStopped = true; finish\(\); \}/.test(src))
+    E('السكوتُ الطويلُ لا يُنهي التسميعَ — فيبقى المايكُ يعمل');
+  if (!/if\(_qCont\)\{ finish\(\); return; \}/.test(src))
+    E('«خلّصت» ينتظر دورةً لا وجودَ لها في المسارِ المتّصل');
+  if (!/_cycTo = setTimeout\(function\(\)\{\s*\n\s*if\(_fin \|\| _userStopped \|\| _st\.ss != null\) return;[\s\S]{0,400}?\}, 15000\);[\s\S]{0,200}?startContinuousRecognitionAsync/.test(src))
+    E('المسارُ المتّصلُ بلا حارسِ جلسةٍ ميّتة — فيقرأ في الفراغ دقيقتَين');
 
   /* ═══ (٥·ب) المقابلةُ تُنتزَع وتُشغَّل على حالاتٍ مقيسة ═══ */
   const ki = src.indexOf('function qKeys(w){');
@@ -4944,7 +4970,7 @@ function quranTilawaPath(){
   if (!/سمعناها[\s\S]{0,160}esc2\(mark\[i\]\.said\)/.test(src))
     E('لا يُعرَض ما سمعناه في موضعِ الشكّ — فلا يملك مراجعتَه');
   /* والنصُّ المُدرَكُ يُجمَع فعلًا لا تبقى قائمتُه فارغة */
-  if (!/allText\.push\(qt\.trim\(\)\);/.test(src))
+  if (!/allText\.push\(tx\);/.test(src))
     E('ما سمعه لا يُجمَع — فلا شيءَ يُقابَل بالمرجع');
   if (!/🟢 وصلت · 🟠 راجِعها · ⚪/.test(src))
     E('مفتاحُ ألوانِ التلاوةِ لا يُبيّن الحالاتِ الثلاث');

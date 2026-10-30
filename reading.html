@@ -871,6 +871,20 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
      لا تُعاد. وإخفاقُ المقياسِ نفسِه لا يُعطّل القراءة: يُهمَل. */
   var _lvlPeak=0, _lvlN=0, _lvlErr=null, _lvlStop=null, _lvlTo=null, _deadMic=false;
   var _lvlWeakTo=null, _lvlPolls=0, _weakWarn=false, _stopWait=null;
+  /* ═══ التلاوةُ تُسجَّل متّصلةً لا نُطقًا نُطقًا ═══════════════════
+     بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): «تعمّدت أقرأ غلط… قرأت قوم نطقتها
+     قوام» فلم يُرصَد. وصفوفُه تُبيّن السبب: «دورات ١» في كلِّ تسميعة،
+     وثلاثَ عشرةَ ثانيةً من صوتٍ لمقطعٍ يحتاج عشرين. فالغلطُ المتعمَّدُ
+     وقع فيما لم يُسجَّل أصلًا.
+
+     وعلّتُه أنّ recognizeOnceAsync تلتقط «نُطقًا واحدًا» ثمّ تنتهي
+     عند أوّلِ سكتة، فنُعيد الفتحَ بعد ٤٥٠ج — وما قاله في الفتحةِ
+     يضيع، ودورتان لم يصلهما كلامٌ تُنهيان التسميعَ كلَّه.
+
+     والتلاوةُ لا تُقيَّم بتقييمِ النطقِ (انظر qKeys) فلا شيءَ يُلزمنا
+     بذلك المسار: نفتح المايكَ مرّةً واحدةً ونُسجّل متّصلًا حتى يقول
+     «خلّصت» أو يسكت سكوتًا بيّنًا. ومسارُ القطعةِ بحالِه لم يُمَسّ. */
+  var _qCont=false, _qSil=null, _qSilMs=7000;
   var _IOS = /iP(hone|od|ad)/.test(navigator.userAgent||"") ||
              (/Macintosh/.test(navigator.userAgent||"") && navigator.maxTouchPoints > 1);
   function _lvlStart(){
@@ -920,7 +934,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
   window.__paBusy=(window.__paBusy||0)+1; window.__micGrace=Date.now()+9000; // استثناء كشف الخروج أثناء التسجيل
   function _releaseBusy(){ if(window.__paBusy>0) window.__paBusy--; window.__micGrace=Date.now()+9000; }
   function _closeRec(){ if(_cycTo){ clearTimeout(_cycTo); _cycTo=null; }
-    var r=rec; rec=null; if(!r) return; try{ r.close(); }catch(e){} }
+    if(_qSil){ clearTimeout(_qSil); _qSil=null; }
+    var r=rec; rec=null; if(!r) return;
+    /* المسارُ المتّصلُ يُوقَف قبل إغلاقِه، وإلّا بقي يُرسل الصوتَ
+       والمايكُ مفتوحٌ بعد انتهاءِ التسميع. */
+    try{ if(_qCont && r.stopContinuousRecognitionAsync){
+      r.stopContinuousRecognitionAsync(function(){ try{ r.close(); }catch(e){} },
+                                       function(){ try{ r.close(); }catch(e){} });
+      _qCont = false; return; } }catch(e){}
+    try{ r.close(); }catch(e){} }
   function finish(){
     if(_fin) return; _fin=true; clearTimeout(_to); _lvlEnd();
     if(_stopWait){ clearTimeout(_stopWait); _stopWait = null; }
@@ -1210,6 +1232,8 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
       _userStopped = true;
       try{ sb.disabled = true; sb.textContent = "⏳ لحظة..."; }catch(e){}
       if(!rec){ finish(); return; }
+      /* المسارُ المتّصلُ سلّم ما سمعه أوّلًا بأوّل، فلا شيءَ يُنتظَر */
+      if(_qCont){ finish(); return; }
       var lt = statusEl.querySelector("[data-livetxt]");
       if(lt) lt.textContent = "⏳ لحظة، أحسب درجتك...";
       _stopWait = setTimeout(function(){ _stopWait = null; finish(); }, 3500);
@@ -1292,6 +1316,73 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
          سفاري — انظر MIC.audioConfig في mic-help.js وبلاغ ٦ سبتمبر ٢٠٢٦. */
       audio = MIC.audioConfig(SDK);
       rec = new SDK.SpeechRecognizer(cfg, audio);
+      /* ═══ التلاوة: مسارٌ متّصلٌ واحدٌ لا دوراتٌ متتابعة ═══ */
+      /* ولا فرعَ متقطّعًا للتلاوة: لو غاب المسارُ المتّصلُ يومًا
+         لانزلقت إلى مسارِ تقييمِ النطقِ صامتةً — وهو الذي لا يرى
+         الكلمةَ المُبدَلةَ أصلًا. فيُقال الحقُّ ولا يُسجَّل تسميعٌ
+         لا نملك تقييمَه. */
+      if(qmode && !rec.startContinuousRecognitionAsync){
+        _fin = true; clearTimeout(_to); _releaseBusy(); _closeRec();
+        statusEl.style.color = "var(--bad)";
+        statusEl.innerHTML = "❌ أداةُ التسجيلِ عندك قديمةٌ ولا تدعم التسميعَ المتّصل — "+
+          "حدِّث المتصفّحَ ثمّ جرّب.";
+        if(btn){ btn.disabled = false; }
+        if(onFail){ try{ onFail(); }catch(e){} }
+        return;
+      }
+      if(qmode){
+        _hook(rec);
+        _qCont = true;
+        var _qBump = function(){
+          if(_qSil) clearTimeout(_qSil);
+          _qSil = setTimeout(function(){
+            _qSil = null;
+            if(_fin || _userStopped) return;
+            /* سكوتٌ بيّنٌ بعد كلامٍ سُمع: أتمَّ تسميعَه */
+            if(allText.length){ _userStopped = true; finish(); }
+          }, _qSilMs);
+        };
+        rec.recognized = function(sx, e){
+          try{
+            var r2 = e && e.result;
+            if(!r2 || r2.reason !== SDK.ResultReason.RecognizedSpeech) return;
+            var tx = String(r2.text || "").trim();
+            if(!tx) return;
+            allText.push(tx); _heardAny = true;
+            if(typeof r2.duration === "number") _audioSec += r2.duration/1e7;
+            window.__micGrace = Date.now()+9000;
+            var cn2 = statusEl.querySelector("[data-readcnt]");
+            if(cn2) cn2.textContent = allText.join(" ").split(/\s+/).filter(Boolean).length;
+            _qBump();
+          }catch(x){}
+        };
+        rec.canceled = function(sx, e){
+          _st.cx = Date.now()-_st.t0;
+          try{ _st.cxr = String(e && e.reason); _st.cxd = String((e && e.errorDetails)||"").slice(0,200); }catch(x){}
+          try{ _lastWhy = MIC.why(SDK, null, e); }catch(x){}
+          if(_fin || _userStopped) return;
+          /* أُلغيت الجلسةُ: ما سُمع يُحصَد ولا يُرمى */
+          _userStopped = true; finish();
+        };
+        /* ولا يُترَك يقرأ في الفراغ: إن لم تُفتح جلسةٌ في خمسَ عشرةَ
+           ثانيةً فالمسارُ ميّت، نُغلق ونُعيد — ودورتان تكفيان للحكم.
+           (وهو حارسُ القطعةِ نفسُه، فالعلّةُ واحدة.) */
+        _cycTo = setTimeout(function(){
+          if(_fin || _userStopped || _st.ss != null) return;
+          _dead++; _closeRec();
+          if(_dead < 2){ window.__micGrace = Date.now()+9000;
+            setTimeout(function(){ if(_fin||_userStopped) return; _cycle(consecNoMatch); }, 250); return; }
+          finish();
+        }, 15000);
+        try{
+          rec.startContinuousRecognitionAsync(function(){ _qBump(); }, function(err){
+            if(_fin) return;
+            try{ _lastWhy = MIC.why(SDK, null, err); }catch(x){}
+            _closeRec(); if(!_retryOrFail()) finish();
+          });
+        }catch(e2){ _closeRec(); if(!_retryOrFail()) finish(); }
+        return;
+      }
       if(!qmode){
         pa = new SDK.PronunciationAssessmentConfig(refText, SDK.PronunciationAssessmentGradingSystem.HundredMark, SDK.PronunciationAssessmentGranularity.Phoneme, true);
         pa.applyTo(rec);
@@ -1344,18 +1435,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
       if(_fin){ _closeRec(); return; }
       var gotWords=false, _ex=null;   /* _ex: استثناء قراءة التقييم — كان يُبتلع صامتًا */
       try{
-        if(qmode){
-          var qt = (result && result.text) || "";
-          if(result && result.reason===SDK.ResultReason.RecognizedSpeech && qt.trim()){
-            allText.push(qt.trim());
-            gotWords = true;
-            if(typeof result.duration === "number") _audioSec += result.duration/1e7;
-            window.__micGrace=Date.now()+9000;
-            if(_st.rz > _maxRz) _maxRz = _st.rz;
-            var cnq = statusEl.querySelector("[data-readcnt]");
-            if(cnq) cnq.textContent = allText.join(" ").split(/\s+/).filter(Boolean).length;
-          }
-        } else if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
+        if(result && result.reason===SDK.ResultReason.RecognizedSpeech){
           var r = SDK.PronunciationAssessmentResult.fromResult(result);
           var ws = (r.detailResult && r.detailResult.Words) || [];
           if(ws.length){
