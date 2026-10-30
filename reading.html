@@ -1016,6 +1016,15 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
         '<div style="direction:rtl;text-align:right;margin-top:8px;line-height:2.1;font-size:1.05rem;font-weight:700">'+html+'</div>'+
         (subList ? '<div style="margin-top:8px;font-weight:400;font-size:.9rem">'+
           '<b style="color:var(--warn)">مواضعُ تُراجَع</b> — وقد يكون السمعُ منّا خطأً لا منك:'+
+          /* ═══ ويُقال المقدارُ بدقّةٍ لا بعبارةٍ مُطاطة ═══
+             قِيس على تلاوةِ قارئٍ متقَنٍ (ق ١–٢٤): سُئل عن عشرِ كلماتٍ
+             من ١٩٥ — كلمةٌ من كلِّ عشرين تقريبًا، سمعُنا فيها أخطأ
+             لا القارئ. وجُرّب التفريقُ بين سمعِنا الخاطئِ وغلطِ
+             القارئِ بمقدارِ اختلافِ الحرف، فتداخل التوزيعان:
+             «لوط ← نوط» سمعُنا، و«قوم ← قوام» غلطٌ حقيقيّ، وكلاهما
+             حرفٌ واحد. فلا عتبةَ تفصل، ولا يُدَّعى ما لا يُقاس. */
+          '<div style="font-size:.8rem;color:var(--muted);font-weight:400;margin-top:2px">'+
+          'ويُخطئ سمعُنا في نحوِ كلمةٍ من كلِّ عشرين حتى في تلاوةٍ لا غلطَ فيها.</div>'+
           '<ul style="margin:4px 18px 0 0;padding:0">'+subList+'</ul></div>' : '')+
         '<div style="font-size:.8rem;color:var(--muted);margin-top:6px;font-weight:400">'+
           '👆 المس أيَّ كلمةٍ لتسمع آيتَها بصوت '+QARI[qariOf()].name+
