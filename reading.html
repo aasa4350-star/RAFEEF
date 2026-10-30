@@ -49,6 +49,22 @@
   .langtabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px;border-radius:14px;font-size:1.05rem;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .langtabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   .tabs{display:flex;gap:8px;margin:10px 0 18px}
+  /* ═══ خطُّ المصحف ═══════════════════════════════════════════════
+     طلبُ الأب (٣٠ أكتوبر ٢٠٢٦): «خلها نفس الخط هذا» — وأرسل صورةَ
+     صفحةِ المصحف. وكان النصُّ يُعرَض بـTraditional Arabic ثمّ Tahoma،
+     وأوّلُهما لا يُوجَد على الآيفون والثاني ليس خطَّ مصحف: فتتمزّق
+     «تُرَابًا» على السطرِ وتتراكب العلاماتُ — وهو ما كان يراه.
+
+     وخطُّ مجمّعِ الملكِ فهدٍ بعينِه لم أقدر على إنزالِه من هنا،
+     فالمستعمَلُ شهرزاد الجديد (SIL · رخصةٌ مفتوحة): خطُّ نسخٍ
+     قرآنيٌّ يغطّي علاماتِ نصِّنا كلَّها (فُحص حرفًا حرفًا في
+     checks/pages.js). وهو مُستضافٌ في الموقعِ نفسِه لا في موقعٍ
+     خارجيّ — فلا يذهب المصحفُ إن تعذّر ذلك الموقع. */
+  @font-face{
+    font-family:'QuranText';
+    src:url('fonts/quran.woff2') format('woff2');
+    font-display:swap;
+  }
   .tabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:11px 6px;border-radius:13px;font-size:.98rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--shadow)}
   .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   section.panel{display:none} section.panel.active{display:block;animation:fade .25s ease}
@@ -1753,6 +1769,9 @@ function qariSet(k){ try{ if(QARI[k]) localStorage.setItem("q_qari_"+who, k); }c
 function tjOn(){ try{ return localStorage.getItem("q_tj_"+who) === "1"; }catch(e){ return false; } }
 function tjSet(v){ try{ localStorage.setItem("q_tj_"+who, v ? "1" : "0"); }catch(e){} }
 function qPad(n, w){ var s = String(n); while(s.length < w) s = "0" + s; return s; }
+/* أرقامُ الآياتِ بالهنديّةِ كما في المصحف: «١٢» لا «12» */
+function hindi(n){ return String(n).replace(/[0-9]/g, function(d){
+  return String.fromCharCode(0x0660 + (+d)); }); }
 function qAudioUrl(surah, ayah, qari){
   var q = QARI[qari] ? qari : qariOf();
   return "https://everyayah.com/data/" + QARI[q].dir + "/" +
@@ -4000,12 +4019,12 @@ if(!META[who] || !DATA[who]){
           ? '<div style="margin-top:6px;font-size:.8rem;line-height:2;color:var(--muted)">'+
             TAJWEED.legend(take.map(function(k){ return S.ayat[k]; }))+'</div>'
           : '')+
-        '<div class="txt" data-q-txt style="direction:rtl;text-align:right;font-size:1.5rem;line-height:2.6;font-family:\'Traditional Arabic\',\'Scheherazade New\',Tahoma,serif">'+
+        '<div class="txt" data-q-txt style="direction:rtl;text-align:right;font-size:1.5rem;line-height:2.6;font-family:\'QuranText\',\'Scheherazade New\',\'Traditional Arabic\',serif">'+
           take.map(function(k){
             /* الألوانُ تُوضَع على الحرفِ في موضعِه من رسمِ المصحف،
                فلا يتغيّر النصُّ ولا يُحذَف منه حرف — انظر tajweed.js */
             var body = (tjOn() && window.TAJWEED) ? TAJWEED.html(S.ayat[k]) : S.ayat[k];
-            return body+' <span style="color:var(--muted);font-size:.7em">﴿'+(k+1)+'﴾</span>'; }).join(' ')+
+            return body+' <span style="color:var(--muted);font-size:.72em">﴿'+hindi(k+1)+'﴾</span>'; }).join(' ')+
         '</div>'+
         '<div class="pfb" data-q-fb style="margin-top:10px;font-weight:700;min-height:18px"></div>'+
       '</div>'+
