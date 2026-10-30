@@ -102,11 +102,28 @@
   }
 
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  /* ═══ الحرفُ المشدَّدُ يُعلَّم في النصِّ وإن أُطفئت الألوان ═══
+     بلاغُ الأب (٣٠ أكتوبر ٢٠٢٦): «وَنَزَّلْنَا نطقتها ونزلنَا… لازم
+     الحركات تنتبه لها ضروري». وقد قِيس رصدُ الشدّةِ آليًّا فلم يصحّ:
+     زمنُ الحرفِ المشدَّدِ نسبةً إلى كلمتِه ٣٨–٤٨٪، وغيرِ المشدَّدِ
+     ٢٦–٤٥٪ (صوتان × خمسُ سرعات) — والمدَيان يتداخلان، فالحكمُ على
+     كلمةٍ بعينِها يُخطئ. فلا يُدَّعى رصدٌ لا يصحّ.
+
+     والذي يصحُّ أن تقع عينُه على الشدّةِ قبل أن ينطق: فتُعلَّم كلُّ
+     مشدَّدةٍ في المصحفِ المعروضِ أمامه، وهي من النصِّ لا من ظنٍّ. */
+  function shaddaAt(t){
+    var L = parse(t), R = [], i;
+    for(i = 0; i < L.length; i++)
+      if(L[i].m.indexOf(SHADDA) >= 0) R.push({ at:L[i].at, end:L[i].end });
+    return R;
+  }
   /* النصُّ مُلوَّنًا: يُلوَّن الحرفُ وما عليه، وما بينها يبقى كما هو.
      ولا يُحذَف حرفٌ ولا يُزاد: الناتجُ مجرَّدًا = الداخلُ مجرَّدًا. */
-  function html(t){
+  /* rules=false: لا تُلوَّن الأحكام، وتبقى الشدّةُ معلَّمةً وحدَها */
+  function html(t, rules){
     t = String(t || "");
-    var M = marks(t).slice().sort(function(x, y){ return x.at - y.at; });
+    var M = (rules === false ? [] : marks(t)).slice().sort(function(x, y){ return x.at - y.at; });
     /* ═══ حرفٌ تحت حكمَين: يُذكَران كلاهما ولا يُسقَط أحدُهما ═══
        «صُمٌّۢ بُكْمٌ»: الميمُ مشدّدةٌ (غنّة) وتنوينُها قبل الباءِ
        (إقلاب)، وكلاهما حقّ. ولا يسع الحرفَ لونان، فيُلوَّن بالأوّلِ
@@ -118,14 +135,25 @@
       if(g && g.at === M[i].at){ if(g.rs.indexOf(M[i].r) < 0) g.rs.push(M[i].r); }
       else G.push({ at:M[i].at, end:M[i].end, rs:[M[i].r] });
     }
+    /* والمشدَّدُ يُضَمُّ إلى القطعِ: ما لم يقع عليه حكمٌ يُعلَّم وحدَه */
+    var has = {}; G.forEach(function(g){ has[g.at] = g; });
+    shaddaAt(t).forEach(function(sd){
+      if(has[sd.at]){ has[sd.at].sh = true; return; }
+      G.push({ at:sd.at, end:sd.end, rs:[], sh:true });
+    });
+    G.sort(function(x, y){ return x.at - y.at; });
     var out = "", p = 0;
     for(i = 0; i < G.length; i++){
       var m = G[i];
       if(m.at < p) continue;               /* تداخلٌ لا يقع، وإن وقع فالأوّل */
       out += esc(t.slice(p, m.at));
-      out += '<span class="tj" data-tj="' + m.rs.join(" ") + '" title="' +
-             esc(m.rs.map(function(k){ return RULES[k].name; }).join(" + ")) +
-             '" style="color:' + RULES[m.rs[0]].hue + ';font-weight:800">' +
+      var nm = m.rs.map(function(k){ return RULES[k].name; });
+      if(m.sh) nm.push("شدّة — يُضعَّف الحرف");
+      out += '<span class="tj" data-tj="' + (m.rs.join(" ") || "sh") + '"' +
+             (m.sh ? ' data-sh="1"' : '') + ' title="' + esc(nm.join(" + ")) + '"' +
+             ' style="' + (m.rs.length ? ('color:' + RULES[m.rs[0]].hue + ';') : '') +
+             'font-weight:800' +
+             (m.sh ? ';border-bottom:2px solid currentColor' : '') + '">' +
              esc(t.slice(m.at, m.end)) + '</span>';
       p = m.end;
     }
@@ -142,5 +170,6 @@
              '">■</b> ' + RULES[k].name + '</span>';
     }).join("");
   }
-  window.TAJWEED = { RULES:RULES, marks:marks, html:html, legend:legend, parse:parse };
+  window.TAJWEED = { RULES:RULES, marks:marks, html:html, legend:legend, parse:parse,
+                     shaddaAt:shaddaAt };
 })();

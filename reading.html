@@ -4072,8 +4072,9 @@ if(!META[who] || !DATA[who]){
          بالنصِّ نفسِه حرفًا بحرفٍ ورجع تقييمُ النطقِ ١٠٠/١٠٠. وعلّتُه
          أنّ أزورَ تكتب العربيّةَ بلا تشكيلٍ أصلًا، فالحركةُ ليست في
          مخرجِها. فلا يُوهَم أنّها تُراجِع إعرابَه. */
-      '<br><b>ولا تُراجَع الحركاتُ</b> (المفتوحُ والمضمومُ والمكسور): الأداةُ تكتب '+
-      'الكلماتِ بلا تشكيل، فالإعرابُ لا يصل إليها — وهو ممّا يُعرَض على معلّمك.</p>'+
+      '<br><b>ولا تُراجَع الحركاتُ</b> (المفتوحُ والمضمومُ والمكسور) ولا <b>الشدّة</b>: الأداةُ '+
+      'تكتب الكلماتِ بلا تشكيل، فالإعرابُ لا يصل إليها — وهو ممّا يُعرَض على معلّمك. '+
+      'ولذلك <b><u>الحروفُ المشدَّدة</u></b> مُعلَّمةٌ في النصِّ تحتها خطّ: انتبه لها فهي تُضعَّف.</p>'+
       '<div class="passage" data-q-wrap>'+
         '<div class="row"><button class="say" data-q-listen>🔊 استمع بصوت '+QARI[qariOf()].name+'</button>'+
           (canRec ? '<button class="say small azbtn" style="background:#0e9f6e;color:#fff;border-color:#0e9f6e" data-q-rec>🎙️ سمّع حفظك</button>' : '')+
@@ -4104,7 +4105,10 @@ if(!META[who] || !DATA[who]){
           take.map(function(k){
             /* الألوانُ تُوضَع على الحرفِ في موضعِه من رسمِ المصحف،
                فلا يتغيّر النصُّ ولا يُحذَف منه حرف — انظر tajweed.js */
-            var body = (tjOn() && window.TAJWEED) ? TAJWEED.html(S.ayat[k]) : S.ayat[k];
+            /* والمشدَّدُ يُعلَّم في الحالَين: بلاغُ الأب (٣٠ أكتوبر
+               ٢٠٢٦) «وَنَزَّلْنَا نطقتها ونزلنَا». ورصدُه آليًّا قِيس
+               فلم يصحّ، فتقع عينُه عليه قبل أن ينطق. */
+            var body = window.TAJWEED ? TAJWEED.html(S.ayat[k], tjOn()) : S.ayat[k];
             return body+' <span style="color:var(--muted);font-size:.72em">﴿'+hindi(k+1)+'﴾</span>'; }).join(' ')+
         '</div>'+
         '<div class="pfb" data-q-fb style="margin-top:10px;font-weight:700;min-height:18px"></div>'+
