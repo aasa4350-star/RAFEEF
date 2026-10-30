@@ -1,5 +1,486 @@
 [
     {
+        "id": "e8275bb0-a083-4de2-9baf-45f03f997ddb",
+        "created_at": "2026-10-30T16:02:44.909829+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-30T16:02:44.126Z",
+            "to": 6,
+            "cid": "1793376164126_c3em9m30ukf",
+            "from": 4,
+            "kind": "tilawa",
+            "subs": 5,
+            "test": "\u062a\u0644\u0627\u0648\u0629 \ud83d\udcd6",
+            "heard": 30,
+            "surah": 50,
+            "total": 30,
+            "words": 25,
+            "cycles": 1,
+            "muddle": null,
+            "correct": 25,
+            "unknown": 0,
+            "audioSec": 25,
+            "refWords": 30,
+            "surahName": "\u0642"
+        }
+    },
+    {
+        "id": "19e065c2-3215-4430-ba3e-182f4a82087d",
+        "created_at": "2026-10-30T12:51:20.640732+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-30T12:51:19.748Z",
+            "cid": "1793364679748_nsbjn2xhlf9",
+            "dur": 91,
+            "pid": "mvuyz10b_34lram",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 3-1 \u062a\u0645\u062b\u064a\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a \u0628\u064a\u0627\u0646\u064a\u064b\u0651\u0627",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "g31PlotPoint",
+                    "j": 1,
+                    "ms": 7862,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31YIntPoint",
+                    "j": 2,
+                    "ms": 3192,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "g31ConvertToSI",
+                    "j": 0,
+                    "ms": 26605,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31ConvertToSI",
+                    "j": 1,
+                    "ms": 5329,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 4893,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 2,
+                    "ms": 6595,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 3443,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31ConvertToSI",
+                    "j": 0,
+                    "ms": 5312,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 1,
+                    "ms": 12038,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31YIntPoint",
+                    "j": 0,
+                    "ms": 15459,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0646\u0642\u0637\u0629 \u062a\u0642\u0627\u0637\u0639 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0645\u0639 \u0645\u062d\u0648\u0631 \u0627\u0644\u0635\u0627\u062f\u0627\u062a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0625\u064a\u062c\u0627\u062f \u0646\u0642\u0637\u0629\u064d \u0623\u062e\u0631\u0649 \u0639\u0644\u0649 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0628\u0627\u0644\u062a\u0639\u0648\u064a\u0636": {
+                    "c": 2,
+                    "t": 5
+                },
+                "\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0635\u0648\u0631\u0629 \u0627\u0644\u0642\u064a\u0627\u0633\u064a\u0629 \u0625\u0644\u0649 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639": {
+                    "c": 1,
+                    "t": 3
+                }
+            },
+            "correct": 5,
+            "secPerQ": 9.1,
+            "trusted": true
+        }
+    },
+    {
+        "id": "15dacf16-5e31-40d1-8d1e-111018f0399c",
+        "created_at": "2026-10-30T12:49:39.813858+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-30T12:49:38.443Z",
+            "cid": "1793364578443_wxfwyemvi4k",
+            "dur": 58,
+            "pid": "mvuyxkae_2asfb1",
+            "why": "fast",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 3-1 \u062a\u0645\u062b\u064a\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a \u0628\u064a\u0627\u0646\u064a\u064b\u0651\u0627",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "g31ConvertToSI",
+                    "j": 1,
+                    "ms": 5656,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 2,
+                    "ms": 5008,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31LineTypes",
+                    "j": 2,
+                    "ms": 1684,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31IdSI",
+                    "j": 2,
+                    "ms": 5295,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 17769,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31IdSI",
+                    "j": 2,
+                    "ms": 3510,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 1,
+                    "ms": 4330,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31YIntPoint",
+                    "j": 2,
+                    "ms": 3094,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 7873,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31LineTypes",
+                    "j": 0,
+                    "ms": 3529,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645\u0627\u0646 \u0627\u0644\u0623\u0641\u0642\u064a \u0648\u0627\u0644\u0631\u0623\u0633\u064a \u2014 \u0645\u0641\u0647\u0648\u0645": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0646\u0642\u0637\u0629 \u062a\u0642\u0627\u0637\u0639 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0645\u0639 \u0645\u062d\u0648\u0631 \u0627\u0644\u0635\u0627\u062f\u0627\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0625\u064a\u062c\u0627\u062f \u0646\u0642\u0637\u0629\u064d \u0623\u062e\u0631\u0649 \u0639\u0644\u0649 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0628\u0627\u0644\u062a\u0639\u0648\u064a\u0636": {
+                    "c": 1,
+                    "t": 4
+                },
+                "\u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0635\u0648\u0631\u0629 \u0627\u0644\u0642\u064a\u0627\u0633\u064a\u0629 \u0625\u0644\u0649 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639": {
+                    "c": 0,
+                    "t": 1
+                },
+                "\u0623\u0648\u062c\u062f \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639 \u0627\u0644\u0635\u0627\u062f\u064a \u0645\u0639\u064b\u0627 \u0645\u0646 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639": {
+                    "c": 2,
+                    "t": 2
+                }
+            },
+            "correct": 6,
+            "secPerQ": 5.8,
+            "trusted": false
+        }
+    },
+    {
+        "id": "1237a228-b1e7-4868-a0c7-20abb7a4cd9f",
+        "created_at": "2026-10-30T12:47:47.6401+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-30T12:47:47.071Z",
+            "cid": "1793364467071_62q4i36xjdq",
+            "dur": 61,
+            "pid": "mvuyv3zv_24t5tv",
+            "why": "fast",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 3-1 \u062a\u0645\u062b\u064a\u0644 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a \u0628\u064a\u0627\u0646\u064a\u064b\u0651\u0627",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "g31IdSI",
+                    "j": 1,
+                    "ms": 13885,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "g31LineTypes",
+                    "j": 0,
+                    "ms": 2242,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 1,
+                    "ms": 10092,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31YIntPoint",
+                    "j": 0,
+                    "ms": 6291,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "g31IdSI",
+                    "j": 2,
+                    "ms": 4844,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 4901,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g31PlotPoint",
+                    "j": 1,
+                    "ms": 3492,
+                    "ok": 0
+                },
+                {
+                    "a": 1,
+                    "g": "g31PlotPoint",
+                    "j": -1,
+                    "ms": 3197,
+                    "ok": 0
+                },
+                {
+                    "a": 0,
+                    "g": "g31IdSI",
+                    "j": 0,
+                    "ms": 6396,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "g31YIntPoint",
+                    "j": 0,
+                    "ms": 5464,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645\u0627\u0646 \u0627\u0644\u0623\u0641\u0642\u064a \u0648\u0627\u0644\u0631\u0623\u0633\u064a \u2014 \u0645\u0641\u0647\u0648\u0645": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0646\u0642\u0637\u0629 \u062a\u0642\u0627\u0637\u0639 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0645\u0639 \u0645\u062d\u0648\u0631 \u0627\u0644\u0635\u0627\u062f\u0627\u062a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0625\u064a\u062c\u0627\u062f \u0646\u0642\u0637\u0629\u064d \u0623\u062e\u0631\u0649 \u0639\u0644\u0649 \u0627\u0644\u0645\u0633\u062a\u0642\u064a\u0645 \u0628\u0627\u0644\u062a\u0639\u0648\u064a\u0636": {
+                    "c": 0,
+                    "t": 4
+                },
+                "\u0623\u0648\u062c\u062f \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639 \u0627\u0644\u0635\u0627\u062f\u064a \u0645\u0639\u064b\u0627 \u0645\u0646 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0627\u0644\u0645\u0642\u0637\u0639": {
+                    "c": 2,
+                    "t": 3
+                }
+            },
+            "correct": 5,
+            "secPerQ": 6.1,
+            "trusted": false
+        }
+    },
+    {
+        "id": "9716c80e-bea6-4fa7-971f-9bbaf442de8a",
+        "created_at": "2026-10-30T12:46:44.968758+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-30T12:46:44.790Z",
+            "cid": "1793364404790_pd6ncou0prf",
+            "dur": 30,
+            "pid": "mvuyufxp_44n4sp",
+            "why": "burst",
+            "fast": 2,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0631\u064a\u0627\u0636\u064a\u0627\u062a \u0645\u0663 \u2014 3-3 \u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0645\u0639\u0627\u062f\u0644\u0627\u062a (\u0645\u064a\u0644 \u0648\u0646\u0642\u0637\u0629)",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "g33FromTwoPointsPS",
+                    "j": 0,
+                    "ms": 20603,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g33PointSlopeForm",
+                    "j": 1,
+                    "ms": 2916,
+                    "ok": 0
+                },
+                {
+                    "a": 2,
+                    "g": "g33PointSlopeForm",
+                    "j": 1,
+                    "ms": 2050,
+                    "ok": 0
+                }
+            ],
+            "total": 3,
+            "skills": {
+                "\u0645\u0646 \u0627\u0644\u0645\u064a\u0644 \u0648\u0646\u0642\u0637\u0629\u060c \u0627\u0643\u062a\u0628 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0646\u0642\u0637\u0629": {
+                    "c": 0,
+                    "t": 2
+                },
+                "\u0645\u0646 \u0646\u0642\u0637\u062a\u064a\u0646\u060c \u0627\u0643\u062a\u0628 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u064a\u0644 \u0648\u0646\u0642\u0637\u0629 \u0645\u0633\u062a\u0639\u0645\u0644\u064b\u0627 \u0627\u0644\u0646\u0642\u0637\u0629 \u0627\u0644\u0623\u0648\u0644\u0649": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "secPerQ": 10,
+            "trusted": false
+        }
+    },
+    {
+        "id": "7ce9ce53-0334-4ee2-a968-f515ac6ce1df",
+        "created_at": "2026-10-30T12:45:08.814587+00:00",
+        "student": "\u062d\u0633\u0646",
+        "grade": "\u062b\u0627\u0644\u062b \u0645\u062a\u0648\u0633\u0637",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-10-16T11:05:49.389Z",
+            "cid": "1792148749389_1mmvzyl4nqb",
+            "dur": 11,
+            "mcq": 0,
+            "pid": "mvav351h_2csnm1",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 3000,
+            "test": "\u0639\u0644\u0648\u0645 \u0645\u0663 \u2014 \u0627\u062e\u062a\u0628\u0627\u0631 \u0627\u0644\u0645\u0630\u0643\u0651\u0631\u0629 \ud83d\udcd2",
+            "essay": "(1) \n\n(2) \n\n(3) \n\n(4) ",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "muth",
+                    "j": 0,
+                    "ms": 8413,
+                    "ok": 0
+                }
+            ],
+            "total": 32,
+            "skills": {
+                "\u0637\u0628\u064a\u0639\u0629 \u0627\u0644\u0639\u0644\u0645": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "trusted": true,
+            "essayMax": 12,
+            "mcqTotal": 20,
+            "essaySelf": 0
+        }
+    },
+    {
         "id": "5bb2095b-45c2-4594-833a-fc52ec5ff4a3",
         "created_at": "2026-10-30T11:59:44.963076+00:00",
         "student": "\u0633\u0639\u0648\u062f",
@@ -141702,186 +142183,6 @@
             "cycles": null,
             "correct": 1,
             "audioSec": 2,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "ce7fcc91-215c-4c76-a7c3-8f712e887621",
-        "created_at": "2026-10-23T07:46:51.277651+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:46:50.346Z",
-            "acc": 99,
-            "cid": "1792741610346_u4pbsfa4c29",
-            "flu": 41,
-            "wpm": 60,
-            "comp": null,
-            "kind": "practice",
-            "pron": 64,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 2,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 2,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "b0233493-1f06-46db-9880-78cfdfdb55e3",
-        "created_at": "2026-10-23T07:46:26.760202+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:46:25.649Z",
-            "acc": 0,
-            "cid": "1792741585649_38k228xyyy4",
-            "flu": 0,
-            "wpm": 5,
-            "comp": null,
-            "kind": "practice",
-            "pron": 0,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 1,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 13,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "3a5f87e1-ef87-4c0b-b979-1a4283b5f483",
-        "created_at": "2026-10-23T07:45:06.324962+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:45:03.863Z",
-            "acc": 69,
-            "cid": "1792741503863_8eb23fixgk5",
-            "flu": 100,
-            "wpm": 60,
-            "comp": null,
-            "kind": "practice",
-            "pron": 81,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 1,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 1,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "26bbea91-0453-4607-9f15-957b8dc3abf1",
-        "created_at": "2026-10-23T07:44:18.112106+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:44:17.481Z",
-            "acc": 45,
-            "cid": "1792741457481_q1xdu656dqf",
-            "flu": 0,
-            "wpm": 60,
-            "comp": null,
-            "kind": "practice",
-            "pron": 9,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 1,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 1,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "3e19adc0-8105-4471-9a4d-dc1195db4f1f",
-        "created_at": "2026-10-23T07:42:19.628051+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:42:19.266Z",
-            "acc": 65,
-            "cid": "1792741339266_zcsljpujvyi",
-            "flu": 100,
-            "wpm": 60,
-            "comp": null,
-            "kind": "practice",
-            "pron": 79,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 1,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 1,
-            "kindPron": true,
-            "refWords": 1
-        }
-    },
-    {
-        "id": "0c2743fe-0ca2-4b61-a954-013253281270",
-        "created_at": "2026-10-23T07:41:48.994083+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-23T07:41:48.620Z",
-            "acc": 0,
-            "cid": "1792741308620_zqzwis5qvih",
-            "flu": 0,
-            "wpm": 5,
-            "comp": null,
-            "kind": "practice",
-            "pron": 0,
-            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
-            "pmode": "word",
-            "total": 1,
-            "words": 1,
-            "cycles": null,
-            "correct": 1,
-            "audioSec": 12,
             "kindPron": true,
             "refWords": 1
         }
