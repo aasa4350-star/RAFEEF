@@ -132,6 +132,55 @@
    وهي محقّة، والكتابُ يرسمه مرصوفًا. والتطبيق هنا مقصورٌ على نصّ
    السؤال وخياراته وشرحه — لا على سطر النتيجة، فـ«8/10» فيه درجةٌ لا
    كسرٌ يُرصَف. */
+/* ═══ «شرح بالفيديو» — رابطُ بحثٍ لا معرّفُ فيديو ═══════════════
+   طلبُ الأب (٣١ أكتوبر ٢٠٢٦): «عطني شرح واضح ومقطع فيديو». وهو
+   المنهجُ المتّبَعُ في math9.html منذ ٤ سبتمبر: الفيديو يُحذف أو
+   يصير خاصًّا فينكسر الزرُّ صامتًا، والبحثُ لا ينكسر. */
+function vidLink(topic){
+  if(!topic) return "";
+  return '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+
+    encodeURIComponent("عين دروس " + topic) + '" target="_blank" rel="noopener" '+
+    'style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;'+
+    'padding:7px 13px;border-radius:9px;font-weight:700;font-size:.86rem">📺 شرح بالفيديو: '+
+    topic + '</a></div>';
+}
+/* السالبُ يُكتَب بعلامةِ الطرحِ الطباعيّةِ لا بشرطةِ لوحةِ المفاتيح،
+   فالشرطةُ تلتبس في النصِّ العربيِّ وتبدو واصلةً بين كلمتَين. */
+function ng(n){ return (n < 0) ? ("\u2212" + (-n)) : String(n); }
+/* ═══ المقطعُ الرياضيُّ يُعزَل ليُقرأ من اليسارِ كما كُتب ═══════
+   بلاغُ الأب (٣١ أكتوبر ٢٠٢٦) ومعه صورة: الشرحُ يُعرَض «بجمع
+   المعادلتين: 3» ثمّ «x = 18» في موضعٍ آخر — والثلاثةُ انفصلت عن
+   الـx. وكان الصندوقُ مفروضًا عليه dir="ltr" والنصُّ عربيّ.
+
+   ورفعُ الفرضِ وحدَه لا يكفي: قِيست مواضعُ الحروفِ في المتصفّحِ على
+   أربعِ جملٍ فانقلب ثلاثُ مقاطعَ رياضيّةٍ من أربعة (يصير أوّلُ
+   المقطعِ يمينَ آخرِه). وبعزلِ المقطعِ صحّت الأربعُ كلُّها.
+
+   ولا يبدأ المقطعُ إلّا بحرفٍ لاتينيٍّ أو رقمٍ أو قوسٍ أو جذر: فلو
+   بدأ بنقطةٍ لابتلع نهايةَ الجملةِ العربيّةِ قبله فاختلّ موضعُها
+   (جُرّب فأفسد جملةَ فيثاغورس). */
+/* والأسُّ المرفوعُ كلُّه من المقطع: كان المحصورُ ²³⁴ وحدَها فانقطع
+   «x\u2075» عزلتَين فانقلبتا في السطرِ العربيّ (رصدته جولةٌ من ستّ،
+   لأنّ الأسَّ يُولَّد عشوائيًّا من واحدٍ إلى ستّة). */
+var MDIR_CH = "[A-Za-z0-9\u00B9\u00B2\u00B3\u2070-\u2079\u221A()\u00D7\u00F7+\\-\u2212=.,\/\u2192]";
+var MDIR = new RegExp("[A-Za-z0-9\u221A(](" + MDIR_CH + "|\\s(?=" + MDIR_CH + "))*", "g");
+/* \u0648\u0644\u0627 \u064A\u064F\u0639\u0632\u064E\u0644 \u0625\u0644\u0651\u0627 \u0645\u0627 \u0641\u064A\u0647 \u0639\u0644\u0627\u0645\u0629\u064C \u062D\u0633\u0627\u0628\u064A\u0651\u0629\u064C \u0623\u0648 \u0631\u0642\u0645. \u0623\u0645\u0651\u0627 \u0627\u0644\u0643\u0644\u0627\u0645\u064F \u0627\u0644\u0625\u0646\u062C\u0644\u064A\u0632\u064A\u064F\u0651
+   \u0627\u0644\u0645\u062D\u0636\u064F \u0641\u0627\u0644\u0645\u062A\u0635\u0641\u0651\u062D\u064F \u064A\u0631\u0635\u0641\u0647 \u0639\u0644\u0649 \u0648\u062C\u0647\u0650\u0647 \u0628\u0644\u0627 \u0639\u0632\u0644\u060C \u0648\u0639\u0632\u0644\u064F\u0647 \u064A\u064F\u0641\u0633\u062F\u0647: \u0642\u0650\u064A\u0633 \u0634\u0631\u062D\u064F
+   \u0627\u0644\u0625\u0646\u062C\u0644\u064A\u0632\u064A\u0650\u0651 \u0641\u0625\u0630\u0627 \u00ABaren't you\u00BB \u0642\u062F \u0627\u0646\u0642\u0637\u0639\u062A \u0639\u0646\u062F \u0627\u0644\u0641\u0627\u0635\u0644\u0629\u0650 \u0627\u0644\u0639\u0644\u0648\u064A\u0651\u0629\u0650
+   \u0639\u0632\u0644\u062A\u064E\u064A\u0646\u060C \u0641\u0635\u0627\u0631\u062A\u0627 \u0641\u064A \u0627\u0644\u0633\u0637\u0631\u0650 \u0627\u0644\u0639\u0631\u0628\u064A\u0650\u0651 \u0645\u0642\u0644\u0648\u0628\u062A\u064E\u064A\u0646. \u0641\u0627\u0644\u0639\u0632\u0644\u064F \u062F\u0648\u0627\u0621\u064F
+   \u0627\u0644\u062D\u0633\u0627\u0628\u0650 \u0644\u0627 \u062F\u0648\u0627\u0621\u064F \u0643\u0644\u0650\u0651 \u0644\u0627\u062A\u064A\u0646\u064A\u0651. */
+var MDIR_MATH = /[=+\u2212\u00D7\u00F7\u221A\u00B2\u00B3\u2074\u2192]|\d/;
+function mdir(s){
+  return String(s).replace(MDIR, function(m){
+    var tail = (/[\s.,\u060C\u061B]*$/.exec(m) || [""])[0];
+    var core = m.slice(0, m.length - tail.length);
+    if(!/[A-Za-z0-9]/.test(core) || core.length < 2) return m;
+    if(!MDIR_MATH.test(core)) return m;
+    return '<bdi dir="ltr">' + core + '</bdi>' + tail;
+  });
+}
+/* شرحُ السؤال: يُعزَل رياضيُّه ثمّ تُرسَم كسورُه */
+function expl(s){ return frx(mdir(s)); }
 function frx(s){
   return String(s).replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
     function(m, sg, n, dg, d){
@@ -1590,7 +1639,7 @@ if(!STUDENTS[who]){
        لا كخطأٍ جديد — وإلّا انقسمت المهارة الواحدة إلى عشرات المداخل. */
     var o = missRead(), k = String(q.missKey || q[0]);
     var e = o[k] || { n:0, ok:0 };
-    if(!q.missKey) e.q = [q[0], q[1].slice(), q[2], q[3], q[4]];
+    if(!q.missKey) e.q = [q[0], q[1].slice(), q[2], q[3], q[4], q[5]];
     /* نحفظ اسم المولّد إن وُجد، لنعيد عليه السؤال بكلماتٍ جديدة لا بالكلمات
        نفسها — وإلّا حفظ «generous ← mean» بدل أن يتعلّم معنى opposite. */
     e.gf = q.genFn || missGenName(q, id) || e.gf || "";
@@ -1671,7 +1720,7 @@ if(!STUDENTS[who]){
         try{ q = f(); }catch(err){ continue; }
         if(!q || !q[1] || q[2] == null) continue;
         if(String(q[0]) === String(e.q[0])) continue;   /* لا نعيد الكلمات نفسها */
-        var out = [q[0], q[1].slice(), q[2], q[3], q[4]];
+        var out = [q[0], q[1].slice(), q[2], q[3], q[4], q[5]];
         out.rev = 1; out.missKey = String(e.q[0]);      /* مفتاح الخطأ الأصلي للتقاعد */
         out.fresh = 1;
         return out;
@@ -1682,7 +1731,7 @@ if(!STUDENTS[who]){
   function missReshuffle(q){
     var opts = q[1].slice(), correct = opts[q[2]];
     for(var i=opts.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
-    var out = [q[0], opts, opts.indexOf(correct), q[3], q[4]];
+    var out = [q[0], opts, opts.indexOf(correct), q[3], q[4], q[5]];
     out.rev = 1;                       /* علامة: سبق أن أخطأ فيه */
     out.missKey = String(q[0]);
     return out;
@@ -1762,14 +1811,14 @@ if(!STUDENTS[who]){
       function(){var cf=gpick([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي %"+p+" من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+".","ma"];}
     ],
     hasan:[
-      function(){var base=ri(2,5),m=ri(3,6),n=ri(1,m-1),v=Math.pow(base,m-n),o=opt3(v,[Math.pow(base,m+n),base*(m-n),v+base]);return ["احسب: "+base+sup(m)+" ÷ "+base+sup(n),o[0],o[1],"نطرح الأسس: "+m+"−"+n+"="+(m-n)+" → "+base+sup(m-n)+" = "+v+".","ma"];},
-      function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[-a-b,a+b,s+3]);return ["احسب: −"+a+" + "+b,o[0],o[1],"= "+s+".","ma"];},
-      function(){var x=ri(2,12),a=ri(2,7),b=ri(1,12),c=a*x-b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x − "+b+" = "+c,o[0],o[1],a+"x = "+(c+b)+" → x = "+x+".","ma"];},
-      function(){var t=gpick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17],[7,24,25]]),o=opt3(t[2],[t[2]+2,t[2]-2,t[0]+t[1]]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+".","ma"];},
-      function(){var base=ri(2,5),e=gpick([2,3,4]),v=Math.pow(-base,e),o=opt3(v,[-v,Math.pow(base,e),v+base]);return ["احسب: (−"+base+")"+sup(e),o[0],o[1],(e%2?"أس فردي → سالب: ":"أس زوجي → موجب: ")+v+".","ma"];},
-      function(){var r1=ri(2,6),r2=ri(1,r1-1),b=r1+r2,c=r1*r2,ans=r2+" و "+r1,o=opt3(ans,["−"+r2+" و −"+r1,r2+" و "+(r1+1),(r2+1)+" و "+r1]);return ["حل: x² − "+b+"x + "+c+" = 0",o[0],o[1],"الجذران "+r2+" و "+r1+" (مجموعهما "+b+" وحاصل ضربهما "+c+").","ma"];},
-      function(){var x=ri(2,8),y=ri(1,7),s1=2*x+y,s2=x-y,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+y]);return ["إذا 2x + y = "+s1+" و x − y = "+s2+"، فما x؟",o[0],o[1],"بجمع المعادلتين: 3x = "+(s1+s2)+" → x = "+x+".","ma"];},
-      function(){var a=ri(2,7),o=opt3("x²+"+(2*a)+"x+"+(a*a),["x²+"+(a*a),"x²+"+a+"x+"+(a*a),"x²+"+(2*a)+"x+"+(2*a)]);return ["بسّط: (x + "+a+")²",o[0],o[1],"(x+"+a+")² = x²+"+(2*a)+"x+"+(a*a)+".","ma"];}
+      function(){var base=ri(2,5),m=ri(3,6),n=ri(1,m-1),v=Math.pow(base,m-n),o=opt3(v,[Math.pow(base,m+n),base*(m-n),v+base]);return ["احسب: "+base+sup(m)+" ÷ "+base+sup(n),o[0],o[1],"قسمةُ أسٍّ على أسٍّ للأساسِ نفسِه: يبقى الأساسُ وتُطرَح الأسس. "+m+"−"+n+" = "+(m-n)+"، فالناتج "+base+sup(m-n)+" = "+v+".","ma","خواص الأسس قسمة"];},
+      function(){var a=ri(2,15),b=ri(2,15),s=-a+b,o=opt3(s,[-a-b,a+b,s+3]);return ["احسب: −"+a+" + "+b,o[0],o[1],"نبدأ من −"+a+" ونتقدّم "+b+" خطوةً نحو الموجب، فنصل إلى "+ng(s)+".","ma","جمع وطرح الأعداد الصحيحة"];},
+      function(){var x=ri(2,12),a=ri(2,7),b=ri(1,12),c=a*x-b,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+(x+2)]);return ["حل: "+a+"x − "+b+" = "+ng(c),o[0],o[1],"ننقل "+b+" إلى الطرفِ الآخرِ بالجمع: "+a+"x = "+(c<0?("("+ng(c)+")"):c)+" + "+b+" = "+(c+b)+"، ثمّ نقسم الطرفَين على "+a+": x = "+(c+b)+" ÷ "+a+" = "+x+".","ma","حل معادلة من الدرجة الأولى"];},
+      function(){var t=gpick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17],[7,24,25]]),o=opt3(t[2],[t[2]+2,t[2]-2,t[0]+t[1]]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، الوتر؟",o[0],o[1],"في المثلثِ القائم: مربّعُ الوترِ = مجموعُ مربّعَي الضلعَين. "+(t[0]*t[0])+" + "+(t[1]*t[1])+" = "+(t[2]*t[2])+"، والوترُ = √"+(t[2]*t[2])+" = "+t[2]+".","ma","نظرية فيثاغورس"];},
+      function(){var base=ri(2,5),e=gpick([2,3,4]),v=Math.pow(-base,e),o=opt3(v,[-v,Math.pow(base,e),v+base]);return ["احسب: (−"+base+")"+sup(e),o[0],o[1],"(−"+base+")"+sup(e)+" ضربُ (−"+base+") في نفسِه "+(e===2?"مرّتين":(e+" مرّات"))+". "+(e%2?"والأسُّ فرديٌّ فتبقى الإشارةُ سالبة: ":"والأسُّ زوجيٌّ فتصير موجبة: ")+ng(v)+".","ma","الأسس والأعداد السالبة"];},
+      function(){var r1=ri(2,6),r2=ri(1,r1-1),b=r1+r2,c=r1*r2,ans=r2+" و "+r1,o=opt3(ans,["−"+r2+" و −"+r1,r2+" و "+(r1+1),(r2+1)+" و "+r1]);return ["حل: x² − "+b+"x + "+c+" = 0",o[0],o[1],"نبحث عن عددَين حاصلُ ضربِهما "+c+" ومجموعُهما "+b+"، وهما "+r2+" و "+r1+". فتصير (x − "+r2+")(x − "+r1+") = 0، ومنها x = "+r2+" أو x = "+r1+".","ma","تحليل المقدار الثلاثي وحل المعادلة التربيعية"];},
+      function(){var x=ri(2,8),y=ri(1,7),s1=2*x+y,s2=x-y,o=opt3("x="+x,["x="+(x+1),"x="+(x-1),"x="+y]);return ["إذا 2x + y = "+s1+" و x − y = "+ng(s2)+"، فما x؟",o[0],o[1],"نجمع المعادلتَين فيسقط y، لأنّ في الأولى +y وفي الثانية −y: (2x + y) + (x − y) = "+s1+" + "+(s2<0?("("+ng(s2)+")"):s2)+"، فيبقى 3x = "+(s1+s2)+"، ثمّ نقسم على 3 فيكون x = "+x+".","ma","حل نظام معادلتين بطريقة الحذف"];},
+      function(){var a=ri(2,7),o=opt3("x²+"+(2*a)+"x+"+(a*a),["x²+"+(a*a),"x²+"+a+"x+"+(a*a),"x²+"+(2*a)+"x+"+(2*a)]);return ["بسّط: (x + "+a+")²",o[0],o[1],"مربّعُ مجموع: (x + "+a+")² = x² + (2×"+a+")x + "+a+"² = x² + "+(2*a)+"x + "+(a*a)+".","ma","مربع مجموع حدين"];}
     ]
   };
   /* اسم المهارة لكل مولّد إنجليزي — يُحفظ مع النتيجة ليصير التقرير على مستوى المهارة */
@@ -2234,10 +2283,17 @@ if(!STUDENTS[who]){
         var curated = shuffle(pool(id).slice()).slice(0, QN*2); // عيّنة متنوّعة من المنسّق
         /* نفس السؤال موجود بنصّه في أكثر من بنك (BANK2 وBANK5 مثلًا)، فكان
            يظهر مرّتين في الاختبار الواحد. نُسقط المكرّر بالنصّ. */
+        /* والمولَّدُ يُقدَّم على المنسَّق، ثمّ يُكمِل المنسَّقُ ما بقي. وكان
+           الاثنان يُخلطان معًا ثمّ يُقتطع منهما اثنا عشر، فيغلب المنسَّقُ
+           بالعدد (أربعةٌ وعشرون مقابل عشرة) فلا ينجو من المولَّدِ إلّا
+           ثلاثةٌ أو أربعة — خلافَ ما يقوله التعليقُ أعلاه. وقِيس ذلك في
+           المتصفّح: ظهر زرَّا فيديوٍ من اثني عشر سؤالًا، والمولَّداتُ
+           كلُّها ذاتُ أزرار. (٣١ أكتوبر ٢٠٢٦) */
         var seenQ = {};
-        quiz = shuffle(generated.concat(curated)).filter(function(q){
+        quiz = shuffle(generated).concat(shuffle(curated)).filter(function(q){
           var k = String(q[0]); if(seenQ[k]) return false; seenQ[k] = 1; return true;
         }).slice(0, QN);
+        quiz = shuffle(quiz);
         // تركيز مرادفات إنجليزية لحسن (ضعفه المحدّد): نضمن ~٣ أسئلة مرادف في القسم.
         // الإجبار على النوع لا على السؤال بعينه — نُولّدها كي تتغيّر كلماتها كلّ مرّة.
         if(isEn && who==="hasan"){
@@ -2280,7 +2336,7 @@ if(!STUDENTS[who]){
         q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${frx(o)}</button>`; });
         html += `</div>`;
       }
-      html += `<div class="explain" ${(id==="ma")?'dir="ltr"':''}>${frx(q[3])}</div></div>`;
+      html += `<div class="explain" dir="auto">${expl(q[3])}${vidLink(q[5])}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${d.quiz.length}</span>
       <div class="track"><div class="fill" data-fill></div></div></div>
@@ -2684,7 +2740,7 @@ if(!STUDENTS[who]){
       h += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
         '<div class="stem">'+frx(q[0])+'</div><div class="opts">';
       q[1].forEach(function(o,j){ h += '<button type="button" data-j="'+j+'">'+frx(o)+'</button>'; });
-      h += '</div><div class="explain">'+frx(q[3])+'</div></div>';
+      h += '</div><div class="explain" dir="auto">'+expl(q[3])+vidLink(q[5])+'</div></div>';
     });
     h += '<div class="scorebar"><span class="txt" data-ars dir="ltr">0 / '+arq.length+'</span>'+
          '<div class="track"><div class="fill" data-arf></div></div></div>'+
@@ -2944,7 +3000,7 @@ if(!STUDENTS[who]){
       html += `<div class="q" data-i="${i}"><div class="num">تمرين ${i+1}</div>`+
         `<div class="stem ${isEn?'ltr':''}">${frx(q[0])}</div><div class="opts">`;
       q[1].forEach((o,j)=>{ html += `<button class="${isEn?'ltr':''}" data-j="${j}">${frx(o)}</button>`; });
-      html += `</div><div class="explain" ${(q[4]==="ma")?'dir="ltr"':''}>${frx(q[3])}</div></div>`;
+      html += `</div><div class="explain" dir="auto">${expl(q[3])}${vidLink(q[5])}</div></div>`;
     });
     html += `<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ${items.length}</span>`+
       `<div class="track"><div class="fill" data-fill></div></div></div>`+
@@ -3111,6 +3167,7 @@ if(!STUDENTS[who]){
       else { meLost++; return; }                          /* لا خياراتٍ نعرفها — لا نُلفِّق سؤالًا */
       if(!opts || opts.length < 2 || ci == null || !opts[ci]){ meLost++; return; }
       out.push({ key:k, stem:(b ? b.q[0] : k), opts:opts, ci:ci, exp:exp,
+                 topic:(b ? (b.q[5] || "") : ""),
                  sub:sub, n:e.n, got:got, last:e.last });
     });
     /* الأكثرُ خطأً أوّلًا، ثمّ الأحدثُ خطأً */
@@ -3208,8 +3265,12 @@ if(!STUDENTS[who]){
       r.opts.forEach(function(o, j){
         html += '<button class="' + (en ? 'ltr' : '') + '" data-j="' + j + '">' + frx(o) + '</button>';
       });
-      html += '</div><div class="explain"' + (it.sub === "ma" ? ' dir="ltr"' : '') + '>' +
-        (it.exp ? frx(it.exp) : ('<b>الإجابة الصحيحة: ' + frx(r.opts[r.ci]) + '</b>')) + '</div></div>';
+      /* وهنا كان dir="ltr" مفروضًا على شرحِ الرياضيات — وهو عينُ العطبِ
+         الذي صوّره الأب. و«أخطائي» أحقُّ الأقسامِ ببابِ الفيديو، فمَن
+         أخطأ مرّتَين لا يكفيه شرحٌ مكتوب. (٣١ أكتوبر ٢٠٢٦) */
+      html += '</div><div class="explain" dir="auto">' +
+        (it.exp ? expl(it.exp) : ('<b>الإجابة الصحيحة: ' + frx(r.opts[r.ci]) + '</b>')) +
+        vidLink(it.topic) + '</div></div>';
     });
     html += '<div class="scorebar"><span class="txt" data-score dir="ltr">0 / ' + round.length + '</span>' +
       '<div class="track"><div class="fill" data-fill></div></div></div>' +

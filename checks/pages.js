@@ -368,6 +368,7 @@ function run(){
   issues.push(...listenSkillPath());
   issues.push(...quranTilawaPath());
   issues.push(...tajweedPath());
+  issues.push(...quizExplainPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5173,6 +5174,196 @@ function quranTilawaPath(){
    ق كاملةً، وتُقابَل أعدادُه بأعدادٍ قُرئت من مصحفٍ مُعلَّمٍ بالأحكام
    (quran-tajweed) يومَ البناء. فإن تغيّر المحرِّكُ تغيّرت الأعدادُ
    فسقط الحارس. ويُعاد التنزيلُ والتحقّقُ بـ tj-rules.js متى شُكّ. */
+/* ═══ شرحُ السؤالِ: يُقرأ على وجهِه ومعه بابُ فيديو ═══════════════
+   طلبُ الأب (٣١ أكتوبر ٢٠٢٦) ومعه صورةُ تمرينِ قدرات: «عطني شرح
+   واضح ومقطع فيديو». وفي الصورةِ عطبٌ ظاهر: الشرحُ معروضٌ «بجمع
+   المعادلتين: 3» ثمّ «x = 18» في موضعٍ آخر. وسببُه dir="ltr"
+   مفروضًا على نصٍّ عربيّ.
+
+   وهذا الحارسُ ينتزع دوالَّ الصفحةِ نفسَها ويُشغّلها — لا يُحاكيها. */
+function quizExplainPath(){
+  const out = [];
+  const F = 'quiz.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ═══ (١) لا يُفرَض على صندوقِ الشرحِ اتّجاهٌ لاتينيّ ═══
+     فالنصُّ عربيٌّ ومقطعُه الرياضيُّ لاتينيّ، و«auto» تُسلِّم
+     للمتصفّحِ فيحكم بأوّلِ حرفٍ قويّ. */
+  const boxes = src.match(/<div class="explain"[^>]*>/g) || [];
+  if (!boxes.length) E('ما وُجد صندوقُ شرحٍ في الصفحة');
+  boxes.forEach(function(b){
+    if (/dir\s*=\s*"ltr"/.test(b))
+      E('صندوقُ شرحٍ مفروضٌ عليه dir="ltr" — يُقلَب العربيُّ فيه (بلاغُ الأب بالصورة)');
+    if (!/dir\s*=\s*"auto"/.test(b))
+      E('صندوقُ شرحٍ بلا dir="auto" — فيرِثُ اتّجاهَ ما حولَه');
+  });
+  /* والشرحُ يمرُّ على expl لا يُطبَع خامًا: وإلّا بطل العزلُ ورصفُ الكسر */
+  const raw = (src.match(/class="explain"[^>]*>\$\{(?!expl\()/g) || []).length;
+  if (raw) E(raw + ' صندوقَ شرحٍ لا يمرُّ على expl — فلا عزلَ ولا رصفَ كسر');
+
+  /* ═══ (٢) mdir — تُنتزَع وتُشغَّل ═══
+     ولا تعزل إلّا ما فيه حسابٌ: قِيس في المتصفّحِ أنّ عزلَ الكلامِ
+     الإنجليزيِّ المحضِ يُفسده، فـ«aren't you» انقطعت عند الفاصلةِ
+     العلويّةِ عزلتَين فانقلبتا في السطرِ العربيّ. */
+  const mm = /var MDIR_CH = ([\s\S]*?);\nvar MDIR = ([\s\S]*?);\n/.exec(src);
+  const mf = /var MDIR_MATH = ([\s\S]*?);\nfunction mdir\(s\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!mm || !mf) { E('mdir لا تُنتزَع'); return out; }
+  let mdir = null;
+  try { const sb = {}; vm.createContext(sb);
+    vm.runInContext('var MDIR_CH = ' + mm[1] + ';\nvar MDIR = ' + mm[2] +
+      ';\nvar MDIR_MATH = ' + mf[1] + ';\nf = function(s){' + mf[2] + '\n};', sb);
+    mdir = sb.f; } catch(e){}
+  if (typeof mdir !== 'function') { E('mdir لا تُشغَّل'); return out; }
+  const M = function(s){ try { return mdir(s); } catch(e){ return '«عطب» ' + e.message; } };
+
+  const BDI = /<bdi dir="ltr">([\s\S]*?)<\/bdi>/g;
+  const iso = function(s){ const r = []; let m; BDI.lastIndex = 0;
+    while ((m = BDI.exec(M(s)))) r.push(m[1]); return r; };
+
+  /* يُعزَل الحساب */
+  [ 'نجمع: (2x + y) + (x \u2212 y) = 18 + 0.',
+    /* والأسُّ المرفوعُ كلُّه: كان ²³⁴ وحدَها محصورةً فانقطع «x\u2075»
+       عزلتَين فانقلبتا — ولم ترصده إلّا جولةٌ من ستٍّ في المتصفّح،
+       فيُثبَّت هنا بلا عشوائيّة. */
+    'x\u00B2 \u00D7 x\u00B3 = x\u2075 \u2192 6x\u2075.',
+    'x\u2075 \u00F7 x\u2074 = x\u00B9 = x.',
+    '\u0648\u0627\u0644\u0646\u0627\u062A\u062C 2\u2076 = 64.',
+    'ثمّ 3x = 18 فيكون x = 6.',
+    'الوتر √(9+16) = 5.',
+    'بسّط: (x + 3)² = x² + 6x + 9.' ].forEach(function(s){
+    if (!iso(s).length) E('mdir لا تعزل مقطعًا رياضيًّا في: «' + s.slice(0,40) + '»');
+  });
+  /* ولا يُعزَل الكلامُ الإنجليزيُّ المحض */
+  [ "نستعمل don't have to للدلالة على عدمِ الحاجة.",
+    'عكس permanent هو temporary.',
+    "aren't you للسؤالِ التوكيديّ." ].forEach(function(s){
+    const g = iso(s);
+    if (g.length) E('mdir تعزل كلامًا إنجليزيًّا محضًا («' + g[0] +
+      '») — وقِيس أنّ عزلَه يقلبه في السطرِ العربيّ');
+  });
+  /* ولا تبتلع نهايةَ الجملةِ العربيّةِ قبلَها ولا بعدَها */
+  /* ولا يُقطَّع المقطعُ الواحدُ عزلتَين: قِيس في المتصفّحِ أنّ عزلتَين
+     متجاورتَين بلا عربيٍّ بينهما تنقلبان في السطرِ العربيّ. */
+  [ 'x\u00B2 \u00D7 x\u00B3 = x\u2075 \u2192 6x\u2075.',
+    'x\u2075 \u00F7 x\u2074 = x\u00B9 = x.',
+    '3.14 \u00D7 10\u00B2 = 314.',
+    '(x + 3)\u00B2 = x\u00B2 + 6x + 9.' ].forEach(function(s){
+    if (iso(s).length > 1)
+      E('mdir تُقطِّع مقطعًا رياضيًّا واحدًا ' + iso(s).length +
+        ' عزلاتٍ فتنقلب: «' + s + '» \u2192 ' + JSON.stringify(iso(s)));
+  });
+  const keep = 'في المثلثِ القائم: 9 + 16 = 25، والوترُ 5.';
+  const flat = M(keep).replace(/<[^>]*>/g, '');
+  if (flat !== keep) E('mdir تُغيّر نصَّ الشرحِ لا تغليفَه فحسب: «' + flat.slice(0,60) + '»');
+  if (/<bdi[^>]*>[^<]*[\u0600-\u06FF]/.test(M(keep)))
+    E('mdir تُدخل حرفًا عربيًّا داخلَ العزلة — فيُقلَب');
+  /* والعزلةُ لا تُفتَح على حرفٍ ليس من الحساب: ولا بدَّ من جملةٍ
+     تسبق حسابَها نقطةٌ، وإلّا مرَّ توسيعُ أوّلِ العزلةِ بلا رصد
+     (جُرّب فمرّ). */
+  const dotted = 'هذا صحيح. 3x = 9 إذًا x = 3.';
+  [keep, dotted, 'نعم، 2x = 8.'].forEach(function(s){
+    if (/<bdi dir="ltr">[.,\u060C\u061B\s]/.test(M(s)))
+      E('عزلةٌ تبدأ بنقطةٍ أو فاصلةٍ — تبتلع نهايةَ الجملةِ العربيّةِ قبلَها: «' +
+        M(s).slice(0, 70) + '»');
+    const flat2 = M(s).replace(/<[^>]*>/g, '');
+    if (flat2 !== s) E('mdir تُغيّر نصَّ «' + s.slice(0,30) + '»');
+  });
+  /* ولا يُعزَل رمزٌ واحدٌ وحدَه: العزلةُ حولَ «5» لا تُفيد شيئًا
+     وتُثقل النصَّ بعلاماتٍ لا تُقرأ، وقد مرَّ ذلك بلا رصد. */
+  ['والوترُ 5.', 'الناتجُ 7، فتأمّل.'].forEach(function(s){
+    const g = iso(s);
+    if (g.some(function(x){ return x.replace(/[\s.,]/g,'').length < 2; }))
+      E('mdir تعزل رمزًا واحدًا وحدَه في «' + s + '» — عزلةٌ بلا فائدة');
+  });
+
+  /* ═══ (٣) السالبُ بعلامةِ الطرحِ الطباعيّةِ لا بشرطةِ لوحةِ المفاتيح ═══ */
+  const ngm = /function ng\(n\)\{([\s\S]*?)\}/.exec(src);
+  if (!ngm) E('ng لا تُنتزَع');
+  else {
+    let ng = null;
+    try { const sb = {}; vm.createContext(sb);
+      vm.runInContext('f = function(n){' + ngm[1] + '};', sb); ng = sb.f; } catch(e){}
+    if (typeof ng !== 'function') E('ng لا تُشغَّل');
+    else {
+      if (ng(-4) !== '\u22124') E('ng(\u22124) = «' + ng(-4) + '» والمنتظَرُ علامةُ الطرحِ الطباعيّة');
+      if (ng(0) !== '0' || ng(7) !== '7') E('ng تُغيّر الموجبَ والصفر');
+    }
+  }
+
+  /* ═══ (٤) زرُّ الفيديو: رابطُ بحثٍ لا معرّفُ فيديو ═══
+     منهجُ math9.html منذ ٤ سبتمبر: الفيديو يُحذف أو يصير خاصًّا
+     فينكسر الزرُّ صامتًا، والبحثُ لا ينكسر. */
+  const vm2 = /function vidLink\(topic\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!vm2) { E('vidLink لا تُنتزَع'); return out; }
+  let vidLink = null;
+  try { const sb = {}; vm.createContext(sb);
+    vm.runInContext('f = function(topic){' + vm2[1] + '\n};', sb); vidLink = sb.f; } catch(e){}
+  if (typeof vidLink !== 'function') { E('vidLink لا تُشغَّل'); return out; }
+  const V = vidLink('\u0646\u0632\u0627\u0645 \u0645\u0639\u0627\u062F\u0644\u062A\u064A\u0646');
+  if (/watch\?v=/.test(V)) E('vidLink تُخرج معرّفَ فيديوٍ بعينِه — يُحذف فينكسر الزرُّ صامتًا');
+  if (!/youtube\.com\/results\?search_query=/.test(V)) E('vidLink لا تُخرج رابطَ بحث');
+  if (!/target="_blank"/.test(V) || !/rel="noopener"/.test(V))
+    E('زرُّ الفيديو يفتح في اللسانِ نفسِه فيضيع الاختبارُ الجاري');
+  if (!/%D8%B9%D9%8A%D9%86|\u0639\u064A\u0646/.test(V))
+    E('بحثُ الفيديو لا يقصد قناةً معروفة — فتُفتَح لهم قناةٌ مجهولة');
+  if (vidLink('') !== '' || vidLink(null) !== '')
+    E('vidLink تُخرج زرًّا بلا موضوع — فيُبحَث عن فراغ');
+
+  /* ═══ (٥) مولّداتُ حسن: شرحٌ مُعلَّلٌ ومعه موضوعُ فيديو ═══
+     لا يكفي «= ٤٢»: الأبُ طلب شرحًا واضحًا، فكلُّ مولّدٍ يُشرَح
+     خطوتَه ويُسمَّى موضوعُه. وتُشغَّل المولّداتُ حقًّا لا تُقرأ. */
+  const gm = /const MGEN = \{([\s\S]*?)\n  \};/.exec(src);
+  if (!gm) { E('MGEN لا تُنتزَع'); return out; }
+  const helpers = [];
+  ['ri','opt3','gpick','sup','ng'].forEach(function(n){
+    /* المُعينُ قد يكون في سطرٍ واحدٍ وقد يكون في سطور، فيُجرَّب
+       الأضيقُ أوّلًا: ولو قُدِّم الواسعُ لابتلع دوالَّ بعدَه. */
+    const h = new RegExp('function ' + n + '\\(([^)]*)\\)\\s*\\{([^\\n]*)\\}\\s*$', 'm').exec(src)
+      || new RegExp('function ' + n + '\\(([^)]*)\\)\\s*\\{([\\s\\S]*?)\\n  \\}').exec(src);
+    if (h) helpers.push('function ' + n + '(' + h[1] + '){' + h[2] + '}');
+    else E('مُعينُ المولّداتِ ' + n + ' لا يُنتزَع');
+  });
+  let G = null;
+  try { const sb = {}; vm.createContext(sb);
+    vm.runInContext(helpers.join('\n') + '\nG = {' + gm[1] + '\n};', sb); G = sb.G; } catch(e){}
+  if (!G || !Array.isArray(G.hasan)) { E('مولّداتُ حسنٍ لا تُشغَّل'); return out; }
+  if (G.hasan.length < 8) E('مولّداتُ حسنٍ ' + G.hasan.length + ' — نقصت');
+  const seen = {};
+  G.hasan.forEach(function(g, i){
+    for (let k = 0; k < 40; k++){
+      let q = null;
+      try { q = g(); } catch(e){ E('المولّدُ ' + (i+1) + ' لحسنٍ يتعطّل: ' + e.message); return; }
+      if (!Array.isArray(q)) { E('المولّدُ ' + (i+1) + ' لا يُخرج سؤالًا'); return; }
+      /* يُجرَّد الشرحُ من التشكيلِ قبل طلبِ كلمةِ الخطوة: فالمولّدُ
+         يكتب «مرّتين» بلا فتحةٍ والحارسُ كان يطلبها مشكولةً فردَّ
+         شرحًا سليمًا نتيجةً بلا خطوة. */
+      const ex = String(q[3] || '').replace(/[\u064B-\u0652\u0670]/g, ''), topic = q[5];
+      if (!topic) { E('المولّدُ ' + (i+1) + ' لحسنٍ بلا موضوعِ فيديو — فلا بابَ شرحٍ له'); return; }
+      seen[topic] = 1;
+      /* الشرحُ مُعلَّلٌ لا نتيجةٌ مجرّدة: فيه كلمةٌ تدلُّ على خطوة */
+      if (!/\u0646\u062C\u0645\u0639|\u0646\u0642\u0633\u0645|\u0646\u0646\u0642\u0644|\u0646\u0628\u062F\u0623|\u0646\u0628\u062D\u062B|\u064A\u0628\u0642\u0649|\u0641\u064A\u0633\u0642\u0637|\u062A\u0637\u0631\u062D|\u0645\u0631\u0627\u062A|\u0645\u0631\u062A\u064A\u0646|\u0645\u062C\u0645\u0648\u0639|\u0645\u0631\u0628\u0639/.test(ex))
+        { E('شرحُ المولّدِ ' + (i+1) + ' لحسنٍ نتيجةٌ بلا خطوة: «' + ex.slice(0,54) + '»'); return; }
+      if (ex.length < 40)
+        { E('شرحُ المولّدِ ' + (i+1) + ' لحسنٍ أقصرُ من أن يَشرح: «' + ex + '»'); return; }
+      /* ولا شرطةَ لوحةِ مفاتيحَ سالبةً: تلتبس واصلةً في السطرِ العربيّ */
+      if (/(^|[\s(=])-\d/.test(String(q[0] || '') + ' ' + ex))
+        { E('المولّدُ ' + (i+1) + ' لحسنٍ يكتب السالبَ بشرطةِ لوحةِ المفاتيح'); return; }
+    }
+  });
+  if (Object.keys(seen).length < 8)
+    E('مواضيعُ الفيديو لحسنٍ ' + Object.keys(seen).length + ' — فمولّدانِ يتشاركان بابًا واحدًا');
+
+  /* ═══ (٦) المولَّدُ يُقدَّم على المنسَّقِ في الخلط ═══
+     وكان الاثنان يُخلطان معًا ثمّ يُقتطعان، فيغلب المنسَّقُ بالعدد
+     فلا ينجو من المولَّدِ إلّا ثلاثةٌ — فتُحجَب الشروحُ والأزرار. */
+  if (!/shuffle\(generated\)\.concat\(shuffle\(curated\)\)/.test(src))
+    E('المولَّدُ لا يُقدَّم على المنسَّقِ في الخلط — فتُحجَب الشروحُ المُعلَّلةُ وأزرارُها');
+
+  return out;
+}
+
 function tajweedPath(){
   const out = [];
   const F = 'tajweed.js', p = path.join(ROOT, F);
