@@ -768,9 +768,9 @@ var TOPICS={
   meet:{ico:"👋",t:"تعارف",open:"Hello! Nice to meet you. What's your name?",qs:["How old are you?","Where do you live?","What grade are you in?","What is your favorite subject?"]},
   family:{ico:"👨‍👩‍👧",t:"العائلة",open:"Let's talk about your family. How many people are in your family?",qs:["Do you have brothers or sisters?","What does your father do?","What do you like to do together?","Who do you love the most?"]},
   hobby:{ico:"⚽",t:"الهوايات",open:"What do you like to do in your free time?",qs:["Do you play any sports?","What is your favorite game?","Do you like reading or watching TV?","What do you do on the weekend?"]},
-  school:{ico:"🏫",t:"المدرسة",open:"Let's talk about school. Do you like school?",qs:["What is your favorite subject?","Who is your favorite teacher?","What do you do at break time?","Is English easy for you?"]},
+  school:{ico:"🏫",t:"المدرسة",open:"Let's talk about school. Do you like school?",qs:["Which subject do you find the hardest?","Who is your favorite teacher?","What do you do at break time?","Is English easy for you?"]},
   food:{ico:"🍕",t:"الأكل",open:"Let's talk about food. What is your favorite food?",qs:["Do you like fruit?","What do you eat for breakfast?","Can you cook anything?","Do you like sweets?"]},
-  day:{ico:"🌤️",t:"يومي",open:"Tell me about your day. What time do you wake up?",qs:["What do you do in the morning?","How do you go to school?","What do you do after school?","What time do you sleep?"]},
+  day:{ico:"🌤️",t:"يومي",open:"Tell me about your day. What time do you wake up?",qs:["What do you do in the morning?","How do you go to school?","What do you do after school?","What time do you usually go to bed?"]},
   dream:{ico:"🌟",t:"أحلامي",open:"Let's dream big! What do you want to be in the future?",qs:["Why do you want that?","Where do you want to travel?","What is your biggest wish?","What makes you happy?"]},
 
   /* ═══ مواضيعُ من هو على أبواب الجامعة والعمل ═══
@@ -791,7 +791,7 @@ var TOPICS={
   uni:{ico:"🎓",t:"الجامعة والتخصّص",
     open:"So, you are finishing high school. Which major are you planning to study?",
     qs:["Why did you choose that major?",
-        "Which university would you like to join, and why?",
+        "Which university would you like to apply to, and why?",
         "What subjects are you strongest in?",
         "How are you preparing for the entrance exams?",
         "Would you study abroad if you had the chance?",
@@ -806,6 +806,48 @@ var TOPICS={
         "Is there anything else I can help you with?",
         "How would you rate the service you received?"]}
 };
+/* ═══ أسئلةُ الأطفالِ لا تُطرَح على ابنِ الثامنةَ عشرة ═══════════════
+   سأل الأب (١ نوفمبر ٢٠٢٦): «كيف المحادثة عنده، هل الجمل صحيحة؟»
+   فراجعتُ الستَّ والأربعين جملةً التي يراها فهد، فلم أجد خطأً نحويًّا،
+   ووجدتُ ثلاثًا تُصلَح:
+     • «What time do you sleep?» ترجمةٌ حرفيّةٌ من العربيّة؛ الإنجليزيُّ
+       يقول go to bed. (أُصلِحت للجميع، فهي خطأُ أسلوبٍ لا عمر.)
+     • و«What is your favorite subject?» مكرّرٌ في موضوعين.
+     • وأسئلةٌ مكتوبةٌ لطفلٍ تُطرَح على ثالثِ ثانويّ: «ماذا تريد أن تصير
+       حين تكبر؟» و«ماذا تفعل في الفسحة؟».
+   وأربعةٌ من مواضيعِه الثمانيةِ أصلًا مواضيعُ الصغار، فتُرفَع أسئلتُها
+   إلى سنِّه بدل حذفِ الموضوع — فالبياناتُ تقول إنّه يستعملها فعلًا. */
+var SENIOR_Q = {
+  free: { open:"Hi! I'm your English speaking partner. How has your week been?",
+          qs:["What is your name?",
+              "What have you been working on lately?",
+              "What do you do to relax after a long day of studying?",
+              "Tell me about your family.",
+              "What are you planning to do after high school?"] },
+  meet: { qs:["How old are you?","Where do you live?","What grade are you in?",
+              "Which subject are you strongest in?"] },
+  school:{ open:"Let's talk about school. How is your final year going?",
+          qs:["Which subject do you find the hardest?",
+              "Who is your favorite teacher, and why?",
+              "How do you balance studying with everything else?",
+              "How do you revise for a big exam?"] },
+  day:  { qs:["What do you do in the morning?",
+              "How do you get to school?",
+              "How much of your day goes to studying?",
+              "What time do you usually go to bed?"] },
+  dream:{ open:"Let's think ahead. What do you want to be in the future?",
+          qs:["Why do you want that?",
+              "Where would you like to travel, and why?",
+              "What is your biggest goal this year?",
+              "What makes a day a good day for you?"] }
+};
+if(who==="fahad"){
+  Object.keys(SENIOR_Q).forEach(function(k){
+    if(!TOPICS[k]) return;
+    if(SENIOR_Q[k].open) TOPICS[k].open = SENIOR_Q[k].open;
+    if(SENIOR_Q[k].qs)   TOPICS[k].qs   = SENIOR_Q[k].qs;
+  });
+}
 var LIST_ALL=["free","meet","family","hobby","school","food","day","dream"];
 /* فهد في مرحلةٍ أخرى: نُبقي الدردشةَ الحرّة والتعارف، ونُبدِل مواضيعَ
    الأطفال بمواضيع الجامعة والعمل ومواقف الحياة. */
