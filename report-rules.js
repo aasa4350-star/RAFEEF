@@ -252,8 +252,15 @@
           var m = p.meta || {}, tot = +m.total || 0;
           sum += tot ? Math.round((+m.correct || 0) / tot * 100) : 0;
         });
+        /* ومحاولاتُها معها: التاريخُ والوقتُ يُعرَضان تحتَ سطرِ الوحدة.
+           وكان السطرُ ملخَّصًا وحدَه فطار التاريخُ — بلاغُ الأب. */
+        var ord = all.slice().sort(function(x, y){
+          var a = self.when ? self.when(x) : x.created_at;
+          var b = self.when ? self.when(y) : y.created_at;
+          return (a < b) ? 1 : ((a > b) ? -1 : 0);
+        });
         return { name: k, n: all.length, skipped: all.length - kept.length,
-                 avg: base.length ? Math.round(sum / base.length) : 0 };
+                 avg: base.length ? Math.round(sum / base.length) : 0, rows: ord };
       }).sort(function(a, b){
         var na = /(\d+)/.exec(a.name), nb = /(\d+)/.exec(b.name);
         if(na && nb && +na[1] !== +nb[1]) return +na[1] - +nb[1];

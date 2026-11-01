@@ -5272,6 +5272,39 @@ function shortTestPath(){
       if (String(ord[ord.length - 1]).indexOf(EL) !== 0)
         E(R, 'الصفُّ المجموعُ ليس آخرَ الصفوف: ' + JSON.stringify(ord));
     }
+    /* ═══ أسطرُ الخانة: وحدةٌ وحدةً، مرتَّبةً بالرقم، ومعها تواريخُها ═══
+       مرَّ عطبانِ بلا رصدٍ أوّلَ مرّة: ترتيبٌ بالنصِّ فيسبق العاشرُ
+       الثاني، وخلطُ الوحداتِ كلِّها في سطرٍ واحد. */
+    if (typeof RR.foldLines !== 'function') E(R, 'RR.foldLines مفقودة — فتُمحى نسبةُ كلِّ وحدة');
+    else {
+      const mk = function(u, c){ return { foldFrom: 'وحدة ' + u,
+        created_at: '2026-10-' + (10 + u) + 'T10:0' + c + ':00Z',
+        meta: { correct: c, total: 10 } }; };
+      let L = null;
+      try { L = RR.foldLines([mk(10,9), mk(2,5), mk(10,7), mk(1,3), mk(2,9)]); }
+      catch(e){ E(R, 'foldLines تتعطّل: ' + e.message); }
+      if (Array.isArray(L)){
+        if (L.length !== 3)
+          E(R, 'أسطرُ الخانةِ ' + L.length + ' والمنتظَرُ ثلاثُ وحداتٍ — الوحداتُ مختلطة');
+        const names = L.map(function(x){ return x.name; });
+        const nums = names.map(function(x){ const m2 = /(\d+)/.exec(x); return m2 ? +m2[1] : -1; });
+        const srt = nums.slice().sort(function(a,b){ return a-b; });
+        if (JSON.stringify(nums) !== JSON.stringify(srt))
+          E(R, 'ترتيبُ أسطرِ الخانةِ ' + JSON.stringify(names) +
+               ' — العاشرةُ تسبق الثانيةَ إن رُتِّب بالنصّ');
+        const u2 = L.filter(function(x){ return /2$/.test(x.name); })[0];
+        if (!u2 || u2.n !== 2) E(R, 'عدُّ محاولاتِ الوحدةِ خطأ: ' + JSON.stringify(u2));
+        else if (u2.avg !== 70) E(R, 'متوسّطُ الوحدةِ ' + u2.avg + '% والصوابُ ٧٠٪');
+        /* ومحاولاتُها معها، أحدثُها أوّلًا — وبها التاريخُ يُعرَض */
+        const bad = L.filter(function(x){ return !Array.isArray(x.rows) || x.rows.length !== x.n; });
+        if (bad.length) E(R, 'سطرُ الوحدةِ بلا محاولاتِه — فلا تاريخَ يُعرَض داخلَ الخانة');
+        else {
+          const u10 = L.filter(function(x){ return /10$/.test(x.name); })[0];
+          if (u10 && u10.rows[0] && u10.rows[0].meta.correct !== 9)
+            E(R, 'محاولاتُ الوحدةِ غيرُ مرتَّبةٍ بالأحدث — فيُقرأ القديمُ على أنّه الأخير');
+        }
+      }
+    }
     if (typeof RR.foldLesson !== 'function') E(R, 'RR.foldLesson مفقودة');
     else if (RR.foldLesson(EL + ' \u2014 \u0634\u0627\u0645\u0644 \u06411') !==
              '\u0634\u0627\u0645\u0644 \u06411')
@@ -5318,6 +5351,11 @@ function shortTestPath(){
       E(F, 'الخانةُ المجموعةُ بلا سطرٍ لكلِّ وحدة — تُمحى نسبةُ الوحداتِ التي طلب متابعتَها');
     if (!/RR\.foldedName\(t\)/.test(src))
       E(F, 'الصفوفُ المجموعةُ لا تُميَّز عن غيرِها — فتُعرَض أسطرُها كأسطرِ اختبارٍ مفرد');
+    /* وتحتَ سطرِ الوحدةِ محاولاتُها بتواريخِها: بلاغُ الأب (١ نوفمبر
+       ٢٠٢٦) «ليش ماسجل تاريخ ووقت الاختبار؟ أضبطها زي قبل بس خلها
+       داخل». والتسجيلُ لم يسقط، وإنّما حُذف من العرضِ عند الجمع. */
+    if (!/L\.rows\.slice\(0,\s*5\)/.test(src))
+      E(F, 'محاولاتُ الوحدةِ لا تُعرَض داخلَ الخانة — فيضيع تاريخُ الاختبارِ ووقتُه');
     /* ولا يُسنَد إلى ثابت: الإسنادُ إلى const يرمي TypeError فتسقط
        البطاقةُ كلُّها صامتةً (وقع في child.html). */
     const dec = new RegExp('const[^;]{0,80}\\botherMap\\s*=').test(src);
