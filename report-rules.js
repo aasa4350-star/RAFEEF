@@ -161,8 +161,109 @@
       }
       return t;
     },
+    /* ═══ بابٌ يُجمَع في صفٍّ واحدٍ ويُؤخَّر ═══════════════════════════
+       طلبُ الأب (١ نوفمبر ٢٠٢٦) ومعه صورةُ لوحتِه: «بالنسبة الإلقاء
+       حطها كلها في خانة وحدة وخلها آخر شي لأنها ليست مهمة بالنسبة
+       لي». وكان بابُ الإلقاءِ ثمانيةَ عشرَ درسًا، لكلٍّ صفٌّ قائمٌ
+       بنفسِه، فيدفع ما يَعنيه إلى أسفلِ الشاشة.
+
+       ولا تُحذَف: هو يتابعها إن أراد، لكنّها تُجمَع وتُؤخَّر. */
+    /* وطلبٌ ثانٍ بعدَه: «وحط الجمل في خانة واحدة والتثبيت كذلك زيها».
+       ولم يُجمَعا جمعًا مسطَّحًا: نسبةُ كلِّ وحدةٍ هي ما طلبه قبل
+       قليلٍ («عشان أعرف أتابعه بالضبط»)، فجمعُها بلا تفصيلٍ يمحو
+       ما بناه. فالخانةُ واحدةٌ في القائمة، وفيها سطرٌ لكلِّ وحدةٍ
+       بعدِّها ومتوسّطِها. */
+    FOLD_TESTS: [
+      { re: /^\s*\u062C\u0645\u0644\s+\u0625\u0646\u062C\u0644\u064A\u0632\u064A\s*\u0648\s*\d+/,
+        as: "\u062C\u0645\u0644 \uD83E\uDDE9", unit: true },
+      { re: /^\s*\u062A\u062B\u0628\u064A\u062A\s+\u0625\u0646\u062C\u0644\u064A\u0632\u064A\s*\u0648\s*\d+/,
+        as: "\u062A\u062B\u0628\u064A\u062A \uD83D\uDD01", unit: true },
+      /* والإلقاءُ آخرُ الصفوفِ وحدَه: هو الذي قال إنّه لا يَعنيه */
+      { re: /^\s*\u0625\u0644\u0642\u0627\u0621\s*[\u2014\u2013-]/,
+        as: "\u0625\u0644\u0642\u0627\u0621 \uD83C\uDFA4", last: true }
+    ],
+    foldRule: function(test){
+      var t = String(test == null ? "" : test);
+      for(var i = 0; i < this.FOLD_TESTS.length; i++)
+        if(this.FOLD_TESTS[i].re.test(t)) return this.FOLD_TESTS[i];
+      return null;
+    },
+    foldName: function(test){
+      var r = this.foldRule(test);
+      return r ? r.as : null;
+    },
+    foldedName: function(test){
+      var t = String(test == null ? "" : test);
+      for(var i = 0; i < this.FOLD_TESTS.length; i++)
+        if(this.FOLD_TESTS[i].as === t) return true;
+      return false;
+    },
+    /* والمؤخَّرُ وحدَه هو ما وُسم last — لا كلُّ مجموع */
+    foldLast: function(test){
+      var t = String(test == null ? "" : test);
+      for(var i = 0; i < this.FOLD_TESTS.length; i++)
+        if(this.FOLD_TESTS[i].as === t) return !!this.FOLD_TESTS[i].last;
+      return false;
+    },
+    /* الخريطةُ تُعاد مدموجةً: مفتاحُ البابِ واحدٌ وصفوفُه مجموعة.
+       ويُعلَّم كلُّ صفٍّ بدرسِه (foldFrom) على نسخةٍ منه لا على أصلِه،
+       وإلّا صارت أسطرُ الصفِّ المجموعِ «٨/٨» خمسَ مرّاتٍ بلا اسمٍ
+       ولا يُعرَف أيُّ درسٍ منها. */
+    foldTests: function(map){
+      var out = {}, self = this;
+      Object.keys(map || {}).forEach(function(t){
+        var k = self.foldName(t);
+        var rows = map[t] || [];
+        if(k){
+          rows = rows.map(function(p){
+            var c = {}; for(var x in p) if(Object.prototype.hasOwnProperty.call(p,x)) c[x] = p[x];
+            c.foldFrom = self.foldLesson(t); return c;
+          });
+        } else { k = t; }
+        out[k] = (out[k] || []).concat(rows);
+      });
+      return out;
+    },
+    /* اسمُ الدرسِ داخلَ الخانة — «إلقاء — شامل ف١» ⇐ «شامل ف١»،
+       و«جمل إنجليزي و3 🧩» ⇐ «وحدة 3». */
+    foldLesson: function(test){
+      var t = String(test == null ? "" : test), r = this.foldRule(t);
+      if(r && r.unit){
+        var m = /\u0648\s*(\d+)/.exec(t);
+        if(m) return "\u0648\u062D\u062F\u0629 " + m[1];
+      }
+      return t.replace(/^\s*[^\s\u2014\u2013-]+\s*[\u2014\u2013-]\s*/, "").trim() || t;
+    },
+    /* أسطرُ الخانة: لكلِّ وحدةٍ عدُّها ومتوسّطُها، مرتَّبةً بالرقم.
+       والمتوسّطُ من المحسوبةِ وحدَها كما في بقيّةِ الصفحة. */
+    foldLines: function(rows){
+      var by = {}, order = [], self = this;
+      (rows || []).forEach(function(p){
+        var k = p.foldFrom || "";
+        if(!by[k]){ by[k] = []; order.push(k); }
+        by[k].push(p);
+      });
+      return order.map(function(k){
+        var all = by[k];
+        var kept = all.filter(function(p){ return !p.meta || p.meta.trusted !== false; });
+        var base = kept.length ? kept : all;
+        var sum = 0;
+        base.forEach(function(p){
+          var m = p.meta || {}, tot = +m.total || 0;
+          sum += tot ? Math.round((+m.correct || 0) / tot * 100) : 0;
+        });
+        return { name: k, n: all.length, skipped: all.length - kept.length,
+                 avg: base.length ? Math.round(sum / base.length) : 0 };
+      }).sort(function(a, b){
+        var na = /(\d+)/.exec(a.name), nb = /(\d+)/.exec(b.name);
+        if(na && nb && +na[1] !== +nb[1]) return +na[1] - +nb[1];
+        return (a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0);
+      });
+    },
+
     /* والترتيبُ بالرقمِ لا بالنصّ: «جمل 10» بعد «جمل 2» لا قبلَها،
-       وبغيرِ ذلك لا تُتابَع الوحداتُ على وجهِها. */
+       وبغيرِ ذلك لا تُتابَع الوحداتُ على وجهِها. والبابُ المجموعُ
+       يُؤخَّر مهما كان اسمُه. */
     testOrder: function(test){
       var t = this.shortTest(test);
       var m = /(\d+)/.exec(t);
@@ -172,6 +273,8 @@
     sortTests: function(list){
       var self = this;
       return (list || []).slice().sort(function(a, b){
+        var fa = self.foldLast(a) ? 1 : 0, fb = self.foldLast(b) ? 1 : 0;
+        if(fa !== fb) return fa - fb;          /* الموسومُ last آخرًا */
         var x = self.testOrder(a), y = self.testOrder(b);
         if(x.kind !== y.kind) return (x.kind < y.kind) ? -1 : 1;
         if(x.n !== y.n) return x.n - y.n;

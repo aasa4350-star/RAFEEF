@@ -831,6 +831,8 @@ async function loadReport(){
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦: «كل شي عندك خلل») — نفس علّة «قراءة» بالضبط
        كانت موجودةً في otherMap كلّه: يحتفظ بمحاولةٍ واحدة فقط لكل اسم
        اختبار، فتُخفى بقيّة محاولات قدرات/تحصيلي/STEP/كانجرو المتكرّرة. */
+    /* بابُ الإلقاءِ يُجمَع في صفٍّ واحدٍ ويُؤخَّر — طلبُ الأب ١ نوفمبر ٢٠٢٦ */
+    otherMap = RR.foldTests(otherMap);
     if(Object.keys(otherMap).length){
       html+='<div class="card"><div style="font-weight:800;margin-bottom:8px">الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)</div>'+
         RR.sortTests(Object.keys(otherMap)).map(function(t){
@@ -846,7 +848,7 @@ async function loadReport(){
           var avg=Math.round(base.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/base.length);
           return '<div style="font-weight:700;margin:4px 2px 2px">'+RR.shortTest(t)+' <span class="cnt">('+base.length+' محاولة · المتوسط '+avg+'%'+
             (skipped?(kept.length?'':' — كلّها نقر!')+' · <b style="color:var(--bad)">'+skipped+' مستبعدة (نقر)</b>':'')+')</span></div><ul class="weak">'+
-            arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
+            (RR.foldedName(t) ? RR.foldLines(arr).map(function(L){ return '<li><b>'+L.name+'</b>: '+L.n+' محاولة · <b>'+L.avg+'%</b>'+(L.skipped?' <span style="color:var(--bad)">· '+L.skipped+' مستبعدة</span>':'')+'</li>'; }).join("") : arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join(""))+
             '</ul>'; }).join("")+
         '</div>';
     }

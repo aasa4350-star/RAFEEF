@@ -5235,6 +5235,50 @@ function shortTestPath(){
     if (S(t) !== t) E(R, 'shortTest غيّرت اسمًا ليس من البابَين: «' + t + '» \u2192 «' + S(t) + '»');
   });
 
+  /* ═══ بابُ الإلقاءِ خانةٌ واحدةٌ آخرَ الصفوف ═══
+     طلبُ الأب (١ نوفمبر ٢٠٢٦): «حطها كلها في خانة وحدة وخلها آخر
+     شي لأنها ليست مهمة بالنسبة لي». وكان ثمانيةَ عشرَ صفًّا. */
+  if (typeof RR.foldTests !== 'function') E(R, 'RR.foldTests مفقودة — فيبقى بابُ الإلقاءِ مفرَّقًا');
+  else {
+    const EL = '\u0625\u0644\u0642\u0627\u0621';          /* إلقاء */
+    const src0 = {};
+    src0[EL + ' \u2014 1-1 \u0623'] = [{ id:1 }, { id:2 }];
+    src0[EL + ' \u2014 \u0634\u0627\u0645\u0644'] = [{ id:3 }];
+    src0[EL + ' \u2014 2-2 \u0628'] = [{ id:4 }];
+    src0['STEP'] = [{ id:5 }];
+    src0['\u062C\u0645\u0644 \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u06482 \uD83E\uDDE9'] = [{ id:6 }];
+    let F = null;
+    try { F = RR.foldTests(src0); } catch(e){ E(R, 'foldTests تتعطّل: ' + e.message); }
+    if (F){
+      const keys = Object.keys(F);
+      const elq = keys.filter(function(k){ return k.indexOf(EL) === 0; });
+      if (elq.length !== 1)
+        E(R, 'بابُ الإلقاءِ ' + elq.length + ' صفًّا بعد الجمعِ والمنتظَرُ واحد');
+      else if ((F[elq[0]] || []).length !== 4)
+        E(R, 'الصفُّ المجموعُ فيه ' + (F[elq[0]] || []).length + ' محاولةً والمنتظَرُ أربع');
+      if (keys.length !== 3) E(R, 'الجمعُ غيّر عددَ الصفوف: ' + keys.length + ' والمنتظَرُ ثلاثة');
+      /* ولا يُمَسُّ ما ليس من الباب */
+      if (!F['STEP'] || F['STEP'].length !== 1) E(R, 'الجمعُ مسَّ صفًّا ليس من الباب');
+      /* والأصلُ لا يُمَسّ: الصفوفُ تُنسَخ قبل أن تُعلَّم */
+      if (src0[EL + ' \u2014 \u0634\u0627\u0645\u0644'][0].foldFrom !== undefined)
+        E(R, 'foldTests تكتب على صفِّ قاعدةِ البيانات نفسِه — يُفسد كلَّ حسابٍ بعدَه');
+      /* وكلُّ صفٍّ مجموعٍ يحمل اسمَ درسِه، وإلّا صارت أسطرُه بلا هويّة */
+      if (elq.length === 1){
+        const bad = (F[elq[0]] || []).filter(function(p){ return !p.foldFrom; }).length;
+        if (bad) E(R, bad + ' محاولةً في الصفِّ المجموعِ بلا اسمِ درس — «٨/٨» بلا هويّة');
+      }
+      /* والمجموعُ آخرُ الصفوف */
+      const ord = RR.sortTests(keys);
+      if (String(ord[ord.length - 1]).indexOf(EL) !== 0)
+        E(R, 'الصفُّ المجموعُ ليس آخرَ الصفوف: ' + JSON.stringify(ord));
+    }
+    if (typeof RR.foldLesson !== 'function') E(R, 'RR.foldLesson مفقودة');
+    else if (RR.foldLesson(EL + ' \u2014 \u0634\u0627\u0645\u0644 \u06411') !==
+             '\u0634\u0627\u0645\u0644 \u06411')
+      E(R, 'foldLesson لا تنزع اسمَ الباب: «' +
+            RR.foldLesson(EL + ' \u2014 \u0634\u0627\u0645\u0644 \u06411') + '»');
+  }
+
   /* ═══ الترتيبُ بالرقمِ لا بالنصّ: الواحدُ قبل العاشر ═══ */
   const mk = (k, n) => k + ' \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u0648' + n +
     (k === '\u062C\u0645\u0644' ? ' \uD83E\uDDE9' : ' \uD83D\uDD01');
@@ -5262,8 +5306,23 @@ function shortTestPath(){
     const src = fs.readFileSync(fp, 'utf8');
     if (!/RR\.shortTest\(t\)/.test(src))
       E(F, 'صفوفُ الاختباراتِ تُعرَض باسمِها الطويل — يُقَصُّ فيضيع رقمُ الوحدة');
-    if (!/RR\.sortTests\(Object\.keys\(otherMap\)\)/.test(src))
+    /* والاسمُ قد يكون otherMap أو نسختَها المدموجة — المهمُّ أن تُرتَّب */
+    if (!/RR\.sortTests\(Object\.keys\(other\w*\)\)/.test(src))
       E(F, 'صفوفُ الاختباراتِ غيرُ مرتَّبةٍ بالرقم — فلا تُتابَع الوحداتُ على وجهِها');
+    /* وبابُ الإلقاءِ يُجمَع قبل العرض — طلبُ الأب: «خانة وحدة وآخر شي» */
+    if (!/RR\.foldTests\(otherMap\)/.test(src))
+      E(F, 'بابُ الإلقاءِ لا يُجمَع — ثمانيةَ عشرَ صفًّا تدفع ما يَعني الأبَ أسفلَ الشاشة');
+    /* وداخلَ الخانةِ سطرٌ لكلِّ وحدةٍ بعدِّها ومتوسّطِها — وإلّا محا
+       الجمعُ نسبةَ كلِّ وحدةٍ وهي ما طلب الأبُ متابعتَه بالضبط */
+    if (!/RR\.foldLines\(/.test(src))
+      E(F, 'الخانةُ المجموعةُ بلا سطرٍ لكلِّ وحدة — تُمحى نسبةُ الوحداتِ التي طلب متابعتَها');
+    if (!/RR\.foldedName\(t\)/.test(src))
+      E(F, 'الصفوفُ المجموعةُ لا تُميَّز عن غيرِها — فتُعرَض أسطرُها كأسطرِ اختبارٍ مفرد');
+    /* ولا يُسنَد إلى ثابت: الإسنادُ إلى const يرمي TypeError فتسقط
+       البطاقةُ كلُّها صامتةً (وقع في child.html). */
+    const dec = new RegExp('const[^;]{0,80}\\botherMap\\s*=').test(src);
+    if (dec && /(^|[^.\w])otherMap\s*=\s*RR\.foldTests/.test(src))
+      E(F, 'إسنادٌ إلى otherMap وهي const — يرمي TypeError فتسقط البطاقةُ صامتة');
     /* ولا يُمَسُّ مفتاحُ الطيِّ المحفوظ: هو الاسمُ الكاملُ لا المختصر */
     if (pair[1] && !/data-subj="\$\{name\}\|\u062A\u062C\u0631\u064A\u0628\u064A \$\{t\}"/.test(src))
       E(F, 'مفتاحُ طيِّ البطاقةِ تغيّر — فتُنسى البطاقاتُ المفتوحةُ عند الأب');
