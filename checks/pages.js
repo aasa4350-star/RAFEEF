@@ -369,6 +369,7 @@ function run(){
   issues.push(...quranTilawaPath());
   issues.push(...tajweedPath());
   issues.push(...quizExplainPath());
+  issues.push(...shortTestPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5181,6 +5182,106 @@ function quranTilawaPath(){
    مفروضًا على نصٍّ عربيّ.
 
    وهذا الحارسُ ينتزع دوالَّ الصفحةِ نفسَها ويُشغّلها — لا يُحاكيها. */
+/* ═══ رقمُ الوحدةِ يُقرأ من خارجِ البطاقة ═══════════════════════
+   طلبُ الأب (١ نوفمبر ٢٠٢٦) ومعه صورةُ لوحتِه: «ابيك تحطها بالأرقام
+   من برا — جمل 1، تثبيت 1 — عشان أعرف أتابعه بالضبط».
+
+   وعلّتُه أنّ الاسمَ المحفوظَ «جمل إنجليزي و3 🧩»، وعرضُ البطاقةِ
+   يقُصُّه عند «جمل إنجليزي و…» — فيبتلع الرقمَ وحدَه، وهو الفارقُ
+   الوحيدُ بين الصفوف.
+
+   وهذا الحارسُ يُشغِّل RR نفسَها لا يُحاكيها. */
+function shortTestPath(){
+  const out = [];
+  const R = 'report-rules.js', rp = path.join(ROOT, R);
+  if (!fs.existsSync(rp)) return [{ sev:'خطأ', file:R, msg:'قواعدُ التقريرِ مفقودة' }];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  let RR = null;
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(rp, 'utf8'), sb); RR = sb.window.RR; } catch(e){}
+  if (!RR || typeof RR.shortTest !== 'function')
+    return [{ sev:'خطأ', file:R, msg:'RR.shortTest مفقودة — فيُقَصُّ اسمُ الوحدةِ ويضيع رقمُها' }];
+  if (typeof RR.sortTests !== 'function')
+    return [{ sev:'خطأ', file:R, msg:'RR.sortTests مفقودة — فلا تُتابَع الوحداتُ مرتَّبةً' }];
+
+  const S = t => { try { return RR.shortTest(t); } catch(e){ return 'عطب: ' + e.message; } };
+  /* الاسمُ يُقصَّر ورقمُه يبقى */
+  [ ['\u062C\u0645\u0644 \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u06483 \uD83E\uDDE9',
+     '\u062C\u0645\u0644 3 \uD83E\uDDE9'],
+    ['\u062A\u062B\u0628\u064A\u062A \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u064810 \uD83D\uDD01',
+     '\u062A\u062B\u0628\u064A\u062A 10 \uD83D\uDD01'],
+    ['\u062C\u0645\u0644 \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u06481 \uD83E\uDDE9',
+     '\u062C\u0645\u0644 1 \uD83E\uDDE9'] ].forEach(function(c){
+    if (S(c[0]) !== c[1])
+      E(R, 'shortTest(«' + c[0] + '») = «' + S(c[0]) + '» والمنتظَرُ «' + c[1] + '»');
+  });
+  /* ورقمُ الوحدةِ لا يسقط: وهو الفارقُ الوحيدُ بين الصفوف */
+  ['1','2','3','10','12'].forEach(function(n){
+    const t = '\u062C\u0645\u0644 \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u0648' + n + ' \uD83E\uDDE9';
+    if (S(t).indexOf(n) < 0)
+      E(R, 'رقمُ الوحدةِ ' + n + ' سقط من «' + S(t) + '» — وهو ما طلب الأبُ رؤيتَه');
+  });
+  /* والقصيرُ قصيرٌ حقًّا: وإلّا قُصَّ في البطاقةِ كما كان */
+  ['\u062C\u0645\u0644','\u062A\u062B\u0628\u064A\u062A'].forEach(function(k){
+    const t = k + ' \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u064810 \uD83D\uDD01';
+    if (S(t).length > 12)
+      E(R, 'الاسمُ المختصرُ «' + S(t) + '» ما زال طويلًا — يُقَصُّ في البطاقة');
+  });
+  /* ولا يُمَسُّ اسمُ اختبارٍ ليس من البابَين */
+  ['\u0642\u062F\u0631\u0627\u062A \u0644\u0641\u0638\u064A',
+   '\u062A\u062D\u0635\u064A\u0644\u064A \u0643\u064A\u0645\u064A\u0627\u0621',
+   'STEP', ''].forEach(function(t){
+    if (S(t) !== t) E(R, 'shortTest غيّرت اسمًا ليس من البابَين: «' + t + '» \u2192 «' + S(t) + '»');
+  });
+
+  /* ═══ الترتيبُ بالرقمِ لا بالنصّ: الواحدُ قبل العاشر ═══ */
+  const mk = (k, n) => k + ' \u0625\u0646\u062C\u0644\u064A\u0632\u064A \u0648' + n +
+    (k === '\u062C\u0645\u0644' ? ' \uD83E\uDDE9' : ' \uD83D\uDD01');
+  const J = '\u062C\u0645\u0644', T = '\u062A\u062B\u0628\u064A\u062A';
+  let sorted = null;
+  try { sorted = RR.sortTests([mk(J,10), mk(T,2), mk(J,2), '\u0642\u062F\u0631\u0627\u062A',
+                               mk(T,1), mk(J,1)]); } catch(e){}
+  if (!Array.isArray(sorted)) E(R, 'sortTests لا تُشغَّل');
+  else {
+    const nums = k => sorted.filter(function(t){ return String(t).indexOf(k) === 0; })
+      .map(function(t){ const m = /(\d+)/.exec(RR.shortTest(t)); return m ? +m[1] : -1; });
+    [J, T].forEach(function(k){
+      const seq = nums(k), srt = seq.slice().sort(function(a,b){ return a-b; });
+      if (JSON.stringify(seq) !== JSON.stringify(srt))
+        E(R, 'ترتيبُ «' + k + '» ' + JSON.stringify(seq) + ' والصوابُ ' + JSON.stringify(srt) +
+             ' — العاشرُ يسبق الثاني إن رُتِّب بالنصّ');
+    });
+    if (sorted.length !== 6) E(R, 'sortTests أسقطت صفًّا: ' + sorted.length + ' من ٦');
+  }
+
+  /* ═══ والصفحاتُ الثلاثُ تستعملها — وإلّا افترقت ═══ */
+  [['index.html', true], ['child.html', false], ['home.html', false]].forEach(function(pair){
+    const F = pair[0], fp = path.join(ROOT, F);
+    if (!fs.existsSync(fp)) { E(F, 'الصفحةُ مفقودة'); return; }
+    const src = fs.readFileSync(fp, 'utf8');
+    if (!/RR\.shortTest\(t\)/.test(src))
+      E(F, 'صفوفُ الاختباراتِ تُعرَض باسمِها الطويل — يُقَصُّ فيضيع رقمُ الوحدة');
+    if (!/RR\.sortTests\(Object\.keys\(otherMap\)\)/.test(src))
+      E(F, 'صفوفُ الاختباراتِ غيرُ مرتَّبةٍ بالرقم — فلا تُتابَع الوحداتُ على وجهِها');
+    /* ولا يُمَسُّ مفتاحُ الطيِّ المحفوظ: هو الاسمُ الكاملُ لا المختصر */
+    if (pair[1] && !/data-subj="\$\{name\}\|\u062A\u062C\u0631\u064A\u0628\u064A \$\{t\}"/.test(src))
+      E(F, 'مفتاحُ طيِّ البطاقةِ تغيّر — فتُنسى البطاقاتُ المفتوحةُ عند الأب');
+  });
+
+  /* ═══ وتخطيطُ البطاقةِ يُفسح للاسمِ قبل الوصف ═══
+     قِيس في المتصفّح: الوصفُ الجامدُ يأخذ ١٥٤ بكسلًا من ٢٢٠ فلا
+     يترك للاسمِ إلّا اثنَين وثلاثين وهو يحتاج أربعةً وستّين، فيُقَصُّ
+     على عرضَي ٣٢٠ و٣٦٠. والالتفافُ يرفعه ولا يحجب «المتوسط». */
+  const ix = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  if (!/details\.subj>summary\{[^}]*flex-wrap:\s*wrap/.test(ix))
+    E('index.html', 'سطرُ البطاقةِ لا يلتفّ — فيُقَصُّ الاسمُ على الهواتفِ الضيّقة (قِيس على ٣٢٠ و٣٦٠)');
+  if (!/\.subjsum\{[^}]*min-width:\s*max-content/.test(ix))
+    E('index.html', 'الاسمُ يتقلّص قبل أن يلتفَّ السطر — فيبتلع القصُّ رقمَ الوحدة');
+
+  return out;
+}
+
 function quizExplainPath(){
   const out = [];
   const F = 'quiz.html', p = path.join(ROOT, F);
