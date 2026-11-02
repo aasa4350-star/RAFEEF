@@ -10,6 +10,7 @@
 <script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="report-rules.js"></script>
+<script src="gram-rules.js"></script>
 <script src="attempts-queue.js"></script>
 <style>
   :root{
@@ -727,6 +728,7 @@ async function loadReport(){
     if(!gramActs.length && hasStep){
       html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
         '<li>🚪 <b>ما فتح القسم بعد</b> — وهو شغّالٌ وجاهز: يبني له طابورًا من أخطائه هو في ستيب ويعيدها بنصّها حتى يصحّحها.</li>'+
+        (window.GRAM_RULES?'<li style="font-weight:400">وفيه <b>'+window.GRAM_RULES.length+'</b> قاعدة، بنكُ كلٍّ منها <b>'+(window.GRAM_BANK_N||0)+'</b> سؤالًا.</li>':'')+
         '</ul><div style="margin-top:8px"><a href="practice.html?who='+who+'&tab=gr" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">✏️ افتح القواعد المركّزة</a></div></div>';
     }
     /* ✏️ القواعدُ المركَّزة */
@@ -741,12 +743,22 @@ async function loadReport(){
         if(e.r===null && typeof x.meta.remain==="number") e.r=x.meta.remain; });
       var gKeys=Object.keys(gBy).sort(function(a,b){ return gBy[b].f-gBy[a].f; });
       var gRem=0; gKeys.forEach(function(k){ gRem += (gBy[k].r||0); });
+      /* ═══ المتروكُ يُقال ══════════════════════════════════════════════
+         «صحّح كذا خطأً في كذا جولة» يقيس القواعدَ التي فتحها وحدَها.
+         فيُزاد سطرُ التغطية: كم قاعدةً من خمسةَ عشرةَ جرّبها، وأسماءُ
+         ما تركه — انظر RR.gramCoverage. */
+      var gCov=RR.gramCoverage(ga);
       html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
         '<li>✅ <b>صحّح '+arCount(gFix,"خطأً واحدًا","خطأين","أخطاء","خطأً")+'</b> من أخطائه في قواعد ستيب'+
         (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+saTime(RR.when(ga[0]))+'</span></li>'+
+        (gCov.rules?'<li>📚 جرّب <b>'+gCov.tried+'</b> من <b>'+gCov.rules+'</b> قاعدة'+
+          (gCov.bank?' · وقطع <b>'+gCov.cut+'</b> سؤالًا من <b>'+gCov.bank+'</b>':'')+'</li>':'')+
+        (gCov.left.length?'<li style="font-weight:400">🆕 <b>ما جرّبه بعد:</b> '+gCov.left.slice(0,6).join(" · ")+
+          (gCov.left.length>6?' <span class="cnt">و'+arCount(gCov.left.length-6,"قاعدةٌ واحدةٌ","قاعدتان","قواعدَ","قاعدةً")+' غيرها</span>':'')+'</li>':'')+
         gKeys.slice(0,6).map(function(k){ var e=gBy[k];
           return '<li>'+k+' <span class="cnt">صحّح '+e.f+(e.r?' · بقي '+e.r:'')+'</span></li>'; }).join("")+
-        '</ul><small style="color:var(--muted)">الطابورُ من أخطائه هو، والسؤالُ لا يخرج حتى يُجيبه صحيحًا.</small></div>';
+        '</ul><small style="color:var(--muted)">الطابورُ من أخطائه هو، والسؤالُ لا يخرج حتى يُجيبه صحيحًا. و«قطع» عدُّ ما أجابه صحيحًا من بنوكِ القواعد'+
+        (gCov.left.length?' — وزرُّ «القاعدة كاملة» في صفحتِه يمشي به على بنكِ القاعدةِ كلِّه'+'':'')+'.</small></div>';
     }
     /* ═══ 📖 التلاوة — تسميعُ حفظٍ لا تقييمُ تجويد ═══════════════
        طلبُ الأب (٢٩ أكتوبر ٢٠٢٦). والمعروضُ ما يصحُّ قياسُه آليًّا:

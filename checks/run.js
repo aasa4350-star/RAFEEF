@@ -20,6 +20,7 @@ const kangaroo= require('./kangaroo');
 const eduvid  = require('./eduvid');
 const mic     = require('./mic');
 const banks   = require('./banks');
+const gram    = require('./gram');
 const azure   = require('./azure');
 
 const BAR = '─'.repeat(56);
@@ -102,6 +103,15 @@ function head(t){ console.log('\n' + BAR + '\n  ' + t + '\n' + BAR); }
     i.sev === 'خطأ' ? errors++ : warns++;
   });
   if (!bk.issues.length) console.log('  ✅ لا ملاحظات');
+
+  head('٨ب · جدول قواعد ستيب');
+  const gm = gram();
+  console.log('قواعد: ' + gm.rules + ' · مواضيع البنك: ' + gm.topics + ' · أسئلة القاعدة: ' + gm.bankN);
+  gm.issues.forEach(i => {
+    console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.msg);
+    i.sev === 'خطأ' ? errors++ : warns++;
+  });
+  if (!gm.issues.length) console.log('  ✅ لا ملاحظات');
 
   head('٩ · خدمة النطق (أزور)');
   const az = await azure();

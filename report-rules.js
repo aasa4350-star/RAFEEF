@@ -623,6 +623,37 @@
       return { learned: L, total: Math.max(T, L) };
     },
 
+    /* ═══ أين هو من قواعدِ ستيب الخمسةَ عشر ════════════════════════════
+       طلبُ الأب (٢ نوفمبر ٢٠٢٦). وكانت بطاقةُ القواعدِ تقول «صحّح كذا
+       خطأً في كذا جولة» — وهذا يقيس عملَه في القواعدِ التي فتحها ولا
+       يقول شيئًا عن التي لم يفتحها. وقِستُ فهدًا فإذا سبعٌ من خمسةَ
+       عشرةَ، وثلاثٌ من الثمانيةِ المتروكةِ مفتوحةٌ في أعلى صفحتِه
+       بنسبةِ صفرٍ — تجاوزها. فالمتروكُ خبرٌ لا يُرى إلّا إذا عُرِض.
+
+       والعدُّ من بصماتِ الصوابِ المحفوظةِ في الصفوفِ (seenKeys وقبلَها
+       fixedKeys)، فما حُفظ في جهازِ الابنِ وحدَه لا يصل الأبَ — ولا
+       نحمّل صفحةَ التقريرِ بنكَ الثلاثمئة، بل عددَ القاعدةِ الواحدة
+       من gram-rules.js. */
+    gramCoverage: function(rows){
+      var RULES = (typeof window !== "undefined" && window.GRAM_RULES) || [];
+      var BANK_N = (typeof window !== "undefined" && window.GRAM_BANK_N) || 0;
+      var tried = {}, seen = {};
+      (rows || []).forEach(function(p){
+        var m = (p && p.meta) || {};
+        if (m.skill) tried[m.skill] = 1;
+        (m.seenKeys || []).concat(m.fixedKeys || []).forEach(function(k){ seen[k] = 1; });
+      });
+      var left = [];
+      RULES.forEach(function(t){ if (!tried["Grammar — " + t[0]]) left.push(t[1]); });
+      return {
+        rules: RULES.length,
+        tried: RULES.length - left.length,
+        left: left,                                  /* أسماءُ المتروكِ بالعربيّ */
+        cut: Object.keys(seen).length,                /* أسئلةٌ أجابها صحيحًا */
+        bank: RULES.length * BANK_N                   /* بنكُ القواعدِ كلِّه */
+      };
+    },
+
     /* ═══ وصفُ الجلسة كما يفهمه الأب ═══
        بلاغه (٨ سبتمبر ٢٠٢٦): «يقول جلست ٨ دقايق وتحدّثت كثيرًا، وما طلع
        لي إلّا ٥ جمل — ودّي توضيح أكثر». وكان التقرير يعرض الجمل المفهومة

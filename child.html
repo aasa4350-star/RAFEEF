@@ -10,6 +10,7 @@
 <script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="report-rules.js"></script>
+<script src="gram-rules.js"></script>
 <style>
   :root{
     --accent:#3b5bdb; --accent-soft:#bac8ff; --accent-deep:#2b3fa0;
@@ -658,6 +659,7 @@ async function main(){
     if(!gramActs.length && hasStep){
       html+=`<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">`+
         `<li>🚪 <b>ما فتحته بعد</b> — وهو جاهز: يبني لك طابورًا من أخطائك أنت في ستيب ويعيدها بنصّها حتى تصحّحها.</li>`+
+        (window.GRAM_RULES?`<li style="font-weight:400">وفيه <b>${window.GRAM_RULES.length}</b> قاعدة، بنكُ كلٍّ منها <b>${window.GRAM_BANK_N||0}</b> سؤالًا.</li>`:'')+
         `</ul><div style="margin-top:8px"><a href="practice.html?who=${who}&tab=gr" style="display:inline-block;text-decoration:none;background:var(--accent);color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">✏️ افتح القواعد المركّزة</a></div></div>`;
     }
     /* ✏️ القواعدُ المركَّزة */
@@ -670,12 +672,18 @@ async function main(){
         if(e.r===null && typeof x.meta.remain==="number") e.r=x.meta.remain; });
       const gKeys=Object.keys(gBy).sort((a,b)=> gBy[b].f-gBy[a].f);
       let gRem=0; gKeys.forEach(k=>{ gRem += (gBy[k].r||0); });
+      /* المتروكُ يُقال — كما في تقريرِ الأب، والخطابُ هنا للابن */
+      const gCov=RR.gramCoverage(ga);
       html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
         '<li>✅ <b>صحّحت '+arCount(gFix,"خطأً واحدًا","خطأين","أخطاء","خطأً")+'</b> من أخطائك في قواعد ستيب'+
         (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+saTime(RR.when(ga[0]))+'</span></li>'+
+        (gCov.rules?'<li>📚 جرّبت <b>'+gCov.tried+'</b> من <b>'+gCov.rules+'</b> قاعدة'+
+          (gCov.bank?' · وقطعت <b>'+gCov.cut+'</b> سؤالًا من <b>'+gCov.bank+'</b>':'')+'</li>':'')+
+        (gCov.left.length?'<li style="font-weight:400">🆕 <b>ما جرّبتها بعد:</b> '+gCov.left.slice(0,6).join(" · ")+
+          (gCov.left.length>6?' <span class="cnt">و'+arCount(gCov.left.length-6,"قاعدةٌ واحدةٌ","قاعدتان","قواعدَ","قاعدةً")+' غيرها</span>':'')+'</li>':'')+
         gKeys.slice(0,6).map(k=>{ const e=gBy[k];
           return '<li>'+k+' <span class="cnt">صحّحت '+e.f+(e.r?' · بقي '+e.r:'')+'</span></li>'; }).join("")+
-        '</ul><small style="color:var(--muted)">الطابورُ من أخطائك أنت، والسؤالُ لا يخرج حتى تُجيبه صحيحًا.</small></div>';
+        '</ul><small style="color:var(--muted)">الطابورُ من أخطائك أنت، والسؤالُ لا يخرج حتى تُجيبه صحيحًا. وزرُّ «📚 القاعدة كاملة» يمشي بك على بنكِ القاعدةِ كلِّه لا على ثلاثةٍ فقط.</small></div>';
     }
     /* ═══ 📖 التلاوة ═══ وهذه صفحةُ الابنِ نفسِه فالخطابُ له */
     if(tilawaAll.length){
