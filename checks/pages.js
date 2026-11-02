@@ -3366,9 +3366,18 @@ function readAloudPath(){
     const m2 = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
     const lp = path.join(ROOT, 'reading-long.js');
     if (m2 && fs.existsSync(lp)){
-      let fn2 = null;
+      let fn2 = null, fnParts = null;
       try { const sb = {}; vm.createContext(sb);
         vm.runInContext('f = function(txt, cfg){' + m2[1] + '\n};', sb); fn2 = sb.f; } catch(e){}
+      /* وتُنتزَع readParts وتُشغَّل معها: الفحصُ على ما يقرؤه الابنُ
+         فعلًا — أجزاءِ القطعةِ لا جزئِها الأوّل. */
+      const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
+      if (mp && m2){
+        try { const sb = {}; vm.createContext(sb);
+          vm.runInContext('function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
+            'function readCapOf(){ return null; }\n' +
+            'g = function(txt, cfg){' + mp[1] + '\n};', sb); fnParts = sb.g; } catch(e){}
+      }
       let pool = null;
       try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
         vm.runInContext(fs.readFileSync(lp, 'utf8'), sb);
@@ -3429,6 +3438,9 @@ function readAloudPath(){
             E('السقفُ الصلبُ لحسنٍ ' + hard + ' — وفوق الخمسةِ والأربعين تنهار طلاقتُه إلى ٢٨');
           /* وعلى قطعِه الحقيقيّة */
           const hp = (pool.hasan || {});
+          const TXT = [];
+          Object.keys(hp).forEach(lang => ((hp[lang] || {}).pass || []).forEach(p => {
+            const t = String((p || [])[0] || '').trim(); if (t) TXT.push(t); }));
           let over = 0, under = 0, mx = 0, notFull = 0;
           Object.keys(hp).forEach(lang => ((hp[lang] || {}).pass || []).forEach(p => {
             const txt = String((p || [])[0] || '').trim(); if (!txt) return;
@@ -3437,7 +3449,7 @@ function readAloudPath(){
             const rw = String(r).trim().split(/\s+/).filter(Boolean).length;
             if (rw > mx) mx = rw;
             if (HFULL){ if (String(r).trim() !== txt) notFull++; }
-            else {
+            else {   /* والحدودُ تضبط طولَ الجزءِ بعد رفعِ full */
               if (rw > hard) over++;
               if (rw < floor && tw >= floor) under++;
             }
@@ -3445,10 +3457,30 @@ function readAloudPath(){
           if (over) E('حسن: ' + over + ' قطعةً يُقاس عليها فوق سقفِه الصلب (أطولُها ' + mx + ' كلمة)');
           if (under) E('حسن: ' + under + ' قطعةً يُقاس عليها دون أدنى مقدارِه (' + floor + ' كلمة)');
           /* ═══ وهو يقرأ قطعتَه كاملةً بقرارِ الأب (٢٩ أكتوبر) ═══
-             فلا يُقتطَع منها شيء، ومهلةُ الأمانِ تسع أطولَها بمهلة:
-             أبطأُ ما قُيس عليه ١٫٥١ ثانيةً للكلمة، فنشترط ٢ ثانية. */
-          if (!HFULL)
-            E('حسن لا يقرأ قطعتَه كاملة — وهو قرارُ الأب في ٢٩ أكتوبر، فلا يُردُّ إلّا بقرارٍ مثلِه');
+             وقرارُه باقٍ، وتغيّرت طريقةُ الوفاءِ به (٢ نوفمبر ٢٠٢٦):
+             كان «full» يعطيه القطعةَ في نَفَسٍ واحد، وقِيس أنّ ذلك لا
+             يقع — اكتمالُه في القطعِ ≥٩٠ كلمةً ٢٥٪ في سبعِ قراءات،
+             يقرأ ثلاثين من مئةٍ وستّين ثمّ يضغط «خلّصت». فصارت تُقرَأ
+             كاملةً على أجزاءٍ يُنهيها، وهو أوفى لقرارِ الأب لا أنقص.
+             فيُفحَص المقصودُ — أن تُغطّي الأجزاءُ القطعةَ كلَّها — لا
+             الوسيلةُ التي كانت. */
+          if (typeof fnParts === 'function'){
+            let miss = 0, longest = 0;
+            TXT.forEach(function(txt){
+              let ps = [];
+              try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
+              const join = ps.join(' ').replace(/\s+/g,' ').trim();
+              if (join !== String(txt).replace(/\s+/g,' ').trim()) miss++;
+              ps.forEach(function(x){
+                const n2 = String(x).trim().split(/\s+/).filter(Boolean).length;
+                if (n2 > longest) longest = n2;
+              });
+            });
+            if (miss)
+              E('حسن: ' + miss + ' قطعةً لا تُغطّيها أجزاؤها — فلا يقرؤها كاملةً وهو قرارُ الأب');
+            if (longest > hard + 12)
+              E('حسن: جزءٌ من ' + longest + ' كلمةً فوق سقفِه (' + hard + ') — ولا يُنهيه');
+          } else E('readParts لا تُنتزَع — فلا يُتحقَّق أنّ حسنًا يقرأ قطعتَه كاملة');
           if (HFULL){
             if (notFull) E('حسن: ' + notFull + ' قطعةً تُقتطَع وهو مأمورٌ بقراءتِها كاملة');
             const CAPMS = /_capMs = Math\.min\((\d+), Math\.max\((\d+), _refW\*(\d+) \+ (\d+)\)\)/.exec(src);
@@ -3491,14 +3523,34 @@ function readAloudPath(){
     E('شاشةُ التسجيلِ لا توجّهه إلى الفقرةِ المظلَّلةِ حين يكون المقيَّسُ فقرة');
   if (!/_partRead\(\) \? '<div[\s\S]{0,240}هذي درجةُ/.test(src))
     E('النتيجةُ لا تقول إنّ الدرجةَ للفقرةِ المظلَّلةِ وحدَها — فيُظنُّ التسجيلُ انقطع');
-  if (!/partRead && canRead[\s\S]{0,300}تقرأه <b>بصوتك<\/b>/.test(src))
+  if (!/partRead && canRead[\s\S]{0,300}اقرأ المظلَّل بصوتك/.test(src))
     E('لا سطرَ ملاصقٌ للقطعةِ يفسّر التظليل — ورسالةُ القفلِ تختفي بعد أن يُفتح');
+  /* ═══ والقطعةُ تُقرَأ كاملةً جزءًا بعد جزء ═══
+     طلبُ الأب (٢ نوفمبر ٢٠٢٦): «خلّه يقرأ القطعة كاملة». وقِيس أنّ
+     الجزءَ الواحدَ الطويلَ لا يُقرَأ: اكتمالُ حسنٍ في القطعِ ≥٩٠ كلمةً
+     ٢٥٪، واكتمالُ فهدٍ ينزل من ٩٥٪ دون الثلاثين إلى ٤٩٪ فوق الستّين.
+     فالأجزاءُ لا الجزءُ الأوّلُ وحدَه. */
+  if (!/function readParts\(/.test(src))
+    E('readParts مفقودة — فلا تُقرَأ القطعةُ إلّا جزأَها الأوّل');
+  if (!/var rParts = readParts\(passage\)/.test(src))
+    E('شاشةُ القراءةِ لا تُقسّم القطعةَ أجزاءً');
+  if (!/data-go-next/.test(src))
+    E('لا زرَّ ينقل إلى الجزءِ التالي — فيقف الابنُ عند الأوّلِ ولا يُتمُّ القطعة');
+  if (!/الجزء ' \+ \(i\+1\) \+ ' من ' \+ rParts\.length/.test(src))
+    E('لا يُعرَض للابنِ أينَ وصل من أجزاءِ القطعة');
+  if (!/\u0642\u0631\u0623\u062A \u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0645\u0644\u0629/.test(src))
+    E('لا يُقال له إنّه أتمَّ القطعةَ عند آخرِ جزء');
+  /* والأسئلةُ تُفتَح بعد الجزءِ الأوّلِ كما كانت: لو عُلّقت على إتمامِ
+     القطعةِ لقُفل الفهمُ على طولِ نَفَسِه — وهي علّةٌ شكا منها الأبُ
+     من قبلُ في المايكروفون. */
+  if (!/unlock\(\);\s*\n\s*offerNext\(\);/.test(src))
+    E('فتحُ الأسئلةِ لا يسبق عرضَ الجزءِ التالي — فقد يُقفَل الفهمُ على إتمامِ القطعة');
 
   /* ── وهي التي تُرسَل لأزور، والمظلَّلُ هو هي ── */
   if (!/azureAssess\(readRef,/.test(src))
     E('قطعةُ القراءةِ تُرسَل كاملةً لتقييمِ النطقِ لا readRef — فيُقاس على ما لم يُطلَب منه');
-  if (!/var readRef = readAloudRef\(passage\)/.test(src))
-    E('readRef لا يُشتقُّ من القطعة');
+  if (!/var readRef = rParts\[0\]/.test(src))
+    E('readRef لا يُشتقُّ من أجزاءِ القطعة');
   if (!/data-readpart/.test(src))
     E('الفقرةُ المقروءةُ لا تُظلَّل — فيقرأ القطعةَ كلَّها ويُقاس على فقرة');
   /* والتظليلُ يُرى: خلفيّةُ ‎--good-bg وحدَها باهتةٌ لا تكاد تبين على

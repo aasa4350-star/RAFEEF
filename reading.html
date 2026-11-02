@@ -513,7 +513,12 @@ try{
    وهذا مكتوبٌ هنا لئلّا يُقرأ الرقمُ يومًا على غيرِ وجهِه.
 
    وبقيّةُ أرقامِه محفوظةٌ تحتَها: إن رُدَّ يومًا إلى الفقرةِ رجع إليها. */
-var READ_CAP = { hasan: { full:true, floor:25, cap:42, hard:45 } };
+/* و«full» رُفعت (٢ نوفمبر ٢٠٢٦): كانت تعني أن يقرأ القطعةَ في
+   نَفَسٍ واحد، وقِيس أنّ ذلك لا يقع — اكتمالُ حسنٍ في القطعِ
+   الطويلةِ ٢٥٪. وصارت القطعةُ تُقرَأ كاملةً على أجزاء، فالحدودُ
+   هنا تضبط طولَ الجزءِ لا وجودَه. وتركُها بلا أثرٍ يُوهِم أنّها
+   تعمل. */
+var READ_CAP = { hasan: { floor:25, cap:42, hard:45 } };
 var READ_DEF = { floor:18, cap:35, hard:55 };
 function readCapOf(){
   try{ return READ_CAP[who] || READ_DEF; }catch(e){ return READ_DEF; }
@@ -570,6 +575,56 @@ function readAloudRef(txt, cfg){
      الجهرِ أضرُّ من كسرةٍ في جملةٍ طويلةٍ أصلًا. */
   if(!took || n > HARD) return _cut(first, CAP).trim();
   return first.slice(0, end).trim();
+}
+
+/* ═══ القطعةُ تُقرَأ كاملةً على أجزاءٍ يُنهيها ═══════════════════
+   طلبُ الأب (٢ نوفمبر ٢٠٢٦) ومعه صورةُ شاشةِ فهد: «خلّه يقرأ القطعة
+   كاملة». وطلبه قبلَه في حسنٍ مثلُه.
+
+   وقِيس قبل التنفيذ، فإذا الطلبُ حرفيًّا يعطي عكسَ المراد:
+   • اكتمالُ فهدٍ بحسبِ طولِ المرجع: ٠–٣٠ كلمةً ٩٥٪ · ٣٠–٤٥ ٧٦٪ ·
+     ٤٥–٦٠ ٥٦٪ · ٦٠–٩٠ ٤٩٪. وقطعُه وسطُها ١٦١ كلمة.
+   • وحسنٌ عنده full:true أصلًا، واكتمالُه في القطعِ الطويلةِ (≥٩٠
+     كلمة) ٢٥٪ في سبعِ قراءات: يقرأ ثلاثين من مئةٍ وستّين ثمّ يضغط
+     «خلّصت». فالقطعةُ الكاملةُ في نَفَسٍ واحدٍ لا تُقرَأ.
+   • والتسجيلُ يحتمل ١١٧ ثانية (قِيس) فالحدُّ ليس تقنيًّا بل نَفَسُ
+     الطفل.
+
+   فتُقسَم القطعةُ أجزاءً كلٌّ منها في حدودِ ما يُنهيه، ويقرؤها جزءًا
+   بعد جزءٍ حتى يُتمَّها — فيقرأ كلَّ كلمةٍ فيها، ولا يُطالَب بنَفَسٍ
+   لا يملكه. */
+function readParts(txt, cfg){
+  var s = String(txt||"").trim();
+  if(!s) return [];
+  cfg = cfg || (typeof readCapOf === "function" ? readCapOf() : { floor:18, cap:35, hard:55 });
+  /* وأجزاءُ «القارئِ كاملًا» كأجزاءِ غيرِه: full تعني أن يُتمَّ القطعةَ
+     لا أن يقرأها في نَفَسٍ واحد. فتُنزَع هنا ويُقسَّم بالحدودِ نفسِها. */
+  var cut = { floor:cfg.floor, cap:cfg.cap, hard:cfg.hard };
+  var parts = [], rest = s, guard = 0;
+  while(rest.trim().length && guard++ < 40){
+    var ref = readAloudRef(rest, cut);
+    if(!ref || !ref.trim()){ parts.push(rest.trim()); break; }
+    var at = rest.indexOf(ref);
+    if(at < 0){ parts.push(rest.trim()); break; }
+    parts.push(ref.trim());
+    rest = rest.slice(at + ref.length);
+    /* ذيلٌ أقصرُ من أن يُقاس عليه نطقٌ يُضَمُّ إلى ما قبلَه — ما لم
+       يتجاوز المجموعُ السقفَ الصلب. وأوّلُ صياغةٍ ضمّته بلا شرطٍ
+       فأخرجت جزءًا من خمسٍ وستّين كلمةً لحسنٍ وسقفُه خمسٌ وأربعون
+       (رصده الحارسُ قبل أن يراه أحد). والذيلُ القصيرُ وحدَه أهونُ من
+       جزءٍ لا يُنهيه. */
+    var tw = rest.trim().split(/\s+/).filter(Boolean).length;
+    if(tw && tw < cut.floor){
+      var prevW = parts[parts.length-1].split(/\s+/).filter(Boolean).length;
+      if(prevW + tw <= cut.hard){
+        parts[parts.length-1] = (parts[parts.length-1] + " " + rest.trim()).trim();
+      } else {
+        parts.push(rest.trim());
+      }
+      rest = "";
+    }
+  }
+  return parts.filter(function(x){ return x && x.trim(); });
 }
 
 function passageId(txt){
@@ -2569,29 +2624,39 @@ if(!META[who] || !DATA[who]){
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
-    /* المقروءُ بصوته فقرةٌ واحدةٌ لا القطعةُ كلُّها — انظر readAloudRef */
-    var readRef = readAloudRef(passage);
-    var partRead = readRef.length < passage.trim().length - 4;
+    /* المقروءُ بصوته جزءٌ من القطعة — انظر readAloudRef و readParts.
+       والقطعةُ تُقرَأ كاملةً جزءًا بعد جزءٍ لا في نَفَسٍ واحد (طلبُ
+       الأب ٢ نوفمبر ٢٠٢٦، وانظر التعليلَ المقيسَ عند readParts). */
+    var rParts = readParts(passage);
+    var rOff = [], _rk = 0;
+    rParts.forEach(function(x){ var at = passage.indexOf(x, _rk); rOff.push(at); _rk = at + x.length; });
+    var partIx = 0;
+    var readRef = rParts[0] || passage.trim();
+    var partRead = rParts.length > 1;
     var lockMsg = azureConfigured()
       ? ('🔒 الخطوة ١: استمع للنص (🔊 استمع للنص). الخطوة ٢: اقرأ ' +
-         (partRead ? '<b>الفقرة الأولى فقط</b> (المظلَّلة)' : 'القطعة كاملة') +
-         ' بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة.' +
-         (partRead ? ' وبقيّة القطعة تقرأها بعينك للأسئلة.' : ''))
+         (partRead ? '<b>الجزء المظلَّل بالأخضر</b>' : 'القطعة كاملة') +
+         ' بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة' +
+         (partRead ? '، ويطلع لك زر تواصل فيه بقيّة القطعة جزءًا جزءًا.' : '.'))
       : '🔒 استمع للنص كاملًا (🔊 استمع للنص) وبعدها تُفتح الأسئلة.';
     /* وتُظلَّل الفقرةُ المقروءةُ حتّى لا يقرأ غيرَها ثمّ يُقال له «خلّصت» */
-    var passHtml = passage;
-    if(partRead && canRead && passage.indexOf(readRef) === 0)
-      passHtml = '<span data-readpart style="background:var(--good-bg);border-radius:6px;' +
-                 'box-shadow:0 0 0 3px var(--good-bg);border-bottom:2px solid var(--good);' +
-                 '-webkit-box-decoration-break:clone;box-decoration-break:clone">' + readRef + '</span>' +
-                 passage.slice(readRef.length);
+    function partHtml(i){
+      if(!(partRead && canRead) || rOff[i] == null || rOff[i] < 0) return passage;
+      return passage.slice(0, rOff[i]) +
+        '<span data-readpart style="background:var(--good-bg);border-radius:6px;' +
+        'box-shadow:0 0 0 3px var(--good-bg);border-bottom:2px solid var(--good);' +
+        '-webkit-box-decoration-break:clone;box-decoration-break:clone">' + rParts[i] + '</span>' +
+        passage.slice(rOff[i] + rParts[i].length);
+    }
+    var passHtml = partHtml(0);
     var html = '<div class="block-title"><span class="dot"></span> اقرأ واستمع</div>'+
       '<div class="passage" data-mic-wrap><div class="row"><button class="say" data-read>🔊 استمع للنص</button>'+azBtnHtml()+micTestBtnHtml()+'</div>'+
       '<div data-mictest style="display:none;margin-top:8px"></div>'+
       '<div class="txt" style="direction:'+dir+';text-align:'+ta+'">'+passHtml+'</div>'+
       ((partRead && canRead)
-        ? '<div style="font-size:.84rem;color:var(--good);font-weight:700;margin-top:6px">'+
-          '🟩 المظلَّل بالأخضر تقرأه <b>بصوتك</b> · وباقي القطعة تقرأه <b>بعينك</b> للأسئلة</div>'
+        ? '<div data-partbar style="font-size:.84rem;color:var(--good);font-weight:700;margin-top:6px">'+
+          '🟩 اقرأ المظلَّل بصوتك — <b>الجزء 1 من '+rParts.length+'</b></div>'+
+          '<div data-nextpart style="display:none;margin-top:8px"></div>'
         : '')+
       '<div class="pfb" style="margin-top:8px;font-weight:700;min-height:18px"></div></div>'+
       '<div class="block-title"><span class="dot"></span> أسئلة الفهم</div>'+
@@ -2623,9 +2688,39 @@ if(!META[who] || !DATA[who]){
       setReadEnabled(true);
       if(lockEl && !unlocked){ lockEl.textContent="✅ سمعت النص! الخطوة ٢: اقرأها بصوتك (🎙️ قيّم نطقي) عشان تُفتح الأسئلة."; }
     }
+    /* ═══ بقيّةُ القطعةِ تُقرَأ جزءًا بعد جزء ═══════════════════════
+       طلبُ الأب: «خلّه يقرأ القطعة كاملة». والأسئلةُ تُفتَح بعد الجزءِ
+       الأوّل كما كانت — فلا يُقفَل الفهمُ على طولِ نَفَسِه — ثمّ يُدعى
+       إلى ما بقي بزرٍّ ظاهرٍ وعدٍّ يرى فيه أين وصل. */
+    var partBar = sec.querySelector("[data-partbar]");
+    var nextBox = sec.querySelector("[data-nextpart]");
+    var txtEl   = sec.querySelector(".passage .txt");
+    function showPart(i){
+      partIx = i; readRef = rParts[i];
+      if(txtEl) txtEl.innerHTML = partHtml(i);
+      if(partBar) partBar.innerHTML = '🟩 اقرأ المظلَّل بصوتك — <b>الجزء ' + (i+1) + ' من ' + rParts.length + '</b>';
+      if(nextBox) nextBox.style.display = "none";
+      try{ if(txtEl) txtEl.scrollIntoView({block:"nearest"}); }catch(e){}
+    }
+    function offerNext(){
+      if(!partRead || !nextBox) return;
+      if(partIx >= rParts.length - 1){
+        nextBox.style.display = "";
+        nextBox.innerHTML = '<div style="color:var(--good);font-weight:800">🎉 قرأت القطعة كاملة — كل أجزائها.</div>';
+        return;
+      }
+      nextBox.style.display = "";
+      nextBox.innerHTML = '<button class="say small" data-go-next style="background:var(--good);' +
+        'border-color:var(--good);color:#fff;font-weight:800">▶️ اقرأ الجزء ' + (partIx+2) +
+        ' من ' + rParts.length + '</button>' +
+        '<div style="font-size:.82rem;color:var(--muted);margin-top:4px">الأسئلة مفتوحة — وتقدر تكمّل القطعة بصوتك.</div>';
+      var gb = nextBox.querySelector("[data-go-next]");
+      if(gb) gb.addEventListener("click", function(){ showPart(partIx + 1); });
+    }
     function onRead(){
       if(!listened){ if(lockEl && !unlocked){ lockEl.textContent="⚠️ استمع للنص أولًا (🔊 استمع للنص) قبل ما تقرأها."; } return; }
       unlock();
+      offerNext();
     }
     /* تعذّر المايكروفون: كانت أسئلة الفهم تبقى مقفلةً إلى الأبد، لأنّ
        فتحها معلّقٌ على نجاح القراءة وحدها. فيقف الدرس كلّه على زرٍّ
