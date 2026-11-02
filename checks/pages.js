@@ -371,6 +371,7 @@ function run(){
   issues.push(...quizExplainPath());
   issues.push(...shortTestPath());
   issues.push(...dictDosePath());
+  issues.push(...storyBankPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5250,6 +5251,109 @@ function quranTilawaPath(){
    الأساسيِّ تكتب منها ٥٨٪ من الكلمات، وجملُ التوسعةِ ١٥٪ — وكلُّ
    جملةٍ خرجت صفرًا من كلماتِها كلِّها من التوسعة. فالقسمةُ عند حدِّ
    البنكَين مقيسةٌ لا مُخمَّنة. */
+/* ═══ قصصُ فهدٍ التاريخيّةُ والعلميّة ═══════════════════════════
+   ملاحظةُ فهدٍ نقلها الأب (٢ نوفمبر ٢٠٢٦): «يبي قطعًا كثيرةً متنوّعة،
+   ويفضّل قصصًا تاريخيّةً وعلميّة». وقِيس بنكُه قبل الزيادة: اثنتان
+   وثلاثون قطعةً كلُّها مقاليّةٌ حِجاجيّة ولا قصّةَ واحدة. */
+function storyBankPath(){
+  const out = [];
+  const F = 'step-reading-story.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'بنكُ القصصِ مفقود' }];
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ويُحمَّل في الصفحتَين معًا بعد الأصل، وإلّا دخل قسمًا دون قسم */
+  ['reading.html', 'practice.html'].forEach(function(pg){
+    const fp = path.join(ROOT, pg);
+    if (!fs.existsSync(fp)) return;
+    const src = fs.readFileSync(fp, 'utf8');
+    const a = src.indexOf('step-reading.js'), b = src.indexOf('step-reading-story.js');
+    if (b < 0) out.push({ sev:'خطأ', file:pg, msg:'بنكُ القصصِ غيرُ محمَّلٍ — فلا يراها فهد' });
+    else if (a < 0 || b < a)
+      out.push({ sev:'خطأ', file:pg, msg:'بنكُ القصصِ يُحمَّل قبل الأصل — فلا يجد STEP_READING فيُنشئها ويُهمل الأصل' });
+  });
+
+  /* ═══ ويُشغَّل الملفّان معًا كما في المتصفّح ═══ */
+  let BASE = 0, S = null, ALL = null;
+  try {
+    const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(path.join(ROOT, 'step-reading.js'), 'utf8'), sb);
+    BASE = (sb.window.STEP_READING || []).length;
+    vm.runInContext(fs.readFileSync(p, 'utf8'), sb);
+    S = sb.window.STEP_READING_STORY; ALL = sb.window.STEP_READING;
+  } catch(e){ E('البنكُ لا يُشغَّل: ' + e.message); return out; }
+  if (!Array.isArray(S) || !Array.isArray(ALL)) { E('البنكُ لا يُخرج قطعًا'); return out; }
+
+  if (S.length < 12) E('القصصُ ' + S.length + ' — وطلبُ فهدٍ «كثيرةٌ متنوّعة»');
+  if (ALL.length !== BASE + S.length)
+    E('الدمجُ غيّر العدد: ' + BASE + ' + ' + S.length + ' ≠ ' + ALL.length);
+  const keys = ALL.map(function(x){ return String((x||[])[0] || '').trim(); });
+  if (new Set(keys).size !== keys.length)
+    E('قطعةٌ مكرّرةٌ بعد الدمج — فتتكرّر على فهدٍ ويُقاس الحفظُ فهمًا');
+  /* والدمجُ لا يُكرّر لو حُمّل الملفُّ مرّتَين */
+  try {
+    const sb2 = { window:{} }; sb2.globalThis = sb2; vm.createContext(sb2);
+    vm.runInContext(fs.readFileSync(path.join(ROOT, 'step-reading.js'), 'utf8'), sb2);
+    const src2 = fs.readFileSync(p, 'utf8');
+    vm.runInContext(src2, sb2); vm.runInContext(src2, sb2);
+    if ((sb2.window.STEP_READING || []).length !== BASE + S.length)
+      E('تحميلُ البنكِ مرّتَين يُكرّر القطع');
+  } catch(e){ E('إعادةُ التحميلِ تتعطّل: ' + e.message); }
+
+  /* ═══ وشكلُ كلِّ قصّةٍ كشكلِ قطعِ ستيب ═══ */
+  const wc = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+  let short = 0, longp = 0, qbad = 0, obad = 0, dup = 0, firstOnly = 0;
+  S.forEach(function(st, i){
+    const t = String((st||[])[0] || ''), qs = (st||[])[1];
+    const n = wc(t);
+    if (n < 110) short++;
+    if (n > 185) longp++;
+    if (!Array.isArray(qs) || qs.length < 3) { qbad++; return; }
+    qs.forEach(function(q){
+      if (!Array.isArray(q) || q.length !== 3) { qbad++; return; }
+      if (!Array.isArray(q[1]) || q[1].length !== 4) obad++;
+      else if (new Set(q[1]).size !== q[1].length) dup++;
+      if (typeof q[2] !== 'number' || q[2] < 0 || q[2] >= (q[1]||[]).length) qbad++;
+    });
+  });
+  if (short) E(short + ' قصّةً دون ١١٠ كلمةً — وقطعُ ستيبَ أطول');
+  if (longp) E(longp + ' قصّةً فوق ١٨٥ كلمة');
+  if (qbad) E(qbad + ' سؤالًا شكلُه خطأ — الصيغةُ [السؤال, [أربعةُ خيارات], فهرسُ الصحيح]');
+  if (obad) E(obad + ' سؤالًا خياراتُه ليست أربعة');
+  if (dup) E(dup + ' سؤالًا فيه خيارٌ مكرَّر — فيصير الصحيحُ اثنَين');
+  /* ولا تُقاس القصّةُ على عنوانِها: نصُّها لا يكون جملةً واحدة */
+  S.forEach(function(st, i){
+    const t = String((st||[])[0] || '');
+    if ((t.match(/[.!?]/g) || []).length < 5) firstOnly++;
+  });
+  if (firstOnly) E(firstOnly + ' قصّةً أقلُّ من خمسِ جملٍ — لا تكفي لأسئلةِ فهم');
+
+  /* ═══ وتُقسَّم أجزاءً كغيرِها ═══ */
+  const rsrc = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
+  const m2 = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
+  const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
+  if (m2 && mp){
+    let fnP = null;
+    try { const sb3 = {}; vm.createContext(sb3);
+      vm.runInContext('function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
+        'function readCapOf(){ return null; }\n' +
+        'g = function(txt, cfg){' + mp[1] + '\n};', sb3); fnP = sb3.g; } catch(e){}
+    if (typeof fnP !== 'function') E('readParts لا تُشغَّل على القصص');
+    else {
+      const cfg = { floor:18, cap:35, hard:55 };
+      let miss = 0, over = 0;
+      S.forEach(function(st){
+        const t = String((st||[])[0] || '').trim();
+        let ps = []; try { ps = fnP(t, cfg); } catch(e){}
+        if (ps.join(' ').replace(/\s+/g,' ').trim() !== t.replace(/\s+/g,' ').trim()) miss++;
+        ps.forEach(function(x){ if (wc(x) > cfg.hard) over++; });
+      });
+      if (miss) E(miss + ' قصّةً لا تُغطّيها أجزاؤها — فلا تُقرَأ كاملة');
+      if (over) E(over + ' جزءًا فوق السقفِ الصلب');
+    }
+  }
+  return out;
+}
+
 function dictDosePath(){
   const out = [];
   const F = 'reading.html', p = path.join(ROOT, F);
