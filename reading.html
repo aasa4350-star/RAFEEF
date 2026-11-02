@@ -359,7 +359,18 @@ try{
     if(Array.isArray(_src.pass) && Array.isArray(_dst.pass)) _dst.pass = _dst.pass.concat(_src.pass);
     if(Array.isArray(_src.dictation) && Array.isArray(_dst.dictation)){
       var _seen={}; _dst.dictation.forEach(function(x){ _seen[x]=1; });
-      _src.dictation.forEach(function(x){ if(!_seen[x]){ _seen[x]=1; _dst.dictation.push(x); } });
+      /* ═══ جملُ التوسعةِ تُعلَّم درجةً ثانية ═══════════════════════
+         تشخيصُ رفيف (٢ نوفمبر ٢٠٢٦) بطلبِ الأب: إملاؤها ١٣–٢٥٪.
+         وقُوبل ما كتبته ببنكِه، فإذا الفرقُ قاطع: في جملِ البنكِ
+         الأساسيِّ تكتب ٥٨٪ من الكلماتِ صحيحة، وفي جملِ التوسعةِ
+         ١٥٪ — وكلُّ جملةٍ خرجت صفرًا من كلماتِها كلِّها من التوسعة
+         («Success usually follows…» ⇐ «sixsyeuaf opraei»). فليست
+         علّةَ إملاءٍ بل أذنٌ لم تلتقط شيئًا.
+         فتُعلَّم لتُجرَّع تدريجًا لا دفعةً واحدة. */
+      _dst.dict2 = (_dst.dict2 || []).slice();
+      _src.dictation.forEach(function(x){
+        if(!_seen[x]){ _seen[x]=1; _dst.dictation.push(x); _dst.dict2.push(x); }
+      });
     }
   } } }
 }catch(e){}
@@ -772,6 +783,32 @@ function hookLeaveSave(owner, fn){
 // لا نحفظ جزئيًا عند اختفاء الصفحة (فتح تطبيق/فيديو ثم الرجوع)، وإلا قُفل الحفظ على
 // جزء ناقص فلم يُسجَّل الاختبار كاملًا. الحفظ الجزئي يبقى عند تبديل القسم فعليًا.
 // اختيار عناصر جديدة كل مرة بدون تكرار — نلفّ على كل القائمة ثم نعيد
+/* ═══ جرعةُ الإملاء: الصعبُ يُزاد واحدًا واحدًا ═══════════════════
+   طلبُ الأب (٢ نوفمبر ٢٠٢٦) بعد التشخيص: «تتدرّج بدل ما تصطدم».
+   فلا درجتانِ منفصلتانِ بينهما عتبةٌ تُقفَز، بل جرعةٌ تتحرّك: تبدأ
+   الجلسةُ بثمانٍ من اليوميِّ، فإن بلغت ٧٥٪ دخلت جملةٌ من التوسعةِ
+   في التي بعدها، وإن نزلت عن ٤٠٪ خرجت واحدة. فلا تصطدم بسبعٍ
+   أكاديميّةٍ دفعةً واحدة، ولا تبقى في السهلِ إن أتقنته.
+
+   والحدّانِ (٧٥ و٤٠) أوّليّان، يُضبطان بعد خمسِ جلساتٍ من بياناتِها
+   هي لا بالتخمين. */
+function dictDoseKey(lang){ return "dictdose_"+lang+"_"+who; }
+function dictDose(lang){
+  var v = 0; try{ v = parseInt(localStorage.getItem(dictDoseKey(lang))||"0",10); }catch(e){}
+  return (isNaN(v) || v < 0) ? 0 : v;
+}
+function dictDoseSet(lang, v){
+  v = Math.max(0, Math.min(8, v));
+  try{ localStorage.setItem(dictDoseKey(lang), String(v)); }catch(e){}
+  return v;
+}
+function dictDoseAfter(lang, correct, total){
+  if(!total) return dictDose(lang);
+  var p = correct / total * 100, cur = dictDose(lang);
+  if(p >= 75) return dictDoseSet(lang, cur + 1);
+  if(p <  40) return dictDoseSet(lang, cur - 1);
+  return cur;
+}
 function pickFresh(pool, key, n){
   n = Math.min(n||8, pool.length);
   var k = "seen_"+key+"_"+who;
@@ -2250,9 +2287,22 @@ if(!META[who] || !DATA[who]){
   function renderDict(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
-    var items = pickFresh(D.dictation, "dict_"+curLang, 8);
+    /* الجرعة: ما بقي من الثمانيةِ يوميٌّ، والباقي من التوسعة */
+    var hardAll = (D.dict2 || []);
+    var easyAll = D.dictation.filter(function(x){ return hardAll.indexOf(x) < 0; });
+    var dose = Math.min(dictDose(curLang), hardAll.length, 8);
+    if(!easyAll.length){ dose = Math.min(8, hardAll.length); easyAll = D.dictation; }
+    var items = pickFresh(easyAll, "dict_"+curLang, 8 - dose);
+    if(dose) items = items.concat(pickFresh(hardAll, "dict2_"+curLang, dose));
+    items = shuffle(items);
+    var doseLine = hardAll.length
+      ? ('<p class="hint" style="margin-top:-4px">📶 جرعتك اليوم: <b>' + (items.length - dose) +
+         '</b> جملة يوميّة' + (dose ? (' و<b>' + dose + '</b> أكاديميّة') : '') +
+         '. تطلع لك وحدة أصعب كل ما توصل ٧٥٪.</p>')
+      : '';
     var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
       '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>'+
+      doseLine+
       EXIT_WARN_HTML+
       PRON_TIP;
     items.forEach(function(item,i){
@@ -2286,8 +2336,8 @@ if(!META[who] || !DATA[who]){
     var missed=[];
     function missedList(){ return missed.slice(0,10); }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); } }
-    function savePartial(){ var n=Object.keys(tried).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId}); }
+    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose, hard:dose}); /* الجرعةُ تُضبَط بالجلسةِ التامّةِ وحدَها: الجزئيّةُ قد تكون سطرًا واحدًا فتُحرّكها بلا دليل */ dictDoseAfter(curLang, correct, total); } }
+    function savePartial(){ var n=Object.keys(tried).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose}); }
     /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
        إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
 

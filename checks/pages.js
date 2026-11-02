@@ -370,6 +370,7 @@ function run(){
   issues.push(...tajweedPath());
   issues.push(...quizExplainPath());
   issues.push(...shortTestPath());
+  issues.push(...dictDosePath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5191,6 +5192,89 @@ function quranTilawaPath(){
    الوحيدُ بين الصفوف.
 
    وهذا الحارسُ يُشغِّل RR نفسَها لا يُحاكيها. */
+/* ═══ جرعةُ الإملاء: الصعبُ يُجرَّع لا يُصبُّ دفعةً ═══════════════
+   تشخيصُ رفيف (٢ نوفمبر ٢٠٢٦) بطلبِ الأب، ثمّ طلبُه: «تتدرّج بدل
+   ما تصطدم». وقُوبل ما كتبته ببنكِه فإذا الفرقُ قاطع: جملُ البنكِ
+   الأساسيِّ تكتب منها ٥٨٪ من الكلمات، وجملُ التوسعةِ ١٥٪ — وكلُّ
+   جملةٍ خرجت صفرًا من كلماتِها كلِّها من التوسعة. فالقسمةُ عند حدِّ
+   البنكَين مقيسةٌ لا مُخمَّنة. */
+function dictDosePath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  /* ═══ (١) جملُ التوسعةِ تُعلَّم عند الدمج ═══ */
+  if (!/_dst\.dict2/.test(src))
+    E('جملُ التوسعةِ لا تُعلَّم — فتختلط بالسهلِ وتُصَبُّ على الابنِ دفعةً');
+  if (!/_dst\.dictation\.push\(x\);\s*_dst\.dict2\.push\(x\)/.test(src))
+    E('الصعبُ يُضاف إلى البنكِ ولا يُسجَّل في قائمةِ الصعب');
+
+  /* ═══ (٢) دوالُّ الجرعة — تُنتزَع وتُشغَّل ═══ */
+  const dm = /function dictDose\(lang\)\{([\s\S]*?)\n\}/.exec(src);
+  const sm = /function dictDoseSet\(lang, v\)\{([\s\S]*?)\n\}/.exec(src);
+  const am = /function dictDoseAfter\(lang, correct, total\)\{([\s\S]*?)\n\}/.exec(src);
+  const km = /function dictDoseKey\(lang\)\{([\s\S]*?)\}/.exec(src);
+  if (!dm || !sm || !am || !km) { E('دوالُّ الجرعةِ لا تُنتزَع'); return out; }
+  let A = null, G = null;
+  try {
+    const store = {};
+    const sb = { who:'rafeef', localStorage:{
+      getItem:k=>(k in store? store[k] : null), setItem:(k,v)=>{store[k]=String(v);},
+      removeItem:k=>{delete store[k];} } };
+    vm.createContext(sb);
+    vm.runInContext('function dictDoseKey(lang){' + km[1] + '}\n' +
+      'function dictDose(lang){' + dm[1] + '\n}\n' +
+      'function dictDoseSet(lang, v){' + sm[1] + '\n}\n' +
+      'function dictDoseAfter(lang, correct, total){' + am[1] + '\n}\n' +
+      'R={after:dictDoseAfter, get:dictDose};', sb);
+    A = sb.R.after; G = sb.R.get;
+  } catch(e){ E('دوالُّ الجرعةِ لا تُشغَّل: ' + e.message); return out; }
+
+  const step = (c, t) => { try { A('en', c, t); } catch(e){ E('الجرعةُ تتعطّل: ' + e.message); } return G('en'); };
+  if (G('en') !== 0) E('الجرعةُ لا تبدأ صفرًا — فأوّلُ جلسةٍ فيها صعبٌ قبل أن يُتقَن السهل');
+  if (step(8,8) !== 1) E('الإتقانُ لا يرفع الجرعة — فيبقى في السهلِ أبدًا');
+  if (step(6,8) !== 2) E('٧٥٪ لا ترفع الجرعة، وهو الحدُّ المعلَن للابنِ على الشاشة');
+  const mid = G('en'); step(5,8);
+  if (G('en') !== mid) E('ما بين الحدَّين يُحرّك الجرعة — والمنتظَرُ ثبات');
+  if (step(2,8) !== mid - 1) E('التعثّرُ لا يخفض الجرعة — فيُصَبُّ عليه الصعبُ وهو يغرق');
+  for (let i = 0; i < 6; i++) step(0, 8);
+  if (G('en') < 0) E('الجرعةُ تنزل تحت الصفر');
+  if (G('en') !== 0) E('الجرعةُ لا تستقرُّ عند الصفرِ مع التعثّرِ المتّصل: ' + G('en'));
+  for (let i = 0; i < 20; i++) step(8, 8);
+  if (G('en') > 8) E('الجرعةُ تتجاوز الثمانيةَ (' + G('en') + ') — فتُطلَب تسعُ جملٍ من ثمانٍ');
+  /* ولا تتحرّك بجلسةٍ فارغة */
+  const before = G('en'); step(0, 0);
+  if (G('en') !== before) E('جلسةٌ بلا أسئلةٍ تُحرّك الجرعة');
+
+  /* ═══ (٣) الجرعةُ تُستعمَل في العرضِ وتُضبَط بالجلسةِ التامّةِ وحدَها ═══ */
+  if (!/var dose = Math\.min\(dictDose\(curLang\)/.test(src))
+    E('العرضُ لا يقرأ الجرعة — فتُجمَع البنودُ كما كانت');
+  if (!/pickFresh\(hardAll, "dict2_"\+curLang, dose\)/.test(src))
+    E('الصعبُ لا يُنتقى بالجرعة');
+  if (!/items = pickFresh\(easyAll, "dict_"\+curLang, 8 - dose\)/.test(src))
+    E('السهلُ لا يُكمِل بقيّةَ الثمانية — فتنقص بنودُ الجلسةِ أو تزيد');
+  /* وتُنتزَع بسطرِها الواحد: الصيغةُ الواسعةُ (\n    \}) تبتلع
+     savePartial بعدَها — ٥٩٤٠ حرفًا — فيمرُّ الفحصُ وهو لا يفحصها. */
+  const mb = /function maybeSave\(\)\{([^\n]*)\}/.exec(src);
+  if (!mb || !/dictDoseAfter\(curLang, correct, total\)/.test(mb[1]))
+    E('الجرعةُ لا تُضبَط بعد الجلسةِ التامّة');
+  const sp = /function savePartial\(\)\{([^\n]*)\}/.exec(src);
+  if (sp && /dictDoseAfter/.test(sp[1]))
+    E('الحفظُ الجزئيُّ يُحرّك الجرعة — وقد يكون سطرًا واحدًا فتتحرّك بلا دليل');
+  /* وتُطلَب داخلَ الحفظِ التامِّ بعينِه: «dose:dose» ترد في الحفظِ
+     الجزئيِّ أيضًا، فالبحثُ في الملفِّ كلِّه يمرُّ وهي ساقطةٌ من
+     التامّ (مرَّ عطبٌ متعمَّدٌ بلا رصدٍ حتى ضُيِّق). */
+  if (!mb || !/dose:dose/.test(mb[1]))
+    E('الجرعةُ لا تُحفَظ مع النتيجةِ التامّة — فلا يُعرَف على أيِّ مستوًى كانت الدرجة');
+  /* والابنُ يرى جرعتَه ولا تُغيَّر عليه في الخفاء */
+  if (!/\u062C\u0631\u0639\u062A\u0643 \u0627\u0644\u064A\u0648\u0645/.test(src))
+    E('الجرعةُ لا تُعرَض للابن — تتغيّر صعوبةُ اختبارِه ولا يدري لِمَ');
+
+  return out;
+}
+
 function shortTestPath(){
   const out = [];
   const R = 'report-rules.js', rp = path.join(ROOT, R);
