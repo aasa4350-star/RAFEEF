@@ -88,6 +88,34 @@
      صفحةُ سعودٍ بحرف. ومفتاحُ التخزينِ يحمل وسمَ الكتابِ مع اسمِ
      الابن، فلا يلتقي «u1» من كتابٍ بـ«u1» من آخر. */
   function BK(){ return window.STUDY_BOOK || window.BOOK_EN4 || null; }
+/* ═══ الجولةُ الناقصةُ تُحفَظ أيضًا ═══════════════════════════════
+   بلاغُ الأب (٢ نوفمبر ٢٠٢٦): «حسن يقول إنّه حلَّ التثبيتَ والجملَ
+   وما طلع لي في التقرير». وكان محقًّا: الحفظُ كان في finish() وحدَها،
+   فمن بدأ الجولةَ ولم يُتمَّها لا يُسجَّل له شيءٌ البتّة — لا سطرَ
+   ولا أثر.
+
+   وهي العلّةُ نفسُها التي شكا منها من قبلُ في دروسٍ أخرى («حلّ ٣
+   دروس وما طلع إلا درسان»)، وعولجت هناك بالحفظِ الجزئيِّ ونُسيت
+   هنا. وبقيّةُ الموقعِ تحفظ الجزئيَّ: القراءةُ والإملاءُ والكلماتُ
+   ودروسُ الرياضيات.
+
+   ويُحفَظ بمعرّفِ الجولةِ نفسِه (pid) فلا يصير صفَّين: التقريرُ
+   يأخذ أوفى صفٍّ لكلِّ pid. */
+function partSaver(label, pid){
+  var savedN = 0;
+  function put(done, total, meta){
+    if(!(done >= 1) || done <= savedN || done >= total) return;
+    savedN = done;
+    try{ if(window.saveScore) saveScore(label, (meta && meta.__right) || 0, done, pid, meta); }catch(e){}
+  }
+  put.seal = function(n){ savedN = n; };       /* بعد التمامِ لا جزئيَّ بعده */
+  put.wire = function(fn){
+    document.addEventListener("visibilitychange", function(){ if(document.hidden) fn(); });
+    window.addEventListener("pagehide", fn);
+  };
+  return put;
+}
+
   function TAG(){ return window.STUDY_TAG || "en4"; }
   function memKey(id){ return "memo_" + TAG() + "_" + (window.who || "saud") + "_" + id; }
   function memLoad(id){ try{ return JSON.parse(localStorage.getItem(memKey(id))) || {}; }catch(e){ return {}; } }
@@ -195,6 +223,11 @@
       var queue = pick.map(function(v){ return { v: v, rev: Math.random() < .35 }; });
       var firstTry = {}, right = 0, done = 0, n = pick.length, pid = window.newPid ? newPid() : null, t0 = Date.now();
       var label = "تثبيت إنجليزي " + id.replace("u", "و") + " 🔁";
+      var part = partSaver(label, pid);
+      function partLeave(){ part(done, n, { mode:"memo", unit:id, tag:TAG(),
+        unitTitle:(unit && unit.title) || id, dur:Math.round((Date.now()-t0)/1000),
+        partial:true, __right:right, skills:{ "حفظ: مفردات الكتاب":{ c:right, t:done } } }); }
+      part.wire(partLeave);
       function next(){
         if(!queue.length) return finish();
         var q = queue.shift(), v = q.v;
@@ -234,6 +267,7 @@
         });
       }
       function finish(){
+        part.seal(n);
         if(window.saveScore) saveScore(label, right, n, pid, { mode: "memo", unit: id, tag: TAG(), unitTitle: (unit && unit.title) || id, dur: Math.round((Date.now() - t0) / 1000),
           skills: { "حفظ: مفردات الكتاب": { c: right, t: n } },
           missed: Object.keys(firstTry).filter(function(k){ return !firstTry[k]; }) });
@@ -266,6 +300,11 @@
       var list = shuf(order.concat(fills)), i = 0, right = 0, pid = window.newPid ? newPid() : null, t0 = Date.now();
       var SK = { "جمل: ترتيب الكلمات": { c: 0, t: 0 }, "جمل: إكمال الفراغ": { c: 0, t: 0 } };
       var label = "جمل إنجليزي " + id.replace("u", "و") + " 🧩";
+      var part = partSaver(label, pid);
+      function partLeave(){ part(i, list.length, { mode:"sentences", unit:id, tag:TAG(),
+        unitTitle:(unit && unit.title) || id, dur:Math.round((Date.now()-t0)/1000),
+        partial:true, __right:right }); }
+      part.wire(partLeave);
       function next(){
         if(i >= list.length) return finish();
         var ex = list[i++]; (ex.k === "order" ? orderEx : fillEx)(ex.s);
@@ -331,6 +370,7 @@
       }
       function finish(){
         var n = list.length;
+        part.seal(n);
         if(window.saveScore) saveScore(label, right, n, pid, { mode: "sentences", unit: id, tag: TAG(), unitTitle: (unit && unit.title) || id, dur: Math.round((Date.now() - t0) / 1000), skills: SK });
         box.innerHTML = '<div class="st-card"><div class="st-big">'+(right === n ? '🌟' : '👍')+' '+right+' / '+n+'</div>'+
           '<div class="st-act"><button data-more>جولة ثانية ▶</button><button class="ghost" data-home>رجوع</button></div></div>';

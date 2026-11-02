@@ -707,7 +707,7 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
             `</ul></div>`;
         })()}
         ${(function(){ var acts=(actBy[name]||[]).filter(function(a){ return !(a.meta && a.meta.sect==="try"); }); return acts.length
-          ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>{ var dur=(a.meta.event!=="video"&&a.meta.secs)?(" · ⏱️ "+(a.meta.secs>=60?(Math.floor(a.meta.secs/60)+"د "+(a.meta.secs%60)+"ث"):(a.meta.secs+"ث"))):""; return `<li>${a.meta.event==="video"?"🎬 فيديو":"📖 درس"}: ${a.meta.label||""} <span class="cnt">${saTime(a.created_at)}${dur}</span></li>`; }).join("")}</ul></div>`
+          ? `<div class="weak"><div class="wt">📖 النشاط (فتح الدروس والفيديوهات):</div><ul>${acts.slice(0,6).map(a=>{ var dur=(a.meta.event!=="video"&&a.meta.secs)?(" · ⏱️ "+(a.meta.secs>=60?(Math.floor(a.meta.secs/60)+"د "+(a.meta.secs%60)+"ث"):(a.meta.secs+"ث"))):""; var nm=a.meta.label||a.meta.test||"—"; var ask=+a.meta.asked||0; var sc=ask?(` — <b>${(+a.meta.right||0)} من ${ask}</b>`):``; var ico=a.meta.event==="video"?"🎬 فيديو":(ask?"🧩 تدريب":"📖 درس"); return `<li>${ico}: ${nm}${sc} <span class="cnt">${saTime(a.created_at)}${dur}</span></li>`; }).join("")}</ul></div>`
           : `<div class="weak"><div class="wt">📖 النشاط: ما فتح دروس أو فيديوهات بعد</div></div>`; })()}
         ${rows.length? `<div class="hist">آخر المحاولات (النسبة الكلية): ${hist}</div>`:``}
         ${(function(){
