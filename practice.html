@@ -2338,6 +2338,18 @@ function grHash(s){
   return t.length.toString(36) + "_" + (h>>>0).toString(36);
 }
 function grFixedLocal(){ try{ return JSON.parse(localStorage.getItem(GR_LS) || "{}") || {}; }catch(e){ return {}; } }
+/* ═══ سجلُّ ما أجابه صحيحًا من بنكِ القاعدة ═══════════════════════════
+   كان القسمُ يعرف «أخطاءه» ولا يعرف «ما قطعه». وطلب الأب (٢ نوفمبر
+   ٢٠٢٦) أن يُرى من العشرين كم حلَّ — لأنّ فهدًا كان يفتح القاعدةَ
+   فتُعطيه ثلاثةً جديدةً ثمّ تقول «خلّصت»، وهي ثلاثةٌ من عشرين.
+   فنحفظ بصمةَ كلِّ سؤالٍ أجابه صحيحًا، محلِّيًّا وفي القاعدةِ معًا،
+   فلا يضيع العدُّ إذا بدّل الجهاز. ولا يُحفظ الخطأُ هنا: السؤالُ
+   يُعدُّ مقطوعًا إذا أصابه، ويبقى في الطابورِ ما لم يُصبه. */
+var GR_SEEN_LS = "rafeef_grseen_" + who;
+function grSeenLocal(){ try{ return JSON.parse(localStorage.getItem(GR_SEEN_LS) || "{}") || {}; }catch(e){ return {}; } }
+function grMarkSeen(stem){
+  try{ var o = grSeenLocal(); o[grHash(stem)] = 1; localStorage.setItem(GR_SEEN_LS, JSON.stringify(o)); }catch(e){}
+}
 /* ═══ عزلُ المقاطعِ اللاتينيّةِ داخلَ الشرحِ العربيّ ══════════════════
    شرحُ القاعدةِ عربيٌّ فيه مقاطعُ إنجليزيّةٌ بينها علاماتٌ محايدة
    (+ و. و/)، والمحايدُ بين عربيٍّ ولاتينيٍّ يأخذ اتّجاهَ الفقرةِ فينقلب
@@ -2363,13 +2375,14 @@ function grMarkFixed(stem){
 }
 /* الوسمُ activity لا practice — كالعلاجيّ والنطقِ والمحادثة، فلا يدخل
    في متوسّطاتِ الاختباراتِ ولا يُغيّر نسبةَ ستيب. */
-function saveGram(skill, label, correct, total, fixedN, remain, pid, fixedKeys){
+function saveGram(skill, label, correct, total, fixedN, remain, pid, fixedKeys, seenKeys, mode){
   try{
     if(!skill) return;
     var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[],
       meta:{ kind:"activity", sect:"gram", test:"قواعد مركّزة ✏️", skill:skill, label:(label||skill),
-             correct:correct, total:total, fixed:fixedN, remain:remain,
-             fixedKeys:(fixedKeys||[]).slice(0,40), pid:pid, at:new Date().toISOString() } };
+             correct:correct, total:total, fixed:fixedN, remain:remain, mode:(mode||"queue"),
+             fixedKeys:(fixedKeys||[]).slice(0,40), seenKeys:(seenKeys||[]).slice(0,40),
+             pid:pid, at:new Date().toISOString() } };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY, "Content-Type":"application/json", "Prefer":"return=minimal" },
@@ -2391,32 +2404,76 @@ function grKeyOf(stem){
   if(m) return "Grammar — " + m[1].trim();
   return /^<b>Grammar:<\/b>/.test(String(stem||"")) ? "Grammar" : null;
 }
+/* بنكُ القاعدةِ كلُّه — يقرؤه العدُّ («حلّيت كم من عشرين») وجولةُ
+   «القاعدة كاملة» وجولةُ الثلاثةِ الجديدة، فلا يُكتب الفرزُ ثلاثًا. */
+function grPool(key){
+  if(key === "Grammar") return STEP.filter(function(q){ return /^<b>Grammar:<\/b>/.test(q[0]); });
+  var SB = window.STEP_BANK || [];
+  return SB.filter(function(q){ return q[0].indexOf(key + ":") >= 0; });
+}
+/* كم سؤالًا من بنكِ القاعدةِ أجابه صحيحًا — بالبصمةِ لا بالنصّ، فنصُّ
+   السؤالِ قد يُعدَّل في البنكِ ولا يضيع عدُّه. */
+function grDoneN(key, seen){
+  var n = 0;
+  grPool(key).forEach(function(q){ if(seen[grHash(q[0])]) n++; });
+  return n;
+}
 function grFresh(key, n){
-  var pool;
-  if(key === "Grammar"){
-    pool = STEP.filter(function(q){ return /^<b>Grammar:<\/b>/.test(q[0]); });
-  }else{
-    var SB = window.STEP_BANK || [];
-    pool = SB.filter(function(q){ return q[0].indexOf(key + ":") >= 0; });
-  }
+  var pool = grPool(key);
   if(!pool.length) return [];
-  var pick = [], seen = {}, tries = 0;
-  while(pick.length < n && tries++ < 60){
-    var q = gp(pool); if(seen[q[0]]) continue; seen[q[0]] = 1; pick.push(q);
+  /* الجديدُ أوّلًا: كان الاختيارُ عشواءَ من البنكِ كلِّه، فيُعيد عليه
+     ما قطعه ويبقى في البنكِ ما لم يرَه. فنُقدّم ما لم يُصبه بعد،
+     ومتى قطع البنكَ كلَّه رجع العشواءُ من المقطوع للتثبيت. */
+  var seenMap = grSeenLocal();
+  var unseen = pool.filter(function(q){ return !seenMap[grHash(q[0])]; });
+  var src = unseen.length ? unseen : pool;
+  var pick = [], used = {}, tries = 0;
+  while(pick.length < n && pick.length < src.length && tries++ < 80){
+    var q = gp(src); if(used[q[0]]) continue; used[q[0]] = 1; pick.push(q);
   }
   return pick;
 }
 /* جولةُ قاعدةٍ واحدة: سؤالٌ واحدٌ معروضٌ في كلّ لحظة، وشرحُه يُقرأ قبل
    «التالي» — فعرضُ ثلاثةٍ معًا يجعله يُظلِّل ثمّ يمضي بلا قراءة. */
-function grRun(box, prog, key, label, missed){
+function grRun(box, prog, key, label, missed, full){
   var queue = missed.map(function(x){ return { q:x.q, missed:true, when:x.when }; });
   var startN = queue.length, phase = (startN ? "missed" : "fresh");
-  if(!startN) queue = grFresh(key, 3).map(function(q){ return { q:q, missed:false }; });
-  var pid = newPid(), done = 0, ok = 0, fixedN = 0, savedN = 0, fixedKeys = [];
+  /* ═══ جولةُ «القاعدة كاملة» ════════════════════════════════════════
+     الطابورُ المعتادُ خمسةُ أخطاءٍ أو ثلاثةٌ جديدة، وبنكُ القاعدةِ
+     عشرون. فهذي تمشي على العشرين كلِّها: أخطاؤه أوّلًا، ثمّ ما لم
+     يُصبه، ثمّ المقطوعُ للتثبيت — والسؤالُ لا يخرج حتى يُجيبه. */
+  var poolN = grPool(key).length;
+  if(full){
+    var seenMap = grSeenLocal(), have = {};
+    missed.forEach(function(x){ have[x.q[0]] = 1; });
+    var fresh = [], again = [];
+    grPool(key).forEach(function(q){
+      if(have[q[0]]) return;
+      (seenMap[grHash(q[0])] ? again : fresh).push(q);
+    });
+    queue = queue.concat(shuffle(fresh).concat(shuffle(again)).map(function(q){ return { q:q, missed:false }; }));
+    phase = "full";
+  }else if(!startN){
+    queue = grFresh(key, 3).map(function(q){ return { q:q, missed:false }; });
+  }
+  var qN = queue.length;
+  var pid = newPid(), done = 0, ok = 0, fixedN = 0, savedN = 0, fixedKeys = [], seenKeys = [], cut = 0;
   function remain(){ var n = 0; queue.forEach(function(x){ if(x.missed) n++; }); return n; }
   function drawProg(){
     if(!prog) return;
-    if(!startN){ prog.innerHTML = '<span style="color:var(--muted);font-weight:700">أسئلةٌ جديدة في هذي القاعدة — ما عندك فيها خطأٌ مسجَّل.</span>'; return; }
+    if(full){
+      var wf = qN ? Math.round(cut / qN * 100) : 0;
+      prog.innerHTML = '<div style="background:var(--bg);border-radius:9px;height:9px;overflow:hidden;margin:8px 0 4px">'+
+        '<div style="height:100%;width:'+wf+'%;background:#16a34a;transition:width .3s"></div></div>'+
+        '<span style="font-weight:800;color:'+(cut===qN?'#16a34a':'var(--muted)')+'">قطعت '+cut+' من '+qN+
+        ' في هذي القاعدة'+(cut===qN?' ✅':' · وباقي '+(qN-cut))+'</span>';
+      return;
+    }
+    if(!startN){
+      prog.innerHTML = '<span style="color:var(--muted);font-weight:700">أسئلةٌ جديدة في هذي القاعدة — ما عندك فيها خطأٌ مسجَّل.'+
+        (poolN>3?' وبنكُها '+poolN+' سؤالًا، فاضغط «القاعدة كاملة» تمشي عليها كلِّها.':'')+'</span>';
+      return;
+    }
     var w = Math.round(fixedN / startN * 100);
     prog.innerHTML = '<div style="background:var(--bg);border-radius:9px;height:9px;overflow:hidden;margin:8px 0 4px">'+
       '<div style="height:100%;width:'+w+'%;background:#16a34a;transition:width .3s"></div></div>'+
@@ -2430,10 +2487,15 @@ function grRun(box, prog, key, label, missed){
   function save(force){
     if(done < 2) return;
     if(!force && done - savedN < 3) return;
-    savedN = done; saveGram(key, label, ok, done, fixedN, remain(), pid, fixedKeys);
+    savedN = done; saveGram(key, label, ok, done, fixedN, remain(), pid, fixedKeys, seenKeys, full?"full":"queue");
   }
   function step(){
     if(!queue.length){
+      if(phase === "full"){
+        box.innerHTML = '<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;padding:11px 13px;font-weight:800;color:#047857">'+
+          '🎉 قطعت بنكَ هذي القاعدة كلَّه — '+qN+' سؤالًا، وكلٌّ منها أجبتَه صحيحًا. ارجع لها بعد يومين للتثبيت.</div>';
+        drawProg(); save(true); return;
+      }
       if(phase === "missed"){
         phase = "fresh";
         queue = grFresh(key, 3).map(function(q){ return { q:q, missed:false }; });
@@ -2469,8 +2531,12 @@ function grRun(box, prog, key, label, missed){
         qEl.querySelector(".explain").classList.add("show");
         done++; if(good) ok++;
         if(good){
-          queue.shift();
-          if(cur.missed){ fixedN++; fixedKeys.push(grHash(cur.q[0])); grMarkFixed(cur.q[0]); }
+          queue.shift(); cut++;
+          /* السؤالُ يُعدُّ مقطوعًا بإصابته، فيدخل سجلَّ «حلّيت كم من
+             عشرين» — محلِّيًّا وفي القاعدةِ معًا */
+          grMarkSeen(cur.q[0]);
+          var sh = grHash(cur.q[0]); if(seenKeys.indexOf(sh) < 0) seenKeys.push(sh);
+          if(cur.missed){ fixedN++; fixedKeys.push(sh); grMarkFixed(cur.q[0]); }
         }else{
           /* يعود آخرَ الطابورِ في الجولةِ نفسِها — لا في جلسةٍ قد لا تأتي */
           queue.shift(); queue.push(cur);
@@ -2486,10 +2552,21 @@ function grRun(box, prog, key, label, missed){
   }
   drawProg(); step();
 }
-function grCard(key, st, missed, open, totalMiss){
+function grCard(key, st, missed, open, totalMiss, info){
   var g = GRAM_BY_KEY[key] || { ar:"قواعدُ ستيب العامّة", en:"Grammar", lesson:"", yt:"شرح قواعد ستيب grammar" };
   var label = "قواعد — " + g.ar + (GRAM_BY_KEY[key] ? " (" + g.en + ")" : "");
   var badge = (st && st.t) ? ' <span style="color:#dc2626;font-weight:800">('+Math.round(st.c/st.t*100)+'% — '+st.c+'/'+st.t+')</span>' : '';
+  /* ═══ «حلّيت كم من البنك» و«ما جرّبتها» ════════════════════════════
+     البطاقةُ كانت تقول نسبتَه في ستيب وعددَ أخطائه، ولا تقول أين هو
+     من بنكِ القاعدة. وكان فهدٌ يحلُّ ثلاثةً فتقول «خلّصت» وفي البنكِ
+     عشرون. فنُظهر العدَّين: ما قطعه من البنك، ووسمُ «ما جرّبتها» لمن
+     لا جولةَ له فيها — فيُرى المتروكُ من غيرِ أن يفتح البطاقاتِ كلَّها. */
+  info = info || {};
+  var poolN = info.poolN || 0, doneN = info.doneN || 0, rounds = info.rounds || 0;
+  var pbadge = poolN
+    ? ' <span style="color:'+(doneN>=poolN?'#16a34a':'var(--muted)')+';font-weight:800">· حلّيت '+doneN+' من '+poolN+'</span>'
+    : '';
+  var nbadge = !rounds ? ' <span style="background:#fef3c7;color:#92400e;font-weight:800;border-radius:8px;padding:1px 7px">🆕 ما جرّبتها</span>' : '';
   totalMiss = totalMiss || missed.length;
   var more = totalMiss > missed.length ? ' <span style="font-weight:800">(من '+totalMiss+' — والبقيّةُ في الجولةِ القادمة)</span>' : '';
   var mnote = missed.length
@@ -2498,12 +2575,15 @@ function grCard(key, st, missed, open, totalMiss){
     : '<div style="background:var(--bg);border-radius:11px;padding:9px 12px;margin-bottom:9px;font-weight:700;color:var(--muted)">ما عندك خطأٌ مسجَّلٌ هنا بنصِّه — فالجولةُ أسئلةٌ جديدةٌ في القاعدة.</div>';
   return '<details '+(open?'open':'')+' data-grk="'+key.replace(/"/g,'&quot;')+'" style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px;box-shadow:var(--shadow)">'+
     '<summary style="font-weight:800;cursor:pointer;padding:8px 0">✏️ '+g.ar+(GRAM_BY_KEY[key]?' <span dir="ltr" style="unicode-bidi:isolate;color:var(--muted);font-weight:700">('+g.en+')</span>':'')+badge+
-      (totalMiss?' <span style="color:#c2410c;font-weight:800">· '+totalMiss+' خطأ</span>':'')+'</summary>'+
+      (totalMiss?' <span style="color:#c2410c;font-weight:800">· '+totalMiss+' خطأ</span>':'')+pbadge+nbadge+'</summary>'+
     '<div style="padding:4px 0 12px">'+
       (g.lesson ? '<div style="background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.95rem;line-height:1.9;margin-bottom:9px"><b>📘 القاعدة:</b> '+isoLatin(g.lesson)+'</div>' : '')+
       mnote+
       '<div data-grbox></div><div data-grprog></div>'+
-      '<div style="margin-top:10px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(g.yt)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:8px 14px;border-radius:11px;font-weight:800">🎬 فيديو شرح</a></div>'+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+        (poolN > 3 ? '<button data-grfull style="background:#0f766e;color:#fff;border:0;padding:9px 15px;border-radius:11px;font-weight:800;cursor:pointer;font-family:inherit">📚 القاعدة كاملة ('+poolN+' سؤال)</button>' : '')+
+        '<a href="https://www.youtube.com/results?search_query='+encodeURIComponent(g.yt)+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 15px;border-radius:11px;font-weight:800">🎬 فيديو شرح</a>'+
+      '</div>'+
     '</div></details>';
 }
 var grBuilt = false;
@@ -2539,13 +2619,35 @@ async function renderGrammar(){
   /* ما صحّحه سابقًا — من الخادمِ لا من الجهازِ وحده */
   try{
     var r2 = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+
-        "&meta->>sect=eq.gram&order=created_at.desc&limit=120",
+        "&meta->>sect=eq.gram&order=created_at.desc&limit=240",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
     gramRows = await r2.json(); if(!Array.isArray(gramRows)) gramRows = [];
   }catch(e){}
   grBuilt = true;
   var fixed = grFixedLocal();
   gramRows.forEach(function(x){ ((x.meta && x.meta.fixedKeys) || []).forEach(function(k){ fixed[k] = 1; }); });
+  /* ═══ العدُّ من الخادمِ لا من الجهازِ وحده ══════════════════════════
+     سجلُّ «ما قطعه» محلِّيٌّ، فلو فتح الموقعَ من جهازٍ آخرَ بدا العدُّ
+     صفرًا وهو قد قطع نصفَ البنك. فنجمع بصماتِ الصوابِ المحفوظةَ في
+     القاعدة (seenKeys، وfixedKeys قبلها) إلى المحلِّيّ، ونكتب المجموعَ
+     محلِّيًّا — فيستوي الجهازان. */
+  var seenAll = grSeenLocal(), seenNew = 0;
+  gramRows.forEach(function(x){
+    var m = x.meta || {};
+    (m.seenKeys || []).concat(m.fixedKeys || []).forEach(function(k){
+      if(!seenAll[k]){ seenAll[k] = 1; seenNew++; }
+    });
+  });
+  if(seenNew){ try{ localStorage.setItem(GR_SEEN_LS, JSON.stringify(seenAll)); }catch(e){} }
+  /* جولاتُه في كلِّ قاعدة — منها وسمُ «ما جرّبتها» */
+  var roundsBy = {};
+  gramRows.forEach(function(x){
+    var sk = (x.meta || {}).skill; if(!sk) return;
+    roundsBy[sk] = (roundsBy[sk] || 0) + 1;
+  });
+  function grInfo(k){
+    return { poolN:grPool(k).length, doneN:grDoneN(k, seenAll), rounds:(roundsBy[k] || 0) };
+  }
 
   var agg = {}, bank = grBankIndex(), missedBy = {}, lost = 0, seenStem = {};
   rows.forEach(function(x){
@@ -2590,48 +2692,76 @@ async function renderGrammar(){
   var MINQ = 2, WEAK = 0.5, TOPN = 6;
   var weak = stats.filter(function(o){ return o.st.t >= MINQ && o.p < WEAK; })
                   .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
-  var rest = stats.filter(function(o){ return weak.indexOf(o) < 0 && (o.miss > 0 || o.st.t > 0); })
+  /* ═══ القواعدُ الخمسةَ عشرَ كلُّها تُعرَض ═══════════════════════════
+     كان الشرطُ «miss > 0 || st.t > 0»، فالقاعدةُ التي لم تمرَّ عليه في
+     ستيبٍ قطُّ لا تُعرض له أصلًا — لا مفتوحةً ولا مطويّة. وبنكُها
+     موجودٌ بعشرينَ سؤالًا، فكان المتروكُ محجوبًا لا مؤجَّلًا. فصارت
+     البقيّةُ تضمُّ القواعدَ كلَّها، وعليها وسمُ «ما جرّبتها» فيُرى. */
+  var rest = stats.filter(function(o){ return weak.indexOf(o) < 0; })
                   .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
   var totMiss = 0; Object.keys(missedAll).forEach(function(k){ totMiss += missedAll[k]; });
+  var untried = stats.filter(function(o){ return !(roundsBy[o.k] || 0); }).length;
+  /* العددُ العربيُّ يُجمع من ثلاثةٍ إلى عشرةٍ ويُفرَد بعدها — فـ«٨ قاعدةً»
+     لحنٌ يقرؤه الولدُ كلَّ يوم. */
+  function arQ(n){ return n === 1 ? "قاعدةٌ واحدةٌ" : n === 2 ? "قاعدتان" : (n >= 3 && n <= 10) ? n + " قواعدَ" : n + " قاعدةً"; }
 
   var html = '';
   if(!rows.length){
-    html += '<div class="intro">لسّا ما فيه محاولاتُ ستيب مسجّلةٌ لك. افتح <b>STEP إنجليزي 🌍</b> وحُلّ جولةً أو جولتين، وارجع هنا — يبني لك القسمُ طابورًا من <b>أخطائك أنت</b> بنصِّها، ويعيدها عليك حتى تصحّحها.</div>';
+    /* ولو لم يختبر في ستيبٍ بعدُ فالبنكُ مفتوحٌ له: لا طابورَ أخطاءٍ،
+       لكنّ «القاعدة كاملة» تمشي به على العشرين. */
+    html += '<div class="intro">لسّا ما فيه محاولاتُ ستيب مسجّلةٌ لك، فما عندنا أخطاءً نُعيدها عليك. افتح <b>STEP إنجليزي 🌍</b> وحُلّ جولةً أو جولتين وارجع هنا، وإلى حينِها <b>القواعدُ كلُّها تحت</b> — اقرأ القاعدةَ واضغط «📚 القاعدة كاملة» تمشي على بنكِها كلِّه.</div>';
   }else{
     html += '<div class="intro">✏️ <b>القواعدُ المركَّزة</b> — مو أسئلةٌ عشواء: الطابورُ من <b>أخطائك أنت</b> في ستيب، محفوظةً بنصِّها. '+
       (totMiss ? 'عندك <b>'+totMiss+' سؤالًا</b> أخطأتَها ولم تصحّحها بعد، ونبدأ بخمسةٍ في كلّ قاعدة. ' : 'ما بقي سؤالٌ أخطأتَه ولم تصحّحه ✅ ')+
       'والسؤالُ <b>لا يخرج من الطابور حتى تُجيبه صحيحًا</b> — وإن أخطأته رجع آخرَ الطابور.'+
       (lost ? ' <span style="color:var(--muted);font-weight:600">(و'+lost+' خطأً قديمًا تغيّر نصُّه في البنكِ فما قدرنا نُعيده بعينه.)</span>' : '')+'</div>';
+    if(untried){
+      html += '<div class="intro" style="margin-top:10px">🆕 وعندك <b>'+arQ(untried)+'</b> ما جرّبتَها ولا جولةً، كلٌّ منها موسومةٌ بـ<b>«🆕 ما جرّبتها»</b>. وبنكُ كلِّ قاعدةٍ ٢٠ سؤالًا، وزرُّ <b>«📚 القاعدة كاملة»</b> يمشي بك عليها كلِّها لا على ثلاثةٍ فقط.</div>';
+    }
     if(weak.length){
       html += '<div class="intro" style="margin-top:12px">🎯 <b>قواعدُك تحت ٥٠٪</b>'+(weak.length>TOPN?' — ابدأ بهذي '+Math.min(TOPN,weak.length)+'، هي الأضعف.':'')+
         ' اقرأ القاعدةَ أوّلًا، ثمّ حُلّ الطابور.</div>';
-      weak.slice(0, TOPN).forEach(function(o){ html += grCard(o.k, o.st, missedBy[o.k]||[], true, missedAll[o.k]||0); });
-    }
-    var tail = weak.slice(TOPN).concat(rest);
-    if(tail.length){
-      html += '<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0">➕ بقيّةُ القواعدِ ('+tail.length+')</summary><div style="margin-top:8px">'+
-        tail.map(function(o){ return grCard(o.k, o.st, missedBy[o.k]||[], false, missedAll[o.k]||0); }).join('')+'</div></details>';
+      weak.slice(0, TOPN).forEach(function(o){ html += grCard(o.k, o.st, missedBy[o.k]||[], true, missedAll[o.k]||0, grInfo(o.k)); });
     }
     if((missedBy["Grammar"]||[]).length){
       html += '<div class="intro" style="margin-top:12px">📌 وهذي أخطاءٌ في أسئلةِ قواعدَ عامّةٍ ما فيها وسمُ قاعدةٍ بعينها — نُعيدها عليك كما هي.</div>'+
-        grCard("Grammar", agg["Grammar"]||{c:0,t:0}, missedBy["Grammar"], true, missedAll["Grammar"]||0);
+        grCard("Grammar", agg["Grammar"]||{c:0,t:0}, missedBy["Grammar"], true, missedAll["Grammar"]||0, grInfo("Grammar"));
     }
   }
+  var tail = weak.slice(TOPN).concat(rest);
+  if(tail.length){
+    var tUntried = tail.filter(function(o){ return !(roundsBy[o.k] || 0); }).length;
+    html += '<details '+(rows.length?'':'open')+' style="margin-top:12px"><summary style="cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0">➕ بقيّةُ القواعدِ ('+tail.length+')'+
+      (tUntried?' <span style="background:#fef3c7;color:#92400e;font-weight:800;border-radius:8px;padding:1px 7px">'+tUntried+' ما جرّبتها</span>':'')+'</summary><div style="margin-top:8px">'+
+      tail.map(function(o){ return grCard(o.k, o.st, missedBy[o.k]||[], false, missedAll[o.k]||0, grInfo(o.k)); }).join('')+'</div></details>';
+  }
   html += '<p class="intro" style="background:transparent;border:0;color:var(--muted);margin-top:14px">'+
-    'النسبةُ المكتوبةُ بجانبِ كلّ قاعدةٍ من آخرِ ستّين محاولةٍ مسجَّلة. وجولاتُ هذا القسم <b>لا تُحسب</b> في متوسّطِ ستيب — هي تدريبٌ لا اختبار.</p>';
+    'النسبةُ المكتوبةُ بجانبِ كلّ قاعدةٍ من آخرِ ستّين محاولةٍ مسجَّلة، وقد تكون من سؤالين أو ثلاثةٍ فلا تُبنى عليها حكمٌ قاطع. و«حلّيت كم من كم» عدُّ ما أجبتَه صحيحًا من بنكِ القاعدة. وجولاتُ هذا القسم <b>لا تُحسب</b> في متوسّطِ ستيب — هي تدريبٌ لا اختبار.</p>';
   sec.innerHTML = html;
   /* الطابورُ يبدأ فورًا في البطاقاتِ المفتوحة، ولا يُبنى للمطويّةِ إلّا
      عند فتحِها — فبناءُ ستّةَ عشرَ طابورًا دفعةً واحدةً إثقالٌ بلا داعٍ. */
-  function startCard(d){
-    if(d.dataset.grgo) return; d.dataset.grgo = 1;
-    var key = d.getAttribute("data-grk");
+  function grLabel(key){
     var g = GRAM_BY_KEY[key];
-    var label = "قواعد — " + (g ? g.ar + " (" + g.en + ")" : "عامّة");
-    grRun(d.querySelector("[data-grbox]"), d.querySelector("[data-grprog]"), key, label, missedBy[key] || []);
+    return "قواعد — " + (g ? g.ar + " (" + g.en + ")" : "عامّة");
+  }
+  function startCard(d, full){
+    if(!full){ if(d.dataset.grgo) return; d.dataset.grgo = 1; }
+    var key = d.getAttribute("data-grk");
+    grRun(d.querySelector("[data-grbox]"), d.querySelector("[data-grprog]"), key, grLabel(key), missedBy[key] || [], !!full);
   }
   sec.querySelectorAll("details[data-grk]").forEach(function(d){
     if(d.open) startCard(d);
     d.addEventListener("toggle", function(){ if(d.open) startCard(d); });
+    /* ═══ زرُّ «القاعدة كاملة» ═════════════════════════════════════════
+       يُعيد بناءَ الطابورِ في البطاقةِ نفسِها على البنكِ كلِّه، ويُعلَّم
+       أنّ الجولةَ قد بدأت فلا يُبنى طابورٌ ثانٍ فوقه عند الفتحِ والطيّ. */
+    var fb = d.querySelector("[data-grfull]");
+    if(fb) fb.addEventListener("click", function(){
+      d.dataset.grgo = 1;
+      fb.disabled = true; fb.style.opacity = ".55"; fb.style.cursor = "default";
+      fb.textContent = "📚 الجولة الكاملة شغّالة";
+      startCard(d, true);
+    });
   });
 }
 
