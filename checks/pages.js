@@ -3452,7 +3452,10 @@ function readAloudPath(){
            فالهاويةُ بين ٤١ و٤٦، والسقفُ ٤٢ والصلبُ ٤٥ يقعان بينهما.
            ولا تُقاس قطعةٌ له على ما فوق الخمسةِ والأربعين بحال. */
         const HFULL = /hasan:\s*\{\s*full:\s*true/.test(src);
-        const HCAP = /READ_CAP = \{[^}]*hasan:\s*\{[^}]*floor:\s*(\d+),\s*cap:\s*(\d+),\s*hard:\s*(\d+)/.exec(src);
+        /* ويُلتقَط مدخلُ حسنٍ أينما كان في الجدول: كان التعبيرُ
+           «READ_CAP = {[^}]*hasan:» فلا يعبر قوسَ مدخلٍ قبلَه —
+           ولمّا صار الجدولُ خمسةَ أبناءٍ سقط الالتقاطُ صامتًا. */
+        const HCAP = /hasan:\s*\{\s*floor:\s*(\d+),\s*cap:\s*(\d+),\s*hard:\s*(\d+)/.exec(src);
         /* ═══ والعامُّ مكتوبٌ مرّتَين، فلا يفترقان ═══
            القيمُ الافتراضيّةُ في READ_DEF، وتُعاد في readAloudRef نفسِها
            لأنّها تُنتزَع وتُشغَّل وحدَها في هذا الفحص. فلو تغيّرت إحداهما
@@ -3471,6 +3474,28 @@ function readAloudPath(){
            الجدولُ مكتوبًا والصفحةُ تعمل بالعامِّ للجميع. */
         if (!/return READ_CAP\[who\] \|\| READ_DEF;/.test(src))
           E('readCapOf لا تقرأ السقفَ بالابن — فجدولُ READ_CAP حِبرٌ على ورق');
+        /* ═══ ولكلِّ ابنٍ سقفُه، لا حسنٌ وحدَه ═══
+           طلبُ الأب (٣ نوفمبر ٢٠٢٦): «خلّهم كلّهم نفس طريقة حسن».
+           والتقسيمُ عامٌّ منذ ٢ نوفمبر، وإنّما كان السقفُ المضبوطُ
+           لحسنٍ وحدَه. فضُبط لكلٍّ من صفوفِه (٢٧٧ قراءةَ قطعة). */
+        ['saud','osama','rafeef','hasan','fahad'].forEach(function(kid){
+          const rx = new RegExp(kid + ':\\s*\\{\\s*floor:(\\d+),\\s*cap:(\\d+),\\s*hard:(\\d+)');
+          const mm = rx.exec(src);
+          if (!mm){ E('READ_CAP بلا مدخلٍ لـ' + kid + ' — فسقفُه يرجع إلى العامِّ وصفوفُه تقول غيرَه'); return; }
+          const f = +mm[1], c = +mm[2], h = +mm[3];
+          if (!(f < c && c < h)) E('سقفُ ' + kid + ' غيرُ مرتَّب: ' + f + '/' + c + '/' + h);
+          if (f < 8 || h > 60) E('سقفُ ' + kid + ' خارجَ المعقول: ' + f + '/' + c + '/' + h);
+        });
+        /* وسعودٌ أضيقُهم وفهدٌ ورفيفُ أوسع — وهو ترتيبُ قياسِهم */
+        const capOf = function(kid){
+          const mm = new RegExp(kid + ':\\s*\\{\\s*floor:\\d+,\\s*cap:(\\d+)').exec(src);
+          return mm ? +mm[1] : null;
+        };
+        const cS = capOf('saud'), cO = capOf('osama'), cR = capOf('rafeef');
+        if (cS != null && cO != null && !(cS <= cO))
+          E('سقفُ سعودٍ (' + cS + ') ليس دون سقفِ أسامة (' + cO + ') — وقياسُه ينهار عند ٢٨ وقياسُ أسامةَ مستوٍ');
+        if (cR != null && cS != null && !(cR > cS))
+          E('سقفُ رفيفَ (' + cR + ') ليس فوق سقفِ سعودٍ (' + cS + ') — واكتمالُها ٩٢–٩٩٪ إلى الستّين');
         if (!HCAP) E('READ_CAP بلا مدخلٍ لحسن — فسقفُه يرجع إلى العامِّ وصفوفُه تقول غيرَه');
         else {
           const floor = +HCAP[1], cap = +HCAP[2], hard = +HCAP[3];
