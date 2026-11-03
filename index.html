@@ -592,6 +592,31 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
            صفحات الموقع (كلماتٍ ومحادثة) عولجت هذا الشرح مسبقًا؛ القراءة
            لم تكن معالَجةً بعد. صار لها قسمها الخاصّ يعرض آخر خمس محاولات
            لكل نوعٍ (عربي/إنجليزي) بدل محاولةٍ واحدة. */
+        /* ═══ قراءةُ القطعةِ بصوتِه — في لوحةِ الأبِ أيضًا ═══════════
+           بلاغُ الأب (٣ نوفمبر ٢٠٢٦): «حسن قرأ القطعة الصباح، طلع
+           أنّه جاوب الخمسةَ أسئلة، لكنّ تقريرَ قراءةِ القطعةِ ما طلع،
+           الذي طلع كلماتٌ وهو لم يقرأ الكلمات».
+
+           وكان قد قرأها فعلًا: خمسةُ أجزاءٍ باكتمالِ ٩٤٪. وعلّتان:
+           (١) هذه البطاقةُ كانت في صفحةِ الابنِ وصفحةِ البدايةِ ولا
+               وجودَ لها في لوحةِ الأبِ أصلًا — وهي التي ينظر فيها.
+           (٢) وبطاقةُ «النطق» تعرض آخرَ ثلاثةِ تقييمات، وقد نطق بعدها
+               خمسَ كلماتٍ مفردةً فدفعت القطعةَ خارجَ الثلاثة — فرأى
+               «كلمة/جملة» ثلاثًا وظنَّها «الكلمات».
+           والأجزاءُ تُجمَع قراءةً واحدةً (RR.passageSessions). */
+        var PSESS = (window.RR && RR.passageSessions) ? RR.passageSessions(pronAll) : [];
+        if(PSESS.length){
+          out += '<div class="weak"><div class="wt">🎙️ قرأ القطعة بصوته <span class="cnt">('+PSESS.length+' مرّة)</span></div><ul>'+
+            PSESS.slice(0,4).map(function(g){
+              var pcw = g.refWords ? Math.round(g.words/g.refWords*100) : null;
+              var head = (g.parts>1) ? ('<b>'+g.n+' من '+g.parts+' أجزاء</b>') : 'جزء واحد';
+              var warn = (pcw!=null && pcw<60) ? ' <span style="color:var(--bad)">⚠️ ما أكمل القطعة</span>' : '';
+              return '<li>'+head+' · قرأ <b>'+g.words+'</b> من '+g.refWords+' كلمة'+
+                (pcw!=null?(' ('+pcw+'%)'):'')+
+                (g.pron!=null?(' · نطق <b>'+g.pron+'%</b>'):'')+warn+
+                ' <span class="cnt">'+saTime(RR.when(g.at))+'</span></li>';
+            }).join("")+'</ul></div>';
+        }
         if(readAll.length){
           var readByT={}; readAll.forEach(function(p){ var t=p.meta.test||"قراءة"; (readByT[t]=readByT[t]||[]).push(p); });
           out+=`<div class="weak"><div class="wt">📖 القراءة (فهم المقروء):</div>`;

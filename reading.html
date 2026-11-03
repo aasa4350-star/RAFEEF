@@ -741,6 +741,11 @@ function savePron(isAr, d){
       comp:(typeof d.comp==="number"?d.comp:null),
       words:d.words||0, refWords:d.refWords||0,
       audioSec:d.audioSec||0, wpm:wpm,
+      /* ═══ أجزاءُ القطعةِ الواحدةِ تُعرَف أنّها واحدة ═══════════════
+         صارت القطعةُ تُقرَأ أجزاءً (٢ نوفمبر ٢٠٢٦)، فقراءةٌ واحدةٌ
+         خمسةُ صفوف. وبلا رابطٍ بينها يراها الأبُ خمسَ قراءاتٍ
+         منفصلة. فتحمل كلُّها معرّفَ الجلسةِ ورقمَ الجزءِ وعددَها. */
+      rsid:(window.__rsid || null), part:(window.__rpart || null), parts:(window.__rparts || null),
       cycles:(typeof d.cycles==="number"?d.cycles:null)
     });
   }catch(e){}
@@ -2633,6 +2638,9 @@ if(!META[who] || !DATA[who]){
     var rOff = [], _rk = 0;
     rParts.forEach(function(x){ var at = passage.indexOf(x, _rk); rOff.push(at); _rk = at + x.length; });
     var partIx = 0;
+    /* معرّفُ جلسةِ القراءة: تحمله أجزاؤها كلُّها فتُجمَع في التقرير */
+    try{ window.__rsid = newPid(); window.__rpart = 1; window.__rparts = rParts.length; }
+    catch(e){ window.__rsid = null; }
     var readRef = rParts[0] || passage.trim();
     var partRead = rParts.length > 1;
     var lockMsg = azureConfigured()
@@ -2699,6 +2707,7 @@ if(!META[who] || !DATA[who]){
     var txtEl   = sec.querySelector(".passage .txt");
     function showPart(i){
       partIx = i; readRef = rParts[i];
+      try{ window.__rpart = i + 1; window.__rparts = rParts.length; }catch(e){}
       if(txtEl) txtEl.innerHTML = partHtml(i);
       if(partBar) partBar.innerHTML = '🟩 اقرأ المظلَّل بصوتك — <b>الجزء ' + (i+1) + ' من ' + rParts.length + '</b>';
       if(nextBox) nextBox.style.display = "none";

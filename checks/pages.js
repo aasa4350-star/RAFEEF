@@ -372,6 +372,7 @@ function run(){
   issues.push(...shortTestPath());
   issues.push(...dictDosePath());
   issues.push(...storyBankPath());
+  issues.push(...passageReadPath());
   issues.push(...typedAnswers());
   issues.push(...bankAnswerIndex());
   issues.push(...conflicts(allBanks));
@@ -5300,6 +5301,106 @@ function quranTilawaPath(){
    ملاحظةُ فهدٍ نقلها الأب (٢ نوفمبر ٢٠٢٦): «يبي قطعًا كثيرةً متنوّعة،
    ويفضّل قصصًا تاريخيّةً وعلميّة». وقِيس بنكُه قبل الزيادة: اثنتان
    وثلاثون قطعةً كلُّها مقاليّةٌ حِجاجيّة ولا قصّةَ واحدة. */
+/* ═══ قراءةُ القطعةِ بصوتِه تصل الأبَ مجموعةً ═══════════════════
+   بلاغُ الأب (٣ نوفمبر ٢٠٢٦): «حسن قرأ القطعة الصباح، طلع أنّه جاوب
+   الخمسةَ أسئلة، لكنّ تقريرَ قراءةِ القطعةِ ما طلع، الذي طلع كلماتٌ
+   وهو لم يقرأ الكلمات».
+   وكان قد قرأها: خمسةُ أجزاءٍ باكتمالِ ٩٤٪ (٩٤·٩٢·٨٩·٩٧·١٠٠). */
+function passageReadPath(){
+  const out = [];
+  const R = 'report-rules.js', rp = path.join(ROOT, R);
+  if (!fs.existsSync(rp)) return [{ sev:'خطأ', file:R, msg:'قواعدُ التقريرِ مفقودة' }];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  let RR = null;
+  try { const sb = { window:{} }; sb.globalThis = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(rp, 'utf8'), sb); RR = sb.window.RR; } catch(e){}
+  if (!RR || typeof RR.passageSessions !== 'function')
+    return [{ sev:'خطأ', file:R, msg:'RR.passageSessions مفقودة — فأجزاءُ القطعةِ تبدو قراءاتٍ منفصلة' }];
+
+  const mk = (iso, o) => ({ created_at: iso, meta: Object.assign(
+    { kind:'practice', kindPron:true, pmode:'passage', pron:80, comp:90, refWords:30, words:28 }, o) });
+  /* خمسةُ أجزاءٍ برابطٍ واحد = قراءةٌ واحدة */
+  let S = null;
+  try {
+    S = RR.passageSessions([
+      mk('2026-11-03T02:33:25Z', { rsid:'A', part:5, parts:5, refWords:21, words:21, comp:100 }),
+      mk('2026-11-03T02:32:37Z', { rsid:'A', part:4, parts:5, refWords:29, words:28, comp:97 }),
+      mk('2026-11-03T02:31:56Z', { rsid:'A', part:3, parts:5, refWords:35, words:31, comp:89 }),
+      mk('2026-11-03T02:31:08Z', { rsid:'A', part:2, parts:5, refWords:36, words:33, comp:92 }),
+      mk('2026-11-03T02:30:22Z', { rsid:'A', part:1, parts:5, refWords:33, words:31, comp:94 }),
+      mk('2026-11-02T12:52:00Z', { refWords:148, words:32, comp:22, pron:68 }),
+      { created_at:'2026-11-03T02:35:00Z',
+        meta:{ kind:'practice', kindPron:true, pmode:'word', pron:88, refWords:1, words:1 } }
+    ]);
+  } catch(e){ E(R, 'passageSessions تتعطّل: ' + e.message); return out; }
+  if (!Array.isArray(S)) { E(R, 'passageSessions لا تُخرج جلسات'); return out; }
+  if (S.length !== 2)
+    E(R, 'الجلساتُ ' + S.length + ' والمنتظَرُ اثنتان — الأجزاءُ لم تُجمَع أو الكلمةُ المفردةُ دخلت');
+  const big = S.filter(function(g){ return g.n === 5; })[0];
+  if (!big) E(R, 'الأجزاءُ الخمسةُ لم تُجمَع قراءةً واحدة');
+  else {
+    if (big.parts !== 5) E(R, 'عددُ الأجزاءِ المُعلَن ' + big.parts + ' لا ٥');
+    if (!big.done) E(R, 'القراءةُ التامّةُ تُقرأ ناقصة');
+    if (big.words !== 144 || big.refWords !== 154)
+      E(R, 'مجموعُ الكلماتِ ' + big.words + '/' + big.refWords + ' والصوابُ ١٤٤/١٥٤');
+    if (big.comp !== 94) E(R, 'اكتمالُ القراءةِ المجموعةِ ' + big.comp + '٪ والصوابُ ٩٤');
+  }
+  /* وقراءةٌ ناقصةٌ تُعرَف ناقصةً: ثلاثةُ أجزاءٍ من خمسةٍ مُعلَنة.
+     وبلا هذا الفحصِ يمرُّ «parts = عددُ الصفوفِ» فتبدو كلُّ قراءةٍ
+     تامّةً مهما تُرك منها (مرَّ عطبٌ متعمَّدٌ بلا رصد). */
+  let P3 = null;
+  try { P3 = RR.passageSessions([
+    mk('2026-11-03T06:02:00Z', { rsid:'B', part:3, parts:5 }),
+    mk('2026-11-03T06:01:00Z', { rsid:'B', part:2, parts:5 }),
+    mk('2026-11-03T06:00:00Z', { rsid:'B', part:1, parts:5 }) ]); } catch(e){}
+  if (!Array.isArray(P3) || P3.length !== 1) E(R, 'الأجزاءُ الثلاثةُ لم تُجمَع');
+  else {
+    if (P3[0].parts !== 5) E(R, 'عددُ أجزاءِ القطعةِ ' + P3[0].parts + ' والمُعلَنُ ٥ — فالناقصةُ تبدو تامّة');
+    if (P3[0].done) E(R, 'قراءةٌ ثلاثةٌ من خمسةٍ تُقرأ تامّة');
+  }
+
+  /* والقراءةُ المنفردةُ لا تُضَمُّ إلى غيرِها ولو تقاربت */
+  const small = S.filter(function(g){ return g.n === 1; })[0];
+  if (!small) E(R, 'القراءةُ المنفردةُ ضُمَّت إلى غيرِها');
+  /* ولا تُجمَع جلستانِ متباعدتانِ بلا رابط */
+  let T = null;
+  try { T = RR.passageSessions([
+    mk('2026-11-03T05:00:00Z', {}), mk('2026-11-03T02:00:00Z', {}) ]); } catch(e){}
+  if (Array.isArray(T) && T.length !== 2)
+    E(R, 'جلستانِ متباعدتانِ ثلاثَ ساعاتٍ جُمعتا واحدةً');
+  /* والمتقاربتانِ بلا رابطٍ تُجمَعان (الصفوفُ القديمةُ قبل rsid) */
+  let U = null;
+  try { U = RR.passageSessions([
+    mk('2026-11-03T02:01:00Z', {}), mk('2026-11-03T02:00:00Z', {}) ]); } catch(e){}
+  if (Array.isArray(U) && U.length !== 1)
+    E(R, 'صفّانِ قديمانِ متقاربانِ دقيقةً لم يُجمَعا — فتُعَدُّ أجزاءُ القطعةِ قراءاتٍ');
+
+  /* ═══ وتصل لوحةَ الأب ═══
+     كانت البطاقةُ في صفحةِ الابنِ وصفحةِ البدايةِ ولا وجودَ لها في
+     لوحةِ الأب — وهي التي ينظر فيها. */
+  const ix = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  if (!/RR\.passageSessions\(pronAll\)/.test(ix))
+    E('index.html', 'لوحةُ الأبِ لا تعرض قراءةَ القطعةِ بصوتِه — يقرؤها الابنُ ولا يراها الأب');
+  if (!/\u0642\u0631\u0623 \u0627\u0644\u0642\u0637\u0639\u0629 \u0628\u0635\u0648\u062A\u0647/.test(ix))
+    E('index.html', 'عنوانُ البطاقةِ غيرُ ظاهرٍ في لوحةِ الأب');
+  if (!/\u0645\u0627 \u0623\u0643\u0645\u0644 \u0627\u0644\u0642\u0637\u0639\u0629/.test(ix))
+    E('index.html', 'القراءةُ الناقصةُ لا تُوسَم — فتُقرأ كالتامّة');
+
+  /* ═══ والأجزاءُ تحمل رابطَها عند الحفظ ═══ */
+  const rd = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
+  if (!/rsid:\(window\.__rsid/.test(rd))
+    E('reading.html', 'صفُّ النطقِ بلا رابطِ جلسةٍ — فأجزاءُ القطعةِ تبقى قراءاتٍ منفصلة');
+  /* ويُضبَط في الموضعَين: عند بناءِ الشاشةِ وعند الانتقالِ إلى الجزءِ
+     التالي. وطلبُ موضعٍ واحدٍ يمرُّ وأحدُهما ساقط (مرَّ عطبٌ متعمَّد). */
+  const nParts = (rd.match(/window\.__rparts = rParts\.length/g) || []).length;
+  if (nParts < 2)
+    E('reading.html', 'عددُ الأجزاءِ يُضبَط في ' + nParts + ' موضعٍ لا اثنَين — فيَسقط عند البناءِ أو عند الانتقال');
+  const nPart = (rd.match(/window\.__rpart = /g) || []).length;
+  if (nPart < 2)
+    E('reading.html', 'رقمُ الجزءِ يُضبَط في ' + nPart + ' موضعٍ لا اثنَين');
+  return out;
+}
+
 function storyBankPath(){
   const out = [];
   const F = 'step-reading-story.js', p = path.join(ROOT, F);

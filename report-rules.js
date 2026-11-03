@@ -533,6 +533,46 @@
       }).sort(function(a,b){ return (RRwhen(a) < RRwhen(b)) ? 1 : -1; });
     },
 
+    /* ═══ أجزاءُ القطعةِ الواحدةِ قراءةٌ واحدة ═══════════════════════
+       بلاغُ الأب (٣ نوفمبر ٢٠٢٦): «حسن قرأ القطعة الصباح، وتقريرُ
+       قراءةِ القطعةِ ما طلع». وكان قد قرأها فعلًا خمسةَ أجزاءٍ
+       (٩٤٪ · ٩٢٪ · ٨٩٪ · ٩٧٪ · ١٠٠٪) — لكنّها خمسةُ صفوف، فتبدو
+       خمسَ قراءاتٍ منفصلةً لا قراءةً واحدةً تامّة.
+
+       فتُجمَع: بـ rsid إن وُجد (الصفوفُ الجديدة)، وإلّا بتقاربِ
+       الزمنِ — قراءةٌ تلي أختَها في أقلَّ من خمسِ دقائقَ من جلستِها،
+       وهو أوسعُ من أطولِ جزءٍ قِيس (١١٧ ثانية) وأضيقُ من جلستَين. */
+    passageSessions: function(pronRows){
+      var rows = (this.passageReads ? this.passageReads(pronRows) : []).slice();
+      var out = [], cur = null, GAP = 5 * 60000;
+      rows.forEach(function(p){
+        var id = p.meta && p.meta.rsid;
+        var t = Date.parse(RRwhen(p));
+        var same = cur && (
+          (id && cur.rsid && id === cur.rsid) ||
+          (!id && !cur.rsid && Math.abs(cur.lastT - t) <= GAP));
+        if(!same){ cur = { rsid:id || null, rows:[], lastT:t }; out.push(cur); }
+        cur.rows.push(p); cur.lastT = t;
+      });
+      return out.map(function(g){
+        var n = g.rows.length;
+        var avg = function(k){
+          var v = g.rows.map(function(p){ return p.meta && p.meta[k]; })
+                        .filter(function(x){ return typeof x === "number" && !isNaN(x); });
+          return v.length ? Math.round(v.reduce(function(a,b){ return a+b; }, 0) / v.length) : null;
+        };
+        var sum = function(k){
+          return g.rows.reduce(function(a,p){ return a + ((p.meta && +p.meta[k]) || 0); }, 0);
+        };
+        var declared = g.rows.map(function(p){ return (p.meta && +p.meta.parts) || 0; })
+                             .filter(function(x){ return x > 0; });
+        var want = declared.length ? Math.max.apply(null, declared) : n;
+        return { rows:g.rows, n:n, parts:want, done:(n >= want),
+                 at:g.rows[0], pron:avg("pron"), comp:avg("comp"), wpm:avg("wpm"),
+                 words:sum("words"), refWords:sum("refWords") };
+      });
+    },
+
     /* هل تُعرض ملاحظات هذه الجلسة؟ (خروج · سرعة · غير محتسبة) */
     freshFlag: function(row){ return ageMs(row) <= FLAG_HOURS * 3600e3; },
 
