@@ -635,8 +635,19 @@ out+=`<div class="weak"><div class="wt">📖 حفظ الكلمات (إنجليز
           var pAvg=function(k,arr){ var a=(arr||prs).map(function(p){return pv(p,k);}).filter(function(v){return v!=null;});
             return a.length?Math.round(a.reduce(function(x,y){return x+y;},0)/a.length):null; };
           var aP=pAvg("pron"), aA=pAvg("acc"), aF=pAvg("flu"), aW=pAvg("wpm");
+          /* ═══ الكلمةُ المفردةُ لا تحجب القطعة ═══════════════════════
+             بلاغُ الأب (٣ نوفمبر ٢٠٢٦): «الذي طلع فقط كلمات». وكان
+             هذا السطرُ يعرض آخرَ ثلاثةِ تقييماتٍ مهما كانت، وقد نطق
+             الابنُ بعد القطعةِ خمسَ كلماتٍ مفردةً فدفعتها خارجَ
+             الثلاثة. فصار لكلِّ نوعٍ سطرُه ومتوسّطُه: الكلمةُ وحدَها
+             والقطعةُ وحدَها — فلا يُقرأ أحدُهما على أنّه الآخر. */
+          var prsW = prs.filter(function(p){ return (p.meta||{}).pmode !== "passage"; });
+          var prsP = prs.filter(function(p){ return (p.meta||{}).pmode === "passage"; });
+          var wAvg = pAvg("pron", prsW), pPAvg = pAvg("pron", prsP);
           out+=`<div class="weak"><div class="wt">🗣️ النطق (قيّم نطقي):</div><ul>`+
             `<li>🎙️ <b>${prs.length}</b> تقييم${aP!=null?` · متوسط النطق <b>${aP}%</b>`:``}${aA!=null?` · دقّة ${aA}%`:``}${aF!=null?` · طلاقة ${aF}%`:``}${aW!=null?` · <b>${aW}</b> كلمة/دقيقة`:``}</li>`+
+            (prsW.length?`<li>🔤 كلمات مفردة: <b>${prsW.length}</b>${wAvg!=null?` · نطق <b>${wAvg}%</b>`:``} <span class="cnt">آخرها ${saTime(RR.when(prsW[0]))}</span></li>`:``)+
+            (prsP.length?`<li>📖 قراءة قطعة: <b>${prsP.length}</b> جزء${pPAvg!=null?` · نطق <b>${pPAvg}%</b>`:``} <span class="cnt">آخرها ${saTime(RR.when(prsP[0]))}</span></li>`:``)+
             prs.slice(0,3).map(function(p){ var m=p.meta;
               return `<li>${m.pmode==="passage"?"قطعة":"كلمة"} · ${m.test||""} — <b>${pv(p,"pron")}%</b>${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`; }).join("")+
             `</ul></div>`;
