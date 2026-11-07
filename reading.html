@@ -3039,6 +3039,22 @@ if(!META[who] || !DATA[who]){
      الصفحة لا على جهازٍ واحد، ويبقى تاريخُ المحاولات في التقرير كما هو
      — فالمطلوبُ إعادةُ الحفظ لا محوُ ما مضى. */
   var VOC_RESET_TEST = "تصفير الكلمات ♻️";
+  /* ═══ والاسترجاعُ يُلغي التصفيرَ — صفٌّ أحدثُ ينسخه ═══════════════════
+     صفّر حسنٌ تسعَ مئةٍ وعشرَ كلماتٍ في ٧ نوفمبر ٢٠٢٦ الساعةَ ١:٣٠ ظهرًا
+     (مرّتين في تسعِ ثوان)، وطلب أبوه إرجاعَها. ولم تكن ثَمَّ سبيلٌ: حدُّ
+     التصفيرِ يحجب كلَّ ما سُجّل قبله، والمفتاحُ يُدخل ولا يحذف ولا
+     يعدّل — فلا يُمحى صفُّ التصفيرِ نفسُه.
+
+     فصار للاسترجاعِ صفٌّ باسمِه الخاصّ يحمل ساعتَه وعددَ الكلماتِ
+     ولقطةَ الذاكرة. والمزامنةُ تقرأ الاثنين: فإن كان الاسترجاعُ أحدثَ
+     من التصفيرِ نُسخ التصفيرُ وعادت الكلماتُ على كلِّ جهازٍ يفتح
+     الصفحة — لا على جهازٍ واحد. وتعودُ بالدمجِ لا بالإحلال، فما حلَّه
+     الطفلُ بعد التصفيرِ لا يضيع: لكلِّ كلمةٍ يفوز أحدثُ عهدٍ بها.
+
+     ولا يُحسَب الصفُّ محاولةً: هو علامةُ حالةٍ كصفِّ التصفير (MARKERS
+     في report-rules.js)، ويُلغي حدَّ التصفيرِ في تقريرِ الأب أيضًا
+     فيعود تاريخُ جلساتِه كما كان. */
+  var VOC_RESTORE_TEST = "استرجاع الكلمات ↩️";
   function getResetAt(){ var n=parseInt(localStorage.getItem(vKey("resetat"))||"0",10); return isNaN(n)?0:n; }
   function setResetAt(ms){ try{ localStorage.setItem(vKey("resetat"), String(ms)); }catch(e){} }
   function wipeVocabLocal(){ setLearned(0); setWeak({}); setReviewSeen({}); setSR({}); }
@@ -3050,6 +3066,18 @@ if(!META[who] || !DATA[who]){
     _vocSynced = true;   /* لا تُعِد المزامنةُ الرقمَ القديم في هذي الجلسة */
     return now;
   }
+  /* يُطبَّق صفُّ الاسترجاع: العدّادُ لا ينزل، والذاكرةُ تُدمَج فما حلَّه
+     الطفلُ بعد التصفيرِ أولى بكلمتِه (أحدثُ عهدٍ يفوز — انظر srMerge).
+     وحدُّ الزمنِ يصير ساعةَ الاسترجاع، وإلّا رأى الجهازُ تصفيرًا أحدثَ
+     من حدِّه في الفتحةِ التالية فمحا ما استُرجع. */
+  function applyRestore(m, t){
+    try{
+      if(typeof m.learned === "number" && m.learned > getLearned()) setLearned(m.learned);
+      if(m.sr) setSR(srMerge(getSR(), srUnpack(m.sr)));
+      setResetAt(t);
+      renderVocab();
+    }catch(e){}
+  }
   function getLearned(){ var n=parseInt(localStorage.getItem(vKey("learned"))||"0",10); return isNaN(n)?0:Math.max(0,Math.min(VOC_TOTAL,n)); }
   function setLearned(n){ try{ localStorage.setItem(vKey("learned"), String(Math.max(0,Math.min(VOC_TOTAL,n)))); }catch(e){} }
   // مزامنة تقدّم الحفظ من قاعدة البيانات — يحفظ التقدّم حتى لو فُتحت الصفحة من الشاشة الرئيسية
@@ -3059,17 +3087,32 @@ if(!META[who] || !DATA[who]){
     if(_vocSynced) return; _vocSynced=true;
     try{
       var nm = (META[who] && META[who].name) || who;
-      /* أوّلًا: هل صُفّرت الكلمات — هنا أو على جهازٍ آخر؟ */
-      fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(nm)+
-            "&meta->>test=eq."+encodeURIComponent(VOC_RESET_TEST)+"&order=created_at.desc&limit=5",
+      /* أوّلًا: هل صُفّرت الكلمات — هنا أو على جهازٍ آخر؟ وهل استُرجعت
+         بعد التصفير؟ الاثنان بطلبٍ واحدٍ على kind (حرفٌ لاتينيٌّ لا
+         يحتاج ترميزًا، بخلافِ اسمِ الاختبارِ العربيِّ بالرمز). */
+      fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(nm)+
+            "&meta->>kind=in.(vocabreset,vocabrestore)&order=created_at.desc&limit=10",
         { headers:{ "apikey":SUPA_KEY, "Authorization":"Bearer "+SUPA_KEY } })
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
-        var dbReset = 0;
+        var dbReset = 0, back = null;
         (rows||[]).forEach(function(x){
           var m=x.meta||{};
+          if(m.kind === "vocabrestore"){
+            var v = (typeof m.restoreAt==="number") ? m.restoreAt : Date.parse(m.at||x.created_at||"");
+            if(v && !isNaN(v) && (!back || v > back.t)) back = { t:v, m:m };
+            return;
+          }
           if(typeof m.resetAt==="number" && m.resetAt>dbReset) dbReset=m.resetAt;
         });
+        /* استرجاعٌ أحدثُ من التصفير: يُلغيه ويُعيد ما حُجب — بالدمجِ
+           لا بالإحلال، وحدُّ الزمنِ يصير ساعةَ الاسترجاعِ فلا يُعيد
+           التصفيرُ محوَ شيءٍ في الفتحةِ التالية. */
+        if(back && back.t > dbReset){
+          applyRestore(back.m, back.t);
+          pullSR();
+          return;
+        }
         /* تصفيرٌ وقع على جهازٍ آخر بعد آخر ما يعرفه هذا الجهاز: نتبعه */
         if(dbReset > getResetAt()){ wipeVocabLocal(); setResetAt(dbReset); }
         pullLearned(nm, getResetAt());
@@ -3653,7 +3696,10 @@ if(!META[who] || !DATA[who]){
     var b=sec.querySelector("[data-reset]"); if(!b) return;
     b.addEventListener("click",function(){
       var cur=vocLearnedNum();
-      if(!confirm("تصفير حفظ الكلمات والبدء من الكلمة الأولى؟\n\nالعدّاد الآن "+cur+" كلمة، وسيرجع صفرًا على كلّ الأجهزة.\nتقرير الأب يبقى كما هو — ما يُمحى شيءٌ من تاريخ المحاولات.")) return;
+      /* ويُقال له إنّ الإرجاعَ ممكن: صفّر حسنٌ ٩١٠ كلماتٍ في ٧ نوفمبر
+         ٢٠٢٦ وهو يحسبها ضائعةً إلى الأبد، وأبوه طلب إرجاعَها فأمكن.
+         فالإخبارُ بالحقيقةِ أنفعُ من بابٍ مُوصَد. */
+      if(!confirm("تصفير حفظ الكلمات والبدء من الكلمة الأولى؟\n\nالعدّاد الآن "+cur+" كلمة، وسيرجع صفرًا على كلّ الأجهزة.\nتقرير الأب يبقى كما هو — ما يُمحى شيءٌ من تاريخ المحاولات.\nوإن ندمت: ذاكرة كلماتك محفوظة عندنا، وأبوك يقدر يرجّعها لك.")) return;
       wipeVocabLocal();
       markVocabReset(cur, 0);
       vocMode = "new"; vocModePicked = true; newForce = false;

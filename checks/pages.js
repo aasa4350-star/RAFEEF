@@ -372,6 +372,7 @@ function run(){
   issues.push(...shortTestPath());
   issues.push(...dictDosePath());
   issues.push(...weakCapPath());
+  issues.push(...vocabRestorePath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -5720,6 +5721,102 @@ function weakCapPath(){
   }
   return out;
 }
+/* ═══════════════════════════════════════════════════════════════════
+   الاسترجاعُ يُلغي التصفيرَ — في الصفحةِ وفي التقريرِ معًا
+   ═══════════════════════════════════════════════════════════════════
+   صفّر حسنٌ ٩١٠ كلماتٍ في ٧ نوفمبر ٢٠٢٦ (مرّتين في تسعِ ثوانٍ) وطلب
+   أبوه إرجاعَها. والمفتاحُ يُدخل ولا يحذف ولا يعدّل، فلا يُمحى صفُّ
+   التصفير — وإنّما يُنسَخ بصفِّ استرجاعٍ أحدثَ منه. وهذا الحارسُ
+   يُشغّل دالّةَ الحدِّ من report-rules.js نفسِها، ويتحقّق من مسارِ
+   الصفحة. */
+function vocabRestorePath(){
+  const out = [];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+
+  /* ═══ (١) الصفحة: تقرأ الاسترجاعَ وتُطبّقه بالدمج ═══ */
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  if (!/var VOC_RESTORE_TEST = /.test(src))
+    E(F, 'لا صفَّ استرجاعٍ — فالتصفيرُ لا رجعةَ فيه');
+  if (!/meta->>kind=in\.\(vocabreset,vocabrestore\)/.test(src))
+    E(F, 'المزامنةُ لا تطلب صفوفَ الاسترجاع — فلا يسري إلّا على جهازٍ واحد');
+  if (!/if\(back && back\.t > dbReset\)/.test(src))
+    E(F, 'الاسترجاعُ لا يُقدَّم على التصفيرِ بالأحدثيّة');
+  if (!/function applyRestore\(m, t\)/.test(src))
+    E(F, 'لا دالّةَ تطبيقٍ للاسترجاع');
+  const am = /function applyRestore\(m, t\)\{([\s\S]*?)\n  \}/.exec(src);
+  if (!am) E(F, 'دالّةُ الاسترجاعِ لا تُنتزَع');
+  else {
+    const body = am[1];
+    if (!/srMerge\(getSR\(\), srUnpack\(m\.sr\)\)/.test(body))
+      E(F, 'الذاكرةُ تُحَلُّ محلَّ المحلّيّةِ لا تُدمَج — فيضيع ما حلَّه بعد التصفير');
+    if (!/m\.learned > getLearned\(\)/.test(body))
+      E(F, 'العدّادُ قد ينزل بالاسترجاع — والاسترجاعُ لا يُنقِص');
+    if (!/setResetAt\(t\)/.test(body))
+      E(F, 'حدُّ الزمنِ لا يُرفَع إلى ساعةِ الاسترجاع — فيُعيد التصفيرُ المحوَ في الفتحةِ التالية');
+  }
+  /* ويُقال للطفلِ إنّ الإرجاعَ ممكنٌ قبل أن يصفّر */
+  if (!/يقدر يرجحها|يقدر يرجعها/.test(src.replace(/[ً-ْٰـّ]/g, '')))
+    E(F, 'لا يُقال للطفلِ إنّ كلماتِه تُرجَع — فيصفّر وهو يحسبها ضائعةً أبدًا');
+
+  /* ═══ (٢) التقرير: الحدُّ يُنسَخ، والصفُّ ليس محاولة ═══ */
+  const RF = 'report-rules.js', rp = path.join(ROOT, RF);
+  if (!fs.existsSync(rp)) return out.concat([{ sev:'خطأ', file:RF, msg:'الملفُّ مفقود' }]);
+  const rsrc = fs.readFileSync(rp, 'utf8');
+  if (!/MARKERS = \{[^}]*vocabrestore:\s*1/.test(rsrc))
+    E(RF, 'صفُّ الاسترجاعِ يُعدُّ محاولةً — فيُفسد العدَّ والمتوسّط');
+
+  let RR = null;
+  try {
+    const sb = { window:{}, globalThis:{} }; sb.globalThis = sb;
+    vm.createContext(sb);
+    vm.runInContext(rsrc, sb, { timeout: 5000 });
+    RR = sb.RR || (sb.window && sb.window.RR);
+  } catch(e){ E(RF, 'الملفُّ لا يُشغَّل: ' + e.message); }
+  if (!RR) { E(RF, 'RR غيرُ متاحة'); return out; }
+
+  const T0 = Date.UTC(2026, 10, 1), H = 3600000;
+  const row = (student, kind, t, extra) => Object.assign(
+    { student, created_at: new Date(t).toISOString(),
+      meta: Object.assign({ kind, at: new Date(t).toISOString(),
+        test: kind === 'vocabreset' ? 'تصفير الكلمات ♻️' : 'استرجاع الكلمات ↩️' },
+        kind === 'vocabreset' ? { resetAt: t } : { restoreAt: t }, extra || {}) }, {});
+  const att = (student, t, learned) => ({ student, created_at: new Date(t).toISOString(),
+    meta: { test: RR.VOCAB_TEST, kind:'practice', correct: 9, total: 10, learned,
+            at: new Date(t).toISOString(), pid: 'p' + t } });
+
+  /* (أ) تصفيرٌ وحدَه يحجب ما قبله */
+  let rows = [att('حسن', T0, 900), row('حسن', 'vocabreset', T0 + 5*H, { learnedBefore: 910 }),
+              att('حسن', T0 + 9*H, 10)];
+  if (RR.vocabResetAt(rows) !== T0 + 5*H) E(RF, 'حدُّ التصفيرِ لا يُقرأ');
+  let u = RR.usable(rows).filter(r => r.meta.test === RR.VOCAB_TEST);
+  if (u.length !== 1) E(RF, 'التصفيرُ لا يحجب جلساتَ الكلماتِ قبله (' + u.length + ' من ١)');
+
+  /* (ب) واسترجاعٌ بعده يُلغيه فيعود ما حُجب */
+  rows = rows.concat([row('حسن', 'vocabrestore', T0 + 7*H, { learned: 910, sr: { father: [2,2,310] } })]);
+  if (RR.vocabResetAt(rows) !== null)
+    E(RF, 'الاسترجاعُ لا يُلغي حدَّ التصفيرِ في التقرير — فيبقى تاريخُ الكلماتِ محجوبًا');
+  u = RR.usable(rows).filter(r => r.meta.test === RR.VOCAB_TEST);
+  if (u.length !== 2) E(RF, 'جلساتُ الكلماتِ لم تعد بعد الاسترجاع (' + u.length + ' من ٢)');
+  if (RR.usable(rows).some(r => r.meta.kind === 'vocabrestore'))
+    E(RF, 'صفُّ الاسترجاعِ يدخل المحاولاتِ — وهو علامةُ حالة');
+
+  /* (ج) وتصفيرٌ بعد استرجاعٍ يسري من جديدٍ: الأحدثُ هو الحاكم */
+  rows = rows.concat([row('حسن', 'vocabreset', T0 + 20*H, { learnedBefore: 910 })]);
+  if (RR.vocabResetAt(rows) !== T0 + 20*H)
+    E(RF, 'تصفيرٌ بعد استرجاعٍ لا يسري — فلا يقدر أن يبدأ من جديدٍ مرّةً أخرى');
+
+  /* (د) ولا يسري استرجاعُ ابنٍ على أخيه */
+  rows = [att('رفيف', T0, 500), row('رفيف', 'vocabreset', T0 + 5*H, {}),
+          att('رفيف', T0 + 9*H, 10), row('حسن', 'vocabrestore', T0 + 7*H, { learned: 910 })];
+  u = RR.usable(rows).filter(r => r.meta.test === RR.VOCAB_TEST);
+  if (u.length !== 1)
+    E(RF, 'استرجاعُ حسنٍ ألغى تصفيرَ رفيف — الحدُّ يجب أن يكون لكلِّ ابنٍ وحدَه');
+
+  return out;
+}
+
 function dictDosePath(){
   const out = [];
   const F = 'reading.html', p = path.join(ROOT, F);

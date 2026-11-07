@@ -162,9 +162,12 @@ async function run(){
        micfail   تعذّر المايكروفون
        vocabreset ساعةُ تصفير حفظ الكلمات — علامةٌ أُدخلت لأنّ المفتاح
                  يُدخل ولا يحذف، فلا سبيل إلى محو الصفوف القديمة.
+       vocabrestore ساعةُ استرجاعِ ما صُفّر، وتحمل العدّادَ ولقطةَ
+                 الذاكرة. ولأنّ الصفَّ لا يُمحى فالاسترجاعُ صفٌّ أحدثُ
+                 ينسخ التصفيرَ لا حذفٌ له (حسن، ٧ نوفمبر ٢٠٢٦).
      ومَن أضاف علامةً جديدةً فليُسجّلها هنا وفي MARKERS في
      report-rules.js، وإلّا عُدّت جلسةً بلا درجة. */
-  const NOT_SESSION = new Set(['activity', 'talk', 'micfail', 'vocabreset', 'vocabsr']);
+  const NOT_SESSION = new Set(['activity', 'talk', 'micfail', 'vocabreset', 'vocabsr', 'vocabrestore']);
 
   const stub = rows.filter(r => {
     const m = r.meta || {};

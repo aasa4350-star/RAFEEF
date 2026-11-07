@@ -51,7 +51,31 @@
        vocabreset — ساعةُ تصفير حفظ الكلمات (reading.html) */
   /* vocabsr — لقطةُ ذاكرةِ التكرارِ (reading.html): بيانٌ لا جلسة،
      درجتُها صفرٌ من صفر، فلو عُدَّت جلسةً أفسدت المتوسّطات. */
-  var MARKERS = { vocabreset:1, vocabsr:1 };
+  /* vocabrestore — ساعةُ استرجاعِ ما صُفّر (reading.html): علامةُ حالةٍ
+     كأختِها، تحمل العدّادَ ولقطةَ الذاكرةِ ولا تُعدّ جلسة. */
+  var MARKERS = { vocabreset:1, vocabsr:1, vocabrestore:1 };
+
+  /* ═══ حدُّ التصفيرِ ينسخه استرجاعٌ أحدثُ منه ════════════════════════
+     صفّر حسنٌ ٩١٠ كلماتٍ في ٧ نوفمبر ٢٠٢٦ وطلب أبوه إرجاعَها. والمفتاحُ
+     يُدخل ولا يحذف، فلا يُمحى صفُّ التصفير — وإنّما يُدخَل صفُّ استرجاعٍ
+     أحدثُ منه فيُلغي حدَّه، فيعود تاريخُ جلساتِ الكلماتِ إلى التقرير
+     كما كان. وتصفيرٌ بعد استرجاعٍ يسري من جديدٍ (الأحدثُ هو الحاكم). */
+  function vocabBound(rows, student){
+    var reset = 0, back = 0;
+    (rows || []).forEach(function(r){
+      var m = (r && r.meta) || {};
+      var k = m.kind;
+      if(k !== "vocabreset" && k !== "vocabrestore") return;
+      if(student != null && (r.student || "") !== student) return;
+      var v = (typeof m.resetAt === "number") ? m.resetAt
+            : (typeof m.restoreAt === "number") ? m.restoreAt
+            : Date.parse(m.at || r.created_at || "");
+      if(!v || isNaN(v)) return;
+      if(k === "vocabreset"){ if(v > reset) reset = v; }
+      else if(v > back) back = v;
+    });
+    return (back > reset) ? 0 : reset;
+  }
 
   function excluded(row){
     if(!row) return false;
@@ -438,14 +462,8 @@
        شيئًا انكسر — بلاغُ الأب (٢٨ سبتمبر): «تقرير حفظ الكلمات حقّ حسن
        اختفى عندي»، وقد صُفّر بطلبهم ولم يبدأ بعدُ. */
     vocabResetAt: function(rows){
-      var t = 0;
-      (rows || []).forEach(function(r){
-        var m = (r && r.meta) || {};
-        if(m.kind !== "vocabreset") return;
-        var v = (typeof m.resetAt === "number") ? m.resetAt : Date.parse(m.at || r.created_at || "");
-        if(v && !isNaN(v) && v > t) t = v;
-      });
-      return t || null;
+      /* الحدُّ الفعليّ: تصفيرٌ لم يَنسخه استرجاعٌ بعده */
+      return vocabBound(rows, null) || null;
     },
     /* آخرُ ما بلغه قبل التصفير — للسياق لا للحساب */
     vocabBeforeReset: function(rows){
@@ -461,14 +479,14 @@
     usable: function(rows){
       var self = this, list = rows || [];
       /* حدودُ التصفير تُقرأ قبل الاستثناء، فصفُّ العلامة نفسُه مستثنًى */
-      var bound = {};
+      var bound = {}, who = {};
       list.forEach(function(r){
         var m = (r && r.meta) || {};
-        if(m.kind !== "vocabreset") return;
-        var t = (typeof m.resetAt === "number") ? m.resetAt : Date.parse(m.at || r.created_at || "");
-        if(!t || isNaN(t)) return;
-        var k = r.student || "";
-        if(!bound[k] || t > bound[k]) bound[k] = t;
+        if(m.kind === "vocabreset" || m.kind === "vocabrestore") who[r.student || ""] = 1;
+      });
+      Object.keys(who).forEach(function(k){
+        var t = vocabBound(list, k);
+        if(t) bound[k] = t;
       });
       return dedupe(list.filter(function(r){
         if(excluded(r)) return false;
