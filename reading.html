@@ -2940,22 +2940,51 @@ if(!META[who] || !DATA[who]){
      ثمّ تتبعها العامّةُ لمن أتمّها — فلا يضيع ما بُني من القائمةِ
      العامّةِ ولا يُقدَّم على ما يُمتَحَن فيه. والترتيبُ وحدَه تغيّر،
      وتقدُّمُ الطفلِ المحفوظُ بالرقمِ لا بالكلمة. */
+  /* ═══ ورجع الترتيبُ إلى ورقتِه ═══════════════════════════════════
+     بلاغُ سعودٍ نقلَه أبوه (٧ نوفمبر ٢٠٢٦): «ما أعرف الكلمات هذي، ماهي
+     نفس الترتيب» — وطلب الأب: «حطّ له نفس الترتيب الأوّل، الـ٣٠٠ كلمة
+     الأولات، عشان يقدر يذاكر من البي دي إف. هو متأخّرٌ عنهم وأصغرهم
+     عمرًا».
+
+     وسجلُّه يصدّقه حرفًا: إلى ٦ أكتوبر كان يحفظ عشرًا كلَّ جلسةٍ من
+     العامّةِ بتسعٍ أو عشرٍ من عشر، وعدّادُه ٣٧٠. ثمّ قُدّم المقرَّرُ في
+     ٨ أكتوبر، فارتفع دَينُه من ٢٢ إلى ١٢٧ بلا جلسةٍ واحدةٍ بينهما،
+     وصارت مراجعاتُه: ٣/١٠ · ٠/٣ · ١/٨ · ٠/٣ · ٠/٧ · ٣/٥ · ٠/٥ —
+     والكلماتُ التي أخطأ فيها كلماتُ كتابِه التي لم يرَها قطُّ (wife ·
+     cousin · parent · chatty · dry · closed). وفي ٢٧ أكتوبر صفّر
+     ٣٨٦ كلمةً، ولم يفتح حفظَ الكلماتِ بعدها ولا مرّةً إلى اليوم.
+
+     فالعلّةُ لم تكن في حسابِ العدّادِ وحدَه (وقد أُصلح في ٢٤ أكتوبر)،
+     بل في الورقة: يذاكرون من ورقةٍ مطبوعةٍ بترتيبِ القائمةِ العامّة،
+     فإذا خالفها ما على الشاشةِ لم يجد كلماتَه. وهو أصغرُهم، والورقةُ
+     في يدِه هي سبيلُه.
+
+     فالعامّةُ تعود أوّلًا بترتيبِها كما لبقيّةِ أبنائِه، ويُلحَق ما في
+     كتابِه ولم يكن فيها آخرًا فلا يُحذَف منه شيء. ومفرداتُ كتابِه
+     تُدرَّس حيث هي أنفعُ: في تمارينِ وحداتِه (تثبيت/جمل) وحدةً وحدةً،
+     لا مبثوثةً في بنكٍ من تسعِ مئة. */
   var VOCAB_LIST = (function(){
     var base = VOCAB300;
     var course = (who==="saud" && window.VOCAB_EN4) ? window.VOCAB_EN4 : null;
     if(!course || !course.length) return base;
     var seen = {};
-    course.forEach(function(w){ seen[String(w[0]).toLowerCase()] = 1; });
-    return course.concat(base.filter(function(w){ return !seen[String(w[0]).toLowerCase()]; }));
+    base.forEach(function(w){ seen[String(w[0]).toLowerCase()] = 1; });
+    var extra = course.filter(function(w){
+      var k = String(w[0]).toLowerCase();
+      if(seen[k]) return false;
+      seen[k] = 1; return true;
+    });
+    return base.concat(extra);
   })();
 
   // ===== تتبّع تقدّم الحفظ (لكل ابن على جهازه) =====
   var VOC_TOTAL = VOCAB_LIST.length;
   /* الهدف المعروض للطفل: سعود وأسامة يرَيان ٣٠٠ حتى يبلغاها ثم يُفتح الباقي،
      فيبقى الرقم قريبًا محسوسًا بلا أن يسدّ الطريق أمام كلماتٍ جديدة. */
-  /* وهدفُ سعودٍ المعروضُ هو طولُ ملفِّ مقرَّرِه — فإذا أتمّه انفتحت
-     العامّةُ بعده. فيرى غايةً تُدرَك ومعناها إتمامُ كتابِه. */
-  var GOAL_STEP = { saud:(window.VOCAB_EN4 ? window.VOCAB_EN4.length : 300), osama:300 };
+  /* وهدفُ سعودٍ المعروضُ ثلاثُ مئةٍ كأخيه، وهو ما طلبه أبوه نصًّا:
+     «الـ٣٠٠ كلمة الأولات». وكان طولَ ملفِّ مقرَّرِه حين كان المقرَّرُ
+     مقدَّمًا، فإذا أتمّها انفتح الباقي بعدها. */
+  var GOAL_STEP = { saud:300, osama:300 };
   function vocGoal(learned){
     var g = GOAL_STEP[who];
     return (g && learned < g) ? g : VOC_TOTAL;
@@ -2981,35 +3010,36 @@ if(!META[who] || !DATA[who]){
      كلمةٍ لم يرَها — وهي أوّلُ ما بقي من كتابِه، وذلك مقصودُ النقلة.
 
      وهو مقصورٌ على من تغيّرت قائمتُه: بقيّةُ الأولادِ قائمتُهم كما
-     كانت، فموضعُهم يصفُ كلماتِهم، ولا يُمَسُّ حسابُهم بشيء. */
-  var POS_STALE = (who === "saud" && !!(window.VOCAB_EN4 && window.VOCAB_EN4.length));
-  /* كلماتُ الابن — ترتيبَ القائمة. وللآخَرين: أوّلُ «learned» كما كان */
+     كانت، فموضعُهم يصفُ كلماتِهم، ولا يُمَسُّ حسابُهم بشيء.
+
+     ⚠️ وقد زال سببُه كلُّه في ٧ نوفمبر ٢٠٢٦: رُدَّ الترتيبُ إلى العامّةِ
+     أوّلًا (انظر VOCAB_LIST) بطلبِ الأب، فصار موضعُ الكلمةِ يصفُ كلماتَ
+     سعودٍ كما يصف كلماتِ أخيه — «بلغتُ الكلمةَ الأربعين من الورقة» كلامٌ
+     له معنى. وعدّادُه صفرٌ أصلًا منذ تصفيرِ ٢٧ أكتوبر، فلا موضعَ قديمًا
+     يُنقَل. فأُطفئت، وبقي شرحُها لأنّ الدرسَ أغلى من الشِّفرة: من أعاد
+     ترتيبَ قائمةٍ فقد أعاد تعريفَ كلِّ عدّادٍ محفوظٍ بالرقم. والحارسُ
+     يُثبّت الآن ما يُغني عنها: أوّلُ القائمةِ هو العامّةُ بترتيبِها. */
+  var POS_STALE = false;
+  /* كلماتُ الابن: أوّلُ «learned» من القائمة — والقائمةُ بترتيبِ ورقتِه */
   function ownedList(learned){
-    if(!POS_STALE) return VOCAB_LIST.slice(0, learned);
-    var s = getSR();
-    return VOCAB_LIST.filter(function(w){ return !!s[w[0]]; });
+    return VOCAB_LIST.slice(0, learned);
   }
   function ownedCount(learned){
-    return POS_STALE ? ownedList(learned).length : Math.max(0, Math.min(learned, VOC_TOTAL));
+    return Math.max(0, Math.min(learned, VOC_TOTAL));
   }
   /* الرقمُ الذي يُحفظ في الصفِّ ويُعرَض في تقريرِ الأب: عددُ كلماتِه */
   function vocLearnedNum(){ return ownedCount(getLearned()); }
-  /* الدفعةُ الجديدة: ما لم يُعرض بعدُ، بترتيبِ القائمة (المقرَّرُ أوّلًا) */
+  /* الدفعةُ الجديدة: ما يلي عدّادَه بترتيبِ القائمة — وهو ترتيبُ ورقتِه */
   function nextNewWords(learned){
-    if(!POS_STALE) return (learned >= VOC_TOTAL) ? [] : VOCAB_LIST.slice(learned, learned+VOC_STEP);
-    var s = getSR(), out = [];
-    for(var i = 0; i < VOCAB_LIST.length && out.length < VOC_STEP; i++)
-      if(!s[VOCAB_LIST[i][0]]) out.push(VOCAB_LIST[i]);
-    return out;
+    return (learned >= VOC_TOTAL) ? [] : VOCAB_LIST.slice(learned, learned+VOC_STEP);
   }
-  /* لافتةُ البيانِ مرّةً واحدة: أنّ كلماتِه صارت من كتابِه */
+  /* ولافتةُ «كلماتك صارت من كتابك» تُرفَع: صارت خبرًا كاذبًا بعد ردِّ
+     الترتيب. ونمحو وسمَها من الجهازِ أيضًا، وإلّا بقيت على شاشةِ من
+     رآها تقول له ما ليس بحقّ. */
   (function(){
-    if(!POS_STALE) return;
-    var K = "vocab_listver_" + who;
     try{
-      if(localStorage.getItem(K) === "course1") return;
-      localStorage.setItem(K, "course1");
-      localStorage.setItem("vocab_listnote_"+who, "1");
+      localStorage.removeItem("vocab_listnote_" + who);
+      localStorage.removeItem("vocab_listver_" + who);
     }catch(e){}
   })();
 
@@ -3999,15 +4029,14 @@ if(!META[who] || !DATA[who]){
         '<div style="display:flex;justify-content:space-between;font-weight:800;font-size:.95rem"><span>📈 تقدّمك</span><span>حفظت <span dir="ltr">'+owned+' / '+goal+'</span></span></div>'+
         '<div style="height:9px;background:var(--line);border-radius:6px;margin-top:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent)"></div></div>'+
       '</div>'+
-      /* بيانُ سببِ تصفيرِ العدّادِ مرّةً واحدة، فلا يظنّ الطفلُ أو أبوه
-         أنّ جهدَه ضاع — وهو لم يضع: الكلماتُ باقيةٌ في آخرِ القائمة. */
+      /* ⚠️ كانت ههنا لافتةُ «كلماتك صارت من كتابك» تُعرَض مرّةً لسعود.
+         ورُفعت في ٧ نوفمبر ٢٠٢٦ لمّا رُدَّ الترتيبُ إلى القائمةِ العامّة:
+         صارت خبرًا كاذبًا، والخبرُ الكاذبُ على شاشةِ الطفلِ أضرُّ من لا
+         خبر. ووسمُها يُمحى من الجهازِ عند التحميل (انظر vocab_listnote).
+         والدالّةُ باقيةٌ فارغةً لأنّ موضعَها في سلسلةِ البناءِ محفوظٌ
+         لِلافتةٍ قد تُحتاج. */
       (function(){
-        var had=0;
-        try{ had=parseInt(localStorage.getItem("vocab_listnote_"+who)||"0",10)||0; }catch(e){}
-        if(!had) return "";
-        return '<div style="background:var(--good-bg);border:1px solid var(--good);border-radius:12px;padding:11px 13px;margin-bottom:10px;font-size:.92rem;line-height:1.8">'+
-          '📘 <b>كلماتك صارت من كتابك.</b> الكلمات الي حفظتها قبل باقيةٌ معك في «راجع المحفوظ» ما ضاع منها شيء — والجديد الي يجيك من الآن صار من مفردات مقرّرك، لأنها الي تُختبر فيها.'+
-          '<div style="margin-top:7px"><button data-notok style="background:var(--accent);color:#fff;border:0;border-radius:9px;padding:7px 14px;font-weight:800;cursor:pointer;font-family:inherit">فهمت 👍</button></div></div>';
+        return "";
       })()+
       '<div class="row" style="gap:8px;margin-bottom:8px">'+btn("new","📚 تعلّم "+VOC_STEP_AR+" جديدة")+btn("review","🔁 راجع المحفوظ")+'</div>'+
       /* بلاغ الأب (٢٥ سبتمبر ٢٠٢٦): «ليش تحط لفهد راجع الجديد؟ وهو كل شي
@@ -4046,8 +4075,6 @@ if(!META[who] || !DATA[who]){
       sec.querySelectorAll("[data-mode]").forEach(function(b){ b.addEventListener("click",function(){ vocModePicked=true; vocMode=b.dataset.mode; renderVocab(); }); });
       sec.querySelectorAll("[data-rv]").forEach(function(b){ b.addEventListener("click",function(){ setRvSize(+b.dataset.rv); renderVocab(); }); });
       var go=sec.querySelector("[data-gateoff]"); if(go) go.addEventListener("click",function(){ newForce=true; renderVocab(); });
-      var nb=sec.querySelector("[data-notok]");
-      if(nb) nb.addEventListener("click",function(){ try{ localStorage.removeItem("vocab_listnote_"+who); }catch(e){} renderVocab(); });
       wireReset(sec);
       return;
     }
@@ -4093,16 +4120,6 @@ if(!META[who] || !DATA[who]){
       '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
       '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
     sec.innerHTML = html;
-    /* زرُّ «فهمت» كان مربوطًا في فرعِ الشاشةِ الفارغةِ وحدَه، وهو يظهر في
-       هذه الشاشةِ أيضًا — فكان لا يُغلِق الإشعارَ لمن عنده كلماتٌ اليوم. */
-    (function(){
-      var nb=sec.querySelector("[data-notok]");
-      if(nb) nb.addEventListener("click",function(){
-        try{ localStorage.removeItem("vocab_listnote_"+who); }catch(e){}
-        renderVocab();
-      });
-    })();
-
     var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
     /* الكلماتُ التي لم تُحسب له — مثل الإملاء: الكلمة، وما كتبه، وهل
        كشفها قبل المحاولة. بها يعرف الأب أين يقف ابنُه بالضبط. */
