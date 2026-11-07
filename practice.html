@@ -63,6 +63,7 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="practice-bank.js"></script>
+<script src="gat-quant.js?v=20261107"></script>
 <script src="step-bank.js"></script>
 <script src="gram-rules.js"></script>
 <script src="tahsili-math.js"></script>
@@ -192,50 +193,60 @@ function saveWriting(m){
 // ===== مولّدات كمي (أرقام جديدة كل مرة) =====
 function ri(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
-function opt3(correct, ds){
+/* ═══ أربعةُ خيارات لا ثلاثة ═══════════════════════════════════════
+   كانت opt3 تقف عند ثلاثة. وورقةُ قدراتٍ كمّيّةٍ أرسلها الأب (منصّة نبأ،
+   ٣٠ سؤالًا) أسئلتُها كلُّها أربعةُ خيارات بلا استثناء — وكذلك الاختبارُ
+   نفسُه. والفرقُ ليس شكلًا: التخمينُ في الثلاثيِّ ٣٣٪ وفي الرباعيِّ ٢٥٪،
+   فمن تدرّب على الثلاثيِّ رأى درجتَه أعلى ممّا سيراها.
+
+   وسبعةٌ وعشرون من سبعةٍ وثلاثين موضعًا كانت تُمرّر ثلاثةَ مشتّتاتٍ
+   أصلًا فيُهمَل ثالثُها — فالخيارُ الرابعُ كان مكتوبًا ومطروحًا. وما
+   مرّر أقلَّ يُكمَّل آليًّا كما كان. */
+function opts(correct, ds){
   var o=[correct];
-  (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<3) o.push(d); });
-  var p=1; while(o.length<3){ var c=(typeof correct==="number")?correct+p:String(correct)+"×"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
+  (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<4) o.push(d); });
+  var p=1; while(o.length<4){ var c=(typeof correct==="number")?correct+p:String(correct)+"×"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
   for(var i=o.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; }
   return [o.map(function(v){return String(v).replace(/-/g,"−");}), o.indexOf(correct)];
 }
+var opt3 = opts;   /* الاسمُ القديمُ يبقى حتى لا ينكسر نداءٌ فاتني */
 var QUANT = [
-  function(){var cf=gp([[10,10],[15,20],[20,5],[25,4],[40,5],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opt3(v,[v+5,v-5,v*2]);return ["كم يساوي "+p+"% من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+"."];},
-  function(){var a=ri(2,9),b=ri(2,9),x=ri(2,12),c=a*x+b,o=opt3(x,[x+1,x-1,x+2]);return ["إذا كان "+a+"س + "+b+" = "+c+"، فما قيمة س؟",o[0],o[1],a+"س = "+(c-b)+" → س = "+x+"."];},
-  function(){var r1=ri(2,6),r2=ri(2,6),k=ri(2,8),o=opt3(r2*k,[r1*k,(r1+r2)*k,r2*k+1]);return ["إذا كانت النسبة "+r1+":"+r2+" وكان الأول "+(r1*k)+"، فما الثاني؟",o[0],o[1],"معامل التناسب "+k+" → الثاني = "+(r2*k)+"."];},
-  function(){var n=gp([3,4,5]),m=ri(6,20),arr=[];for(var i=0;i<n;i++)arr.push(m+(i-Math.floor(n/2))*2);var s=arr.reduce(function(a,b){return a+b;},0),av=s/n,o=opt3(av,[av+2,av-2,s]);return ["ما متوسط الأعداد: "+arr.join("، ")+"؟",o[0],o[1],"المجموع "+s+" ÷ "+n+" = "+av+"."];},
-  function(){var L=ri(5,15),W=ri(3,L-1),o=opt3(L*W,[2*(L+W),L*W+L,L*W-W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما مساحته؟",o[0],o[1],L+"×"+W+" = "+(L*W)+"."];},
-  function(){var L=ri(5,15),W=ri(3,L-1),o=opt3(2*(L+W),[L*W,L+W,2*L+W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما محيطه؟",o[0],o[1],"(الطول+العرض)×2 = "+(2*(L+W))+"."];},
-  function(){var t=gp([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]),o=opt3(t[2],[t[2]+1,t[0]+t[1],t[2]-2]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، فما طول الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+"."];},
-  function(){var a=ri(2,9),step=gp([2,3,5]),start=ri(1,5),seq=[start,start+step,start+2*step,start+3*step],nx=start+4*step,o=opt3(nx,[nx+step,nx-1,nx+1]);return ["أكمل النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد "+step+" كل مرة → "+nx+"."];},
-  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),inc=cf[0],base=cf[1]*ri(Math.ceil(20/cf[1]),Math.floor(60/cf[1])),nv=base+base*inc/100,o=opt3(nv,[base+inc,nv+5,base]);return ["زاد سعر من "+base+" بنسبة "+inc+"%، فما السعر الجديد؟",o[0],o[1],base+" + "+inc+"% = "+nv+"."];},
-  function(){var w=ri(2,9),d=ri(2,9),o=opt3(w*d,[w+d,w*d+w,w*d-d]);return ["عامل ينجز "+w+" قطع في الساعة، كم ينجز في "+d+" ساعات؟",o[0],o[1],w+"×"+d+" = "+(w*d)+" قطعة."];},
-  function(){var v=ri(3,20),t=ri(2,9),d=v*t,o=opt3(v,[v+2,v-1,d]);return ["قطع متسابق "+d+" كم في "+t+" ساعات، فما سرعته (كم/ساعة)؟",o[0],o[1],d+" ÷ "+t+" = "+v+" كم/س."];},
-  function(){var son=ri(6,16),diff=ri(18,32),f=son+diff,o=opt3(son,[son+2,diff,f]);return ["الأب أكبر من ابنه بـ "+diff+" سنة، وعمر الأب "+f+"، فكم عمر الابن؟",o[0],o[1],f+" − "+diff+" = "+son+"."];},
-  function(){var r=ri(1,5),b=ri(1,5),tot=r+b,o=opt3(r+"/"+tot,[b+"/"+tot,r+"/"+b,tot+"/"+r]);return ["كيس فيه "+r+" كرات حمراء و "+b+" زرقاء، ما احتمال سحب حمراء؟",o[0],o[1],"عدد الحمراء ÷ الكل = "+r+"/"+tot+"."];},
-  function(){var a=ri(30,150),o=opt3(180-a,[a,180+a,90]);return ["زاويتان متكاملتان (مجموعهما 180°)، إحداهما "+a+"°، فما الأخرى؟",o[0],o[1],"180 − "+a+" = "+(180-a)+"°."];},
-  function(){var a=ri(10,80),o=opt3(90-a,[a,90+a,180-a]);return ["زاويتان متتامتان (مجموعهما 90°)، إحداهما "+a+"°، فما الأخرى؟",o[0],o[1],"90 − "+a+" = "+(90-a)+"°."];},
-  function(){var r=gp([7,14,21]),area=22*r*r/7,o=opt3(area,[2*22*r/7,area+r,r*r]);return ["مساحة دائرة نصف قطرها "+r+" (π≈22/7)؟",o[0],o[1],"22/7 × "+r+"² = "+area+"."];},
-  function(){var arr=[ri(2,9),ri(11,19),ri(21,29)];shuffle(arr);var sorted=arr.slice().sort(function(x,y){return x-y;});var med=sorted[1],o=opt3(med,[sorted[0],sorted[2],sorted[0]+sorted[2]]);return ["ما الوسيط (القيمة الوسطى) للأعداد: "+arr.join("، ")+"؟",o[0],o[1],"بعد الترتيب الوسيط = "+med+"."];},
-  function(){var st=ri(3,15),sum=st+(st+1)+(st+2),o=opt3(sum,[sum+3,sum-3,st*3]);return ["مجموع ثلاثة أعداد متتالية أولها "+st+"؟",o[0],o[1],st+"+"+(st+1)+"+"+(st+2)+" = "+sum+"."];},
-  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),dec=cf[0],base=cf[1]*ri(Math.ceil(40/cf[1]),Math.floor(90/cf[1])),nv=base-base*dec/100,o=opt3(nv,[base-dec,nv+5,base]);return ["نقص سعر من "+base+" بنسبة "+dec+"%، فما السعر الجديد؟",o[0],o[1],base+" − "+dec+"% = "+nv+"."];},
-  function(){var den=gp([3,4,5,6]),mult=ri(2,9),N=den*mult,num=ri(1,den-1),v=N*num/den,o=opt3(v,[N-v,v+num,v+2]);return ["كم يساوي "+num+"/"+den+" من "+N+"؟",o[0],o[1],"("+N+"÷"+den+")×"+num+" = "+v+"."];},
-  function(){var a=ri(1,4),b=ri(1,4),k=ri(2,9),N=(a+b)*k,first=a*k,o=opt3(first,[b*k,N-first+1,N]);return ["قُسِّم مبلغ "+N+" ريال بين شخصين بنسبة "+a+":"+b+"، فما نصيب الأول؟",o[0],o[1],"الوحدة = "+N+"÷"+(a+b)+" = "+k+" → "+a+"×"+k+" = "+first+"."];},
-  function(){var cost=ri(20,80),profit=ri(5,40),sell=cost+profit,o=opt3(profit,[sell,cost,profit+5]);return ["اشترى تاجر سلعة بـ "+cost+" وباعها بـ "+sell+"، فما الربح؟",o[0],o[1],sell+" − "+cost+" = "+profit+" ريال."];},
-  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],price=cf[1]*ri(4,18),disc=price*p/100,fin=price-disc,o=opt3(fin,[disc,price,fin+5]);return ["خصم "+p+"% على سعر "+price+" ريال، فكم السعر بعد الخصم؟",o[0],o[1],"الخصم "+disc+" → "+price+"−"+disc+" = "+fin+"."];},
-  function(){var m=ri(2,9),o=opt3(m*100,[m*10,m*1000,m*60]);return ["كم سنتيمترًا في "+m+" أمتار؟ (المتر = 100 سم)",o[0],o[1],m+"×100 = "+(m*100)+" سم."];},
-  function(){var pr=gp([[2,3,6],[3,4,12],[4,6,12],[2,5,10],[6,8,24],[3,5,15]]),o=opt3(pr[2],[pr[0]*pr[1],pr[0]+pr[1],pr[2]+2]);return ["ما أصغر مضاعف مشترك للعددين "+pr[0]+" و "+pr[1]+"؟",o[0],o[1],"أصغر عدد يقبل القسمة على "+pr[0]+" و "+pr[1]+" هو "+pr[2]+"."];},
-  function(){var b=ri(2,9),n=ri(2,9),tot=b*n,o=opt3(n,[n+1,n-1,tot]);return ["وُزّع "+tot+" قلمًا بالتساوي على "+b+" طلاب، فكم نصيب كلٍّ؟",o[0],o[1],tot+" ÷ "+b+" = "+n+"."];},
-  function(){var s=ri(3,15),o=opt3(4*s,[s*s,2*s,4*s+1]);return ["مربّع طول ضلعه "+s+"، ما محيطه؟",o[0],o[1],"4×"+s+" = "+(4*s)+"."];},
-  function(){var s=ri(3,12),o=opt3(s*s,[4*s,2*s,s*s+s]);return ["مربّع طول ضلعه "+s+"، ما مساحته؟",o[0],o[1],s+"×"+s+" = "+(s*s)+"."];},
-  function(){var b=gp([4,6,8,10]),h=ri(3,10),area=b*h/2,o=opt3(area,[b*h,b+h,area+b]);return ["مثلث قاعدته "+b+" وارتفاعه "+h+"، ما مساحته؟",o[0],o[1],"(القاعدة×الارتفاع)÷2 = "+area+"."];},
-  function(){var l=ri(2,6),w=ri(2,6),h=ri(2,6),o=opt3(l*w*h,[l+w+h,2*(l+w+h),l*w]);return ["صندوق أبعاده "+l+"×"+w+"×"+h+"، ما حجمه؟",o[0],o[1],l+"×"+w+"×"+h+" = "+(l*w*h)+"."];},
-  function(){var h=ri(2,9),o=opt3(h*60,[h*100,h*24,h*30]);return ["كم دقيقة في "+h+" ساعات؟ (الساعة = 60 دقيقة)",o[0],o[1],h+"×60 = "+(h*60)+" دقيقة."];},
-  function(){var kg=ri(2,9),o=opt3(kg*1000,[kg*100,kg*10,kg*500]);return ["كم غرامًا في "+kg+" كيلوغرامات؟ (الكيلو = 1000غ)",o[0],o[1],kg+"×1000 = "+(kg*1000)+" غ."];},
-  function(){var pr=gp([[4,6,2],[6,9,3],[8,12,4],[10,15,5],[9,12,3]]),o=opt3(pr[2],[pr[0]*pr[1],pr[0]+pr[1],pr[2]+1]);return ["ما أكبر قاسم مشترك للعددين "+pr[0]+" و "+pr[1]+"؟",o[0],o[1],"أكبر عدد يقسم "+pr[0]+" و "+pr[1]+" هو "+pr[2]+"."];},
-  function(){var d=gp([4,5,8,10]),a=ri(1,d-2),b=ri(1,d-a-1),o=opt3((a+b)+"/"+d,[a+"/"+d,(a+b)+"/"+(2*d),(a*b)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d+" =؟",o[0],o[1],"نجمع البسط: ("+a+"+"+b+")/"+d+" = "+(a+b)+"/"+d+"."];},
-  function(){var st=gp([2,4,6,8]),seq=[st,st+2,st+4,st+6],nx=st+8,o=opt3(nx,[nx+2,nx-2,nx+1]);return ["أكمل نمط الأعداد الزوجية: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد 2 → "+nx+"."];},
-  function(){var n=gp([12,16,20,24,30,40]),o=opt3(n/2,[n/4,n*2,n-2]);return ["نصف العدد "+n+" يساوي؟",o[0],o[1],n+" ÷ 2 = "+(n/2)+"."];}
+  function(){var cf=gp([[10,10],[15,20],[20,5],[25,4],[40,5],[50,2]]),p=cf[0],N=cf[1]*ri(3,20),v=N*p/100,o=opts(v,[v+5,v-5,v*2]);return ["كم يساوي "+p+"% من "+N+"؟",o[0],o[1],"("+p+"÷100)×"+N+" = "+v+"."];},
+  function(){var a=ri(2,9),b=ri(2,9),x=ri(2,12),c=a*x+b,o=opts(x,[x+1,x-1,x+2]);return ["إذا كان "+a+"س + "+b+" = "+c+"، فما قيمة س؟",o[0],o[1],a+"س = "+(c-b)+" → س = "+x+"."];},
+  function(){var r1=ri(2,6),r2=ri(2,6),k=ri(2,8),o=opts(r2*k,[r1*k,(r1+r2)*k,r2*k+1]);return ["إذا كانت النسبة "+r1+":"+r2+" وكان الأول "+(r1*k)+"، فما الثاني؟",o[0],o[1],"معامل التناسب "+k+" → الثاني = "+(r2*k)+"."];},
+  function(){var n=gp([3,4,5]),m=ri(6,20),arr=[];for(var i=0;i<n;i++)arr.push(m+(i-Math.floor(n/2))*2);var s=arr.reduce(function(a,b){return a+b;},0),av=s/n,o=opts(av,[av+2,av-2,s]);return ["ما متوسط الأعداد: "+arr.join("، ")+"؟",o[0],o[1],"المجموع "+s+" ÷ "+n+" = "+av+"."];},
+  function(){var L=ri(5,15),W=ri(3,L-1),o=opts(L*W,[2*(L+W),L*W+L,L*W-W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما مساحته؟",o[0],o[1],L+"×"+W+" = "+(L*W)+"."];},
+  function(){var L=ri(5,15),W=ri(3,L-1),o=opts(2*(L+W),[L*W,L+W,2*L+W]);return ["مستطيل طوله "+L+" وعرضه "+W+"، ما محيطه؟",o[0],o[1],"(الطول+العرض)×2 = "+(2*(L+W))+"."];},
+  function(){var t=gp([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]),o=opts(t[2],[t[2]+1,t[0]+t[1],t[2]-2]);return ["مثلث قائم ضلعاه "+t[0]+" و "+t[1]+"، فما طول الوتر؟",o[0],o[1],"√("+t[0]+"²+"+t[1]+"²) = "+t[2]+"."];},
+  function(){var a=ri(2,9),step=gp([2,3,5]),start=ri(1,5),seq=[start,start+step,start+2*step,start+3*step],nx=start+4*step,o=opts(nx,[nx+step,nx-1,nx+1]);return ["أكمل النمط: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد "+step+" كل مرة → "+nx+"."];},
+  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),inc=cf[0],base=cf[1]*ri(Math.ceil(20/cf[1]),Math.floor(60/cf[1])),nv=base+base*inc/100,o=opts(nv,[base+inc,nv+5,base]);return ["زاد سعر من "+base+" بنسبة "+inc+"%، فما السعر الجديد؟",o[0],o[1],base+" + "+inc+"% = "+nv+"."];},
+  function(){var w=ri(2,9),d=ri(2,9),o=opts(w*d,[w+d,w*d+w,w*d-d]);return ["عامل ينجز "+w+" قطع في الساعة، كم ينجز في "+d+" ساعات؟",o[0],o[1],w+"×"+d+" = "+(w*d)+" قطعة."];},
+  function(){var v=ri(3,20),t=ri(2,9),d=v*t,o=opts(v,[v+2,v-1,d]);return ["قطع متسابق "+d+" كم في "+t+" ساعات، فما سرعته (كم/ساعة)؟",o[0],o[1],d+" ÷ "+t+" = "+v+" كم/س."];},
+  function(){var son=ri(6,16),diff=ri(18,32),f=son+diff,o=opts(son,[son+2,diff,f]);return ["الأب أكبر من ابنه بـ "+diff+" سنة، وعمر الأب "+f+"، فكم عمر الابن؟",o[0],o[1],f+" − "+diff+" = "+son+"."];},
+  function(){var r=ri(1,5),b=ri(1,5),tot=r+b,o=opts(r+"/"+tot,[b+"/"+tot,r+"/"+b,tot+"/"+r]);return ["كيس فيه "+r+" كرات حمراء و "+b+" زرقاء، ما احتمال سحب حمراء؟",o[0],o[1],"عدد الحمراء ÷ الكل = "+r+"/"+tot+"."];},
+  function(){var a=ri(30,150),o=opts(180-a,[a,180+a,90]);return ["زاويتان متكاملتان (مجموعهما 180°)، إحداهما "+a+"°، فما الأخرى؟",o[0],o[1],"180 − "+a+" = "+(180-a)+"°."];},
+  function(){var a=ri(10,80),o=opts(90-a,[a,90+a,180-a]);return ["زاويتان متتامتان (مجموعهما 90°)، إحداهما "+a+"°، فما الأخرى؟",o[0],o[1],"90 − "+a+" = "+(90-a)+"°."];},
+  function(){var r=gp([7,14,21]),area=22*r*r/7,o=opts(area,[2*22*r/7,area+r,r*r]);return ["مساحة دائرة نصف قطرها "+r+" (π≈22/7)؟",o[0],o[1],"22/7 × "+r+"² = "+area+"."];},
+  function(){var arr=[ri(2,9),ri(11,19),ri(21,29)];shuffle(arr);var sorted=arr.slice().sort(function(x,y){return x-y;});var med=sorted[1],o=opts(med,[sorted[0],sorted[2],sorted[0]+sorted[2]]);return ["ما الوسيط (القيمة الوسطى) للأعداد: "+arr.join("، ")+"؟",o[0],o[1],"بعد الترتيب الوسيط = "+med+"."];},
+  function(){var st=ri(3,15),sum=st+(st+1)+(st+2),o=opts(sum,[sum+3,sum-3,st*3]);return ["مجموع ثلاثة أعداد متتالية أولها "+st+"؟",o[0],o[1],st+"+"+(st+1)+"+"+(st+2)+" = "+sum+"."];},
+  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),dec=cf[0],base=cf[1]*ri(Math.ceil(40/cf[1]),Math.floor(90/cf[1])),nv=base-base*dec/100,o=opts(nv,[base-dec,nv+5,base]);return ["نقص سعر من "+base+" بنسبة "+dec+"%، فما السعر الجديد؟",o[0],o[1],base+" − "+dec+"% = "+nv+"."];},
+  function(){var den=gp([3,4,5,6]),mult=ri(2,9),N=den*mult,num=ri(1,den-1),v=N*num/den,o=opts(v,[N-v,v+num,v+2]);return ["كم يساوي "+num+"/"+den+" من "+N+"؟",o[0],o[1],"("+N+"÷"+den+")×"+num+" = "+v+"."];},
+  function(){var a=ri(1,4),b=ri(1,4),k=ri(2,9),N=(a+b)*k,first=a*k,o=opts(first,[b*k,N-first+1,N]);return ["قُسِّم مبلغ "+N+" ريال بين شخصين بنسبة "+a+":"+b+"، فما نصيب الأول؟",o[0],o[1],"الوحدة = "+N+"÷"+(a+b)+" = "+k+" → "+a+"×"+k+" = "+first+"."];},
+  function(){var cost=ri(20,80),profit=ri(5,40),sell=cost+profit,o=opts(profit,[sell,cost,profit+5]);return ["اشترى تاجر سلعة بـ "+cost+" وباعها بـ "+sell+"، فما الربح؟",o[0],o[1],sell+" − "+cost+" = "+profit+" ريال."];},
+  function(){var cf=gp([[10,10],[20,5],[25,4],[50,2]]),p=cf[0],price=cf[1]*ri(4,18),disc=price*p/100,fin=price-disc,o=opts(fin,[disc,price,fin+5]);return ["خصم "+p+"% على سعر "+price+" ريال، فكم السعر بعد الخصم؟",o[0],o[1],"الخصم "+disc+" → "+price+"−"+disc+" = "+fin+"."];},
+  function(){var m=ri(2,9),o=opts(m*100,[m*10,m*1000,m*60]);return ["كم سنتيمترًا في "+m+" أمتار؟ (المتر = 100 سم)",o[0],o[1],m+"×100 = "+(m*100)+" سم."];},
+  function(){var pr=gp([[2,3,6],[3,4,12],[4,6,12],[2,5,10],[6,8,24],[3,5,15]]),o=opts(pr[2],[pr[0]*pr[1],pr[0]+pr[1],pr[2]+2]);return ["ما أصغر مضاعف مشترك للعددين "+pr[0]+" و "+pr[1]+"؟",o[0],o[1],"أصغر عدد يقبل القسمة على "+pr[0]+" و "+pr[1]+" هو "+pr[2]+"."];},
+  function(){var b=ri(2,9),n=ri(2,9),tot=b*n,o=opts(n,[n+1,n-1,tot]);return ["وُزّع "+tot+" قلمًا بالتساوي على "+b+" طلاب، فكم نصيب كلٍّ؟",o[0],o[1],tot+" ÷ "+b+" = "+n+"."];},
+  function(){var s=ri(3,15),o=opts(4*s,[s*s,2*s,4*s+1]);return ["مربّع طول ضلعه "+s+"، ما محيطه؟",o[0],o[1],"4×"+s+" = "+(4*s)+"."];},
+  function(){var s=ri(3,12),o=opts(s*s,[4*s,2*s,s*s+s]);return ["مربّع طول ضلعه "+s+"، ما مساحته؟",o[0],o[1],s+"×"+s+" = "+(s*s)+"."];},
+  function(){var b=gp([4,6,8,10]),h=ri(3,10),area=b*h/2,o=opts(area,[b*h,b+h,area+b]);return ["مثلث قاعدته "+b+" وارتفاعه "+h+"، ما مساحته؟",o[0],o[1],"(القاعدة×الارتفاع)÷2 = "+area+"."];},
+  function(){var l=ri(2,6),w=ri(2,6),h=ri(2,6),o=opts(l*w*h,[l+w+h,2*(l+w+h),l*w]);return ["صندوق أبعاده "+l+"×"+w+"×"+h+"، ما حجمه؟",o[0],o[1],l+"×"+w+"×"+h+" = "+(l*w*h)+"."];},
+  function(){var h=ri(2,9),o=opts(h*60,[h*100,h*24,h*30]);return ["كم دقيقة في "+h+" ساعات؟ (الساعة = 60 دقيقة)",o[0],o[1],h+"×60 = "+(h*60)+" دقيقة."];},
+  function(){var kg=ri(2,9),o=opts(kg*1000,[kg*100,kg*10,kg*500]);return ["كم غرامًا في "+kg+" كيلوغرامات؟ (الكيلو = 1000غ)",o[0],o[1],kg+"×1000 = "+(kg*1000)+" غ."];},
+  function(){var pr=gp([[4,6,2],[6,9,3],[8,12,4],[10,15,5],[9,12,3]]),o=opts(pr[2],[pr[0]*pr[1],pr[0]+pr[1],pr[2]+1]);return ["ما أكبر قاسم مشترك للعددين "+pr[0]+" و "+pr[1]+"؟",o[0],o[1],"أكبر عدد يقسم "+pr[0]+" و "+pr[1]+" هو "+pr[2]+"."];},
+  function(){var d=gp([4,5,8,10]),a=ri(1,d-2),b=ri(1,d-a-1),o=opts((a+b)+"/"+d,[a+"/"+d,(a+b)+"/"+(2*d),(a*b)+"/"+d]);return ["احسب: "+a+"/"+d+" + "+b+"/"+d+" =؟",o[0],o[1],"نجمع البسط: ("+a+"+"+b+")/"+d+" = "+(a+b)+"/"+d+"."];},
+  function(){var st=gp([2,4,6,8]),seq=[st,st+2,st+4,st+6],nx=st+8,o=opts(nx,[nx+2,nx-2,nx+1]);return ["أكمل نمط الأعداد الزوجية: "+seq.join("، ")+"، ...؟",o[0],o[1],"نزيد 2 → "+nx+"."];},
+  function(){var n=gp([12,16,20,24,30,40]),o=opts(n/2,[n/4,n*2,n-2]);return ["نصف العدد "+n+" يساوي؟",o[0],o[1],n+" ÷ 2 = "+(n/2)+"."];}
 ];
 /* اسم كل مولّد كمّي — بالترتيب نفسه لعناصر QUANT أعلاه.
    ⚠️ لو أضفت أو حذفت مولّدًا في QUANT، عدّل هذي القائمة في الموضع نفسه. */
@@ -248,12 +259,31 @@ var QUANT_AR=[
  "حجم الصندوق","تحويل الزمن","تحويل الكتلة","القاسم المشترك الأكبر","جمع الكسور",
  "أنماط الأعداد الزوجية","نصف العدد"
 ];
+/* ═══ النمطان الغائبان، بوزنِهما في الاختبار ═══════════════════════
+   قِياسُ ورقةِ قدراتٍ كمّيّةٍ أرسلها الأب (٣٠ سؤالًا): المقارناتُ أربعةٌ
+   (١٣٪) وقراءةُ الرسومِ خمسةٌ (١٧٪) — وثلاثونَ في المئةٍ من القسمِ لم
+   يكن لها عندنا مولّدٌ واحد. وهما أشدُّ ما يُربك من لم يرَهما: المقارنةُ
+   تُختبَر فيها عادةٌ ذهنيّةٌ غيرُ الحساب (هل تكفي المعطيات؟)، والرسمُ
+   يُستخرَج فيه العددُ من صورةٍ لا من نصّ.
+   وغيابُ الملفِّ لا يكسر القسم: يعود إلى مولّداتِه الستّةِ والثلاثين. */
+var GQ = window.GAT_QUANT || {};
+var CMPG = GQ.CMP || [], CMPG_AR = GQ.CMP_AR || [];
+var CHARTG = GQ.CHART || [], CHARTG_AR = GQ.CHART_AR || [];
+var HAS_GQ = !!(CMPG.length && CHARTG.length);
+/* الوزنُ بثلاثين خانةً كعددِ أسئلةِ الورقة: ٤ مقارنات · ٥ رسوم · ٢١ بقيّة */
+function qPick(){
+  if(!HAS_GQ) return { g:QUANT, ar:QUANT_AR, k:Math.floor(Math.random()*QUANT.length) };
+  var slot = Math.floor(Math.random()*30);
+  if(slot < 4)  return { g:CMPG,   ar:CMPG_AR,   k:Math.floor(Math.random()*CMPG.length) };
+  if(slot < 9)  return { g:CHARTG, ar:CHARTG_AR, k:Math.floor(Math.random()*CHARTG.length) };
+  return { g:QUANT, ar:QUANT_AR, k:Math.floor(Math.random()*QUANT.length) };
+}
 function genQuant(n){
   var out=[],seen={},t=0;
   while(out.length<n && t<n*10){
-    var k=Math.floor(Math.random()*QUANT.length), q=QUANT[k]();
+    var s=qPick(), q=s.g[s.k]();
     t++; if(seen[q[0]])continue; seen[q[0]]=1;
-    q.gen = QUANT_AR[k] || ("كمّي "+k);
+    q.gen = s.ar[s.k] || ("كمّي "+s.k);
     out.push(q);
   }
   return out;
@@ -1272,6 +1302,16 @@ app.innerHTML =
   '<footer>أسئلة تدريبية من إعداد المعلّم بنمط اختبارات قياس · ليست الأسئلة الرسمية</footer>';
 
 function shuffleQ(q){
+  /* ═══ وأسئلةُ المقارنةِ لا تُخلَط ═══════════════════════════════
+     خياراتُها الأربعةُ ثابتةُ النصِّ والترتيبِ في الاختبار (الأولى أكبر ·
+     الثانية أكبر · متساويتان · المعطيات غير كافية)، فخلطُها يُدرّب على
+     صورةٍ لا يراها في القاعة — انظر gat-quant.js. */
+  if(q && q.fixed){
+    var f = [q[0], q[1].slice(), q[2], q[3]];
+    if(q.gen) f.gen = q.gen;
+    f.fixed = true;
+    return f;
+  }
   var pairs = q[1].map(function(o,i){ return [o,i]; });
   for(var i=pairs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pairs[i]; pairs[i]=pairs[j]; pairs[j]=t; }
   var idx=0, newOpts=pairs.map(function(p,ni){ if(p[1]===q[2]) idx=ni; return p[0]; });

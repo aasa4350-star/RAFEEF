@@ -374,6 +374,7 @@ function run(){
   issues.push(...weakCapPath());
   issues.push(...vocabRestorePath());
   issues.push(...licenseExamPath());
+  issues.push(...gatQuantPath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -3845,8 +3846,11 @@ function quantDosePath(){
                                          : ('function ' + name + src.slice(m.index + m[0].length - 1, end + 1)), sb);
           return true; } catch(e){ return false; }
   }
-  for (const h of ['ri','gp','opt3'])
+  /* opt3 صارت opts لمّا رُفعت الخياراتُ إلى أربعة (انظر gatQuantPath)،
+     والاسمُ القديمُ باقٍ كمرادفٍ في الصفحةِ لا كدالّة — فيُنتزَع الجديد. */
+  for (const h of ['ri','gp','opts'])
     if (!take(h, 'fn')) { E('المساعدُ ' + h + ' لا يُنتزَع — فالمولّداتُ لا تُشغَّل'); return out; }
+  try { vm.runInContext('var opt3 = opts;', sb); } catch(e){}
   for (const a of ['QUANT','QUANT_AR','DOSE_Q_EX','DOSE_Q_SETS'])
     if (!take(a, 'arr')) { E(a + ' لا تُنتزَع'); return out; }
 
@@ -5966,6 +5970,148 @@ function licenseExamPath(){
     if (Math.abs(pedag/tot - 0.50) > 0.08)
       E(F, 'وزنُ التربويِّ في الشامل ' + Math.round(pedag/tot*100) + '٪ ووزنُه في الورقةِ ٥٠٪');
   }
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   قدرات الكمّيّ — النمطان الغائبان، وأربعةُ خيارات
+   ═══════════════════════════════════════════════════════════════════
+   أرسل الأب ورقةَ قدراتٍ كمّيّةٍ (٣٠ سؤالًا مُجمَّعةً ومحلولة). وقِياسُ
+   أنماطِها على مولّداتِنا كشف ثغرتين كالتي كشفتها ورقةُ الرخصة:
+
+   (١) المقارناتُ أربعةٌ (١٣٪) وقراءةُ الرسومِ خمسٌ (١٧٪) — ثلاثون في
+       المئةٍ من القسمِ بلا مولّدٍ واحدٍ عندنا.
+   (٢) opt3 كانت تقف عند ثلاثةِ خيارات، والاختبارُ رباعيّ — والتخمينُ
+       ٣٣٪ لا ٢٥٪. وسبعةٌ وعشرون موضعًا كانت تُمرّر ثلاثةَ مشتّتاتٍ
+       فيُهمَل ثالثُها.
+
+   والحارسُ لا يثق بجوابٍ مكتوب: يُشغّل كلَّ مولّدٍ مئةَ مرّةٍ، ويعيد
+   حسابَ المقارناتِ العدديّةِ من متنِها بنفسِه. */
+function gatQuantPath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F);
+  const BF = 'gat-quant.js', bp = path.join(ROOT, BF);
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(p))  return [{ sev:'خطأ', file:F,  msg:'الصفحةُ مفقودة' }];
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:BF, msg:'مولّداتُ المقارناتِ والرسومِ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ═══ (١) أربعةُ خيارات — تُشغَّل opts نفسُها ═══ */
+  const om = /function opts\(correct, ds\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!om) { E(F, 'دالّةُ الخياراتِ (opts) لا تُنتزَع'); return out; }
+  let O = null;
+  try {
+    const sb = { Math: Math, String: String };
+    vm.createContext(sb);
+    vm.runInContext('function opts(correct, ds){' + om[1] + '\n}; R = opts;', sb);
+    O = sb.R;
+  } catch(e){ E(F, 'دالّةُ الخياراتِ لا تُشغَّل: ' + e.message); return out; }
+  for (let t = 0; t < 50; t++){
+    const r = O(10, [20, 30, 40]);
+    if (r[0].length !== 4) { E(F, 'الخياراتُ ' + r[0].length + ' لا أربعة — والاختبارُ رباعيّ'); break; }
+    if (new Set(r[0]).size !== 4) { E(F, 'خيارٌ مكرَّرٌ في المخرجات'); break; }
+    if (r[0][r[1]] !== '10') { E(F, 'فهرسُ الصحيحِ لا يشير إليه'); break; }
+  }
+  const few = O(7, [9]);          /* ما مرّر مشتّتًا واحدًا يُكمَّل آليًّا */
+  if (few[0].length !== 4) E(F, 'ما مرّر مشتّتًا واحدًا لا يُكمَّل إلى أربعة (' + few[0].length + ')');
+  if (/o\.length<3/.test(src)) E(F, 'بقي في الصفحةِ سقفُ الثلاثةِ القديم');
+
+  /* ═══ (٢) المولّداتُ الجديدةُ: تُشغَّل ويُراجَع جوابُها حسابًا ═══ */
+  let G = null;
+  try {
+    const b2 = { window:{}, Math: Math, String: String };
+    vm.createContext(b2);
+    vm.runInContext(fs.readFileSync(bp, 'utf8'), b2, { timeout: 5000 });
+    G = b2.window.GAT_QUANT;
+  } catch(e){ E(BF, 'الملفُّ لا يُشغَّل: ' + e.message); return out; }
+  if (!G || !G.CMP || !G.CHART) { E(BF, 'GAT_QUANT ناقصة'); return out; }
+  if (G.CMP.length < 8)   E(BF, 'مولّداتُ المقارنةِ ' + G.CMP.length + ' — قليلةٌ فتتكرّر');
+  if (G.CHART.length < 5) E(BF, 'مولّداتُ الرسومِ ' + G.CHART.length + ' — قليلةٌ فتتكرّر');
+  if (G.CMP_AR.length !== G.CMP.length)     E(BF, 'أسماءُ مولّداتِ المقارنةِ لا تطابق عددَها');
+  if (G.CHART_AR.length !== G.CHART.length) E(BF, 'أسماءُ مولّداتِ الرسومِ لا تطابق عددَها');
+
+  let shape = 0, three = 0, dup = 0, idx = 0, noexp = 0, notFixed = 0;
+  [['CMP', G.CMP], ['CHART', G.CHART]].forEach(function(pair){
+    pair[1].forEach(function(f, k){
+      for (let t = 0; t < 100; t++){
+        let q;
+        try { q = f(); } catch(e){ E(BF, pair[0] + '[' + k + '] يتعطّل: ' + e.message); return; }
+        if (!Array.isArray(q) || q.length !== 4) { shape++; return; }
+        if (q[1].length !== 4) { three++; return; }
+        if (new Set(q[1]).size !== 4) { dup++; return; }
+        if (!(q[2] >= 0 && q[2] < 4)) { idx++; return; }
+        if (typeof q[3] !== 'string' || q[3].length < 10) { noexp++; return; }
+        if (pair[0] === 'CMP' && !q.fixed) { notFixed++; return; }
+      }
+    });
+  });
+  if (shape)    E(BF, shape + ' مولّدًا على غيرِ صيغةِ [متن، خيارات، فهرس، شرح]');
+  if (three)    E(BF, three + ' مولّدًا يخرج بغيرِ أربعةِ خيارات');
+  if (dup)      E(BF, dup + ' مولّدًا يكرّر خيارًا — فيصير الجوابُ خيارين');
+  if (idx)      E(BF, idx + ' مولّدًا فهرسُ جوابِه خارجَ الخيارات');
+  if (noexp)    E(BF, noexp + ' مولّدًا بلا شرح');
+  if (notFixed) E(BF, notFixed + ' مولّدَ مقارنةٍ بلا وسمِ fixed — فتُخلَط خياراتُه وترتيبُها ثابتٌ في الاختبار');
+
+  /* ═══ (٣) الجوابُ يُراجَع حسابًا لا يُصدَّق كما كُتب ═══
+     نقرأ العددين من متنِ المقارنةِ العدديّةِ ونقارنهما بأنفسنا. */
+  const A2E = x => String(x).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+                            .replace(/٫/g, '.').replace(/−/g, '-').trim();
+  /* يُقوّم الصورَ الحسابيّةَ الصريحةَ وحدَها، ويردُّ null فيما سواها
+     (أعدادٌ أوّليّةٌ · متباينةٌ · س² · محيطٌ ومساحة) فلا يُحكَم عليه. */
+  function val(txt){
+    let x = A2E(txt).replace(/^\(|\)$/g, '').trim();
+    let m;
+    if ((m = /^(-?[\d.]+)\s*٪\s*من\s*(-?[\d.]+)$/.exec(x)))
+      return (+m[1]) * (+m[2]) / 100;
+    if ((m = /^(-?[\d.]+)\s*\/\s*(-?[\d.]+)$/.exec(x)))
+      return (+m[2]) === 0 ? null : (+m[1]) / (+m[2]);
+    if (/^-?[\d.]+(\s*[×+]\s*-?[\d.]+)+$/.test(x)){
+      const plus = x.indexOf('+') >= 0;
+      const parts = x.split(plus ? '+' : '×').map(v => +v.trim());
+      if (parts.some(v => !isFinite(v))) return null;
+      return plus ? parts.reduce((a,b) => a+b, 0) : parts.reduce((a,b) => a*b, 1);
+    }
+    if (/^-?[\d.]+$/.test(x)) return +x;
+    return null;
+  }
+  let checked = 0, wrong = 0;
+  for (let t = 0; t < 900; t++){
+    const q = G.CMP[t % G.CMP.length]();
+    const m = /القيمة الأولى:\s*([^·]+)·\s*القيمة الثانية:\s*(.+)$/.exec(q[0]);
+    if (!m) continue;
+    const a = val(m[1]), b = val(m[2]);
+    if (a === null || b === null) continue;
+    checked++;
+    const want = (Math.abs(a-b) < 1e-9) ? 2 : (a > b ? 0 : 1);
+    if (q[2] !== want){
+      wrong++;
+      if (wrong === 1) E(BF, 'جوابُ مقارنةٍ خاطئ: «' + q[0].slice(0,80) + '» قال «' +
+        q[1][q[2]] + '» والحسابُ المستقلُّ ' + a + ' مقابل ' + b);
+    }
+  }
+  if (checked < 150)
+    E(BF, 'لم تُراجَع حسابيًّا إلّا ' + checked + ' مقارنةً من ٩٠٠ — المراجعةُ المستقلّةُ لا تعمل');
+
+  /* ═══ (٤) الصفحةُ تصلها، بوزنِ الورقة، ولا تنكسر بغيابها ═══ */
+  if (!/<script src="gat-quant\.js/.test(src)) E(F, 'الصفحةُ لا تُحمّل مولّداتِ النمطين');
+  if (!/var HAS_GQ = /.test(src) || !/if\(!HAS_GQ\)/.test(src))
+    E(F, 'غيابُ الملفِّ يكسر القسمَ الكمّيَّ بدل أن يعود إلى مولّداتِه');
+  const wm = /function qPick\(\)\{([\s\S]*?)\n\}/.exec(src);
+  if (!wm) E(F, 'لا وزنَ للأنماطِ في القسمِ الكمّيّ — تُنتقى بالتساوي فيظنُّ المقارناتِ ضِعفَ وزنِها');
+  else {
+    const lo = /slot < (\d+)\)\s*return \{ g:CMPG/.exec(wm[1]);
+    const hi = /slot < (\d+)\)\s*return \{ g:CHARTG/.exec(wm[1]);
+    const tot = /Math\.random\(\)\*(\d+)/.exec(wm[1]);
+    if (!lo || !hi || !tot) E(F, 'وزنُ الأنماطِ لا يُقرأ');
+    else {
+      const T = +tot[1], c = +lo[1], h = +hi[1] - +lo[1];
+      if (Math.abs(c/T - 4/30) > 0.05) E(F, 'وزنُ المقارناتِ ' + Math.round(100*c/T) + '٪ ووزنُها في الورقةِ ١٣٪');
+      if (Math.abs(h/T - 5/30) > 0.05) E(F, 'وزنُ الرسومِ ' + Math.round(100*h/T) + '٪ ووزنُها في الورقةِ ١٧٪');
+    }
+  }
+  /* وترتيبُ خياراتِ المقارنةِ لا يُخلَط */
+  if (!/if\(q && q\.fixed\)/.test(src))
+    E(F, 'خلطُ الخياراتِ يشمل المقارنات — وترتيبُها ثابتٌ في الاختبار');
   return out;
 }
 
