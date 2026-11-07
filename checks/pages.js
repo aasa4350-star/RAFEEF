@@ -373,6 +373,7 @@ function run(){
   issues.push(...dictDosePath());
   issues.push(...weakCapPath());
   issues.push(...vocabRestorePath());
+  issues.push(...licenseExamPath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -5853,6 +5854,118 @@ function vocabRestorePath(){
   if (u.length !== 1)
     E(RF, 'استرجاعُ حسنٍ ألغى تصفيرَ رفيف — الحدُّ يجب أن يكون لكلِّ ابنٍ وحدَه');
 
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   الرخصة المهنية — المجالاتُ التي لم تكن في البنك
+   ═══════════════════════════════════════════════════════════════════
+   أرسل الأب ورقةَ «أسئلة الجمعة» (٢٦/٥/١٤٤٨هـ): ٦٨ سؤالًا في ستّة
+   مجالات. وقِياسُها على صفحتِنا كشف ثغرتين:
+
+   (١) ثلثُ الاختبارِ بلا تدريب: لغويٌّ ١٤ (٢١٪) · كمّيٌّ ٥ · أنظمةٌ ٢ ·
+       تقنيةٌ ٢ — ولا شيءَ منها في البنك. ونصفُه مواقفُ صفّيّةٌ وبنكُنا
+       تعريفيٌّ في أكثره.
+   (٢) bankGen كان يقتطع ثلاثةَ خيارات، والاختبارُ رباعيّ. فسؤالٌ
+       رباعيٌّ يُعرَض ناقصًا بلا خطأٍ يظهر — والتخمينُ ٣٣٪ لا ٢٥٪. */
+function licenseExamPath(){
+  const out = [];
+  const F = 'license.html', p = path.join(ROOT, F);
+  const BF = 'license-exam.js', bp = path.join(ROOT, BF);
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:BF, msg:'بنكُ المجالاتِ الجديدةِ مفقود' }];
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ═══ (١) الخياراتُ لا تُقتطَع — تُشغَّل الدالّةُ نفسُها ═══ */
+  const sb = { en: x => x, gp: a => a[0], shuffle: a => a, window: {} };
+  vm.createContext(sb);
+  const i0 = src.indexOf('function bankExpl'), i1 = src.indexOf('var THEOG=');
+  if (i0 < 0 || i1 < 0) { E(F, 'دوالُّ البنكِ لا تُنتزَع'); return out; }
+  try { vm.runInContext(src.slice(i0, i1), sb); }
+  catch(e){ E(F, 'دوالُّ البنكِ لا تُشغَّل: ' + e.message); return out; }
+  const four = sb.bankGen([['س', ['صح','خ١','خ٢','خ٣'], 'شرح']])();
+  if (four[1].length !== 4)
+    E(F, 'السؤالُ الرباعيُّ يخرج بـ' + four[1].length + ' خيارات — يُقتطَع صامتًا والاختبارُ رباعيّ');
+  if (four[1][four[2]] !== 'صح') E(F, 'موضعُ الجوابِ الصحيحِ لا يتبع الخيارات');
+  if (four[3] !== 'شرح') E(F, 'الشرحُ لا يُقرأ من الصيغةِ الثلاثية');
+  const three = sb.bankGen([['س', ['صح','خ١','خ٢'], 'شرح']])();
+  if (three[1].length !== 3) E(F, 'الصيغةُ الثلاثيةُ القديمةُ انكسرت (' + three[1].length + ')');
+
+  /* ═══ (٢) البنكُ الجديدُ: يُحمَّل، ويُفحَص سؤالًا سؤالًا ═══ */
+  let X = null;
+  try {
+    const b2 = { window:{} }; vm.createContext(b2);
+    vm.runInContext(fs.readFileSync(bp, 'utf8'), b2, { timeout: 5000 });
+    X = b2.window.LIC_EXTRA;
+  } catch(e){ E(BF, 'الملفُّ لا يُشغَّل: ' + e.message); return out; }
+  if (!X) { E(BF, 'LIC_EXTRA غيرُ معرَّفة'); return out; }
+
+  /* أعدادُ الورقةِ كما جاءت فيها — فلو سقط سؤالٌ بُيِّن */
+  const PAPER = { LANG:14, QUANT:5, SYS:4, SITU:34, MEAS:11 };
+  Object.keys(PAPER).forEach(function(k){
+    const b = X[k];
+    if (!Array.isArray(b) || !b.length) { E(BF, 'بنكُ ' + k + ' مفقودٌ أو فارغ'); return; }
+    if (b.length < PAPER[k])
+      E(BF, 'بنكُ ' + k + ' فيه ' + b.length + ' سؤالًا، وفي الورقةِ ' + PAPER[k] + ' — سقط منه شيء');
+  });
+  /* ولا يُلحَق بالأنظمةِ والتقنيةِ شيءٌ من عندنا: أحكامُها تُنقَل */
+  if (X.SYS && X.SYS.length !== PAPER.SYS)
+    E(BF, 'بابُ الأنظمةِ والتقنيةِ ' + X.SYS.length + ' والورقةُ ' + PAPER.SYS +
+          ' — وأحكامُهما تُنقَل عن جهتِها ولا تُستنبَط');
+
+  let shape = 0, dup = 0, noexp = 0, thin = 0;
+  Object.keys(X).forEach(function(k){
+    (X[k] || []).forEach(function(q, n){
+      if (typeof q[0] !== 'string' || !Array.isArray(q[1]) || typeof q[2] !== 'string') { shape++; return; }
+      if (q[1].length < 3) thin++;
+      if (new Set(q[1]).size !== q[1].length) dup++;
+      if (!q[2] || q[2].length < 25) noexp++;
+    });
+  });
+  if (shape) E(BF, shape + ' سؤالًا على غيرِ صيغةِ البنك [متن، خيارات، شرح]');
+  if (thin)  E(BF, thin + ' سؤالًا خياراتُه أقلُّ من ثلاثة');
+  if (dup)   E(BF, dup + ' سؤالًا فيه خيارٌ مكرَّر — فيصير الجوابُ الصحيحُ خيارين');
+  if (noexp) E(BF, noexp + ' سؤالًا بلا شرحٍ معتبَر — والشرحُ هو ما يُعلّم، لا الدرجة');
+
+  /* ═══ (٣) الصفحةُ تصلها فعلًا: تبويبٌ ولوحٌ وتهيئةٌ لكلِّ محور ═══ */
+  if (!/<script src="license-exam\.js/.test(src))
+    E(F, 'الصفحةُ لا تُحمّل بنكَ المجالاتِ الجديدة');
+  if (!/EVAL = EVAL\.concat\(X\.MEAS\)/.test(src))
+    E(F, 'أسئلةُ القياسِ من الورقةِ لا تُضَمُّ إلى محورِ التقويم');
+  ['situ','lang','quant','sys'].forEach(function(id){
+    if (!new RegExp('data-tab="' + id + '"').test(src)) E(F, 'لا تبويبَ للمحور «' + id + '»');
+    if (!new RegExp('id="' + id + '"').test(src))       E(F, 'لا لوحَ للمحور «' + id + '»');
+    if (!new RegExp('CFG\\.' + id + '\\s*=').test(src)) E(F, 'لا تهيئةَ (CFG) للمحور «' + id + '»');
+    if (!new RegExp('id:"' + id + '"').test(src))
+      E(F, 'المحورُ «' + id + '» خارجَ العلاجيِّ — فيسكت عن ثلثِ الاختبار');
+  });
+  /* وغيابُ الملفِّ لا يكسر الصفحة */
+  if (!/var HAS_X = /.test(src) || !/HAS_X \?/.test(src))
+    E(F, 'الصفحةُ لا تحتمل غيابَ البنكِ الجديد — فتنكسر إن لم يُحمَّل');
+
+  /* ═══ (٤) الشاملُ يُوزَن بوزنِ الورقةِ لا بالتساوي ═══
+     الورقة: تربويٌّ ٣٤ · لغويٌّ ١٤ · قياسٌ ١١ · كمّيٌّ ٥ · أنظمةٌ+تقنيةٌ ٤
+     من ٦٨ — أي ٥٠٪ · ٢١٪ · ١٦٪ · ٧٪ · ٦٪. */
+  const am = /var ALLG = HAS_X \? \[([\s\S]*?)\] : \[/.exec(src);
+  if (!am) E(F, 'الشاملُ غيرُ موزونٍ بوزنِ الاختبار — يُنتقى بالتساوي فيظنُّ اللغويَّ ثُمنَه وهو خُمسُه');
+  else {
+    const slots = (am[1].match(/[A-Z]+G\[0\]/g) || []);
+    const cnt = {};
+    slots.forEach(function(g){ cnt[g] = (cnt[g] || 0) + 1; });
+    const tot = slots.length;
+    const pedag = ['SITUG[0]','THEOG[0]','GROWG[0]','BLOOMG[0]','PLANG[0]','CLASSG[0]','SPECG[0]','ETHICG[0]']
+      .reduce(function(a,g){ return a + (cnt[g] || 0); }, 0);
+    const want = { 'LANGG[0]':0.21, 'EVALG[0]':0.16, 'QUANTG[0]':0.07, 'SYSG[0]':0.06 };
+    Object.keys(want).forEach(function(g){
+      const got = (cnt[g] || 0) / tot;
+      if (Math.abs(got - want[g]) > 0.06)
+        E(F, 'وزنُ ' + g.replace('G[0]','') + ' في الشامل ' + Math.round(got*100) +
+             '٪ ووزنُه في الورقةِ ' + Math.round(want[g]*100) + '٪');
+    });
+    if (Math.abs(pedag/tot - 0.50) > 0.08)
+      E(F, 'وزنُ التربويِّ في الشامل ' + Math.round(pedag/tot*100) + '٪ ووزنُه في الورقةِ ٥٠٪');
+  }
   return out;
 }
 

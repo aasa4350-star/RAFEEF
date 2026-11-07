@@ -11,6 +11,7 @@
 <script src="gate.js"></script>
 <script src="rules-print.js?v=20261010"></script>
 <script src="attempts-queue.js"></script>
+<script src="license-exam.js?v=20261107"></script>
 <style>
   :root{
     --accent:#b45309; --accent-deep:#92400e;
@@ -687,10 +688,46 @@ var ETHIC = [
 ];
 
 function bankExpl(p){ return (typeof p[2] === "number") ? p[3] : p[2]; }
-function bankGen(bank){ return function(){ var p=gp(bank); var o=[p[1][0],p[1][1],p[1][2]]; shuffle(o); return [p[0], o, o.indexOf(p[1][0]), bankExpl(p)]; }; }
+/* ═══ الخياراتُ تُحمَل كما كُتبت، ثلاثًا كانت أو أربعًا ══════════════
+   كان ههنا [p[1][0],p[1][1],p[1][2]] — ثلاثةٌ بالعدد. وبنكُنا كلُّه
+   ثلاثيٌّ (١٨٩ سؤالًا بلا استثناء)، والاختبارُ الحقيقيُّ رباعيّ: ففي
+   ورقةِ «أسئلة الجمعة» (٢٦/٥/١٤٤٨هـ) الأسئلةُ الثمانيةُ والستّون
+   كلُّها أربعةُ خيارات. والفرقُ ليس شكلًا: التخمينُ في الثلاثيِّ ٣٣٪
+   وفي الرباعيِّ ٢٥٪، فمن تدرّب على الثلاثيِّ قاس نفسَه بأرفقَ ممّا
+   سيُقاس به.
+
+   ولو أُضيف سؤالٌ رباعيٌّ على الصيغةِ القديمةِ لسقط خيارُه الرابعُ
+   صامتًا — لا خطأً يظهر، بل سؤالٌ ناقصٌ يُعرَض على الدارسِ كأنّه تامّ.
+   فصارت تُحمَل كما كُتبت. */
+function bankGen(bank){ return function(){ var p=gp(bank); var o=p[1].slice(); shuffle(o); return [p[0], o, o.indexOf(p[1][0]), bankExpl(p)]; }; }
+/* ═══ المجالاتُ التي لم تكن في البنك ══════════════════════════════
+   من license-exam.js — انظر صدرَه: ورقةُ «أسئلة الجمعة» كشفت أنّ
+   اللغويَّ (٢١٪ من الاختبار) والكمّيَّ والأنظمةَ والتقنيةَ لا تدريبَ
+   عليها عندنا أصلًا، وأنّ نصفَ الاختبارِ مواقفُ صفّيّةٌ لا تعريفات.
+   وما لم يصل الملفُّ بقيت الصفحةُ على محاورها الثمانيةِ ولم تنكسر. */
+var X = window.LIC_EXTRA || {};
+if(X.MEAS && X.MEAS.length) EVAL = EVAL.concat(X.MEAS);   /* القياسُ يُضمُّ إلى محورِه */
+var LANG = X.LANG || [], QUANT = X.QUANT || [], SITU = X.SITU || [], SYS = X.SYS || [];
+var HAS_X = !!(LANG.length && QUANT.length && SITU.length && SYS.length);
+
 var THEOG=[bankGen(THEO)], GROWG=[bankGen(GROW)], BLOOMG=[bankGen(BLOOM)], PLANG=[bankGen(PLAN)],
     EVALG=[bankGen(EVAL)], CLASSG=[bankGen(CLASS)], SPECG=[bankGen(SPEC)], ETHICG=[bankGen(ETHIC)];
-var ALLG=[THEOG[0], GROWG[0], BLOOMG[0], PLANG[0], EVALG[0], CLASSG[0], SPECG[0], ETHICG[0]];
+var LANGG=[bankGen(LANG)], QUANTG=[bankGen(QUANT)], SITUG=[bankGen(SITU)], SYSG=[bankGen(SYS)];
+
+/* ═══ والشاملُ يُوزَن بوزنِ الاختبارِ لا بالتساوي ═══════════════════
+   كان ALLG ثمانيةَ مولّداتٍ تُنتقى بالتساوي، فيخرج الشاملُ ١٢٫٥٪ لكلّ
+   محور. ووزنُ الورقةِ الحقيقيّ: تربويٌّ ٣٤ · لغويٌّ ١٤ · قياسٌ ١١ ·
+   كمّيٌّ ٥ · أنظمةٌ ٢ · تقنيةٌ ٢ من ٦٨. فمن تدرّب بالتساوي ظنّ اللغويَّ
+   ثُمنَ الاختبارِ وهو خُمسُه، والكمّيَّ ثُمنَه وهو جزءٌ من أربعةَ عشر.
+   والتكرارُ في المصفوفةِ هو الوزن، لأنّ genN تنتقي منها بالتساوي. */
+var ALLG = HAS_X ? [
+  LANGG[0], LANGG[0], LANGG[0], LANGG[0],                    /* لغويّ ٢٠٪ */
+  EVALG[0], EVALG[0], EVALG[0],                              /* قياسٌ وتقويم ١٥٪ */
+  QUANTG[0], QUANTG[0],                                      /* كمّيّ ١٠٪ */
+  SYSG[0],                                                   /* أنظمةٌ وتقنية ٥٪ */
+  SITUG[0], SITUG[0], SITUG[0], SITUG[0],                    /* مواقفُ تربويّة ٢٠٪ */
+  THEOG[0], GROWG[0], BLOOMG[0], PLANG[0], CLASSG[0], SPECG[0]   /* تربويٌّ نظريّ ٣٠٪ */
+] : [THEOG[0], GROWG[0], BLOOMG[0], PLANG[0], EVALG[0], CLASSG[0], SPECG[0], ETHICG[0]];
 
 function genN(gens, n){ var out=[], seen={}, t=0; while(out.length<n && t<n*30){ var f=gp(gens), q; try{ q=f(); }catch(e){ t++; continue; } t++; if(!q||seen[q[0]]) continue; seen[q[0]]=1; try{ q.__g=f.name||""; q.__gf=f; }catch(e){} out.push(q); } return out; }
 
@@ -701,7 +738,7 @@ if(!NAMES[who]){
   app.innerHTML =
     '<header class="top"><p class="eyebrow">الرخصة المهنية للمعلمين</p><h1>🎓 الاختبار التربويّ العامّ</h1></header>'+
     '<div class="bar"><a href="khassa.html?who=khassa">🧩 اضطراب التوحد</a><a href="child.html?who=khassa">📊 تقريري</a><a href="index.html">🏠 اللوحة</a></div>'+
-    '<div class="unit">📘 ثمانية محاور · أسئلةٌ جديدة كلّ مرّة · شرحٌ لكلّ جواب</div>'+
+    '<div class="unit">📘 '+(HAS_X?'اثنا عشر محورًا':'ثمانية محاور')+' · أسئلةٌ جديدة كلّ مرّة · شرحٌ لكلّ جواب</div>'+
     '<div class="tabs" role="tablist">'+
       '<button data-tab="theo" aria-selected="true">نظريات التعلّم 🧠</button>'+
       '<button data-tab="grow" aria-selected="false">النموّ والمتعلّم 👦</button>'+
@@ -711,6 +748,10 @@ if(!NAMES[who]){
       '<button data-tab="class" aria-selected="false">إدارة الصفّ 🏫</button>'+
       '<button data-tab="spec" aria-selected="false">التربية الخاصة ♿</button>'+
       '<button data-tab="ethic" aria-selected="false">الأخلاقيات والتطوير ⚖️</button>'+
+      (HAS_X ? '<button data-tab="situ" aria-selected="false">مواقف تربويّة 🎬</button>'+
+               '<button data-tab="lang" aria-selected="false">لغويّ 📖</button>'+
+               '<button data-tab="quant" aria-selected="false">كمّيّ 🔢</button>'+
+               '<button data-tab="sys" aria-selected="false">أنظمة وتقنية 📜</button>' : '')+
       '<button data-tab="all" aria-selected="false">اختبار شامل 📋</button>'+
       '<button data-tab="rem" aria-selected="false">علاجي 💪</button>'+
     '</div>'+
@@ -722,6 +763,10 @@ if(!NAMES[who]){
     '<section class="panel" id="class"></section>'+
     '<section class="panel" id="spec"></section>'+
     '<section class="panel" id="ethic"></section>'+
+    (HAS_X ? '<section class="panel" id="situ"></section>'+
+             '<section class="panel" id="lang"></section>'+
+             '<section class="panel" id="quant"></section>'+
+             '<section class="panel" id="sys"></section>' : '')+
     '<section class="panel" id="all"></section>'+
     '<section class="panel" id="rem"></section>'+
     '<footer>الرخصة المهنية · الاختبار التربويّ العامّ — من إعداد المعلّم</footer>';
@@ -737,6 +782,13 @@ if(!NAMES[who]){
     spec:  {gens:SPECG,  n:10, intro:"<b>التربية الخاصة والدمج:</b> الخطّة التربوية الفردية، البيئة الأقلّ تقييدًا، صعوبات التعلّم، الموهوبون.", label:"رخصة مهنية — التربية الخاصة"},
     ethic: {gens:ETHICG, n:10, intro:"<b>الأخلاقيات والتطوير المهنيّ:</b> السرّية والعدالة والقدوة، الشراكة مع الأسرة، البحث الإجرائيّ، مجتمعات التعلّم.", label:"رخصة مهنية — الأخلاقيات"}
   };
+  /* والمحاورُ الأربعةُ الجديدة — انظر license-exam.js */
+  if(HAS_X){
+    CFG.situ  = {gens:SITUG,  n:12, intro:"<b>مواقف تربويّة:</b> نصفُ الاختبارِ مواقفُ صفّيّةٌ تسأل «ما التصرّف الأنسب؟» لا تعريفاتٍ تُستظهَر — والمهارةُ أن تُنزِّل القاعدةَ على موقفٍ لم ترَه.", label:"رخصة مهنية — مواقف تربوية"};
+    CFG.lang  = {gens:LANGG,  n:10, intro:"<b>لغويّ:</b> خُمسُ الاختبار — ضبطٌ وإملاءٌ وترقيم، وأغراضٌ بلاغية، ومعاني مفردات، واستنتاجٌ من نصّ، وتمييزُ الحقيقةِ من الرأي.", label:"رخصة مهنية — لغويّ"};
+    CFG.quant = {gens:QUANTG, n:10, intro:"<b>كمّيّ:</b> نِسَبٌ ومساحاتٌ ومعدّلاتٌ ومتوسّطات. اقرأ المطلوبَ مرّتين قبل الحساب — وأكثرُ الخطأِ فيه من سوءِ قراءةِ السؤال لا من الحساب.", label:"رخصة مهنية — كمّيّ"};
+    CFG.sys   = {gens:SYSG,   n:4,  intro:"<b>أنظمة وتقنية:</b> بابٌ صغيرٌ (أربعةُ أسئلة) — أحكامُ الأنظمةِ تُنقَل عن جهتِها ولا تُستنبَط، فينمو هذا المحورُ كلّما وصلت أوراقٌ جديدة.", label:"رخصة مهنية — أنظمة وتقنية"};
+  }
 
   function render(id){
     var c = CFG[id], sec = document.getElementById(id);
@@ -786,6 +838,14 @@ if(!NAMES[who]){
     {id:"spec", name:"٧) التربية الخاصة والدمج", tip:"الخطّة الفردية لكلّ طالبٍ وحده، يُعدّها فريقٌ بمشاركة الأسرة. والبيئة الأقلّ تقييدًا مبدأٌ أساس. وصعوبات التعلّم مع ذكاءٍ عاديّ — وهذا ما يميّزها عن الإعاقة الذهنية.", yt:"الخطة التربوية الفردية والدمج"},
     {id:"ethic", name:"٨) الأخلاقيات والتطوير", tip:"السرّية والعدالة والقدوة والأمانة العلمية. والشراكة مع الأسرة تواصلٌ مستمرّ لا عند المشكلة. والبحث الإجرائيّ يحلّ مشكلةً في صفّك، والتأمّل الذاتيّ محرّك النموّ.", yt:"أخلاقيات مهنة التعليم والتطوير المهني"}
   ];
+  /* والمحاورُ الأربعةُ الجديدةُ تدخل العلاجيَّ أيضًا، وإلّا بقي يعالج
+     ثمانيةً ويسكت عن ثلثِ الاختبار — وهو موضعُ الضعفِ الأرجح. */
+  if(HAS_X) REMTOPICS = REMTOPICS.concat([
+    {id:"situ", name:"٩) مواقف تربويّة", tip:"اقرأ السؤال إلى آخره وحدّد المطلوب بالضبط («الأنسب» لا «الصحيح»)، ثمّ احذف ما فيه تجاهلٌ أو تصعيدٌ أو إحراجٌ للطالب أمام زملائه. والأصل: عالِج الموقفَ تربويًّا أوّلًا، ولا تُصعّد إلّا بعد استنفاد ما دونه. وإذا ذُكر قيدٌ في المتن (من بيئتهم · مستمرّ · دون قصد) فهو مفتاحُ الإجابة.", yt:"مواقف تربوية الرخصة المهنية"},
+    {id:"lang", name:"١٠) لغويّ", tip:"الضبط: ابحث عن الفاعل (مرفوع) وما بعد حرف الجرّ (مجرور). والترقيم: الفاصلة بين جملتين متّصلتين، والنقطتان للتفسير، والفاصلة المنقوطة لما بينهما سببية. والاستنتاج يجمع طرفَي النصّ ولا يعيد أحدهما. والحقيقة تُثبَت والرأي يُختلَف فيه («أفضل» و«يكفي» علامةُ رأي).", yt:"القسم اللغوي الرخصة المهنية"},
+    {id:"quant", name:"١١) كمّيّ", tip:"اكتب المعطيات أوّلًا ثمّ المطلوب. وفي النسب: الخصمُ يُرجَع بالقسمة لا بالجمع (٢٤٠ بعد خصم ٢٠٪ أصلُها ٢٤٠÷٠٫٨). وفي المعدّلات: وحّد الوحدة قبل الضرب (الربع ساعةٍ أربعٌ في الساعة). وفي المتوسّطات: المجموع = المتوسّط × العدد.", yt:"القسم الكمي الرخصة المهنية"},
+    {id:"sys", name:"١٢) أنظمة وتقنية", tip:"الأنظمة: الأصلُ الجوازُ بإذن الجهة لا المنعُ المطلق ولا الإذنُ المطلق. وميثاقُ أخلاقيات مهنة التعليم يحكم علاقةَ المعلّم بوطنه ومجتمعه وطلابه. والتقنية: المواطنةُ الرقمية معاييرُ الاستخدام الآمن، ورخصةُ CC0 تنازلٌ كاملٌ حتى عن شرط النسبة (والنسبة شرطُ CC BY).", yt:"الأنظمة والمواطنة الرقمية الرخصة المهنية"}
+  ]);
   function remKey(id){ return "rem_"+REM_PAGE+"_"+who+"_"+id; }
   function renderRem(){
     var sec=document.getElementById("rem");
