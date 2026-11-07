@@ -371,6 +371,7 @@ function run(){
   issues.push(...quizExplainPath());
   issues.push(...shortTestPath());
   issues.push(...dictDosePath());
+  issues.push(...weakCapPath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -5540,6 +5541,128 @@ function storyBankPath(){
       if (miss) E(miss + ' قصّةً لا تُغطّيها أجزاؤها — فلا تُقرَأ كاملة');
       if (over) E(over + ' جزءًا فوق السقفِ الصلب');
     }
+  }
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   سقفُ الكلماتِ المخطوءةِ في جلسةِ المراجعة
+   ═══════════════════════════════════════════════════════════════════
+   بلاغُ حسن (٧ نوفمبر ٢٠٢٦) نقلَه أبوه: «حفظ الكلمات تتكرّر لأنّه
+   يراجع ويثبّت». وقِستُ سجلَّه فصحّ، والتكرارُ في المخطوءِ وحدَه:
+   تسعٌ وأربعون جلسةً قِستُها من لقطاتِ ذاكرتِه، ثلاثٌ منها كلُّ كلمةٍ
+   فيها كلمةٌ سبق أن أخطأ فيها (٢٠ أكتوبر: ١٣/١٣ و١٥/١٥ و٢٥/٢٥)،
+   وثلاثُ جلساتٍ تركها بعد ستٍّ وثمانٍ وتسعٍ وكلُّ خطأٍ فيها خطأُ
+   الجلسةِ التي قبلَها. ثمّ صفّر ٩١٠ كلمةً وبدأ من «father».
+
+   والحارسُ يُشغّل كتلةَ الاختيارِ من الصفحةِ نفسِها — لا يُعيد كتابتَها
+   — على حالاتٍ مصنوعةٍ تُحاكي حالَه. */
+function weakCapPath(){
+  const out = [];
+  const F = 'reading.html', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return [{ sev:'خطأ', file:F, msg:'الصفحةُ مفقودة' }];
+  const src = fs.readFileSync(p, 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+
+  const A = src.indexOf('var dueL=[], newL=[], restL=[];');
+  const B = src.indexOf('V = sel.sort(function(a,b){ return a.idx-b.idx; })');
+  if (A < 0 || B < 0 || B < A){ E('كتلةُ اختيارِ المراجعةِ لا تُنتزَع'); return out; }
+  const BLOCK = src.slice(A, B);
+
+  function num(name){
+    const m = new RegExp('var\\s+' + name + '\\s*=\\s*([0-9.*\\s]+?);').exec(src);
+    return m ? vm.runInNewContext('(' + m[1] + ')') : null;
+  }
+  const WEAK_SHARE = num('WEAK_SHARE'), WEAK_MIN = num('WEAK_MIN');
+  const LAPSE_HOLD_MS = num('LAPSE_HOLD_MS'), NEW_SHARE = num('NEW_SHARE');
+  const VOC_STEP = num('VOC_STEP'), COOL = num('SHOWN_COOLDOWN_MS');
+  const dm = /var\s+SR_DAYS\s*=\s*(\[[^\]]*\])/.exec(src);
+  if (WEAK_SHARE == null || WEAK_MIN == null || LAPSE_HOLD_MS == null || !dm){
+    E('ثوابتُ سقفِ الضعيفِ مفقودة (WEAK_SHARE / WEAK_MIN / LAPSE_HOLD_MS)');
+    return out;
+  }
+  const SR_DAYS = vm.runInNewContext('(' + dm[1] + ')'), DAY = 86400000;
+
+  if (!(WEAK_SHARE > 0 && WEAK_SHARE <= 0.5))
+    E('WEAK_SHARE = ' + WEAK_SHARE + ' — إمّا لا سقفَ أو سقفٌ يبتلع نصفَ الجلسة');
+  if (!(WEAK_MIN >= 1))
+    E('WEAK_MIN دون الواحد — فالجلسةُ الصغيرةُ لا تصلها كلمةٌ أخطأ فيها');
+  if (!(LAPSE_HOLD_MS >= 12 * 3600 * 1000 && LAPSE_HOLD_MS <= 36 * 3600 * 1000))
+    E('مهلةُ الكبوةِ ليست ليلةً (' + Math.round(LAPSE_HOLD_MS / 3600000) + ' ساعة)');
+
+  const NOW = Date.UTC(2026, 10, 7, 9, 0, 0);
+  function pick(st, weak, rvWant, nWords){
+    const pool = [];
+    for (let i = 0; i < nWords; i++) pool.push(['w' + i, ['ـ']]);
+    const sb = {
+      pool: pool, fullPool: pool, srs: st, wk: weak, rvWant: rvWant,
+      VOC_STEP: VOC_STEP, NEW_SHARE: NEW_SHARE, WEAK_SHARE: WEAK_SHARE,
+      WEAK_MIN: WEAK_MIN, LAPSE_HOLD_MS: LAPSE_HOLD_MS, Math: Math,
+      srDueIn: s => (!s || !s.t) ? -Infinity
+        : (s.t + SR_DAYS[Math.min(s.b || 0, SR_DAYS.length - 1)] * DAY) - NOW,
+      shownRecently: s => (s && s.s && (NOW - s.s) < COOL) ? 1 : 0,
+      srShow(){}, srMastered(){ return 0; },
+      rvSize: 0, dueNow: 0, masteredNow: 0, V: null
+    };
+    vm.createContext(sb);
+    vm.runInContext('Date = { now: function(){ return ' + NOW + '; } };', sb);
+    vm.runInContext(BLOCK + '\nV = sel.sort(function(a,b){ return a.idx-b.idx; })' +
+                    '.map(function(x){ return x.w; });', sb, { timeout: 5000 });
+    return sb.V || [];
+  }
+  /* V أزواجُ [كلمة، ترجمة] لا نصوص */
+  const key = w => Array.isArray(w) ? w[0] : w;
+  const weakIn = (sel, ks) => sel.filter(w => ks.indexOf(key(w)) >= 0).length;
+
+  /* بنكٌ واسعٌ مستحقٌّ، وفيه كبواتٌ عمرُها lapseAge */
+  function state(nWeak, lapseAge){
+    const st = {}, weak = {}, ks = [];
+    for (let i = 0; i < 300; i++) st['w' + i] = { b:2, c:2, t: NOW - 16 * DAY, s:0 };
+    for (let i = 0; i < nWeak; i++){
+      const k = 'w' + (100 + i * 7);
+      st[k] = { b:0, c:1, t: NOW - lapseAge, s:0 }; weak[k] = 1; ks.push(k);
+    }
+    return { st, weak, ks };
+  }
+
+  try {
+    /* (أ) كبوةُ ساعتين لا ترجع في جلسةِ اليومِ نفسِه — أخذت بطاقةَ التثبيت */
+    const a = state(6, 2 * 3600 * 1000);
+    const selA = pick(a.st, a.weak, 30, 300);
+    if (selA.length !== 30) E('جلسةُ المراجعةِ ليست بحجمِها: ' + selA.length + ' من ٣٠');
+    if (weakIn(selA, a.ks) > 0)
+      E('كلمةٌ أخطأ فيها قبل ساعتين تتصدّر جلستَه التالية — وهو بلاغُ حسن بعينِه');
+
+    /* (ب) والكبوةُ القديمةُ تعود، بقدرِ السقفِ لا أكثرَ ولا أقلّ */
+    const b = state(30, 3 * DAY);
+    const nB = weakIn(pick(b.st, b.weak, 30, 300), b.ks);
+    const cap = Math.max(WEAK_MIN, Math.round(30 * WEAK_SHARE));
+    if (nB !== cap)
+      E('ثلاثون كبوةً قديمةً أعطت ' + nB + ' من ٣٠ — والسقفُ ' + cap +
+        (nB > cap ? ' (تبتلع الجلسة)' : ' (يُهدَر نصيبُ المخطوء)'));
+
+    /* (ج) مئةُ كبوةٍ لا تجعل الجلسةَ كلَّها مخطوءًا — وهو ٢٠ أكتوبر */
+    const stC = {}, wC = {}, ksC = [];
+    for (let i = 0; i < 100; i++){ stC['w'+i] = { b:0, c:0, t: NOW - 4*DAY, s:0 }; wC['w'+i]=1; ksC.push('w'+i); }
+    for (let i = 100; i < 300; i++) stC['w'+i] = { b:2, c:2, t: NOW - 16*DAY, s:0 };
+    const selC = pick(stC, wC, 25, 300), nC = weakIn(selC, ksC);
+    if (nC === selC.length)
+      E('جلسةٌ كلُّ كلمةٍ فيها كلمةٌ أخطأ فيها (' + nC + '/' + selC.length + ') — وهي الجلسةُ التي يتركها');
+    else if (nC > Math.max(WEAK_MIN, Math.round(25 * WEAK_SHARE)))
+      E('مئةُ كبوةٍ ملأت ' + nC + ' من ' + selC.length + ' — السقفُ لا يعمل عند الدَّينِ الكبير');
+
+    /* (د) والسقفُ يؤخّر ولا يحجب: بنكٌ صغيرٌ كلُّه كبواتٌ لا يُعطي جلسةً فارغة */
+    const stD = {}, wD = {};
+    for (let i = 0; i < 12; i++){ stD['w'+i] = { b:0, c:0, t: NOW - 3600000, s:0 }; wD['w'+i]=1; }
+    if (!pick(stD, wD, 25, 12).length)
+      E('بنكٌ صغيرٌ كلُّه كبواتٌ أعطى جلسةً فارغة — الزائدُ يُحجَب ولا يُؤخَّر');
+
+    /* (هـ) ولا يضيع الضعيفُ: كبوةٌ قديمةٌ واحدةٌ تدخل */
+    const e = state(1, 3 * DAY);
+    if (weakIn(pick(e.st, e.weak, 30, 300), e.ks) !== 1)
+      E('كبوةٌ قديمةٌ واحدةٌ لا تدخل الجلسة — فالكلمةُ المخطوءةُ تضيع');
+  } catch(err){
+    E('كتلةُ اختيارِ المراجعةِ لا تُشغَّل: ' + err.message);
   }
   return out;
 }
