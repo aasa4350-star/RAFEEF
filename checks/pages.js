@@ -5564,10 +5564,13 @@ function weakCapPath(){
   const src = fs.readFileSync(p, 'utf8');
   const E = m => out.push({ sev:'خطأ', file:F, msg:m });
 
-  const A = src.indexOf('var dueL=[], newL=[], restL=[];');
+  /* الكتلةُ تُستخرَج من الصفحةِ لا تُنسَخ: من بناءِ المجموعةِ العاملةِ
+     إلى بناءِ V — فيجري في الاختبارِ ما يجري عند الطفلِ بعينِه. */
+  const A = src.indexOf('var WORK_MUL = 3;');
   const B = src.indexOf('V = sel.sort(function(a,b){ return a.idx-b.idx; })');
   if (A < 0 || B < 0 || B < A){ E('كتلةُ اختيارِ المراجعةِ لا تُنتزَع'); return out; }
   const BLOCK = src.slice(A, B);
+  const TAIL = 'V = sel.sort(function(a,b){ return a.idx-b.idx; }).map(function(x){ return x.w; });\n}';
 
   function num(name){
     const m = new RegExp('var\\s+' + name + '\\s*=\\s*([0-9.*\\s]+?);').exec(src);
@@ -5576,50 +5579,65 @@ function weakCapPath(){
   const WEAK_SHARE = num('WEAK_SHARE'), WEAK_MIN = num('WEAK_MIN');
   const LAPSE_HOLD_MS = num('LAPSE_HOLD_MS'), NEW_SHARE = num('NEW_SHARE');
   const VOC_STEP = num('VOC_STEP'), COOL = num('SHOWN_COOLDOWN_MS');
+  const WORK_MUL = num('WORK_MUL'), KBOX = num('KNOWN_BOX'), KHITS = num('KNOWN_MIN_HITS');
   const dm = /var\s+SR_DAYS\s*=\s*(\[[^\]]*\])/.exec(src);
-  if (WEAK_SHARE == null || WEAK_MIN == null || LAPSE_HOLD_MS == null || !dm){
-    E('ثوابتُ سقفِ الضعيفِ مفقودة (WEAK_SHARE / WEAK_MIN / LAPSE_HOLD_MS)');
+  if ([WEAK_SHARE, WEAK_MIN, LAPSE_HOLD_MS, WORK_MUL, KBOX, KHITS].some(x => x == null) || !dm){
+    E('ثوابتُ جلسةِ المراجعةِ مفقودة (WEAK_SHARE / WEAK_MIN / LAPSE_HOLD_MS / WORK_MUL)');
     return out;
   }
   const SR_DAYS = vm.runInNewContext('(' + dm[1] + ')'), DAY = 86400000;
 
+  /* ═══ (١) الحدودُ المعلَنة ═══ */
   if (!(WEAK_SHARE > 0 && WEAK_SHARE <= 0.5))
-    E('WEAK_SHARE = ' + WEAK_SHARE + ' — إمّا لا سقفَ أو سقفٌ يبتلع نصفَ الجلسة');
+    E('WEAK_SHARE = ' + WEAK_SHARE + ' — إمّا لا سقفَ للمخطوءِ أو سقفٌ يبتلع نصفَ الجلسة');
   if (!(WEAK_MIN >= 1))
     E('WEAK_MIN دون الواحد — فالجلسةُ الصغيرةُ لا تصلها كلمةٌ أخطأ فيها');
-  if (!(LAPSE_HOLD_MS >= 12 * 3600 * 1000 && LAPSE_HOLD_MS <= 36 * 3600 * 1000))
-    E('مهلةُ الكبوةِ ليست ليلةً (' + Math.round(LAPSE_HOLD_MS / 3600000) + ' ساعة)');
+  if (!(LAPSE_HOLD_MS >= 12*3600*1000 && LAPSE_HOLD_MS <= 36*3600*1000))
+    E('مهلةُ الكبوةِ ليست ليلةً (' + Math.round(LAPSE_HOLD_MS/3600000) + ' ساعة)');
+  /* والقياسُ أعطى: ٣ أضعافٍ ٣٥٧ متقنةً في ٣٠ يومًا و٢٪ قبل المواعيد،
+     والضِّعفُ ٣٦٨ لكن ١٨٪ قبل المواعيد، والخمسةُ ٣٣٧. */
+  if (!(WORK_MUL >= 2.5 && WORK_MUL <= 4))
+    E('WORK_MUL = ' + WORK_MUL + ' — دونَ ٣ يُكدَّس العرضُ قبل المواعيد، وفوقَه يتشتّت الجهد');
+  if (!/unrested\.slice\(0,\s*workCap\)/.test(src))
+    E('المجموعةُ لا تُقتَطع من غيرِ الراسخِ — فالجهدُ يُشتَّت على البنكِ كلِّه');
+  if (!/if\(unrested\.length >= rvWant\)/.test(src))
+    E('لا بابَ رجوعٍ لمن رسخ أكثرُ كلماتِه — فتنقص جلستُه أو تفرغ');
+  if (!/function srIsKnown\(st\)/.test(src) || !/!srIsKnown\(srw\[w\[0\]\]\)/.test(src))
+    E('عتبةُ الخروجِ من المجموعةِ مكتوبةٌ بيدٍ أخرى — فتختلف عن عتبةِ «متقنة»');
+  /* ويُبيَّن للطفلِ أنّ تكرارَ الدفعةِ مقصود: حسنٌ صفّر ٩١٠ كلمةً لأجلِ هذا */
+  if (!/نركز على/.test(src.replace(/[ً-ْٰـ]/g, '')))
+    E('لا يُبيَّن للطفلِ أنّ تكرارَ الدفعةِ مقصود — فيظنُّ الخللَ عاد');
 
+  /* ═══ (٢) تشغيلُ الكتلة ═══ */
   const NOW = Date.UTC(2026, 10, 7, 9, 0, 0);
+  const isKnown = s => !!(s && (s.b||0) >= KBOX && (s.c||0) >= KHITS);
   function pick(st, weak, rvWant, nWords){
     const pool = [];
     for (let i = 0; i < nWords; i++) pool.push(['w' + i, ['ـ']]);
     const sb = {
-      pool: pool, fullPool: pool, srs: st, wk: weak, rvWant: rvWant,
-      VOC_STEP: VOC_STEP, NEW_SHARE: NEW_SHARE, WEAK_SHARE: WEAK_SHARE,
-      WEAK_MIN: WEAK_MIN, LAPSE_HOLD_MS: LAPSE_HOLD_MS, Math: Math,
+      pool, fullPool: pool.slice(), srs: st, wk: weak, rvWant, workOn: 0, workCap: 0,
+      VOC_STEP, NEW_SHARE, WEAK_SHARE, WEAK_MIN, LAPSE_HOLD_MS, Math,
+      getSR: () => st, srIsKnown: isKnown,
       srDueIn: s => (!s || !s.t) ? -Infinity
         : (s.t + SR_DAYS[Math.min(s.b || 0, SR_DAYS.length - 1)] * DAY) - NOW,
       shownRecently: s => (s && s.s && (NOW - s.s) < COOL) ? 1 : 0,
-      srShow(){}, srMastered(){ return 0; },
-      rvSize: 0, dueNow: 0, masteredNow: 0, V: null
+      srShow(){}, srMastered(){ return 0; }, srKnown(){ return 0; },
+      rvSize: 0, dueNow: 0, masteredNow: 0, knownNow: 0, V: null
     };
     vm.createContext(sb);
     vm.runInContext('Date = { now: function(){ return ' + NOW + '; } };', sb);
-    vm.runInContext(BLOCK + '\nV = sel.sort(function(a,b){ return a.idx-b.idx; })' +
-                    '.map(function(x){ return x.w; });', sb, { timeout: 5000 });
-    return sb.V || [];
+    vm.runInContext(BLOCK + '\n' + TAIL, sb, { timeout: 5000 });
+    return { sel: sb.V || [], workOn: sb.workOn };
   }
-  /* V أزواجُ [كلمة، ترجمة] لا نصوص */
-  const key = w => Array.isArray(w) ? w[0] : w;
+  const key = w => Array.isArray(w) ? w[0] : w;     /* V أزواجُ [كلمة، ترجمة] */
   const weakIn = (sel, ks) => sel.filter(w => ks.indexOf(key(w)) >= 0).length;
 
-  /* بنكٌ واسعٌ مستحقٌّ، وفيه كبواتٌ عمرُها lapseAge */
+  /* بنكٌ واسعٌ مستحقٌّ، وكبواتٌ في أوّلِه فتقع داخلَ المجموعةِ العاملة */
   function state(nWeak, lapseAge){
     const st = {}, weak = {}, ks = [];
-    for (let i = 0; i < 300; i++) st['w' + i] = { b:2, c:2, t: NOW - 16 * DAY, s:0 };
+    for (let i = 0; i < 300; i++) st['w'+i] = { b:2, c:2, t: NOW - 16*DAY, s:0 };
     for (let i = 0; i < nWeak; i++){
-      const k = 'w' + (100 + i * 7);
+      const k = 'w' + (i * 2);
       st[k] = { b:0, c:1, t: NOW - lapseAge, s:0 }; weak[k] = 1; ks.push(k);
     }
     return { st, weak, ks };
@@ -5627,46 +5645,81 @@ function weakCapPath(){
 
   try {
     /* (أ) كبوةُ ساعتين لا ترجع في جلسةِ اليومِ نفسِه — أخذت بطاقةَ التثبيت */
-    const a = state(6, 2 * 3600 * 1000);
-    const selA = pick(a.st, a.weak, 30, 300);
-    if (selA.length !== 30) E('جلسةُ المراجعةِ ليست بحجمِها: ' + selA.length + ' من ٣٠');
-    if (weakIn(selA, a.ks) > 0)
+    const a = state(6, 2*3600*1000), ra = pick(a.st, a.weak, 30, 300);
+    if (ra.sel.length !== 30) E('جلسةُ المراجعةِ ليست بحجمِها: ' + ra.sel.length + ' من ٣٠');
+    if (weakIn(ra.sel, a.ks) > 0)
       E('كلمةٌ أخطأ فيها قبل ساعتين تتصدّر جلستَه التالية — وهو بلاغُ حسن بعينِه');
 
     /* (ب) والكبوةُ القديمةُ تعود، بقدرِ السقفِ لا أكثرَ ولا أقلّ */
-    const b = state(30, 3 * DAY);
-    const nB = weakIn(pick(b.st, b.weak, 30, 300), b.ks);
+    const b = state(30, 3*DAY);
+    const nB = weakIn(pick(b.st, b.weak, 30, 300).sel, b.ks);
     const cap = Math.max(WEAK_MIN, Math.round(30 * WEAK_SHARE));
     if (nB !== cap)
       E('ثلاثون كبوةً قديمةً أعطت ' + nB + ' من ٣٠ — والسقفُ ' + cap +
         (nB > cap ? ' (تبتلع الجلسة)' : ' (يُهدَر نصيبُ المخطوء)'));
 
-    /* (ج) مئةُ كبوةٍ لا تجعل الجلسةَ كلَّها مخطوءًا — وهو ٢٠ أكتوبر */
+    /* (ج) مئةُ كبوةٍ مبثوثةٌ في البنكِ لا تجعل الجلسةَ كلَّها مخطوءًا — ٢٠ أكتوبر */
     const stC = {}, wC = {}, ksC = [];
-    for (let i = 0; i < 100; i++){ stC['w'+i] = { b:0, c:0, t: NOW - 4*DAY, s:0 }; wC['w'+i]=1; ksC.push('w'+i); }
-    for (let i = 100; i < 300; i++) stC['w'+i] = { b:2, c:2, t: NOW - 16*DAY, s:0 };
-    const selC = pick(stC, wC, 25, 300), nC = weakIn(selC, ksC);
-    if (nC === selC.length)
-      E('جلسةٌ كلُّ كلمةٍ فيها كلمةٌ أخطأ فيها (' + nC + '/' + selC.length + ') — وهي الجلسةُ التي يتركها');
+    for (let i = 0; i < 300; i++) stC['w'+i] = { b:2, c:2, t: NOW - 16*DAY, s:0 };
+    for (let i = 0; i < 100; i++){
+      const k = 'w' + (i*3);
+      stC[k] = { b:0, c:0, t: NOW - 4*DAY, s:0 }; wC[k] = 1; ksC.push(k);
+    }
+    const sC = pick(stC, wC, 25, 300).sel, nC = weakIn(sC, ksC);
+    if (nC === sC.length)
+      E('جلسةٌ كلُّ كلمةٍ فيها كلمةٌ أخطأ فيها (' + nC + '/' + sC.length + ') — وهي الجلسةُ التي يتركها');
     else if (nC > Math.max(WEAK_MIN, Math.round(25 * WEAK_SHARE)))
-      E('مئةُ كبوةٍ ملأت ' + nC + ' من ' + selC.length + ' — السقفُ لا يعمل عند الدَّينِ الكبير');
+      E('مئةُ كبوةٍ ملأت ' + nC + ' من ' + sC.length + ' — السقفُ لا يعمل عند الدَّينِ الكبير');
 
     /* (د) والسقفُ يؤخّر ولا يحجب: بنكٌ صغيرٌ كلُّه كبواتٌ لا يُعطي جلسةً فارغة */
     const stD = {}, wD = {};
-    for (let i = 0; i < 12; i++){ stD['w'+i] = { b:0, c:0, t: NOW - 3600000, s:0 }; wD['w'+i]=1; }
-    if (!pick(stD, wD, 25, 12).length)
+    for (let i = 0; i < 12; i++){ stD['w'+i] = { b:0, c:0, t: NOW - 3600000, s:0 }; wD['w'+i] = 1; }
+    if (!pick(stD, wD, 25, 12).sel.length)
       E('بنكٌ صغيرٌ كلُّه كبواتٌ أعطى جلسةً فارغة — الزائدُ يُحجَب ولا يُؤخَّر');
 
     /* (هـ) ولا يضيع الضعيفُ: كبوةٌ قديمةٌ واحدةٌ تدخل */
-    const e = state(1, 3 * DAY);
-    if (weakIn(pick(e.st, e.weak, 30, 300), e.ks) !== 1)
+    const e = state(1, 3*DAY);
+    if (weakIn(pick(e.st, e.weak, 30, 300).sel, e.ks) !== 1)
       E('كبوةٌ قديمةٌ واحدةٌ لا تدخل الجلسة — فالكلمةُ المخطوءةُ تضيع');
+
+    /* ═══ (٣) والمجموعةُ العاملة ═══ */
+    /* (و) الراسخُ لا يُزاحم ما لم يرسخ */
+    const stW = {}, ksUn = [];
+    for (let i = 0; i < 300; i++){
+      if (i < 100){ stW['w'+i] = { b:2, c:2, t: NOW - 16*DAY, s:0 }; ksUn.push('w'+i); }
+      else stW['w'+i] = { b:6, c:5, t: NOW - 40*DAY, s:0 };
+    }
+    const rW = pick(stW, {}, 30, 300);
+    const outside = rW.sel.filter(w => ksUn.indexOf(key(w)) < 0).length;
+    if (outside)
+      E('الجلسةُ ضمّت ' + outside + ' كلمةً راسخةً ومئةٌ لم ترسخ بعد — الجهدُ يُشتَّت');
+    const want = Math.max(VOC_STEP, Math.round(30 * WORK_MUL));
+    if (rW.workOn !== Math.min(100, want))
+      E('المجموعةُ العاملةُ ' + rW.workOn + ' والمنتظَرُ ' + Math.min(100, want));
+
+    /* (ز) ولا تتجاوز حدَّها: مئتان لم ترسخ، فلا تظهر كلمةٌ خارجَ المجموعة */
+    const stB2 = {};
+    for (let i = 0; i < 200; i++) stB2['w'+i] = { b:2, c:2, t: NOW - (10 + (i % 9))*DAY, s:0 };
+    const sB2 = pick(stB2, {}, 30, 200).sel;
+    const maxIx = Math.max.apply(null, sB2.map(w => parseInt(key(w).slice(1), 10)));
+    if (maxIx >= want)
+      E('الجلسةُ خرجت عن المجموعةِ العاملة: ظهرت الكلمةُ رقمَ ' + (maxIx+1) + ' والحدُّ ' + want);
+
+    /* (ح) ومن رسخ له كلُّ شيءٍ إلّا قليلًا يعود إليه البنكُ كلُّه */
+    const stF = {};
+    for (let i = 0; i < 300; i++)
+      stF['w'+i] = (i < 5) ? { b:2, c:2, t: NOW - 9*DAY, s:0 }
+                           : { b:6, c:5, t: NOW - 40*DAY, s:0 };
+    const rF = pick(stF, {}, 30, 300);
+    if (rF.sel.length < 30)
+      E('من رسخ أكثرُ كلماتِه نقصت جلستُه إلى ' + rF.sel.length + ' — والبابُ موضوعٌ لهذا');
+    if (rF.workOn)
+      E('المجموعةُ طُبّقت على خمسِ كلماتٍ فحُبس عليها — والبابُ لا يعمل');
   } catch(err){
     E('كتلةُ اختيارِ المراجعةِ لا تُشغَّل: ' + err.message);
   }
   return out;
 }
-
 function dictDosePath(){
   const out = [];
   const F = 'reading.html', p = path.join(ROOT, F);
