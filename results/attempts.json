@@ -1,5 +1,30 @@
 [
     {
+        "id": "7be2bdad-f95e-4122-ba57-962a53bd51c8",
+        "created_at": "2026-11-07T15:06:09.691988+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-07T15:06:08.948Z",
+            "cid": "1794063968948_dk05avr04tv",
+            "pid": "mw6j8fgu_2bh4xz",
+            "kind": "activity",
+            "left": 88,
+            "sect": "myerr",
+            "test": "\u0623\u062e\u0637\u0627\u0626\u064a \ud83c\udfaf",
+            "asked": 3,
+            "right": 1,
+            "okKeys": [
+                "\u0627\u062d\u0633\u0628: 402 \u2212 158"
+            ]
+        }
+    },
+    {
         "id": "ecb5fb8e-c26a-4908-bb4d-9c588ad5bd51",
         "created_at": "2026-11-07T14:04:26.125416+00:00",
         "student": "\u062d\u0633\u0646",
@@ -141932,60 +141957,6 @@
             ],
             "correct": 6,
             "learned": 340,
-            "learning": 173,
-            "vocTotal": 993,
-            "unrecalled": 8
-        }
-    },
-    {
-        "id": "2542d1de-a31c-4396-8498-47be3c6a7698",
-        "created_at": "2026-10-30T17:50:55.261094+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-10-30T17:50:55.004Z",
-            "cid": "1793382655004_7f286mbntdi",
-            "dur": 168,
-            "pid": "mvv9mmyt_10n2cv6",
-            "away": 0,
-            "kind": "practice",
-            "mode": "new",
-            "reps": 4,
-            "test": "\u0643\u0644\u0645\u0627\u062a \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udd24",
-            "exits": 0,
-            "fixed": 0,
-            "known": 159,
-            "total": 10,
-            "missed": [
-                {
-                    "t": "ki",
-                    "w": "kill",
-                    "seen": true
-                },
-                {
-                    "t": "lol",
-                    "w": "laugh",
-                    "seen": false
-                },
-                {
-                    "t": "Leve",
-                    "w": "leave",
-                    "seen": false
-                },
-                {
-                    "t": "movec",
-                    "w": "move",
-                    "seen": true
-                }
-            ],
-            "correct": 6,
-            "learned": 340,
-            "trusted": true,
             "learning": 173,
             "vocTotal": 993,
             "unrecalled": 8
