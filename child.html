@@ -449,7 +449,7 @@ async function main(){
       const isFlag=p=> fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2));
       const mIco=p=> p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖";
       const flagged=vocabWk.filter(isFlag), show=vocabWk.filter(p=>!isFlag(p)).slice(0,3).concat(flagged).sort((a,b)=> (a.created_at<b.created_at)?1:-1).slice(0,8);
-      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=untrustedTxt(p); return `<li>${mIco(p)} ${saTime(RR.when(p))} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
+      const revList=show.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const dt=(p.meta.dur==null)?` · ⏱️ —`:durTxt(p); const ut=untrustedTxt(p); return `<li>${mIco(p)} ${RR.stamp(saTime(RR.when(p)))} — <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b>${dt}${ut}</li>`; }).join("");
       const byDay={}; vocabT.forEach(p=>{ const f=saTime(RR.when(p)); const d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       const days=Object.keys(byDay).sort().reverse().slice(0,6);
       const dayList=days.map(d=>{ const o=byDay[d]; const dp=o.w?Math.round(o.c/o.w*100):0; const tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return `<li>📅 ${d} <span style="color:var(--muted);font-size:.85rem">(${tm})</span>: راجع <b>${o.w} كلمة</b> (${o.c}/${o.w} · ${dp}%)</li>`; }).join("");
@@ -479,7 +479,7 @@ async function main(){
             if(u.memo.n) bits.push(`🔁 ثبّت ${u.memo.n}× · ${pct(u.memo.c,u.memo.t)}%`);
             if(u.sent.n) bits.push(`🧩 جمل ${u.sent.n}× · ${pct(u.sent.c,u.sent.t)}%`);
             return `<li><b>${esc(u.title)}</b> — <span style="color:${p<60?'var(--bad)':(p<80?'#b45309':'var(--good)')}">${p}%</span> `+
-              `<span class="cnt">${bits.join(' · ')}${u.last?' · '+saTime(new Date(u.last).toISOString()):''}</span></li>`;
+              `<span class="cnt">${bits.join(' · ')}${u.last?' · '+RR.stamp(saTime(new Date(u.last).toISOString())):''}</span></li>`;
           }).join("")+`</ul>`+
           (hard.length
             ? `<div style="font-weight:700;margin:10px 2px 4px;font-size:.9rem">📌 كلمات تتعثّر فيها مرّة بعد مرّة — راجعها:</div>`+
@@ -510,14 +510,14 @@ async function main(){
           /* ولا يُقال «لم يُجب» لمن أعياه المايك: صفُّ حسن (١٧ أكتوبر)
              noMic:true و٦٨٢ ثانية — أحدَ عشرَ دقيقةً يُحاول التسجيل،
              فالسطرُ كان يقرأ كأنّه تهمةُ كسلٍ وهو خبرُ عطل. */
-          acts.slice(0,3).map(p=>`<li>${p.meta.answered?`أجاب عن <b>${p.meta.answered}</b> من ${p.meta.of} ثمّ خرج`:(p.meta.noMic?`تعذّر المايك فما أكمل الأسئلة`:`فتح الأسئلة ولم يُجب`)}${p.meta.dur?` · ⏱️ ${p.meta.dur}ث`:``} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+          acts.slice(0,3).map(p=>`<li>${p.meta.answered?`أجاب عن <b>${p.meta.answered}</b> من ${p.meta.of} ثمّ خرج`:(p.meta.noMic?`تعذّر المايك فما أكمل الأسئلة`:`فتح الأسئلة ولم يُجب`)}${p.meta.dur?` · ⏱️ ${p.meta.dur}ث`:``} <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span></li>`).join("")+
           `</ul>`;
       }
       if(passReads.length){
         const lastRead=passReads[0], lastComp=readAll.slice().sort((a,b)=> RR.when(a)<RR.when(b)?1:-1)[0];
         const openNoComp = !lastComp || RR.when(lastRead) > RR.when(lastComp);
         html+=`<div style="font-weight:700;margin:4px 2px 2px">🎙️ قرأ القطعة بصوته <span class="cnt">(${passReads.length} مرّة)</span></div><ul class="weak">`+
-          passReads.slice(0,3).map(p=>`<li>نطق <b>${p.meta.pron!=null?p.meta.pron+"%":"—"}</b>${p.meta.comp!=null?" · اكتمال "+p.meta.comp+"%":""}${p.meta.wpm?" · "+p.meta.wpm+" كلمة/دقيقة":""} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+          passReads.slice(0,3).map(p=>`<li>نطق <b>${p.meta.pron!=null?p.meta.pron+"%":"—"}</b>${p.meta.comp!=null?" · اكتمال "+p.meta.comp+"%":""}${p.meta.wpm?" · "+p.meta.wpm+" كلمة/دقيقة":""} <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span></li>`).join("")+
           (openNoComp?`<li style="color:var(--warn)">⚠️ آخر مرّة قرأ القطعة ولم يُكمل أسئلة الفهم — الأسئلة تحت القطعة في الصفحة نفسها.</li>`:``)+
           `</ul>`;
       }
@@ -525,7 +525,7 @@ async function main(){
         const arr=readByT[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
         const avg=Math.round(arr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/arr.length);
         html+=`<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط ${avg}%)</span></div><ul class="weak">`+
-          arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
+          arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
           `</ul>`;
       });
       html+=`</div>`;
@@ -541,7 +541,7 @@ async function main(){
         const acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+=`<div style="font-weight:700;margin:4px 2px 2px">${t} <span class="cnt">(${arr.length} محاولة · المتوسط <b style="color:${acol}">${avg}%</b>)</span></div><ul class="weak">`+
           arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total);
-            return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
+            return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")+
           `</ul>`;
         const miss={}; let seenAny=false;
         arr.slice(0,5).forEach(p=>{ (p.meta.missed||[]).forEach(m=>{ if(!m||!m.w) return; seenAny=true;
@@ -568,7 +568,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ النطق</div><div class="card"><ul class="weak">`+
         `<li>🎙️ <b>${prs.length}</b> تقييم${aP!=null?` · متوسط النطق <b style="color:${col(aP)}">${aP}%</b>`:``}${aA!=null?` · دقّة ${aA}%`:``}${aF!=null?` · طلاقة ${aF}%`:``}${aW!=null?` · <b>${aW}</b> كلمة/دقيقة`:``}</li>`+
         prs.slice(0,6).map(p=>{ const m=p.meta, v=pv(p,"pron");
-          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${pronKind(m)} · ${m.test||""} <span class="cnt">${saTime(RR.when(p))}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
+          return `<li><span style="color:${v!=null?col(v):'var(--muted)'};font-weight:800">${v!=null?v+'%':'—'}</span> ${pronKind(m)} · ${m.test||""} <span class="cnt">${RR.stamp(saTime(RR.when(p)))}${m.words?` · ${m.words} كلمة`:``}${pv(p,"wpm")?` · ${m.wpm} كلمة/د`:``}${pv(p,"comp")!=null?` · اكتمال ${m.comp}%`:``}</span></li>`; }).join("")+
         `</ul>${prs.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${prs.length-6} تقييمًا.</p>`:``}</div>`;
     }
     // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
@@ -591,7 +591,7 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">`+
         /* بلاغ الأب: «التعبير ما يطلع لي التاريخ والوقت» — الفقرات تحتها مؤرَّخة،
            لكن من حلّ التدريب وحده بلا فقرة كان سطره رقمًا بلا زمن. */
-        `<li>📝 ${(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?`كتب <b>${wCount(writingAll.length,L)}</b>`:wNone(L))+(dt2?` · ${wDrill(L)}: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``); })()}${(function(){ var L=writingAll.concat(writingDrill).map(p=>p.created_at).sort().pop(); return L?` · آخر مرة: <span class="cnt">${saTime(L)}</span>`:``; })()}</li>`;
+        `<li>📝 ${(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?`كتب <b>${wCount(writingAll.length,L)}</b>`:wNone(L))+(dt2?` · ${wDrill(L)}: <b>${dc2}/${dt2}</b> (${pct(dc2,dt2)}%)`:``); })()}${(function(){ var L=writingAll.concat(writingDrill).map(p=>p.created_at).sort().pop(); return L?` · آخر مرة: <span class="cnt">${RR.stamp(saTime(L))}</span>`:``; })()}</li>`;
       if(wAggN){
         const avgs=WSUBS.map(s=>({s, avg:wAgg[s[0]]/wAggN}));
         const weakestW=avgs.slice().sort((a,b)=>a.avg-b.avg)[0];
@@ -601,7 +601,7 @@ async function main(){
       }
       html+=`</ul>`+
         writingAll.slice(0,3).map(p=>{ const m=p.meta;
-          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${saTime(RR.when(p))}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
         `</div>`;
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)
@@ -621,7 +621,7 @@ async function main(){
       const mwLvl = /م٢/.test((mwA[0].meta.test)||"") ? "الثاني" : "الثالث";
       html+='<div class="sec-title"><span class="dot"></span> 🧠 مقياس موهبة — المستوى '+mwLvl+'</div><div class="card"><ul class="weak">'+
         '<li>🎯 <b>'+arCount(mwA.length,"جولة واحدة","جولتان","جولات","جولة")+'</b> · '+
-        '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+saTime(RR.when(mwA[0]))+'</span></li>'+
+        '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+RR.stamp(saTime(RR.when(mwA[0])))+'</span></li>'+
         mwK.map(function(k){ var e=mwD[k];
           return '<li>'+k+' <span class="cnt">'+e.c+'/'+e.t+' · '+pct(e.c,e.t)+'%</span></li>'; }).join("")+
         '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
@@ -650,7 +650,7 @@ async function main(){
       html+='<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">'+
         '<li>🎯 <b>'+arCount(rN,"جولة تدرّب واحدة","جولتا تدرّب","جولات تدرّب","جولة تدرّب")+'</b>'+' على '+'<b>'+arCount(rKeys.length,"درس واحد","درسين","دروس","درسًا")+'</b>'+
         (rT?' · الصحيح <b>'+rC+'/'+rT+'</b> ('+Math.round(rC/rT*100)+'%)':'')+
-        ' <span class="cnt">آخرها '+saTime(RR.when(ra[0]))+'</span></li>'+
+        ' <span class="cnt">آخرها '+RR.stamp(saTime(RR.when(ra[0])))+'</span></li>'+
         rKeys.slice(0,6).map(k=>{ const e=rBy[k];
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
@@ -676,7 +676,7 @@ async function main(){
       const gCov=RR.gramCoverage(ga);
       html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
         '<li>✅ <b>صحّحت '+arCount(gFix,"خطأً واحدًا","خطأين","أخطاء","خطأً")+'</b> من أخطائك في قواعد ستيب'+
-        (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+saTime(RR.when(ga[0]))+'</span></li>'+
+        (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+RR.stamp(saTime(RR.when(ga[0])))+'</span></li>'+
         (gCov.rules?'<li>📚 جرّبت <b>'+gCov.tried+'</b> من <b>'+gCov.rules+'</b> قاعدة'+
           (gCov.bank?' · وقطعت <b>'+gCov.cut+'</b> سؤالًا من <b>'+gCov.bank+'</b>':'')+'</li>':'')+
         (gCov.left.length?'<li style="font-weight:400">🆕 <b>ما جرّبتها بعد:</b> '+gCov.left.slice(0,6).join(" · ")+
@@ -691,14 +691,14 @@ async function main(){
       html+=`<div class="sec-title"><span class="dot"></span> 📖 التلاوة</div><div class="card"><ul class="weak">`+
         `<li>📖 سمّعت <b>${tlw.length}</b> مرّة · منها <b>${RR.tilawaFull(tlw)}</b> ما سقطت فيها كلمة</li>`+
         `<li style="font-weight:400">وهذا تحقُّقٌ من <b>حفظك</b> لا من <b>تجويدك</b> — التجويدُ تعرضه على معلّمك.</li>`+
-        tlw.slice(0,5).map(p=>`<li>${RR.tilawaLine(p.meta)} <span class="cnt">${saTime(RR.when(p))}</span></li>`).join("")+
+        tlw.slice(0,5).map(p=>`<li>${RR.tilawaLine(p.meta)} <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span></li>`).join("")+
         `</ul></div>`;
     }
     if(talkActs.length && !talkAll.length){
       const ta=talkActs.slice().sort((a,b)=> a.created_at<b.created_at?1:-1);
       html+=`<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">`+
         `<li>🚪 فتحت المحادثة <b>${ta.length}</b> مرّة وما ضغطت «تكلّم» — ما فيه جملةٌ تُقيَّم بعد.</li>`+
-        ta.slice(0,3).map(p=>`<li>${p.meta.topic||''} <span class="cnt">${saTime(RR.when(p))}${p.meta.secs?' · مكثت '+p.meta.secs+'ث':''}</span></li>`).join("")+
+        ta.slice(0,3).map(p=>`<li>${p.meta.topic||''} <span class="cnt">${RR.stamp(saTime(RR.when(p)))}${p.meta.secs?' · مكثت '+p.meta.secs+'ث':''}</span></li>`).join("")+
         `</ul></div>`;
     }
     if(talkAll.length){
@@ -720,7 +720,7 @@ async function main(){
           const cn=m.corrN, cb=(typeof cn==="number"&&cn<(m.turns||0))?` من ${cn}${cn===1?" — لا تُقرأ مستوًى":""}`:"";
           const co=typeof m.avgCorrect==="number"?` · صحّة ${m.avgCorrect}%${cb}`:"";
           const un=(typeof m.unh==="number"&&m.unh>0)?` · 🔁 ${m.unh} محاولة ما وضحت`:"";
-          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${saTime(RR.when(p))} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}${un}</span></li>`; }).join("")+
+          return `<li><span style="color:${col};font-weight:800">${pr}</span> ${m.topic||"—"} <span class="cnt">${RR.stamp(saTime(RR.when(p)))} · ${m.turns||0} جملة${m.secs?` · ${Math.round(m.secs/60)} د`:``}${co}${un}</span></li>`; }).join("")+
         `</ul>`+(tks.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${tks.length-6} جلسة.</p>`:``)+
         `</div>`;
     }
@@ -736,8 +736,25 @@ async function main(){
         const okArr=arr.filter(p=> p.meta.trusted!==false);
         const avg=okArr.length?Math.round(okArr.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/okArr.length):null;
         const acol=avg==null?"var(--muted)":avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
-        html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg==null?"—":avg+"%"}</span></div><ul class="weak">`+
-          arr.map(p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=RR.lessonOf(p.meta.test); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+        /* ═══ دروسُ المادّةِ داخلَ فصولِها — انظر RR.chapters ═══ */
+        const CH_SUM='cursor:pointer;font-weight:800;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.92rem';
+        const CH_BOX='background:var(--bg);border:1px solid var(--line);border-radius:11px;margin:6px 0';
+        const chapBody=(rows, li)=>{
+          const gs=RR.chapters(rows);
+          if(!gs) return `<ul class="weak">${rows.map(li).join("")}</ul>`;
+          return gs.map(g=>{
+            const ok=g.rows.filter(x=> x.meta.trusted!==false);
+            const av=ok.length?Math.round(ok.reduce((t,x)=>t+pct(x.meta.correct,x.meta.total),0)/ok.length):null;
+            const c=av==null?"var(--muted)":av>=80?"var(--good)":av>=50?"var(--warn)":"var(--bad)";
+            return `<details style="${CH_BOX}"><summary style="${CH_SUM}"><span>${g.label}</span>`+
+              `<span style="font-size:.8rem;font-weight:600;color:var(--muted)">${g.rows.length} درسًا · `+
+              `<span style="color:${c}">${av==null?"—":av+"%"}</span></span></summary>`+
+              `<ul class="weak" style="margin:0;padding:2px 20px 8px">${g.rows.map(li).join("")}</ul></details>`;
+          }).join("");
+        };
+
+        html+=`<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>${SUBJ_EMOJI[subj]} ${subj}</span><span style="font-size:.85rem;color:${acol}">المتوسط ${avg==null?"—":avg+"%"}</span></div>`+
+          chapBody(arr, p=>{ const pc=pct(p.meta.correct,p.meta.total); const lesson=RR.lessonHTML(p.meta.test); const col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             /* نصُّ المقاليِّ ودرجتُه الذاتيّة — انظر home.html */
             const esc=x=>String(x).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
             const ess = (p.meta.essay && String(p.meta.essay).trim()) ?
@@ -745,8 +762,8 @@ async function main(){
               `<summary style="cursor:pointer;font-weight:800;padding:7px 0">📝 إجابتك في السؤال المقالي — وضعت لنفسك <b style="color:var(--accent)">${p.meta.essaySelf!=null?p.meta.essaySelf:'؟'} من ${p.meta.essayMax||6}</b></summary>`+
               `<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">${esc(p.meta.essay)}</div></details></li>` : ``;
             const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
-            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${saTime(RR.when(p))}</span>${un}</li>`+ess; }).join("")+
-          `</ul></div>`;
+            return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${RR.stamp(saTime(RR.when(p)))}</span>${un}</li>`+ess; })+
+          `</div>`;
       });
     }
     // الاختبارات التجريبية (قدرات/تحصيلي/STEP/كانجرو...)
@@ -771,7 +788,7 @@ async function main(){
               const arr=prevBy[t].slice().sort((a,b)=> (a.created_at<b.created_at)?1:-1);
               const lesson=t.replace(/^\S+\s+\S+\s*—\s*/,"");   /* «أحياء ١ث — 1-1 …» ⇐ «1-1 …» */
               return arr.slice(0,3).map(p=>{ const pc=pct(p.meta.correct,p.meta.total);
-                return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${saTime(RR.when(p))}</span></li>`; }).join("");
+                return `<li>${lesson}: <b>${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span></li>`; }).join("");
             }).join("")+`</ul>`;
         }).join("")+
         `<p class="note" style="margin:6px 2px 0">هذي مقرّرات صفٍّ أعلى — تُعرض لتتابع اطّلاعه عليها، ولا تدخل في «المستوى» ولا في التشخيص.</p></div>`;
@@ -791,7 +808,7 @@ async function main(){
           const base=kept.length?kept:arr;
           const avg=Math.round(base.reduce((s,p)=>s+pct(p.meta.correct,p.meta.total),0)/base.length);
           return `<div style="font-weight:700;margin:4px 2px 2px">${RR.shortTest(t)} <span class="cnt">(${base.length} محاولة · المتوسط ${avg}%${skipped?` · <b style="color:var(--bad)">${skipped} مستبعدة (نقر)</b>`:``})</span></div><ul class="weak">`+
-            (RR.foldedName(t) ? RR.foldLines(arr).map(L=>`<li><b>${L.name}</b>: ${L.n} محاولة · <b>${L.avg}%</b>${L.skipped?` <span style="color:var(--bad)">· ${L.skipped} مستبعدة</span>`:``}<ul>${L.rows.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")}</ul></li>`).join("") : arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${saTime(RR.when(p))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join(""))+
+            (RR.foldedName(t) ? RR.foldLines(arr).map(L=>`<li><b>${L.name}</b>: ${L.n} محاولة · <b>${L.avg}%</b>${L.skipped?` <span style="color:var(--bad)">· ${L.skipped} مستبعدة</span>`:``}<ul>${L.rows.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join("")}</ul></li>`).join("") : arr.slice(0,5).map(p=>{ const pc=pct(p.meta.correct,p.meta.total); return `<li>${p.meta.correct}/${p.meta.total} (${pc}%) <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${durTxt(p)}${untrustedTxt(p)}</li>`; }).join(""))+
             `</ul>`; }).join("")+
         `</div>`;
     }
@@ -871,7 +888,7 @@ async function main(){
           return h;
         };
         html+=`<details ${pi===0?'open':''} class="card" style="margin-bottom:12px">
-          <summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج ${saTime(RR.when(r))} — النتيجة ${tot}/${all} (${pc}%) · إنجليزي ${P.en_correct}/${P.en_total} · رياضيات ${P.ma_correct}/${P.ma_total}</summary>
+          <summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج ${RR.stamp(saTime(RR.when(r)))} — النتيجة ${tot}/${all} (${pc}%) · إنجليزي ${P.en_correct}/${P.en_total} · رياضيات ${P.ma_correct}/${P.ma_total}</summary>
           <div style="margin-top:8px">${secHtml("الإنجليزي",P.en,true)}${secHtml("الرياضيات",P.ma,false)}</div>
         </details>`;
       });

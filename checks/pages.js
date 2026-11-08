@@ -375,6 +375,7 @@ function run(){
   issues.push(...vocabRestorePath());
   issues.push(...licenseExamPath());
   issues.push(...gatQuantPath());
+  issues.push(...reportChapPath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -2101,13 +2102,18 @@ function subjFoldPath(){
       E('مفتاحُ مادّةٍ لا يبدأ باسمِ الابن (' + t.slice(0, 60) + ') — فتُفتَح عند إخوتِه معه');
 
   /* ── والسطرُ المطويُّ يحمل ما يُغني عن فتحِه ── */
+  /* وبطاقةُ الفصلِ داخلَ المادّةِ سطرُ طيٍّ مثلُها (details.subj chap —
+     طلبُ الأب ٨ نوفمبر ٢٠٢٦)، فتُعَدُّ معها ويلزمها ما يلزمها: عددٌ
+     ومتوسّطٌ وسهم. */
+  const chapTags = src.match(/<details class="subj chap"/g) || [];
+  const foldTags = subjTags.length + chapTags.length;
   const sums = src.match(/<summary><span class="subjsum">[\s\S]{0,400}?<\/summary>/g) || [];
-  if (sums.length !== subjTags.length)
-    E('عددُ سطورِ المواد ' + sums.length + ' وعناصرُها ' + subjTags.length);
+  if (sums.length !== foldTags)
+    E('عددُ سطورِ الطيّ ' + sums.length + ' وعناصرُها ' + foldTags);
   sums.forEach(function(s, i){
     if (!/المتوسط/.test(s)) E('سطرُ المادّةِ ' + (i + 1) + ' بلا متوسّط — فلا يُغني طيُّه عن فتحِه');
     /* المنهجُ يعدّ اختبارات، وفوقَ الصفِّ جلسات، والتجريبيُّ محاولات */
-    if (!/اختبارًا|جلسة|محاولة/.test(s)) E('سطرُ المادّةِ ' + (i + 1) + ' بلا عددٍ يُغني عن فتحِه');
+    if (!/اختبارًا|جلسة|محاولة|درسًا/.test(s)) E('سطرُ المادّةِ ' + (i + 1) + ' بلا عددٍ يُغني عن فتحِه');
     if (!/class="chev"/.test(s)) E('سطرُ المادّةِ ' + (i + 1) + ' بلا سهمٍ يدلّ على أنّه يُفتَح');
   });
 
@@ -6112,6 +6118,133 @@ function gatQuantPath(){
   /* وترتيبُ خياراتِ المقارنةِ لا يُخلَط */
   if (!/if\(q && q\.fixed\)/.test(src))
     E(F, 'خلطُ الخياراتِ يشمل المقارنات — وترتيبُها ثابتٌ في الاختبار');
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   الفصولُ داخلَ المادّة · والأرقامُ لا تنقلب · واليومُ أخضر
+   ═══════════════════════════════════════════════════════════════════
+   طلبان من الأب (٨ نوفمبر ٢٠٢٦) ومعهما صورةُ لوحتِه:
+   (١) «حطّ كل تقارير الدروس داخل الفصل — أفتح الفصل الأوّل أحصل داخله
+       تقرير كل درس، لأنّه صار صفحة طويلة متعبة».
+   (٢) «التاريخ بالأحمر ما فيه مشكلة، بس تاريخ اليوم حطّه بلون أخضر،
+       أمّا الشهر والوقت خلّه بالأحمر».
+
+   وفي الصورةِ ما لم يذكره وهو أصلُ التعب: الأرقامُ مقلوبةٌ على جهازِه.
+   المحفوظُ «1-2 ذات الخطوة الواحدة» ويعرض «2-1»، و«3-1 تمثيل المعادلات
+   بيانيًّا» يعرض «1-3»، و«2026-11-07» يعرض «07-11-2026». فدروسُ الفصلِ
+   الأوّلِ الخمسةُ (1-1 … 1-5) تظهر له 1-1 و2-1 و3-1 و4-1 و5-1 فيقرؤها
+   خمسةَ فصول. ولا يُعالَج إلّا بعزلٍ صريح. */
+function reportChapPath(){
+  const out = [];
+  const RF = 'report-rules.js', rp = path.join(ROOT, RF);
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(rp)) return [{ sev:'خطأ', file:RF, msg:'الملفُّ مفقود' }];
+
+  let RR = null;
+  try {
+    const sb = { window:{} }; sb.globalThis = sb;
+    vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(rp, 'utf8'), sb, { timeout: 5000 });
+    RR = sb.RR || (sb.window && sb.window.RR);
+  } catch(e){ E(RF, 'الملفُّ لا يُشغَّل: ' + e.message); }
+  if (!RR) { E(RF, 'RR غيرُ متاحة'); return out; }
+  ['chapterOf','chapters','stamp','isoNum','lessonHTML'].forEach(function(k){
+    if (typeof RR[k] !== 'function') E(RF, 'RR.' + k + ' مفقودة');
+  });
+  if (out.length) return out;
+
+  /* ═══ (١) كلُّ نمطِ تسميةٍ في البنكِ يُعرَف فصلُه ═══ */
+  const CASES = [
+    ['رياضيات م٣ — 1-2 ذات الخطوة الواحدة', 'الفصل ١'],
+    ['رياضيات م٣ — 1-5 القيمة المطلقة',     'الفصل ١'],
+    ['رياضيات م٣ — شامل ف١',                'الفصل ١'],
+    ['علوم م٢ — 2-1 المحاليل والذائبية',    'الفصل ٢'],
+    ['رياضيات م٣ — 3-1 تمثيل المعادلات بيانيًّا', 'الفصل ٣'],
+    ['رياضيات ف3 — البيانات',               'الفصل ٣'],
+    ['لغتي م٢ — و١ نحو: الفاعل',            'الوحدة ١'],
+    ['إنجليزي م٢ — Unit 3',                 'الوحدة ٣'],
+    ['إنجليزي٥ و1 — Personal Interests',    'الوحدة ١'],
+    ['إنجليزي م٢ — شامل و1-4',              'مراجعات شاملة'],
+    ['إنجليزي م٣ — Expansion 1-3',          'مراجعات شاملة'],
+    ['لغتي م٣ — نحو: الحال',                null]
+  ];
+  CASES.forEach(function(c){
+    const got = RR.chapterOf(RR.lessonOf(c[0]));
+    const lab = got ? got.label : null;
+    if (lab !== c[1])
+      E(RF, '«' + c[0] + '» فصلُه «' + lab + '» والمنتظَر «' + c[1] + '»');
+  });
+  /* و«شامل ف٢» و«2-1» فصلٌ واحدٌ لا فصلان بخطّين */
+  const k1 = RR.chapterOf(RR.lessonOf('رياضيات م٣ — شامل ف٢'));
+  const k2 = RR.chapterOf(RR.lessonOf('رياضيات م٣ — 2-4 الحل بيانيًّا'));
+  if (!k1 || !k2 || k1.k !== k2.k || k1.label !== k2.label)
+    E(RF, 'الفصلُ الثاني يخرج عنوانين: «' + (k1&&k1.label) + '» و«' + (k2&&k2.label) + '»');
+
+  /* ═══ (٢) التجميعُ يعمل حيث يُقصِّر، ويسكت حيث يُطيل ═══ */
+  const row = t => ({ meta:{ test:t, correct:9, total:10 } });
+  const maths = ['1-1 المعادلات','1-2 ذات الخطوة الواحدة','1-3 متعدّدة الخطوات','1-4 متغيّر في الطرفين',
+                 '1-5 القيمة المطلقة','2-1 العلاقات','2-2 الدوال','2-3 تمثيل المعادلات','2-4 الحل بيانيًّا',
+                 '2-5 معدّل التغيّر','2-6 المتتابعات','3-1 تمثيل بيانيّ','3-2 كتابة المعادلات',
+                 '3-3 ميل ونقطة','3-4 التوازي','شامل ف١','شامل ف٢','شامل ف٣']
+                 .map(x => row('رياضيات م٣ — ' + x));
+  const g = RR.chapters(maths);
+  if (!g) E(RF, 'ثمانيةَ عشرَ درسًا في ثلاثةِ فصولٍ لم تُجمَّع — وهو عينُ ما شكا منه');
+  else {
+    if (g.length > 5) E(RF, 'المجموعاتُ ' + g.length + ' لثمانيةَ عشرَ درسًا — لم يَقصُر شيء');
+    const n = g.reduce(function(a,x){ return a + x.rows.length; }, 0);
+    if (n !== maths.length) E(RF, 'سقط من التجميعِ ' + (maths.length - n) + ' درسًا');
+    const lab = g.map(function(x){ return x.label; });
+    if (lab[0] !== 'الفصل ١') E(RF, 'أوّلُ المجموعاتِ «' + lab[0] + '» لا «الفصل ١» — الترتيبُ ليس بالفصل');
+    if (g[0].rows.length !== 6) E(RF, 'الفصلُ الأوّلُ ' + g[0].rows.length + ' دروسٍ والمنتظَر ٦ (خمسةٌ وشاملُه)');
+  }
+  /* واثنا عشرَ درسًا كلُّ فصلٍ منها واحد: لا يُجمَّع — زيادةُ نقراتٍ */
+  const units = [];
+  for (let i = 1; i <= 8; i++) units.push(row('إنجليزي م٢ — Unit ' + i));
+  units.push(row('إنجليزي م٢ — الفتري 📝'), row('إنجليزي م٢ — جرعة: صياغة السؤال'));
+  if (RR.chapters(units))
+    E(RF, 'عشرةُ دروسٍ كلُّ وحدةٍ منها درسٌ واحدٌ جُمّعت — فزادت النقراتُ ولم تَقصُر الصفحة');
+  if (RR.chapters([row('أ'), row('ب')]))
+    E(RF, 'قائمةٌ من درسين جُمّعت');
+
+  /* ═══ (٣) الختمُ: يومٌ فشهرٌ فسنةٌ، معزولٌ، واليومُ أخضر ═══ */
+  const st = RR.stamp('2026-11-07 13:10');
+  if (!/<bdi dir="ltr">/.test(st)) E(RF, 'الختمُ غيرُ معزول — فينقلب على جهازِ الأب');
+  if (!/var\(--good\)/.test(st))   E(RF, 'اليومُ ليس أخضرَ — وهو نصُّ الطلب');
+  const flat = st.replace(/<[^>]*>/g, '');
+  if (flat !== '07-11-2026 13:10')
+    E(RF, 'الختمُ «' + flat + '» والمنتظَر «07-11-2026 13:10» (يومٌ فشهرٌ فسنةٌ ثمّ الوقت)');
+  const dayOnly = /<span style="color:var\(--good\)">(\d{2})<\/span>/.exec(st);
+  if (!dayOnly || dayOnly[1] !== '07')
+    E(RF, 'الأخضرُ ليس على اليومِ وحدَه — الشهرُ والوقتُ يبقيان كما كانا');
+  if (/var\(--good\)/.test(st.replace(/<span style="color:var\(--good\)">\d{2}<\/span>/, '')))
+    E(RF, 'الأخضرُ تعدّى اليومَ إلى غيرِه');
+  if (RR.stamp('') !== '' || /undefined|null/.test(RR.stamp(null)))
+    E(RF, 'الختمُ يطبع «undefined» حين لا تاريخ');
+
+  /* ═══ (٤) الأرقامُ في اسمِ الدرسِ تُعزَل ═══ */
+  const lh = RR.lessonHTML('رياضيات م٣ — 1-2 ذات الخطوة الواحدة');
+  if (!/<bdi dir="ltr">1-2<\/bdi>/.test(lh))
+    E(RF, 'رقمُ الدرسِ غيرُ معزولٍ — فيظهر «2-1» على جهازِ الأب');
+  if (lh.replace(/<[^>]*>/g, '') !== 'م٣ — 1-2 ذات الخطوة الواحدة')
+    E(RF, 'العزلُ غيّر نصَّ اسمِ الدرس');
+  if (/<bdi/.test(RR.isoNum('درسٌ بلا أرقام')))
+    E(RF, 'العزلُ يقع على نصٍّ بلا أرقام');
+
+  /* ═══ (٥) الصفحاتُ الثلاثُ تستعملها ═══ */
+  [['index.html', 'chapBody(arr)'], ['child.html', 'chapBody(arr,'], ['home.html', 'chapBody(arr,']]
+    .forEach(function(pair){
+      const f = pair[0], fp = path.join(ROOT, f);
+      if (!fs.existsSync(fp)) { E(f, 'الصفحةُ مفقودة'); return; }
+      const src = fs.readFileSync(fp, 'utf8');
+      if (src.indexOf(pair[1]) < 0) E(f, 'بطاقةُ المادّةِ لا تُجمِّع دروسَها في فصول');
+      if (!/RR\.lessonHTML\(/.test(src)) E(f, 'اسمُ الدرسِ يُعرَض بلا عزلٍ لأرقامِه');
+      if (!/RR\.stamp\(/.test(src))      E(f, 'التواريخُ تُعرَض بلا ختمٍ — فلا يومَ أخضرَ ولا عزل');
+      /* ولا يبقى تاريخٌ معروضٌ بلا ختم */
+      const bare = (src.match(/\$\{saTime\(/g) || []).length +
+                   (src.match(/'\+saTime\(/g) || []).length;
+      if (bare) E(f, bare + ' تاريخًا معروضًا بلا ختمٍ — ينقلب على جهازِه ولا يومَ فيه أخضر');
+    });
   return out;
 }
 

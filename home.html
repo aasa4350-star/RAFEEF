@@ -510,7 +510,7 @@ async function loadReport(){
       var isFlag=function(p){ return fresh(p) && (p.meta.trusted===false || p.meta.exits>0 || (p.meta.dur!=null && p.meta.total && (p.meta.dur/p.meta.total)<2)); };
       var mIco=function(p){ return p.meta.mode==="review"?"🔁":p.meta.mode==="new"?"📚":"📖"; };
       var flagged=vocabWk.filter(isFlag), show=vocabWk.filter(function(p){return !isFlag(p);}).slice(0,3).concat(flagged).sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; }).slice(0,8);
-      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=untrustedTxt(p); return '<li>'+mIco(p)+' '+saTime(rowTime(p))+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
+      var revList=show.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var ut=untrustedTxt(p); return '<li>'+mIco(p)+' '+RR.stamp(saTime(rowTime(p)))+' — <b>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b>'+durTxt(p)+ut+'</li>'; }).join("");
       var byDay={}; vocabT.forEach(function(p){ var f=saTime(rowTime(p)); var d=f.slice(0,10), hm=f.slice(11,16); if(!byDay[d]) byDay[d]={w:0,c:0,t0:hm,t1:hm}; byDay[d].w+=(p.meta.total||0); byDay[d].c+=(p.meta.correct||0); if(hm<byDay[d].t0)byDay[d].t0=hm; if(hm>byDay[d].t1)byDay[d].t1=hm; });
       var days=Object.keys(byDay).sort().reverse().slice(0,6);
       var dayList=days.map(function(d){ var o=byDay[d]; var dp=o.w?Math.round(o.c/o.w*100):0; var tm=(o.t0===o.t1)?o.t0:(o.t0+'–'+o.t1); return '<li>📅 '+d+' <span style="color:var(--muted);font-size:.85rem">('+tm+')</span>: راجع <b>'+o.w+' كلمة</b> ('+o.c+'/'+o.w+' · '+dp+'%)</li>'; }).join("");
@@ -577,7 +577,7 @@ async function loadReport(){
         html+='<div style="font-weight:700;margin:4px 2px 2px">📖 فتح القطعة ولم يُكملها <span class="cnt">('+acts.length+' مرّة · لا تدخل المتوسّط)</span></div><ul class="weak">'+
           acts.slice(0,3).map(function(p){
             return '<li>'+(p.meta.answered?('أجاب عن <b>'+p.meta.answered+'</b> من '+p.meta.of+' ثمّ خرج'):'فتح الأسئلة ولم يُجب')+
-              (p.meta.dur?' · ⏱️ '+p.meta.dur+'ث':'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+              (p.meta.dur?' · ⏱️ '+p.meta.dur+'ث':'')+' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span></li>'; }).join("")+
           '</ul>';
       }
       if(passReads.length){
@@ -588,7 +588,7 @@ async function loadReport(){
             return '<li>نطق <b>'+(p.meta.pron!=null?p.meta.pron+'%':'—')+'</b>'+
               (p.meta.comp!=null?' · اكتمال '+p.meta.comp+'%':'')+
               (p.meta.wpm?' · '+p.meta.wpm+' كلمة/دقيقة':'')+
-              ' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+              ' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span></li>'; }).join("")+
           (openNoComp?'<li style="color:var(--warn)">⚠️ آخر مرّة قرأ القطعة ولم يُكمل أسئلة الفهم — الأسئلة تحت القطعة في الصفحة نفسها.</li>':'')+
           '</ul>';
       }
@@ -596,7 +596,7 @@ async function loadReport(){
         var arr=readByT[t].slice().sort(function(a,b){ return (a.created_at<b.created_at)?1:-1; });
         var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
         html+='<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
-          arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
+          arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+RR.stamp(saTime(rowTime(p)))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
           '</ul>';
       });
       html+='</div>';
@@ -612,7 +612,7 @@ async function loadReport(){
         var acol=avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
         html+='<div style="font-weight:700;margin:4px 2px 2px">'+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط <b style="color:'+acol+'">'+avg+'%</b>)</span></div><ul class="weak">'+
           arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total);
-            return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(RR.when(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
+            return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+
           '</ul>';
         /* الكلماتُ التي أخطأ فيها — أنفعُ ما في التقرير: يُمليها عليه الأب */
         var miss={}, seenAny=false;
@@ -644,7 +644,7 @@ async function loadReport(){
           (aW!=null?' · <b>'+aW+'</b> كلمة/دقيقة':'')+'</li>'+
         prs.slice(0,3).map(function(p){ var m=p.meta;
           return '<li>'+pronKind(m)+' · '+(m.test||"")+' — <b>'+pv(p,"pron")+'%</b>'+
-            (pv(p,"comp")!=null?' · اكتمال '+m.comp+'%':'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+            (pv(p,"comp")!=null?' · اكتمال '+m.comp+'%':'')+' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     // ✍️ التعبير الإنجليزي
@@ -659,7 +659,7 @@ async function loadReport(){
       /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» */
       var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
       html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
-        '<li>📝 '+(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?('كتب <b>'+wCount(writingAll.length,L)+'</b>'):wNone(L))+(dt2?' · '+wDrill(L)+': <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':''); })()+(wLast?' · آخر مرة: <span class="cnt">'+saTime(wLast)+'</span>':'')+'</li>'+
+        '<li>📝 '+(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?('كتب <b>'+wCount(writingAll.length,L)+'</b>'):wNone(L))+(dt2?' · '+wDrill(L)+': <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':''); })()+(wLast?' · آخر مرة: <span class="cnt">'+RR.stamp(saTime(wLast))+'</span>':'')+'</li>'+
         (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
         '</ul></div>';
     }
@@ -683,7 +683,7 @@ async function loadReport(){
       var mwLvl = /م٢/.test((mwA[0].meta.test)||"") ? "الثاني" : "الثالث";
       html+='<div class="sec-title"><span class="dot"></span> 🧠 مقياس موهبة — المستوى '+mwLvl+'</div><div class="card"><ul class="weak">'+
         '<li>🎯 <b>'+arCount(mwA.length,"جولة واحدة","جولتان","جولات","جولة")+'</b> · '+
-        '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+saTime(rowTime(mwA[0]))+'</span></li>'+
+        '<b>'+mwC+'/'+mwT+'</b> ('+pct(mwC,mwT)+'%) <span class="cnt">آخرها '+RR.stamp(saTime(rowTime(mwA[0])))+'</span></li>'+
         mwK.map(function(k){ var e=mwD[k];
           return '<li>'+k+' <span class="cnt">'+e.c+'/'+e.t+' · '+pct(e.c,e.t)+'%</span></li>'; }).join("")+
         '</ul><small style="color:var(--muted)">المجالاتُ الأربعةُ مرتّبةٌ من الأضعف. '+
@@ -706,7 +706,7 @@ async function loadReport(){
       html+='<div class="sec-title"><span class="dot"></span> 💪 القسم العلاجي</div><div class="card"><ul class="weak">'+
         '<li>🎯 <b>'+arCount(rN,"جولة تدرّب واحدة","جولتا تدرّب","جولات تدرّب","جولة تدرّب")+'</b>'+' على '+'<b>'+arCount(rKeys.length,"درس واحد","درسين","دروس","درسًا")+'</b>'+
         (rT?' · الصحيح <b>'+rC+'/'+rT+'</b> ('+Math.round(rC/rT*100)+'%)':'')+
-        ' <span class="cnt">آخرها '+saTime(RR.when(ra[0]))+'</span></li>'+
+        ' <span class="cnt">آخرها '+RR.stamp(saTime(RR.when(ra[0])))+'</span></li>'+
         rKeys.slice(0,6).map(function(k){ var e=rBy[k];
           return '<li>'+k+' <span class="cnt">'+e.n+' جولة'+(e.t?' · '+e.c+'/'+e.t:'')+'</span></li>'; }).join("")+
         '</ul></div>';
@@ -750,7 +750,7 @@ async function loadReport(){
       var gCov=RR.gramCoverage(ga);
       html+='<div class="sec-title"><span class="dot"></span> ✏️ القواعد المركّزة</div><div class="card"><ul class="weak">'+
         '<li>✅ <b>صحّح '+arCount(gFix,"خطأً واحدًا","خطأين","أخطاء","خطأً")+'</b> من أخطائه في قواعد ستيب'+
-        (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+saTime(RR.when(ga[0]))+'</span></li>'+
+        (gRem?' · وبقي <b>'+gRem+'</b>':'')+' <span class="cnt">في '+arCount(gN,"جولة واحدة","جولتين","جولات","جولة")+' · آخرها '+RR.stamp(saTime(RR.when(ga[0])))+'</span></li>'+
         (gCov.rules?'<li>📚 جرّب <b>'+gCov.tried+'</b> من <b>'+gCov.rules+'</b> قاعدة'+
           (gCov.bank?' · وقطع <b>'+gCov.cut+'</b> سؤالًا من <b>'+gCov.bank+'</b>':'')+'</li>':'')+
         (gCov.left.length?'<li style="font-weight:400">🆕 <b>ما جرّبه بعد:</b> '+gCov.left.slice(0,6).join(" · ")+
@@ -770,14 +770,14 @@ async function loadReport(){
         '<li>📖 <b>'+tlw.length+'</b> تسميعًا · تامٌّ بلا نقص <b>'+RR.tilawaFull(tlw)+'</b></li>'+
         '<li style="font-weight:400">تحقُّقٌ من <b>الحفظ</b> لا من <b>التجويد</b> — والتجويدُ يُعرَض على معلّمه.</li>'+
         tlw.slice(0,5).map(function(p){ return '<li>'+RR.tilawaLine(p.meta)+
-          ' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+          ' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     if(talkActs.length && !talkAll.length){
       var ta=talkActs.slice().sort(function(a,b){ return a.created_at<b.created_at?1:-1; });
       html+='<div class="sec-title"><span class="dot"></span> 🗣️ المحادثة الإنجليزية</div><div class="card"><ul class="weak">'+
         '<li>🚪 فتح المحادثة <b>'+ta.length+'</b> مرّة ولم يضغط «تكلّم» — ما فيه جملةٌ تُقيَّم بعد.</li>'+
-        ta.slice(0,3).map(function(p){ return '<li>'+(p.meta.topic||'')+' <span class="cnt">'+saTime(RR.when(p))+
+        ta.slice(0,3).map(function(p){ return '<li>'+(p.meta.topic||'')+' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+
           (p.meta.secs?' · مكث '+p.meta.secs+'ث':'')+'</span></li>'; }).join("")+
         '</ul></div>';
     }
@@ -791,7 +791,7 @@ async function loadReport(){
         '<li>💬 <b>'+tks.length+'</b> جلسة محادثة · <b>'+totTurns+'</b> جملة'+(pA?' · متوسط النطق <b>'+pA.pct+'%</b>'+basis(pA):'')+(cA?' · صحّة الجملة <b>'+cA.pct+'%</b>'+basis(cA):'')+'</li>'+
         (RR.talkUnheard(tks)?'<li>🔁 وتكلّم <b>'+RR.talkUnheard(tks)+'</b> مرّة ولم يوضح كلامه فلم تُحسب</li>':'')+
         tks.slice(0,3).map(function(p){ var m=p.meta; var ex=RR.talkLine(m);
-          return '<li>'+(m.topic||"—")+' · <b>'+(m.turns||0)+'</b> جملة'+(typeof m.avgPron==="number"?' · نطق '+m.avgPron+'%':'')+(typeof m.avgCorrect==="number"?' · صحّة '+m.avgCorrect+'%':'')+(ex.length?' · '+ex.join(' · '):'')+' <span class="cnt">'+saTime(RR.when(p))+'</span></li>'; }).join("")+
+          return '<li>'+(m.topic||"—")+' · <b>'+(m.turns||0)+'</b> جملة'+(typeof m.avgPron==="number"?' · نطق '+m.avgPron+'%':'')+(typeof m.avgCorrect==="number"?' · صحّة '+m.avgCorrect+'%':'')+(ex.length?' · '+ex.join(' · '):'')+' <span class="cnt">'+RR.stamp(saTime(RR.when(p)))+'</span></li>'; }).join("")+
         '</ul></div>';
     }
     // 📚 تقرير المنهج الدراسي — مجمّع حسب المادة
@@ -805,8 +805,28 @@ async function loadReport(){
         var okArr=arr.filter(function(p){ return p.meta.trusted!==false; });
         var avg=okArr.length?Math.round(okArr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/okArr.length):null;
         var acol=avg==null?"var(--muted)":avg>=80?"var(--good)":avg>=50?"var(--warn)":"var(--bad)";
-        html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+(avg==null?"—":avg+'%')+'</span></div><ul class="weak">'+
-          arr.map(function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=RR.lessonOf(p.meta.test); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
+        /* ═══ دروسُ المادّةِ داخلَ فصولِها ═══════════════════════════
+           طلبُ الأب (٨ نوفمبر ٢٠٢٦): «أفتح الفصل الأوّل أحصل داخله
+           تقرير كل درس». والتجميعُ يسقط من نفسِه إن لم يُقصِّر القائمة
+           — انظر RR.chapters. */
+        var CH_SUM='cursor:pointer;font-weight:800;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.92rem';
+        var CH_BOX='background:var(--bg);border:1px solid var(--line);border-radius:11px;margin:6px 0';
+        var chapBody=function(arr, li){
+          var gs=RR.chapters(arr);
+          if(!gs) return '<ul class="weak">'+arr.map(li).join("")+'</ul>';
+          return gs.map(function(g){
+            var ok=g.rows.filter(function(x){ return x.meta.trusted!==false; });
+            var av=ok.length?Math.round(ok.reduce(function(t,x){ return t+pct(x.meta.correct,x.meta.total); },0)/ok.length):null;
+            var c=av==null?"var(--muted)":av>=80?"var(--good)":av>=50?"var(--warn)":"var(--bad)";
+            return '<details style="'+CH_BOX+'"><summary style="'+CH_SUM+'"><span>'+g.label+'</span>'+
+              '<span style="font-size:.8rem;font-weight:600;color:var(--muted)">'+g.rows.length+' درسًا · '+
+              '<span style="color:'+c+'">'+(av==null?"—":av+'%')+'</span></span></summary>'+
+              '<ul class="weak" style="margin:0;padding:2px 20px 8px">'+g.rows.map(li).join("")+'</ul></details>';
+          }).join("");
+        };
+
+        html+='<div class="card"><div style="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>'+SUBJ_EMOJI[subj]+' '+subj+'</span><span style="font-size:.85rem;color:'+acol+'">المتوسط '+(avg==null?"—":avg+'%')+'</span></div>'+
+          chapBody(arr, function(p){ var pc=pct(p.meta.correct,p.meta.total); var lesson=RR.lessonHTML(p.meta.test); var col=pc>=80?"var(--good)":pc>=50?"var(--warn)":"var(--bad)";
             /* ═══ السؤالُ المقاليُّ يُقرأ لا يُختصر في رقم ══════════════
                بعضُ الاختباراتِ فيها سؤالٌ مقاليٌّ يضع الابنُ درجتَه فيه
                بنفسِه. فلو عُرض الرقمُ وحدَه لم يُعرَف أصادقٌ تقديرُه أم
@@ -820,8 +840,8 @@ async function loadReport(){
                   String(p.meta.essay).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+
                 '</div></details></li>' : '';
             var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
-            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+saTime(rowTime(p))+'</span>'+un+'</li>'+ess; }).join("")+
-          '</ul></div>';
+            return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+RR.stamp(saTime(rowTime(p)))+'</span>'+un+'</li>'+ess; })+
+          '</div>';
       });
     }
     /* 🔭 مواد فوق الصفّ — يراها الطالب نفسه مفصولةً عن درجاته */
@@ -835,7 +855,7 @@ async function loadReport(){
           var sj=t.split(" ")[0];
           var avg=Math.round(arr.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/arr.length);
           return '<div style="font-weight:700;margin:4px 2px 2px">'+(PREV_ICO[sj]||"📘")+' '+t+' <span class="cnt">('+arr.length+' محاولة · المتوسط '+avg+'%)</span></div><ul class="weak">'+
-            arr.slice(0,3).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span></li>'; }).join("")+
+            arr.slice(0,3).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+RR.stamp(saTime(rowTime(p)))+'</span></li>'; }).join("")+
             '</ul>'; }).join("")+
         '</div>';
     }
@@ -860,7 +880,7 @@ async function loadReport(){
           var avg=Math.round(base.reduce(function(s,p){return s+pct(p.meta.correct,p.meta.total);},0)/base.length);
           return '<div style="font-weight:700;margin:4px 2px 2px">'+RR.shortTest(t)+' <span class="cnt">('+base.length+' محاولة · المتوسط '+avg+'%'+
             (skipped?(kept.length?'':' — كلّها نقر!')+' · <b style="color:var(--bad)">'+skipped+' مستبعدة (نقر)</b>':'')+')</span></div><ul class="weak">'+
-            (RR.foldedName(t) ? RR.foldLines(arr).map(function(L){ return '<li><b>'+L.name+'</b>: '+L.n+' محاولة · <b>'+L.avg+'%</b>'+(L.skipped?' <span style="color:var(--bad)">· '+L.skipped+' مستبعدة</span>':'')+'<ul>'+L.rows.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+'</ul></li>'; }).join("") : arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+saTime(rowTime(p))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join(""))+
+            (RR.foldedName(t) ? RR.foldLines(arr).map(function(L){ return '<li><b>'+L.name+'</b>: '+L.n+' محاولة · <b>'+L.avg+'%</b>'+(L.skipped?' <span style="color:var(--bad)">· '+L.skipped+' مستبعدة</span>':'')+'<ul>'+L.rows.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+RR.stamp(saTime(rowTime(p)))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join("")+'</ul></li>'; }).join("") : arr.slice(0,5).map(function(p){ var pc=pct(p.meta.correct,p.meta.total); return '<li>'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%) <span class="cnt">'+RR.stamp(saTime(rowTime(p)))+'</span>'+durTxt(p)+untrustedTxt(p)+'</li>'; }).join(""))+
             '</ul>'; }).join("")+
         '</div>';
     }
@@ -901,7 +921,7 @@ async function loadReport(){
           });
           return h;
         };
-        html+='<details '+(pi===0?'open':'')+' class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج '+saTime(rowTime(r))+' — النتيجة '+tot+'/'+all+' ('+pc+'%) · إنجليزي '+P.en_correct+'/'+P.en_total+' · رياضيات '+P.ma_correct+'/'+P.ma_total+'</summary><div style="margin-top:8px">'+secHtml("الإنجليزي",P.en,true)+secHtml("الرياضيات",P.ma,false)+'</div></details>';
+        html+='<details '+(pi===0?'open':'')+' class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:800;padding:6px 0">📄 نموذج '+RR.stamp(saTime(rowTime(r)))+' — النتيجة '+tot+'/'+all+' ('+pc+'%) · إنجليزي '+P.en_correct+'/'+P.en_total+' · رياضيات '+P.ma_correct+'/'+P.ma_total+'</summary><div style="margin-top:8px">'+secHtml("الإنجليزي",P.en,true)+secHtml("الرياضيات",P.ma,false)+'</div></details>';
       });
     }
   } else {
