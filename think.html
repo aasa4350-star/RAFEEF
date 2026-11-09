@@ -10,6 +10,7 @@
 <script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="attempts-queue.js"></script>
+<script src="think-deep.js"></script>
 <style>
   :root{
     --accent:#7c3aed; --soft:#c4b5fd; --deep:#5b21b6;
@@ -109,6 +110,9 @@
   @media (prefers-color-scheme:dark){ .vz-in{fill:#fff} .vz-fill{fill:#4c1d95;stroke:#a78bfa} }
   /* مسائل الاستدلال (TIMSS) تُميَّز بصريًّا عن تمارين المهارة */
   .q-reason{border-inline-start:4px solid var(--accent)}
+  /* طبقةُ التحدّي تُميَّز عنهما جميعًا — فهي ليست «أكثرَ من الشيء نفسه» */
+  .q-deep{border-inline-start:5px solid var(--warn)}
+  .q-deep .tag{background:var(--warn);color:#fff}
   .score{text-align:center;font-weight:800;margin:14px 0;font-size:1.05rem}
   .go{width:100%;background:var(--accent);color:#fff;border:0;border-radius:14px;
       padding:13px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;margin-top:6px}
@@ -138,11 +142,29 @@ function khana(n){
   if(n>=3 && n<=10) return n+" خانات";
   return n+" خانة";
 }
+/* العددُ والمعدودُ في الثواني — الصفحةُ تذكر الزمنَ في كلِّ سؤالٍ، فـ«٤
+   ثانية» تتكرّر عشراتِ المرّاتِ على عينِ الابن. */
+function thawan(n){
+  if(n === 1) return "ثانيةٍ واحدة";
+  if(n === 2) return "ثانيتين";
+  if(n >= 3 && n <= 10) return n+" ثوانٍ";
+  return n+" ثانية";
+}
 /* ثلاثة خيارات: الصحيح ومشتّتان، مخلوطة. نُرجع [الخيارات، فهرس الصحيح] */
 function opt3(correct, ds){
   var o=[correct];
   (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<3) o.push(d); });
   var p=1; while(o.length<3){ var c=(typeof correct==="number")?correct+p:String(correct)+"*"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
+  shuffle(o);
+  return [o.map(function(v){ return String(v).replace(/-/g,"−"); }), o.indexOf(correct)];
+}
+/* أربعةُ خيارات — لطبقةِ التحدّي وحدَها. التخمينُ من ثلاثةٍ ٣٣٪ ومن
+   أربعةٍ ٢٥٪، واختباراتُ موهبةَ وكانجرو رباعيّةٌ فأكثر. وأسئلةُ المهارةِ
+   تبقى ثلاثيّةً كما هي، فالتغييرُ مقصورٌ على المستوى الجديد. */
+function opt4(correct, ds){
+  var o=[correct];
+  (ds||[]).forEach(function(d){ if(o.indexOf(d)<0 && o.length<4) o.push(d); });
+  var p=1; while(o.length<4){ var c=(typeof correct==="number")?correct+p:String(correct)+"*"; if(o.indexOf(c)<0)o.push(c); p++; if(p>40)break; }
   shuffle(o);
   return [o.map(function(v){ return String(v).replace(/-/g,"−"); }), o.indexOf(correct)];
 }
@@ -627,6 +649,72 @@ var REASON = {
 }
 };
 
+/* ═══════════════════════════════════════════════════════════════
+   طبقةُ التحدّي — سقفُ البنكِ لا سقفُ الابن
+
+   قال حسنٌ (٩ نوفمبر ٢٠٢٦): «قسمُ تقويةِ التفكيرِ تافه». وقياسُه
+   يُصدّقه: آخرُ خمسِ جلساتٍ ٨/٨ كلُّها، وزمنُ السؤالِ ٣–٥ ثوانٍ من
+   أصلِ عشرينَ مسموحة. والعلّةُ في البنكِ لا فيه — ثمانيَ عشرةَ مهارةً
+   كلُّها خطوةٌ واحدةٌ من حسابِ الابتدائيّة، وستُّ مسائلَ مركّبةٍ أتقنها
+   كلَّها، فصار الاستهدافُ الموجَّهُ يُدوّر الحفنةَ نفسَها عليه.
+
+   فمن بلغ سقفَ البنكِ لم يبقَ له فيه تفكيرٌ، وإنّما استرجاعٌ سريع.
+   والعلاجُ ليس تضييقَ الزمنِ على ما يعرف، بل أسئلةً لا يكفي فيها أن
+   يعرف — وهي think-deep.js.
+
+   ═══ متى تُفتح؟ ═══
+   لا بإعلانٍ منّا ولا بزرٍّ يضغطه، بل من قياسِه هو: جلستانِ فأكثر،
+   ومتوسّطُ صحّةٍ ٩٠٪ فأعلى. فإن أضاف إليها سرعةً (وسيطُ زمنِ السؤال
+   عشرُ ثوانٍ أو أقلّ — أي نصفُ المهلة) فُتحت على مصراعيها أربعةً من
+   ثمانية؛ وإن كان دقيقًا بطيئًا فمسألتان، فالصعوبةُ تُزاد على من
+   أتقن لا على من يكافح.
+
+   ═══ وبوّابةُ الصفّ فوق ذلك ═══
+   سعودٌ (رابع) وأسامةُ (خامس) لا يُفتح لهما شيءٌ من هذه الطبقةِ ولو
+   بلغا السقف — لكلِّ مسألةٍ أدنى صفٍّ في GRADE، وأدناها السابع.
+   صعوبةٌ قبل أوانها تُعلّم العجزَ لا التفكير، وسقفُهما يُعالَج بتوسيعِ
+   بنكِ صفِّهما لا باستعارةِ بنكِ أخيهما.
+   ═══════════════════════════════════════════════════════════════ */
+var THINK_TEST = "تقوية التفكير 🧠";
+var DEEP = (window.THINK_DEEP && window.THINK_DEEP.BANK) || {};
+var DEEP_GRADE = (window.THINK_DEEP && window.THINK_DEEP.GRADE) || {};
+var GRADE_NUM = { hasan:9, rafeef:8, osama:5, saud:4 };
+var T_DEEP = 90;
+var DEEP_ALLOW = (function(){
+  var g = GRADE_NUM[who] || 0, b = {};
+  Object.keys(DEEP).forEach(function(k){ if((DEEP_GRADE[k] || 99) <= g) b[k] = DEEP[k]; });
+  return b;
+})();
+var CEIL_PCT = 90, CEIL_SEC = 10, CEIL_MIN = 2, CEIL_LOOK = 5;
+/* سقفُه يُقرأ من جلساتِ هذه الصفحةِ وحدَها: نسبةُ الصحّةِ ووسيطُ الزمن.
+   والصفوفُ الجزئيّةُ (حُفظت قبل الإكمال) تُطوى في معرّفِها pid فلا
+   تُحسَب جلستين. */
+function mastery(rows){
+  var byPid = {}, loose = [];
+  (rows||[]).forEach(function(r){
+    var m = r.meta;
+    if(!m || m.test !== THINK_TEST || !m.total) return;
+    var o = { pct: Math.round(100*(m.correct||0)/m.total), sec:(m.msAvg==null?null:m.msAvg), total:m.total };
+    if(m.pid){ if(!byPid[m.pid] || byPid[m.pid].total < o.total) byPid[m.pid] = o; }
+    else loose.push(o);
+  });
+  var ses = Object.keys(byPid).map(function(k){ return byPid[k]; }).concat(loose)
+              .filter(function(o){ return o.total >= 5; }).slice(0, CEIL_LOOK);
+  if(!ses.length) return { n:0, pct:null, sec:null };
+  var pct = Math.round(ses.reduce(function(a,x){ return a+x.pct; },0)/ses.length);
+  var ts = ses.filter(function(x){ return x.sec != null; }).map(function(x){ return x.sec; })
+              .sort(function(a,b){ return a-b; });
+  return { n:ses.length, pct:pct, sec:(ts.length ? ts[Math.floor(ts.length/2)] : null) };
+}
+function deepQuota(ms){
+  if(!Object.keys(DEEP_ALLOW).length) return 0;          /* الصفُّ لا يسمح */
+  if(!ms || ms.n < CEIL_MIN || ms.pct == null) return 0;  /* لا قياسَ بعد */
+  if(ms.pct >= CEIL_PCT && ms.sec != null && ms.sec <= CEIL_SEC) return 4;
+  if(ms.pct >= CEIL_PCT) return 2;
+  return 0;
+}
+function goalOf(it){ return it.deep ? T_DEEP : (it.reason ? T_REASON : T_SKILL); }
+
 /* ═══ قراءة ضعف الابن من جلساته الفعلية ═══════════════════════
    نقرأ meta.skills من كل جلساته (اختبر نفسك/قدرات...)، ونجمع لكل
    مهارةٍ صحيحَها من مجموعها. الأضعف أوّلًا — بشرط ٣ أسئلةٍ فأكثر،
@@ -670,9 +758,11 @@ function fetchSkills(){
           agg[k].c += (v.c||0); agg[k].t += v.t;
         });
       });
-      return agg;
+      /* نفسُ الصفوفِ تُقرأ مرّتين: مرّةً للضعفِ ومرّةً للسقف — فلا طلبَ
+         ثانٍ على الشبكة. */
+      return { agg:agg, mast:mastery(rows) };
     })
-    .catch(function(){ return {}; });
+    .catch(function(){ return { agg:{}, mast:{ n:0, pct:null, sec:null } }; });
 }
 /* ═══ المسائلُ المركّبةُ كانت خارجَ الاستهداف ═══════════════════════
    كان الكشفُ عن الضعف يقتصر على REMEDY (المهاراتِ المفردة)، وREASON
@@ -704,12 +794,18 @@ var DEFAULT_WEAK = ["النسبة المئوية","مساحة المثلّث","�
    لا تُنتج استدلالًا؛ ومجال «الاستدلال» في TIMSS مسائلُ تدمج أكثر من
    خطوةٍ في سياقٍ غير مألوف، وهو أضعف ما عند حسن. */
 var SKILL_Q = 5, REASON_Q = 3;
-function buildSession(weak, weakR){
+/* والمجموعُ ثمانيةٌ في كلِّ الأحوال: إذا فُتحت طبقةُ التحدّي أخذت من
+   نصيبِ المهارةِ المفردةِ لا من طولِ الجلسة — فمن بلغ السقفَ لا يُطالب
+   بجلسةٍ أطول، بل بجلسةٍ أثقل. */
+function buildSession(weak, weakR, weakD, nDeep){
+  var nD = Math.max(0, Math.min(4, nDeep|0));
+  var nR = nD ? 2 : REASON_Q;
+  var nS = Math.max(0, SESSION - nD - nR);
   var pool=[];
   weak.forEach(function(w,i){ var reps = Math.max(1, 4-i); for(var j=0;j<reps;j++) pool.push(w.k); });
   shuffle(pool);
   var out=[], seen={}, guard=0;
-  while(out.length < SKILL_Q && guard < SKILL_Q*30){
+  while(out.length < nS && guard < (nS+1)*30){
     guard++;
     var k = pool[out.length % pool.length];
     var item;
@@ -721,12 +817,24 @@ function buildSession(weak, weakR){
   var rk = (weakR && weakR.length) ? shuffle(weakR.map(function(w){ return w.k; }))
                                    : shuffle(Object.keys(REASON));
   guard=0;
-  while(out.length < SKILL_Q+REASON_Q && guard < REASON_Q*30){
+  while(out.length < nS+nR && guard < (nR+1)*30){
     guard++;
-    var key = rk[(out.length - SKILL_Q) % rk.length], it2;
+    var key = rk[(out.length - nS) % rk.length], it2;
     try{ it2 = REASON[key](); }catch(e){ continue; }
     if(!it2 || seen[it2.q]) continue;
     seen[it2.q]=1; it2.skill = key; it2.reason = true; out.push(it2);
+  }
+  /* طبقةُ التحدّي: من أضعفها عنده إن كان له فيها تاريخ، وإلّا فمن
+     المسموحِ لصفِّه. ولا يُسحب منها شيءٌ لمن لم تُفتح له. */
+  var dk = (weakD && weakD.length) ? shuffle(weakD.map(function(w){ return w.k; }))
+                                   : shuffle(Object.keys(DEEP_ALLOW));
+  guard=0;
+  while(nD && dk.length && out.length < nS+nR+nD && guard < (nD+1)*30){
+    guard++;
+    var kd = dk[(out.length - nS - nR) % dk.length], it3;
+    try{ it3 = DEEP_ALLOW[kd](); }catch(e){ continue; }
+    if(!it3 || seen[it3.q]) continue;
+    seen[it3.q]=1; it3.skill = kd; it3.deep = true; out.push(it3);
   }
   return out;
 }
@@ -737,14 +845,15 @@ function buildSession(weak, weakR){
    الأكمل (RR.usable). */
 var __PIDN = 0;
 function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.random().toString(36).slice(2,7); }
-function saveScore(correct, total, skills, pid, items, msAvg){
+function saveScore(correct, total, skills, pid, items, msAvg, deepN){
   try{
     var body = { student:name, grade:GRADES[who]||"", en_correct:0,en_total:0,ma_correct:0,ma_total:0, wrong:[],
       /* items وmsAvg جديدان: بلا تخزين الزمن لا يُعرف أتحسّنت سرعتُه أم
          ثبتت — وهو المقصودُ من هذا التغيير كلِّه. */
-      meta:{ kind:"practice", test:"تقوية التفكير 🧠", correct:correct, total:total,
+      meta:{ kind:"practice", test:THINK_TEST, correct:correct, total:total,
              skills:(skills||{}), items:(items||[]), msAvg:(msAvg||null),
-             tSkill:T_SKILL, tReason:T_REASON, targeted:true, pid:pid||null } };
+             tSkill:T_SKILL, tReason:T_REASON, tDeep:T_DEEP, deepN:(deepN||0),
+             targeted:true, pid:pid||null } };
     if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
     fetch(SUPA_URL+"/rest/v1/attempts", { method:"POST", keepalive:true,
       headers:{ "apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal" },
@@ -761,8 +870,9 @@ function renderLoading(){
     '<div class="card"><p class="note">أقرأ نتائجك السابقة لأحدّد أضعف مهاراتك…</p></div>';
 }
 
-function render(weak, hasData, weakR){
-  var items = buildSession(weak, weakR);
+function render(weak, hasData, weakR, weakD, nDeep, mast){
+  var items = buildSession(weak, weakR, weakD, nDeep);
+  var deepN = items.filter(function(x){ return x.deep; }).length;
   var answered = {}, correct = 0, saved = false, savedN = 0, pid = newPid();
   var skillTally = {};
   var log = [];        /* سطرٌ لكلّ سؤال: المهارة والصحّة والزمن */
@@ -808,9 +918,24 @@ function render(weak, hasData, weakR){
     '<a href="practice.html?who='+who+'">📊 قدرات وتحصيلي</a></div>';
 
   var intro = '<div class="intro">'+
-    (hasData ? 'هذي أسئلةٌ مختارةٌ لك أنت — من أضعف مهاراتك في نتائجك السابقة.'
-             : 'أوّل جلسة لك — نبدأ بمهاراتٍ أساسيّة، وبعدها تصير الأسئلة مُفصّلةً على ضعفك أنت.')+
+    (deepN ? 'رفعنا مستوى جلستك — فيها '+deepN+' '+(deepN===1?'مسألةُ':'مسائلِ')+' <b>تحدٍّ</b> لا تُحَلُّ بخطوةٍ واحدة.'
+           : (hasData ? 'هذي أسئلةٌ مختارةٌ لك أنت — من أضعف مهاراتك في نتائجك السابقة.'
+                      : 'أوّل جلسة لك — نبدأ بمهاراتٍ أساسيّة، وبعدها تصير الأسئلة مُفصّلةً على ضعفك أنت.'))+
     '<small>كل سؤالٍ بعد إجابتك يفتح لك <b>الحلّ خطوة بخطوة</b> — اقرأه حتى لو أجبت صح.</small></div>';
+
+  /* ═══ لمَ ارتفع المستوى؟ يُقال له بالرقمِ لا بالدعوى ═══
+     شكواه أنّ القسمَ «تافه»، وجوابُه ليس كلامًا مطمئنًا بل قياسَه هو
+     معروضًا عليه: هذا ما سجّلتَه، ولذلك تغيّرت الأسئلة. */
+  var deepCard = !deepN ? '' :
+    '<div class="card"><b>🔶 رُفع المستوى — وهذا سببُه</b>'+
+    '<div class="note">آخرُ '+(mast && mast.n ? mast.n : '')+' جلساتٍ لك: <b>'+
+      (mast && mast.pct!=null ? mast.pct+'%' : '—')+'</b> صحّةً'+
+      (mast && mast.sec!=null ? '، وزمنُ السؤال <b>'+thawan(mast.sec)+'</b> من أصل '+T_SKILL : '')+
+    '. فما كان يُدرّبك صار يَستعرض ما تعرفه أصلًا.</div>'+
+    '<div class="note">فدخلت <b>'+deepN+'</b> '+(deepN===1?'مسألةُ تحدٍّ':'مسائلِ تحدٍّ')+': '+
+      'أربعةُ خيارات لا ثلاثة، وفي كلِّ واحدةٍ خيارٌ هو <b>الجوابُ البديهيُّ الخاطئ</b> — '+
+      'من حسبَ بلا فهمٍ وقع فيه. ومهلتُها <b>'+T_DEEP+'ث</b>، فخُذها كاملةً؛ '+
+      'المطلوبُ هنا التفكيرُ لا السرعة.</div></div>';
 
   function skillLis(list){
     return list.map(function(w){
@@ -827,6 +952,10 @@ function render(weak, hasData, weakR){
         '<small style="color:var(--muted)">هذي اللي تتركّب فيها أكثرُ من خطوة — وهي موضعُ تعثّرك، '+
         'لا الخطوةُ المفردة.</small>'
       : '')+
+    ((deepN && weakD && weakD.length)
+      ? '<div style="margin-top:10px;font-weight:800">🔶 ومن طبقةِ التحدّي:</div>'+
+        '<ul class="skills">'+skillLis(weakD)+'</ul>'
+      : '')+
     '</div>';
 
   /* أسئلةُ مراقبة التفكير — توصية ٢ (دليل قويّ) في IES/WWC، منقولةٌ من
@@ -835,12 +964,19 @@ function render(weak, hasData, weakR){
   var PROMPTS_SKILL = ["وش يطلبه السؤال بالضبط؟","أيّ معلومةٍ فيه مهمّة؟","شفت مسألةً تشبهها قبل؟"];
   var PROMPTS_REASON = ["وش المطلوب في النهاية — لا في الخطوة الأولى؟","وش الخطوات اللي أحتاجها بالترتيب؟",
                         "فيه شرطٌ خفيّ («ما عدا»، «بعد كذا سنة»)؟"];
+  /* أسئلةُ التحدّي: التنبيهُ فيها على المصيدةِ نفسِها — فأكثرُ ما يُسقط
+     المتقِنَ هو الجوابُ الذي يبدو بديهيًّا */
+  var PROMPTS_DEEP = ["أيُّ خيارٍ هنا يبدو بديهيًّا؟ اشكُك فيه أوّلًا.",
+                      "على أيِّ أساسٍ أحسب — هل تغيّر الأساسُ في منتصف المسألة؟",
+                      "هل أُجيب عن السؤالِ المطلوبِ فعلًا، أو عن خطوةٍ وسطى؟"];
 
   var qs_ = items.map(function(it,i){
-    var pr = it.reason ? PROMPTS_REASON : PROMPTS_SKILL;
-    return '<div class="q'+(it.reason?' q-reason':'')+'" data-i="'+i+'">'+
-      '<div class="num">سؤال '+(i+1)+' <span class="tag">'+(it.reason?'🧩 استدلال · ':'')+esc(it.skill)+'</span>'+
-        '<span class="goal">🎯 الهدف: دون '+(it.reason?T_REASON:T_SKILL)+'ث</span></div>'+
+    var pr = it.deep ? PROMPTS_DEEP : (it.reason ? PROMPTS_REASON : PROMPTS_SKILL);
+    return '<div class="q'+(it.deep?' q-deep':(it.reason?' q-reason':''))+'" data-i="'+i+'">'+
+      '<div class="num">سؤال '+(i+1)+' <span class="tag">'+
+        (it.deep?'🔶 تحدٍّ · ':(it.reason?'🧩 استدلال · ':''))+esc(it.skill)+'</span>'+
+        '<span class="goal">'+(it.deep ? '🧠 مهلتك: '+T_DEEP+'ث — فكّر'
+                                       : '🎯 الهدف: دون '+goalOf(it)+'ث')+'</span></div>'+
       '<div class="stem">'+esc(it.q)+'</div>'+
       (it.viz || '')+
       '<div class="ask"><b>قبل ما تحلّ، اسأل نفسك:</b><ul>'+
@@ -859,7 +995,7 @@ function render(weak, hasData, weakR){
       '</div></div>';
   }).join("");
 
-  app.innerHTML = head + intro + skillsCard + qs_ +
+  app.innerHTML = head + intro + deepCard + skillsCard + qs_ +
     '<div class="score" data-score>الدرجة: 0 / '+items.length+'</div>'+
     '<button class="go" data-again>جلسة جديدة 🔄</button>'+
     '<footer>الأسئلة تتغيّر أرقامها كل مرّة · والمهارات تتحدّث تلقائيًّا مع تقدّمك</footer>';
@@ -869,7 +1005,7 @@ function render(weak, hasData, weakR){
     var n = log.length;
     if(!n) return "الدرجة: 0 / "+items.length;
     var avg = Math.round(log.reduce(function(a,x){ return a+x.ms; },0)/n);
-    var under = log.filter(function(x){ return x.ms <= (x.r?T_REASON:T_SKILL); }).length;
+    var under = log.filter(function(x){ return x.ms <= (x.d?T_DEEP:(x.r?T_REASON:T_SKILL)); }).length;
     return "الدرجة: "+correct+" / "+items.length+
       ' <span class="spd">⏱️ متوسّط '+avg+'ث · تحت الهدف '+under+' من '+n+'</span>';
   }
@@ -878,14 +1014,14 @@ function render(weak, hasData, weakR){
     var n = Object.keys(answered).length;
     if(saved) return;
     if(n === items.length && savedN < n){ savedN = n; saved = true;
-      saveScore(correct, items.length, skillTally, pid, log, msAvgOf()); }
+      saveScore(correct, items.length, skillTally, pid, log, msAvgOf(), deepN); }
   }
   /* حفظٌ جزئيّ إن غادر قبل أن يُكمل — كبقيّة صفحات الموقع، فلا يضيع جهده */
   function savePartial(){
     /* لا يُقفل: من حُفظ له جزءٌ ثمّ أكمل، يُحفظ إكماله بالمعرّف نفسه */
     var n = Object.keys(answered).length;
     if(n < MIN_ASK || n <= savedN) return;
-    savedN = n; saved = true; saveScore(correct, n, skillTally, pid, log, msAvgOf());
+    savedN = n; saved = true; saveScore(correct, n, skillTally, pid, log, msAvgOf(), deepN);
   }
   document.addEventListener("visibilitychange", function(){ if(document.hidden) savePartial(); });
   window.addEventListener("pagehide", function(){ savePartial(); });
@@ -912,13 +1048,18 @@ function render(weak, hasData, weakR){
 
         /* ═══ الزمن: يُرى ويُقال فيه الصدق ═══
            ولا يُمدح سريعٌ مخطئ — وإلّا علّمناه التخمين. */
-        var sec = secOf(i), goal = it.reason ? T_REASON : T_SKILL;
-        log.push({ s:it.skill, ok:(ok?1:0), ms:sec, r:(it.reason?1:0) });
+        var sec = secOf(i), goal = goalOf(it);
+        /* في طبقةِ التحدّي لا يُطلب سرعة، وإنّما لا يُقبل أن يُخطئ في
+           عشرينَ ثانيةً من تسعين — فذاك تخمينٌ لا تفكير. */
+        var rush = it.deep ? 20 : goal/2;
+        log.push({ s:it.skill, ok:(ok?1:0), ms:sec, r:(it.reason?1:0), d:(it.deep?1:0) });
         var tmEl = qEl.querySelector("[data-tm]"), msg, klass;
-        if(ok && sec <= goal){ klass="t-good"; msg = "⏱️ <b>"+sec+" ثانية</b> — صحيحة وتحت الهدف ("+goal+"ث). ممتاز 🎯"; }
-        else if(ok){ klass="t-mid"; msg = "⏱️ <b>"+sec+" ثانية</b> — صحيحة. والهدف أن تنزل تحت <b>"+goal+"ث</b>؛ اقرأ «طريقة ثانية» تحت، فهي أقصر."; }
-        else if(sec < goal/2){ klass="t-bad"; msg = "⏱️ <b>"+sec+" ثانية</b> — <b>تسرّعت</b>. السرعةُ بلا صحّةٍ لا تنفع: اقرأ الحلّ كاملًا."; }
-        else { klass="t-bad"; msg = "⏱️ <b>"+sec+" ثانية</b> — المهمُّ الآن الحلُّ لا الوقت. الوقتُ يأتي بعد أن تتقن."; }
+        if(ok && it.deep){ klass="t-good"; msg = "⏱️ <b>"+thawan(sec)+"</b> — صحيحة، وهذي ما تُحَلُّ بالصدفة. اقرأ «تحقّق» تحت لتثبِّت الطريقة 🔶"; }
+        else if(ok && sec <= goal){ klass="t-good"; msg = "⏱️ <b>"+thawan(sec)+"</b> — صحيحة وتحت الهدف ("+goal+"ث). ممتاز 🎯"; }
+        else if(ok){ klass="t-mid"; msg = "⏱️ <b>"+thawan(sec)+"</b> — صحيحة. والهدف أن تنزل تحت <b>"+goal+"ث</b>؛ اقرأ «طريقة ثانية» تحت، فهي أقصر."; }
+        else if(sec < rush){ klass="t-bad"; msg = "⏱️ <b>"+thawan(sec)+"</b> — <b>تسرّعت</b>"+
+            (it.deep ? " ومهلتُك "+goal+"ث. هذي مسألةُ مصيدةٍ: اقرأ «المصيدة» في التحقّق تحت." : ". السرعةُ بلا صحّةٍ لا تنفع: اقرأ الحلّ كاملًا."); }
+        else { klass="t-bad"; msg = "⏱️ <b>"+thawan(sec)+"</b> — المهمُّ الآن الحلُّ لا الوقت. الوقتُ يأتي بعد أن تتقن."; }
         if(tmEl){ tmEl.className = "tm "+klass; tmEl.innerHTML = msg; }
         active = null; refresh();
 
@@ -938,10 +1079,12 @@ function render(weak, hasData, weakR){
 
 function start(){
   renderLoading();
-  fetchSkills().then(function(agg){
+  fetchSkills().then(function(res){
+    var agg = (res && res.agg) || {}, mast = (res && res.mast) || { n:0, pct:null, sec:null };
     var w = weakest(agg), wr = weakIn(agg, REASON, 3);
-    if(w.length) render(w, true, wr);
-    else render(DEFAULT_WEAK, false, wr);
+    var nD = deepQuota(mast), wd = nD ? weakIn(agg, DEEP_ALLOW, 3) : [];
+    if(w.length) render(w, true, wr, wd, nD, mast);
+    else render(DEFAULT_WEAK, false, wr, wd, nD, mast);
   });
 }
 start();
