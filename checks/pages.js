@@ -376,6 +376,7 @@ function run(){
   issues.push(...licenseExamPath());
   issues.push(...gatQuantPath());
   issues.push(...reportChapPath());
+  issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
   issues.push(...passageReadPath());
   issues.push(...typedAnswers());
@@ -3172,7 +3173,8 @@ function readingPoolPath(){
   /* ── البنوكُ تُحمَّل كلُّها ── */
   /* وstep-reading.js معها: قطعُ فهدٍ تأتي منه لا من DATA، فلو استُبدِل
      بقائمةٍ فارغةٍ لمرّ بنكُه كلُّه بلا فحصٍ وهو لا يُرى. */
-  const BANKS = ['reading-bank.js', 'reading-bank2.js', 'reading-long.js', 'step-reading.js'];
+  const BANKS = ['reading-bank.js', 'reading-bank2.js', 'reading-long.js', 'step-reading.js',
+                 'reading-osama.js'];
   const sb = { window:{} }; vm.createContext(sb);
   for (const b of BANKS){
     const bp = path.join(ROOT, b);
@@ -3201,7 +3203,10 @@ function readingPoolPath(){
 
   const W = sb.window;
   const words = s => String(s||'').trim().split(/\s+/).filter(Boolean);
-  const MW = W.READING_MINWORDS || {}, MK = W.READING_MINKEEP || 16;
+  const MW = W.READING_MINWORDS || {}, MK0 = W.READING_MINKEEP || 16;
+  /* والصمّامُ يُخفَض لابنٍ بعينِه (READING_MINKEEP_BY) — انظر reading-long.js */
+  const MKB = W.READING_MINKEEP_BY || {};
+  const mkOf = w => (MKB[w] > 0 ? MKB[w] : MK0);
 
   /* ═══ القطعُ الطويلةُ أسئلتُها أربعةٌ فأكثر ═══════════════════════
      بنكُ القراءةِ القديمُ ثلاثةُ أسئلةٍ لكلِّ قطعة، وهو ما يحتمله نصٌّ
@@ -3247,9 +3252,11 @@ function readingPoolPath(){
     const min = MW[w]; if (!(min > 0) || !DATA[w]) continue;
     for (const lg in DATA[w]){
       const pool = RAW[w+'/'+lg] || [];
+      /* والقطعُ الطويلةُ قد تأتي من ملفٍّ آخر (قطعُ أسامةَ في
+         reading-osama.js)، فالقياسُ على البنكِ المدموجِ كلِّه. */
       if (pool.length && !pool.some(t => words(t).length >= min))
         E('reading-long.js', 'عتبةُ ' + w + '/' + lg + ' هي ' + min +
-          ' كلمةً ولا تبلغها قطعةٌ واحدة — فالصمّامُ وحدَه يحمل القائمة');
+          ' كلمةً ولا تبلغها قطعةٌ واحدة في البنوكِ كلِّها — فالصمّامُ وحدَه يحمل القائمة');
     }
   }
 
@@ -3313,8 +3320,8 @@ function readingPoolPath(){
       if (a.length < 12)
         E(F, tag + ': ' + a.length + ' قطعةً فقط بعد الرفعِ والعتبة — تدور عليه فتتكرّر');
     }
-    if (MW[w] > 0 && a.length < MK)
-      E(F, tag + ': ' + a.length + ' قطعةً والصمّامُ ' + MK + ' — فالبنكُ جاع');
+    if (MW[w] > 0 && a.length < mkOf(w))
+      E(F, tag + ': ' + a.length + ' قطعةً والصمّامُ ' + mkOf(w) + ' — فالبنكُ جاع');
   }
   return out;
 }
@@ -3431,7 +3438,13 @@ function readAloudPath(){
       const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
       if (mp && m2){
         try { const sb = {}; vm.createContext(sb);
-          vm.runInContext('function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
+          /* وREAD_WHOLE تُقرَأ من الصفحةِ لا تُفترَض: هي التي تقرّر
+             أتُقرَأ القطعةُ كاملةً أم على أجزاء (٩ نوفمبر ٢٠٢٦). ولولا
+             تمريرُها لسقطت الدالّةُ بـReferenceError فخرجت الأجزاءُ
+             فارغةً وظُنَّ أنّ القطعةَ لا تُغطّى. */
+          const rw = /var READ_WHOLE = (true|false);/.exec(src);
+          vm.runInContext('var READ_WHOLE = ' + (rw ? rw[1] : 'false') + ';\n' +
+            'function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
             'function readCapOf(){ return null; }\n' +
             'g = function(txt, cfg){' + mp[1] + '\n};', sb); fnParts = sb.g; } catch(e){}
       }
@@ -3565,18 +3578,36 @@ function readAloudPath(){
                فإذا فيها جزءٌ من خمسِ كلمات — تركَه ضمُّ الذيلِ حين
                يتجاوز المجموعُ السقفَ الصلب. فصار الذيلُ القصيرُ يُضَمُّ
                ثمّ يُعاد شطرُ المجموعِ عند منتصفِه. */
-            let tiny = 0;
-            TXT.forEach(function(txt){
-              let ps = [];
-              try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
-              ps.forEach(function(x){
-                if (String(x).trim().split(/\s+/).filter(Boolean).length < 10) tiny++;
+            /* ═══ والسقفُ والذيلُ إنّما يُفحَصان حين تُقسَّم ═══════════
+               قرارُ الأب (٩ نوفمبر ٢٠٢٦): تُقرَأ القطعةُ كاملةً في
+               نَفَسٍ واحد (READ_WHOLE). فالجزءُ هو القطعةُ، ولا معنى
+               لسقفٍ عليه ولا لذيلٍ قصير. ويبقى الفحصان مكتوبَين ليعملا
+               إن رجع التقسيمُ يومًا. */
+            const WHOLE = !!(/var READ_WHOLE = true;/.test(src));
+            if (!WHOLE){
+              let tiny = 0;
+              TXT.forEach(function(txt){
+                let ps = [];
+                try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
+                ps.forEach(function(x){
+                  if (String(x).trim().split(/\s+/).filter(Boolean).length < 10) tiny++;
+                });
               });
-            });
-            if (tiny)
-              E('حسن: ' + tiny + ' جزءًا دون عشرِ كلمات — لا يُقاس عليه نطقٌ، والذيلُ القصيرُ يُوازَن لا يُترَك');
-            if (longest > hard + 12)
-              E('حسن: جزءٌ من ' + longest + ' كلمةً فوق سقفِه (' + hard + ') — ولا يُنهيه');
+              if (tiny)
+                E('حسن: ' + tiny + ' جزءًا دون عشرِ كلمات — لا يُقاس عليه نطقٌ، والذيلُ القصيرُ يُوازَن لا يُترَك');
+              if (longest > hard + 12)
+                E('حسن: جزءٌ من ' + longest + ' كلمةً فوق سقفِه (' + hard + ') — ولا يُنهيه');
+            } else {
+              /* وتُقرَأ كاملةً: جزءٌ واحدٌ لكلِّ قطعة، لا أكثر */
+              let split = 0;
+              TXT.forEach(function(txt){
+                let ps = [];
+                try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
+                if (ps.length !== 1) split++;
+              });
+              if (split)
+                E('حسن: ' + split + ' قطعةً تُقطَّع أجزاءً وهي تُقرَأ كاملةً بقرارِ الأب (٩ نوفمبر ٢٠٢٦)');
+            }
           } else E('readParts لا تُنتزَع — فلا يُتحقَّق أنّ حسنًا يقرأ قطعتَه كاملة');
           if (HFULL){
             if (notFull) E('حسن: ' + notFull + ' قطعةً تُقتطَع وهو مأمورٌ بقراءتِها كاملة');
@@ -3627,6 +3658,16 @@ function readAloudPath(){
      الجزءَ الواحدَ الطويلَ لا يُقرَأ: اكتمالُ حسنٍ في القطعِ ≥٩٠ كلمةً
      ٢٥٪، واكتمالُ فهدٍ ينزل من ٩٥٪ دون الثلاثين إلى ٤٩٪ فوق الستّين.
      فالأجزاءُ لا الجزءُ الأوّلُ وحدَه. */
+  /* ═══ والقطعةُ تُقرَأ كاملةً — قرارُ الأب، لا رايةٌ تُقلَب ═══════════
+     أعاد الطلبَ ثالثةً (٩ نوفمبر ٢٠٢٦): «ليش ما تخلّيه يقرا القطعة
+     كاملة؟؟؟ وخلّهم كلّهم يقرونها كاملة». وبقيّةُ الفحوصِ تتبع
+     READ_WHOLE فتُبدّل مقاييسَها بتبديلِها — فلو قُلبت الرايةُ وحدَها
+     مرّت بلا رصد (جُرّب فمرّ). فتُثبَّت هنا صريحةً: من أرادها قسمةً
+     فليُغيّر هذا السطرَ ومعه سببٌ مكتوب. */
+  if (!/var READ_WHOLE = true;/.test(src))
+    E('READ_WHOLE ليست true — والقطعةُ تُقرَأ كاملةً بقرارِ الأب (٩ نوفمبر ٢٠٢٦)');
+  if (!/if\(READ_WHOLE\) return \[s\];/.test(src))
+    E('READ_WHOLE لا تُستعمَل في readParts — فالرايةُ مرفوعةٌ والقسمةُ قائمة');
   if (!/function readParts\(/.test(src))
     E('readParts مفقودة — فلا تُقرَأ القطعةُ إلّا جزأَها الأوّل');
   if (!/var rParts = readParts\(passage\)/.test(src))
@@ -5573,24 +5614,31 @@ function storyBankPath(){
   const rsrc = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
   const m2 = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
   const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
+  /* وREAD_WHOLE من الصفحة: هي التي تقرّر أتُقرَأ كاملةً أم أجزاء */
+  const rwS = /var READ_WHOLE = (true|false);/.exec(rsrc);
+  const WHOLE = !!(rwS && rwS[1] === 'true');
   if (m2 && mp){
     let fnP = null;
     try { const sb3 = {}; vm.createContext(sb3);
-      vm.runInContext('function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
+      vm.runInContext('var READ_WHOLE = ' + WHOLE + ';\n' +
+        'function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
         'function readCapOf(){ return null; }\n' +
         'g = function(txt, cfg){' + mp[1] + '\n};', sb3); fnP = sb3.g; } catch(e){}
     if (typeof fnP !== 'function') E('readParts لا تُشغَّل على القصص');
     else {
       const cfg = { floor:18, cap:35, hard:55 };
-      let miss = 0, over = 0;
+      let miss = 0, over = 0, split = 0;
       S.forEach(function(st){
         const t = String((st||[])[0] || '').trim();
         let ps = []; try { ps = fnP(t, cfg); } catch(e){}
         if (ps.join(' ').replace(/\s+/g,' ').trim() !== t.replace(/\s+/g,' ').trim()) miss++;
-        ps.forEach(function(x){ if (wc(x) > cfg.hard) over++; });
+        if (ps.length !== 1) split++;
+        if (!WHOLE) ps.forEach(function(x){ if (wc(x) > cfg.hard) over++; });
       });
       if (miss) E(miss + ' قصّةً لا تُغطّيها أجزاؤها — فلا تُقرَأ كاملة');
       if (over) E(over + ' جزءًا فوق السقفِ الصلب');
+      /* وقرارُ الأب (٩ نوفمبر ٢٠٢٦): تُقرَأ في نَفَسٍ واحد */
+      if (WHOLE && split) E(split + ' قصّةً تُقطَّع أجزاءً وهي تُقرَأ كاملةً بقرارِ الأب');
     }
   }
   return out;
@@ -6268,6 +6316,85 @@ function reportChapPath(){
                    (src.match(/'\+saTime\(/g) || []).length;
       if (bare) E(f, bare + ' تاريخًا معروضًا بلا ختمٍ — ينقلب على جهازِه ولا يومَ فيه أخضر');
     });
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   قطعُ أسامة — ولا ابنَ بلا حدٍّ أدنى لطولِ قطعتِه
+   ═══════════════════════════════════════════════════════════════════
+   سؤالُ الأب (٩ نوفمبر ٢٠٢٦) ومعه صورةُ شاشتِه: «أسامة قطعته قصيرة
+   جدًّا ليش؟؟» — والقطعةُ ثلاثٌ وعشرون كلمة. والجوابُ سطرٌ واحد:
+   READING_MINWORDS فيها إخوتُه الأربعةُ وليس فيها هو. وقُيست البنوك:
+   سعودٌ (أصغرُ منه بسنة) ٥٦–٦٤ كلمة، وهو ١٦–٣١.
+
+   فهذا الحارسُ يمنع عودتَها: لا ابنَ له قطعٌ بلا حدٍّ أدنى. */
+function osamaReadPath(){
+  const out = [];
+  const BF = 'reading-osama.js', LF = 'reading-long.js';
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  const bp = path.join(ROOT, BF), lp = path.join(ROOT, LF);
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:BF, msg:'بنكُ قطعِ أسامةَ مفقود' }];
+
+  let B = null, W = null;
+  try {
+    const sb = { window:{} }; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(bp, 'utf8'), sb);
+    vm.runInContext(fs.readFileSync(lp, 'utf8'), sb);
+    B = sb.window.READING_OSAMA; W = sb.window;
+  } catch(e){ E(BF, 'لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  if (!B || !B.osama) { E(BF, 'READING_OSAMA ناقصة'); return out; }
+
+  /* ═══ (١) لا ابنَ بلا حدٍّ ═══ */
+  const MW = W.READING_MINWORDS || {};
+  ['hasan','rafeef','fahad','saud','osama'].forEach(function(k){
+    if (!(MW[k] > 0)) E(LF, 'READING_MINWORDS بلا حدٍّ لـ' + k + ' — فقطعُه تبقى قصيرةً بلا أن ينتبه أحد');
+  });
+  if (MW.osama >= MW.rafeef) E(LF, 'حدُّ أسامةَ (' + MW.osama + ') ليس دون حدِّ رفيف (' + MW.rafeef + ')');
+  if (MW.osama <= MW.saud)   E(LF, 'حدُّ أسامةَ (' + MW.osama + ') ليس فوق حدِّ سعود (' + MW.saud + ')');
+
+  /* ═══ (٢) والقطعُ تبلغ حدَّه، وعددُها يكفي الصمّام ═══ */
+  const wc = t => String(t || '').trim().split(/\s+/).filter(Boolean).length;
+  const KEEP = (W.READING_MINKEEP_BY || {}).osama || W.READING_MINKEEP || 16;
+  ['en','ar'].forEach(function(lg){
+    const ps = ((B.osama[lg] || {}).pass) || [];
+    if (!ps.length) { E(BF, 'لا قطعَ في ' + lg); return; }
+    if (ps.length < KEEP)
+      E(BF, lg + ': ' + ps.length + ' قطعةً والصمّامُ ' + KEEP +
+        ' — فيرجع القصيرُ القديمُ ليملأ القائمة، وهو ما شكا منه الأب');
+    const w = ps.map(p => wc(p[0]));
+    const under = w.filter(x => x < MW.osama).length;
+    if (under) E(BF, lg + ': ' + under + ' قطعةً دون حدِّه (' + MW.osama + ' كلمة) — تُرفَع عند الدمجِ فتجوع القائمة');
+    if (Math.max.apply(null, w) > (lg === 'en' ? 110 : 80))
+      E(BF, lg + ': أطولُ قطعةٍ ' + Math.max.apply(null, w) + ' كلمةً — فوقَ ما يُحتمَل لخامسٍ ابتدائيّ');
+  });
+
+  /* ═══ (٣) وبنيةُ الأسئلة ═══ */
+  let shape = 0, notFirst = 0, dup = 0, few = 0;
+  ['en','ar'].forEach(function(lg){
+    (((B.osama[lg] || {}).pass) || []).forEach(function(p){
+      const qs = p[1];
+      if (!Array.isArray(qs)) { shape++; return; }
+      if (qs.length < 4) few++;
+      qs.forEach(function(q){
+        if (!Array.isArray(q[1]) || q[1].length !== 3) { shape++; return; }
+        if (q[2] !== 0) notFirst++;
+        if (new Set(q[1]).size !== q[1].length) dup++;
+      });
+    });
+  });
+  if (shape)    E(BF, shape + ' سؤالًا على غيرِ الصيغة [متن، ثلاثةُ خيارات، 0]');
+  if (few)      E(BF, few + ' قطعةً دون أربعةِ أسئلة');
+  if (notFirst) E(BF, notFirst + ' سؤالًا صحيحُه ليس أوّلًا — والعرضُ يخلط على أنّ الأوّلَ هو الصحيح');
+  if (dup)      E(BF, dup + ' سؤالًا فيه خيارٌ مكرَّر');
+
+  /* ═══ (٤) والصفحةُ تُحمّله وتدمجه ═══ */
+  const rp = path.join(ROOT, 'reading.html');
+  if (fs.existsSync(rp)){
+    const rs = fs.readFileSync(rp, 'utf8');
+    if (rs.indexOf('src="' + BF + '"') < 0) E('reading.html', 'لا تُحمّل ' + BF);
+    if (!/window\.READING_OSAMA/.test(rs))  E('reading.html', 'بنكُ أسامةَ لا يُدمَج في DATA');
+    if (!/_MKB\[_w5\] > 0/.test(rs))        E('reading.html', 'الصمّامُ لا يُقرأ بالابن — فيرجع القصيرُ إلى أسامة');
+  }
   return out;
 }
 
