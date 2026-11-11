@@ -556,13 +556,38 @@ var READ_CAP = {
   /* وسعودٌ ضُيّق سقفُه بعد موازنةِ الأجزاء (٣ نوفمبر): كان ٥٤٪ من
      أجزائِه في شريحةِ ٢٠–٢٨ (اكتمالُه فيها ٧٢٪)، فصار ٨١٪ منها في
      شريحةِ ما دون العشرين (اكتمالُه فيها ٨٢٪). */
-  saud:   { floor:12, cap:18, hard:22 },
-  osama:  { floor:16, cap:28, hard:34 },
-  rafeef: { floor:25, cap:45, hard:55 },
-  hasan:  { floor:25, cap:42, hard:45 },
-  fahad:  { floor:22, cap:34, hard:40 }
+  /* ═══ و«whole»: أطولُ قطعةٍ يُتمُّها في تسجيلٍ واحد ═══════════════
+     ما دونَها لا تُقسَّم أصلًا، وما فوقَها أجزاءٌ لكلٍّ تسجيلُه (انظر
+     readParts · ١١ نوفمبر ٢٠٢٦).
+
+     وأُعيد القياسُ كلُّه قبل وضعِها، على نسبةِ القراءاتِ التي بلغت ٩٠٪
+     فأكثرَ ممّا طُلب (لا على متوسّطٍ يخبّئ ذيلَه)، من كلِّ السجلّ:
+
+       فهد : ٢٠–٣٠ ⇐ ١٠٠٪ · ٣٠–٤٠ ⇐ ٥٥٪ · ٤٠–٥٥ ⇐ ٩٤٪ · ٥٥–٧٥ ⇐ ٩٣٪ (٥٥ قراءة) · ١٠٠+ ⇐ ٠٪
+       حسن : ٢٠–٣٠ ⇐ ٨٨٪ · ٣٠–٤٠ ⇐ ٩٥٪ · ٤٠–٥٥ ⇐ ٨٦٪ · ٥٥–٧٥ ⇐ ١٠٠٪ · ١٠٠+ ⇐ ٠٪ (٩ قراءات)
+       رفيف: ١٠٠٪ في كلِّ شريحةٍ إلى الخمسِ والخمسين · وقطعةٌ من ١٢٤ ⇐ ٩١٪
+       أسامة: ٢٠–٣٠ ⇐ ٨١٪ · ٣٠–٤٠ ⇐ ٥٠٪ · ٧٥–١٠٠ ⇐ ٠٪
+       سعود: ٢٠–٣٠ ⇐ ٣٦٪ · ٣٠–٤٠ ⇐ ٠٪
+
+     فالهاويةُ عند الجميعِ بين الخمسِ والسبعينَ والمئة، لا عند الأربعين.
+
+     ═══ وسقفُ جزءِ فهدٍ صُحِّح ═══
+     كان أربعةً وثلاثين، وُضع في ٣ نوفمبر على شريحةِ ٣٦–٤٥ ⇐ ٧٠٪ وهي
+     إحدى عشرةَ قراءةً فقط. والشريحةُ التي فوقَها (٥٥–٧٥) خمسٌ وخمسون
+     قراءةً واكتمالُها ٩٣٪ وطلاقتُه فيها ٧٢ ولا تنخفض — فالرقمُ الأوّلُ
+     كان من عيّنةٍ صغيرةٍ لا من هاوية. فصار سقفُه خمسةً وخمسين، وقطعتُه
+     (١٦٠ كلمةً وسيطًا) ثلاثةَ أجزاءٍ بدل ستّة — وكلُّ جزءٍ فرصةُ توقّف.
+
+     وسقفُ حسنٍ (٤٢) لا يُمَسّ: مبناه الطلاقةُ لا الاكتمال — ٨٥ كلمةً
+     في الدقيقةِ عند مرجعِ ٤١ و٢١ عند ٥١ — وتلك هاويةٌ حقيقيّةٌ قِيست.
+     وسعودٌ لا يُتمُّ ثلاثين، فسقفُ قطعتِه الواحدةِ اثنانِ وعشرون. */
+  saud:   { floor:12, cap:18, hard:22, whole:22 },
+  osama:  { floor:16, cap:28, hard:34, whole:36 },
+  rafeef: { floor:25, cap:45, hard:55, whole:75 },
+  hasan:  { floor:25, cap:42, hard:45, whole:60 },
+  fahad:  { floor:22, cap:55, hard:65, whole:75 }
 };
-var READ_DEF = { floor:18, cap:35, hard:55 };
+var READ_DEF = { floor:18, cap:35, hard:55, whole:55 };
 function readCapOf(){
   try{ return READ_CAP[who] || READ_DEF; }catch(e){ return READ_DEF; }
 }
@@ -656,12 +681,36 @@ function readAloudRef(txt, cfg){
    فصار READ_WHOLE: القطعةُ جزءٌ واحدٌ هو نصُّها كلُّه. وبقي المقسِّمُ
    مكتوبًا بحدودِه وقياسِه (READ_CAP · readAloudRef) لأنّ قياسَه كان
    صحيحًا، فإن عاد الأمرُ عاد بسطرٍ واحد. */
-var READ_WHOLE = true;
+/* ═══ والقصيرةُ كاملةً والطويلةُ على أجزاء ═══════════════════════════
+   طلبُ الأب (١١ نوفمبر ٢٠٢٦): «القطعةُ الطويلةُ خلّها مثل نظامِ كلِّ
+   قطعةٍ لحالها يسوّي تسجيل، نفس نظامِ أوّل — خصوصًا فهدٌ يقول إنّه
+   يوقف القراءة».
+
+   وقِياسُ اليومين اللذين عملت فيهما القطعةُ الكاملةُ يصدّقه بلا لبس:
+
+     فهد  ١٠ نوفمبر: مرجع ١٥٥ ⇐ قرأ ٣٨ (٢٥٪) في ٣٠ ثانية
+     فهد  ١١ نوفمبر: مرجع ١٤٩ ⇐ قرأ ٣٤ (٢٣٪) في ٣١ ثانية
+     حسن  ٩  نوفمبر: مرجع ١٥٣ ⇐ قرأ ٧٠ (٤٦٪)
+     حسن  ١٠ نوفمبر: مرجع ١٥٢ ⇐ قرأ ٣٨ (٢٥٪)
+     أسامة ١٠ نوفمبر: مرجع ٨٤ ⇐ أربعُ محاولاتٍ ٢٤٪ و١٤٪ و١١٪ و١٨٪
+     رفيف ٩  نوفمبر: مرجع ١٢٤ ⇐ قرأت ١١٣ (٩١٪)  ← وحدَها تُتمُّها
+
+   وفي يومِ الأجزاءِ نفسِه (٩ نوفمبر) قرأ فهدٌ أجزاءَه ١ و٢ و٣ و٤ من
+   ستّةٍ بنسبِ ١٠٠٪ و٧٥٪ و٧٤٪ و١٠٠٪ — أي بلغ ستّةً وتسعين كلمةً من
+   مئةٍ وخمسٍ وخمسين (٦٢٪)، ضِعفَ ما بلغه بالقطعةِ الكاملةِ ونصفَه.
+
+   فالقاعدةُ لا رايةٌ تُقلَب على الجميع، بل طولٌ يُقاس: ما كان في حدودِ
+   ما يُتمُّه الابنُ في تسجيلٍ واحد (cfg.whole) فهو قطعةٌ واحدةٌ كما
+   أراد الأبُ في ٩ نوفمبر، وما زاد عليه قُسِّم أجزاءً لكلِّ جزءٍ
+   تسجيلُه كما أراد في ١١ نوفمبر. ورفيفُ سقفُها مئةٌ وثلاثون فقطعُها
+   تبقى كاملةً — فهي تُتمُّها فعلًا، ولا يُقسَّم على أحدٍ ما يُنهيه. */
 function readParts(txt, cfg){
   var s = String(txt||"").trim();
   if(!s) return [];
-  if(READ_WHOLE) return [s];
-  cfg = cfg || (typeof readCapOf === "function" ? readCapOf() : { floor:18, cap:35, hard:55 });
+  cfg = cfg || (typeof readCapOf === "function" ? readCapOf() : { floor:18, cap:35, hard:55, whole:55 });
+  /* السقفُ مكتوبٌ هنا أيضًا: الدالّةُ تُنتزَع وتُشغَّل وحدَها في الفحص */
+  var WHOLE_MAX = (typeof cfg.whole === "number") ? cfg.whole : (cfg.hard || 55);
+  if(s.split(/\s+/).filter(Boolean).length <= WHOLE_MAX) return [s];
   /* وأجزاءُ «القارئِ كاملًا» كأجزاءِ غيرِه: full تعني أن يُتمَّ القطعةَ
      لا أن يقرأها في نَفَسٍ واحد. فتُنزَع هنا ويُقسَّم بالحدودِ نفسِها. */
   var cut = { floor:cfg.floor, cap:cfg.cap, hard:cfg.hard };
@@ -2730,9 +2779,8 @@ if(!META[who] || !DATA[who]){
     // القفل يُفتح بعد أن *يقرأ* الطفل القطعة بصوته (قيّم نطقي / اقرأ بصوتك) — مب بالاستماع فقط.
     // إن تعذّر التسجيل نهائيًا (لا مفتاح Azure ولا مايك متصفح) نرجع للاستماع كحل بديل حتى لا يُقفل.
     var canRead = azureConfigured() || (SR && !IS_IOS);
-    /* المقروءُ بصوته القطعةُ كاملةً في نَفَسٍ واحد — طلبُ الأب ثالثةً
-       (٩ نوفمبر ٢٠٢٦) بعد أن وقف حسنٌ عند الجزءِ الأوّلِ من خمسةٍ أربعةَ
-       أيّامٍ متوالية. وانظر READ_WHOLE عند readParts. */
+    /* القطعةُ القصيرةُ تسجيلٌ واحدٌ والطويلةُ أجزاءٌ لكلٍّ تسجيلُه —
+       انظر الحدَّ والقياسَ عند readParts (١١ نوفمبر ٢٠٢٦). */
     var rParts = readParts(passage);
     var rOff = [], _rk = 0;
     rParts.forEach(function(x){ var at = passage.indexOf(x, _rk); rOff.push(at); _rk = at + x.length; });
@@ -2746,7 +2794,7 @@ if(!META[who] || !DATA[who]){
       ? ('🔒 الخطوة ١: استمع للنص (🔊 استمع للنص). الخطوة ٢: اقرأ ' +
          (partRead ? '<b>الجزء المظلَّل بالأخضر</b>' : 'القطعة كاملة') +
          ' بصوتك عبر «🎙️ قيّم نطقي» ثم اضغط «⏹️ خلّصت القراءة». بعدها تُفتح الأسئلة' +
-         (partRead ? '، ويطلع لك زر تواصل فيه بقيّة القطعة جزءًا جزءًا.' : '.'))
+         (partRead ? '، وينتقل التظليل وحده للجزء اللي بعده — كرّر «قيّم نطقي» إلى آخر جزء.' : '.'))
       : '🔒 استمع للنص كاملًا (🔊 استمع للنص) وبعدها تُفتح الأسئلة.';
     /* وتُظلَّل الفقرةُ المقروءةُ حتّى لا يقرأ غيرَها ثمّ يُقال له «خلّصت» */
     function partHtml(i){
@@ -2786,10 +2834,33 @@ if(!META[who] || !DATA[who]){
     // الخطوة ٢ (القراءة) مقفلة حتى يستمع أولًا
     function setReadEnabled(on){ [azBtnEl,micBtnEl].forEach(function(b){ if(b){ b.disabled=!on; b.style.opacity=on?"":"0.45"; b.style.cursor=on?"":"not-allowed"; } }); }
     if(canRead) setReadEnabled(false);
+    /* ═══ وما بقي من القطعةِ يُقال له حيث ينظر ═══════════════════════
+       حسنٌ وقف عند الجزءِ الأوّلِ من خمسةٍ أربعةَ أيّامٍ متوالية، والزرُّ
+       الناقلُ إلى ما بعده كان تحت القطعةِ — وهو حين تُفتح الأسئلةُ يكون
+       قد نزل إليها فلا يراه. فصار العدُّ الباقي مكتوبًا في صندوقِ
+       الأسئلةِ نفسِه، وهو الذي تقع عليه عينُه. */
+    var doneParts = 0;
+    function restLine(){
+      var left = rParts.length - doneParts;
+      if(left <= 0) return "🎉 قرأت القطعة كاملة — كل أجزائها. حلّ الأسئلة الآن.";
+      /* والعددُ والمعدود: «٢ جزأين» خطأٌ يقرؤه الطفلُ كلَّ مرّة */
+      var n = (left === 1) ? "جزءٌ واحد" : (left === 2) ? "جزآن"
+            : (left <= 10) ? (left + " أجزاء") : (left + " جزءًا");
+      return "✅ تقدر تحلّ الأسئلة — وباقٍ عليك " + n + " من القطعة، أكملها بصوتك فوق ⬆️";
+    }
+    function restPaint(){
+      if(!lockEl || !unlocked || !partRead || !canRead) return;
+      var all = doneParts >= rParts.length;
+      lockEl.style.background = all ? "var(--good-bg)" : "var(--warn-bg)";
+      lockEl.style.borderColor = all ? "var(--good)" : "var(--warn)";
+      lockEl.style.color = all ? "var(--good)" : "var(--warn)";
+      lockEl.textContent = restLine();
+    }
     function unlock(){
       if(unlocked) return; unlocked=true;
       qButtons.forEach(function(b){ b.disabled=false; });
       if(lockEl){ lockEl.style.background="var(--good-bg)"; lockEl.style.borderColor="var(--good)"; lockEl.style.color="var(--good)"; lockEl.textContent = canRead ? "✅ استمعت وقرأت — تقدر تحلّ الأسئلة الآن." : "✅ تمّ الاستماع — تقدر تحلّ الأسئلة الآن."; }
+      restPaint();
     }
     function onListened(){
       listened=true;
@@ -2812,23 +2883,36 @@ if(!META[who] || !DATA[who]){
       if(nextBox) nextBox.style.display = "none";
       try{ if(txtEl) txtEl.scrollIntoView({block:"nearest"}); }catch(e){}
     }
+    /* ═══ والجزءُ التالي يُفتح وحدَه لا بزرٍّ يُنتظَر ═══════════════════
+       كان بعد كلِّ جزءٍ زرٌّ «اقرأ الجزء التالي» ينتظر ضغطةً — وهي
+       الضغطةُ التي لم تقع أربعةَ أيّام. فصار التظليلُ ينتقل تلقائيًّا
+       إلى الجزءِ الذي يليه، فيكون كلُّ ما عليه أن يضغط «قيّم نطقي»
+       مرّةً أخرى كما ضغطها أوّلًا. والزرُّ باقٍ لمن نزل إلى الأسئلةِ
+       ثمّ أراد الرجوعَ إلى القطعة. */
     function offerNext(){
       if(!partRead || !nextBox) return;
-      if(partIx >= rParts.length - 1){
+      if(doneParts >= rParts.length){
         nextBox.style.display = "";
         nextBox.innerHTML = '<div style="color:var(--good);font-weight:800">🎉 قرأت القطعة كاملة — كل أجزائها.</div>';
+        restPaint();
         return;
       }
+      if(partIx < rParts.length - 1) showPart(partIx + 1);   /* ينتقل وحدَه */
       nextBox.style.display = "";
       nextBox.innerHTML = '<button class="say small" data-go-next style="background:var(--good);' +
-        'border-color:var(--good);color:#fff;font-weight:800">▶️ اقرأ الجزء ' + (partIx+2) +
+        'border-color:var(--good);color:#fff;font-weight:800">▶️ اقرأ الجزء ' + (partIx+1) +
         ' من ' + rParts.length + '</button>' +
-        '<div style="font-size:.82rem;color:var(--muted);margin-top:4px">الأسئلة مفتوحة — وتقدر تكمّل القطعة بصوتك.</div>';
+        '<div style="font-size:.82rem;color:var(--muted);margin-top:4px">الأسئلة مفتوحة — وباقي القطعةِ ينتظرك: اضغط «🎙️ قيّم نطقي» للجزء المظلَّل.</div>';
       var gb = nextBox.querySelector("[data-go-next]");
-      if(gb) gb.addEventListener("click", function(){ showPart(partIx + 1); });
+      if(gb) gb.addEventListener("click", function(){
+        showPart(partIx);
+        try{ var w = sec.querySelector(".passage"); if(w) w.scrollIntoView({block:"start",behavior:"smooth"}); }catch(e){}
+      });
+      restPaint();
     }
     function onRead(){
       if(!listened){ if(lockEl && !unlocked){ lockEl.textContent="⚠️ استمع للنص أولًا (🔊 استمع للنص) قبل ما تقرأها."; } return; }
+      if(doneParts < partIx + 1) doneParts = partIx + 1;
       unlock();
       offerNext();
     }
@@ -2937,7 +3021,19 @@ if(!META[who] || !DATA[who]){
         });
       });
     });
-    sec.querySelector("[data-regen]").addEventListener("click", function(){ savePartial(); saveActivity(); renderRead(); });
+    /* و«نصٌّ جديد» لا يُهرَب به من بقيّةِ القطعة: يُسأل مرّةً واحدة،
+       فإن أصرّ مضى — فالمنعُ يُخرجه من الصفحةِ كلِّها لا إلى القراءة. */
+    sec.querySelector("[data-regen]").addEventListener("click", function(){
+      if(partRead && canRead && doneParts < rParts.length){
+        var left = rParts.length - doneParts;
+        if(!confirm("باقي عليك " + left + " من " + rParts.length + " أجزاء في هذي القطعة.\nتبغى تتركها وتاخذ نصًّا جديدًا؟")){
+          showPart(Math.min(partIx, rParts.length - 1));
+          try{ var w = sec.querySelector(".passage"); if(w) w.scrollIntoView({block:"start",behavior:"smooth"}); }catch(e){}
+          return;
+        }
+      }
+      savePartial(); saveActivity(); renderRead();
+    });
   }
 
   // 300 كلمة (نفس ملف الطباعة PDF) — قسم الكلمات يختبر منها

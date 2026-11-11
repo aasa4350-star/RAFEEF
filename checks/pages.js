@@ -3438,12 +3438,10 @@ function readAloudPath(){
       const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(src);
       if (mp && m2){
         try { const sb = {}; vm.createContext(sb);
-          /* وREAD_WHOLE تُقرَأ من الصفحةِ لا تُفترَض: هي التي تقرّر
-             أتُقرَأ القطعةُ كاملةً أم على أجزاء (٩ نوفمبر ٢٠٢٦). ولولا
-             تمريرُها لسقطت الدالّةُ بـReferenceError فخرجت الأجزاءُ
-             فارغةً وظُنَّ أنّ القطعةَ لا تُغطّى. */
-          const rw = /var READ_WHOLE = (true|false);/.exec(src);
-          vm.runInContext('var READ_WHOLE = ' + (rw ? rw[1] : 'false') + ';\n' +
+          /* والقسمةُ صارت بالطول لا برايةٍ عامّة (١١ نوفمبر ٢٠٢٦):
+             ما كان في حدودِ cfg.whole فقطعةٌ واحدة، وما زاد قُسِّم.
+             فيُمرَّر السقفُ في cfg كما تُمرِّره الصفحة. */
+          vm.runInContext(
             'function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
             'function readCapOf(){ return null; }\n' +
             'g = function(txt, cfg){' + mp[1] + '\n};', sb); fnParts = sb.g; } catch(e){}
@@ -3483,15 +3481,22 @@ function readAloudPath(){
            القيمُ الافتراضيّةُ في READ_DEF، وتُعاد في readAloudRef نفسِها
            لأنّها تُنتزَع وتُشغَّل وحدَها في هذا الفحص. فلو تغيّرت إحداهما
            دون الأخرى عمل الفحصُ على قيمٍ والصفحةُ على غيرِها. */
-        const DEF = /var READ_DEF = \{ floor:(\d+), cap:(\d+), hard:(\d+) \};/.exec(src);
+        const DEF = /var READ_DEF = \{ floor:(\d+), cap:(\d+), hard:(\d+), whole:(\d+) \};/.exec(src);
         const INL = /\? readCapOf\(\) : \{ floor:(\d+), cap:(\d+), hard:(\d+) \}/.exec(src);
         if (!DEF) E('READ_DEF غيرُ مكتوبٍ كما يُتوقَّع — فالعامُّ لا يُفحَص');
         else if (DEF[1] + ',' + DEF[2] + ',' + DEF[3] !== '18,35,55')
           E('العامُّ صار ' + DEF.slice(1).join('/') + ' — وعيّناتُ هذا الفحصِ كلُّها مبنيّةٌ على ١٨/٣٥/٥٥');
         if (!INL) E('القيمُ الاحتياطيّةُ داخلَ readAloudRef غيرُ مكتوبةٍ كما يُتوقَّع');
-        else if (DEF && INL.slice(1).join(',') !== DEF.slice(1).join(','))
-          E('الاحتياطيُّ داخلَ readAloudRef (' + INL.slice(1).join('/') + ') يخالف READ_DEF (' +
-            DEF.slice(1).join('/') + ') — فالفحصُ على قيمٍ والصفحةُ على غيرِها');
+        else if (DEF && INL.slice(1,4).join(',') !== DEF.slice(1,4).join(','))
+          E('الاحتياطيُّ داخلَ readAloudRef (' + INL.slice(1,4).join('/') + ') يخالف READ_DEF (' +
+            DEF.slice(1,4).join('/') + ') — فالفحصُ على قيمٍ والصفحةُ على غيرِها');
+        /* واحتياطيُّ readParts مكتوبٌ فيها أيضًا (تُنتزَع وحدَها)، فيشمل
+           السقفَ الكامل — ولو افترق عن READ_DEF عملت الصفحةُ بقيمتين. */
+        const INP = /\? readCapOf\(\) : \{ floor:(\d+), cap:(\d+), hard:(\d+), whole:(\d+) \}/.exec(src);
+        if (!INP) E('القيمُ الاحتياطيّةُ داخلَ readParts غيرُ مكتوبةٍ كما يُتوقَّع (ومنها السقفُ الكامل)');
+        else if (DEF && INP.slice(1).join(',') !== DEF.slice(1).join(','))
+          E('احتياطيُّ readParts (' + INP.slice(1).join('/') + ') يخالف READ_DEF (' +
+            DEF.slice(1).join('/') + ')');
 
         /* ولا يكفي وجودُ مدخلِ حسن: لا بدّ أن يُقرأ بالابن، وإلّا بقي
            الجدولُ مكتوبًا والصفحةُ تعمل بالعامِّ للجميع. */
@@ -3501,13 +3506,48 @@ function readAloudPath(){
            طلبُ الأب (٣ نوفمبر ٢٠٢٦): «خلّهم كلّهم نفس طريقة حسن».
            والتقسيمُ عامٌّ منذ ٢ نوفمبر، وإنّما كان السقفُ المضبوطُ
            لحسنٍ وحدَه. فضُبط لكلٍّ من صفوفِه (٢٧٧ قراءةَ قطعة). */
+        /* ═══ وسقفُ «القطعةِ الواحدة» لكلِّ ابنٍ من صفوفِه ═══════════════
+           طلبُ الأب (١١ نوفمبر ٢٠٢٦): الطويلةُ تُقسَّم ولكلِّ جزءٍ
+           تسجيلُه. وأطولُ ما يُتمُّه في تسجيلٍ واحدٍ هو whole، وقياسُه
+           في التعليقِ عند readParts: فهدٌ ٢٣–٢٥٪ عند ١٥٠ كلمة، ورفيفُ
+           ٩١٪ عند ١٢٤ — فلا يُسوَّى بينهما. */
+        const WH = {};
         ['saud','osama','rafeef','hasan','fahad'].forEach(function(kid){
-          const rx = new RegExp(kid + ':\\s*\\{\\s*floor:(\\d+),\\s*cap:(\\d+),\\s*hard:(\\d+)');
+          const rx = new RegExp(kid + ':\\s*\\{\\s*floor:(\\d+),\\s*cap:(\\d+),\\s*hard:(\\d+),\\s*whole:(\\d+)');
           const mm = rx.exec(src);
-          if (!mm){ E('READ_CAP بلا مدخلٍ لـ' + kid + ' — فسقفُه يرجع إلى العامِّ وصفوفُه تقول غيرَه'); return; }
-          const f = +mm[1], c = +mm[2], h = +mm[3];
+          if (!mm){ E('READ_CAP بلا مدخلٍ كاملٍ لـ' + kid + ' (ومنه whole) — فسقفُه يرجع إلى العامِّ وصفوفُه تقول غيرَه'); return; }
+          const f = +mm[1], c = +mm[2], h = +mm[3], w = +mm[4];
+          WH[kid] = w;
           if (!(f < c && c < h)) E('سقفُ ' + kid + ' غيرُ مرتَّب: ' + f + '/' + c + '/' + h);
-          if (f < 8 || h > 60) E('سقفُ ' + kid + ' خارجَ المعقول: ' + f + '/' + c + '/' + h);
+          if (f < 8 || h > 70) E('سقفُ ' + kid + ' خارجَ المعقول: ' + f + '/' + c + '/' + h);
+          if (w < h) E('سقفُ القطعةِ الواحدةِ عند ' + kid + ' (' + w + ') دون سقفِ جزئِه (' + h +
+                       ') — فتُقسَّم قطعةٌ أقصرُ من جزءٍ واحد');
+          /* ولا أحدَ منهم أتمَّ قطعةً فوق المئة: صفرُ قراءاتٍ تامّةٍ عند
+             الجميع في شريحةِ ١٠٠+. فما فوق الثمانينَ دعوى لا قياس. */
+          if (w > 80) E('سقفُ القطعةِ الواحدةِ عند ' + kid + ' (' + w +
+                        ') فوق الثمانين — ولا قراءةَ تامّةً واحدةً فوق المئةِ في السجلِّ كلِّه');
+        });
+        /* ═══ وسقفُ جزءِ فهدٍ صُحِّح من عيّنةٍ أكبر ═══════════════════════
+           كان ٣٤ مبنيًّا على إحدى عشرةَ قراءة، وشريحةُ ٥٥–٧٥ خمسٌ
+           وخمسون قراءةً اكتمالُها ٩٣٪ وطلاقتُه فيها ٧٢ لا تنخفض. فلو
+           رُدَّ إلى الثلاثين عادت قطعتُه ستّةَ أجزاءٍ — وكلُّ جزءٍ فرصةُ
+           توقّف، وهو الذي شكا منه الأب (١١ نوفمبر ٢٠٢٦). */
+        const FCAP = /fahad:\s*\{\s*floor:\d+,\s*cap:(\d+),\s*hard:(\d+)/.exec(src);
+        if (!FCAP) E('READ_CAP بلا مدخلٍ لفهد');
+        else {
+          if (!(+FCAP[1] >= 45 && +FCAP[1] <= 60))
+            E('سقفُ جزءِ فهدٍ ' + FCAP[1] + ' — وصفوفُه (٥٥ قراءةً باكتمالِ ٩٣٪ في ٥٥–٧٥) تضعه بين ٤٥ و٦٠');
+          if (!(+FCAP[2] > +FCAP[1] && +FCAP[2] <= 70))
+            E('السقفُ الصلبُ لفهدٍ ' + FCAP[2] + ' — فوق سقفِه ودون السبعين');
+        }
+        /* وسعودٌ لا يُتمُّ ثلاثين: ٣٦٪ تامّةً في ٢٠–٣٠ و٠٪ في ٣٠–٤٠ */
+        const SCAP = /saud:\s*\{\s*floor:\d+,\s*cap:(\d+)/.exec(src);
+        if (SCAP && +SCAP[1] > 22)
+          E('سقفُ جزءِ سعودٍ ' + SCAP[1] + ' — ولم يُتمَّ قراءةً واحدةً فوق الثلاثين');
+        /* وسعودٌ أضيقُهم: ٣٦٪ تامّةً في ٢٠–٣٠ و٠٪ فوقَها */
+        ['osama','hasan','rafeef','fahad'].forEach(function(kid){
+          if (WH.saud != null && WH[kid] != null && !(WH.saud < WH[kid]))
+            E('سقفُ قطعةِ سعودٍ (' + WH.saud + ') ليس دون سقفِ ' + kid + ' (' + WH[kid] + ')');
         });
         /* وسعودٌ أضيقُهم وفهدٌ ورفيفُ أوسع — وهو ترتيبُ قياسِهم */
         const capOf = function(kid){
@@ -3559,11 +3599,12 @@ function readAloudPath(){
              كاملةً على أجزاءٍ يُنهيها، وهو أوفى لقرارِ الأب لا أنقص.
              فيُفحَص المقصودُ — أن تُغطّي الأجزاءُ القطعةَ كلَّها — لا
              الوسيلةُ التي كانت. */
+          const HCFG = { floor:floor, cap:cap, hard:hard, whole:(WH.hasan != null ? WH.hasan : hard) };
           if (typeof fnParts === 'function'){
             let miss = 0, longest = 0;
             TXT.forEach(function(txt){
               let ps = [];
-              try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
+              try { ps = fnParts(txt, HCFG); } catch(e){}
               const join = ps.join(' ').replace(/\s+/g,' ').trim();
               if (join !== String(txt).replace(/\s+/g,' ').trim()) miss++;
               ps.forEach(function(x){
@@ -3583,31 +3624,37 @@ function readAloudPath(){
                نَفَسٍ واحد (READ_WHOLE). فالجزءُ هو القطعةُ، ولا معنى
                لسقفٍ عليه ولا لذيلٍ قصير. ويبقى الفحصان مكتوبَين ليعملا
                إن رجع التقسيمُ يومًا. */
-            const WHOLE = !!(/var READ_WHOLE = true;/.test(src));
-            if (!WHOLE){
-              let tiny = 0;
-              TXT.forEach(function(txt){
-                let ps = [];
-                try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
-                ps.forEach(function(x){
-                  if (String(x).trim().split(/\s+/).filter(Boolean).length < 10) tiny++;
-                });
+            let tiny = 0;
+            TXT.forEach(function(txt){
+              let ps = [];
+              try { ps = fnParts(txt, HCFG); } catch(e){}
+              ps.forEach(function(x){
+                if (String(x).trim().split(/\s+/).filter(Boolean).length < 10) tiny++;
               });
-              if (tiny)
-                E('حسن: ' + tiny + ' جزءًا دون عشرِ كلمات — لا يُقاس عليه نطقٌ، والذيلُ القصيرُ يُوازَن لا يُترَك');
-              if (longest > hard + 12)
-                E('حسن: جزءٌ من ' + longest + ' كلمةً فوق سقفِه (' + hard + ') — ولا يُنهيه');
-            } else {
-              /* وتُقرَأ كاملةً: جزءٌ واحدٌ لكلِّ قطعة، لا أكثر */
-              let split = 0;
-              TXT.forEach(function(txt){
-                let ps = [];
-                try { ps = fnParts(txt, { floor:floor, cap:cap, hard:hard }); } catch(e){}
-                if (ps.length !== 1) split++;
-              });
-              if (split)
-                E('حسن: ' + split + ' قطعةً تُقطَّع أجزاءً وهي تُقرَأ كاملةً بقرارِ الأب (٩ نوفمبر ٢٠٢٦)');
-            }
+            });
+            if (tiny)
+              E('حسن: ' + tiny + ' جزءًا دون عشرِ كلمات — لا يُقاس عليه نطقٌ، والذيلُ القصيرُ يُوازَن لا يُترَك');
+            if (longest > hard + 12)
+              E('حسن: جزءٌ من ' + longest + ' كلمةً فوق سقفِه (' + hard + ') — ولا يُنهيه');
+            /* ═══ والقسمةُ بالطولِ لا على الجميع ولا على أحد ═══════════
+               طلبُ الأب (١١ نوفمبر ٢٠٢٦): «القطعةُ الطويلةُ خلّها مثل
+               نظامِ كلِّ قطعةٍ لحالها يسوّي تسجيل». فما كان في حدودِ ما
+               يُتمُّه فتسجيلٌ واحد، وما زاد فأجزاء. وطرفا القاعدةِ
+               يُفحَصان معًا، وإلّا مرَّ طرفٌ منهما. */
+            let wrongWhole = 0, wrongSplit = 0;
+            TXT.forEach(function(txt){
+              const tw = String(txt).trim().split(/\s+/).filter(Boolean).length;
+              let ps = [];
+              try { ps = fnParts(txt, HCFG); } catch(e){}
+              if (tw <= HCFG.whole && ps.length !== 1) wrongWhole++;
+              if (tw >  HCFG.whole && ps.length < 2)  wrongSplit++;
+            });
+            if (wrongWhole)
+              E('حسن: ' + wrongWhole + ' قطعةً في حدودِ تسجيلٍ واحدٍ (' + HCFG.whole +
+                ' كلمةً) وتُقطَّع أجزاءً — والقصيرةُ تُقرَأ كاملةً');
+            if (wrongSplit)
+              E('حسن: ' + wrongSplit + ' قطعةً فوق ' + HCFG.whole +
+                ' كلمةً ولا تُقسَّم — وهو يقف عند الثلاثين فيترك باقيَها (قرارُ الأب ١١ نوفمبر ٢٠٢٦)');
           } else E('readParts لا تُنتزَع — فلا يُتحقَّق أنّ حسنًا يقرأ قطعتَه كاملة');
           if (HFULL){
             if (notFull) E('حسن: ' + notFull + ' قطعةً تُقتطَع وهو مأمورٌ بقراءتِها كاملة');
@@ -3658,16 +3705,19 @@ function readAloudPath(){
      الجزءَ الواحدَ الطويلَ لا يُقرَأ: اكتمالُ حسنٍ في القطعِ ≥٩٠ كلمةً
      ٢٥٪، واكتمالُ فهدٍ ينزل من ٩٥٪ دون الثلاثين إلى ٤٩٪ فوق الستّين.
      فالأجزاءُ لا الجزءُ الأوّلُ وحدَه. */
-  /* ═══ والقطعةُ تُقرَأ كاملةً — قرارُ الأب، لا رايةٌ تُقلَب ═══════════
-     أعاد الطلبَ ثالثةً (٩ نوفمبر ٢٠٢٦): «ليش ما تخلّيه يقرا القطعة
-     كاملة؟؟؟ وخلّهم كلّهم يقرونها كاملة». وبقيّةُ الفحوصِ تتبع
-     READ_WHOLE فتُبدّل مقاييسَها بتبديلِها — فلو قُلبت الرايةُ وحدَها
-     مرّت بلا رصد (جُرّب فمرّ). فتُثبَّت هنا صريحةً: من أرادها قسمةً
-     فليُغيّر هذا السطرَ ومعه سببٌ مكتوب. */
-  if (!/var READ_WHOLE = true;/.test(src))
-    E('READ_WHOLE ليست true — والقطعةُ تُقرَأ كاملةً بقرارِ الأب (٩ نوفمبر ٢٠٢٦)');
-  if (!/if\(READ_WHOLE\) return \[s\];/.test(src))
-    E('READ_WHOLE لا تُستعمَل في readParts — فالرايةُ مرفوعةٌ والقسمةُ قائمة');
+  /* ═══ والقسمةُ بالطولِ المقيس، لا رايةٌ تُقلَب ═══════════════════════
+     كانت رايةً عامّةً (READ_WHOLE) فمرَّ قلبُها مرّةً بلا رصد. وصارت
+     (١١ نوفمبر ٢٠٢٦) طولًا يُقاس: ما كان في حدودِ ما يُتمُّه الابنُ في
+     تسجيلٍ واحدٍ فقطعةٌ واحدة، وما زاد فأجزاءٌ لكلٍّ تسجيلُه. فيُثبَّت
+     السطرانِ هنا صريحَين — من أرادهما غيرَ ذلك فليُغيّرهما ومعه قياس. */
+  if (/var READ_WHOLE\b/.test(src))
+    E('READ_WHOLE رايةٌ عامّةٌ عادت — والقسمةُ صارت بطولِ القطعةِ لا براية');
+  if (!/var WHOLE_MAX = \(typeof cfg\.whole === "number"\) \? cfg\.whole : \(cfg\.hard \|\| 55\);/.test(src))
+    E('سقفُ القطعةِ الواحدةِ لا يُقرَأ من cfg في readParts');
+  if (!/if\(s\.split\(\/\\s\+\/\)\.filter\(Boolean\)\.length <= WHOLE_MAX\) return \[s\];/.test(src))
+    E('readParts لا تُرجع القطعةَ القصيرةَ جزءًا واحدًا — فتُقطَّع قطعةٌ يُتمُّها في نَفَسٍ واحد');
+  if (!/whole:(\d+)/.test(src))
+    E('READ_CAP بلا سقفِ قطعةٍ واحدة — فالطويلةُ والقصيرةُ سواء');
   if (!/function readParts\(/.test(src))
     E('readParts مفقودة — فلا تُقرَأ القطعةُ إلّا جزأَها الأوّل');
   if (!/var rParts = readParts\(passage\)/.test(src))
@@ -3678,6 +3728,22 @@ function readAloudPath(){
     E('الموازنةُ لا تُقاس بأدنى مقدارِ الابن');
   if (!/data-go-next/.test(src))
     E('لا زرَّ ينقل إلى الجزءِ التالي — فيقف الابنُ عند الأوّلِ ولا يُتمُّ القطعة');
+  /* ═══ والجزءُ التالي يُفتح وحدَه، وما بقي يُقال حيث ينظر ═══════════
+     حسنٌ وقف عند الجزءِ الأوّلِ من خمسةٍ أربعةَ أيّامٍ متوالية (٦–٩
+     نوفمبر ٢٠٢٦) والزرُّ تحتَه — فالزرُّ وحدَه لا يكفي: ينتقل التظليلُ
+     تلقائيًّا، ويُكتَب الباقي في صندوقِ الأسئلةِ الذي تقع عليه عينُه. */
+  if (!/if\(partIx < rParts\.length - 1\) showPart\(partIx \+ 1\);/.test(src))
+    E('الجزءُ التالي لا يُفتح تلقائيًّا بعد تسجيلِ الجزء — والزرُّ وحدَه لم يُضغَط أربعةَ أيّام');
+  if (!/function restLine\(\)[\s\S]{0,420}باقٍ عليك/.test(src))
+    E('لا يُقال له كم بقي من أجزاءِ القطعة');
+  if (!/function restPaint\(\)[\s\S]{0,420}lockEl\.textContent = restLine\(\);/.test(src))
+    E('الباقي لا يُكتَب في صندوقِ الأسئلة — فيقرؤه حيث لا ينظر');
+  if (!/unlock\(\);\s*\n\s*restPaint\(\);/.test(src) && !/restPaint\(\);\s*\n\s*\}/.test(src))
+    E('restPaint لا تُنادى عند فتحِ الأسئلة');
+  if (!/if\(doneParts < partIx \+ 1\) doneParts = partIx \+ 1;/.test(src))
+    E('الأجزاءُ المقروءةُ لا تُعَدّ — فالباقي المعروضُ لا يتغيّر');
+  if (!/data-regen[\s\S]{0,700}doneParts < rParts\.length[\s\S]{0,300}confirm\(/.test(src))
+    E('«نصٌّ جديد» لا يسأل وقد بقيت أجزاءٌ — فيُهرَب به من بقيّةِ القطعة');
   if (!/الجزء ' \+ \(i\+1\) \+ ' من ' \+ rParts\.length/.test(src))
     E('لا يُعرَض للابنِ أينَ وصل من أجزاءِ القطعة');
   if (!/\u0642\u0631\u0623\u062A \u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0645\u0644\u0629/.test(src))
@@ -5614,31 +5680,30 @@ function storyBankPath(){
   const rsrc = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
   const m2 = /function readAloudRef\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
   const mp = /function readParts\(txt, cfg\)\{([\s\S]*?)\n\}/.exec(rsrc);
-  /* وREAD_WHOLE من الصفحة: هي التي تقرّر أتُقرَأ كاملةً أم أجزاء */
-  const rwS = /var READ_WHOLE = (true|false);/.exec(rsrc);
-  const WHOLE = !!(rwS && rwS[1] === 'true');
+  /* والقسمةُ بالطول: cfg.whole هو أطولُ ما يُتمُّه في تسجيلٍ واحد */
   if (m2 && mp){
     let fnP = null;
     try { const sb3 = {}; vm.createContext(sb3);
-      vm.runInContext('var READ_WHOLE = ' + WHOLE + ';\n' +
+      vm.runInContext(
         'function readAloudRef(txt, cfg){' + m2[1] + '\n}\n' +
         'function readCapOf(){ return null; }\n' +
         'g = function(txt, cfg){' + mp[1] + '\n};', sb3); fnP = sb3.g; } catch(e){}
     if (typeof fnP !== 'function') E('readParts لا تُشغَّل على القصص');
     else {
-      const cfg = { floor:18, cap:35, hard:55 };
-      let miss = 0, over = 0, split = 0;
+      const cfg = { floor:18, cap:35, hard:55, whole:55 };
+      let miss = 0, over = 0, badWhole = 0, badSplit = 0;
       S.forEach(function(st){
         const t = String((st||[])[0] || '').trim();
         let ps = []; try { ps = fnP(t, cfg); } catch(e){}
         if (ps.join(' ').replace(/\s+/g,' ').trim() !== t.replace(/\s+/g,' ').trim()) miss++;
-        if (ps.length !== 1) split++;
-        if (!WHOLE) ps.forEach(function(x){ if (wc(x) > cfg.hard) over++; });
+        if (wc(t) <= cfg.whole && ps.length !== 1) badWhole++;
+        if (wc(t) >  cfg.whole && ps.length < 2)  badSplit++;
+        ps.forEach(function(x){ if (wc(x) > cfg.hard) over++; });
       });
       if (miss) E(miss + ' قصّةً لا تُغطّيها أجزاؤها — فلا تُقرَأ كاملة');
       if (over) E(over + ' جزءًا فوق السقفِ الصلب');
-      /* وقرارُ الأب (٩ نوفمبر ٢٠٢٦): تُقرَأ في نَفَسٍ واحد */
-      if (WHOLE && split) E(split + ' قصّةً تُقطَّع أجزاءً وهي تُقرَأ كاملةً بقرارِ الأب');
+      if (badWhole) E(badWhole + ' قصّةً قصيرةً تُقطَّع أجزاءً — والقصيرةُ تسجيلٌ واحد');
+      if (badSplit) E(badSplit + ' قصّةً طويلةً لا تُقسَّم — ولكلِّ جزءٍ تسجيلُه (قرارُ الأب ١١ نوفمبر ٢٠٢٦)');
     }
   }
   return out;
