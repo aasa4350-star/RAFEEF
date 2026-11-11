@@ -3744,6 +3744,58 @@ function readAloudPath(){
     E('الأجزاءُ المقروءةُ لا تُعَدّ — فالباقي المعروضُ لا يتغيّر');
   if (!/data-regen[\s\S]{0,700}doneParts < rParts\.length[\s\S]{0,300}confirm\(/.test(src))
     E('«نصٌّ جديد» لا يسأل وقد بقيت أجزاءٌ — فيُهرَب به من بقيّةِ القطعة');
+
+  /* ═══ أضعفُ الكلماتِ وأضعفُ الأصواتِ تُحفَظ ═══════════════════════════
+     سؤالُ الأب (١١ نوفمبر ٢٠٢٦): «أين يتعثّر — الحروفُ أم المدُّ أم
+     السرعة؟». وأزور تُرجع درجةَ كلِّ كلمةٍ وكلِّ صوتٍ وكانت تُرمى، فلا
+     يُجاب عن الحروفِ أبدًا مهما طال السجلّ. فإن سقط هذا الحفظُ عاد
+     السؤالُ بلا جواب — ولا يُكتشَف إلّا بعد أسابيعَ من القراءة. */
+  if (!/function pronWeak\(refWords, scores, spokenWords\)/.test(src))
+    E('pronWeak مفقودة — فلا تُحفَظ أضعفُ الكلماتِ ولا أضعفُ الأصوات');
+  if (!/wk:\(d\.wk \|\| null\), ph:\(d\.ph \|\| null\)/.test(src))
+    E('الكلماتُ والأصواتُ الضعيفةُ لا تدخل الصفَّ المحفوظ');
+  if (!/wk:_weak\.wk, ph:_weak\.ph/.test(src))
+    E('قراءةُ القطعةِ لا تحفظ أضعفَ كلماتِها');
+  if (!/wk:_wk1\.wk, ph:_wk1\.ph/.test(src))
+    E('قراءةُ الكلمةِ الواحدةِ لا تحفظ الكلمةَ التي أخطأ فيها');
+  {
+    /* والسقوفُ تُفحَص بتشغيلِ الدالّةِ نفسِها: صفُّ القراءةِ لا يصير
+       سجلَّ صوتٍ كاملًا، ولا يُحفَظ ما ليس ضعيفًا. */
+    const mw = /function pronWeak\(refWords, scores, spokenWords\)\{([\s\S]*?)\n\}/.exec(src);
+    if (!mw) E('pronWeak لا تُنتزَع — فلا تُفحَص سقوفُها');
+    else {
+      let fn = null;
+      try { const sb = {}; vm.createContext(sb);
+        vm.runInContext('f = function(refWords, scores, spokenWords){' + mw[1] + '\n};', sb); fn = sb.f; } catch(e){}
+      if (typeof fn !== 'function') E('pronWeak لا تُشغَّل');
+      else {
+        const words = [], scores = [];
+        for (let i = 0; i < 40; i++){ words.push('w' + i); scores.push(i * 2); }   /* ٠..٧٨ */
+        const spoken = [{ Phonemes: [] }];
+        for (let i = 0; i < 30; i++)
+          spoken[0].Phonemes.push({ Phoneme:'p' + i, PronunciationAssessment:{ AccuracyScore: i * 3 } });
+        const r = fn(words, scores, spoken);
+        if (!r || !Array.isArray(r.wk)) E('pronWeak لا تُرجع قائمةَ الكلماتِ الضعيفة');
+        else {
+          if (r.wk.length > 10) E('pronWeak تحفظ ' + r.wk.length + ' كلمةً — والسقفُ عشر');
+          if (r.wk.some(x => x[1] >= 70)) E('pronWeak تحفظ كلمةً ليست ضعيفة (٧٠ فأعلى)');
+          if (r.wk.length > 1 && r.wk[0][1] > r.wk[1][1]) E('أضعفُ الكلماتِ غيرُ مرتّبةٍ من الأضعف');
+        }
+        if (!r || !Array.isArray(r.ph)) E('pronWeak لا تُرجع قائمةَ الأصواتِ الضعيفة');
+        else {
+          if (r.ph.length > 12) E('pronWeak تحفظ ' + r.ph.length + ' صوتًا — والسقفُ اثنا عشر');
+          if (r.ph.some(x => x[1] >= 80)) E('pronWeak تحفظ صوتًا ليس ضعيفًا (٨٠ فأعلى)');
+          if (r.ph.some(x => !(x[2] > 0))) E('الصوتُ المحفوظُ بلا عددِ مرّات — فلا يُعرف أهو نادرٌ أم متكرّر');
+        }
+        const none = fn(['a','b'], [95, 92], [{ Phonemes:[{ Phoneme:'x', PronunciationAssessment:{ AccuracyScore:99 } }] }]);
+        if (none.wk !== null || none.ph !== null)
+          E('pronWeak تحفظ قائمةً فارغةً حين لا ضعفَ — فتنتفخ الصفوفُ بلا فائدة');
+        let threw = false;
+        try { fn(null, null, null); } catch(e){ threw = true; }
+        if (threw) E('pronWeak تنهار على مدخلٍ ناقص — فتُسقِط حفظَ القراءةِ كلِّها');
+      }
+    }
+  }
   if (!/الجزء ' \+ \(i\+1\) \+ ' من ' \+ rParts\.length/.test(src))
     E('لا يُعرَض للابنِ أينَ وصل من أجزاءِ القطعة');
   if (!/\u0642\u0631\u0623\u062A \u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0645\u0644\u0629/.test(src))

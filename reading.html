@@ -879,6 +879,47 @@ function micFailMsg(info){
   }
   return null;   /* NoMatch حقيقيّ: تبقى الرسالة المعتادة */
 }
+/* ═══ أضعفُ الكلماتِ وأضعفُ الأصواتِ تُحفَظ ═══════════════════════════
+   سؤالُ الأب (١١ نوفمبر ٢٠٢٦): «أين يتعثّر بالضبط — الحروفُ أم المدُّ
+   أم السرعة؟». وقِيس المحفوظُ كلُّه (١٨٤٦ قراءةً مسجّلة) فأجاب عن
+   السرعةِ جوابًا قاطعًا: فوق مئةٍ وأربعينَ كلمةً في الدقيقةِ تنهار
+   الدقّةُ عند كلِّ واحدٍ منهم — سعود ٨١ ⇐ ٣٥، وأسامة ٨٧ ⇐ ٢٠، وحسن
+   ٨٣ ⇐ ٢٤، وفهد ٨٧ ⇐ ٣٢، ورفيف ٨٨ ⇐ ٣٦. ولم يُجِب عن الحروفِ ولا
+   المدِّ بحرفٍ واحد، لأنّ المحفوظَ أرقامٌ مجملةٌ لا غير.
+
+   وأزور تُرجع درجةَ كلِّ كلمةٍ ودرجةَ كلِّ صوتٍ فيها — والإعدادُ يطلب
+   الفونيمَ أصلًا (Granularity.Phoneme) — ثمّ كانت تُعرَض على الشاشةِ
+   وتُرمى. فتُحفَظ الآن مُلخَّصةً لا كاملةً: أضعفُ عشرِ كلماتٍ
+   بدرجاتها (wk)، وأضعفُ اثني عشرَ صوتًا بمتوسّطِه وعددِ مرّاتِه (ph).
+   وبها يُعرف بعد جلساتٍ قليلةٍ أهو المدُّ (ـا ـو ـي الطويلة) أم حروفٌ
+   بعينِها أم لا هذا ولا ذاك. والحجمُ محدودٌ قصدًا: صفُّ القراءةِ لا
+   يصير سجلَّ صوتٍ كاملًا. */
+function pronWeak(refWords, scores, spokenWords){
+  var wk = [], ph = {}, out = { wk:null, ph:null };
+  try{
+    (refWords||[]).forEach(function(w,i){
+      var sc = scores ? scores[i] : null;
+      if(sc != null && sc < 70) wk.push([String(w).slice(0,24), Math.round(sc)]);
+    });
+    wk.sort(function(a,b){ return a[1]-b[1]; });
+    if(wk.length) out.wk = wk.slice(0, 10);
+    (spokenWords||[]).forEach(function(w){
+      ((w && w.Phonemes) || []).forEach(function(p){
+        var k = String((p && p.Phoneme) || "").slice(0,8); if(!k) return;
+        var sc = ((p.PronunciationAssessment||{}).AccuracyScore);
+        if(typeof sc !== "number") return;
+        var e = ph[k] || (ph[k] = [0,0]);
+        e[0] += sc; e[1]++;
+      });
+    });
+    var pk = Object.keys(ph).map(function(k){ return [k, Math.round(ph[k][0]/ph[k][1]), ph[k][1]]; })
+               .filter(function(x){ return x[1] < 80; })
+               .sort(function(a,b){ return a[1] - b[1]; })
+               .slice(0, 12);
+    if(pk.length) out.ph = pk;
+  }catch(e){}
+  return out;
+}
 function savePron(isAr, d){
   try{
     if(typeof d.pron !== "number" || isNaN(d.pron)) return;
@@ -894,6 +935,8 @@ function savePron(isAr, d){
          خمسةُ صفوف. وبلا رابطٍ بينها يراها الأبُ خمسَ قراءاتٍ
          منفصلة. فتحمل كلُّها معرّفَ الجلسةِ ورقمَ الجزءِ وعددَها. */
       rsid:(window.__rsid || null), part:(window.__rpart || null), parts:(window.__rparts || null),
+      /* أضعفُ كلماتِه وأضعفُ أصواتِه — انظر pronWeak أعلاه */
+      wk:(d.wk || null), ph:(d.ph || null),
       cycles:(typeof d.cycles==="number"?d.cycles:null)
     });
   }catch(e){}
@@ -1467,6 +1510,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
        فإذا هبطت الطلاقةُ ودقّتُه عالية، قيل له الحقُّ صراحةً: نطقُك
        سليمٌ وإنّما قراءتُك بطيئة — فلا يظنّ لسانَه هو الخطأ. */
     var wpm = (_audioSec && readCount) ? Math.round(readCount*60/_audioSec) : null;
+    var _weak = pronWeak(refWordsArr, best, spoken);
     var slowNote = (flu!=null && flu < 50 && acc >= 75)
       ? '<div style="font-size:.84rem;color:var(--warn);margin-top:6px;font-weight:700">'+
         '🐢 نطقُك سليم — الطلاقةُ نزلت لأنّ القراءةَ كانت بطيئة. اقرأ المقطعَ مرّةً بعينك ثمّ سجّل.</div>'
@@ -1491,6 +1535,7 @@ function _paRunLong(refText, isAr, statusEl, btn, onDone, onFail, qmode){
          عليها فقرأت ٣٧٦ كلمةً في الدقيقة، وهو رقمٌ لا يقوله بشر. */
       mode:"passage", pron:pron, acc:acc, flu:flu, comp:comp,
       words:readCount, refWords:refCount, audioSec:Math.round(_audioSec),
+      wk:_weak.wk, ph:_weak.ph,
       /* عددُ الدوراتِ يُحفَظ: به نعرف إن عاد الرقمُ يتبع التقطيعَ يومًا */
       cycles:segs.length
     });
@@ -1902,11 +1947,19 @@ function _paRun(refText, isAr, statusEl, btn, onDone, longText, tries, onFail, q
             return '<span style="color:'+wc+'">'+w.Word+'</span>';
           }).join(' ');
         }catch(e){}
+        /* وفي وضعِ الكلمةِ الواحدةِ تُحفَظ الكلمةُ نفسُها: مئتانِ وأربعُ
+           قراءةِ كلمةٍ عند سعودٍ وحدَه، ولا يُعرَف من أيِّها أخطأ. */
+        var _ws = (r.detailResult && r.detailResult.Words) || [];
+        var _wSc = _ws.map(function(w){ var a=w.PronunciationAssessment||{};
+          return (typeof a.AccuracyScore==="number") ? a.AccuracyScore : null; });
+        var _wTx = _ws.map(function(w){ return w.Word; });
+        var _wk1 = pronWeak(_wTx, _wSc, _ws);
         savePron(isAr, {
           mode:"word", pron:pron, acc:acc, flu:flu, comp:null,
-          words:((r.detailResult&&r.detailResult.Words)||[]).length,
+          words:_ws.length,
           refWords:String(refText||"").trim().split(/\s+/).filter(Boolean).length,
-          audioSec:(typeof result.duration==="number") ? Math.round(result.duration/1e7) : null
+          audioSec:(typeof result.duration==="number") ? Math.round(result.duration/1e7) : null,
+          wk:_wk1.wk, ph:_wk1.ph
         });
         var face = pron>=80?"🌟":pron>=60?"👍":"💪";
         statusEl.innerHTML = face+' <b style="color:'+col+'">النطق: '+pron+'/100</b> · دقّة '+acc+' · طلاقة '+flu +
