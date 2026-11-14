@@ -3750,6 +3750,73 @@ function readAloudPath(){
      السرعة؟». وأزور تُرجع درجةَ كلِّ كلمةٍ وكلِّ صوتٍ وكانت تُرمى، فلا
      يُجاب عن الحروفِ أبدًا مهما طال السجلّ. فإن سقط هذا الحفظُ عاد
      السؤالُ بلا جواب — ولا يُكتشَف إلّا بعد أسابيعَ من القراءة. */
+  /* ═══ «انطق» لا يَعِد بما لم يفعل ═══════════════════════════════════
+     بلاغُ الأب (١٤ نوفمبر ٢٠٢٦): «حسنٌ يقول يتأخّر جدًّا في النطق، يبطي
+     ما بدا — بنود ٥ و٦ و٧ و٨». وجُرّب بمحاكاةِ كروم فظهر عطبان: الشاشةُ
+     تقول «تكلّم الآن» قبل أن يُفتح المايك بأكثرَ من ثانية، ومحرّكُ
+     التعرّفِ الواحدُ يبقى محجوزًا للبندِ الأوّل فيُرفَض ما بعده
+     بـInvalidStateError ويُقال له «اسمح بالمايك» — وهي كاذبة. */
+  if (!/function srStop\(code\)/.test(src))
+    E('srStop مفقودة — فالبندُ السابقُ يبقى ممسكًا بالمايكِ ويُرفَض ما بعده');
+  if (!/function startRecognition\(lang, onResult, onErr, onLive\)\{\s*\n\s*if\(!SR\)[^\n]*\n\s*srStop\(\);/.test(src))
+    E('startRecognition لا تُجهِض الجاريَ قبل أن تبدأ — وهي علّةُ بنودِ ٥ و٦ و٧ و٨');
+  if (!/r\.onaudiostart = function\(\)\{[\s\S]{0,200}onLive/.test(src))
+    E('«تكلّم الآن» لا تنتظر onaudiostart — فيتكلّم في مايكٍ لم يُفتَح');
+  if (!/pfb\.textContent = "⏳ جارٍ فتح المايك\.\.\.";/.test(src))
+    E('ضغطةُ «انطق» لا تقول إنّ المايكَ يُفتَح — فيظنّه جاهزًا');
+  if (!/r\.onend\s*= function\(\)\{ fin\(onErr, live \? "no-speech" : "no-start"\); \};/.test(src))
+    E('onend غيرُ معالَجة — فتبقى الجلسةُ معلّقةً بلا جواب');
+  if (!/fin\(onErr, "no-start"\); \} \}, 6000\)/.test(src))
+    E('لا مهلةَ لفتحِ المايك — فيبقى السطرُ «جارٍ فتح المايك» إلى الأبد');
+  if (!/fin\(onErr, "no-speech"\); \}, 12000\)/.test(src))
+    E('لا مهلةَ للصمتِ بعد الفتح — فتبقى الجلسةُ مفتوحةً بلا نهاية');
+  ['no-start','no-speech','cancelled'].forEach(function(k){
+    if (!new RegExp('err==="' + k + '"').test(src))
+      E('«انطق» بلا رسالةٍ خاصّةٍ لحالِ ' + k + ' — فتُقال له علّةٌ ليست علّتَه');
+  });
+  {
+    /* والسلوكُ يُشغَّل بساعةٍ مضبوطةٍ ومحرّكٍ مزيَّف، لا يُقرأ نصًّا */
+    const ms = /var _srCur = null, _srFin = null;([\s\S]*?)\nfunction speechMatch/.exec(src);
+    if (!ms) E('srStop/startRecognition لا تُنتزَعان — فلا يُفحَص سلوكُهما');
+    else {
+      const sb = { log: [] };
+      sb.timers = [];
+      sb.setTimeout = (fn, t) => { sb.timers.push({ fn, t, id: sb.timers.length + 1 }); return sb.timers.length; };
+      sb.clearTimeout = id => { const x = sb.timers[id - 1]; if (x) x.fn = null; };
+      vm.createContext(sb);
+      vm.runInContext(
+        'var active = null;\n' +
+        'function SR(){}\n' +
+        'SR.prototype.start = function(){ if(active){ var e=new Error("x"); e.name="InvalidStateError"; throw e; } active=this; log.push("start"); };\n' +
+        'SR.prototype.abort = function(){ active=null; log.push("abort"); };\n' +
+        'SR.prototype.stop  = function(){ active=null; log.push("stop"); };\n' +
+        'var _srCur = null, _srFin = null;' + ms[1] + '\n', sb);
+      if (typeof sb.startRecognition !== 'function') E('startRecognition لا تُشغَّل في الفحص');
+      else {
+        const errs = [];
+        sb.startRecognition('ar-SA', () => {}, e => errs.push('أ:' + e), () => sb.log.push('live1'));
+        sb.startRecognition('ar-SA', () => {}, e => errs.push('ب:' + e), () => sb.log.push('live2'));
+        if (errs[0] !== 'أ:cancelled')
+          E('البندُ المتروكُ لا يُبلَّغ بأنّه تُرك (جاء: ' + (errs[0] || 'لا شيء') + ') — فيبقى سطرُه معلّقًا');
+        if (sb.log.join(',') !== 'start,abort,start')
+          E('تسلسلُ المايكِ غيرُ سليم: ' + sb.log.join(',') + ' — والمنتظَر start,abort,start');
+        /* مهلةُ الفتح: نُفجّرها يدويًّا ونتأكّد أنّها تُنهي بالسببِ الصحيح */
+        const openT = sb.timers.filter(x => x.t === 6000 && x.fn).pop();
+        if (!openT) E('مهلةُ فتحِ المايكِ (٦ ثوانٍ) غيرُ مجدولة');
+        else {
+          openT.fn();
+          if (errs[1] !== 'ب:no-start')
+            E('انتهاءُ مهلةِ الفتحِ لا يُبلِّغ no-start (جاء: ' + (errs[1] || 'لا شيء') + ')');
+        }
+        /* ولا يبقى المحرّكُ محجوزًا بعد الانتهاء */
+        sb.log.length = 0; errs.length = 0;
+        sb.startRecognition('ar-SA', () => {}, e => errs.push(e), () => {});
+        if (sb.log.indexOf('start') < 0)
+          E('المحرّكُ يبقى محجوزًا بعد انتهاءِ الجلسة — فلا يُقبَل بندٌ بعده');
+      }
+    }
+  }
+
   /* ═══ وتنبيهُ الهرولة ═══════════════════════════════════════════════
      قِيس (١١ نوفمبر ٢٠٢٦) أنّ الدقّةَ تنهار فوق مئةٍ وأربعينَ كلمةً في
      الدقيقةِ عند كلِّ واحدٍ منهم، والاكتمالُ باقٍ — فالكلماتُ تصل

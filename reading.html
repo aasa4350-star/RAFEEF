@@ -2422,14 +2422,75 @@ var IS_IOS = /iP(hone|od|ad)/.test(navigator.platform)
   || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
   || /iPad|iPhone|iPod/.test(navigator.userAgent);
 if(!SR || IS_IOS){ try{ document.documentElement.classList.add("no-mic"); }catch(e){} }
-function startRecognition(lang, onResult, onErr){
-  if(!SR){ onErr && onErr("no-support"); return; }
+/* ═══ «انطق» كان يَعِد بما لم يفعل ═══════════════════════════════════
+   بلاغُ الأب (١٤ نوفمبر ٢٠٢٦) ومعه صورةُ شاشةِ الإملاء: «حسنٌ يقول
+   يتأخّر جدًّا في النطق، يبطي ما بدا — بنود ٥ و٦ و٧ و٨».
+
+   وجُرّب المسارُ بمحاكاةِ سلوكِ كروم الحقيقيّ (محرّكُ تعرّفٍ واحدٌ لا
+   يقبل تشغيلَين معًا، ومصافحةٌ قبل أن يبدأ الالتقاط) فظهر عطبان:
+
+   (١) الشاشةُ تقول «🎤 تكلّم الآن...» في لحظةِ الضغط، والمايكُ لا يبدأ
+       الالتقاطَ إلّا بعد مصافحةٍ تزيد على الثانية. فالطفلُ يتكلّم في
+       مايكٍ لم يُفتَح بعد، ثمّ لا يسمع جوابًا — وهو عينُ ما وصفه:
+       «يبطي ما بدا». ولا مهلةَ تُنهيها، فيبقى السطرُ «تكلّم الآن»
+       إلى الأبد.
+
+   (٢) محرّكُ التعرّفِ في المتصفّحِ واحد. فالبندُ الخامسُ يبقى ممسكًا
+       بالمايك، فإذا ضغط السادسَ رُفض بـInvalidStateError وابتلعه
+       try/catch فقيل له «⚠️ لم أسمع بوضوح، اسمح بالمايك» — وهي رسالةٌ
+       كاذبةٌ مرّتين: المايكُ لم يُفتَح أصلًا، والإذنُ ليس العلّة.
+       وجُرّب فإذا ٥ عالقٌ و٦ و٧ و٨ كلُّها مرفوضة.
+
+   فصار: يُجهَض الجاري قبل أن يبدأ الجديد، ولا يُقال «تكلّم» إلّا بعد
+   onaudiostart، ولكلِّ إخفاقٍ اسمُه (لم يفتح · ما سمعت صوتًا). */
+var _srCur = null, _srFin = null;
+function srStop(code){
+  var f = _srFin; _srFin = null;
   try{
-    var r = new SR(); r.lang = lang; r.interimResults = false; r.maxAlternatives = 5;
-    r.onresult = function(e){ var a=[]; for(var i=0;i<e.results[0].length;i++) a.push(e.results[0][i].transcript); onResult(a); };
-    r.onerror = function(e){ onErr && onErr((e && e.error) || "error"); };
+    if(_srCur){
+      _srCur.onresult = _srCur.onerror = _srCur.onend = _srCur.onaudiostart = null;
+      _srCur.abort();
+    }
+  }catch(e){}
+  _srCur = null;
+  /* والبندُ المتروكُ يُقال له إنّه تُرك: بلا هذا يبقى سطرُه «جارٍ فتح
+     المايك...» إلى الأبد، فيظنّ أنّ الصفحةَ معلّقة. */
+  if(f){ try{ f(code || "cancelled"); }catch(e){} }
+}
+function startRecognition(lang, onResult, onErr, onLive){
+  if(!SR){ onErr && onErr("no-support"); return; }
+  srStop();
+  var openTo = null, quietTo = null, live = false, done = false;
+  function fin(fn, arg){
+    if(done) return; done = true;
+    clearTimeout(openTo); clearTimeout(quietTo);
+    if(_srCur === r) _srCur = null;
+    if(fn){ try{ fn(arg); }catch(e){} }
+  }
+  var r;
+  try{
+    r = new SR(); r.lang = lang; r.interimResults = false; r.maxAlternatives = 5;
+    r.onaudiostart = function(){
+      live = true; clearTimeout(openTo);
+      if(onLive){ try{ onLive(); }catch(e){} }
+      /* صمتٌ طويلٌ بعد الفتح: نُنهيها ونقول السبب، فلا تبقى معلّقة */
+      quietTo = setTimeout(function(){ try{ r.stop(); }catch(e){} fin(onErr, "no-speech"); }, 12000);
+    };
+    r.onresult = function(e){
+      var a=[]; for(var i=0;i<e.results[0].length;i++) a.push(e.results[0][i].transcript);
+      fin(onResult, a);
+    };
+    r.onerror = function(e){ fin(onErr, (e && e.error) || "error"); };
+    r.onend   = function(){ fin(onErr, live ? "no-speech" : "no-start"); };
+    /* لم يفتح المايكُ في ستِّ ثوانٍ: إذنٌ مرفوضٌ أو شبكةٌ واقفة */
+    openTo = setTimeout(function(){ if(!live){ try{ r.abort(); }catch(e){} fin(onErr, "no-start"); } }, 6000);
+    _srCur = r;
+    _srFin = function(code){ fin(onErr, code); };
     r.start();
-  }catch(e){ onErr && onErr("error"); }
+  }catch(e){
+    _srCur = null;
+    fin(onErr, (e && e.name === "InvalidStateError") ? "busy" : "error");
+  }
 }
 function speechMatch(alts, target, ar){
   var t = normX(target, ar).split(" ").filter(Boolean);
@@ -2447,14 +2508,24 @@ function wireMic(qEl, text, ar, onOk){
   var mic = qEl.querySelector("[data-mic]"), pfb = qEl.querySelector(".pfb");
   if(!mic || !pfb) return;
   mic.addEventListener("click", function(){
-    pfb.style.color = "var(--muted)"; pfb.textContent = "🎤 تكلّم الآن...";
+    /* لا يُقال «تكلّم» قبل أن يُفتح المايك: الوعدُ قبل أوانِه هو الذي
+       جعل حسنًا يتكلّم في مايكٍ ميّت (انظر startRecognition). */
+    pfb.style.color = "var(--muted)"; pfb.textContent = "⏳ جارٍ فتح المايك...";
     startRecognition(ar?"ar-SA":"en-US", function(alts){
       var m = speechMatch(alts, text, ar);
       if(m.ok){ pfb.style.color = "var(--good)"; pfb.textContent = "✅ نطق صحيح! ("+m.heard+")"; if(onOk){ try{ onOk(); }catch(e){} } }
       else{ pfb.style.color = "var(--bad)"; pfb.textContent = '❌ سمعتك: "'+m.heard+'" · انطقها: '+text; }
     }, function(err){
       pfb.style.color = "var(--bad)";
-      pfb.textContent = (err==="no-support") ? "⚠️ متصفح الآيفون لا يدعم النطق بالمايك — يشتغل على أندرويد/كمبيوتر بمتصفح Chrome." : "⚠️ لم أسمع بوضوح، اسمح بالمايك وحاول ثانية.";
+      pfb.textContent =
+        (err==="no-support") ? "⚠️ متصفح الآيفون لا يدعم النطق بالمايك — يشتغل على أندرويد/كمبيوتر بمتصفح Chrome." :
+        (err==="no-start")   ? "⚠️ المايك ما فتح. اسمح للموقع بالمايك من قفل العنوان 🔒 وجرّب ثانية." :
+        (err==="no-speech")  ? "🔇 ما سمعت صوتًا. اضغط «انطق» وانتظر كلمة «تكلّم الآن» ثمّ انطق." :
+        (err==="not-allowed"||err==="service-not-allowed") ? "⚠️ المايك ممنوع لهذا الموقع — اسمح به من قفل العنوان 🔒." :
+        (err==="cancelled")  ? "↩️ وقفنا هذا — المايك راح للبند اللي ضغطته بعده." :
+                               "⚠️ ما ضبطت. جرّب ثانية.";
+    }, function(){
+      pfb.style.color = "var(--good)"; pfb.textContent = "🎤 تكلّم الآن...";
     });
   });
 }
