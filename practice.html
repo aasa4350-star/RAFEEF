@@ -63,7 +63,8 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="practice-bank.js"></script>
-<script src="gat-quant.js?v=20261107"></script>
+<script src="gat-quant.js?v=20261114"></script>
+<script src="gat-verbal.js?v=20261114"></script>
 <script src="step-bank.js"></script>
 <script src="gram-rules.js"></script>
 <script src="tahsili-math.js"></script>
@@ -266,16 +267,37 @@ var QUANT_AR=[
    تُختبَر فيها عادةٌ ذهنيّةٌ غيرُ الحساب (هل تكفي المعطيات؟)، والرسمُ
    يُستخرَج فيه العددُ من صورةٍ لا من نصّ.
    وغيابُ الملفِّ لا يكسر القسم: يعود إلى مولّداتِه الستّةِ والثلاثين. */
+/* ═══ سلّمُ مستوى القدرات ═══════════════════════════════════════════
+   يُقرأ قبل البنوكِ كلِّها لأنّها تُرشَّح به. ومستوى كلِّ ابنٍ من صفِّه:
+   ١ ابتدائيّ · ٢ متوسّط · ٣ ثانويّ وهو مستوى الاختبارِ الحقيقيّ.
+   ورفعُ حسنٍ إلى الثالثِ قرارٌ يُتَّخذ من قياسِه بعد شهرٍ من التدريب،
+   لا بالتقدير — فيُغيَّر رقمُه هنا وحدَه. */
+var GAT_LV_BY = { saud:1, osama:1, rafeef:2, hasan:2, fahad:3 };
+var GAT_LV = GAT_LV_BY[who] || 2;
+
 var GQ = window.GAT_QUANT || {};
 var CMPG = GQ.CMP || [], CMPG_AR = GQ.CMP_AR || [];
 var CHARTG = GQ.CHART || [], CHARTG_AR = GQ.CHART_AR || [];
 var HAS_GQ = !!(CMPG.length && CHARTG.length);
-/* الوزنُ بثلاثين خانةً كعددِ أسئلةِ الورقة: ٤ مقارنات · ٥ رسوم · ٢١ بقيّة */
+/* ═══ والمسائلُ المركّبةُ ثُلثُ القسمِ الكمّيّ ═══════════════════════
+   قرارُ الأب (١٤ نوفمبر ٢٠٢٦) بعد قياسِ القسم: وسيطُ نصِّ السؤالِ
+   ثماني كلماتٍ وأكثرُه خطوةٌ واحدة. فدخلت مسائلُ لا تُحَلُّ بخطوةٍ
+   (gat-quant.js · MULTI) بمستوًى يتبع صفَّ الابن. */
+var MULG_ALL = GQ.MULTI || [], MULG_AR_ALL = GQ.MULTI_AR || [], MULG_LV = GQ.MULTI_LV || [];
+var MULG = [], MULG_AR = [];
+MULG_ALL.forEach(function(g,i){
+  if((MULG_LV[i] || 2) <= GAT_LV){ MULG.push(g); MULG_AR.push(MULG_AR_ALL[i] || ("مركّبة "+i)); }
+});
+var HAS_MUL = !!MULG.length;
+/* الوزنُ بثلاثين خانةً كعددِ أسئلةِ الورقة: ٤ مقارنات · ٥ رسوم ·
+   ٨ مركّبات · ١٣ بقيّة. والمركّباتُ أثقلُ من غيرِها فلا تُزاد عن ذلك. */
 function qPick(){
   if(!HAS_GQ) return { g:QUANT, ar:QUANT_AR, k:Math.floor(Math.random()*QUANT.length) };
   var slot = Math.floor(Math.random()*30);
   if(slot < 4)  return { g:CMPG,   ar:CMPG_AR,   k:Math.floor(Math.random()*CMPG.length) };
   if(slot < 9)  return { g:CHARTG, ar:CHARTG_AR, k:Math.floor(Math.random()*CHARTG.length) };
+  if(slot < 17 && HAS_MUL)
+                return { g:MULG,   ar:MULG_AR,   k:Math.floor(Math.random()*MULG.length) };
   return { g:QUANT, ar:QUANT_AR, k:Math.floor(Math.random()*QUANT.length) };
 }
 function genQuant(n){
@@ -819,6 +841,103 @@ var VGEN = [
   function(){var a=gp(VC);return ["<b>إكمال جمل:</b> "+a[0],[a[1],a[2],a[3]],0,a[4]];},
   function(){var a=gp(VR);return ["<b>استيعاب مقروء:</b> «"+a[0]+"» الفكرة الرئيسة:",[a[1],a[2],a[3]],0,"الفكرة العامة للنصّ."];}
 ];
+
+/* ═══════════════════════════════════════════════════════════════════
+   القسمُ اللفظيُّ بأبوابِ الاختبارِ الأربعةِ — وسلّمُ مستوًى يرتفع
+
+   سؤالُ الأب (١٤ نوفمبر ٢٠٢٦): «هل هي نفسُ مستوى ثالثِ ثانويّ؟».
+   وقِيس القسمُ: ٦٢٪ من لفظيِّ حسنٍ و٤٧٪ من لفظيِّ رفيفَ في مرادفٍ
+   وضدٍّ ومعنًى — وهي أبوابٌ ليست في الاختبارِ أصلًا بنصِّ دليلِ
+   «قياس». والخطأُ السياقيُّ — وهو أحدُ الأربعةِ — صفرٌ عندهما.
+   وقرارُه: تُصلَح الثلاثةُ جميعًا.
+
+     ١ · الشكلُ أوّلًا: أبوابُ الاختبارِ الأربعةُ وحدَها في تبويبِ
+         «قدرات — لفظي»، والمرادفُ والضدُّ والمعنى تُنقَل إلى تبويبٍ
+         مستقلٍّ «مفردات» — فهي نافعةٌ للثروةِ اللغويّةِ لا للاختبار،
+         ولا تُحسَب على أنّها تدريبُ قدرات.
+     ٢ · والأوزانُ كالاختبار: تناظرٌ وإكمالٌ وخطأٌ سياقيٌّ واستيعاب.
+     ٣ · وسلّمُ مستوًى (GAT_LV): يأخذ الابنُ مستواه وما دونه.
+
+   واستيعابُ المقروءِ يُعرَض كالاختبار: قطعةٌ تُقرأ مرّةً ثمّ سؤالان
+   أو ثلاثةٌ عليها — لا أن تُعاد القطعةُ مع كلِّ سؤال.
+   ═══════════════════════════════════════════════════════════════════ */
+var GV = window.GAT_VERBAL || {};
+var HAS_GV = !!(GV.CTX && GV.CTX.length && GV.PASS && GV.PASS.length);
+function lvOk(x){ return (x == null) || (x <= GAT_LV); }
+function gvPick(arr, lvIdx){
+  var ok = arr.filter(function(it,i){ return lvOk(typeof lvIdx === "function" ? lvIdx(it,i) : it[lvIdx]); });
+  return ok.length ? ok[Math.floor(Math.random()*ok.length)] : null;
+}
+/* الخطأُ السياقيّ: الجملةُ تُعرَض وكلماتُها الأربعُ مُعلَّمة، والخياراتُ
+   هي الكلماتُ نفسُها — والصحيحُ منها ما لا يناسب السياق. */
+function qCtx(){
+  var it = gvPick(GV.CTX || [], 4);
+  if(!it) return null;
+  var s = it[0], ws = it[1], bad = it[2];
+  var marked = s;
+  ws.forEach(function(w){ marked = marked.split(w).join('<u>'+w+'</u>'); });
+  var opts = [ws[bad]].concat(ws.filter(function(_,i){ return i !== bad; }));
+  return ["<b>الخطأ السياقي:</b> أيُّ الكلماتِ المُعلَّمةِ لا تناسب سياقَ الجملة؟<br>"+marked,
+          opts, 0, it[3]];
+}
+/* ═══ وللقطعِ ذاكرةٌ قصيرةٌ خاصّةٌ بها ═══════════════════════════════
+   ذاكرةُ الجولاتِ العامّةُ (١٥٠ سؤالًا) تمنع تكرارَ البنودِ الكثيرة،
+   لكنّ القطعَ قليلةٌ بطبعِها وأسئلتُها معدودة — فلو طُبّقت عليها
+   جُوّعت: قِيس فخرجت في خمسِ جولاتٍ من عشرين، و٤٪ من القسم. فلها
+   ذاكرةٌ تمنع إعادةَ آخرِ قطعتَين فقط. */
+var PMEM = 2;
+function pRecent(){ try{ return JSON.parse(localStorage.getItem("pr_pass_"+who)||"[]")||[]; }catch(e){ return []; } }
+function pRemember(t){
+  try{
+    var all = [t].concat(pRecent()), seen={}, out=[];
+    all.forEach(function(k){ if(k && !seen[k]){ seen[k]=1; out.push(k); } });
+    localStorage.setItem("pr_pass_"+who, JSON.stringify(out.slice(0, PMEM)));
+  }catch(e){}
+}
+/* استيعابُ المقروء: قطعةٌ واحدةٌ وسؤالان أو ثلاثةٌ عليها متتالية */
+function qPass(){
+  var lvl = (GV.PASS || []).filter(function(it){ return lvOk(it.lv); });
+  var recent = pRecent();
+  var fresh = lvl.filter(function(it){ return recent.indexOf(it.t) < 0; });
+  var pool = fresh.length ? fresh : lvl;
+  var p = pool.length ? pool[Math.floor(Math.random()*pool.length)] : null;
+  if(!p || !p.q || !p.q.length) return null;
+  pRemember(p.t);
+  var qs = p.q.slice();
+  for(var i=qs.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=qs[i]; qs[i]=qs[j]; qs[j]=t; }
+  var take = Math.min(qs.length, 3);
+  var out = [];
+  for(var k=0;k<take;k++){
+    var q = qs[k];
+    var head = (k === 0)
+      ? '<b>استيعاب مقروء:</b> اقرأ النصَّ ثمّ أجب:<div style="background:var(--step-bg,#f3f0ff);border-radius:12px;padding:10px 12px;margin:8px 0;line-height:2.05;font-weight:400">'+p.t+'</div>'
+      : '<b>استيعاب مقروء:</b> <span style="color:var(--muted);font-weight:400">(من النصِّ السابق)</span><br>';
+    out.push([head + q[0], q[1].slice(), q[2], q[3]]);
+  }
+  return out;
+}
+function qAna(){
+  var a = gvPick(GV.ANA || [], 8);
+  if(!a) return null;
+  return ["<b>تناظر لفظي:</b> "+a[0]+" : "+a[1]+" ، "+a[2]+" : ؟",
+          [a[3],a[4],a[5],a[6]], 0, "العلاقة: "+a[7]+"."];
+}
+function qSent(){
+  var s = gvPick(GV.SENT || [], 6);
+  if(!s) return null;
+  return ["<b>إكمال جمل:</b> "+s[0], [s[1],s[2],s[3],s[4]], 0, s[5]];
+}
+/* مولّداتُ المفرداتِ — خرجت من القدراتِ إلى تبويبِها */
+var WORDG = [
+  function(){var a=gp(VS);return ["<b>مرادف:</b> مرادف «"+a[0]+"»:",[a[1],a[2],a[3]],0,a[0]+" = "+a[1]+"."];},
+  function(){var a=gp(VO);return ["<b>ضدّ:</b> ضدّ «"+a[0]+"»:",[a[1],a[2],a[3]],0,"ضدّ "+a[0]+": "+a[1]+"."];},
+  function(){var a=gp(VM);return ["<b>معنى كلمة:</b> ما معنى «"+a[0]+"»؟",[a[1],a[2],a[3]],0,a[0]+" = "+a[1]+"."];}
+];
+function genWords(n){
+  var out=[], seen={}, t=0;
+  while(out.length<n && t<n*12){ var q=gp(WORDG)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); }
+  return out;
+}
 /* ═══ ذاكرةُ جولاتٍ للقسم اللفظيّ ═════════════════════════════════
    بلاغ الأب (١٥ سبتمبر ٢٠٢٦): «قدرات لفظي فيه تكرار».
 
@@ -839,18 +958,42 @@ function vRemember(qs){
     localStorage.setItem("pr_vmem_"+who, JSON.stringify(out.slice(0, VMEM)));
   }catch(e){}
 }
+/* ═══ الجولةُ اللفظيّةُ بأوزانِ الاختبار ═══════════════════════════
+   أربعةُ أبوابٍ لا غير: استيعابٌ (قطعةٌ وأسئلتُها معًا) ثمّ تناظرٌ
+   وإكمالٌ وخطأٌ سياقيّ. والترتيبُ مقصود: القطعةُ أوّلًا وهو مستريح.
+   وإن غاب الملفُّ (gat-verbal.js) رجعت الجولةُ إلى المولّداتِ القديمة
+   كما كانت — فغيابُ ملفٍّ لا يُعطّل القسم. */
 function genVerbal(n){
-  var out=[],seen={},t=0;
+  var out=[], seen={}, inRound={}, t=0;
   vRecent().forEach(function(k){ seen[k]=1; });
-  // تركيز مرادفات لحسن (ضعفه المحدّد): نحجز ~ثلث القسم لأسئلة المرادف.
-  // مولّد المرادف = العنصر الذي نصّه يبدأ بـ«مرادف» في VGEN (بدل الاعتماد على فهرس ثابت).
-  var synGen = VGEN.filter(function(g){ try{ return /^<b>مرادف/.test(g()[0]); }catch(e){ return false; } })[0];
-  var synN = (who==="hasan" && synGen) ? Math.round(n*0.3) : 0;
-  while(out.length<synN && t<n*12){ var qs=synGen(); t++; if(seen[qs[0]])continue; seen[qs[0]]=1; out.push(qs); }
-  while(out.length<n && t<n*12){ var q=gp(VGEN)(); t++; if(seen[q[0]])continue; seen[q[0]]=1; out.push(q); }
-  if(out.length<n){
-    var s2={}; out.forEach(function(q){ s2[q[0]]=1; }); t=0;
-    while(out.length<n && t<n*12){ var q2=gp(VGEN)(); t++; if(s2[q2[0]])continue; s2[q2[0]]=1; out.push(q2); }
+  /* force: للقطعِ وحدَها — تتخطّى ذاكرةَ الجولاتِ العامّةَ ولا تتخطّى
+     منعَ التكرارِ داخلَ الجولةِ نفسِها (انظر PMEM أعلاه). */
+  function push(q, force){
+    if(!q) return false;
+    if(inRound[q[0]]) return false;
+    if(!force && seen[q[0]]) return false;
+    inRound[q[0]] = 1; seen[q[0]] = 1; out.push(q); return true;
+  }
+  if(HAS_GV){
+    /* قطعةُ استيعابٍ واحدةٌ بأسئلتِها (٢–٣ من ١٣) */
+    var blk = qPass(), g = 0;
+    while(!blk && g++ < 6) blk = qPass();
+    if(blk) blk.forEach(function(q){ if(out.length < n) push(q, true); });
+    /* ثمّ البقيّةُ على الأبوابِ الثلاثةِ بالتناوبِ العشوائيّ */
+    var rest = [qAna, qSent, qCtx];
+    while(out.length < n && t < n*25){ t++; push(gp(rest)()); }
+    /* ضاق البنكُ مع ذاكرةِ الجولات: نُخفّف الشرطَ لا نترك الجولةَ ناقصة */
+    if(out.length < n){
+      var s2 = {}; out.forEach(function(q){ s2[q[0]] = 1; }); t = 0;
+      while(out.length < n && t < n*25){
+        t++; var q2 = gp(rest)();
+        if(!q2 || s2[q2[0]]) continue;
+        s2[q2[0]] = 1; out.push(q2);
+      }
+    }
+  }
+  if(out.length < n){
+    while(out.length < n && t < n*40){ t++; push(gp(VGEN)()); }
   }
   vRemember(out);
   return out;
@@ -1175,6 +1318,9 @@ var MW3 = !!MW_BANK;
    مفتوح. والآن أوّلُ متاحٍ هو المفتوح، أيًّا كان. */
 var TABS = [];
 if(!NO_GAT) TABS.push(["v","قدرات — لفظي 📖"]);
+/* المفرداتُ تبويبٌ مستقلّ: مرادفٌ وضدٌّ ومعنًى — نافعةٌ للثروةِ اللغويّةِ
+   وليست من أبوابِ الاختبار، فلا تُحسَب تدريبَ قدرات (١٤ نوفمبر ٢٠٢٦). */
+if(!NO_GAT) TABS.push(["vw","مفردات 📚"]);
 if(!VERBAL_ONLY){
   if(!YOUNG && !NO_GAT) TABS.push(["q","قدرات — كمي 🔢"]);
   /* جرعةُ حسنٍ الكمّيّة — بابُها من قياسِ أخطائِه هو لا من ترتيبِ البنك.
@@ -1683,7 +1829,9 @@ function mawhibaMix(n){
 }
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
-  if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". تناظر، مرادف، ضدّ، معاني، إكمال جمل، واستيعاب — <b>أسئلة جديدة كل مرة</b>.", function(){return genVerbal(13);}, "قدرات لفظي");
+  if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". أبوابُ الاختبار الأربعة: <b>تناظر لفظي · إكمال جمل · خطأ سياقي · استيعاب مقروء</b> — أسئلة جديدة كل مرة.", function(){return genVerbal(13);}, "قدرات لفظي");
+  /* المفردات: نافعةٌ للثروةِ اللغويّةِ وليست من أبوابِ الاختبار */
+  if(!NO_GAT) renderSet("vw", genWords(10), "📚 <b>مفردات</b>: مرادف وضدّ ومعنى — تُوسّع ثروتَك اللغويّةَ وتنفعك في التناظرِ وإكمالِ الجمل. <b>وليست من أقسامِ اختبارِ القدرات</b>، فهي هنا لا هناك.", function(){return genWords(10);}, "مفردات عربية");
   if(!VERBAL_ONLY){
     if(!YOUNG && !NO_GAT){
       renderSet("q", genQuant(10), "القسم الكمي: 10 أسئلة · 12 دقيقة"+tnote+" — <b>أرقام جديدة كل مرة</b>.", function(){return genQuant(10);}, "قدرات كمي");

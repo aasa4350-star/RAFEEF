@@ -375,6 +375,7 @@ function run(){
   issues.push(...vocabRestorePath());
   issues.push(...licenseExamPath());
   issues.push(...gatQuantPath());
+  issues.push(...gatVerbalPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -6248,6 +6249,149 @@ function licenseExamPath(){
 
    والحارسُ لا يثق بجوابٍ مكتوب: يُشغّل كلَّ مولّدٍ مئةَ مرّةٍ، ويعيد
    حسابَ المقارناتِ العدديّةِ من متنِها بنفسِه. */
+/* ═══════════════════════════════════════════════════════════════════
+   القسمُ اللفظيُّ بأبوابِ الاختبارِ الأربعة
+
+   سؤالُ الأب (١٤ نوفمبر ٢٠٢٦): «هل هي نفسُ مستوى ثالثِ ثانويّ؟».
+   وقِيس القسمُ قبل الجواب: ٦٢٪ من لفظيِّ حسنٍ و٤٧٪ من لفظيِّ رفيفَ في
+   مرادفٍ وضدٍّ ومعنًى — وهي ليست من أبوابِ الاختبارِ بنصِّ دليلِ
+   «قياس»، والخطأُ السياقيُّ (وهو أحدُها) صفرٌ عندهما.
+
+   فهذا الحارسُ يحفظ ثلاثةً لا يُرى سقوطُها إلّا بعد أسابيع:
+     (١) أنّ الأبوابَ الأربعةَ حاضرةٌ وأنّ المفرداتِ خرجت من القسم.
+     (٢) أنّ بنكَ gat-verbal.js سليمُ البنية — وأخطرُه الخطأُ السياقيّ:
+         كلمةٌ مُعلَّمةٌ لا ترد في الجملةِ أو ترد مرّتين تُفسد السؤالَ
+         ولا يظهر ذلك إلّا لمن يقرؤه بعينِه.
+     (٣) أنّ سلّمَ المستوياتِ مكتوبٌ لكلِّ ابن.
+   ═══════════════════════════════════════════════════════════════════ */
+function gatVerbalPath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F);
+  const BF = 'gat-verbal.js', bp = path.join(ROOT, BF);
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(p))  return [{ sev:'خطأ', file:F,  msg:'الصفحةُ مفقودة' }];
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:BF, msg:'بنكُ القسمِ اللفظيِّ مفقود — فتعود المفرداتُ مكانَ أبوابِ الاختبار' }];
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ── (١) الوصلُ بالصفحة ── */
+  if (!/<script src="gat-verbal\.js/.test(src))
+    E(F, 'gat-verbal.js غيرُ محمَّلٍ — فالبنكُ ميّت');
+  ['qCtx','qPass','qAna','qSent'].forEach(function(fn){
+    if (!new RegExp('function ' + fn + '\\(').test(src))
+      E(F, 'مولّدُ ' + fn + ' مفقود — وبابٌ من أبوابِ الاختبارِ الأربعةِ يسقط معه');
+  });
+  if (!/var rest = \[qAna, qSent, qCtx\];/.test(src))
+    E(F, 'جولةُ اللفظيِّ لا تُبنى من أبوابِ الاختبارِ الثلاثةِ مع القطعة');
+  if (!/TABS\.push\(\["vw","مفردات/.test(src))
+    E(F, 'المفرداتُ لم تُنقَل إلى تبويبِها — فتبقى محسوبةً تدريبَ قدرات');
+  if (!/function genWords\(/.test(src))
+    E(F, 'genWords مفقودة — فالمفرداتُ تضيع بدل أن تُنقَل');
+  if (/var synN = \(who==="hasan"/.test(src))
+    E(F, 'ثلثُ القسمِ ما زال محجوزًا للمرادف — وهو ليس من الاختبار');
+  /* وذاكرةُ القطعِ: بلا ذاكرةٍ خاصّةٍ بها تُجوَّع — قِيس فخرجت في خمسِ
+     جولاتٍ من عشرين، و٤٪ من القسم. */
+  if (!/var PMEM = \d+;/.test(src) || !/function pRecent\(/.test(src))
+    E(F, 'لا ذاكرةَ خاصّةً بقطعِ الاستيعابِ — فذاكرةُ الجولاتِ العامّةُ تُجوّعها');
+  if (!/push\(q, true\)/.test(src))
+    E(F, 'أسئلةُ القطعةِ تخضع لذاكرةِ الجولاتِ العامّة — فتختفي القطعُ بعد جولات');
+
+  /* ── (٢) سلّمُ المستويات ── */
+  const LV = /var GAT_LV_BY = \{([^}]*)\};/.exec(src);
+  if (!LV) E(F, 'سلّمُ مستوياتِ القدرات (GAT_LV_BY) غيرُ مكتوب');
+  else {
+    ['saud','osama','rafeef','hasan','fahad'].forEach(function(kid){
+      const m = new RegExp(kid + ':\\s*(\\d)').exec(LV[1]);
+      if (!m) E(F, 'لا مستوى قدراتٍ لـ' + kid);
+      else if (!(+m[1] >= 1 && +m[1] <= 3)) E(F, 'مستوى ' + kid + ' خارجَ ١–٣');
+    });
+    const g = k => { const m = new RegExp(k + ':\\s*(\\d)').exec(LV[1]); return m ? +m[1] : null; };
+    if (g('saud') != null && g('hasan') != null && !(g('saud') <= g('hasan')))
+      E(F, 'مستوى سعودٍ فوق مستوى حسن');
+    if (g('fahad') != null && g('fahad') !== 3)
+      E(F, 'فهدٌ في ثالثٍ ثانويّ ومستواه ' + g('fahad') + ' — وهو وحدَه من يجلس للاختبار');
+  }
+
+  /* ── (٣) البنكُ نفسُه ── */
+  let V = null;
+  try {
+    const sb = { window:{}, Math: Math, String: String };
+    vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(bp, 'utf8'), sb, { timeout: 5000 });
+    V = sb.window.GAT_VERBAL;
+  } catch(e){ E(BF, 'الملفُّ لا يُشغَّل: ' + e.message); return out; }
+  if (!V || !V.CTX || !V.PASS || !V.ANA || !V.SENT){ E(BF, 'GAT_VERBAL ناقصة'); return out; }
+
+  if (V.CTX.length  < 12) E(BF, 'الخطأُ السياقيُّ ' + V.CTX.length + ' بندًا — قليلٌ فيتكرّر');
+  if (V.PASS.length < 8)  E(BF, 'قطعُ الاستيعابِ ' + V.PASS.length + ' — قليلةٌ فتتكرّر');
+  if (V.ANA.length  < 16) E(BF, 'التناظرُ ' + V.ANA.length + ' بندًا — قليلٌ فيتكرّر');
+  if (V.SENT.length < 10) E(BF, 'إكمالُ الجملِ ' + V.SENT.length + ' بندًا — قليلٌ فيتكرّر');
+
+  /* الخطأُ السياقيّ: كلُّ كلمةٍ مُعلَّمةٍ ترد في الجملةِ مرّةً واحدةً
+     بالضبط — فلو غابت لم يُعلَّم شيءٌ، ولو تكرّرت عُلِّم موضعٌ غيرُ المراد */
+  let miss = 0, twice = 0, badIdx = 0, noWhy = 0, badLv = 0, dupO = 0;
+  V.CTX.forEach(function(it, i){
+    const s = String(it[0] || ''), ws = it[1] || [];
+    if (ws.length !== 4){ E(BF, 'CTX[' + i + '] كلماتُه المُعلَّمةُ ' + ws.length + ' لا أربع'); return; }
+    ws.forEach(function(w){
+      const n = s.split(String(w)).length - 1;
+      if (n === 0) miss++; else if (n > 1) twice++;
+    });
+    if (!(it[2] >= 0 && it[2] < 4)) badIdx++;
+    if (typeof it[3] !== 'string' || it[3].length < 10) noWhy++;
+    if (!(it[4] >= 1 && it[4] <= 3)) badLv++;
+    if (new Set(ws).size !== 4) dupO++;
+  });
+  if (miss)   E(BF, miss + ' كلمةً مُعلَّمةً لا ترد في جملتِها — فلا تُعلَّم في الشاشة');
+  if (twice)  E(BF, twice + ' كلمةً مُعلَّمةً ترد مرّتين في جملتِها — فيُعلَّم موضعٌ غيرُ المقصود');
+  if (badIdx) E(BF, badIdx + ' بندَ خطأٍ سياقيٍّ فهرسُ خطئِه خارجَ الأربع');
+  if (noWhy)  E(BF, noWhy + ' بندَ خطأٍ سياقيٍّ بلا تعليل');
+  if (badLv)  E(BF, badLv + ' بندَ خطأٍ سياقيٍّ بلا مستوًى صحيح');
+  if (dupO)   E(BF, dupO + ' بندًا فيه كلمتان مُعلَّمتان متطابقتان');
+
+  /* القطع: أربعةُ خيارات، والصحيحُ أوّلُها، وطولٌ يليق بالمستوى */
+  let pq = 0, pOpt = 0, pIdx = 0, pWhy = 0, pLv = 0, pShort = 0;
+  V.PASS.forEach(function(P, i){
+    const t = String(P.t || ''), w = t.trim().split(/\s+/).length;
+    if (!(P.lv >= 1 && P.lv <= 3)) pLv++;
+    const min = P.lv >= 3 ? 110 : (P.lv === 2 ? 70 : 35);
+    if (w < min) pShort++;
+    if (!Array.isArray(P.q) || P.q.length < 2){ E(BF, 'PASS[' + i + '] أقلُّ من سؤالين — والقطعةُ تُقرأ لأسئلة'); return; }
+    P.q.forEach(function(q){
+      pq++;
+      if (!Array.isArray(q[1]) || q[1].length !== 4 || new Set(q[1]).size !== 4) pOpt++;
+      if (q[2] !== 0) pIdx++;
+      if (typeof q[3] !== 'string' || q[3].length < 8) pWhy++;
+    });
+  });
+  if (pOpt)   E(BF, pOpt + ' سؤالَ استيعابٍ بغيرِ أربعةِ خياراتٍ متمايزة');
+  if (pIdx)   E(BF, pIdx + ' سؤالَ استيعابٍ صحيحُه ليس أوّلَ خياراتِه — والاتّفاقُ أن يكون أوّلَها');
+  if (pWhy)   E(BF, pWhy + ' سؤالَ استيعابٍ بلا تعليل');
+  if (pLv)    E(BF, pLv + ' قطعةً بلا مستوًى صحيح');
+  if (pShort) E(BF, pShort + ' قطعةً أقصرُ ممّا يليق بمستواها — والاستيعابُ قطعةٌ لا جملة');
+  if (pq < 24) E(BF, 'أسئلةُ الاستيعابِ ' + pq + ' — قليلةٌ فتتكرّر');
+
+  /* التناظرُ وإكمالُ الجمل: أربعةُ خيارات ومستوًى وتعليل */
+  let aBad = 0, sBad = 0, sTwo = 0;
+  V.ANA.forEach(function(a){
+    if (a.length < 9 || new Set([a[3],a[4],a[5],a[6]]).size !== 4) aBad++;
+    if (!(a[8] >= 1 && a[8] <= 3)) aBad++;
+  });
+  V.SENT.forEach(function(s){
+    if (s.length < 7 || new Set([s[1],s[2],s[3],s[4]]).size !== 4) sBad++;
+    if (!(s[6] >= 1 && s[6] <= 3)) sBad++;
+    /* وفي الثالثِ فراغان يُضبطان معًا — وهي صورةُ الاختبارِ الأصعب */
+    if (s[6] === 3 && (String(s[0]).split('______').length - 1) === 2 &&
+        String(s[1]).indexOf('—') < 0) sTwo++;
+  });
+  if (aBad) E(BF, aBad + ' بندَ تناظرٍ ناقصَ البنيةِ أو الخيارات');
+  if (sBad) E(BF, sBad + ' بندَ إكمالٍ ناقصَ البنيةِ أو الخيارات');
+  if (sTwo) E(BF, sTwo + ' بندَ إكمالٍ بفراغَين وخياراتُه مفردة — فلا يُضبط الفراغان معًا');
+  if (!V.SENT.some(function(s){ return s[6] === 3 && (String(s[0]).split('______').length - 1) === 2; }))
+    E(BF, 'لا بندَ إكمالٍ بفراغَين في المستوى الثالث — وهي صورةُ الاختبارِ الأصعب');
+
+  return out;
+}
+
 function gatQuantPath(){
   const out = [];
   const F = 'practice.html', p = path.join(ROOT, F);
@@ -6290,6 +6434,48 @@ function gatQuantPath(){
   if (G.CHART.length < 5) E(BF, 'مولّداتُ الرسومِ ' + G.CHART.length + ' — قليلةٌ فتتكرّر');
   if (G.CMP_AR.length !== G.CMP.length)     E(BF, 'أسماءُ مولّداتِ المقارنةِ لا تطابق عددَها');
   if (G.CHART_AR.length !== G.CHART.length) E(BF, 'أسماءُ مولّداتِ الرسومِ لا تطابق عددَها');
+
+  /* ═══ المسائلُ المركّبة (١٤ نوفمبر ٢٠٢٦) ═══════════════════════════
+     قِيس القسمُ الكمّيُّ فإذا وسيطُ نصِّ السؤالِ ثماني كلماتٍ وأكثرُه
+     خطوةٌ واحدة. فدخلت مسائلُ لا تُحَلُّ بخطوة، ولكلِّ واحدةٍ مستوًى.
+     وهي أخطرُ ما في البنك: في خياراتِها «الجوابُ البديهيُّ الخاطئ»
+     مقصودًا، فلو أخطأ المولّدُ صار المعتمَدُ هو المصيدةَ نفسَها. */
+  if (!G.MULTI || !G.MULTI.length) E(BF, 'المسائلُ المركّبةُ (MULTI) مفقودة — والقسمُ خطوةٌ واحدة');
+  else {
+    if (G.MULTI.length < 10) E(BF, 'المسائلُ المركّبةُ ' + G.MULTI.length + ' — قليلةٌ فتتكرّر');
+    if (!G.MULTI_AR || G.MULTI_AR.length !== G.MULTI.length) E(BF, 'أسماءُ المركّباتِ لا تطابق عددَها');
+    if (!G.MULTI_LV || G.MULTI_LV.length !== G.MULTI.length) E(BF, 'مستوياتُ المركّباتِ لا تطابق عددَها');
+    else {
+      const bad = G.MULTI_LV.filter(v => !(v >= 1 && v <= 3)).length;
+      if (bad) E(BF, bad + ' مسألةً مركّبةً بمستوًى خارجَ ١–٣');
+      if (!G.MULTI_LV.some(v => v <= 2)) E(BF, 'لا مسألةَ مركّبةً لمستوى المتوسّط — فلا يأخذ منها حسنٌ ورفيفُ شيئًا');
+    }
+    let frac = 0, neg = 0, short2 = 0;
+    G.MULTI.forEach(function(f, k){
+      for (let t = 0; t < 200; t++){
+        let q;
+        try { q = f(); } catch(e){ E(BF, 'MULTI[' + k + '] يتعطّل: ' + e.message); return; }
+        if (!Array.isArray(q) || q.length !== 4 || q[1].length !== 4 || new Set(q[1]).size !== 4){
+          E(BF, 'MULTI[' + k + '] بصيغةٍ خاطئةٍ أو خيارٍ مكرَّر'); return;
+        }
+        if (q[2] !== 0){ E(BF, 'MULTI[' + k + '] فهرسُ الصحيحِ ليس صفرًا — والاتّفاقُ أن يكون أوّلَها'); return; }
+        if (typeof q[3] !== 'string' || q[3].length < 15){ E(BF, 'MULTI[' + k + '] بلا شرحٍ كافٍ'); return; }
+        /* سؤالٌ مركّبٌ من ثماني كلماتٍ ليس مركّبًا — وهو عينُ ما قِيس */
+        const w = String(q[0]).replace(/<[^>]*>/g, ' ').trim().split(/\s+/).length;
+        if (w < 12) short2++;
+        q[1].forEach(function(o){
+          const s = String(o);
+          if (!/^[-−]?[\d.]+$/.test(s)) return;
+          const v = parseFloat(s.replace(/−/g, '-'));
+          if (Math.abs(v - Math.round(v)) > 1e-9) frac++;
+          if (v < 0) neg++;
+        });
+      }
+    });
+    if (frac)   E(BF, frac + ' خيارًا كسريًّا في المركّبات — ولا يظهر في ورقةِ الاختبار');
+    if (neg)    E(BF, neg + ' خيارًا سالبًا في المركّبات — وأسئلتُها أسعارٌ وأعدادٌ وأزمنة');
+    if (short2) E(BF, short2 + ' سؤالًا مركّبًا دون اثنتَي عشرةَ كلمة — وعلّةُ القسمِ أنّه خطوةٌ واحدة');
+  }
 
   let shape = 0, three = 0, dup = 0, idx = 0, noexp = 0, notFixed = 0;
   [['CMP', G.CMP], ['CHART', G.CHART]].forEach(function(pair){
