@@ -376,6 +376,7 @@ function run(){
   issues.push(...licenseExamPath());
   issues.push(...gatQuantPath());
   issues.push(...gatVerbalPath());
+  issues.push(...cssVarsPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -6264,6 +6265,102 @@ function licenseExamPath(){
          ولا يظهر ذلك إلّا لمن يقرؤه بعينِه.
      (٣) أنّ سلّمَ المستوياتِ مكتوبٌ لكلِّ ابن.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   متغيّرُ لونٍ لا تعريفَ له = خاصّيّةٌ ساقطة
+
+   بلاغُ الأب (١٤ نوفمبر ٢٠٢٦) ومعه صورةُ شاشةٍ في الوضعِ الليليّ:
+   صندوقُ قطعةِ الاستيعابِ مستطيلٌ أبيضُ فارغٌ لا يُرى فيه حرف. وعلّتُه
+   ‎background:var(--step-bg,#f3f0ff)‎ و‎--step-bg‎ غيرُ معرَّفٍ في
+   الصفحةِ أصلًا، فيُؤخَذ الاحتياطيُّ الفاتحُ في الوضعَين، ولونُ الخطِّ
+   ‎--ink‎ في الليليِّ أبيضُ تقريبًا — فأبيضُ على أبيض.
+
+   ثمّ مُسحت الصفحاتُ كلُّها فإذا في reading.html ‎--warn‎ مستعمَلٌ
+   عشرين مرّةً و‎--warn-bg‎ مرّتين بلا تعريفٍ ولا احتياطيّ — وقاعدةُ
+   CSS أنّ ‎var()‎ التي لا تُحَلّ تُسقِط الخاصّيّةَ كلَّها (لا تُهمَل
+   وحدَها)، فالخطُّ يرث لونَ ما حوله والخلفيّةُ تصير شفّافة. فكلُّ
+   تنبيهٍ كهرماويٍّ هناك كان بلا لونِه منذ كُتب، ولا يُرى ذلك في
+   الوضعِ النهاريِّ لأنّ الموروثَ مقبولُ القراءة.
+
+   وهذا عطبٌ لا يُكتشَف بالتجربةِ النهاريّةِ ولا بقراءةِ الكود — ولذلك
+   يُفحَص آليًّا: كلُّ ‎var(--x)‎ في صفحةٍ لا بدّ أن يكون ‎--x‎ معرَّفًا
+   فيها، أو يكون له احتياطيٌّ صالحٌ للوضعَين.
+   ═══════════════════════════════════════════════════════════════════ */
+function cssVarsPath(){
+  const out = [];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  let files = [];
+  try { files = fs.readdirSync(ROOT).filter(f => /\.html$/.test(f)); } catch(e){ return out; }
+  files.forEach(function(f){
+    let s = '';
+    try { s = fs.readFileSync(path.join(ROOT, f), 'utf8'); } catch(e){ return; }
+    /* والتعريفُ في كتلةِ الوضعِ الليليِّ وحدَها لا يكفي: النهاريُّ هو
+       الأصلُ الذي يرِث منه الليليّ، فما عُرِّف هناك فقط ساقطٌ نهارًا. */
+    const darkBlk = /@media \(prefers-color-scheme:dark\)\{([\s\S]*?)\n  \}/.exec(s);
+    const darkSrc = darkBlk ? darkBlk[1] : '';
+    const baseSrc = darkBlk ? (s.slice(0, darkBlk.index) + s.slice(darkBlk.index + darkBlk[0].length)) : s;
+    const nameSet = function(txt){
+      const o = new Set();
+      (String(txt).match(/--[a-zA-Z0-9-]+\s*:/g) || []).forEach(function(m){ o.add(m.replace(/\s*:$/, '')); });
+      return o;
+    };
+    const baseDef = nameSet(baseSrc), darkDef = nameSet(darkSrc);
+    const miss = {}, darkOnly = {};
+    (s.match(/var\(\s*--[a-zA-Z0-9-]+\s*(,[^()]*)?\)/g) || []).forEach(function(m){
+      const n = /var\(\s*(--[a-zA-Z0-9-]+)/.exec(m)[1];
+      if (baseDef.has(n)) return;
+      if (darkDef.has(n)) darkOnly[n] = (darkOnly[n] || 0) + 1;
+      else miss[n] = (miss[n] || 0) + 1;
+    });
+    Object.keys(miss).forEach(function(n){
+      E(f, 'متغيّرُ اللونِ ' + n + ' مستعمَلٌ ' + miss[n] +
+           ' مرّةً وليس معرَّفًا في الصفحة — والخاصّيّةُ تسقط كلُّها فيرث الخطُّ لونَ ما حوله');
+    });
+    Object.keys(darkOnly).forEach(function(n){
+      E(f, 'متغيّرُ اللونِ ' + n + ' معرَّفٌ في كتلةِ الوضعِ الليليِّ وحدَها ومستعمَلٌ ' +
+           darkOnly[n] + ' مرّةً — فهو ساقطٌ في الوضعِ النهاريّ');
+    });
+
+    /* ═══ وخلفيّةٌ فاتحةٌ صريحةٌ بلا لونِ خطّ ═══════════════════════════
+       هي صورةُ العطبِ المبلَّغِ نفسُها: الخلفيّةُ ثابتةٌ فاتحةٌ في
+       الوضعَين، ولونُ الخطِّ موروثٌ فينقلب أبيضَ في الليليّ. */
+    const lum = function(hex){
+      let h = hex.replace('#','');
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      if (h.length !== 6) return null;
+      const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+      return (0.299*r + 0.587*g + 0.114*b) / 255;
+    };
+    (baseSrc.match(/\.[a-zA-Z][\w-]*\s*\{[^{}]*\}/g) || []).forEach(function(blk){
+      const bg = /background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,6})\b/.exec(blk);
+      if (!bg) return;
+      const L = lum(bg[1]);
+      if (L == null || L < 0.75) return;                 /* ليست فاتحة */
+      if (/(^|[;{\s])color\s*:/.test(blk)) return;        /* لونُ الخطِّ مكتوب */
+      const sel = (/^\s*(\.[^{]+)\{/.exec(blk) || [,''])[1].trim();
+      /* وللقاعدةِ خلفيّةٌ أخرى في الوضعِ الليليّ؟ فلا عطبَ: الخلفيّةُ
+         تتبدّل مع الوضعِ والخطُّ الموروثُ يصحّ في الاثنين. وهكذا
+         ‎.behav.no‎ و‎.diag.warn‎ في صفحاتِ التقرير — فُحصت فإذا لكلٍّ
+         منها سطرُ ليليٍّ يليها. */
+      if (sel){
+        const esc2 = sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (new RegExp('prefers-color-scheme:\\s*dark[\\s\\S]{0,300}?' + esc2 + '\\s*\\{[^{}]*background').test(s)) return;
+      }
+      E(f, 'القاعدةُ ' + sel + ' خلفيّتُها فاتحةٌ ثابتةٌ (' + bg[1] +
+           ') بلا لونِ خطّ — فيرث الخطُّ لونَ الصفحةِ ويصير أبيضَ على أبيضَ في الوضعِ الليليّ');
+    });
+    /* ولا يكفي التعريفُ في النهاريِّ وحدَه إن كان اللونُ يُقابل غيرَه:
+       كلُّ لونٍ له نظيرٌ في كتلةِ الوضعِ الليليِّ أو يبقى كما هو قصدًا.
+       نفحص الأزواجَ المعروفةَ وحدَها (good/bad/warn) فهي التي تُقرأ. */
+    if (darkSrc && /--ink\s*:/.test(darkSrc)){
+      ['--good','--bad','--warn'].forEach(function(n){
+        if (baseDef.has(n) && !darkDef.has(n))
+          E(f, n + ' معرَّفٌ للوضعِ النهاريِّ ولا نظيرَ له في الليليّ — فيُقرأ على خلفيّةٍ داكنةٍ بلونٍ فاتحٍ وُضع للأبيض');
+      });
+    }
+  });
+  return out;
+}
+
 function gatVerbalPath(){
   const out = [];
   const F = 'practice.html', p = path.join(ROOT, F);

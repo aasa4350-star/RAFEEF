@@ -22,6 +22,21 @@
       --good:#4ade80;--good-bg:#12321f;--bad:#f87171;--bad-bg:#3a1616;
       --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);}
   }
+  /* ═══ صندوقُ قطعةِ الاستيعاب ═══════════════════════════════════════
+     بلاغُ الأب (١٤ نوفمبر ٢٠٢٦) ومعه صورةُ شاشةِ حسنٍ في الوضعِ
+     الليليّ: الصندوقُ مستطيلٌ أبيضُ فارغٌ لا يُرى فيه حرف.
+
+     والعلّةُ أنّي جعلتُ خلفيّتَه متغيّرًا اسمُه ‎step-bg‎ مع احتياطيٍّ
+     فاتح، ولا وجودَ لذلك المتغيّرِ في هذه الصفحةِ أصلًا، فيُؤخَذ الاحتياطيُّ في
+     الوضعَين، ولونُ الخطِّ ‎--ink‎ في الليليِّ أبيضُ تقريبًا — فأبيضُ
+     على أبيض. ولم يظهر في الوضعِ النهاريِّ فمرّ.
+
+     فلا يُترَك اللونانِ للوراثة: لكلِّ وضعٍ خلفيّتُه وخطُّه صريحَين. */
+  .rpass{background:#f3f0ff;color:#14202b;border:1px solid #ddd6fe;border-radius:12px;
+         padding:11px 13px;margin:8px 0;line-height:2.05;font-weight:400}
+  @media (prefers-color-scheme:dark){
+    .rpass{background:#17242c;color:#e7f0f5;border-color:#2d4150}
+  }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.7}
   .wrap{max-width:760px;margin:0 auto;padding:20px 16px 64px}
@@ -910,7 +925,7 @@ function qPass(){
   for(var k=0;k<take;k++){
     var q = qs[k];
     var head = (k === 0)
-      ? '<b>استيعاب مقروء:</b> اقرأ النصَّ ثمّ أجب:<div style="background:var(--step-bg,#f3f0ff);border-radius:12px;padding:10px 12px;margin:8px 0;line-height:2.05;font-weight:400">'+p.t+'</div>'
+      ? '<b>استيعاب مقروء:</b> اقرأ النصَّ ثمّ أجب:<div class="rpass">'+p.t+'</div>'
       : '<b>استيعاب مقروء:</b> <span style="color:var(--muted);font-weight:400">(من النصِّ السابق)</span><br>';
     out.push([head + q[0], q[1].slice(), q[2], q[3]]);
   }
