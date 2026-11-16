@@ -377,6 +377,7 @@ function run(){
   issues.push(...gatQuantPath());
   issues.push(...gatVerbalPath());
   issues.push(...cssVarsPath());
+  issues.push(...gramPassivePath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -6285,6 +6286,102 @@ function licenseExamPath(){
    يُفحَص آليًّا: كلُّ ‎var(--x)‎ في صفحةٍ لا بدّ أن يكون ‎--x‎ معرَّفًا
    فيها، أو يكون له احتياطيٌّ صالحٌ للوضعَين.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   مولّداتُ المبني للمجهول
+
+   طلبَ معلّمُ حسنٍ بحثًا عن المبني للمجهول للماضي والحاضر، ثمّ قال
+   الأب: «يتدرّب عليه لا يقرؤه فقط». وبطاقةُ القاعدةِ كانت عشرين سؤالًا
+   ثابتةَ النصّ، فصارت تُولَّد.
+
+   وهذا بابٌ يسهل فيه الخطأُ ولا يُرى: جوابُ السؤالِ وأحدُ مشتّتاتِه
+   قد يتطابقان إذا كان تصريفُ الفعلِ الثاني كالثالث (sent · built ·
+   made · found · taught) — وقع فعلًا في أربعةِ مولّداتٍ وكُشف قبل
+   النشر. وجدولُ التصريفِ هنا مكتوبٌ مستقلًّا عن جدولِ الملفّ، فلو
+   أخطأ أحدُهما بان الخلافُ ولم يمرّ الغلطُ مؤكَّدًا بـ«✔».
+   ═══════════════════════════════════════════════════════════════════ */
+function gramPassivePath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F);
+  const BF = 'gram-passive.js', bp = path.join(ROOT, BF);
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  if (!fs.existsSync(bp)) return [{ sev:'خطأ', file:BF, msg:'مولّداتُ المبني للمجهول مفقودة' }];
+  const src = fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '';
+
+  if (!/<script src="gram-passive\.js/.test(src))
+    E(F, 'gram-passive.js غيرُ محمَّلٍ — فالبطاقةُ تبقى على البنكِ الثابت');
+  if (!/var G = \(window\.GRAM_GEN \|\| \{\}\)\[t\[0\]\];/.test(src))
+    E(F, 'بطاقةُ القاعدةِ لا تقرأ المولّدات — فلا أثرَ لها');
+  if (!/Math\.random\(\) < 0\.75/.test(src))
+    E(F, 'نصيبُ المولّداتِ من السحبِ غيرُ مكتوبٍ كما يُتوقَّع');
+
+  let G = null, V = null;
+  try {
+    const sb = { window:{}, Math: Math, String: String, Array: Array };
+    vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(bp, 'utf8'), sb, { timeout: 5000 });
+    G = (sb.window.GRAM_GEN || {})['Passive Voice'];
+    V = sb.window.GRAM_PASSIVE_V;
+  } catch(e){ E(BF, 'الملفُّ لا يُشغَّل: ' + e.message); return out; }
+  if (!G || !G.length){ E(BF, 'GRAM_GEN["Passive Voice"] فارغة'); return out; }
+  if (G.length < 10) E(BF, 'المولّداتُ ' + G.length + ' — قليلةٌ فتتكرّر');
+
+  /* جدولُ التصريفِ مكتوبٌ هنا من جديدٍ لا منقولٌ من الملفّ */
+  const PP = { write:'written', build:'built', clean:'cleaned', send:'sent', break:'broken',
+               paint:'painted', repair:'repaired', make:'made', plant:'planted', find:'found',
+               teach:'taught', open:'opened', design:'designed', invent:'invented', take:'taken' };
+  const V2 = { write:'wrote', build:'built', clean:'cleaned', send:'sent', break:'broke',
+               paint:'painted', repair:'repaired', make:'made', plant:'planted', find:'found',
+               teach:'taught', open:'opened', design:'designed', invent:'invented', take:'took' };
+  if (Array.isArray(V)){
+    let mism = 0;
+    V.forEach(function(r){
+      if (PP[r[0]] && PP[r[0]] !== r[2]) mism++;
+      if (V2[r[0]] && V2[r[0]] !== r[1]) mism++;
+    });
+    if (mism) E(BF, mism + ' تصريفًا في جدولِ الملفِّ يخالف الجدولَ المستقلَّ في الفحص');
+    if (!V.some(function(r){ return r[6]; }))
+      E(BF, 'لا فعلَ موسومًا بأنّه يصلح للعادةِ المتكرّرة — فتخرج «is designed every morning»');
+  } else E(BF, 'جدولُ الأفعالِ لا يُقرَأ من الملفّ');
+
+  /* تشغيلُ المولّداتِ وفحصُ ما تُخرج */
+  const NOW = ['every day','every Friday','every year','twice a week','every morning'];
+  const NOHAB = ['built','broken','found','designed','invented'];
+  let dup = 0, idx = 0, noTag = 0, noWhy = 0, three = 0, odd = 0, threw = 0, v2 = 0;
+  G.forEach(function(f, i){
+    for (let k = 0; k < 400; k++){
+      let q;
+      try { q = f(); } catch(e){ threw++; return; }
+      if (!Array.isArray(q) || q.length !== 4){ three++; return; }
+      if (!Array.isArray(q[1]) || q[1].length !== 4){ three++; return; }
+      if (new Set(q[1]).size !== 4){ dup++; return; }
+      if (q[2] !== 0){ idx++; return; }
+      if (String(q[0]).indexOf('Grammar — Passive Voice:') < 0){ noTag++; return; }
+      if (typeof q[3] !== 'string' || q[3].length < 15){ noWhy++; return; }
+      const t = String(q[0]).replace(/<[^>]*>/g, ' ');
+      /* فعلٌ لا يتكرّر مع قرينةِ تكرار: صحيحُ القاعدةِ سخيفُ المعنى */
+      if (NOW.some(n => t.indexOf(n) >= 0) && NOHAB.some(w => t.indexOf(w) >= 0)) odd++;
+      /* والجوابُ لا يكون تصريفًا ثانيًا بعد be — إلّا في سؤالِ «أين
+         الخطأ؟» فجوابُه هو الصيغةُ الخاطئةُ نفسُها بحكمِ السؤال. */
+      if (/أيُّ جزءٍ فيه الخطأ|لا يصحّ/.test(t)) continue;
+      const m = /^(is|are|was|were) ([a-z]+)$/.exec(String(q[1][0]));
+      if (m){
+        const w = m[2];
+        const base = Object.keys(PP).filter(b => V2[b] === w && PP[b] !== w);
+        if (base.length) v2++;
+      }
+    }
+  });
+  if (threw) E(BF, threw + ' مولّدًا يتعطّل');
+  if (three) E(BF, three + ' مولّدًا بغيرِ صيغةِ [متن، أربعةِ خيارات، فهرس، شرح]');
+  if (dup)   E(BF, dup + ' مولّدًا يُخرج خيارَين متطابقَين — فيصير الصحيحُ اثنين (علّةُ sent/built/made)');
+  if (idx)   E(BF, idx + ' مولّدًا فهرسُ صحيحِه ليس صفرًا');
+  if (noTag) E(BF, noTag + ' مولّدًا بلا وسمِ القاعدة — فلا تُنسَب إجابتُه إليها في التقرير');
+  if (noWhy) E(BF, noWhy + ' مولّدًا بلا شرحٍ كافٍ — والبطاقةُ تعليمٌ لا امتحانٌ فقط');
+  if (odd)   E(BF, odd + ' جملةً تُسند فعلًا لا يتكرّر إلى قرينةِ تكرار (مثل «is designed every morning»)');
+  if (v2)    E(BF, v2 + ' جوابًا فيه تصريفٌ ثانٍ بعد be — والقاعدةُ تصريفٌ ثالث');
+  return out;
+}
+
 function cssVarsPath(){
   const out = [];
   const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });

@@ -82,6 +82,7 @@
 <script src="gat-verbal.js?v=20261114"></script>
 <script src="step-bank.js"></script>
 <script src="gram-rules.js"></script>
+<script src="gram-passive.js?v=20261116"></script>
 <script src="tahsili-math.js"></script>
 <script src="tahsili-chem.js"></script>
 <script src="tahsili-bio.js"></script>
@@ -2179,7 +2180,19 @@ if(window.STEP_BANK && window.GRAM_RULES){ (function(){
     SKILLS.push({ group:"STEP", name:"قواعد — "+t[1]+" ("+t[0]+")",
       rx:new RegExp(t[0].replace(/[^A-Za-z ]/g,".")), yt:t[2], keys:[key],
       lesson:t[3],
-      gen:function(){ var f=SB.filter(function(q){ return q[0].indexOf(key+":")>=0; }); return (f.length?gp(f):gp(SB)).slice(); } });
+      /* ═══ القاعدةُ التي لها مولّداتٌ تُولَّد ولا تُنسَخ ═══════════════
+         طلبُ الأب (١٦ نوفمبر ٢٠٢٦) بعد بحثِ المبني للمجهول: «يتدرّب
+         عليه لا يقرؤه فقط». وبطاقةُ القاعدةِ كانت تسحب من عشرين سؤالًا
+         ثابتةِ النصّ — يراها مرّةً فيحفظ مواضعَ الإجابات. فصار لمن له
+         مولّداتٌ في GRAM_GEN ثلاثةُ أرباعِ السحبِ منها (جملةٌ جديدةٌ في
+         كلِّ مرّة) والربعُ من البنكِ الثابت، فلا تضيع أسئلتُه المكتوبةُ
+         بيدٍ وهي تغطّي أزمنةً لا يغطّيها المولّد. */
+      gen:function(){
+        var G = (window.GRAM_GEN || {})[t[0]];
+        if(G && G.length && Math.random() < 0.75){
+          try{ var q = G[Math.floor(Math.random()*G.length)](); if(q) return q.slice(); }catch(e){}
+        }
+        var f=SB.filter(function(q){ return q[0].indexOf(key+":")>=0; }); return (f.length?gp(f):gp(SB)).slice(); } });
   });
 })(); }
 
@@ -2646,8 +2659,12 @@ function grRun(box, prog, key, label, missed, full){
       return;
     }
     if(!startN){
+      /* والقاعدةُ التي لها مولّداتٌ لا يُقال فيها «بنكُها عشرون»: أسئلتُها
+         تُركَّب في كلِّ مرّةٍ فلا عددَ لها (١٦ نوفمبر ٢٠٢٦). */
+      var hasGen = !!((window.GRAM_GEN || {})[(GRAM_BY_KEY[key] || {}).en]);
       prog.innerHTML = '<span style="color:var(--muted);font-weight:700">أسئلةٌ جديدة في هذي القاعدة — ما عندك فيها خطأٌ مسجَّل.'+
-        (poolN>3?' وبنكُها '+poolN+' سؤالًا، فاضغط «القاعدة كاملة» تمشي عليها كلِّها.':'')+'</span>';
+        (hasGen ? ' وأسئلتُها تتولّد بجملٍ جديدةٍ كلَّ مرّة — فلا تنفد.'
+                : (poolN>3?' وبنكُها '+poolN+' سؤالًا، فاضغط «القاعدة كاملة» تمشي عليها كلِّها.':''))+'</span>';
       return;
     }
     var w = Math.round(fixedN / startN * 100);
