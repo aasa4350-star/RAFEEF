@@ -6460,7 +6460,21 @@ function cssVarsPath(){
       const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
       return (0.299*r + 0.587*g + 0.114*b) / 255;
     };
-    (baseSrc.match(/\.[a-zA-Z][\w-]*\s*\{[^{}]*\}/g) || []).forEach(function(blk){
+    /* وكتلةُ الطباعةِ تُستثنى: الورقةُ بيضاءُ دائمًا والخطُّ يُجبَر أسودَ
+       فيها (body{color:#000})، فخلفيّةٌ فاتحةٌ هناك هي الصواب لا العطب. */
+    const noPrint = (function(txt){
+      let s2 = txt, i;
+      while ((i = s2.search(/@media\s+print\s*\{/)) >= 0){
+        let j = s2.indexOf('{', i), d = 0, k = j;
+        for (; k < s2.length; k++){
+          if (s2[k] === '{') d++;
+          else if (s2[k] === '}'){ d--; if (!d) break; }
+        }
+        s2 = s2.slice(0, i) + s2.slice(k + 1);
+      }
+      return s2;
+    })(baseSrc);
+    (noPrint.match(/\.[a-zA-Z][\w-]*\s*\{[^{}]*\}/g) || []).forEach(function(blk){
       const bg = /background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,6})\b/.exec(blk);
       if (!bg) return;
       const L = lum(bg[1]);
