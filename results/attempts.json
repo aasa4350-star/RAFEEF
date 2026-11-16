@@ -1,5 +1,778 @@
 [
     {
+        "id": "4b4f170c-015b-438c-aa12-9588ee553314",
+        "created_at": "2026-11-16T02:39:36.788053+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:39:35.594Z",
+            "cid": "1794796775594_k5b3d7q2i5f",
+            "dur": 24,
+            "pid": "mwinmveh_25uw1q",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "gWill",
+                    "j": -1,
+                    "ms": 17643,
+                    "ok": 0
+                }
+            ],
+            "total": 1,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "secPerQ": 24,
+            "trusted": true
+        }
+    },
+    {
+        "id": "92ce5163-13b9-4e20-b214-876c90d3c351",
+        "created_at": "2026-11-16T02:38:45.232292+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:38:44.892Z",
+            "cid": "1794796724892_8njlinx8ua6",
+            "dur": 123,
+            "pid": "mwink0yn_2kx2j1",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a \u06483 \u2014 Stories",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "gPastNeg",
+                    "j": 2,
+                    "ms": 33151,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gPastNeg",
+                    "j": -1,
+                    "ms": 46211,
+                    "ok": 0
+                }
+            ],
+            "total": 2,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: \u0646\u0641\u064a \u0627\u0644\u0645\u0627\u0636\u064a (didn't)": {
+                    "c": 1,
+                    "t": 2
+                }
+            },
+            "correct": 1,
+            "trusted": true
+        }
+    },
+    {
+        "id": "cd239c80-4a6a-42b1-81c1-352cf858f851",
+        "created_at": "2026-11-16T02:35:39.281248+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:35:38.347Z",
+            "cid": "1794796538347_ow2573ahx4",
+            "dur": 85,
+            "pid": "mwinekua_2b2y1n",
+            "fast": 2,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "gWill",
+                    "j": -1,
+                    "ms": 3972,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gWillGoing",
+                    "j": 2,
+                    "ms": 26998,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gVerbNoun2",
+                    "j": 0,
+                    "ms": 1888,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gHouseW",
+                    "j": 0,
+                    "ms": 12676,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gWill",
+                    "j": 0,
+                    "ms": 2725,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWillGoing",
+                    "j": -1,
+                    "ms": 6439,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gVerbNoun2",
+                    "j": 1,
+                    "ms": 2213,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gVerbNoun2",
+                    "j": 0,
+                    "ms": 2436,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gVerbNoun2",
+                    "j": 0,
+                    "ms": 1288,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gHouse",
+                    "j": 1,
+                    "ms": 23879,
+                    "ok": 1
+                }
+            ],
+            "total": 10,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
+                    "c": 2,
+                    "t": 2
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
+                    "c": 4,
+                    "t": 4
+                }
+            },
+            "correct": 10,
+            "secPerQ": 8.5,
+            "trusted": true
+        }
+    },
+    {
+        "id": "8c163691-2fa3-4931-ab7f-0444894a4112",
+        "created_at": "2026-11-16T02:34:14.46256+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:34:13.826Z",
+            "cid": "1794796453826_zdibpr2fis",
+            "dur": 24,
+            "pid": "mwinekua_2b2y1n",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 0,
+                    "g": "gWill",
+                    "j": -1,
+                    "ms": 14134,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWill",
+                    "j": 2,
+                    "ms": 3762,
+                    "ok": 0
+                }
+            ],
+            "total": 2,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
+                    "c": 1,
+                    "t": 2
+                }
+            },
+            "correct": 1,
+            "secPerQ": 12,
+            "trusted": true
+        }
+    },
+    {
+        "id": "906c7015-31f2-4546-aecf-be3d15525017",
+        "created_at": "2026-11-16T02:33:46.770236+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:46.151Z",
+            "cid": "1794796426151_gtr8utq4h09",
+            "dur": 41,
+            "pid": "mwinekua_2b2y1n",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 1,
+                    "g": "gHouse",
+                    "j": 1,
+                    "ms": 17435,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gHouse",
+                    "j": 1,
+                    "ms": 5671,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gWill",
+                    "j": -1,
+                    "ms": 6131,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWillGoing",
+                    "j": 1,
+                    "ms": 1769,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gHouse",
+                    "j": 2,
+                    "ms": 5694,
+                    "ok": 0
+                }
+            ],
+            "total": 5,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
+                    "c": 2,
+                    "t": 3
+                }
+            },
+            "correct": 4,
+            "secPerQ": 8.2,
+            "trusted": true
+        }
+    },
+    {
+        "id": "26b0d917-efd2-45fd-9205-0fdd451c2fdf",
+        "created_at": "2026-11-16T02:33:44.579551+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:44.292Z",
+            "cid": "1794796424292_c77bmpke425",
+            "dur": 156,
+            "pid": "mwincvxb_1tkrh2",
+            "away": 0,
+            "dose": 0,
+            "hard": 0,
+            "kind": "practice",
+            "lang": "en",
+            "test": "\u0625\u0645\u0644\u0627\u0621 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \u270d\ufe0f",
+            "exits": 0,
+            "total": 8,
+            "missed": [
+                {
+                    "t": "geft",
+                    "w": "gift",
+                    "seen": false
+                },
+                {
+                    "t": "kae",
+                    "w": "key",
+                    "seen": false
+                },
+                {
+                    "t": "toung",
+                    "w": "toy",
+                    "seen": false
+                }
+            ],
+            "correct": 5,
+            "trusted": true
+        }
+    },
+    {
+        "id": "403056c8-c24d-456e-98d8-d379e7e7c8da",
+        "created_at": "2026-11-16T02:33:40.056462+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:39.768Z",
+            "ph": null,
+            "wk": [
+                [
+                    "toy",
+                    61
+                ]
+            ],
+            "acc": 61,
+            "cid": "1794796419768_pfr18trfjcp",
+            "flu": 100,
+            "wpm": null,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 77,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 0,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "1f6f0a18-8eb9-4dc1-8163-21236b379ae8",
+        "created_at": "2026-11-16T02:33:21.699762+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:21.417Z",
+            "ph": null,
+            "wk": [
+                [
+                    "key",
+                    54
+                ]
+            ],
+            "acc": 54,
+            "cid": "1794796401417_c5age5n1qsp",
+            "flu": 0,
+            "wpm": 60,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 11,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 1,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "49fab995-379c-4fa6-a692-42c23fad3dff",
+        "created_at": "2026-11-16T02:33:05.596748+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:04.979Z",
+            "cid": "1794796384979_0szi9ecxsi2d",
+            "dur": 5,
+            "pid": "mwinekua_2b2y1n",
+            "why": "fast",
+            "fast": 0,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "gHouseW",
+                    "j": 1,
+                    "ms": 3365,
+                    "ok": 0
+                }
+            ],
+            "total": 1,
+            "skills": {
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
+                    "c": 0,
+                    "t": 1
+                }
+            },
+            "correct": 0,
+            "secPerQ": 5,
+            "trusted": false
+        }
+    },
+    {
+        "id": "f41db13d-ec31-40e6-81e5-9eedb24012d2",
+        "created_at": "2026-11-16T02:33:03.025064+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:33:02.744Z",
+            "ph": null,
+            "wk": [
+                [
+                    "gift",
+                    49
+                ]
+            ],
+            "acc": 49,
+            "cid": "1794796382744_pllbxnn3gcr",
+            "flu": 0,
+            "wpm": 60,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 10,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 1,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "86fbba0b-a768-481f-935f-3beb15d6dd30",
+        "created_at": "2026-11-16T02:32:59.639121+00:00",
+        "student": "\u0623\u0633\u0627\u0645\u0629",
+        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:32:58.673Z",
+            "cid": "1794796378673_mjhfugnzksd",
+            "dur": 31,
+            "pid": "mwinekua_2b2y1n",
+            "fast": 1,
+            "kind": "practice",
+            "rgMs": 2000,
+            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
+            "items": [
+                {
+                    "a": 2,
+                    "g": "gWill",
+                    "j": -1,
+                    "ms": 16683,
+                    "ok": 1
+                },
+                {
+                    "a": 2,
+                    "g": "gHouseW",
+                    "j": 2,
+                    "ms": 3772,
+                    "ok": 1
+                },
+                {
+                    "a": 1,
+                    "g": "gWillGoing",
+                    "j": 1,
+                    "ms": 2452,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gVerbNoun2",
+                    "j": 0,
+                    "ms": 1616,
+                    "ok": 1
+                },
+                {
+                    "a": 0,
+                    "g": "gHouseW",
+                    "j": 1,
+                    "ms": 4516,
+                    "ok": 0
+                }
+            ],
+            "total": 5,
+            "skills": {
+                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
+                    "c": 1,
+                    "t": 2
+                },
+                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
+                    "c": 1,
+                    "t": 1
+                }
+            },
+            "correct": 4,
+            "secPerQ": 6.2,
+            "trusted": true
+        }
+    },
+    {
+        "id": "f921b274-6918-44d5-ad4e-200311cd4abb",
+        "created_at": "2026-11-16T02:32:49.0425+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:32:48.738Z",
+            "ph": null,
+            "wk": [
+                [
+                    "ball",
+                    49
+                ]
+            ],
+            "acc": 49,
+            "cid": "1794796368738_wyinnedkk2",
+            "flu": 0,
+            "wpm": null,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 10,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 0,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "f16a42fb-e477-47dc-b0b8-a6d835f81a46",
+        "created_at": "2026-11-16T02:32:33.468364+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:32:33.092Z",
+            "ph": null,
+            "wk": [
+                [
+                    "hen",
+                    46
+                ]
+            ],
+            "acc": 46,
+            "cid": "1794796353092_nlcbdujyy2c",
+            "flu": 0,
+            "wpm": 60,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 9,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 1,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "49f263ff-eb90-4693-bc03-24ce0de9db2d",
+        "created_at": "2026-11-16T02:31:48.605275+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:31:48.240Z",
+            "ph": null,
+            "wk": [
+                [
+                    "fish",
+                    69
+                ]
+            ],
+            "acc": 69,
+            "cid": "1794796308240_7wdjkvcjw08",
+            "flu": 100,
+            "wpm": 60,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 81,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 1,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
+        "id": "72b3262f-6844-41df-88a4-b2322c9d4d16",
+        "created_at": "2026-11-16T02:31:34.256812+00:00",
+        "student": "\u0633\u0639\u0648\u062f",
+        "grade": "\u0631\u0627\u0628\u0639 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-16T02:31:33.866Z",
+            "ph": null,
+            "wk": [
+                [
+                    "flag",
+                    56
+                ]
+            ],
+            "acc": 56,
+            "cid": "1794796293866_377z9uo8tio",
+            "flu": 0,
+            "wpm": 60,
+            "comp": null,
+            "kind": "practice",
+            "part": 1,
+            "pron": 11,
+            "rsid": "mwincvxb_2kqcr6",
+            "test": "\u0646\u0637\u0642 \u0625\u0646\u062c\u0644\u064a\u0632\u064a \ud83d\udde3\ufe0f",
+            "parts": 4,
+            "pmode": "word",
+            "total": 1,
+            "words": 1,
+            "cycles": null,
+            "correct": 1,
+            "audioSec": 1,
+            "kindPron": true,
+            "refWords": 1
+        }
+    },
+    {
         "id": "c0e0f798-ca3f-4420-8cab-0c79e34dded5",
         "created_at": "2026-11-15T16:38:43.336596+00:00",
         "student": "\u0641\u0647\u062f",
@@ -117537,1052 +118310,6 @@
             "correct": 1,
             "secPerQ": 3,
             "trusted": false
-        }
-    },
-    {
-        "id": "bdd64f75-8a47-4949-869c-3e7ef96a952f",
-        "created_at": "2026-11-08T11:26:22.774565+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:26:22.158Z",
-            "cid": "1794137182158_ryvjx7vmiig",
-            "dur": 51,
-            "pid": "mw7qvrhh_419ikh",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": 2,
-                    "ms": 3252,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 1,
-                    "ms": 1149,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWillGoing",
-                    "j": 0,
-                    "ms": 2557,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWillGoing",
-                    "j": -1,
-                    "ms": 5775,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 2023,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWill",
-                    "j": 1,
-                    "ms": 2161,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouse",
-                    "j": 0,
-                    "ms": 25337,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 4444,
-                    "ok": 0
-                }
-            ],
-            "total": 8,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
-                    "c": 3,
-                    "t": 3
-                },
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 2,
-                    "t": 2
-                }
-            },
-            "correct": 7,
-            "secPerQ": 6.4,
-            "trusted": true
-        }
-    },
-    {
-        "id": "df5b9e72-5e74-437e-aa64-21e9754988da",
-        "created_at": "2026-11-08T11:25:31.928872+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:25:31.636Z",
-            "cid": "1794137131636_a5vkk5c8mk",
-            "dur": 18,
-            "pid": "mw7qvrhh_419ikh",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gHouseW",
-                    "j": 0,
-                    "ms": 13584,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "secPerQ": 18,
-            "trusted": true
-        }
-    },
-    {
-        "id": "b93c254e-75db-41ef-a4f9-bba3a171c37f",
-        "created_at": "2026-11-08T11:25:13.518702+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:25:13.238Z",
-            "cid": "1794137113238_wnye1dqjl7",
-            "dur": 7,
-            "pid": "mw7qvrhh_419ikh",
-            "why": "fast",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 3795,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "secPerQ": 7,
-            "trusted": false
-        }
-    },
-    {
-        "id": "bba50776-1b37-47af-9fc0-606e3124ed13",
-        "created_at": "2026-11-08T11:25:06.538758+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:25:06.226Z",
-            "cid": "1794137106226_logh3vaxnqr",
-            "dur": 9,
-            "pid": "mw7qvrhh_419ikh",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gHouse",
-                    "j": 0,
-                    "ms": 5803,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "secPerQ": 9,
-            "trusted": true
-        }
-    },
-    {
-        "id": "450d2872-8994-4e6f-9feb-8409c1ab2164",
-        "created_at": "2026-11-08T11:24:57.491862+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:24:57.053Z",
-            "cid": "1794137097053_9o6bior8hf",
-            "dur": 37,
-            "pid": "mw7qvrhh_419ikh",
-            "fast": 2,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 0,
-                    "ms": 7261,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": 2,
-                    "ms": 1603,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 2724,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 0,
-                    "ms": 4849,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": 2,
-                    "ms": 3724,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 1,
-                    "ms": 1477,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 4032,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWillGoing",
-                    "j": -1,
-                    "ms": 5623,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gHouseW",
-                    "j": 2,
-                    "ms": 3757,
-                    "ok": 0
-                }
-            ],
-            "total": 9,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
-                    "c": 3,
-                    "t": 3
-                },
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 3,
-                    "t": 4
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 8,
-            "secPerQ": 4.1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "86dec027-4121-4dfb-92ef-6cf72fe300bc",
-        "created_at": "2026-11-08T11:24:02.336584+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:24:02.022Z",
-            "cid": "1794137042022_5a44ftqzjsc",
-            "dur": 71,
-            "pid": "mw7qr9k7_3w6qyy",
-            "fast": 4,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 1,
-                    "ms": 987,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWillGoing",
-                    "j": 1,
-                    "ms": 4415,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 1935,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": -1,
-                    "ms": 5301,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWillGoing",
-                    "j": 1,
-                    "ms": 1320,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 1,
-                    "ms": 1476,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 0,
-                    "ms": 3831,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gWill",
-                    "j": 1,
-                    "ms": 3862,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 19639,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 28385,
-                    "ok": 1
-                }
-            ],
-            "total": 10,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
-                    "c": 3,
-                    "t": 3
-                },
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 2,
-                    "t": 2
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 2,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 3,
-                    "t": 3
-                }
-            },
-            "correct": 10,
-            "secPerQ": 7.1,
-            "trusted": true
-        }
-    },
-    {
-        "id": "ca15b7fc-83f7-4445-a613-a1dbdc994239",
-        "created_at": "2026-11-08T11:22:51.175535+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:22:50.866Z",
-            "cid": "1794136970866_2fb1fgtwjlt",
-            "dur": 16,
-            "pid": "mw7qr9k7_3w6qyy",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 8256,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "secPerQ": 16,
-            "trusted": true
-        }
-    },
-    {
-        "id": "df24c4a8-d1a1-442e-85b9-bdb07aaf6738",
-        "created_at": "2026-11-08T11:22:35.030345+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:22:34.732Z",
-            "cid": "1794136954732_ex95o4yarm",
-            "dur": 9,
-            "pid": "mw7qr9k7_3w6qyy",
-            "why": "fast",
-            "fast": 2,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gHouseW",
-                    "j": 2,
-                    "ms": 1562,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 1637,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 3335,
-                    "ok": 0
-                }
-            ],
-            "total": 3,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 1,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 2,
-            "secPerQ": 3,
-            "trusted": false
-        }
-    },
-    {
-        "id": "616bc034-93bf-4d62-8e89-01f692c3074d",
-        "created_at": "2026-11-08T11:22:26.16884+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:22:25.845Z",
-            "cid": "1794136945845_5qzkbgkmley",
-            "dur": 8,
-            "pid": "mw7qr9k7_3w6qyy",
-            "why": "fast",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 1,
-                    "g": "gVerbNoun2",
-                    "j": 1,
-                    "ms": 1068,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 0,
-                    "ms": 2464,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 1,
-                    "ms": 2556,
-                    "ok": 0
-                }
-            ],
-            "total": 3,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 1,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 2,
-            "secPerQ": 2.7,
-            "trusted": false
-        }
-    },
-    {
-        "id": "7f13f4d0-de90-4d71-bb75-1c174064b06e",
-        "created_at": "2026-11-08T11:22:17.703554+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:22:17.386Z",
-            "cid": "1794136937386_c0r7yylaeh",
-            "dur": 49,
-            "pid": "mw7qr9k7_3w6qyy",
-            "fast": 1,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": 2,
-                    "ms": 1246,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 3329,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 3379,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 2158,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 33938,
-                    "ok": 0
-                }
-            ],
-            "total": 5,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 3,
-                    "t": 3
-                }
-            },
-            "correct": 4,
-            "secPerQ": 9.8,
-            "trusted": true
-        }
-    },
-    {
-        "id": "ae0c2430-42c0-4125-adde-f9fe60ed20b2",
-        "created_at": "2026-11-08T11:21:28.29265+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:21:27.959Z",
-            "cid": "1794136887959_x4vppwfzx99",
-            "dur": 38,
-            "pid": "mw7qr9k7_3w6qyy",
-            "fast": 2,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 919,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 1215,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gHouseW",
-                    "j": 2,
-                    "ms": 2547,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 20877,
-                    "ok": 0
-                }
-            ],
-            "total": 4,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 2,
-                    "t": 2
-                }
-            },
-            "correct": 3,
-            "secPerQ": 9.5,
-            "trusted": true
-        }
-    },
-    {
-        "id": "ab30c236-8321-4b0c-9e27-9b3a11eb5df7",
-        "created_at": "2026-11-08T11:20:46.036369+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:20:45.350Z",
-            "cid": "1794136845350_slr410pgww",
-            "dur": 34,
-            "pid": "mw7qp4ox_2iv7ku",
-            "fast": 3,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 2,
-                    "g": "gWillGoing",
-                    "j": 2,
-                    "ms": 1466,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 4256,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gHouse",
-                    "j": 2,
-                    "ms": 3395,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 3955,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gWill",
-                    "j": 0,
-                    "ms": 2008,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gHouse",
-                    "j": 1,
-                    "ms": 4435,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 1460,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 4053,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gVerbNoun2",
-                    "j": 0,
-                    "ms": 1543,
-                    "ok": 1
-                },
-                {
-                    "a": 1,
-                    "g": "gHouseW",
-                    "j": 2,
-                    "ms": 7779,
-                    "ok": 0
-                }
-            ],
-            "total": 10,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0623\u0645 be going to": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 3,
-                    "t": 3
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
-                    "c": 2,
-                    "t": 2
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 3,
-                    "t": 3
-                }
-            },
-            "correct": 9,
-            "secPerQ": 3.4,
-            "trusted": true
-        }
-    },
-    {
-        "id": "ef8ca969-be69-49f2-8f60-c39423998499",
-        "created_at": "2026-11-08T11:20:11.330691+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:20:10.994Z",
-            "cid": "1794136810994_ysb2oolh2y",
-            "dur": 4,
-            "pid": "mw7qp4ox_2iv7ku",
-            "why": "fast",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gHouse",
-                    "j": 2,
-                    "ms": 3198,
-                    "ok": 0
-                }
-            ],
-            "total": 1,
-            "skills": {
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
-                    "c": 0,
-                    "t": 1
-                }
-            },
-            "correct": 0,
-            "secPerQ": 4,
-            "trusted": false
-        }
-    },
-    {
-        "id": "6814c74c-bacf-4b6b-8f37-50be9b4a74d5",
-        "created_at": "2026-11-08T11:20:07.071248+00:00",
-        "student": "\u0623\u0633\u0627\u0645\u0629",
-        "grade": "\u062e\u0627\u0645\u0633 \u0627\u0628\u062a\u062f\u0627\u0626\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:20:06.533Z",
-            "cid": "1794136806533_jlo1svy1zf",
-            "dur": 56,
-            "pid": "mw7qp4ox_2iv7ku",
-            "fast": 0,
-            "kind": "practice",
-            "rgMs": 2000,
-            "test": "\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0665 \u06482 \u2014 House Designs",
-            "items": [
-                {
-                    "a": 0,
-                    "g": "gWill",
-                    "j": -1,
-                    "ms": 33893,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouse",
-                    "j": 0,
-                    "ms": 7697,
-                    "ok": 1
-                },
-                {
-                    "a": 0,
-                    "g": "gHouseW",
-                    "j": 2,
-                    "ms": 5395,
-                    "ok": 0
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 3959,
-                    "ok": 1
-                },
-                {
-                    "a": 2,
-                    "g": "gVerbNoun2",
-                    "j": 2,
-                    "ms": 2759,
-                    "ok": 1
-                }
-            ],
-            "total": 5,
-            "skills": {
-                "\u0642\u0648\u0627\u0639\u062f: will \u0644\u0644\u0645\u0633\u062a\u0642\u0628\u0644": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0628\u064a\u062a": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0645\u0641\u0631\u062f\u0627\u062a: \u063a\u0631\u0641 \u0627\u0644\u0628\u064a\u062a \u0648\u0623\u062c\u0632\u0627\u0624\u0647": {
-                    "c": 1,
-                    "t": 1
-                },
-                "\u0642\u0648\u0627\u0639\u062f: \u0627\u0644\u0643\u0644\u0645\u0629 \u0627\u0633\u0645\u064b\u0627 \u0623\u0645 \u0641\u0639\u0644\u064b\u0627": {
-                    "c": 2,
-                    "t": 2
-                }
-            },
-            "correct": 4,
-            "secPerQ": 11.2,
-            "trusted": true
-        }
-    },
-    {
-        "id": "d2a68fad-2982-44aa-8a7c-e2fafda3ce4c",
-        "created_at": "2026-11-08T11:08:09.561357+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-08T11:08:08.266Z",
-            "cid": "1794136088266_1cffeie075l",
-            "dur": 351,
-            "pid": "mw7q3ear_23rjdi",
-            "fast": 0,
-            "kind": "practice",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "total": 12,
-            "wrong": [
-                "<b>Grammar \u2014 Relative Clauses:</b> The explanation ___ she posted last night was very clear.",
-                "<b>Grammar \u2014 For / Since / Used to:</b> We used to ___ paper dictionaries before apps became common."
-            ],
-            "skills": {
-                "\u0641\u0647\u0645 \u0627\u0644\u0645\u0642\u0631\u0648\u0621": {
-                    "c": 6,
-                    "t": 6
-                },
-                "Grammar \u2014 Time Connectors": {
-                    "c": 1,
-                    "t": 1
-                },
-                "Grammar \u2014 Relative Clauses": {
-                    "c": 0,
-                    "t": 1
-                },
-                "\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0643\u062a\u0627\u0628\u064a": {
-                    "c": 2,
-                    "t": 2
-                },
-                "Grammar \u2014 For / Since / Used to": {
-                    "c": 0,
-                    "t": 1
-                },
-                "Grammar \u2014 Prepositions / Articles": {
-                    "c": 1,
-                    "t": 1
-                }
-            },
-            "correct": 10,
-            "secPerQ": 29.3,
-            "stretch": false
         }
     }
 ]
