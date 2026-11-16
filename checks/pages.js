@@ -6314,6 +6314,39 @@ function gramPassivePath(){
   if (!/Math\.random\(\) < 0\.75/.test(src))
     E(F, 'نصيبُ المولّداتِ من السحبِ غيرُ مكتوبٍ كما يُتوقَّع');
 
+  /* ═══ القاعدةُ المرفوعةُ إلى المقدّمة ═══════════════════════════════
+     طلبُ الأب (١٦ نوفمبر ٢٠٢٦): «ارفعها» — فالترتيبُ بالأضعفِ أوّلًا
+     يضع المبنيَّ للمجهولِ تحت «بقيّةُ القواعد» مطويًّا، والمعلّمُ طلبه
+     هذا الأسبوع. وثلاثةٌ تنقطع بصمت: أن يُكتَب الاسمُ خطأً فلا تُرفَع
+     شيئًا، وأن تُعرَض مرّتين (مرفوعةً وفي البقيّة)، وأن تُرفَع بلا
+     سببٍ مكتوبٍ فيراها الابنُ مقدَّمةً ولا يدري لِمَ. */
+  const PIN = /var GR_PIN = \{([^}]*)\};/.exec(src);
+  if (!PIN) E(F, 'جدولُ الرفعِ (GR_PIN) غيرُ مكتوب');
+  else {
+    const names = [...PIN[1].matchAll(/"([^"]+)"\s*:\s*"([^"]*)"/g)].map(m => [m[1], m[2]]);
+    let rules = [];
+    try {
+      const sb = { window:{} };
+      vm.createContext(sb);
+      vm.runInContext(fs.readFileSync(path.join(ROOT, 'gram-rules.js'), 'utf8'), sb);
+      rules = (sb.window.GRAM_RULES || []).map(r => r[0]);
+    } catch(e){}
+    names.forEach(function(n){
+      if (rules.length && rules.indexOf(n[0]) < 0)
+        E(F, 'القاعدةُ المرفوعةُ «' + n[0] + '» ليست في gram-rules.js — فالرفعُ لا يقع على شيء');
+      if (!n[1] || n[1].length < 6)
+        E(F, 'القاعدةُ المرفوعةُ «' + n[0] + '» بلا سببٍ مكتوب — فتُقدَّم بلا تفسير');
+    });
+    if (!/!pinOf\(o\.k\) && o\.st\.t >= MINQ/.test(src))
+      E(F, 'المرفوعةُ لا تُستثنى من قائمةِ الضعيفة — فتظهر مرّتين');
+    if (!/pinned\.indexOf\(o\) < 0/.test(src))
+      E(F, 'المرفوعةُ لا تُستثنى من بقيّةِ القواعد — فتظهر مرّتين');
+    const iPin = src.indexOf('pinned.forEach(');
+    const iWeak = src.indexOf('قواعدُك تحت ٥٠٪');
+    if (iPin < 0) E(F, 'المرفوعةُ لا تُعرَض أصلًا');
+    else if (iWeak > 0 && iPin > iWeak) E(F, 'المرفوعةُ تُعرَض بعد الضعيفةِ لا قبلَها');
+  }
+
   let G = null, V = null;
   try {
     const sb = { window:{}, Math: Math, String: String, Array: Array };

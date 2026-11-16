@@ -2883,14 +2883,29 @@ async function renderGrammar(){
     return { k:k, st:st, p:(st.t ? st.c/st.t : 1), miss:(missedAll[k]||0) };
   });
   var MINQ = 2, WEAK = 0.5, TOPN = 6;
-  var weak = stats.filter(function(o){ return o.st.t >= MINQ && o.p < WEAK; })
+  /* ═══ قاعدةٌ تُرفَع إلى المقدّمةِ بسببٍ خارجِ الأرقام ═══════════════
+     ترتيبُ البطاقاتِ بالأضعفِ أوّلًا، وهو الصوابُ في العموم. لكنّ
+     المعلّمَ قد يطلب بابًا بعينه هذا الأسبوعَ ونسبةُ الابنِ فيه ليست
+     من الأضعف — فيجده تحت «بقيّةُ القواعد» مطويًّا.
+
+     طلبُ الأب (١٦ نوفمبر ٢٠٢٦) بعد أن طلب المعلّمُ بحثَ المبني
+     للمجهول: «ارفعها». فهذا جدولٌ صريحٌ: المفتاحُ اسمُ القاعدةِ
+     الإنجليزيُّ كما في gram-rules.js، والقيمةُ سببُ الرفعِ يُعرَض
+     للابنِ كما هو — فلا يراها مرفوعةً بلا تفسير.
+
+     ولرفعِ الرفع: احذف سطرَها من هنا، ولا شيءَ غيره. */
+  var GR_PIN = { "Passive Voice": "طلبُ معلّمك هذا الأسبوع" };
+  function pinOf(k){ return GR_PIN[(GRAM_BY_KEY[k] || {}).en || ""] || null; }
+  var pinned = stats.filter(function(o){ return !!pinOf(o.k); })
+                    .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
+  var weak = stats.filter(function(o){ return !pinOf(o.k) && o.st.t >= MINQ && o.p < WEAK; })
                   .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
   /* ═══ القواعدُ الخمسةَ عشرَ كلُّها تُعرَض ═══════════════════════════
      كان الشرطُ «miss > 0 || st.t > 0»، فالقاعدةُ التي لم تمرَّ عليه في
      ستيبٍ قطُّ لا تُعرض له أصلًا — لا مفتوحةً ولا مطويّة. وبنكُها
      موجودٌ بعشرينَ سؤالًا، فكان المتروكُ محجوبًا لا مؤجَّلًا. فصارت
      البقيّةُ تضمُّ القواعدَ كلَّها، وعليها وسمُ «ما جرّبتها» فيُرى. */
-  var rest = stats.filter(function(o){ return weak.indexOf(o) < 0; })
+  var rest = stats.filter(function(o){ return weak.indexOf(o) < 0 && pinned.indexOf(o) < 0; })
                   .sort(function(a,b){ return (a.p - b.p) || (b.miss - a.miss); });
   var totMiss = 0; Object.keys(missedAll).forEach(function(k){ totMiss += missedAll[k]; });
   var untried = stats.filter(function(o){ return !(roundsBy[o.k] || 0); }).length;
@@ -2911,6 +2926,13 @@ async function renderGrammar(){
     if(untried){
       html += '<div class="intro" style="margin-top:10px">🆕 وعندك <b>'+arQ(untried)+'</b> ما جرّبتَها ولا جولةً، كلٌّ منها موسومةٌ بـ<b>«🆕 ما جرّبتها»</b>. وبنكُ كلِّ قاعدةٍ ٢٠ سؤالًا، وزرُّ <b>«📚 القاعدة كاملة»</b> يمشي بك عليها كلِّها لا على ثلاثةٍ فقط.</div>';
     }
+    /* المرفوعةُ قبل الأضعفِ وبسببِها مكتوبًا — ولو كانت نسبتُه فيها عالية */
+    pinned.forEach(function(o){
+      html += '<div class="intro" style="margin-top:12px;background:linear-gradient(135deg,#b45309,#d97706);color:#fff">'+
+        '📌 <b>'+((GRAM_BY_KEY[o.k]||{}).ar || o.k)+'</b> — مرفوعةٌ لك إلى المقدّمة: '+pinOf(o.k)+'. '+
+        'اقرأ القاعدةَ ثمّ حُلّ الطابور.</div>';
+      html += grCard(o.k, o.st, missedBy[o.k]||[], true, missedAll[o.k]||0, grInfo(o.k));
+    });
     if(weak.length){
       html += '<div class="intro" style="margin-top:12px">🎯 <b>قواعدُك تحت ٥٠٪</b>'+(weak.length>TOPN?' — ابدأ بهذي '+Math.min(TOPN,weak.length)+'، هي الأضعف.':'')+
         ' اقرأ القاعدةَ أوّلًا، ثمّ حُلّ الطابور.</div>';
