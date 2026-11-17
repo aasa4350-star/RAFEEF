@@ -379,6 +379,7 @@ function run(){
   issues.push(...cssVarsPath());
   issues.push(...gramPassivePath());
   issues.push(...teachStuckPath());
+  issues.push(...microListenPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -7906,5 +7907,142 @@ function teachStuckPath(){
     E('لا سقفَ لعددِ الدروسِ في الجلسة — قد تصير الجلسةُ كلُّها درسًا بلا اختبار');
   if (!/!isNew && srNeedsTeach/.test(src))
     E('التعليمُ يدخل بابَ الكلماتِ الجديدةِ — وعدّادُ «حفظت» يتقدّم بما اختُبر');
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   حارسُ «فكِّ الأصواتِ الصغيرة»
+
+   الجرعةُ مبنيّةٌ على قياسِ رفيف: ٩٧ بندًا خاطئًا، ٩٥٪ منها محاولاتٌ
+   حقيقيّة، وخطؤها كلُّه في الكلماتِ الوظيفيّةِ غيرِ المنبورة. وهي
+   تسقط صامتةً إن اختلّ أحدُ هذه الشروط:
+
+   ١) لكلِّ شظيّةٍ مقاطعُها الأربعةُ محفوظةٌ (صوتان × سرعتان) وملفّاتُها
+      موجودةٌ على القرص. فمقطعٌ ناقصٌ يهبط إلى الشبكةِ فيتأخّر، وبلاغُ
+      الأب الأصليُّ كان «يبطي ما بدا» — فالتأخّرُ يقتل التمرين.
+   ٢) ولا مقطعَ لصيغةٍ خاطئة. كان التوليدُ يُنطق الخطأَ ليكون التمييزُ
+      بين مسموعَين، وهو تدريبٌ لأذنِها على ما لا وجودَ له في اللغة —
+      وأعادت خدمةُ التعرّفِ «the played» همهمةً لأنّه مركّبٌ بلا معنى.
+   ٣) والشظيّةُ أربعُ كلماتٍ أو أقلّ: الطويلةُ تقيس الذاكرةَ العاملةَ مع
+      الفكِّ فتخلط السببَين، وعليها قام التصميمُ كلُّه.
+   ٤) وكلُّ شظيّةٍ مأخوذةٌ من جملةٍ في بنكِ الإملاءِ الحقيقيِّ لصاحبها،
+      وموجودةٌ فيها حرفًا بحرف. فمن زاد شظيّةً من اجتهادِه خرج عن
+      القياسِ الذي بُنيت عليه الجرعة.
+   ════════════════════════════════════════════════════════════════════ */
+function microListenPath(){
+  const out = [], F = 'listen-micro.js', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+
+  const box = { window:{} };
+  vm.createContext(box);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), box); }
+  catch(e){ E('البنكُ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  const BANK = box.window.MICRO_LISTEN || {}, VOICES = box.window.MICRO_VOICES || [];
+  const TAKE = box.window.MICRO_TAKE || 0;
+
+  if (VOICES.length < 2)
+    E('صوتٌ واحدٌ فقط — وتعدّدُ الأصواتِ هو جوهرُ HVPT، فمن تدرّب على صوتٍ تعلّم الصوتَ لا اللغة');
+  if (!TAKE) E('لا عددَ للشظايا في الجلسة');
+
+  /* بنوكُ الإملاءِ الحقيقيّةُ من الصفحةِ نفسِها */
+  const rs = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
+  const dictOf = {};
+  /* ⚠️ لكلِّ ابنٍ كتلتان في الصفحة: كتلةُ الأسماءِ (META) وكتلةُ
+     البياناتِ (DATA). وindexOf يقع على الأولى، فيمضي البحثُ عن
+     dictation إلى أوّلِ بنكٍ بعدَها — وهو بنكُ ابنٍ آخر. فتُقابل جملُ
+     رفيفَ ببنكِ سعودٍ ويصرخ الحارسُ بالباطل. فتُختار الكتلةُ التي
+     تليها en:{ أو ar:{ وهي كتلةُ البيانات. */
+  ['saud','osama','rafeef','fahad','hasan'].forEach(w => {
+    const re = new RegExp('\\n  ' + w + ':\\{', 'g');
+    let m, at = -1;
+    while ((m = re.exec(rs))){
+      if (/^\s*(en|ar):\s*\{/.test(rs.slice(m.index + m[0].length, m.index + m[0].length + 40))){ at = m.index; break; }
+    }
+    if (at < 0) return;
+    const t = EXTRACT.literalAfter(rs.slice(at), /dictation:/, '[', ']');
+    if (!t) return;
+    try { dictOf[w] = EXTRACT.evalLiteral(t, w + '.dictation') || []; } catch(e){}
+  });
+
+  const mp = path.join(ROOT, 'audio', 'manifest.json');
+  let micro = {};
+  if (fs.existsSync(mp)){
+    try { micro = (JSON.parse(fs.readFileSync(mp, 'utf8')).micro) || {}; } catch(e){}
+  } else E('audio/manifest.json غائب');
+
+  const spoken = {};          /* كلُّ نصٍّ له مقطعٌ منطوق */
+  Object.keys(micro).forEach(k => {
+    const parts = k.split('|');
+    spoken[parts[parts.length - 1]] = 1;
+  });
+
+  Object.keys(BANK).forEach(who => {
+    const items = BANK[who] || [];
+    if (!items.length) { E('بنكُ ' + who + ' فارغ'); return; }
+    if (items.length < TAKE)
+      E('بنكُ ' + who + ' فيه ' + items.length + ' شظيّةً والجلسةُ تطلب ' + TAKE + ' — فتتكرّر هي بعينها كلَّ مرّة');
+    const bank = dictOf[who] || [];
+    if (!bank.length) E('لم أجد بنكَ إملاءِ ' + who + ' لأُقابل به الشظايا');
+
+    items.forEach(it => {
+      const h = String(it.heard || ''), w = String(it.wrong || '');
+      if (!h || !w) { E('شظيّةٌ ناقصةٌ عند ' + who); return; }
+      if (h === w) E('الصحيحُ والخطأُ سواءٌ في «' + h + '» — فلا تمييزَ');
+      if (!it.why) E('«' + h + '» بلا سببٍ يُقال للطفل');
+      if (!it.from) E('«' + h + '» بلا جملةٍ مصدر');
+
+      /* ٣) قصيرةٌ بقصد */
+      const n = h.split(/\s+/).filter(Boolean).length;
+      if (n > 4) E('«' + h + '» ' + n + ' كلماتٍ — الشظيّةُ أربعٌ أو أقلّ، وإلّا قاست الذاكرةَ لا الفكّ');
+
+      /* ٤) من بنكِه حرفًا بحرف */
+      if (it.from && String(it.from).indexOf(h) < 0)
+        E('«' + h + '» ليست في جملتِها «' + String(it.from).slice(0,40) + '» حرفًا بحرف');
+      if (bank.length && it.from && bank.indexOf(it.from) < 0)
+        E('جملةُ «' + String(it.from).slice(0,44) + '» ليست في بنكِ إملاءِ ' + who);
+
+      /* ١) المقاطعُ الأربعةُ موجودةٌ وملفّاتُها على القرص */
+      VOICES.forEach(v => {
+        [['', 'الطبيعيّة'], ['s|', 'البطيئة']].forEach(([tag, nm]) => {
+          const key = v + '|' + tag + h;
+          const rel = micro[key];
+          if (!rel) { E('لا مقطعَ ' + nm + ' بصوت ' + v.replace('en-GB-','') + ' لـ«' + h + '» — فيهبط إلى الشبكةِ ويتأخّر'); return; }
+          if (!fs.existsSync(path.join(ROOT, 'audio', rel)))
+            E('الفهرسُ يذكر مقطعًا غيرَ موجودٍ على القرص: ' + rel + ' («' + h + '»)');
+        });
+      });
+
+      /* ٢) الخطأُ لا يُنطَق أبدًا */
+      if (spoken[w])
+        E('الصيغةُ الخاطئةُ «' + w + '» لها مقطعٌ منطوق — تدريبٌ لأذنِها على ما لا وجودَ له في الإنجليزيّة');
+    });
+  });
+
+  /* ٥) وفي الصفحة: البوّابةُ والدرجةُ والفهرسُ والحلقة */
+  const RE = m => out.push({ sev:'خطأ', file:'reading.html', msg:m });
+  if (!/<script src="listen-micro\.js/.test(rs)) RE('بنكُ الشظايا غيرُ محمَّلٍ في الصفحة');
+  /* ⚠️ لا يكفي وجودُ البوّابة: بوّابةٌ فارغةٌ تُطفئ الجرعةَ كلَّها بصمت،
+     وبوّابةٌ تُسمّي من لا بنكَ له تُعطيه قسمًا خاويًا. فتُقرأ قيمتُها. */
+  const gate = EXTRACT.readObject(rs, 'MICRO_FOR');
+  if (!gate) RE('لا بوّابةَ تحصر الجرعةَ بمن تُقاس عليه، أو لا تُقرأ قيمتُها');
+  else {
+    const on = Object.keys(gate).filter(k => gate[k]);
+    if (!on.length) RE('بوّابةُ فكِّ الأصواتِ فارغةٌ — الجرعةُ مُطفأةٌ ولا أحدَ يراها');
+    on.forEach(k => { if (!(BANK[k] || []).length)
+      RE('البوّابةُ تفتح فكَّ الأصواتِ لـ«' + k + '» وليس له بنكُ شظايا — فيرى قسمًا خاويًا'); });
+    Object.keys(BANK).forEach(k => { if (!gate[k])
+      out.push({ sev:'تنبيه', file:'reading.html', msg:'بنكُ شظايا «' + k + '» موجودٌ والبوّابةُ مغلقةٌ عليه' }); });
+  }
+  if (!/if\(qEl\.dataset\.i == null\) return;[\s\S]{0,200}var i=\+qEl\.dataset\.i, text=items\[i\]/.test(rs))
+    RE('حلقةُ بنودِ الإملاءِ لا تستثني بطاقةَ فكِّ الأصوات — ستُعطب الصفحةُ عند رفيف');
+  if (!/if\(!MANI_DONE\)\{ MANI_P\.then\(function\(\)\{ microSay\(/.test(rs))
+    RE('microSay لا ينتظر فهرسَ الصوت — فأوّلُ مقطعٍ يُطلَب من الشبكةِ ويتأخّر');
+  if (!/data-mscore/.test(rs)) RE('لا عدّادَ مستقلًّا لفكِّ الأصوات');
+  if (/saveScore\(ar\?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, \{dur:dur[^}]*micro/.test(rs))
+    RE('فكُّ الأصواتِ يدخل درجةَ الإملاء — وهو تدريبٌ لا امتحان');
+  if (!/"فكّ الأصوات 🎧"/.test(rs)) RE('لا صفَّ يُحفظ فيُقاس أثرُ الجرعة');
+  if (!/hear:good\?1:0/.test(rs))
+    RE('الصفُّ لا يفصل التمييزَ بالأذنِ عن الكتابةِ باليد — فلا يُعرف أيُّهما تحسّن');
   return out;
 }

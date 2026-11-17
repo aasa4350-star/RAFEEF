@@ -121,6 +121,7 @@
 <script src="reading-osama.js"></script>
 <script src="reading-xq.js"></script>
 <script src="vocab-bank.js"></script>
+<script src="listen-micro.js?v=20261117"></script>
 <script>
 const META = {
   hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e",rate:0.95},
@@ -2325,7 +2326,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s5";  /* AUDIO_SIG: 30940888 */
+var AUDIO_VER = "s6";  /* AUDIO_SIG: a2329c7c */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -2652,6 +2653,160 @@ if(!META[who] || !DATA[who]){
     return m ? ' <span style="font-weight:700;color:var(--muted)">— المعنى: '+m+'</span>' : '';
   }
 
+  /* ═══ فكُّ الأصواتِ الصغيرة — قبلَ الإملاء لا بدلَه ═════════════════
+     قياسُ رفيف (٩٧ بندًا خاطئًا، ٩٥٪ محاولاتٌ حقيقيّةٌ لا ضربًا على
+     الكيبورد) أظهر أنّ خطأها كلَّه في موضعٍ واحد: الكلماتُ الوظيفيّةُ
+     غيرُ المنبورة. «are» تصير «a» ثلاثَ مرّات، و«is» تصير «a»، و«They»
+     تصير «the»، و«for» تصير «to»، و«at» تسقط، و«‑ed» و«‑s» تُمحى.
+     وتكتب grandparents و library و homework سليمةً. وهو بعينِه ما يصفه
+     بحثُ الفكِّ السمعيّ: الكلماتُ المعنويّةُ ٧٦٪ والوظيفيّةُ ٥٤٪.
+
+     والجملةُ الكاملةُ لا تُدرِّب هذا: تقيس الذاكرةَ العاملةَ مع الفكِّ
+     فتخلط السببَين. فالشظيّةُ من كلمتين إلى أربعٍ تقيس الفكَّ وحدَه —
+     وهو تمرينُ الاستماعِ المصغَّرِ عند فيلد (micro-listening).
+
+     والصوتُ صحيحٌ دائمًا والخيارُ مكتوب: انظر tools/generate-micro.js —
+     إسماعُها «a playing» تدريبٌ لأذنِها على ما لا وجودَ له، وقد أعادت
+     خدمةُ التعرّفِ مقطعَ «the played» همهمةً لأنّه مركّبٌ بلا معنى.
+
+     وصوتان لا صوتٌ واحد: ذاك جوهرُ HVPT، فمن تدرّب على صوتٍ واحدٍ
+     تعلّم الصوتَ لا اللغة.
+
+     وستٌّ لا أكثر، وقبلَ الإملاء لا تبويبًا جديدًا: تبويبٌ سادسٌ لا
+     يفتحه أحد (الفحصُ الدوريُّ يُنبّه الآن على ٣٣ قسمًا مهجورًا). */
+  var MICRO_FOR = { rafeef:1 };     /* تُجرَّب على رفيفَ أوّلًا ويُقاس أثرُها */
+  var _microSt = null, _microOwner = {};
+  function microItems(){
+    if(!MICRO_FOR[who] || curLang !== "en") return [];
+    var B = (window.MICRO_LISTEN || {})[who] || [];
+    if(!B.length) return [];
+    return shuffle(B.slice()).slice(0, (window.MICRO_TAKE || 6));
+  }
+  function microHtml(list){
+    if(!list.length) return "";
+    var h = '<div class="q" style="border:1.5px solid var(--accent);background:var(--good-bg)">'+
+      '<div class="num">🎧 قبل الإملاء — الأصواتُ الصغيرة</div>'+
+      '<p class="hint" style="margin:2px 0 0">أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً: '+
+      '<b dir="ltr">are</b> · <b dir="ltr">is</b> · <b dir="ltr">at</b> · <b dir="ltr">for</b> · '+
+      '<b dir="ltr">the</b> · <b dir="ltr">-ed</b>. الكلماتُ الطويلةُ تكتبينها صح. '+
+      'فنتدرّب عليها وحدَها: <b>'+list.length+'</b> مقاطعَ قصيرة، تسمعين وتختارين ثمّ تكتبين. '+
+      'ولا تدخل درجةَ الإملاء.</p></div>';
+    list.forEach(function(it, i){
+      /* ترتيبُ الخيارَين يُقلَب عشوائيًّا، وإلّا تعلّمت الموضعَ لا الصوت */
+      var opts = Math.random() < 0.5 ? [it.heard, it.wrong] : [it.wrong, it.heard];
+      h += '<div class="q micro" data-micro="'+i+'" style="border:1.5px dashed var(--accent)">'+
+        '<div class="num">🎧 مقطع '+(i+1)+' من '+list.length+'</div>'+
+        '<div class="row"><button class="say" data-msay>🔊 اسمع</button>'+
+          '<button class="say small" data-mslow>🐢 أبطأ</button>'+
+          '<button class="say small" data-mvoice>🔁 صوتٌ ثانٍ</button></div>'+
+        '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:10px 2px 4px">أيُّهما سمعتِ؟</span>'+
+        '<div class="row" style="gap:6px">'+
+          opts.map(function(o,k){ return '<button class="chk mopt" data-mo="'+o.replace(/"/g,'&quot;')+'" '+
+            'style="flex:1;direction:ltr;font-size:1rem">'+o+'</button>'; }).join('')+
+        '</div>'+
+        '<div class="fb"></div>'+
+        '<div data-mtype style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
+          '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin-bottom:4px">اكتبيها كما سمعتِها:</span>'+
+          '<input class="dinp minp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
+          '<div class="row"><button class="chk mchk">تحقّق</button></div>'+
+          '<div class="fb mfb2"></div>'+
+        '</div></div>';
+    });
+    h += '<div class="score" style="margin-bottom:14px">فكُّ الأصوات: <span data-mscore dir="ltr">0 / '+list.length+'</span></div>';
+    return h;
+  }
+  /* مقطعٌ محفوظٌ بصوتٍ معيَّن — صفرُ انتظارٍ وصوتٌ ثابت. وإن غاب
+     المقطعُ رجعنا إلى أزور بالصوتِ نفسِه، وإلّا إلى نطقِ المتصفّح. */
+  function microSay(text, vIx, slow){
+    /* ═══ الفهرسُ يُنتظَر ولا يُسبَق ═══════════════════════════════════
+       أوّلُ تشغيلٍ يقع قبل أن يصل audio/manifest.json (جلبٌ غيرُ متزامن)،
+       فكان MANIFEST صفرًا فيُهبَط إلى أزور — فيسمع الطفلُ أوّلَ مقطعٍ
+       من الشبكةِ بتأخيرٍ وبقيّتَه من الملفّات، وهو عينُ ما يشكو منه:
+       «يبطي ما بدا». وspeak() يحتاط لهذا أصلًا، وفاتني هنا. */
+    if(!MANI_DONE){ MANI_P.then(function(){ microSay(text, vIx, slow); }); return; }
+    var V = (window.MICRO_VOICES || []), voice = V[vIx % Math.max(V.length,1)] || V[0];
+    /* السرعتان محفوظتان كلتاهما (tools/generate-micro.js)، فالبطيءُ عند
+       الخطأِ فوريٌّ كالطبيعيّ — وهو أحرجُ موضعٍ للتأخير. */
+    var mk = voice + "|" + (slow ? "s|" : "") + text;
+    var f = MANIFEST && MANIFEST.micro && MANIFEST.micro[mk];
+    if(f){
+      try{
+        if(CUR_AUDIO) CUR_AUDIO.pause();
+        var a = new Audio("audio/" + f + "?v=" + AUDIO_VER);
+        CUR_AUDIO = a; var pr = a.play(); if(pr && pr.catch) pr.catch(function(){ azureTTS(text,false,"-10%",null,0.8); });
+        return;
+      }catch(e){}
+    }
+    azureTTS(text, false, slow ? "-40%" : "-10%", null, slow ? 0.6 : 0.8);
+  }
+  function wireMicro(sec){
+    var list = _microSt && _microSt.list; if(!list || !list.length) return;
+    var scoreEl = sec.querySelector("[data-mscore]"), correct = 0, t0 = Date.now();
+    var per = [], saved = 0, pid = newPid();
+    function save(){
+      if(per.length === saved || !per.length) return; saved = per.length;
+      saveScore("فكّ الأصوات 🎧", correct, list.length, {
+        pid:pid, dur:Math.round((Date.now()-t0)/1000), lang:"en",
+        /* لكلِّ بندٍ: الشظيّةُ، وهل ميّزت بالسمعِ، وهل كتبتها — فيُقاس
+           الفكُّ والهجاءُ منفصلَين، وإلّا خُلط عطبُ الأذنِ بعطبِ اليد. */
+        items:per.slice(0,12), skills:{ "فكّ الكلمات الوظيفيّة":{ c:correct, t:list.length } } });
+    }
+    sec.querySelectorAll("[data-micro]").forEach(function(el){
+      var it = list[+el.dataset.micro]; if(!it) return;
+      var vIx = Math.floor(Math.random()*2), picked = false, logged = false;
+      var fb = el.querySelector(".fb"), box = el.querySelector("[data-mtype]");
+      var inp = el.querySelector(".minp"), fb2 = el.querySelector(".mfb2");
+      function play(slow){ microSay(it.heard, vIx, slow); }
+      el.querySelector("[data-msay]").addEventListener("click", function(){ play(false); });
+      el.querySelector("[data-mslow]").addEventListener("click", function(){ play(true); });
+      el.querySelector("[data-mvoice]").addEventListener("click", function(){ vIx = (vIx+1)%2; play(false); });
+      play(false);
+      el.querySelectorAll(".mopt").forEach(function(b){
+        b.addEventListener("click", function(){
+          if(picked) return; picked = true;
+          var good = (b.dataset.mo === it.heard);
+          el.querySelectorAll(".mopt").forEach(function(x){
+            x.disabled = true;
+            if(x.dataset.mo === it.heard){ x.style.background = "var(--good)"; x.style.color = "#fff"; x.style.borderColor = "var(--good)"; }
+            else if(x === b){ x.style.opacity = ".55"; }
+          });
+          if(good){
+            correct++; fb.className = "fb ok"; fb.innerHTML = "✅ صح — هذا الي قاله.";
+            if(scoreEl) scoreEl.textContent = correct + " / " + list.length;
+          } else {
+            fb.className = "fb no";
+            fb.innerHTML = '❌ الي قاله: <span class="corr" dir="ltr">'+it.heard+'</span>'+
+              '<div style="font-weight:600;font-size:.88rem;margin-top:5px;line-height:1.8">'+it.why+'</div>'+
+              '<div style="font-weight:600;font-size:.88rem;margin-top:3px">اسمعيها مرّةً ثانيةً — واضغطي «🐢 أبطأ».</div>';
+            play(true);
+          }
+          if(!logged){ logged = true; per.push({ f:it.heard, hear:good?1:0, w:0 }); save(); }
+          box.style.display = "block";
+        });
+      });
+      el.querySelector(".mchk").addEventListener("click", function(){
+        var v = String(inp.value||"").trim();
+        if(!v){ fb2.className = "fb mfb2"; fb2.textContent = "✍️ اكتبيها كما سمعتِها."; return; }
+        if(normX(v,false) === normX(it.heard,false)){
+          /* الوسمُ يبقى: كتابةُ className وحدَه تمحو «mfb2» فلا يصل
+             إليها فحصٌ ولا حارسٌ بعدَ أوّلِ إجابة. */
+          fb2.className = "fb mfb2 ok";
+          fb2.innerHTML = '🎉 بالضبط. وهي من جملةِ: <span dir="ltr" style="font-weight:700">'+it.from+'</span>';
+          for(var k=0;k<per.length;k++) if(per[k].f===it.heard){ per[k].w = 1; break; }
+          saved = 0; save();
+        } else {
+          fb2.className = "fb mfb2 no";
+          fb2.innerHTML = '❌ الصحيح: <span class="corr" dir="ltr">'+it.heard+'</span>'+
+            '<div style="font-weight:600;font-size:.85rem;margin-top:4px">اكتبيها مرّةً ثانيةً وأنتِ تشوفينها.</div>';
+        }
+      });
+      inp.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); el.querySelector(".mchk").click(); } });
+    });
+    /* مالكٌ خاصٌّ لا null ولا renderDict: hookLeaveSave يكتب على المالكِ
+       ويستبدل خطّافَه، فلو تشاركنا مالكَ الإملاءِ ضاع حفظُ أحدِهما. */
+    hookLeaveSave(_microOwner, save);
+  }
+
   function renderDict(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
@@ -2668,7 +2823,11 @@ if(!META[who] || !DATA[who]){
          '</b> جملة يوميّة' + (dose ? (' و<b>' + dose + '</b> أكاديميّة') : '') +
          '. تطلع لك وحدة أصعب كل ما توصل ٧٥٪.</p>')
       : '';
-    var html = '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
+    /* الشظايا تُحسب مرّةً ويُحفظ اختيارُها، فلا يتبدّل البندُ بين
+       الرسمِ والتوصيل. */
+    _microSt = { list: microItems() };
+    var html = microHtml(_microSt.list)+
+      '<div class="block-title"><span class="dot"></span> اسمع واكتب</div>'+
       '<p class="hint">اضغط 🔊 استمع، ثم اكتب ما سمعته، ثم «تحقّق».</p>'+
       doseLine+
       EXIT_WARN_HTML+
@@ -2728,7 +2887,9 @@ if(!META[who] || !DATA[who]){
     renderDict._save = savePartial;
     sec._leave = function(){};
     hookLeaveSave(renderDict, savePartial);
+    wireMicro(sec);
     sec.querySelectorAll(".q").forEach(function(qEl){
+      if(qEl.dataset.i == null) return;      /* بطاقةُ فكِّ الأصواتِ أو لافتةٌ — لا بندَ إملاء */
       var i=+qEl.dataset.i, text=items[i];
       var inp=qEl.querySelector(".dinp"), fb=qEl.querySelector(".fb");
       /* الإملاء كان يستدعي speak() مباشرةً: تسجيلٌ محفوظ وإلّا نطقُ المتصفّح.
