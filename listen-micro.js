@@ -67,13 +67,61 @@
       from:"The students are studying in the library." }
   ];
 
+  /* ═══ حسنٌ — من محاولاتِه الخمسين الحقيقيّةِ وحدَها ═══════════════
+     طلبُ الأب (١٧ نوفمبر ٢٠٢٦) أن تُوضع له كذلك قبل قياسِ أثرِها على
+     رفيف. فبُنيت من قوائمِ أخطائِه هو لا بنسخِ بنكِ أختِه: استُخرجت
+     محاولاتُه الحقيقيّةُ كلُّها (خمسون محاولةً فريدةً من مدى شهرَين)
+     وأُخذ منها ما كان خطؤه في كلمةٍ وظيفيّةٍ بعينِها ومقيسًا لا متوقَّعًا.
+
+     وثلاثةٌ منها قِيست مرّتين فأكثر: «They were» كتبها «the were» في
+     ٢٦ أكتوبر و١٧ نوفمبر، و«If it rains» كتبها «If rains» و«If a
+     rinas»، و«has already» سمعها «was ready» و«was a raudy». وهذا
+     الأخيرُ أدلُّ ما في الملفّ: «has» صارت «was» مرّتين — فالعطبُ في
+     الفعلِ المساعدِ نفسِه لا في الهجاء.
+
+     وما كان خطؤه بتراً لا إبدالًا (كـ«she has lived here» ثمّ يتوقّف)
+     لم يُؤخَذ: ذاك عطبُ انتباهٍ لا عطبُ فكٍّ، ولا يُدرَّب بهذا. */
+  var HASAN = [
+    { heard:"They were", wrong:"the were",
+      why:"«They» ضميرٌ فاعل و«the» أداةُ تعريف. كتبتَها «the were» مرّتين — في ٢٦ أكتوبر و١٧ نوفمبر.",
+      from:"They were watching TV when I arrived." },
+    { heard:"has already finished", wrong:"was already finished",
+      why:"«has» لا «was». سمعتَها «was ready» و«was a raudy» — والفعلُ المساعدُ هو الذي يحدّد الزمن.",
+      from:"He has already finished his work." },
+    { heard:"If it rains", wrong:"If rains",
+      why:"«it» لازمةٌ قبل الفعلِ في الجوّ، وهي خفيفةٌ فتسقط من سمعك. كتبتَها «If rains» و«If a rinas».",
+      from:"If it rains, we will stay home." },
+    { heard:"is spoken", wrong:"a spoken",
+      why:"«is» تُقال خفيفةً فتُسمع «a» — وهي علامةُ المبنيِّ للمجهول.",
+      from:"English is spoken all over the world." },
+    { heard:"has been studying", wrong:"has studying",
+      why:"«been» ساقطةٌ من سمعك. وبلا «been» لا يصحُّ المضارعُ التامُّ المستمرّ.",
+      from:"She has been studying for three hours." },
+    /* ⚠️ كانت «for three hours» فردّتها خدمةُ التعرّفِ «43 hours»: فـ«for»
+       و«four» متماثلتان في النطق، والشظيّةُ مبتورةٌ قبل عددٍ فتلتبس حتى
+       على السامعِ الأصليّ — فيُحاسَب الطفلُ على تمييزٍ لا يُمكِن. فضُمّ
+       الفعلُ قبلها فزال اللبس: لا أحدَ يقول «studying four three». */
+    { heard:"studying for three", wrong:"studying three",
+      why:"«for» تدلُّ على المدّة، وهي خفيفةٌ فتسقط. أسقطتَها في ٣٠ سبتمبر.",
+      from:"She has been studying for three hours." },
+    { heard:"by a famous", wrong:"by famous",
+      why:"«a» قبل الصفةِ والمعدودِ المفرد. أسقطتَها في ١٤ نوفمبر.",
+      from:"The bridge was designed by a famous engineer." },
+    { heard:"take the bus", wrong:"take they bus",
+      why:"«the» لا «they». الفرقُ صوتُ الياءِ في آخرها، وهي غيرُ منبورةٍ فيلتبسان.",
+      from:"I would rather walk than take the bus." },
+    { heard:"believe that reading", wrong:"believe thay reading",
+      why:"«that» تربط الجملتَين. كتبتَها «thay» — فالصوتُ وصلك ناقصًا لا خطأً في القاعدة.",
+      from:"Many people believe that reading improves memory." }
+  ];
+
   /* أصواتٌ لكلِّ شظيّة — تعدّدُ الأصواتِ هو جوهرُ HVPT، فلا يُنقَص
      إلى واحد. وهما نفسُهما اللذان تُولَّد بهما المقاطعُ المحفوظةُ في
      tools/generate-micro.js، فلا يسمع الطفلُ صوتًا من ملفٍّ وصوتًا من
      الشبكةِ فيظنّ أحدَهما عطبًا. */
   var VOICES = ["en-GB-RyanNeural", "en-GB-SoniaNeural"];
 
-  window.MICRO_LISTEN = { rafeef: RAFEEF };
+  window.MICRO_LISTEN = { rafeef: RAFEEF, hasan: HASAN };
   window.MICRO_VOICES = VOICES;
   window.MICRO_TAKE   = 6;     /* ستٌّ في الجلسةِ — دقيقتان أو ثلاث، لا تُترَك */
 })();

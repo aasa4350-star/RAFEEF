@@ -125,7 +125,10 @@
 <script>
 const META = {
   hasan:{name:"حسن",grade:"ثالث متوسط",emoji:"📘",accent:"#0d9488",deep:"#0f766e",rate:0.95},
-  rafeef:{name:"رفيف",grade:"ثاني متوسط",emoji:"📗",accent:"#4f46e5",deep:"#3730a3",rate:0.92},
+  /* fem: الخطابُ مؤنَّثٌ لرفيفَ وحدَها. ولا يُستغنى عنه بالاسم: الكودُ
+     لا يعرف من الاسمِ ذكرًا من أنثى، ومن خاطب بنتًا بصيغةِ الذكرِ قال
+     لها إنّ الصفحةَ ليست لها. */
+  rafeef:{name:"رفيف",grade:"ثاني متوسط",emoji:"📗",accent:"#4f46e5",deep:"#3730a3",rate:0.92,fem:true},
   osama:{name:"أسامة",grade:"خامس ابتدائي",emoji:"📙",accent:"#ea580c",deep:"#c2410c",rate:0.85},
   saud:{name:"سعود",grade:"رابع ابتدائي",emoji:"📕",accent:"#16a34a",deep:"#15803d",rate:0.8},
   /* فهد — ثالث ثانوي: الإملاءُ جملٌ أكاديميّةٌ طويلة، والقطعُ بنمط
@@ -2326,7 +2329,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s6";  /* AUDIO_SIG: a2329c7c */
+var AUDIO_VER = "s7";  /* AUDIO_SIG: 09cfacf9 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -2674,7 +2677,14 @@ if(!META[who] || !DATA[who]){
 
      وستٌّ لا أكثر، وقبلَ الإملاء لا تبويبًا جديدًا: تبويبٌ سادسٌ لا
      يفتحه أحد (الفحصُ الدوريُّ يُنبّه الآن على ٣٣ قسمًا مهجورًا). */
-  var MICRO_FOR = { rafeef:1 };     /* تُجرَّب على رفيفَ أوّلًا ويُقاس أثرُها */
+  /* بوّابةُ من يراها. بدأت برفيفَ وحدَها لقياسِ الأثرِ قبل التعميم، ثمّ
+     طلب الأبُ حسنًا معها (١٧ نوفمبر) — ولكلٍّ بنكُه من أخطائِه هو، لا
+     بنكٌ واحدٌ مشترك: عطبُ حسنٍ في «has/was» و«it» و«been»، وعطبُ رفيفَ
+     في «are/a» و«is/a» و«‑ed». فلو جُمعا في بنكٍ واحدٍ تدرّب كلٌّ منهما
+     على عطبِ الآخر. */
+  var MICRO_FOR = { rafeef:1, hasan:1 };
+  /* صيغةُ الخطاب: g("اكتبها","اكتبيها") */
+  function g(m, f){ return (META[who] && META[who].fem) ? f : m; }
   var _microSt = null, _microOwner = {};
   function microItems(){
     if(!MICRO_FOR[who] || curLang !== "en") return [];
@@ -2682,14 +2692,33 @@ if(!META[who] || !DATA[who]){
     if(!B.length) return [];
     return shuffle(B.slice()).slice(0, (window.MICRO_TAKE || 6));
   }
+  /* الكلماتُ التي تسقط منه — تُستخرَج من بنكِه هو بفرقِ الصحيحِ عن
+     الخطأ، لا تُكتَب بيدي: عطبُ حسنٍ في has/it/been/that، وعطبُ رفيفَ
+     في are/is/at/for — فلافتةٌ واحدةٌ مكتوبةٌ تكذب على أحدِهما. */
+  function microWords(list){
+    var out = [], seen = {};
+    list.forEach(function(it){
+      var A = String(it.heard).split(/\s+/), B = String(it.wrong).split(/\s+/);
+      var d = A.filter(function(w){ return B.indexOf(w) < 0; });
+      if(!d.length) d = B.filter(function(w){ return A.indexOf(w) < 0; });
+      /* الأطولُ ليست المقصودةَ: الساقطُ كلمةٌ قصيرةٌ وظيفيّة */
+      d.sort(function(a,b){ return a.length - b.length; });
+      var w = d[0]; if(!w) return;
+      /* اللاحقةُ تُعرَض لاحقةً لا كلمةً كاملة (finished → -ed) */
+      if(/ed$/.test(w) && B.indexOf(w.replace(/ed$/,"")) >= 0) w = "-ed";
+      else if(/s$/.test(w) && B.indexOf(w.replace(/s$/,"")) >= 0) w = "-s";
+      if(seen[w]) return; seen[w] = 1; out.push(w);
+    });
+    return out.slice(0, 7);
+  }
   function microHtml(list){
     if(!list.length) return "";
     var h = '<div class="q" style="border:1.5px solid var(--accent);background:var(--good-bg)">'+
       '<div class="num">🎧 قبل الإملاء — الأصواتُ الصغيرة</div>'+
       '<p class="hint" style="margin:2px 0 0">أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً: '+
-      '<b dir="ltr">are</b> · <b dir="ltr">is</b> · <b dir="ltr">at</b> · <b dir="ltr">for</b> · '+
-      '<b dir="ltr">the</b> · <b dir="ltr">-ed</b>. الكلماتُ الطويلةُ تكتبينها صح. '+
-      'فنتدرّب عليها وحدَها: <b>'+list.length+'</b> مقاطعَ قصيرة، تسمعين وتختارين ثمّ تكتبين. '+
+      microWords(list).map(function(w){ return '<b dir="ltr">'+w+'</b>'; }).join(' · ')+
+      '. الكلماتُ الطويلةُ '+g('تكتبها','تكتبينها')+' صح. '+
+      'فنتدرّب عليها وحدَها: <b>'+list.length+'</b> مقاطعَ قصيرة، '+g('تسمع وتختار ثمّ تكتب','تسمعين وتختارين ثمّ تكتبين')+'. '+
       'ولا تدخل درجةَ الإملاء.</p></div>';
     list.forEach(function(it, i){
       /* ترتيبُ الخيارَين يُقلَب عشوائيًّا، وإلّا تعلّمت الموضعَ لا الصوت */
@@ -2699,14 +2728,14 @@ if(!META[who] || !DATA[who]){
         '<div class="row"><button class="say" data-msay>🔊 اسمع</button>'+
           '<button class="say small" data-mslow>🐢 أبطأ</button>'+
           '<button class="say small" data-mvoice>🔁 صوتٌ ثانٍ</button></div>'+
-        '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:10px 2px 4px">أيُّهما سمعتِ؟</span>'+
+        '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:10px 2px 4px">'+g('أيُّهما سمعتَ؟','أيُّهما سمعتِ؟')+'</span>'+
         '<div class="row" style="gap:6px">'+
           opts.map(function(o,k){ return '<button class="chk mopt" data-mo="'+o.replace(/"/g,'&quot;')+'" '+
             'style="flex:1;direction:ltr;font-size:1rem">'+o+'</button>'; }).join('')+
         '</div>'+
         '<div class="fb"></div>'+
         '<div data-mtype style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
-          '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin-bottom:4px">اكتبيها كما سمعتِها:</span>'+
+          '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin-bottom:4px">'+g('اكتبها كما سمعتَها','اكتبيها كما سمعتِها')+':</span>'+
           '<input class="dinp minp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
           '<div class="row"><button class="chk mchk">تحقّق</button></div>'+
           '<div class="fb mfb2"></div>'+
@@ -2777,7 +2806,7 @@ if(!META[who] || !DATA[who]){
             fb.className = "fb no";
             fb.innerHTML = '❌ الي قاله: <span class="corr" dir="ltr">'+it.heard+'</span>'+
               '<div style="font-weight:600;font-size:.88rem;margin-top:5px;line-height:1.8">'+it.why+'</div>'+
-              '<div style="font-weight:600;font-size:.88rem;margin-top:3px">اسمعيها مرّةً ثانيةً — واضغطي «🐢 أبطأ».</div>';
+              '<div style="font-weight:600;font-size:.88rem;margin-top:3px">'+g('اسمعها مرّةً ثانيةً — واضغط','اسمعيها مرّةً ثانيةً — واضغطي')+' «🐢 أبطأ».</div>';
             play(true);
           }
           if(!logged){ logged = true; per.push({ f:it.heard, hear:good?1:0, w:0 }); save(); }
@@ -2786,7 +2815,7 @@ if(!META[who] || !DATA[who]){
       });
       el.querySelector(".mchk").addEventListener("click", function(){
         var v = String(inp.value||"").trim();
-        if(!v){ fb2.className = "fb mfb2"; fb2.textContent = "✍️ اكتبيها كما سمعتِها."; return; }
+        if(!v){ fb2.className = "fb mfb2"; fb2.textContent = "✍️ " + g("اكتبها كما سمعتَها.","اكتبيها كما سمعتِها."); return; }
         if(normX(v,false) === normX(it.heard,false)){
           /* الوسمُ يبقى: كتابةُ className وحدَه تمحو «mfb2» فلا يصل
              إليها فحصٌ ولا حارسٌ بعدَ أوّلِ إجابة. */
@@ -2797,7 +2826,7 @@ if(!META[who] || !DATA[who]){
         } else {
           fb2.className = "fb mfb2 no";
           fb2.innerHTML = '❌ الصحيح: <span class="corr" dir="ltr">'+it.heard+'</span>'+
-            '<div style="font-weight:600;font-size:.85rem;margin-top:4px">اكتبيها مرّةً ثانيةً وأنتِ تشوفينها.</div>';
+            '<div style="font-weight:600;font-size:.85rem;margin-top:4px">'+g('اكتبها مرّةً ثانيةً وأنت تشوفها.','اكتبيها مرّةً ثانيةً وأنتِ تشوفينها.')+'</div>';
         }
       });
       inp.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); el.querySelector(".mchk").click(); } });

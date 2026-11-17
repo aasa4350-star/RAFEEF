@@ -55,15 +55,26 @@ async function say(key, text, voice, rate){
   const esc = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ssml = '<speak version="1.0" xml:lang="en-GB"><voice name="' + voice +
                '"><prosody rate="' + rate + '">' + esc + '</prosody></voice></speak>';
-  const r = await fetch('https://' + REGION + '.tts.speech.microsoft.com/cognitiveservices/v1', {
-    method:'POST',
-    headers:{ 'Ocp-Apim-Subscription-Key':key, 'Content-Type':'application/ssml+xml',
-              'X-Microsoft-OutputFormat':FORMAT, 'User-Agent':'micro-gen' },
-    body: ssml });
-  if (!r.ok) throw new Error('HTTP ' + r.status + ' على «' + text + '» بصوت ' + voice);
-  const b = Buffer.from(await r.arrayBuffer());
-  if (b.length < 800) throw new Error('مقطعٌ فارغٌ على «' + text + '»');
-  return b;
+  /* أزور يحدُّ المعدَّل (429) فيسقط مقطعٌ واحدٌ ويبقى الفهرسُ ناقصًا —
+     والنقصُ صامتٌ: يهبط المقطعُ إلى الشبكةِ وقتَ الاستعمالِ فيتأخّر،
+     وهو عينُ ما نُصلحه. فتُعاد المحاولةُ بتراخٍ متزايدٍ لا تُهمَل. */
+  let last = '';
+  for (let a = 0; a < 5; a++){
+    const r = await fetch('https://' + REGION + '.tts.speech.microsoft.com/cognitiveservices/v1', {
+      method:'POST',
+      headers:{ 'Ocp-Apim-Subscription-Key':key, 'Content-Type':'application/ssml+xml',
+                'X-Microsoft-OutputFormat':FORMAT, 'User-Agent':'micro-gen' },
+      body: ssml });
+    if (r.ok){
+      const b = Buffer.from(await r.arrayBuffer());
+      if (b.length < 800) throw new Error('مقطعٌ فارغٌ على «' + text + '»');
+      return b;
+    }
+    last = 'HTTP ' + r.status;
+    if (r.status !== 429 && r.status < 500) break;
+    await new Promise(z => setTimeout(z, 1500 * (a + 1) * (a + 1)));
+  }
+  throw new Error(last + ' على «' + text + '» بصوت ' + voice + ' بعد خمسِ محاولات');
 }
 
 (async () => {
@@ -113,7 +124,7 @@ async function say(key, text, voice, rate){
     man.micro[keyOf(w.v, w.tag, w.txt)] = rel;
     done++;
     console.log('  ✅ ' + w.v.replace('en-GB-','').replace('Neural','') + ' ' + w.rate + ' → «' + w.txt + '»  (' + buf.length + ' بايت)');
-    await new Promise(r => setTimeout(r, 120));   /* لا نُغرق الخدمة */
+    await new Promise(r => setTimeout(r, 350));   /* لا نُغرق الخدمة */
   }
   fs.writeFileSync(mp, JSON.stringify(man));
   console.log('وُلّد ' + done + ' مقطعًا · والفهرسُ محدَّث');
