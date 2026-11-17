@@ -3556,6 +3556,10 @@ if(!META[who] || !DATA[who]){
     } else {
       st.p = st.b || 0;                          // مكانها قبل الكبوة
       st.b = 0;                                  // نسيها → ترجع بكرة
+      /* وتُعَدُّ الكبوةُ عدًّا باقيًا: الكلمةُ التي تُخطأ مرارًا لا يُعاد
+         اختبارُها إلى الأبد، بل تُعلَّم (انظر srNeedsTeach). والسالبُ
+         وسمُ «كانت عالقةً فأثبتها»، فيُستأنف العدُّ من واحدٍ لا منه. */
+      st.m = Math.max(0, st.m||0) + 1;
     }
     st.t = Date.now(); s[word]=st; setSR(s);
     pushSR();   /* نسخةٌ في الخادم — انظر pushSR */
@@ -3613,6 +3617,110 @@ if(!META[who] || !DATA[who]){
     var s=getSR();
     return pool.filter(function(w){ var st=s[w[0]];
       return st && (st.c||0)>0 && !((st.b||0)>=KNOWN_BOX && (st.c||0)>=KNOWN_MIN_HITS); }).length;
+  }
+
+  /* ═══ الكلمةُ التي تُخطأ مرارًا تُعلَّم، لا تُعاد عليه مُختبَرةً ═══════
+     شكوى حسن (١٧ نوفمبر ٢٠٢٦): «الكلمات الأولى تتكرّر عليّ في التثبيت»،
+     وبلاغ الأب معها: «أتعبتني في ترتيب الكلمات، جانا إحباطٌ من كثرة
+     اللخبطة» — وهو في محلِّه: رُقِّع هذا البابُ ستَّ مرّاتٍ بتعديلِ
+     ترتيبِ الاختيار (٣١ أغسطس · ٥ و٦ و١٠ سبتمبر · ٥ أكتوبر).
+
+     وقِيس المجدولُ هذه المرّةَ بمحاكٍ يُشغّل كتلةَ الاختيارِ نفسَها
+     (tools/sim-vocab.js) على لقطةِ حسنٍ الحقيقيّةِ بسلوكِه الحقيقيّ،
+     فظهر سليمًا: يُغطّي البنكَ كلَّه في ستّين يومًا بتكرارٍ ١٤٪ وبلا
+     عرضٍ قبلَ موعده. فالترتيبُ ليس العلّة، ولم يُمَسَّ.
+
+     والعلّةُ ظهرت في قياسٍ آخر: أوّلُ مئةِ كلمةٍ عند حسنٍ تحمل ١٫٢٦
+     خطأً للكلمة، وباقي البنكِ ٠٫٤١–٠٫٥٥ — ثلاثةُ أضعاف. والعنقودُ
+     بعينه: أعضاءُ الجسمِ وأجزاءُ البيتِ والأسرةِ (tongue · neck ·
+     shoulder · roof · daughter). فالنظامُ يُرجعها لأنّه لا يعرفها،
+     وهو مُحِقٌّ في الإرجاعِ وحسنٌ صادقٌ في الشعور.
+
+     والخللُ الحقيقيُّ أنّ النظامَ يُعيد **الاختبارَ** ولا يُعيد
+     **التعليم**: جولةُ التثبيتِ تُصلح ١٫٥ كلمةٍ في الجلسةِ وحدَها،
+     فالحلقةُ «يُخطئ ← يُختبر ← يُخطئ». والكلمةُ التي أخطأ فيها تسعَ
+     مرّاتٍ لا تحتاج اختبارًا عاشرًا.
+
+     فمن أخطأ في كلمةٍ ثلاثَ مرّاتٍ خرجت من طابورِ الاختبارِ إلى بطاقةِ
+     تعليمٍ: جوابُها مكشوفٌ، ومعها ما يلتبس بها من بنكِه نفسِه، ولا
+     تعود للاختبارِ إلّا بعد أن يكتبها من ذاكرتِه مرّتين. ولا تمسُّ
+     الدرجةَ ولا الصناديقَ — تعليمٌ لا امتحان. */
+  var TEACH_MISSES = 3;   /* ثلاثةُ أخطاءٍ = تُعلَّم */
+  var TEACH_PROOF  = 2;   /* وتعود للاختبارِ بكتابتَين من الذاكرة */
+  var TEACH_PER_SESSION = 4;  /* ولا تصير الجلسةُ كلُّها درسًا */
+  /* ═══ الزرعُ من سجلِّهم الحقيقيّ ═══════════════════════════════════
+     القاعدةُ بلا زرعٍ لا تعمل إلّا بعد ثلاثةِ أخطاءٍ جديدةٍ على كلمةٍ
+     أخطأ فيها اثنتي عشرةَ مرّةً — فينتظر الابنُ عقوبتَه ثلاثَ مرّاتٍ
+     أخرى. فتُزرَع الأعدادُ المقيسةُ من قوائمِ أخطائهم المحفوظةِ في
+     الخادم، لكلٍّ منهم بعد آخرِ تصفيرٍ طلبَه الأبُ صراحةً. وتصفيرٌ بلا
+     طالبٍ تلته استعادةٌ بطلبِ الأبِ لا يُقطع به التاريخُ (وقع لحسنٍ
+     يوم ٧ نوفمبر: تصفيرَان غيرُ مقصودَين ثمّ استعادةٌ أَلغَتهما).
+     وما ثبّته في الجلسةِ نفسِها (fx) لا يُعدُّ خطأً عالقًا. */
+  var HARD_SEED_VER = "1";
+  var HARD_SEED = {
+    hasan:{shoulder:6,cause:5,clear:4,normal:4,powerful:4,sense:4,arm:3,chicken:3,
+           eraser:3,involve:3,connect:3,wrong:3,chance:3},
+    rafeef:{tongue:3,lesson:3},
+    osama:{late:7,sit:7,difficult:7,now:6,small:6,know:6,run:5,dirty:5,"new":5,learn:5,
+           destroy:5,yesterday:4,weak:4,promote:4,sugar:3,tomorrow:3,roof:3,stand:3,
+           restaurant:3,lawyer:3,surprised:3,complain:3,grateful:3,stone:3,answer:3,question:3},
+    saud:{neighbor:13,hair:13,shoulder:12,neck:9,tongue:7,people:6,friend:4,woman:3,
+          pencil:3,wife:3,cousin:3},
+    fahad:{daughter:12,brave:10,mountain:8,different:8,proud:7,environment:7,neighbor:5,
+           sugar:5,house:5,heart:5,tree:5,sea:5,knowledge:5,computer:5,solution:5,friend:4,
+           tongue:4,library:4,horse:4,early:4,factory:4,bridge:4,machine:4,move:4,careful:4,
+           family:3,mouth:3,room:3,rice:3,window:3,floor:3,nurse:3,electricity:3,leave:3,
+           hope:3,foreign:3,busy:3,delicious:3,important:3}
+  };
+  /* ولا يُطبَّق الزرعُ مرّةً واحدةً ثمّ يُنسى: المزامنةُ مع الخادمِ قد
+     تُعيد لقطةً أقدمَ فتمحوه، والوسمُ في الجهازِ يقول «زُرع» وهو قد
+     ضاع. فيُقرأ سقفًا في كلِّ مرّةٍ، ويسقط عن الكلمةِ حين يُثبتها
+     (m = -1) لا حين يمرّ وقت. */
+  function missesOf(word, st){
+    if(st && st.m === -1) return 0;              /* أثبتها فخرجت من العلوق */
+    var seed = (HARD_SEED[who] || {})[word] || 0;
+    return Math.max((st && st.m) || 0, seed);
+  }
+  /* «مرّة» في العربيّة تتبع العدد: واحدةٌ، فمرّتان، فثلاثُ مرّاتٍ إلى
+     عشرٍ، ثمّ إحدى عشرةَ مرّةً بالإفراد. و«١٣ مرّات» خطأٌ يقرؤه الطفل
+     في كلّ بطاقة. */
+  function marratAr(n){
+    if(n === 1) return "مرّة";
+    if(n === 2) return "مرّتين";
+    if(n >= 3 && n <= 10) return n + " مرّات";
+    return n + " مرّة";
+  }
+  function srNeedsTeach(word, st){
+    if(srIsKnown(st)) return false;              /* رسخت فلا تُعلَّم */
+    return missesOf(word, st) >= TEACH_MISSES;
+  }
+  /* كتبها من ذاكرتِه — دليلٌ لا درجة. فإن بلغ الدليلُ نصابَه عادت
+     كلمةً عاديّةً تُختبر كغيرها. */
+  function srProve(word){
+    var s = getSR(), st = s[word] || {b:0,t:0,n:0,c:0};
+    st.fx = (st.fx||0) + 1;
+    if(st.fx >= TEACH_PROOF){ st.fx = 0; st.m = -1; }
+    s[word] = st; setSR(s); pushSR();
+  }
+  /* ما يلتبس بالكلمةِ من بنكِه نفسِه — لا نخترع قائمةً: نُقابل المعاني
+     العربيّةَ فنأخذ ما بدايتُه واحدةٌ أو ما احتوى الآخرَ. فمن أخطأ في
+     desk («مكتب») رأى معها library («مكتبة») وoffice («مكتب عمل»)،
+     وهذا هو موضعُ خطئِه لا الهجاء. */
+  /* مسحةٌ واحدةٌ لكلِّ كلمةٍ تُطلَب (والمطلوبُ قليلٌ: العالقُ وحدَه)،
+     فلا تُبنى مصفوفةُ تقابلٍ لتسعِ مئةٍ في تسعِ مئةٍ على جوّالِ طفل. */
+  function confusablesOf(word){
+    try{
+      var L = VOCAB_LIST, me = null, i, out = [];
+      for(i=0;i<L.length;i++) if(L[i][0] === word){ me = String(L[i][1][0]||"").trim(); break; }
+      if(!me || me.length < 3) return [];
+      for(i=0;i<L.length;i++){
+        if(L[i][0] === word) continue;
+        var b = String(L[i][1][0]||"").trim();
+        if(b.length < 3) continue;
+        if(b.indexOf(me) === 0 || me.indexOf(b) === 0){ out.push([L[i][0], b]); if(out.length >= 3) break; }
+      }
+      return out;
+    }catch(e){ return []; }
   }
   /* تقدير CEFR من حجم المفردات المتقنة — أرقامٌ تقريبية من بحوث حجم
      المفردات (A1≈٥٠٠ · A2≈١٠٠٠ · B1≈٢٠٠٠ · B2≈٣٢٥٠). نقولها تقديرًا لا
@@ -3779,7 +3887,14 @@ if(!META[who] || !DATA[who]){
     Object.keys(s||{}).forEach(function(k){
       var st = s[k]; if(!st) return;
       var d = st.t ? Math.round((st.t - SR_DAY0)/86400000) : 0;
-      o[k] = [st.b||0, st.c||0, d];
+      /* ═══ عدّادُ الخطأِ يجب أن ينجوَ من المزامنة ══════════════════════
+         كانت اللقطةُ تحفظ [صندوق، إصاباتٍ، يومًا] وتُعيدها بـn = c، أي
+         أنّ عددَ الأخطاءِ على الكلمةِ يُمحى في كلِّ مزامنةٍ مع الخادم.
+         فلم يكن في النظامِ رقمٌ يقول «أخطأ في shoulder ستَّ مرّات» —
+         ولولا ذلك لعُرفت الكلمةُ العالقةُ من أوّلِ يوم. فأُضيف الخطأُ
+         (m) والإثباتُ (fx) إلى اللقطةِ، وتُقرأ اللقطاتُ القديمةُ بصفر
+         فلا يَضيع قديمٌ ولا يُكذَب جديد. */
+      o[k] = [st.b||0, st.c||0, d, st.m||0, st.fx||0];
     });
     return o;
   }
@@ -3787,7 +3902,11 @@ if(!META[who] || !DATA[who]){
     var s = {};
     Object.keys(o||{}).forEach(function(k){
       var a = o[k]; if(!a || !a.length) return;
-      s[k] = { b:(a[0]||0), c:(a[1]||0), n:(a[1]||0), t:(a[2] ? a[2]*86400000 + SR_DAY0 : 0) };
+      var m = (a.length > 3 && typeof a[3] === "number") ? a[3] : 0;
+      s[k] = { b:(a[0]||0), c:(a[1]||0), m:m,
+               fx:((a.length > 4 && typeof a[4] === "number") ? a[4] : 0),
+               n:(a[1]||0) + Math.max(0, m),
+               t:(a[2] ? a[2]*86400000 + SR_DAY0 : 0) };
     });
     return s;
   }
@@ -4390,9 +4509,50 @@ if(!META[who] || !DATA[who]){
     html += '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> '+headTitle+'</div>'+rangeNote+
       '<div data-exitwarn style="display:none;background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad);border-radius:12px;padding:12px;margin-bottom:12px;font-weight:800;text-align:center">⚠️ انتبه: خرجت من الصفحة أثناء الحل، فهذه الجلسة قد لا تُحتسب. أكمل عادي — بس لا تفتح تطبيقًا ثانيًا وأنت تحل.</div>';
     var dayBase = getDay().count;
-    V.forEach(function(item,i){
+    /* ═══ فصلُ ما يُعلَّم عمّا يُختبر ══════════════════════════════════
+         الاختيارُ والترتيبُ لا يُمَسّان (انظر TEACH_MISSES): الكلماتُ
+         تأتي كما أتت، ثمّ تُقسَم عند العرضِ قسمَين. والقسمةُ في
+         المراجعةِ وحدَها — فالكلمةُ الجديدةُ لا تكون عالقةً أصلًا،
+         وعدّادُ «حفظت» في بابِ الجديدِ يتقدّم بعددِ ما اختُبر. */
+    var __srV = getSR(), teachL = [], testL = [];
+    V.forEach(function(item){
+      if(!isNew && srNeedsTeach(item[0], __srV[item[0]])) teachL.push(item);
+      else testL.push(item);
+    });
+    /* وسقفٌ للتعليمِ في الجلسةِ الواحدة: سعودٌ عنده إحدى عشرةَ كلمةً
+       عالقةً وجلستُه عشرٌ، فلولا السقفُ صارت الجلسةُ كلُّها درسًا بلا
+       اختبارٍ ولا درجة. والزائدُ يُترك لجلسةٍ أخرى — لا يُرَدُّ إلى
+       الاختبارِ، فردُّه إليه هو عينُ ما نُصلحه. */
+    if(teachL.length > TEACH_PER_SESSION) teachL = teachL.slice(0, TEACH_PER_SESSION);
+    if(teachL.length){
+      html += '<div class="q" style="border:1.5px solid var(--accent);background:var(--good-bg)">'+
+        '<div class="num">📖 نتعلّمها، ما نختبرها</div>'+
+        '<p class="hint" style="margin:2px 0 0">هذي <b>'+teachL.length+'</b> '+
+        (teachL.length===1?'كلمة':'كلمات')+' غلطت فيها كثير، فما فادك الاختبار. '+
+        'جوابها مكشوف لك تحت، ومعها الكلمات الي تلتبس بها. اكتبها من ذاكرتك '+
+        '<b>'+marratAr(TEACH_PROOF)+'</b> وترجع تُختبر كغيرها. ولا تدخل الدرجة.</p></div>';
+      teachL.forEach(function(item,ti){
+        var st = __srV[item[0]], n = missesOf(item[0], st), cf = confusablesOf(item[0]);
+        html += '<div class="q teach" data-teach="'+ti+'" style="border:1.5px dashed var(--accent)">'+
+          '<div class="num">📖 كلمة عالقة — رجعت لك '+marratAr(n)+'</div>'+
+          '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 2px;direction:rtl">'+item[1][0]+'</div>'+
+          '<div style="font-size:1.35rem;font-weight:800;text-align:center;direction:ltr;color:var(--good)">'+item[0]+'</div>'+
+          (cf.length ? ('<div style="margin:8px 0 2px;padding:8px 10px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:.9rem;line-height:1.9">'+
+             '⚠️ <b>لا تخلطها بـ:</b><br>'+cf.map(function(c){
+               return '<span dir="ltr" style="font-weight:800">'+c[0]+'</span> = <span dir="rtl">'+c[1]+'</span>'; }).join('<br>')+
+             '</div>') : '')+
+          '<div class="row"><button class="say small" data-tsay>🔊 اسمعها</button></div>'+
+          '<span '+lab+'>اكتبها من ذاكرتك (<span data-tn dir="ltr">0 / '+TEACH_PROOF+'</span>):</span>'+
+          '<input class="einp tinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
+          '<div class="row"><button class="chk tchk">تحقّق</button></div>'+
+          '<div class="fb"></div></div>';
+      });
+    }
+    testL.forEach(function(item,i){
       var arWord = item[1][0];
-      html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(dayBase+i+1)+' اليوم</div>'+
+      var __mn = missesOf(item[0], __srV[item[0]]);
+      html += '<div class="q" data-i="'+i+'"><div class="num">كلمة '+(dayBase+i+1)+' اليوم'+
+        (__mn ? ' · <span style="color:var(--warn);font-weight:800">غلطت فيها '+marratAr(__mn)+'</span>' : '')+'</div>'+
         '<div style="font-size:1.5rem;font-weight:800;text-align:center;margin:6px 0 4px;direction:rtl">'+arWord+'</div>'+
         '<span '+lab+'>اكتب معناها بالإنجليزي:</span>'+
         '<input class="einp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="English..." style="direction:ltr;text-align:left">'+
@@ -4407,12 +4567,14 @@ if(!META[who] || !DATA[who]){
           '<div class="row"><button class="say small pchk">افحص المكتوب</button><span class="pfb2" style="font-weight:700"></span></div>'+
         '</div></div>';
     });
-    html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+V.length+'</span></div>'+
+    html += '<div class="score">الدرجة: <span data-score dir="ltr">0 / '+testL.length+'</span></div>'+
       '<div class="fb" data-donemsg style="text-align:center;min-height:20px;margin-top:8px"></div>'+
       '<button class="chk" data-regen style="width:100%;margin-top:8px">'+(isNew?'مجموعة أخرى 🔄':'مراجعة أخرى 🔄')+'</button>'+
       '<div style="text-align:center;margin-top:12px"><button data-reset style="background:transparent;border:0;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;font-family:inherit">تصفير الكلمات والبدء من جديد ♻️</button></div>';
     sec.innerHTML = html;
-    var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=V.length;
+    /* الدرجةُ على ما اختُبر وحدَه: بطاقةُ التعليمِ ليست سؤالًا، فلو
+       دخلت المقامَ قُرئت الجلسةُ «٢٨ / ٣٠» وهو لم يُسأل عن اثنتين. */
+    var done={}, tried={}, revealed={}, correct=0, saved=false, savedN=0, attId=newPid(), advanced=false, total=testL.length;
     /* الكلماتُ التي لم تُحسب له — مثل الإملاء: الكلمة، وما كتبه، وهل
        كشفها قبل المحاولة. بها يعرف الأب أين يقف ابنُه بالضبط. */
     var missed=[];
@@ -4564,8 +4726,43 @@ if(!META[who] || !DATA[who]){
     renderVocab._save = saveIfPartial;
     sec._leave = function(){};
     hookLeaveSave(renderVocab, function(){ saveIfPartial(); saveFixups(); });
+    /* ═══ بطاقاتُ التعليمِ: دليلٌ لا درجة ═════════════════════════════
+       يكتبها من ذاكرتِه مرّتين — لا تمسُّ الدرجةَ ولا الصناديق. فإن
+       أتمّ الدليلَ سقط عنها العلوقُ وعادت تُختبر كغيرها. */
+    sec.querySelectorAll("[data-teach]").forEach(function(tEl){
+      var item = teachL[+tEl.dataset.teach]; if(!item) return;
+      var word = item[0], ar = item[1][0];
+      var inp = tEl.querySelector(".tinp"), fb = tEl.querySelector(".fb"),
+          nEl = tEl.querySelector("[data-tn]"), hits = 0, closed = false;
+      var sayB = tEl.querySelector("[data-tsay]");
+      if(sayB) sayB.addEventListener("click", function(){ speak(word, 1, "en-US"); });
+      tEl.querySelector(".tchk").addEventListener("click", function(){
+        if(closed) return;
+        var v = String(inp.value||"").trim();
+        if(!v){ fb.className="fb"; fb.textContent="✍️ اكتبها من ذاكرتك — جوابها فوق، اقرأه ثم غطّه بإصبعك."; return; }
+        if(norm(v,false) === norm(word,false)){
+          hits++; inp.value = "";
+          if(nEl) nEl.textContent = hits+" / "+TEACH_PROOF;
+          srProve(word);
+          if(hits >= TEACH_PROOF){
+            closed = true; tEl.style.borderColor = "var(--good)";
+            fb.className="fb ok";
+            fb.innerHTML="🎉 خلّصتها! كتبتها من ذاكرتك "+marratAr(TEACH_PROOF)+"، فرجعت كلمةً عاديّةً تجيك في المراجعة كغيرها.";
+          } else {
+            fb.className="fb ok";
+            fb.innerHTML="✅ صح. اكتبها مرّةً ثانيةً من ذاكرتك.";
+          }
+        } else {
+          fb.className="fb no";
+          fb.innerHTML='❌ مو بعد · الصحيح: <span class="corr" dir="ltr">'+word+'</span>'+
+            '<div style="font-weight:600;font-size:.85rem;margin-top:4px">اقرأها، غطّها، واكتبها. ما تدخل الدرجة — خذ وقتك.</div>';
+        }
+      });
+      inp.addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); tEl.querySelector(".tchk").click(); } });
+    });
     sec.querySelectorAll(".q").forEach(function(qEl){
-      var i=+qEl.dataset.i, word=V[i][0];
+      if(qEl.dataset.i == null) return;          /* بطاقةُ تعليمٍ أو لافتةٌ — لا سؤال */
+      var i=+qEl.dataset.i, word=testL[i][0];
       var ein=qEl.querySelector(".einp"), fb=qEl.querySelector(".fb");
       /* ═══ كشفُ الإجابة قبل المحاولة لا يُحسب صحيحًا ═══════════════
          بلاغ ٤ سبتمبر ٢٠٢٦ (تقرير حسن): دقّته ٩٩٪ حتى في الكلمات الجديدة
@@ -4634,7 +4831,7 @@ if(!META[who] || !DATA[who]){
             if(missed.length<12) missed.push({ w:String(word).slice(0,30),
                     t:String(ein.value||"").replace(/\s+/g," ").trim().slice(0,30),
                     seen:!!revealed[i] });
-            queueRepeat(qEl, word, V[i][1][0]);   /* ترجع له في هذه الجلسة */
+            queueRepeat(qEl, word, testL[i][1][0]);   /* ترجع له في هذه الجلسة */
           }
           if(revealed[i] && !isNew) seenN++;
           var nx=srNextTxt(word);

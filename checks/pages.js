@@ -378,6 +378,7 @@ function run(){
   issues.push(...gatVerbalPath());
   issues.push(...cssVarsPath());
   issues.push(...gramPassivePath());
+  issues.push(...teachStuckPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -7732,4 +7733,178 @@ if (require.main === module){
   console.log('صفحات: ' + r.fileCount + ' · حُمّلت: ' + r.pageCount + ' · مولّدات: ' + r.genCount);
   r.issues.forEach(i => console.log('  ' + (i.sev === 'خطأ' ? '❌' : '⚠️ ') + ' ' + i.file + ' — ' + i.msg));
   if (!r.issues.length) console.log('  ✅ لا ملاحظات');
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   حارسُ «الكلمةُ العالقةُ تُعلَّم لا تُختبر»
+
+   شكوى حسن (١٧ نوفمبر ٢٠٢٦) «الكلمات الأولى تتكرّر عليّ»، وقبلَها ستُّ
+   محاولاتٍ لإصلاحِ البابِ بتعديلِ ترتيبِ الاختيار. وقِيس المجدولُ
+   بمحاكٍ (tools/sim-vocab.js) فظهر سليمًا، وظهر العيبُ في موضعٍ آخر:
+   أوّلُ مئةِ كلمةٍ تحمل ثلاثةَ أضعافِ كثافةِ الخطأ، والنظامُ يُعيد
+   اختبارَها ولا يُعيد تعليمَها.
+
+   وهذا الحارسُ يُشغّل دوالَّ الصفحةِ نفسَها — لا نسخةً منها — ويفحص
+   أربعةَ شروطٍ يسقط بسقوطِ أيٍّ منها نفعُ الإصلاح كلِّه:
+
+   ١) كلمةٌ مزروعةٌ بثلاثةِ أخطاءٍ فأكثرَ تُعلَّم.
+   ٢) والراسخةُ لا تُعلَّم ولو كانت مزروعةً — وإلّا عُلِّم ما يعرفه.
+   ٣) والدليلُ يُسقط العلوقَ: كتابتان من الذاكرةِ تُعيدانها للاختبار،
+      وإلّا بقيت في الدرسِ إلى الأبد.
+   ٤) وكلماتُ الجدولِ المزروعِ موجودةٌ في البنكِ حرفًا بحرف: كلمةٌ
+      بحرفٍ زائدٍ أو بحرفٍ كبيرٍ لا تُطابق أبدًا، فيبقى الطفلُ يُختبر
+      في أسوأِ كلماتِه والجدولُ يقول إنّه يُعلَّم. وهذا أخطرُ ما في
+      الباب لأنّه يفشل صامتًا.
+   ════════════════════════════════════════════════════════════════════ */
+function teachStuckPath(){
+  const out = [], F = 'reading.html', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ── الكودُ يُقتطع ويُشغَّل، لا يُعاد كتابتُه ── */
+  function slice(from, to, what){
+    const a = src.indexOf(from); if (a < 0) { E('تعذّر إيجادُ بدايةِ ' + what); return null; }
+    const b = src.indexOf(to, a + from.length); if (b < 0) { E('تعذّر إيجادُ نهايةِ ' + what); return null; }
+    return src.slice(a, b);
+  }
+  const srBlock   = slice('var SR_DAYS = [0, 1, 2, 4, 8, 16, 30, 45];',
+                          '  /* تقدير CEFR من حجم المفردات المتقنة', 'كتلةِ SR');
+  /* البدايةُ بلا قيمةٍ: لو ضُمّنت «= 3» لانكسر الاقتطاعُ عند أيِّ ضبطٍ
+     للعتبةِ، فيُمسَك التخريبُ بانهيارِ الحارسِ لا بفحصِه — وهذا مَسْكٌ
+     كاذبٌ يسقط أوّلَ ما تُضبَط العتبةُ ضبطًا مشروعًا. */
+  const teachCode = slice('  var TEACH_MISSES =', '  /* ما يلتبس بالكلمةِ', 'كتلةِ التعليم');
+  const packCode  = slice('  var SR_DAY0 =', '  /* الدمجُ بالكلمة لا بالجملة', 'كتلةِ اللقطة');
+  if (!srBlock || !teachCode || !packCode) return out;
+
+  const bank = EXTRACT.readArray(src, 'VOCAB300');
+  if (!bank) { E('تعذّر استخراجُ بنكِ الكلمات'); return out; }
+  /* البنكُ الكاملُ: العامّةُ ثمّ إضافةُ أكسفورد، كما تبنيه الصفحة */
+  let full = bank.slice();
+  try {
+    const plus = path.join(ROOT, 'vocab-plus.js');
+    if (fs.existsSync(plus)){
+      const box = { window:{} }; vm.createContext(box);
+      vm.runInContext(fs.readFileSync(plus, 'utf8'), box);
+      const P = box.window.VOCAB_PLUS || [];
+      const seen = {}; full.forEach(w => seen[String(w[0]).toLowerCase()] = 1);
+      P.forEach(w => { const k = String(w[0]).toLowerCase(); if (!seen[k]){ seen[k] = 1; full.push(w); } });
+    }
+  } catch(e){}
+  /* وقائمةُ سعودٍ تزيد عليها كلماتِ كتابِه (VOCAB_EN4) كما في الصفحة —
+     ولولا ذلك لزعم الحارسُ أنّ «wife» و«cousin» ليستا في بنكِه وهما فيه. */
+  let course = [];
+  try {
+    const en4 = path.join(ROOT, 'vocab-en4.js');
+    if (fs.existsSync(en4)){
+      const box = { window:{} }; vm.createContext(box);
+      vm.runInContext(fs.readFileSync(en4, 'utf8'), box);
+      course = box.window.VOCAB_EN4 || [];
+    }
+  } catch(e){}
+  function listFor(who){
+    if (who !== 'saud' || !course.length) return full;
+    const seen = {}, extra = [];
+    full.forEach(w => seen[String(w[0]).toLowerCase()] = 1);
+    course.forEach(w => { const k = String(w[0]).toLowerCase();
+      if (!seen[k]){ seen[k] = 1; extra.push(w); } });
+    return full.concat(extra);
+  }
+
+  function world(who){
+    const LS = {}, mine = listFor(who);
+    const sb = { who, VOCAB_LIST: mine, Date, Math, JSON,
+      localStorage:{ getItem:k => (k in LS ? LS[k] : null),
+                     setItem:(k,v) => { LS[k] = String(v); },
+                     removeItem:k => { delete LS[k]; } },
+      pushSR(){}, ownedList: n => mine.slice(0, n) };
+    sb.vKey = k => 'vocab_' + k + '_' + who;
+    vm.createContext(sb);
+    try { vm.runInContext('function vKey(k){ return "vocab_"+k+"_"+who; }\n' + srBlock + '\n' + teachCode + '\n' + packCode, sb); }
+    catch(e){ E('كودُ التعليمِ لا يُقوَّم: ' + String(e.message).slice(0, 80)); return null; }
+    return sb;
+  }
+
+  const W = world('hasan');
+  if (!W) return out;
+  const SEED = W.HARD_SEED || {};
+
+  /* ٤) الجدولُ المزروعُ يجب أن يُطابق البنكَ — وإلّا فشل صامتًا */
+  let ghosts = [];
+  Object.keys(SEED).forEach(child => {
+    const has = {}; listFor(child).forEach(w => has[w[0]] = 1);
+    Object.keys(SEED[child]).forEach(w => { if (!has[w]) ghosts.push(child + ':' + w); });
+  });
+  if (ghosts.length)
+    E('كلماتٌ في جدولِ العالقِ ليست في البنكِ حرفًا بحرف، فلن تُعلَّم أبدًا: ' + ghosts.slice(0, 8).join(' · '));
+  if (!Object.keys(SEED).length) E('جدولُ الكلماتِ العالقةِ فارغٌ — فالقاعدةُ لا تعمل إلّا بعد ثلاثةِ أخطاءٍ جديدة');
+
+  /* ١) المزروعةُ تُعلَّم — تُجرَّب على كلِّ ابنٍ بأسوأِ كلماتِه */
+  Object.keys(SEED).forEach(child => {
+    const C = world(child); if (!C) return;
+    const words = Object.keys(SEED[child] || {});
+    if (!words.length) return;
+    const worst = words.sort((a, b) => SEED[child][b] - SEED[child][a])[0];
+    const st = { b:1, c:1, n:4, t:Date.now() - 6*86400000 };
+    if (!C.srNeedsTeach(worst, st))
+      E('أسوأُ كلماتِ ' + child + ' («' + worst + '» ×' + SEED[child][worst] + ') تُختبر ولا تُعلَّم');
+    if (C.missesOf(worst, st) < C.TEACH_MISSES)
+      E('عدّادُ الخطأِ لا يقرأ الجدولَ المزروعَ عند ' + child);
+  });
+
+  /* ٢) الراسخةُ لا تُعلَّم ولو كانت مزروعة */
+  const seedH = Object.keys(SEED.hasan || {})[0];
+  if (seedH){
+    const known = { b:W.KNOWN_BOX, c:W.KNOWN_MIN_HITS, n:9, t:Date.now() };
+    if (W.srNeedsTeach(seedH, known))
+      E('كلمةٌ راسخةٌ تُعلَّم — يُدرَّس ما يعرفه («' + seedH + '»)');
+  }
+
+  /* ٣) الدليلُ يُسقط العلوق: كتابتان من الذاكرةِ تُعيدانها للاختبار */
+  if (seedH){
+    const S = world('hasan');
+    S.setSR({ [seedH]: { b:1, c:1, n:4, t:Date.now() - 6*86400000 } });
+    for (let i = 0; i < S.TEACH_PROOF; i++) S.srProve(seedH);
+    const after = S.getSR()[seedH];
+    if (S.srNeedsTeach(seedH, after))
+      E('الدليلُ لا يُسقط العلوقَ: بعد ' + S.TEACH_PROOF + ' كتابتَين من الذاكرةِ تبقى الكلمةُ درسًا لا سؤالًا');
+    /* وكبوةٌ بعد الدليلِ تُستأنف من واحدٍ لا من السالب */
+    S.srMark(seedH, false);
+    if ((S.getSR()[seedH].m || 0) !== 1)
+      E('بعد الدليلِ ثمّ كبوةٍ صار عدّادُ الخطأِ ' + S.getSR()[seedH].m + ' والصوابُ ١');
+  }
+
+  /* ٥) عدّادُ الخطأِ ينجو من المزامنة — وهو أصلُ العلّة: كان يُمحى */
+  const R = world('hasan');
+  const packed = R.srPack({ zz:{ b:2, c:3, n:7, m:5, fx:1, t:Date.now() } });
+  const back = R.srUnpack(packed);
+  if (!back.zz || back.zz.m !== 5)
+    E('عدّادُ الخطأِ يضيع في المزامنة: دخل ٥ وخرج ' + (back.zz ? back.zz.m : 'لا شيء'));
+  if (!back.zz || back.zz.fx !== 1)
+    E('عدّادُ الإثباتِ يضيع في المزامنة');
+  const old = R.srUnpack({ yy:[2, 3, 100] });     /* لقطةٌ قديمةٌ بثلاثةِ أرقام */
+  if (!old.yy || old.yy.m !== 0)
+    E('اللقطاتُ القديمةُ لا تُقرأ بصفرٍ — فتُكذَب على الأولاد');
+
+  /* ٦) جمعُ العدد: «١٣ مرّات» خطأٌ يقرؤه الطفلُ في كلّ بطاقة */
+  const want = { 1:'مرّة', 2:'مرّتين', 3:'3 مرّات', 10:'10 مرّات', 11:'11 مرّة', 13:'13 مرّة' };
+  Object.keys(want).forEach(n => {
+    const got = R.marratAr(+n);
+    if (got !== want[n]) E('جمعُ العدد: marratAr(' + n + ') = «' + got + '» والصوابُ «' + want[n] + '»');
+  });
+
+  /* ٧) وفي الصفحة: البطاقتان مفصولتان، والدرجةُ على ما اختُبر وحدَه */
+  if (!/var __srV = getSR\(\), teachL = \[\], testL = \[\]/.test(src))
+    E('لا فصلَ بين ما يُعلَّم وما يُختبر');
+  if (!/total=testL\.length/.test(src))
+    E('الدرجةُ تُحسب على بطاقاتِ التعليمِ أيضًا — تُقرأ إخفاقًا وهو لم يُسأل');
+  if (!/data-score dir="ltr">0 \/ '\+testL\.length/.test(src))
+    E('مقامُ الدرجةِ المعروضُ يضمّ بطاقاتِ التعليم');
+  if (!/if\(qEl\.dataset\.i == null\) return;/.test(src))
+    E('حلقةُ الأسئلةِ لا تستثني بطاقةَ التعليم — ستُعطب الصفحةُ عند أوّلِ كلمةٍ عالقة');
+  if (!/teachL = teachL\.slice\(0, TEACH_PER_SESSION\)/.test(src))
+    E('لا سقفَ لعددِ الدروسِ في الجلسة — قد تصير الجلسةُ كلُّها درسًا بلا اختبار');
+  if (!/!isNew && srNeedsTeach/.test(src))
+    E('التعليمُ يدخل بابَ الكلماتِ الجديدةِ — وعدّادُ «حفظت» يتقدّم بما اختُبر');
+  return out;
 }
