@@ -8150,10 +8150,19 @@ function listenBankPath(){
   /* ٤) وفي الصفحة */
   const RE = m => out.push({ sev:'خطأ', file:'reading.html', msg:m });
   if (!/<script src="listen-bank\.js/.test(rs)) RE('بنكُ الاستماعِ غيرُ محمَّل');
-  if (!/function listenSay\(text\)/.test(rs))
+  /* ⚠️ بلا وسمِ الوسائطِ: عُلّق الحارسُ على «listenSay(text)» حرفيًّا،
+     فلمّا زِيد وسيطُ سطرِ المصدرِ صار الحارسُ يصرخ على كودٍ سليم. */
+  if (!/function listenSay\(/.test(rs))
     RE('لا مشغِّلَ للمقاطعِ المحفوظةِ في فهمِ المسموع — يُطلَب الصوتُ من الشبكةِ في كلِّ بند');
+  if (!/MANIFEST\.listen\[text\]/.test(rs))
+    RE('listenSay لا يقرأ فهرسَ المقاطعِ المحفوظة');
   if (!/if\(!MANI_DONE\)\{ MANI_P\.then\(function\(\)\{ listenSay\(/.test(rs))
     RE('listenSay لا ينتظر فهرسَ الصوت — فأوّلُ بندٍ يُطلَب من الشبكة');
+  /* ويُعلَن مصدرُ الصوتِ ويُسجَّل السقوطُ — وإلّا عُدنا نسأل الأبَ أن يصف ما يسمع */
+  if (!/data-src/.test(rs) || !/function listenSrcNote\(/.test(rs))
+    RE('البطاقةُ لا تُعلن مصدرَ الصوت (محفوظٌ أم من الشبكة)');
+  if (!/function listenFellBack\(/.test(rs) || !/sect:"listen"/.test(rs))
+    RE('السقوطُ إلى الشبكةِ لا يُسجَّل — فلا يُعرف أيُّ جهازٍ يُشغّل نسخةً قديمة');
   if (/azureTTS\(it\.t, false, -10,/.test(rs))
     RE('سرعةُ الاستماعِ عددٌ عارٍ (-10) لا نسبةٌ (-10%) — SSML يقرؤه مضاعِفًا فيخرج الصوتُ أسرعَ ممّا قُصد');
   if (!/ما فيه نصّ مكتوب/.test(rs))
