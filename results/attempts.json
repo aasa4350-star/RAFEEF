@@ -1,5 +1,58 @@
 [
     {
+        "id": "65cab701-1761-486f-a2f3-a8dc0d144c37",
+        "created_at": "2026-11-17T17:48:42.050482+00:00",
+        "student": "\u0641\u0647\u062f",
+        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
+        "en_correct": 0,
+        "en_total": 0,
+        "ma_correct": 0,
+        "ma_total": 0,
+        "wrong": [],
+        "meta": {
+            "at": "2026-11-17T17:48:41.453Z",
+            "cid": "1794937721453_vskbga39oen",
+            "dur": 96,
+            "pid": "mwkzfrr4_2fnr1c",
+            "fast": 0,
+            "kind": "practice",
+            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
+            "total": 12,
+            "wrong": [
+                "<b>Grammar \u2014 If Conditions:</b> If you heat ice, it ___.",
+                "<b>Grammar \u2014 Comparative / Superlative:</b> The earlier you start, the ___ stressful it feels.",
+                "<b>Grammar \u2014 Comparative / Superlative:</b> This mock is ___ than the one we solved yesterday.",
+                "<b>\u0641\u0647\u0645 \u0627\u0644\u0645\u0642\u0631\u0648\u0621:</b><div style=\"background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85\">Sleep is not simply a pause in activity. While we sleep, the brain sorts through the day's experiences, strengthening what matters and discarding what does not. Studies of adolescents show that those who sleep fewer than seven hours perform measurably worse on tasks requiring memory and judgement, even when they report feeling fine. Feeling alert, it seems, is a poor guide to actually being alert.</div>What is the writer's final point?",
+                "<b>\u0641\u0647\u0645 \u0627\u0644\u0645\u0642\u0631\u0648\u0621:</b><div style=\"background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85\">A common error in reasoning is to treat a correlation as a cause. Ice-cream sales and drowning rates rise together every summer, yet no one seriously believes that ice cream causes drowning; warm weather drives both. The lesson is not that correlations are worthless, but that they raise a question rather than answer one.</div>Why do ice-cream sales and drowning rise together?"
+            ],
+            "skills": {
+                "\u0641\u0647\u0645 \u0627\u0644\u0645\u0642\u0631\u0648\u0621": {
+                    "c": 4,
+                    "t": 6
+                },
+                "Grammar \u2014 If Conditions": {
+                    "c": 0,
+                    "t": 1
+                },
+                "Grammar \u2014 Passive Voice": {
+                    "c": 1,
+                    "t": 1
+                },
+                "\u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0643\u062a\u0627\u0628\u064a": {
+                    "c": 2,
+                    "t": 2
+                },
+                "Grammar \u2014 Comparative / Superlative": {
+                    "c": 0,
+                    "t": 2
+                }
+            },
+            "correct": 7,
+            "secPerQ": 8,
+            "stretch": false
+        }
+    },
+    {
         "id": "a04b9518-8e78-4514-b4ed-af86b27bfbd3",
         "created_at": "2026-11-17T17:47:02.610184+00:00",
         "student": "\u0641\u0647\u062f",
@@ -118027,31 +118080,6 @@
             "audioSec": 15,
             "kindPron": true,
             "refWords": 84
-        }
-    },
-    {
-        "id": "ffec172c-0d8d-4d3c-9923-57232242000c",
-        "created_at": "2026-11-10T12:42:33.382164+00:00",
-        "student": "\u0641\u0647\u062f",
-        "grade": "\u062b\u0627\u0644\u062b \u062b\u0627\u0646\u0648\u064a",
-        "en_correct": 0,
-        "en_total": 0,
-        "ma_correct": 0,
-        "ma_total": 0,
-        "wrong": [],
-        "meta": {
-            "at": "2026-11-10T12:42:33.102Z",
-            "of": 12,
-            "cid": "1794314553102_flk8erpvwo",
-            "pid": "mwaof5m2_2s2mkv",
-            "kind": "activity",
-            "sect": "try",
-            "test": "STEP \u0625\u0646\u062c\u0644\u064a\u0632\u064a",
-            "right": 1,
-            "total": 0,
-            "correct": 0,
-            "partial": true,
-            "answered": 2
         }
     }
 ]
