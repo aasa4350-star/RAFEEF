@@ -316,6 +316,19 @@ const DATA = {
   hasan:{
     en:{ dictation:["She has lived here since 2010.","The letter was written by Ali.","If it rains, we will stay home.","He has already finished his work.","They were watching TV when I arrived.","Water boils at one hundred degrees.","The scientists have discovered a new planet.","If I had known, I would have helped.","English is spoken all over the world.","She has been studying for three hours.",
       "The museum was built over a hundred years ago.","If you study hard, you will pass the exam.","She has never visited Japan before.","The bridge was designed by a famous engineer.","He used to play football every weekend.","By the time we arrived, the movie had already started.","The book that she is reading was written last year.","I enjoy reading before I go to sleep.","They were watching a documentary when the power went out.","This is the best restaurant I have ever visited.","If I had more time, I would learn a new language.","The letter has not been answered yet.","We are used to waking up early on school days.","She wishes she could speak three languages.","The bridge that connects the two cities is very old.","He has been working on this project since March.","Many people believe that reading improves memory.","The experiment was carefully planned by the scientists.","I would rather walk than take the bus.","They have already finished building the new school."],
+      /* ═══ قطعُ حسنٍ: بنكُه الخاصُّ ثمّ بنكُ ستيبٍ الرباعيّ ═══════════
+         قياسُ ١٨ نوفمبر ٢٠٢٦: قطعُه كلُّها ثلاثةُ خيارات، وحظُّ
+         التخمينِ فيها ٣٣٪ لا ٢٥٪ كالاختبار. وفي المستودعِ بنكٌ مكتوبٌ
+         على نمطِ ستيبٍ — ثمانٍ وأربعون قطعةً و١٨٠ سؤالًا بأربعةِ
+         خيارات، متوسّطُ القطعةِ ١٣٢ كلمة — وكان مقصورًا على فهدٍ
+         وحدَه (SENIOR في practice.html)، فلا يصل حسنًا.
+
+         فضُمَّ إلى قطعِه. ولم تُحذَف القصيرةُ ذاتُ الثلاثة: فيها
+         مواضيعُ درسَها، وحذفُها يُفقده ما بناه. والطويلةُ الجديدةُ
+         (reading-long.js) تبقى كما هي.
+
+         وطلبُ الأب كان الثانيَ ثمّ الأوّل: وُسّع بنكُ الاستماعِ أوّلًا
+         (٢٠ ← ٦٠ نصًّا) ثمّ فُتح هذا. */
       pass:[
         ["Technology has changed the way we learn. In the past, students depended only on books and teachers. Today, they can find information online, watch videos, and take courses from home. However, experts warn that spending too much time on screens can affect health and focus. Therefore, balance is important.",
           [["How did students learn in the past?",["only online","from books and teachers","from videos"],1],["What do experts warn about?",["reading too much","too much screen time","studying at home"],1],["What is the main advice?",["stop using technology","balance","study all day"],1]]],
@@ -333,7 +346,7 @@ const DATA = {
           [["Who does volunteering benefit?",["both the individual and society","only the individual","no one"],0],["What does volunteering develop?",["a sense of responsibility","selfishness","laziness"],0],["How do volunteers often feel?",["happier and more connected","lonely","tired only"],0]]],
         ["Critical thinking is the ability to analyze information carefully before accepting it. In a world full of news and social media, this skill helps us tell facts from opinions and avoid being misled. Schools should encourage students to question and think deeply.",
           [["What is critical thinking?",["analyzing information before accepting it","believing everything","ignoring facts"],0],["Why is it important today?",["it helps tell facts from opinions","it wastes time","it is easy"],0],["What should schools encourage?",["students to question and think deeply","memorizing only","silence"],0]]]
-      ] },
+      ].concat(window.STEP_READING || []) },
     ar:{ dictation:["إنَّ مَعَ العُسْرِ يُسْرًا.","مَنْ جَدَّ وَجَدَ وَمَنْ زَرَعَ حَصَدَ.","العَقْلُ السَّلِيمُ فِي الجِسْمِ السَّلِيمِ.","الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ.","خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ.","الأَمَانَةُ تَاجٌ عَلَى رُؤُوسِ الأَصْحَابِ.","العِلْمُ فِي الصِّغَرِ كَالنَّقْشِ عَلَى الحَجَرِ.","مَنْ سَارَ عَلَى الدَّرْبِ وَصَلَ.","الوَقْتُ مِنْ ذَهَبٍ فَلَا تُضِعْهُ.","الاتِّحَادُ قُوَّةٌ وَالتَّفَرُّقُ ضَعْفٌ.","اللُّغَةُ العَرَبِيَّةُ لُغَةُ الضَّادِ وَأَوْسَعُ اللُّغَاتِ مُفْرَدَاتٍ.","الشَّمْسُ مَصْدَرُ الطَّاقَةِ الرَّئِيسُ لِكَوْكَبِ الأَرْضِ.","التَّفْكِيرُ العِلْمِيُّ يَقُومُ عَلَى المُلَاحَظَةِ وَالتَّجْرِبَةِ.","حَافِظْ عَلَى بِيئَتِكَ تَحْيَ حَيَاةً سَلِيمَةً.","التَّسَامُحُ خُلُقٌ يَبْنِي الجُسُورَ بَيْنَ النَّاسِ.","العَدْلُ أَسَاسُ المُلْكِ.","المَعْرِفَةُ قُوَّةٌ لَا تُقَدَّرُ بِثَمَنٍ.","الاِبْتِكَارُ ثَمَرَةُ العَقْلِ المُتَجَدِّدِ.","مَنْ أَتْقَنَ عَمَلَهُ نَالَ رِضَا النَّاسِ.","الحُرِّيَّةُ مَسْؤُولِيَّةٌ قَبْلَ أَنْ تَكُونَ حَقًّا.","التَّارِيخُ مِرْآةُ الأُمَمِ وَعِبْرَةُ الأَجْيَالِ.","الطُّمُوحُ سُلَّمٌ يَرْتَقِي بِهِ الإِنْسَانُ.","بِالتَّخْطِيطِ السَّلِيمِ تُدْرَكُ الغَايَاتُ.","القِرَاءَةُ تَفْتَحُ أَمَامَ العَقْلِ آفَاقًا وَاسِعَةً.","الأَمَلُ يُحَوِّلُ المُسْتَحِيلَ إِلَى مُمْكِنٍ.","تَعَلَّمْ مِنْ أَخْطَائِكَ وَلَا تَيْأَسْ.","العَمَلُ الجَمَاعِيُّ يُضَاعِفُ الإِنْجَازَ.","الوَقْتُ أَثْمَنُ مَا يَمْلِكُهُ الإِنْسَانُ.","الصِّدْقُ مَنْجَاةٌ وَالكَذِبُ مَهْوَاةٌ.","بِقَدْرِ الكَدِّ تُكْتَسَبُ المَعَالِي.","العِلْمُ يَبْنِي وَالجَهْلُ يَهْدِمُ.","الإِرَادَةُ القَوِيَّةُ تَقْهَرُ الصِّعَابَ.","الأَخْلَاقُ الحَسَنَةُ رَأْسُ مَالِ الإِنْسَانِ.","الفَشَلُ خُطْوَةٌ نَحْوَ النَّجَاحِ إِذَا تَعَلَّمْنَا مِنْهُ.","خِدْمَةُ الوَطَنِ شَرَفٌ وَوَاجِبٌ.","التَّوَاضُعُ يَرْفَعُ صَاحِبَهُ.","المُثَابَرَةُ طَرِيقُ التَّفَوُّقِ.","العِلْمُ فِي الصُّدُورِ لَا فِي السُّطُورِ.","مَنْ رَاقَبَ النَّاسَ مَاتَ هَمًّا.","المُثَابَرَةُ سِرُّ النَّجَاحِ وَمِفْتَاحُ التَّفَوُّقِ.","المَسْؤُولِيَّةُ أَمَانَةٌ فِي أَعْنَاقِنَا جَمِيعًا.","قَرَأْتُ كِتَابًا مُفِيدًا عَنْ تَارِيخِ العُلَمَاءِ.","سَعَى الطَّالِبُ إِلَى العِلْمِ فَنَالَ مُبْتَغَاهُ.","الشَّبَابُ عِمَادُ الأُمَّةِ وَبُنَاةُ مُسْتَقْبَلِهَا.","مَنْ تَأَنَّى أَدْرَكَ مَا تَمَنَّى.","رَأَيْتُ فِي المَكْتَبَةِ كُتُبًا نَفِيسَةً.","العُلَمَاءُ وَرَثَةُ الأَنْبِيَاءِ.","لَنْ نَتَقَدَّمَ مَا لَمْ نُتْقِنْ أَعْمَالَنَا.","شُؤُونُ الوَطَنِ مَسْؤُولِيَّةُ أَبْنَائِهِ.","تَسَاءَلَ المُعَلِّمُ عَنْ سَبَبِ الغِيَابِ.","دَعَا الأَبُ لِأَبْنَائِهِ بِالتَّوْفِيقِ.","بَنَى المُهَنْدِسُونَ جِسْرًا عَظِيمًا فَوْقَ الوَادِي.","أَلْقَى الخَطِيبُ كَلِمَةً مُؤَثِّرَةً فِي الحَاضِرِينَ.","الصِّدْقُ مَنْجَاةٌ وَالكَذِبُ مَهْلَكَةٌ.","اسْتَغْفَرَ المُؤْمِنُ رَبَّهُ فَغَفَرَ لَهُ.","مَاءُ البِئْرِ عَذْبٌ صَافٍ.","رُؤُوسُ الجِبَالِ مُكَلَّلَةٌ بِالثُّلُوجِ.","أُولَئِكَ هُمُ المُفْلِحُونَ فِي الدَّارَيْنِ.","هَؤُلَاءِ الطُّلَّابُ نُجُومُ المَدْرَسَةِ.","يَقْرَؤُونَ الدَّرْسَ بِتَمَعُّنٍ وَهُدُوءٍ.","جَاءَ أَبْنَاؤُهُ يَسْأَلُونَ عَنْ حَالِهِ.","كَافَأَ المُدِيرُ الطَّالِبَ المُجْتَهِدَ.","لَا تُؤَجِّلْ عَمَلَ اليَوْمِ إِلَى الغَدِ.","إِنَّ فِي الصَّبْرِ عَلَى الشَّدَائِدِ فَرَجًا قَرِيبًا.","العَمَلُ الجَادُّ يَصْنَعُ المُسْتَقْبَلَ.","حَافِظُوا عَلَى نَظَافَةِ بِيئَتِكُمْ.","أَقْبَلَ الرَّبِيعُ فَاكْتَسَتِ الأَرْضُ خُضْرَةً.","كَانَ الجَوُّ صَحْوًا وَالنَّسِيمُ عَلِيلًا.","مَضَى الشِّتَاءُ وَجَاءَ الصَّيْفُ بِحَرِّهِ.","الوَفَاءُ بِالوَعْدِ خُلُقُ الكِرَامِ.","ذَاكَرَ الطُّلَّابُ دُرُوسَهُمْ اسْتِعْدَادًا لِلِاخْتِبَارِ.","فِي التَّأَنِّي السَّلَامَةُ وَفِي العَجَلَةِ النَّدَامَةُ.","أَدَّى الفَرِيقُ وَاجِبَهُ عَلَى أَكْمَلِ وَجْهٍ.","نَشَأَ الفَتَى عَلَى حُبِّ الخَيْرِ وَالعَطَاءِ."],
       pass:[
         ["شَهِدَ العَالَمُ فِي العُقُودِ الأَخِيرَةِ تَطَوُّرًا هَائِلًا فِي مَجَالِ التِّقْنِيَةِ، فَقَدْ غَيَّرَتْ وَسَائِلُ التَّوَاصُلِ الحَدِيثَةُ طَرِيقَةَ تَعَامُلِنَا مَعَ المَعْلُومَةِ وَالعَالَمِ مِنْ حَوْلِنَا. وَمَعَ أَنَّ لِهَذِهِ التِّقْنِيَةِ فَوَائِدَ كَثِيرَةً فِي التَّعْلِيمِ وَالعَمَلِ، إِلَّا أَنَّ الإِفْرَاطَ فِي اسْتِخْدَامِهَا قَدْ يُؤَثِّرُ سَلْبًا عَلَى العَلَاقَاتِ الاجْتِمَاعِيَّةِ وَالصِّحَّةِ. وَلِذَلِكَ فَإِنَّ الاسْتِخْدَامَ المُتَوَازِنَ هُوَ مِفْتَاحُ الاسْتِفَادَةِ الحَقِيقِيَّةِ.",
@@ -2329,7 +2342,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s7";  /* AUDIO_SIG: 09cfacf9 */
+var AUDIO_VER = "s8";  /* AUDIO_SIG: df2facb8 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -4183,6 +4196,24 @@ if(!META[who] || !DATA[who]){
      ولا تُفتح الإجابةُ بالاستماعِ وحدَه إن تعذّر الصوت: إن لم يعمل
      المشغّلُ أصلًا يُفتح النصُّ ويُقال له إنّها قراءةٌ لا استماع، فلا
      يبقى القسمُ مقفلًا بعطلٍ ليس منه. */
+  /* نصُّ فهمِ المسموع: المقطعُ المحفوظُ إن وُجد، وإلّا أزور بالسرعةِ
+     المقصودة. ويُنتظَر الفهرسُ ولا يُسبَق — وإلّا طُلب أوّلُ بندٍ من
+     الشبكةِ وبقيّتُه من الملفّات. */
+  function listenSay(text){
+    if(!MANI_DONE){ MANI_P.then(function(){ listenSay(text); }); return; }
+    var f = MANIFEST && MANIFEST.listen && MANIFEST.listen[text];
+    if(f){
+      try{
+        if(CUR_AUDIO) CUR_AUDIO.pause();
+        var a = new Audio("audio/" + f + "?v=" + AUDIO_VER);
+        CUR_AUDIO = a;
+        var pr = a.play();
+        if(pr && pr.catch) pr.catch(function(){ azureTTS(text, false, "-10%", null, 0.9); });
+        return;
+      }catch(e){}
+    }
+    azureTTS(text, false, "-10%", null, 0.9);
+  }
   function renderListen(){
     var sec = document.getElementById("listen");
     if(!sec) return;
@@ -4299,7 +4330,15 @@ if(!META[who] || !DATA[who]){
         playBtn.textContent = "🔁 اسمع مرّة ثانية";
         if(plays >= 2) playBtn.disabled = true;
         openQs();
-        try{ azureTTS(it.t, false, -10, null, 0.9); }
+        /* ═══ المقطعُ المحفوظُ أوّلًا ══════════════════════════════════
+           كان يُطلَب من أزور في كلِّ تشغيل، فينتظر الطفلُ في كلِّ بندٍ
+           من ثمانية — وهي علّةُ «يبطي ما بدا» بعينها في بابٍ آخر.
+           وstt الستّون كلُّها مُولَّدةٌ محفوظةٌ (tools/generate-listen.js).
+
+           والسرعةُ «-10%» لا -10: SSML يقرأ العددَ العاريَ مضاعِفًا لا
+           نسبةً، فكان الصوتُ يخرج أسرعَ ممّا قُصد — قِيس على النصِّ
+           الواحد: -10 أعطى ١٢٦٧٢ بايتًا و-10% أعطى ١٤١١٢. */
+        try{ listenSay(it.t); }
         catch(e){
           /* لا صوتَ أصلًا: نفتح النصَّ ونقول له الحقيقة — قراءةٌ لا استماع */
           scEl.style.display = "block";

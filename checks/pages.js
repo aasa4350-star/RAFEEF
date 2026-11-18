@@ -380,6 +380,7 @@ function run(){
   issues.push(...gramPassivePath());
   issues.push(...teachStuckPath());
   issues.push(...microListenPath());
+  issues.push(...listenBankPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -8076,5 +8077,86 @@ function microListenPath(){
     if (/dir="ltr">are<\/b>/.test(mb) || !/microWords\(list\)/.test(mb))
       RE('لافتةُ الكلماتِ الساقطةِ مكتوبةٌ بيدٍ لا مستخرجةٌ من بنكِ الطفل — فتكذب على من ليست كلماتُه');
   }
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   حارسُ بنكِ فهمِ المسموع
+
+   القياسُ الذي أوجب التوسعة (١٨ نوفمبر ٢٠٢٦): البنكُ كان عشرين نصًّا =
+   أربعين سؤالًا، وحسنٌ أجاب ١٤٤ سؤالًا — أي كلُّ سؤالٍ ٣٫٦ مرّاتٍ في
+   المتوسّط. فصعودُه من ٥٤٪ إلى ٨٤٪ لا يُفصَل فيه الحفظُ عن المهارة.
+
+   والحارسُ يحفظ أربعةَ شروطٍ تسقط الجرعةُ بسقوطِ أيٍّ منها:
+   ١) لكلِّ نصٍّ مقطعٌ محفوظٌ وملفُّه على القرص — وإلّا طُلب من الشبكةِ
+      فانتظر الطفلُ في كلِّ بندٍ من ثمانية، وهي علّةُ «يبطي ما بدا».
+   ٢) أربعةُ خيارات — حظُّ التخمينِ ٢٥٪ كالاختبار لا ٣٣٪.
+   ٣) البنكُ أكبرُ من الجلسةِ بما يكفي ألّا يُستنفَد.
+   ٤) السرعةُ «-10%» بعلامةِ النسبة: SSML يقرأ العددَ العاريَ مضاعِفًا
+      لا نسبةً، فيخرج الصوتُ أسرعَ ممّا قُصد (قِيس: ١٢٦٧٢ بايتًا مقابل
+      ١٤١١٢ للنصِّ نفسِه).
+   ════════════════════════════════════════════════════════════════════ */
+function listenBankPath(){
+  const out = [], F = 'listen-bank.js', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+  const box = { window:{} };
+  vm.createContext(box);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), box); }
+  catch(e){ E('البنكُ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  const L = box.window.LISTEN_BANK || [];
+  if (!L.length) { E('البنكُ فارغ'); return out; }
+
+  let micro = null;
+  const mp = path.join(ROOT, 'audio', 'manifest.json');
+  if (!fs.existsSync(mp)) E('audio/manifest.json غائب');
+  else { try { micro = JSON.parse(fs.readFileSync(mp, 'utf8')).listen || {}; } catch(e){ E('الفهرسُ لا يُقرأ'); } }
+
+  const seen = {};
+  L.forEach((it, i) => {
+    const t = String(it.t || '');
+    if (!t) { E('نصٌّ فارغٌ في الموضع ' + (i+1)); return; }
+    const key = t.slice(0, 60);
+    if (seen[key]) E('نصٌّ مكرَّرٌ: «' + t.slice(0,46) + '…»'); else seen[key] = 1;
+
+    const n = t.split(/\s+/).filter(Boolean).length;
+    if (n < 15) E('نصٌّ قصيرٌ جدًّا (' + n + ' كلمة) لا يحتمل سؤالَين: «' + t.slice(0,40) + '…»');
+    if (n > 60) E('نصٌّ طويلٌ (' + n + ' كلمة) — يقيس الذاكرةَ مع الفهم: «' + t.slice(0,40) + '…»');
+
+    const qs = it.q || [];
+    if (qs.length !== 2) E('النصُّ «' + t.slice(0,34) + '…» فيه ' + qs.length + ' سؤالًا والمعمولُ به سؤالان');
+    qs.forEach(q => {
+      const o = (q && q[1]) || [];
+      if (o.length !== 4)
+        E('سؤالٌ بـ' + o.length + ' خيارات لا أربعة («' + String(q && q[0]).slice(0,38) + '») — حظُّ التخمينِ يختلف عن الاختبار');
+      const u = {}; o.forEach(x => { const k = String(x).trim().toLowerCase();
+        if (u[k]) E('خيارٌ مكرَّرٌ «' + x + '» في: ' + String(q[0]).slice(0,36)); u[k] = 1; });
+      if (!q || !q[2]) E('سؤالٌ بلا شرحٍ عربيّ: ' + String(q && q[0]).slice(0,40));
+    });
+
+    if (micro && !micro[t])
+      E('لا مقطعَ محفوظًا لـ«' + t.slice(0,40) + '…» — سيُطلَب من الشبكةِ فينتظر الطفلُ في كلِّ بند');
+    else if (micro && !fs.existsSync(path.join(ROOT, 'audio', micro[t])))
+      E('الفهرسُ يذكر مقطعًا غيرَ موجودٍ على القرص: ' + micro[t]);
+  });
+
+  /* ٣) ألّا يُستنفَد: الجلسةُ ثمانيةُ أسئلةٍ، ونشترط عشرةَ أضعافِها */
+  const rs = fs.readFileSync(path.join(ROOT, 'reading.html'), 'utf8');
+  const nm = /var N = (\d+)[^\n]*listen|LISTEN_N\s*=\s*(\d+)/.exec(rs);
+  const totalQ = L.reduce((a, x) => a + ((x.q || []).length), 0);
+  if (totalQ < 80)
+    E('بنكُ الاستماعِ ' + totalQ + ' سؤالًا — يُستنفَد في جلساتٍ قليلةٍ فيصير القياسُ حفظًا (وقع: ٣٫٦ مرّاتٍ للسؤال)');
+
+  /* ٤) وفي الصفحة */
+  const RE = m => out.push({ sev:'خطأ', file:'reading.html', msg:m });
+  if (!/<script src="listen-bank\.js/.test(rs)) RE('بنكُ الاستماعِ غيرُ محمَّل');
+  if (!/function listenSay\(text\)/.test(rs))
+    RE('لا مشغِّلَ للمقاطعِ المحفوظةِ في فهمِ المسموع — يُطلَب الصوتُ من الشبكةِ في كلِّ بند');
+  if (!/if\(!MANI_DONE\)\{ MANI_P\.then\(function\(\)\{ listenSay\(/.test(rs))
+    RE('listenSay لا ينتظر فهرسَ الصوت — فأوّلُ بندٍ يُطلَب من الشبكة');
+  if (/azureTTS\(it\.t, false, -10,/.test(rs))
+    RE('سرعةُ الاستماعِ عددٌ عارٍ (-10) لا نسبةٌ (-10%) — SSML يقرؤه مضاعِفًا فيخرج الصوتُ أسرعَ ممّا قُصد');
+  if (!/ما فيه نصّ مكتوب/.test(rs))
+    RE('لا يُقال له إنّ النصَّ مخفيٌّ كالاختبار');
   return out;
 }
