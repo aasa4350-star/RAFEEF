@@ -383,6 +383,7 @@ function run(){
   issues.push(...listenBankPath());
   issues.push(...longReadOptsPath());
   issues.push(...heardBoxPath());
+  issues.push(...writingGraderPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -8391,3 +8392,149 @@ function heardBoxPath(){
     E('الصفُّ لا يحمل رقمَ السمعِ منفصلًا عن الدرجة');
   return out;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   مصحّحُ التعبيرِ لا يُجيز ما لا يُجاز
+   ════════════════════════════════════════════════════════════════════
+   سؤالُ الأب (١٩ نوفمبر ٢٠٢٦) عن تعبيرِ حسن: «هل منه جدوى؟». فجُرّب
+   المصحّحُ بنصوصٍ مصنوعةٍ فخرج:
+     · جملةٌ واحدةٌ كرّرتُها تسعَ مرّاتٍ وبينها أدواتُ ربط → ١٩/٢٠ ناجح
+     · نصٌّ فيه اثنا عشرَ خطأً قواعديًّا → ١٧/٢٠ ناجح، أُمسِك منها واحد
+     · ومعيارُ «مناسبةِ الأسلوب» خمسةٌ من خمسةٍ في تسليماتِه كلِّها.
+   فكانت الدرجةُ تقيس الطولَ والروابطَ لا الكتابة.
+
+   وهذا الحارسُ يُشغّل المصحّحَ نفسَه — لا يُعيد كتابةَ منطقِه — على
+   نصوصٍ معلومةِ الحكم، فإن عاد يُجيز الحشوَ أو يعمى عن القواعدِ أو
+   يُهدي ربعَ الدرجةِ سقط الفحص. ومعه قياسُ الإنذارِ الكاذب: إنذارٌ
+   باطلٌ يُعلّم الطفلَ خطأً، وهو شرٌّ من السكوت. */
+function writingGraderPath(){
+  const out = [], F = 'writing-en.js', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+
+  const box = { window:{}, console:{ log(){}, warn(){}, error(){} },
+    document:{ createElement:()=>({ style:{}, appendChild(){}, querySelector:()=>null, querySelectorAll:()=>[] }),
+               addEventListener(){} },
+    localStorage:{ getItem:()=>null, setItem(){} } };
+  box.window.document = box.document;
+  vm.createContext(box);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), box); }
+  catch(e){ E('المصحّحُ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  const W = box.window.WritingEN;
+  if (!W || typeof W.grade !== 'function' || typeof W.grammar !== 'function'){
+    E('WritingEN لا يُصدِّر grade/grammar'); return out;
+  }
+  const pr = ((W.PROMPTS||{})[2]||[]).filter(x => /healthy/i.test(x.t))[0];
+  if (!pr){ E('لم أجد موضوعَ «How to stay healthy» لأُجريَ عليه القياس'); return out; }
+  const G = t => W.grade(t, 2, 'B1', pr);
+  const bandOf = (g, en) => (g.subs.filter(s => s.en === en)[0] || {}).band;
+
+  /* ١) الحشوُ لا يُجاز: جملةٌ واحدةٌ مكرّرةٌ بأدواتِ ربط */
+  const PAD = 'Staying healthy is important. First, we should eat healthy food and exercise every day. '+
+    'Second, we should eat healthy food and exercise every day. Third, we should eat healthy food and exercise every day. '+
+    'In addition, we should eat healthy food and sleep every day. For example, we should eat healthy food and sleep every day. '+
+    'However, we should eat healthy food and sleep every day. Moreover, we should eat healthy food and sleep every day. '+
+    'Finally, we should eat healthy food and sleep every day. In conclusion, we should eat healthy food and sleep and exercise every day because it is very important for us.';
+  const gPad = G(PAD);
+  if (gPad.pass) E('نصُّ الحشوِ (جملةٌ واحدةٌ تسعَ مرّاتٍ بروابط) يُجيزه المصحّحُ بـ' + gPad.total + '/20 — فيتعلّم الطفلُ أنّ الطولَ والروابطَ تكفي');
+  if (bandOf(gPad, 'Organisation') > 2)
+    E('«الترتيب» يُعطي نصَّ الحشوِ ' + bandOf(gPad,'Organisation') + ' من ٥ — والنصُّ الذي جملتُه واحدةٌ مكرّرةٌ ليس مرتَّبًا قليلًا، لا أفكارَ فيه تُرتَّب');
+
+  /* ٢) القواعدُ تُقرأ فعلًا */
+  const BROKEN = 'Staying healthy are important because it help us feel energetic. First, we should ate healthy food such as fruits and vegetables. '+
+    'A balanced diet give our body the nutrient we needs and help prevent illness. Second, regular exercise are important. '+
+    'For example, walk, cycling, or play sport keep our muscle strong. In addition, exercise help reduce stress and improve our mood. '+
+    'Third, getting enough sleeps every night are essential. Sleep allow our body and mind to rest and recover. '+
+    'In conclusion, eating, exercise and sleep is three habit that helps us stay healthy and lives a better life.';
+  const nBroken = W.grammar(BROKEN).length;
+  if (nBroken < 5) E('المدقّقُ أمسك ' + nBroken + ' أخطاءٍ فقط في نصٍّ فيه اثنا عشرَ — فالدرجةُ تقول «اللغة سليمة» وهي ليست كذلك');
+  if (G(BROKEN).pass) E('نصٌّ مكسورُ القواعدِ يُجيزه المصحّح');
+
+  /* ⚠️ والعددُ وحدَه لا يكفي حارسًا: حذفُ عائلةٍ كاملةٍ يُنقِص الأخطاءَ
+     من ثمانٍ إلى سبعٍ فيبقى العددُ فوق العتبةِ ويمرّ العطب. فتُفحَص
+     كلُّ عائلةٍ بجملتِها، فما سقطت عائلةٌ إلّا وسقط الفحص. */
+  [['We should ate healthy food.',            'فعل مساعد + فعل مصرَّف'],
+   ['I want to helps you with it.',           'to + فعل الغائب المفرد'],
+   ['Exercise help us stay strong.',          'فاعل مفرد + فعل بلا s'],
+   ['Regular exercise are important.',        'اسمٌ لا يُجمَع + فعل جمع'],
+   ['Three habit help us stay healthy.',      'عدد + اسم مفرد'],
+   ['Every students has a laptop.',           'every/each + جمع'],
+   ['He have a new bike.',                    'هو/هي + فعل بلا s'],
+   ['There is many reasons for this.',        'there is + جمع']
+  ].forEach(function(pair){
+    if (!W.grammar(pair[0]).some(function(x){ return x.why === pair[1]; }))
+      E('عائلةُ «' + pair[1] + '» لا تُمسَك: «' + pair[0] + '» تمرّ سليمةً');
+  });
+
+  /* ٣) معيارُ الأسلوبِ يُفرّق بين نصٍّ ونصّ ═══════════════════════════
+     كان يُعطي خمسةً لكلِّ من كتب كلامًا سويًّا، فربعُ الدرجةِ مُهدًى. */
+  const caOf = t => bandOf(G(t), 'Communicative Achievement');
+  const caGood = caOf(HASAN_REF);
+  if (caGood < 5) E('«مناسبةُ الأسلوب» لا تُعطي الكاملَ لنصٍّ متنوّعِ الفواتحِ مركّبِ التركيبِ غنيِّ المفردات (' + caGood + '/5)');
+  /* ⚠️ ولكلِّ بُعدٍ نصُّه: نصٌّ واحدٌ رديءٌ في ثلاثةِ أبعادٍ يهبط دون
+     الخمسةِ ولو عُطِّل بُعدان منها، فيمرّ العطبُ صامتًا. فيُعزَل كلُّ
+     بُعدٍ في نصٍّ سليمٍ فيما عداه. */
+  [['فاتحةُ الجملِ واحدةٌ لا تتنوّع',
+    'Students need a balanced diet because it provides essential nutrients. '+
+    'Students should exercise regularly although many of them feel tired. '+
+    'Students who sleep enough concentrate better during their lessons. '+
+    'Students often ignore breakfast, which reduces their energy. '+
+    'Students benefit when teachers explain healthy habits clearly. '+
+    'Students improve quickly if they follow a simple routine.'],
+   ['جملٌ مرصوفةٌ بلا تركيبٍ مركّب',
+    'Healthy food provides essential nutrients. Daily exercise strengthens muscles and improves fitness. '+
+    'Enough sleep restores energy for the next morning. Fresh vegetables contain important vitamins. '+
+    'Regular walking reduces stress quickly. My family prepares balanced meals every evening.'],
+   ['مفرداتٌ كلُّها من الشائعِ المئة',
+    'I like it because it is good. You like it because it is good. '+
+    'We like it because it is good. They like it because it is good.']
+  ].forEach(function(pair){
+    const ca = caOf(pair[1]);
+    if (ca >= 5)
+      E('«مناسبةُ الأسلوب» تُعطي ٥ لنصٍّ ' + pair[0] + ' — فالبُعدُ لا يُفحَص وربعُ الدرجةِ مُهدًى');
+  });
+
+  /* ٤) ولا إنذارَ كاذبًا: إنذارٌ باطلٌ يُعلّمه خطأً وهو شرٌّ من السكوت */
+  const OK_SENTS = [
+    'Exercise helps us stay strong and healthy.',
+    'A balanced diet gives our bodies the nutrients we need.',
+    'Sleep allows our minds to rest and recover.',
+    'Regular exercise is important for everyone.',
+    'I exercise every morning before school.',
+    'Students should eat breakfast before they come to school.',
+    'I want to help my brother with his homework.',
+    'Three habits help us stay healthy.',
+    'Every student in my class has a laptop.',
+    'There is a lot of homework tonight.',
+    'There are several reasons for this problem.',
+    'The news is good this morning.',
+    'Much water is wasted every summer.',
+    'An hour later, we arrived at the hotel.',
+    'He is a university student in Riyadh.',
+    'Healthy eating, regular exercise, and enough sleep are three important habits.',
+    'Reading books improves our vocabulary.',
+    'The man who helped us was very kind.',
+    'Although it was raining, we went out.',
+    'People are waiting outside the hall.'
+  ];
+  const fp = OK_SENTS.filter(s => W.grammar(s).length);
+  if (fp.length)
+    E('إنذارٌ كاذبٌ على ' + fp.length + ' جملةٍ صحيحة، منها «' + fp[0] + '» — والإنذارُ الباطلُ يُعلّم الطفلَ خطأً');
+
+  /* ٥) وما كُتِب حسنًا يبقى حسنًا: نصُّ حسنٍ في ١٤ نوفمبر كان ٢٠/٢٠،
+        فلا يجوز أن يُنقِصه التشديدُ — التشديدُ على الحشوِ والخطأ لا على
+        من كتب جيّدًا. */
+  const gRef = G(HASAN_REF);
+  if (W.grammar(HASAN_REF).length)
+    E('إنذارٌ على نصٍّ سليمٍ كتبه الطفلُ فعلًا (١٤ نوفمبر): ' + W.grammar(HASAN_REF).map(x => '«'+x.bad+'»').join(' · '));
+  if (gRef.total < 20)
+    E('نصُّ ١٤ نوفمبر كان ٢٠/٢٠ فصار ' + gRef.total + '/20 — التشديدُ أصاب من كتب جيّدًا');
+
+  return out;
+}
+const HASAN_REF = 'Staying healthy is important because it helps us feel energetic and enjoy our daily lives. '+
+  'First, we should eat healthy food such as fruits, vegetables, and whole grains. A balanced diet gives our bodies the nutrients we need and helps prevent illness. '+
+  'Second, regular exercise is important. For example, walking, cycling, or playing sports keeps our muscles strong and improves our fitness. '+
+  'In addition, exercise helps reduce stress and improves our mood. Third, getting enough sleep every night is essential. '+
+  'Sleep allows our bodies and minds to rest and recover, so we can concentrate better during the day. '+
+  'In conclusion, healthy eating, regular exercise, and enough sleep are three important habits that help us stay healthy and live a better life.';

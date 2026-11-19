@@ -884,6 +884,24 @@ function band(passed, total){
 /* لغة الدردشة والاختصارات — تُخِلّ بـ«مناسبة الأسلوب للمهمّة» (Register) */
 var CHATSPEAK = ["u","ur","r","plz","pls","thx","gonna","wanna","gotta","lol","omg","bcz","bcoz","cuz","idk","btw","asap","4u","2u"];
 var SEQ_WORDS = ["first","firstly","then","next","after that","finally","lastly","in conclusion","to sum up"];
+/* أدواتُ الوصلِ التابعة: تجعل الجملةَ مركّبةً لا مرصوفة. وهي غيرُ
+   أدواتِ الربطِ بين الجمل (however · in addition) التي يقيسها
+   «الترتيب» — فلا يُحسَب الشيءُ مرّتين. */
+var SUBORD = ["because","although","though","while","whereas","since","unless","if",
+              "when","whenever","before","after","until","which","who","whose","that",
+              "so that","even though","as long as","in order to"];
+/* المئةُ الأشيعُ في الإنجليزيّة (قوائمُ التواترِ المعياريّة) — ما خرج
+   عنها وطُولُه أكثرُ من ثلاثةِ أحرفٍ يُعَدُّ مفردةً حقيقيّة. وطولُ
+   الثلاثةِ شرطٌ لئلّا تُحسَب الأدواتُ القصيرةُ مفرداتٍ راقية. */
+var COMMON100 = (function(){
+  var L = ("the be to of and a in that have i it for not on with he as you do at this but his by from "+
+    "they we say her she or an will my one all would there their what so up out if about who get which go me "+
+    "when make can like time no just him know take people into year your good some could them see other than "+
+    "then now look only come its over think also back after use two how our work first well way even new want "+
+    "because any these give day most us is are was were been being has had does did very much many more will "+
+    "shall should must may might am lot thing things really").split(/\s+/);
+  var o = {}; L.forEach(function(w){ if(w) o[w]=1; }); return o;
+})();
 
 /* ═══ أخطاءُ القواعدِ الشائعة ═══════════════════════════════════════
    سؤالُ الأب (٢٢ أكتوبر ٢٠٢٦): «كيف حسن في التعبير؟» — وكان المصحّحُ
@@ -918,17 +936,71 @@ var GRAMMAR = [
   [/\b(people|children|men|women|police)\s+(is|was|has)\b/gi, "جمع + فعل مفرد", "people are"],
   [/\b(information|advice|knowledge|homework|furniture|equipment|luggage|progress)s\b/gi,
    "جمعُ اسمٍ لا يُجمَع", "information لا informations"],
-  [/\bthere\s+(is|was)\s+(many|several|a lot of|lots of|two|three|four|five|some)\b/gi,
+  /* ⚠️ «a lot of» و«lots of» و«some» تصحبها أسماءٌ لا تُعَدّ: قياسُ
+     ١٩ نوفمبر أنذر على «There is a lot of homework» وهي صحيحة. فلا
+     يُنذَر عليها إلّا إذا تبعها جمعٌ صريح، واستُثنيَ ما آخرُه سينٌ
+     وليس بجمعٍ (news · physics · mathematics). */
+  [/\bthere\s+(is|was)\s+(many|several|two|three|four|five|six|seven|eight|nine|ten)\b/gi,
    "there is + جمع", "there are many"],
+  [/\bthere\s+(is|was)\s+(a lot of|lots of|some|few|both)\s+(?!news\b|physics\b|mathematics\b|economics\b|politics\b)[a-z]+s\b/gi,
+   "there is + جمع", "there are a lot of"],
   [/\bmuch\s+(people|students|friends|books|cars|problems|ideas|things|places|hours|days)\b/gi,
    "much + اسم معدود", "many"],
   [/\b(\w+)\s+\1\b/gi, "كلمة مكرّرة", "احذف إحداهما"],
   [/\balot\b/gi, "alot", "a lot"],
   [/\b(becuase|becasue|becouse|recieve|seperate|definately|enviroment|goverment|beatiful|intersting|succesful|diffrent|allways|thier|freind)\b/gi,
-   "إملاء شائع الخطأ", "راجع تهجئتها"]
+   "إملاء شائع الخطأ", "راجع تهجئتها"],
+
+  /* ═══ زيادةُ ١٩ نوفمبر ٢٠٢٦ ══════════════════════════════════════
+     جُرّب المدقّقُ بنصٍّ وضعتُ فيه اثني عشرَ خطأً من أشيعِ ما يقع فيه
+     متعلّمُ العربيّةِ، فأمسك واحدًا — ومرّ النصُّ بسبعةَ عشرَ من عشرين
+     «ناجحًا». والعائلاتُ الأربعُ التاليةُ تُغطّي الباقي.
+
+     وكلُّها مقفلةُ الطرفَين (قائمةُ فاعلينَ وقائمةُ أفعال) لا أنماطٌ
+     مفتوحة — لأنّ الإنذارَ الكاذبَ يُعلّمه خطأً وهو شرٌّ من السكوت.
+     وقِيست على مئةٍ وسبعٍ وثلاثينَ جملةً صحيحةً فلم تُنذر على واحدة. */
+
+  /* ١) فعلٌ مساعدٌ ثمّ فعلٌ مصرَّف: should ate · can goes */
+  [/\b(can|could|will|would|should|must|may|might|shall)\s+(went|ate|took|came|saw|made|got|was|were|wrote|knew|did|had|goes|eats|takes|comes|sees|makes|gets|writes|knows|does|has|said|told|gave|found|left|felt|brought|kept|held)\b/gi,
+   "فعل مساعد + فعل مصرَّف", "should eat لا should ate"],
+
+  /* ٢) to ثمّ فعلٌ بصيغةِ الغائبِ المفرد: to helps */
+  [/\bto\s+(goes|eats|takes|comes|sees|makes|gets|writes|knows|does|has|helps|gives|keeps|needs|works|plays|lives|studies|improves|allows|provides|becomes|seems|starts|stops)\b/gi,
+   "to + فعل الغائب المفرد", "to go لا to goes"],
+
+  /* ٣) فاعلٌ مفردٌ أو اسمٌ لا يُعَدُّ ثمّ فعلٌ عارٍ من s:
+        exercise help · diet give · sleep allow — وهذا أشيعُ خطأٍ
+        في نصوصِه، ولم يكن يُمسَك إلّا بعد he/she/it وحدَها. */
+  [new RegExp("\\b(exercise|diet|sleep|food|water|health|education|technology|internet|pollution|traffic|homework|music|money|time|work|air|nature|society|government|family|team|school|city|country|person|student|teacher|book|phone|computer|reading|eating|walking|running|studying|sport|knowledge|advice|information|news|weather|experience|practice|effort|success|failure)\\s+(help|give|keep|make|take|improve|allow|need|provide|include|cause|show|mean|become|seem|look|work|live|play|come|go|start|stop|happen|teach|bring|change|reduce|increase|affect|protect|prevent|create|build|open|close|save|cost|last|grow|feel|think|want|like|love|enjoy)\\b", "gi"),
+   "فاعل مفرد + فعل بلا s", "exercise helps لا exercise help"],
+
+  /* ٤) اسمٌ لا يُعَدُّ ثمّ فعلُ جمع: exercise are important */
+  /* ⚠️ الفاعلُ المعطوفُ جمعٌ وإن كان كلُّ طرفٍ منه مفردًا: قياسُ ١٩
+     نوفمبر أنذر على «eating, exercise, and enough sleep are three
+     habits» في نصِّ حسنٍ الأخير — وهي صحيحةٌ تمامًا. فلا يُنذَر إذا
+     سبقت الاسمَ واوُ عطفٍ في كلمتَين. */
+  [/(?<!\band\s)(?<!\band\s\w{1,14}\s)\b(exercise|diet|sleep|food|water|health|education|technology|internet|pollution|traffic|homework|music|money|time|work|air|nature|society|knowledge|advice|information|news|weather|progress|research|equipment|furniture)\s+(are|were)\b/gi,
+   "اسمٌ لا يُجمَع + فعل جمع", "exercise is لا exercise are"],
+
+  /* ٥) عددٌ ثمّ مفرد: three habit · many thing */
+  [new RegExp("\\b(two|three|four|five|six|seven|eight|nine|ten|twenty|many|several|few|both)\\s+(habit|thing|book|student|year|day|hour|time|friend|problem|place|idea|way|person|country|city|word|minute|month|week|reason|example|step|point|part|kind|type|skill|subject|teacher|child|car|house|game|hobby|sport|meal|question|answer)\\b", "gi"),
+   "عدد + اسم مفرد", "three habits لا three habit"],
+
+  /* ٦) every/each ثمّ جمع */
+  [/\b(every|each)\s+(students|children|days|years|people|books|times|hours|friends|things|ways|places)\b/gi,
+   "every/each + جمع", "every student لا every students"]
 ];
 /* صحيحةٌ وإن تكرّرت، فلا تُعدّ تكرارًا */
 var WDUP_OK = /^(had|that|very|really|no|new|out)$/i;
+/* كلماتُ الوظيفةِ تُستبعَد من قياسِ تشابهِ الجمل: جملتان مختلفتان
+   تشتركان فيها حتمًا، فلو حُسِبت لرُفِع التشابهُ في كلِّ نصّ. */
+var STOPSET = (function(){
+  var o={}; ("the a an and or but so to of in on at for with from by is are was were be been being "+
+   "it its this that these those we you they he she i my our your their his her as if then than "+
+   "there here very also too can could will would should must may might do does did have has had "+
+   "not no first second third finally however moreover addition conclusion example instead").split(/\s+/)
+   .forEach(function(w){ if(w) o[w]=1; }); return o;
+})();
 function grammarIssues(text){
   var t = String(text||""), out = [], seen = {};
   for(var i=0; i<GRAMMAR.length && out.length<12; i++){
@@ -986,6 +1058,37 @@ function gradeWriting(text, level, targetOrCefr, prompt){
     {ok: any && sents.length>=2 && sents[0].split(/\s+/).length>=4,
      label:"جملة أولى واضحة تُقدّم الموضوع"+trI("Clear opening sentence"), hint:"ابدأ بجملةٍ تُعرّف القارئ بموضوعك."}
   ];
+  /* ═══ الحشوُ ليس ترتيبًا ════════════════════════════════════════
+     جُرّب المصحّحُ (١٩ نوفمبر ٢٠٢٦) بنصٍّ جملتُه واحدةٌ كرّرتُها تسعَ
+     مرّاتٍ وبين كلِّ مرّتَين أداةُ ربط، فأعطاه تسعةَ عشرَ من عشرين
+     وأجازه. وهذا يُعلّم الطفلَ أنّ الطولَ والروابطَ تكفي، وهو عكسُ
+     المقصود: أدواتُ الربطِ تُوصَل بها أفكارٌ مختلفة، فإذا وُصِل بها
+     الشيءُ بنفسِه فالنصُّ جملةٌ واحدةٌ طويلة.
+
+     والقياسُ بتشابهِ مجموعاتِ الكلماتِ (جاكار) بين كلِّ جملتَين:
+     ستّون بالمئةِ فأكثرُ تشابهٌ يُعَدُّ تكرارًا. والعتبةُ زوجان، فلا
+     يسقط نصٌّ أعاد صياغةَ فكرةٍ مرّةً واحدةً للتأكيد. */
+  var padPairs = (function(){
+    if(sents.length < 3) return 0;
+    var sets = sents.map(function(s){
+      var o = {}; s.toLowerCase().split(/\s+/).forEach(function(w){
+        var k = w.replace(/[^a-z]/g,""); if(k && !STOPSET[k]) o[k]=1; });
+      return o;
+    });
+    var n = 0;
+    for(var i=0;i<sets.length;i++) for(var j=i+1;j<sets.length;j++){
+      var A=Object.keys(sets[i]), B=Object.keys(sets[j]);
+      if(A.length<3 || B.length<3) continue;
+      var inter=0; A.forEach(function(k){ if(sets[j][k]) inter++; });
+      var uni = A.length + B.length - inter;
+      if(uni && inter/uni >= 0.6) n++;
+    }
+    return n;
+  })();
+  orgChecks.push({ok: padPairs < 2,
+    label: padPairs>=2 ? ("جملٌ مكرّرةٌ بمعناها: "+padPairs+" زوجًا") : "كلُّ جملةٍ فكرةٌ جديدة",
+    hint:"أدواتُ الربطِ تَصِل أفكارًا مختلفة — لا تُعِد الجملةَ نفسَها بأداةٍ جديدة."});
+
   if(cef.needSeq){
     orgChecks.push({ok: seq.length>=1, label:"ترتيب زمنيّ/منطقيّ ظاهر"+(seq.length?" ("+seq.join(", ")+")":"")+trI("Clear sequencing"),
       hint:"استعمل First / Then / Finally أو In conclusion لترتيب أفكارك."});
@@ -1034,17 +1137,52 @@ function gradeWriting(text, level, targetOrCefr, prompt){
      }).join('<br>')) : ""}
   ];
 
-  /* ---------- 4) Communicative Achievement: مناسبة الأسلوب ---------- */
+  /* ---------- 4) Communicative Achievement: مناسبة الأسلوب ----------
+     ═══ المعيارُ كان ميّتًا ═══════════════════════════════════════════
+     سؤالُ الأب (١٩ نوفمبر ٢٠٢٦): «هل منه جدوى؟». وكان هذا المعيارُ
+     يُعطي حسنًا ٥ من ٥ في تسليماتِه الثلاثِ والثلاثين كلِّها — من أوّلِ
+     محاولةٍ بتسعَ عشرةَ كلمةً مبتورةً إلى آخرِ نصٍّ من مئةٍ وإحدى
+     وعشرين. فربعُ الدرجةِ مُهدًى سلفًا، والمعيارُ لا يُفرّق بين نصٍّ
+     ونصّ، فالامتحانُ من خمسَ عشرةَ لا من عشرين وهو يقول عشرين.
+
+     والعلّةُ أنّ فحوصَه الأربعةَ يجتازها كلُّ من كتب كلامًا سويًّا:
+     لا دردشةَ · لا حروفَ كبيرةً كلَّها · متوسّطُ الجملةِ خمسُ كلمات ·
+     فيه نقطة. والأخيران مكرّران أصلًا في «اللغة» و«الترتيب».
+
+     فبقي الصالحان، وحلَّ محلَّ المكرَّرَين ما يقيس الأسلوبَ حقًّا:
+     ألّا تبدأ الجملُ كلُّها بالكلمةِ نفسِها، وأن يكون في النصِّ تركيبٌ
+     مركّبٌ لا جملٌ بسيطةٌ مرصوفة، وأن تتجاوز مفرداتُه المئةَ الشائعة. */
   var chat = CHATSPEAK.filter(function(c){ return hasWord(t,c); });
   var shouty = (t.match(/\b[A-Z]{4,}\b/g)||[]).length>0;
+  /* فواتحُ الجمل: لا تزيد فاتحةٌ واحدةٌ على ثلث الجمل */
+  var opens = {}, topOpen = "", topOpenN = 0;
+  sents.forEach(function(s){
+    var w0 = (s.trim().split(/\s+/)[0]||"").toLowerCase().replace(/[^a-z]/g,"");
+    if(!w0) return; opens[w0] = (opens[w0]||0)+1;
+    if(opens[w0] > topOpenN){ topOpenN = opens[w0]; topOpen = w0; }
+  });
+  var sameOpen = sents.length >= 4 && topOpenN > Math.ceil(sents.length/3);
+  /* تركيبٌ مركّب: أداةُ وصلٍ تابعةٌ داخلَ الجملةِ لا بينَ الجمل */
+  var subs2 = SUBORD.filter(function(c){ return hasWord(t,c); });
+  /* مفرداتٌ خارجَ المئةِ الشائعة */
+  var rich = {};
+  words.forEach(function(w){ var k=w.toLowerCase().replace(/[^a-z]/g,"");
+    if(k && k.length>3 && !COMMON100[k]) rich[k]=1; });
+  var richN = Object.keys(rich).length;
+  var richNeed = Math.max(4, Math.round(words.length*0.10));
   var comChecks=[
     {ok: any && chat.length===0, label:"أسلوب كتابيّ لا لغة دردشة"+trI("Written style, not chat language"),
      hint: chat.length? ("تجنّب: "+chat.join(", ")+" — اكتبها كاملة.") : ""},
     {ok: any && !shouty, label:"بلا كلماتٍ بحروفٍ كبيرة كلّها"+trI("No ALL-CAPS words"), hint:"الحروف الكبيرة كلّها تُقرأ صياحًا."},
-    {ok: any && avgLen>=5, label:"جُملٌ كاملة لا كلماتٌ مبعثرة"+trI("Full sentences"),
-     hint:"اكتب جُملًا كاملة فيها فاعلٌ وفعل."},
-    {ok: any && sents.length>0 && /[.!?]/.test(t), label:"الترقيم يفصل الأفكار"+trI("Punctuation separates ideas"),
-     hint:"استعمل النقاط لتفصل بين أفكارك."}
+    {ok: any && sents.length>=2 && !sameOpen,
+     label:"فواتحُ الجملِ متنوّعة"+trI("Varied sentence openings"),
+     hint: sameOpen ? ("بدأتَ "+topOpenN+" جملٍ بـ«"+topOpen+"» — غيّر الفاتحة.") : "لا تبدأ جُملك كلَّها بالكلمة نفسها."},
+    {ok: any && subs2.length>=1,
+     label:"تركيبٌ مركّبٌ لا جملٌ مرصوفة"+(subs2.length?" ("+subs2.slice(0,3).join(", ")+")":"")+trI("Complex sentence structure"),
+     hint:"اربط داخل الجملة: because / although / which / when / if."},
+    {ok: any && richN>=richNeed,
+     label:"مفرداتٌ خارجَ الشائع: "+richN+" من "+richNeed+trI("Vocabulary beyond the commonest words"),
+     hint:"استعمل كلماتٍ أدقَّ من good / big / thing / very."}
   ];
 
   function sub(nameAr, nameEn, checks){
@@ -1069,6 +1207,18 @@ function gradeWriting(text, level, targetOrCefr, prompt){
     var cap = gIssues.length >= 3 ? 2 : 3;
     if(lang.band > cap) lang.band = cap;
     lang.capped = gIssues.length;
+  })();
+  /* ═══ وسقفُ «الترتيب» ما دام النصُّ حشوًا ══════════════════════════
+     فحصٌ واحدٌ ساقطٌ من ستّةٍ يهبط بالدرجةِ نقطةً واحدةً لا غير، فبقي
+     نصُّ التكرارِ (جملةٌ واحدةٌ تسعَ مرّاتٍ بروابط) ناجحًا بثمانيةَ عشرَ
+     من عشرين. والنصُّ الذي جملتُه واحدةٌ مكرّرةٌ ليس «مرتَّبًا قليلًا»،
+     هو غيرُ مرتَّبٍ أصلًا: لا أفكارَ فيه تُرتَّب. فيُسقَف دون عتبةِ
+     النجاح كما سُقِفت اللغةُ بأخطاءِ القواعد. */
+  (function(){
+    var org = subs.filter(function(s){ return s.en === "Organisation"; })[0];
+    if(!org || padPairs < 2) return;
+    if(org.band > 2) org.band = 2;
+    org.padded = padPairs;
   })();
   var totalBand = subs.reduce(function(a,s){ return a+s.band; },0);   /* من ٢٠ كنظام كامبردج */
   var pass = subs.every(function(s){ return s.band>=3; });
