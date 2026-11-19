@@ -8,11 +8,17 @@
    (azureTTS داخل renderListen)، فالطفلُ ينتظر في كلِّ بندٍ من ثمانية.
    وبلاغُ الأب عن الإملاء كان «يبطي ما بدا» — والعلّةُ هي هي.
 
-   والأصواتُ تتناوب على النصوصِ بالتناوبِ الدائريّ: جلسةٌ من ثمانيةِ
-   بنودٍ تسمع متحدّثَين لا واحدًا، وهو أقربُ إلى اختبارٍ حقيقيٍّ يسمع
-   فيه الممتحَنُ أكثرَ من صوت. ولا يُولَّد النصُّ الواحدُ بصوتَين: في
-   فهمِ المسموعِ المطلوبُ تنوّعُ المتحدّثين عبر البنكِ لا إعادةُ النصِّ
-   نفسِه بصوتَين (ذاك شأنُ تدريبِ الإدراكِ في listen-micro.js).
+   ═══ ولكلِّ نصٍّ صوتان (١٩ نوفمبر ٢٠٢٦) ═══════════════════════════
+   كان لكلِّ نصٍّ صوتٌ واحدٌ يُسنَد بموضعِه في البنك، والجلسةُ تسحب
+   أربعةً عشوائيًّا — فقِيس على عشرين ألفِ جلسةٍ فخرج ١١٫٤٪ منها بصوتٍ
+   واحدٍ لا غير. وأسوأُ منه أنّ «اسمع مرّة ثانية» كانت تُعيد المقطعَ
+   نفسَه بالصوتِ نفسِه، فيُعيد الطفلُ السماعَ ليلتقط نغمةً حفظها لا
+   ليفهم معنًى.
+
+   فصار لكلِّ نصٍّ مقطعان بصوتَين. والصفحةُ تختار بموضعِ البطاقةِ
+   وبعددِ مرّاتِ السماع: البطاقةُ الأولى بصوتٍ والثانيةُ بالآخر،
+   والإعادةُ بالصوتِ المقابلِ دائمًا. فالتناوبُ مضمونٌ في كلِّ جلسةٍ لا
+   مرجوٌّ باحتمال، والإعادةُ تُختبر الفهمَ لا الذاكرةَ الصوتيّة.
 
    والسرعةُ ‑10% صراحةً: كان الكودُ يمرّر العدد ‑10 بلا علامةِ نسبة،
    وSSML يقرأ العاريَ مضاعِفًا لا نسبة، فيخرج الصوتُ أسرعَ ممّا قُصد
@@ -42,9 +48,10 @@ function bank(){
 }
 /* المفتاحُ من النصِّ وحدَه: الصفحةُ تعرف النصَّ ولا تعرف أيَّ صوتٍ
    أُسنِد إليه، فتجده بالنصِّ كما تجد مقاطعَ الإملاء. */
-function fileOf(text){
-  return 'en/listen-' + crypto.createHash('sha1').update(text).digest('hex').slice(0, 12) + '.mp3';
+function fileOf(text, voice){
+  return 'en/listen-' + crypto.createHash('sha1').update(voice + '|' + text).digest('hex').slice(0, 12) + '.mp3';
 }
+function keyOf(voice, text){ return voice + '|' + text; }
 async function say(key, text, voice){
   const esc = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ssml = '<speak version="1.0" xml:lang="en-GB"><voice name="' + voice +
@@ -75,19 +82,29 @@ async function say(key, text, voice){
   const man = JSON.parse(fs.readFileSync(mp, 'utf8'));
   man.listen = man.listen || {};
 
-  const missing = L.map((it, i) => ({ t: it.t, v: VOICES[i % VOICES.length] }))
-                   .filter(x => !man.listen[x.t]);
-  console.log('نصوص: ' + L.length + ' · ناقصة: ' + missing.length);
+  /* ترحيلٌ لمرّةٍ واحدة: المفاتيحُ القديمةُ بالنصِّ وحدَه، والملفُّ
+     المولَّدُ حينها كان بصوتِ VOICES[i % 2]. فتُعاد تسميةُ المفتاحِ
+     ولا يُعاد تنزيلُ شيء. */
+  L.forEach((it, i) => {
+    if (man.listen[it.t]){
+      man.listen[keyOf(VOICES[i % VOICES.length], it.t)] = man.listen[it.t];
+      delete man.listen[it.t];
+    }
+  });
+  const want = [];
+  L.forEach(it => VOICES.forEach(v => want.push({ t: it.t, v: v })));
+  const missing = want.filter(x => !man.listen[keyOf(x.v, x.t)]);
+  console.log('نصوص: ' + L.length + ' × ' + VOICES.length + ' صوتًا = ' + want.length + ' مقطعًا · ناقص: ' + missing.length);
   if (DRY){ missing.forEach(x => console.log('  - ' + x.v.replace('en-GB-','') + ' → ' + x.t.slice(0,54))); return; }
   if (!missing.length){ console.log('✅ لا ناقص'); return; }
 
   const key = azureKey();
   let done = 0;
   for (const x of missing){
-    const rel = fileOf(x.t), abs = path.join(AUDIO, rel);
+    const rel = fileOf(x.t, x.v), abs = path.join(AUDIO, rel);
     fs.mkdirSync(path.dirname(abs), { recursive:true });
     fs.writeFileSync(abs, await say(key, x.t, x.v));
-    man.listen[x.t] = rel;
+    man.listen[keyOf(x.v, x.t)] = rel;
     done++;
     if (done % 10 === 0 || done === missing.length) console.log('  ✅ ' + done + ' / ' + missing.length);
     await new Promise(r => setTimeout(r, 350));

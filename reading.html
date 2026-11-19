@@ -2342,7 +2342,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s8";  /* AUDIO_SIG: df2facb8 */
+var AUDIO_VER = "s9";  /* AUDIO_SIG: c1ffcd5c */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -4225,9 +4225,24 @@ if(!META[who] || !DATA[who]){
         detail:String(text).slice(0,40) });
     }catch(e){}
   }
-  function listenSay(text, note){
-    if(!MANI_DONE){ MANI_P.then(function(){ listenSay(text, note); }); return; }
-    var f = MANIFEST && MANIFEST.listen && MANIFEST.listen[text];
+  /* ═══ صوتان لكلِّ نصّ، والاختيارُ لا يُترَك للصدفة ══════════════════
+     كان لكلِّ نصٍّ صوتٌ واحدٌ يُسنَد بموضعِه في البنك، والجلسةُ تسحب
+     أربعةً عشوائيًّا — فقِيس على عشرين ألفِ جلسةٍ فخرج ١١٫٤٪ منها
+     بصوتٍ واحدٍ لا غير. وبلاغُ الأب «الصوت نفسه» كان في محلِّه.
+
+     فصار الاختيارُ بموضعِ البطاقةِ وعددِ مرّاتِ السماعِ معًا:
+     (الموضع + مرّات السماع) % ٢. فالبطاقةُ الأولى بصوتٍ والثانيةُ
+     بالآخر — تناوبٌ مضمونٌ لا مرجوٌّ باحتمال — و«اسمع مرّة ثانية»
+     تأتي بالصوتِ المقابلِ دائمًا.
+
+     وفائدةُ الثانيةِ أكبرُ من التنويع: من أعاد السماعَ بالصوتِ نفسِه
+     قد يلتقط نغمةً حفظها لا معنًى فهمه. والإعادةُ بصوتٍ آخرَ تُلزمه
+     الفهم. والنصُّ يُكشَف بعد الإجابةِ على كلّ حال، فلا يبقى بلا مخرج. */
+  function listenSay(text, note, vIx){
+    if(!MANI_DONE){ MANI_P.then(function(){ listenSay(text, note, vIx); }); return; }
+    var V = (window.MICRO_VOICES || ["en-GB-RyanNeural","en-GB-SoniaNeural"]);
+    var voice = V[(vIx || 0) % V.length];
+    var f = MANIFEST && MANIFEST.listen && (MANIFEST.listen[voice + "|" + text] || MANIFEST.listen[text]);
     if(f){
       try{
         if(CUR_AUDIO) CUR_AUDIO.pause();
@@ -4317,7 +4332,11 @@ if(!META[who] || !DATA[who]){
           skills:LSK });
     }
     sec.querySelectorAll("[data-li]").forEach(function(box){
-      var it = items[+box.dataset.li], plays = 0, opened = false;
+      /* الموضعُ يُقرأ من البطاقةِ نفسِها: حلقةُ التوصيلِ غيرُ حلقةِ
+         البناء، فلا «i» فيها — وأخذُه منها سهوًا جعل اختيارَ الصوتِ
+         NaN فسقط كلُّ بندٍ إلى الشبكةِ بلا مقطع. */
+      var li = +box.dataset.li;
+      var it = items[li], plays = 0, opened = false;
       var playBtn = box.querySelector("[data-play]"), cnt = box.querySelector("[data-plays]");
       var qsEl = box.querySelector("[data-qs]"), scEl = box.querySelector("[data-script]");
       function openQs(){
@@ -4375,7 +4394,7 @@ if(!META[who] || !DATA[who]){
            والسرعةُ «-10%» لا -10: SSML يقرأ العددَ العاريَ مضاعِفًا لا
            نسبةً، فكان الصوتُ يخرج أسرعَ ممّا قُصد — قِيس على النصِّ
            الواحد: -10 أعطى ١٢٦٧٢ بايتًا و-10% أعطى ١٤١١٢. */
-        try{ listenSay(it.t, box.querySelector("[data-src]")); }
+        try{ listenSay(it.t, box.querySelector("[data-src]"), li + plays - 1); }
         catch(e){
           /* لا صوتَ أصلًا: نفتح النصَّ ونقول له الحقيقة — قراءةٌ لا استماع */
           scEl.style.display = "block";
