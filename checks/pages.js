@@ -382,6 +382,7 @@ function run(){
   issues.push(...microListenPath());
   issues.push(...listenBankPath());
   issues.push(...longReadOptsPath());
+  issues.push(...heardBoxPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -8250,5 +8251,85 @@ function listenBankPath(){
     RE('سرعةُ الاستماعِ عددٌ عارٍ (-10) لا نسبةٌ (-10%) — SSML يقرؤه مضاعِفًا فيخرج الصوتُ أسرعَ ممّا قُصد');
   if (!/ما فيه نصّ مكتوب/.test(rs))
     RE('لا يُقال له إنّ النصَّ مخفيٌّ كالاختبار');
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   حارسُ «وش سمعت» — السمعُ يُقاس وحدَه
+
+   قياسُ فهدٍ (١٩ نوفمبر ٢٠٢٦): صفرٌ من واحدٍ وثلاثين في خمسِ جلسات،
+   جلس في كلٍّ منها من إحدى عشرةَ دقيقةً إلى ثلاثٍ وعشرين، وصفرُ ضربٍ
+   على الكيبورد. وما يكتبه صوتيٌّ لا هجائيّ: سمع «The proposal was
+   rejected on the grounds» فكتب «the proplso was jacted on growns».
+   وقِيست بنودُه: الهجاءُ ١٨٪ والسمعُ ٤٥٪ — يسمع ضعفَ ما يُظهره هجاؤه،
+   والنظامُ يقول «٠/٨».
+
+   والشروطُ التي يسقط الإصلاحُ بسقوطِ أيٍّ منها:
+   ١) المقياسُ صوتيٌّ لا هجائيّ، وعادلٌ: يُعطي صفرًا للضربِ العشوائيِّ
+      ولكلامٍ أجنبيٍّ عن الجملة، ومئةً للمطابق.
+   ٢) الخانةُ مخفيّةٌ حتى يُجيب — فتحُها قبلَه يجعلها تلميحًا يُفسد
+      الدرجةَ ويُفسد القياسَ معًا.
+   ٣) لا تمسُّ الدرجة.
+   ٤) ويُحفَظ رقمُ السمعِ منفصلًا ولو لم تُحفظ الجلسةُ بعد — وإلّا ضاع
+      وهو المقصودُ من الباب كلِّه.
+   ════════════════════════════════════════════════════════════════════ */
+function heardBoxPath(){
+  const out = [], F = 'reading.html', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  const a = src.indexOf('  function phKey(w){'), b = src.indexOf('  function renderDict(){');
+  if (a < 0 || b < a) { E('لا مقياسَ صوتيًّا (phKey/heardScore) في الصفحة'); return out; }
+  const box = {};
+  vm.createContext(box);
+  try { vm.runInContext(src.slice(a, b), box); }
+  catch(e){ E('المقياسُ الصوتيُّ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  if (typeof box.heardScore !== 'function'){ E('heardScore غائبة'); return out; }
+
+  /* ١) عدلُ المقياس — بالأرقامِ لا بالثقة */
+  const T = 'The proposal was rejected on the grounds of cost';
+  const cases = [
+    ['المطابقُ تمامًا',           T,                                          95, 100],
+    ['الصوتيُّ القريب',           'the proplso was jacted on growns of cost',  70, 100],
+    ['ضربٌ على الكيبورد',        'asdf qwer zxcv hjkl',                        0,   5],
+    ['جملةٌ أخرى تمامًا',         'My sister plays the piano very well today',  0,  20],
+    ['كلماتٌ عشوائيّة',           'banana mountain yellow quickly river seven',  0,  15],
+    ['فارغ',                      '',                                           0,   0],
+    /* ═══ الحالةُ التي تفصل الصوتيَّ عن الهجائيّ ═══════════════════
+       صوائتُ الكلماتِ كلُّها مبدَّلةٌ والصوامتُ كما هي — وهو عينُ ما
+       يفعله فهد. فالمقياسُ الصوتيُّ يقرؤها ٧٨٪، والمقياسُ الذي سقط
+       منه اختزالُ الصوائتِ يقرؤها ٥٦٪. ولولا هذه الحالةُ لمرّ إسقاطُ
+       الاختزالِ كلِّه على الحارسِ بلا أن يُمسَك. */
+    ['صوائتُ مبدَّلةٌ وصوامتُ سليمة', 'Thi proposel wos rijectid un thi groonds uf cust', 70, 100]
+  ];
+  cases.forEach(([nm, v, lo, hi]) => {
+    const r = box.heardScore(v, T);
+    const pct = r.t ? Math.round(100 * r.c / r.t) : 0;
+    if (pct < lo || pct > hi)
+      E('المقياسُ الصوتيُّ ظالمٌ أو كريم: «' + nm + '» أعطى ' + pct + '٪ والمقبولُ ' + lo + '–' + hi + '٪');
+  });
+  /* والعتبةُ لا تُرفع حتى تُلغيَ الباب، ولا تُخفض حتى تُصدّق كلَّ شيء */
+  const th = /var PH_OK = ([\d.]+);/.exec(src);
+  if (!th) E('لا عتبةَ معلنةً للمطابقةِ الصوتيّة (PH_OK)');
+  else if (+th[1] < 0.45 || +th[1] > 0.75)
+    E('عتبةُ المطابقةِ الصوتيّةِ ' + th[1] + ' — خارجَ المدى الذي جُرّب (٠٫٤٥–٠٫٧٥)');
+
+  /* ٢) مخفيّةٌ حتى يُجيب */
+  if (!/<div data-heard style="display:none;/.test(src))
+    E('خانةُ «وش سمعت» ظاهرةٌ قبل المحاولة — تصير تلميحًا يُفسد الدرجةَ والقياسَ معًا');
+  if (!/if\(hBox\) hBox\.style\.display = "block";/.test(src))
+    E('الخانةُ لا تُفتح بعد المحاولة');
+
+  /* ٣) لا تمسُّ الدرجة */
+  if (/\.hchk[\s\S]{0,700}correct\+\+/.test(src))
+    E('خانةُ السمعِ تزيد الدرجة — وهي تشخيصٌ لا امتحان');
+
+  /* ٤) ويُحفَظ ولو لم تُحفظ الجلسة */
+  if (!/function saveHeard\(\)/.test(src)) E('رقمُ السمعِ لا يُحفَظ');
+  if (/var h = heardSum\(\); if\(!h \|\| !saved\) return;/.test(src))
+    E('رقمُ السمعِ لا يُحفَظ إلّا إن حُفظت الجلسةُ قبلَه — فيضيع عند من يُجيب بندًا ثمّ يكتب ما سمع');
+  if (!/heard:\{ c:h\.c, t:h\.t, n:h\.n \}/.test(src))
+    E('الصفُّ لا يحمل رقمَ السمعِ منفصلًا عن الدرجة');
   return out;
 }

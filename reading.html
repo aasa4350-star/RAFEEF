@@ -2849,6 +2849,63 @@ if(!META[who] || !DATA[who]){
     hookLeaveSave(_microOwner, save);
   }
 
+  /* ═══ «وش سمعت؟» — السمعُ يُقاس وحدَه، والهجاءُ وحدَه ═══════════════
+     طلبُ الأب (١٩ نوفمبر ٢٠٢٦) بعد أن رأى إملاءَ فهد. وقياسُه قبلَه:
+     فهدٌ صفرٌ من واحدٍ وثلاثين في خمسِ جلسات، وجلس فيها من إحدى عشرةَ
+     دقيقةً إلى ثلاثٍ وعشرين، وصفرُ ضربٍ على الكيبورد — محاولاتٌ
+     حقيقيّةٌ كلُّها. وما يكتبه صوتيٌّ لا هجائيّ:
+
+       سمع «The proposal was rejected on the grounds»
+       فكتب «the proplso was jacted on growns»
+
+     وقِيست بنودُه الثلاثةُ والثلاثون: دقّتُه الهجائيّةُ ١٨٪ ودقّتُه
+     الصوتيّةُ ٣٣٪ — يسمع ضعفَ ما يُظهره هجاؤه. والنظامُ يقول «٠/٨».
+
+     والجملةُ تُقاس كلًّا أو لا شيء، فمن كتب ثلاثةَ أرباعِها صوابًا
+     خرج بصفر. فلا يعرف هو ولا أبوه أين العطب: في الأذنِ أم في اليد.
+
+     فصارت بعد كلِّ محاولةٍ خانةٌ ثانية: «اكتب وش سمعت» — تُقاس كلمةً
+     كلمةً بالصوتِ لا بالهجاء، ولا تمسُّ الدرجة. فيرى أنّه سمع ستًّا من
+     تسعٍ وإن كتبها كلَّها خطأً، ويُحفظ الرقمان منفصلَين في الصفّ.
+
+     والاختزالُ الصوتيُّ أدناه جُرّب على بنودِ فهدٍ الحقيقيّةِ قبل أن
+     يُكتَب: أعطى ٣٣٪ حيث يعطي الهجاءُ ١٨٪. */
+  function phKey(w){
+    return String(w||"").toLowerCase().replace(/[^a-z]/g,"")
+      .replace(/ph/g,"f").replace(/ck/g,"k").replace(/qu/g,"kw").replace(/x/g,"ks")
+      .replace(/sh/g,"S").replace(/ch/g,"C").replace(/th/g,"T")
+      .replace(/c(?=[ei])/g,"s").replace(/c/g,"k").replace(/z/g,"s").replace(/j/g,"C")
+      .replace(/(.)\1+/g,"$1")
+      .replace(/(?!^)[aeiou]+/g,"");
+  }
+  function phSim(a,b){
+    a = phKey(a); b = phKey(b);
+    if(!a || !b) return 0;
+    var m = Math.max(a.length, b.length), i, j;
+    var dp = []; for(i=0;i<=a.length;i++){ dp.push([i]); for(j=1;j<=b.length;j++) dp[i].push(0); }
+    for(j=0;j<=b.length;j++) dp[0][j] = j;
+    for(i=1;i<=a.length;i++) for(j=1;j<=b.length;j++)
+      dp[i][j] = Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1] + (a.charAt(i-1)===b.charAt(j-1) ? 0 : 1));
+    return 1 - dp[a.length][b.length] / m;
+  }
+  var PH_OK = 0.6;      /* عتبةُ «سمعها» — جُرّبت على بنودِ فهدٍ الحقيقيّة */
+  /* يُقابل كلمةً كلمةً بالترتيب، ويُعيد ما سُمع وما فات */
+  function heardScore(said, target){
+    var T = String(said||"").toLowerCase().match(/[a-z']+/g) || [];
+    var W = String(target||"").toLowerCase().match(/[a-z']+/g) || [];
+    var hit = [], c = 0;
+    W.forEach(function(w, k){
+      var t = T[k] || "";
+      /* يُقبَل من موضعِه أو من جارِه: إسقاطُ كلمةٍ صغيرةٍ يُزيح الباقي،
+         فلا يُعاقَب على الإزاحةِ مرّتين. */
+      var ok = (t && phSim(t, w) >= PH_OK) ||
+               (T[k-1] && phSim(T[k-1], w) >= PH_OK) ||
+               (T[k+1] && phSim(T[k+1], w) >= PH_OK);
+      if(ok) c++;
+      hit.push(ok ? 1 : 0);
+    });
+    return { c:c, t:W.length, words:W, hit:hit };
+  }
   function renderDict(){
     var D = DATA[who][curLang], ar = curLang==="ar", dir = ar?"rtl":"ltr", ta = ar?"right":"left";
     var sec = document.getElementById("dict");
@@ -2883,6 +2940,14 @@ if(!META[who] || !DATA[who]){
         '<button class="say small" data-show>👁️ أظهر</button>'+
         '<button class="say small" data-mic style="background:#dc2626;color:#fff;border-color:#dc2626">🎤 انطق</button></div>'+
         '<div class="fb"></div><div class="pfb" style="margin-top:6px;font-weight:700;min-height:18px"></div>'+
+        /* خانةُ «وش سمعت» — تظهر بعد المحاولةِ لا قبلَها: السمعُ يُقاس
+           بعد أن يُفرغ ما عنده، فلا تصير تلميحًا. */
+        '<div data-heard style="display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
+          '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin-bottom:4px">🎧 وش سمعت؟ اكتبه كما سمعته — ولو كان هجاؤه غلط. ما يدخل الدرجة.</span>'+
+          '<input class="dinp hinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="اكتب ما سمعته..." style="direction:ltr;text-align:left">'+
+          '<div class="row"><button class="chk hchk">احسب سمعي</button></div>'+
+          '<div class="fb hfb"></div>'+
+        '</div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">'+
           '<span style="font-weight:700;font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px">🎤 درّب نطقك — انطقها بمايك الكيبورد:</span>'+
           '<input class="dinp pinp" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="انطق هنا..." style="direction:'+dir+';text-align:'+ta+'">'+
@@ -2904,9 +2969,33 @@ if(!META[who] || !DATA[who]){
        الكلمة الصحيحة وما كتبه الابنُ فعلًا، عشرًا على الأكثر. */
     var missed=[];
     function missedList(){ return missed.slice(0,10); }
+    /* ═══ السمعُ يُحفَظ منفصلًا عن الهجاء ══════════════════════════
+       فهدٌ صفرٌ من واحدٍ وثلاثين في الهجاء، وقِيس سمعُه على بنودِه
+       نفسِها فإذا هو ٤٥٪. فلو حُفظ رقمٌ واحدٌ ضاع الفرقُ ولم يُعرف
+       أفي الأذنِ العطبُ أم في اليد. */
+    var heard={};
+    function heardSum(){
+      var k, c=0, t=0, n=0;
+      for(k in heard){ if(heard.hasOwnProperty(k)){ c+=heard[k].c; t+=heard[k].t; n++; } }
+      return n ? { c:c, t:t, n:n } : null;
+    }
+    /* ⚠️ لا يُشترَط أن تكون الجلسةُ قد حُفظت: فهدٌ يُجيب بندًا ثمّ
+       يكتب ما سمعه، والجلسةُ لم تُحفَظ بعد — فلو اشترطناها ضاع رقمُ
+       السمعِ وهو المقصودُ من الباب كلِّه. فيُحفَظ الصفُّ بمعرّفِه
+       نفسِه (pid) وتُبقي RR.dedupe الأحدثَ منه. */
+    function saveHeard(){
+      var h = heardSum(); if(!h) return;
+      var n = Object.keys(tried).length; if(!n) n = h.n;
+      savedN = Math.max(savedN, n); saved = true;
+      var aw = awaySince(aw0);
+      saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, savedN, { dur:Math.round((Date.now()-t0)/1000),
+        missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose, hard:dose,
+        away:aw.away, exits:aw.exits, trusted:(aw.exits===0),
+        heard:{ c:h.c, t:h.t, n:h.n } });
+    }
     var t0=Date.now(), aw0=awaySnap(); wireExitWarn(sec);
-    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose, hard:dose}); /* الجرعةُ تُضبَط بالجلسةِ التامّةِ وحدَها: الجزئيّةُ قد تكون سطرًا واحدًا فتُحرّكها بلا دليل */ dictDoseAfter(curLang, correct, total); } }
-    function savePartial(){ var n=Object.keys(tried).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose}); }
+    function maybeSave(){ if(savedN<total && Object.keys(tried).length===total){ savedN=total; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, total, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose, hard:dose, heard:heardSum()}); /* الجرعةُ تُضبَط بالجلسةِ التامّةِ وحدَها: الجزئيّةُ قد تكون سطرًا واحدًا فتُحرّكها بلا دليل */ dictDoseAfter(curLang, correct, total); } }
+    function savePartial(){ var n=Object.keys(tried).length; if(n<1||n<=savedN) return;   /* كان ثلاثةً: فدرسٌ أجاب فيه سؤالَين لا يظهر في التقرير أصلًا — بلاغُ الأب «حلّ ٣ دروس وما طلع إلا درسان» */ savedN=n; saved=true; var dur=Math.round((Date.now()-t0)/1000); var aw=awaySince(aw0); saveScore(ar?"إملاء عربي ✍️":"إملاء إنجليزي ✍️", correct, n, {dur:dur, away:aw.away, exits:aw.exits, trusted:(aw.exits===0), missed:missedList(), lang:(ar?"ar":"en"), pid:attId, dose:dose, heard:heardSum()}); }
     /* ═══ بلاغ الأب (٧ سبتمبر ٢٠٢٦): «حسن دخل قراءة إنجليزي وإملاء
        إنجليزي قبل شوي، بس ما طلع لي» — وكان محقًّا ═══════════════════
 
@@ -2957,6 +3046,30 @@ if(!META[who] || !DATA[who]){
         pfb2.textContent = ok? " ✅ نطق صحيح!" : " ❌ غير واضح، جرّب ثانية";
       });
       var azb=qEl.querySelector(".azbtn"); if(azb) azb.addEventListener("click",function(){ azureAssess(text, ar, pfb2, azb); });
+      /* ═══ «وش سمعت» ══════════════════════════════════════════════
+         تُقاس كلمةً كلمةً بالصوتِ لا بالهجاء، ولا تمسُّ الدرجة. وتُفتح
+         بعد أوّلِ محاولةٍ فقط — فتحُها قبلها يجعلها تلميحًا. */
+      var hBox = qEl.querySelector("[data-heard]");
+      var hInp = qEl.querySelector(".hinp"), hFb = qEl.querySelector(".hfb");
+      if(hBox) qEl.querySelector(".hchk").addEventListener("click", function(){
+        var v = String(hInp.value||"").trim();
+        if(!v){ hFb.className = "fb hfb"; hFb.textContent = "🎧 اكتب ما سمعته — حتى لو كلمةً واحدة."; return; }
+        var r = heardScore(v, text);
+        if(!r.t) return;
+        var pct = Math.round(100 * r.c / r.t);
+        /* الكلماتُ مُلوَّنة: ما سُمع أخضرُ وما فات مشطوبٌ باهت — فيرى أين سقط */
+        var line = r.words.map(function(w, k){
+          return '<span style="' + (r.hit[k]
+            ? 'color:var(--good);font-weight:800'
+            : 'color:var(--muted);text-decoration:line-through') + '">' + w + '</span>';
+        }).join(" ");
+        hFb.className = "fb hfb " + (pct >= 60 ? "ok" : "");
+        hFb.innerHTML = '🎧 سمعت <b>' + r.c + '</b> من <b>' + r.t + '</b> كلمة (' + pct + '٪)' +
+          (pct > 0 && !done[i] ? ' — <b>سمعُك أحسن من هجائك</b>، والناقصُ الكتابةُ لا الأذن.' : '') +
+          '<div dir="ltr" style="margin-top:6px;font-weight:700;line-height:1.9">' + line + '</div>';
+        heard[i] = { w:String(text).slice(0,40), c:r.c, t:r.t };
+        saveHeard();
+      });
       qEl.querySelector(".chk").addEventListener("click",function(){
         /* خانةٌ فارغةٌ ليست إجابةً خاطئة — انظر التعليل في قسم الكلمات */
         if(!String(inp.value||"").trim()){
@@ -2971,6 +3084,7 @@ if(!META[who] || !DATA[who]){
            السطر، فينسخها ويضغط ثانيةً فتُحسب له. فالرقم كان يقيس النسخ.
            وقسم الكلمات كان قد عولج بقاعدة «أوّل محاولة» في ٣١ أغسطس،
            ونُسي الإملاء — فنُطبّق القاعدة نفسها هنا. */
+        if(hBox) hBox.style.display = "block";   /* فُرِغ ما عنده، فتُفتح */
         var first = !tried[i];
         if(first){
           var scored = ok && !revealed[i];
