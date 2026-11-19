@@ -1635,6 +1635,41 @@ function render(el, ctx){
   }
   ta.addEventListener("input", refresh); refresh();
 
+  /* ═══ زمنُ الكتابةِ ومرّاتُ اللصق ══════════════════════════════════
+     طلبُ الأب (١٩ نوفمبر ٢٠٢٦): «سجّل مدّة الكتابة وعدد مرّات اللصق
+     في الصفوف القادمة». والصفُّ المحفوظُ لم يكن فيه زمنٌ أصلًا بخلافِ
+     بقيّةِ أقسامِ الموقع، فلا يُعرَف أكتبها في ثلاثِ دقائقَ أم في
+     ثلاثين.
+
+     والساعةُ تبدأ بأوّلِ ضغطةِ مفتاحٍ لا بفتحِ الصفحة: الصفحةُ قد
+     تبقى مفتوحةً ساعةً وهو لا يكتب، فيُحسَب عليه ما لم يعمله.
+     وتتوقّف عن العدِّ وهو خارجَ الصفحة (كما يفعل عدّادُ الاختباراتِ
+     بـaway) فلا يُحسَب زمنُ الغياب.
+
+     واللصقُ يُعَدّ بحدثِه وبعددِ أحرفِه، ولا تُحسَب استعادةُ المسوّدةِ
+     لصقًا — هي كتابتُه هو عادت إلى الصندوق. */
+  var _wStart = 0, _wActive = 0, _wSeen = 0, _pasteN = 0, _pasteCh = 0;
+  function _tick(){
+    var now = Date.now();
+    if(_wSeen && !document.hidden) _wActive += Math.min(now - _wSeen, 30000);
+    _wSeen = now;
+  }
+  function _begin(){ if(!_wStart){ _wStart = Date.now(); _wSeen = _wStart; } else _tick(); }
+  ta.addEventListener("input", _begin);
+  ta.addEventListener("paste", function(e){
+    _begin(); _pasteN++;
+    try{ var d = (e.clipboardData || window.clipboardData);
+         _pasteCh += (d && d.getData ? String(d.getData("text") || "").length : 0); }catch(err){}
+  });
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden) _tick(); else _wSeen = Date.now();
+  });
+  function _writeStats(){
+    if(!_wStart) return {};
+    _tick();
+    return { wdur: Math.round(_wActive/1000), paste: _pasteN, pasteCh: _pasteCh || undefined };
+  }
+
   /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «رفيف حاولت التعبير اليوم» — وقاعدة البيانات
      خاليةٌ من أيّ صفّ تعبيرٍ لها اليوم. والسبب أنّ الفقرة لا تُحفظ إلّا إن
      ضغطت «قيّم نصّي»: الطفلة تكتب فقرتها كاملة، ثمّ تخرج، فيبقى نصّها في
@@ -1668,10 +1703,10 @@ function render(el, ctx){
     var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
     _lastSaved = now;
     try{ localStorage.setItem(savedKey, now); }catch(e){}
-    ctx.save({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
+    ctx.save(Object.assign({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
                bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
                auto:(auto===true)||undefined,
-               text:ta.value.slice(0,1500) });
+               text:ta.value.slice(0,1500) }, _writeStats()));
     return true;
   }
   function autoSaveParagraph(){

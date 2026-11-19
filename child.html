@@ -572,6 +572,23 @@ async function main(){
         `</ul>${prs.length>6?`<p style="margin:6px 2px 0;font-size:.85rem;color:var(--muted)">وأقدم منها ${prs.length-6} تقييمًا.</p>`:``}</div>`;
     }
     // ✍️ التعبير الإنجليزي (بلاغ الأب ١ سبتمبر ٢٠٢٦: «أصلًا مايطلع لي قسم التعبير»)
+
+    /* ═══ كيف كُتِبت الفقرة ══════════════════════════════════════════
+       طلبُ الأب (١٩ نوفمبر ٢٠٢٦): «سجّل مدّة الكتابة وعدد مرّات اللصق».
+       والزمنُ المعروضُ زمنُ كتابةٍ فعليٍّ: يبدأ بأوّلِ حرفٍ ويتوقّف
+       وهو خارجَ الصفحة. واللصقُ يُذكَر بعددِه وأحرفِه ولا يُحكَم به
+       حكمًا: قد يلصق جملةً من كتابِه ليستشهد بها. والصفوفُ القديمةُ
+       بلا هذين الحقلَين فلا يُعرَض لها شيء. */
+    const wHow = m => {
+      if(typeof m.wdur !== "number") return "";
+      const mi = Math.floor(m.wdur/60), se = m.wdur%60;
+      const t = mi ? (mi+" د"+(se?" "+se+" ث":"")) : (se+" ث");
+      const wpm = (m.wdur>=20 && m.words) ? Math.round(m.words/(m.wdur/60)) : 0;
+      const p = m.paste|0;
+      return ` <span class="cnt">· ✍️ ${t}${wpm?` · ${wpm} كلمة/د`:``}</span>`+
+        (p ? ` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· لصق ${p}×${m.pasteCh?` (${m.pasteCh} حرفًا)`:``}</span>`
+           : ` <span style="color:var(--good);font-size:.8rem;font-weight:700">· بلا لصق</span>`);
+    };
     /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «حسن حل التعبير بس ماطلع لي بالتقرير» —
        الشرط كان writingAll.length فقط، فطفلٌ حلّ «تدريب بناء الجملة»
        (writingDrill) دون أن يكتب فقرةً كاملة بعد كان القسم كلّه يختفي
@@ -601,7 +618,7 @@ async function main(){
       }
       html+=`</ul>`+
         writingAll.slice(0,3).map(p=>{ const m=p.meta;
-          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px"><b>${(m.topic||"—")}</b> <span class="cnt">${RR.stamp(saTime(RR.when(p)))}</span>${m.auto?` <span style="color:var(--warn);font-size:.8rem;font-weight:700">· حُفظت تلقائيًّا (ما ضغطت «قيّم»)</span>`:``}${wHow(m)}<div dir="ltr" style="text-align:left;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.9rem;white-space:pre-wrap">${(m.text||"").replace(/</g,"&lt;")}</div></div>`; }).join("")+
         `</div>`;
     }
     // 🗣️ المحادثة الإنجليزية (بلاغ الأب ١ سبتمبر ٢٠٢٦: «تقرير سعود حق المحادثة ماطلع لي»)

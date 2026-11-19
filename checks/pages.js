@@ -8530,6 +8530,54 @@ function writingGraderPath(){
   if (gRef.total < 20)
     E('نصُّ ١٤ نوفمبر كان ٢٠/٢٠ فصار ' + gRef.total + '/20 — التشديدُ أصاب من كتب جيّدًا');
 
+  /* ═══ ٦) زمنُ الكتابةِ واللصقُ يُسجَّلان ═══════════════════════════
+     طلبُ الأب (١٩ نوفمبر ٢٠٢٦). والعطبُ هنا صامتٌ تمامًا: الصفحةُ
+     تعمل، والفقرةُ تُحفَظ، والدرجةُ تظهر — ولا حقلَ في الصفّ. فيقرأ
+     الأبُ تقريرًا بلا زمنٍ ويظنّه غيرَ مُفعَّلٍ بعد. */
+  const ws = fs.readFileSync(p, 'utf8');
+  const RE = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!/_pasteN\+\+/.test(ws) || !/ta\.addEventListener\("paste"/.test(ws))
+    RE('لا يُعَدُّ اللصقُ في صندوقِ الكتابة');
+  if (!/wdur:\s*Math\.round\(_wActive\/1000\)/.test(ws))
+    RE('لا يُحسَب زمنُ الكتابةِ الفعليّ');
+  if (!/if\(_wSeen && !document\.hidden\)/.test(ws))
+    RE('العدّادُ يعدُّ زمنَ الغياب — فيُحسَب على الطفلِ ما لم يجلس له');
+  if (!/function _begin\(\)\{ if\(!_wStart\)\{ _wStart = Date\.now\(\)/.test(ws))
+    RE('الساعةُ تبدأ بفتحِ الصفحةِ لا بأوّلِ حرف — فتُحسَب ساعةُ صفحةٍ مفتوحةٍ كتابةً');
+  if (!/Object\.assign\(\{ kind:"writing"[\s\S]{0,420}_writeStats\(\)\)/.test(ws))
+    RE('الصفُّ المحفوظُ لا يحمل زمنَ الكتابةِ ولا اللصق — فلا يصل الرقمُ إلى القاعدةِ أصلًا');
+  /* ⚠️ ولا تُحسَب استعادةُ المسوّدةِ لصقًا: هي كتابتُه عادت إلى الصندوق */
+  if (/draftKey[\s\S]{0,120}_pasteN/.test(ws))
+    RE('استعادةُ المسوّدةِ تُعَدُّ لصقًا — وهي كتابتُه هو');
+  /* ═══ ٧) مفتاحُ المستوى موجودٌ في جدولِ المستويات ═══════════════
+     gradeWriting يقرأ CEFR[key]، فإن لم يجده سقط صامتًا إلى A2 أو A1
+     — فيهبط المطلوبُ من مئةٍ وخمسين كلمةً إلى ستّين ومن أربعِ أدواتِ
+     ربطٍ إلى اثنتَين، وتصعد درجةُ الطفلِ بلا سبب، ولا يظهر شيء.
+     ووقع هذا في قياسي أنا (١٩ نوفمبر): مرّرتُ اسمَ المستوى «A2+ نحو
+     B1» لا مفتاحَه، فخرجت درجاتٌ أعلى من المحفوظِ حتى كشفها التحقّق.
+     والمستوى نفسُه قرارُ الأبِ يُغيّره متى شاء، فلا يُثبَّت هنا —
+     إنّما يُمنَع أن يكون مفتاحًا لا وجودَ له. */
+  (function(){
+    const q = fs.readFileSync(path.join(ROOT, 'quiz.html'), 'utf8');
+    const map = EXTRACT.readObject(q, 'CEFR_BY_CHILD');
+    if (!map){ out.push({ sev:'خطأ', file:'quiz.html', msg:'لا أقرأ CEFR_BY_CHILD — فلا أتحقّق من مستوياتِ الأولاد' }); return; }
+    const keys = Object.keys((W.CEFR) || {});
+    if (!keys.length){ E('جدولُ CEFR فارغٌ أو غيرُ مُصدَّر'); return; }
+    Object.keys(map).forEach(k => {
+      if (keys.indexOf(map[k]) < 0)
+        out.push({ sev:'خطأ', file:'quiz.html',
+          msg:'مستوى «' + k + '» = «' + map[k] + '» ليس مفتاحًا في جدولِ CEFR (' + keys.join(' · ') +
+              ') — فيسقط صامتًا إلى الأسهلِ وترتفع درجتُه بلا سبب' });
+    });
+  })();
+
+  /* ولا رقمَ يُسجَّل ولا يُقرأ: التقريرُ يعرضه */
+  ['child.html','home.html'].forEach(f => {
+    const h = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    if (!/m\.wdur|meta\.wdur/.test(h) || !/paste/.test(h))
+      out.push({ sev:'خطأ', file:f, msg:'زمنُ الكتابةِ واللصقُ يُسجَّلان ولا يظهران في التقرير — رقمٌ لا يُقرأ لا ينفع' });
+  });
+
   return out;
 }
 const HASAN_REF = 'Staying healthy is important because it helps us feel energetic and enjoy our daily lives. '+

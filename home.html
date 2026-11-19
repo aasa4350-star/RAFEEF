@@ -658,8 +658,24 @@ async function loadReport(){
       var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
       /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» */
       var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
+      /* ═══ كيف كُتِبت الفقرات ════════════════════════════════════════
+         طلبُ الأب (١٩ نوفمبر ٢٠٢٦): «سجّل مدّة الكتابة وعدد مرّات
+         اللصق». وهذه الصفحةُ لا تعرض نصوصَ الفقرات، فتُعرَض الخلاصةُ:
+         متوسّطُ زمنِ الكتابةِ الفعليِّ وكم فقرةً فيها لصق. والصفوفُ
+         المحفوظةُ قبل اليومِ بلا هذين الحقلَين فلا تدخل الحساب. */
+      var wTimed=writingAll.filter(function(p){ return typeof p.meta.wdur === "number"; });
+      var wHowLine=(function(){
+        if(!wTimed.length) return '';
+        var tot=wTimed.reduce(function(s,p){ return s+p.meta.wdur; },0);
+        var avg=Math.round(tot/wTimed.length), mi=Math.floor(avg/60), se=avg%60;
+        var t=mi?(mi+' د'+(se?' '+se+' ث':'')):(se+' ث');
+        var pn=wTimed.filter(function(p){ return (p.meta.paste|0)>0; }).length;
+        return ' · ✍️ متوسّط الكتابة: <b>'+t+'</b>'+
+          (pn? ' · <span style="color:var(--warn);font-weight:700">لصق في '+pn+' من '+wTimed.length+'</span>'
+             : ' · <span style="color:var(--good);font-weight:700">بلا لصق</span>');
+      })();
       html+='<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">'+
-        '<li>📝 '+(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?('كتب <b>'+wCount(writingAll.length,L)+'</b>'):wNone(L))+(dt2?' · '+wDrill(L)+': <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':''); })()+(wLast?' · آخر مرة: <span class="cnt">'+RR.stamp(saTime(wLast))+'</span>':'')+'</li>'+
+        '<li>📝 '+(function(){ var L=wLevelOf(writingAll,writingDrill); return (writingAll.length?('كتب <b>'+wCount(writingAll.length,L)+'</b>'):wNone(L))+(dt2?' · '+wDrill(L)+': <b>'+dc2+'/'+dt2+'</b> ('+pct(dc2,dt2)+'%)':''); })()+(wLast?' · آخر مرة: <span class="cnt">'+RR.stamp(saTime(wLast))+'</span>':'')+wHowLine+'</li>'+
         (wAggN?WSUBS.map(function(s){ var avg=wAgg[s[0]]/wAggN; return '<li>'+(Math.round(avg*10)/10)+'/5 '+s[1]+' <span class="cnt">'+s[0]+'</span></li>'; }).join(""):'')+
         '</ul></div>';
     }
