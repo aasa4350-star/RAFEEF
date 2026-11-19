@@ -137,7 +137,12 @@ const META = {
 };
 const DATA = {
   saud:{
-    en:{ dictation:["cat","dog","red","book","sun","ball","fish","milk","hat","pen","box","star","bird","hand","tree","door","car","cake","moon","rain","cup","key","leg","egg","frog","duck","kite","nest","lion","bear","ship","flag","ring","shoe","gift","leaf","toy","hen","fox","bee"],
+    en:{ dictation:["cat","dog","red","book","sun","ball","fish","milk","hat","pen","box","star","bird","hand","tree","door","car","cake","moon","rain","cup","key","leg","egg","frog","duck","kite","nest","lion","bear","ship","flag","ring","shoe","gift","leaf","toy","hen","fox","bee",
+      /* ⚠️ أُعيدت إلى بنكِه (١٩ نوفمبر ٢٠٢٦) — وهي كلماتٌ اختُبر فيها
+         وأخطأها فعلًا في جلساتِه المحفوظة، ثمّ خرجت من البنكِ فصار
+         يُخطئ فيها ولا تعود إليه. وعليها بُنيت جرعةُ الصوائت، وشرطُ
+         الجرعةِ أن تكون كلمتُها في بنكِ صاحبِها. */
+      "chair","gate","bread","shell","stone","sand","plant","grass","river","crown","farm"],
       pass:[
         ["This is Sam. Sam has a red ball. He plays with his dog. The dog is happy.",
           [["What color is the ball?",["red","blue","green"],0],["What animal does Sam have?",["a cat","a dog","a fish"],1],["Is the dog happy?",["yes","no","maybe"],0]]],
@@ -2342,7 +2347,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s9";  /* AUDIO_SIG: c1ffcd5c */
+var AUDIO_VER = "s10";  /* AUDIO_SIG: 60264526 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -2695,7 +2700,7 @@ if(!META[who] || !DATA[who]){
      بنكٌ واحدٌ مشترك: عطبُ حسنٍ في «has/was» و«it» و«been»، وعطبُ رفيفَ
      في «are/a» و«is/a» و«‑ed». فلو جُمعا في بنكٍ واحدٍ تدرّب كلٌّ منهما
      على عطبِ الآخر. */
-  var MICRO_FOR = { rafeef:1, hasan:1 };
+  var MICRO_FOR = { rafeef:1, hasan:1, saud:1 };
   /* صيغةُ الخطاب: g("اكتبها","اكتبيها") */
   function g(m, f){ return (META[who] && META[who].fem) ? f : m; }
   var _microSt = null, _microOwner = {};
@@ -2728,7 +2733,8 @@ if(!META[who] || !DATA[who]){
     if(!list.length) return "";
     var h = '<div class="q" style="border:1.5px solid var(--accent);background:var(--good-bg)">'+
       '<div class="num">🎧 قبل الإملاء — الأصواتُ الصغيرة</div>'+
-      '<p class="hint" style="margin:2px 0 0">أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً: '+
+      '<p class="hint" style="margin:2px 0 0">'+
+      (((window.MICRO_NOTE||{})[who]) || "أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً")+': '+
       microWords(list).map(function(w){ return '<b dir="ltr">'+w+'</b>'; }).join(' · ')+
       '. الكلماتُ الطويلةُ '+g('تكتبها','تكتبينها')+' صح. '+
       'فنتدرّب عليها وحدَها: <b>'+list.length+'</b> مقاطعَ قصيرة، '+g('تسمع وتختار ثمّ تكتب','تسمعين وتختارين ثمّ تكتبين')+'. '+
@@ -2741,7 +2747,8 @@ if(!META[who] || !DATA[who]){
         '<div class="row"><button class="say" data-msay>🔊 اسمع</button>'+
           '<button class="say small" data-mslow>🐢 أبطأ</button>'+
           '<button class="say small" data-mvoice>🔁 صوتٌ ثانٍ</button></div>'+
-        '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:10px 2px 4px">'+g('أيُّهما سمعتَ؟','أيُّهما سمعتِ؟')+'</span>'+
+        '<span style="font-weight:700;font-size:.9rem;color:var(--muted);display:block;margin:10px 2px 4px">'+(function(){ var A=(window.MICRO_ASK||{})[who];
+          return A ? g(A.m, A.f) : g('أيُّهما سمعتَ؟','أيُّهما سمعتِ؟'); })()+'</span>'+
         '<div class="row" style="gap:6px">'+
           opts.map(function(o,k){ return '<button class="chk mopt" data-mo="'+o.replace(/"/g,'&quot;')+'" '+
             'style="flex:1;direction:ltr;font-size:1rem">'+o+'</button>'; }).join('')+
@@ -2813,11 +2820,12 @@ if(!META[who] || !DATA[who]){
             else if(x === b){ x.style.opacity = ".55"; }
           });
           if(good){
-            correct++; fb.className = "fb ok"; fb.innerHTML = "✅ صح — هذا الي قاله.";
+            correct++; fb.className = "fb ok";
+            fb.innerHTML = (window.MICRO_ASK||{})[who] ? "✅ صح — هذي كتابتها." : "✅ صح — هذا الي قاله.";
             if(scoreEl) scoreEl.textContent = correct + " / " + list.length;
           } else {
             fb.className = "fb no";
-            fb.innerHTML = '❌ الي قاله: <span class="corr" dir="ltr">'+it.heard+'</span>'+
+            fb.innerHTML = '❌ '+((window.MICRO_ASK||{})[who] ? 'الصحيح' : 'الي قاله')+': <span class="corr" dir="ltr">'+it.heard+'</span>'+
               '<div style="font-weight:600;font-size:.88rem;margin-top:5px;line-height:1.8">'+it.why+'</div>'+
               '<div style="font-weight:600;font-size:.88rem;margin-top:3px">'+g('اسمعها مرّةً ثانيةً — واضغط','اسمعيها مرّةً ثانيةً — واضغطي')+' «🐢 أبطأ».</div>';
             play(true);

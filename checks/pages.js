@@ -8078,6 +8078,64 @@ function microListenPath(){
     /* ٧) ولافتةُ الكلماتِ الساقطةِ تُستخرَج من بنكِه هو */
     if (/dir="ltr">are<\/b>/.test(mb) || !/microWords\(list\)/.test(mb))
       RE('لافتةُ الكلماتِ الساقطةِ مكتوبةٌ بيدٍ لا مستخرجةٌ من بنكِ الطفل — فتكذب على من ليست كلماتُه');
+
+    /* ═══ ٨) والسؤالُ يتبع نوعَ الجرعة ═════════════════════════════
+       بنكُ حسنٍ ورفيفَ تمييزٌ بالأذن: «they were» غيرُ «the were»
+       صوتًا، فيصحُّ أن يُسأل «أيُّهما سمعت؟».
+       وبنكُ سعودٍ هجاءٌ لا سمع: gift/geft و ball/boll تُنطَق متطابقةً
+       — وقد أعادت خدمةُ التعرّفِ مقطعَ ball «Paul» و«Bull». فسؤالُ
+       «أيُّهما سمعت؟» يُحاسب الطفلَ على تمييزٍ لا وجودَ له، ويُعلّمه
+       أنّ أذنَه تخونه وهي لم تخنه.
+       فالقاعدة: بنكٌ فيه زوجٌ واحدٌ متطابقُ المفتاحِ الصوتيِّ يلزمه
+       سؤالُ هجاءٍ في MICRO_ASK. والمفتاحُ يُستخرَج من phKey الصفحةِ
+       نفسِها ولا يُعاد كتابتُه هنا. */
+    let PH = null;
+    try {
+      const t = EXTRACT.literalAfter(rs, /function phKey\(/, '{', '}');
+      if (t) PH = new Function('w', t.slice(1, -1).replace(/^\s*function[\s\S]*?\{/, ''));
+    } catch(e){}
+    if (!PH){
+      const a2 = rs.indexOf('  function phKey(w){');
+      if (a2 > 0){
+        const b2 = rs.indexOf('\n  }', a2);
+        if (b2 > a2){
+          const box2 = {}; vm.createContext(box2);
+          try { vm.runInContext(rs.slice(a2, b2 + 4) + '\n;this.__ph = phKey;', box2); PH = box2.__ph; } catch(e){}
+        }
+      }
+    }
+    if (!PH) RE('لم أستخرج phKey من الصفحةِ لأقيسَ تطابقَ الأزواجِ صوتيًّا');
+    else {
+      const ASK = box.window.MICRO_ASK || {};
+      Object.keys(ASK).forEach(k => {
+        if (!(BANK[k] || []).length)
+          E('MICRO_ASK يُسمّي «' + k + '» وليس له بنكُ شظايا');
+        else if (!ASK[k] || !ASK[k].m || !ASK[k].f)
+          E('سؤالُ «' + k + '» ناقصُ إحدى الصيغتَين (m/f)');
+      });
+      Object.keys(BANK).forEach(who => {
+        /* ⚠️ وعددُ الكلماتِ شرطٌ: phKey يحذف الصوائتَ كلَّها، فيقع
+           «by a famous» و«by famous» على مفتاحٍ واحدٍ وهما مختلفان
+           سمعًا — الأداةُ مقطعٌ زائدٌ تسمعه الأذن، وهو عينُ ما يسقط
+           من حسن. فالزيادةُ والنقصُ في الكلماتِ فرقٌ مسموع، ولا
+           يبقى أصمَّ إلّا تغيّرُ حرفِ علّةٍ داخلَ كلمةٍ بعددِ مقاطعِها. */
+        const wc = x => String(x).trim().split(/\s+/).filter(Boolean).length;
+        const same = (BANK[who] || []).filter(it => {
+          const h = String(it.heard||''), w = String(it.wrong||'');
+          return h && w && wc(h) === wc(w) && PH(h) === PH(w);
+        });
+        if (same.length && !ASK[who])
+          E('بنكُ «' + who + '» فيه ' + same.length + ' زوجًا متطابقًا صوتيًّا (مثل «' +
+            same[0].heard + '» و«' + same[0].wrong + '») والسؤالُ «أيُّهما سمعت؟» — ' +
+            'تمييزٌ لا وجودَ له، فيلزمه سؤالُ هجاءٍ في MICRO_ASK');
+        if (!same.length && ASK[who])
+          out.push({ sev:'تنبيه', file:F, msg:'بنكُ «' + who + '» كلُّه مُميَّزٌ بالأذنِ وسؤالُه سؤالُ هجاء' });
+      });
+      /* والصفحةُ تقرؤه فعلًا: السؤالُ والردُّ صوابًا وخطأً */
+      const sites = (mb.match(/window\.MICRO_ASK/g) || []).length;
+      if (sites < 3)
+        RE('الصفحةُ تقرأ MICRO_ASK في ' + sites + ' موضعٍ من ثلاثة (السؤال · ردُّ الصواب · ردُّ الخطأ) — فيبقى خطابُ السمعِ في جرعةِ هجاء');
+    }
   }
   return out;
 }
