@@ -8119,7 +8119,7 @@ function longReadOptsPath(){
   catch(e){ E('البنكُ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
   const L = box.window.READING_LONG || {};
   /* من أُتمَّ بنكُه يبقى تامًّا: قائمةٌ صريحةٌ تمنع الانتكاس */
-  const FOUR = { 'hasan:en':1 };
+  const FOUR = { 'hasan:en':1, 'rafeef:en':1 };
   Object.keys(L).forEach(who => Object.keys(L[who] || {}).forEach(lang => {
     const P = (L[who][lang] || {}).pass || [];
     let three = 0;
