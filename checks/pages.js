@@ -8440,6 +8440,41 @@ function writingGraderPath(){
   if (bandOf(gPad, 'Organisation') > 2)
     E('«الترتيب» يُعطي نصَّ الحشوِ ' + bandOf(gPad,'Organisation') + ' من ٥ — والنصُّ الذي جملتُه واحدةٌ مكرّرةٌ ليس مرتَّبًا قليلًا، لا أفكارَ فيه تُرتَّب');
 
+  /* ═══ والخاتمةُ التي تُحكِم المقدّمةَ ليست حشوًا ══════════════════
+     قياسُ ١٩ نوفمبر على نصوصِ حسنٍ الثلاثةِ والعشرين: متوسّطُ تشابهِ
+     الجملِ ٣٫١٪، وأعلى زوجٍ ٥٧٪ — وهو مقدّمةُ نصِّ ٩ نوفمبر مع
+     خاتمتِه. وذاك مطلوبُ المستوى لا عيبُه.
+     فعتبةُ الزوجَين هي التي تحميه: زوجٌ واحدٌ عالٍ لا يُسقِّف شيئًا،
+     ولو صارت العتبةُ زوجًا واحدًا عُوقِب كلُّ من أحسن الخاتمة. */
+  const CLOSER = 'My plan for the future is to become a successful software engineer. '+
+    'I want to choose this career because I enjoy technology and solving difficult problems. '+
+    'I am interested in computers, programming, and creating useful applications for people. '+
+    'At the moment, I am preparing for my career in several practical ways. '+
+    'I study hard at school, especially English, mathematics, and computer subjects. '+
+    'I also spend time learning about technology through educational videos and online courses. '+
+    'In addition, I practice using computers although my skills still need improvement. '+
+    'In conclusion, my plan for the future is to become a successful software engineer.';
+  if (typeof W.sims !== 'function') E('مقياسُ تشابهِ الجملِ غيرُ مُصدَّرٍ — فلا يُقاس تكرارُ الطفلِ إلّا عند بلوغِ العتبة');
+  else {
+    const prF = ((W.PROMPTS||{})[2]||[]).filter(x => /future/i.test(x.t))[0];
+    if (prF){
+      const simsC = W.sims(CLOSER.split(/[.!?]+/).map(x => x.trim()).filter(Boolean));
+      const hi = simsC.filter(x => x >= (W.PAD_SIM || 0.6)).length;
+      if (hi !== 1) E('نصُّ المقايسةِ ما عاد يُنتِج زوجًا عاليًا واحدًا (' + hi + ') — فالحارسُ لا يقيس ما وُضِع له');
+      const gC = W.grade(CLOSER, 2, 'B2', prF);
+      const orgC = gC.subs.filter(x => x.en === 'Organisation')[0] || {};
+      if (orgC.padded) E('خاتمةٌ تُحكِم المقدّمةَ تُعَدُّ حشوًا فيُسقَّف «الترتيب» — وهي مطلوبُ المستوى، فعتبةُ الزوجَين ضاعت');
+      if (!gC.pass) E('نصٌّ مرتَّبٌ خاتمتُه تُعيد مقدّمتَه يرسُب — والعقوبةُ أصابت من أحسن');
+    }
+    if (W.sims(['One short line here','Another short line here']).length)
+      E('المقياسُ يعمل على نصٍّ من جملتَين — وتشابهُ جملتَين قصيرتَين مصادفةٌ لا تكرار');
+    /* والجملةُ التي أقلُّ من ثلاثِ كلماتٍ معجميّةٍ لا تُقاس: نصيبُها من
+       الاشتراكِ مصادفةٌ لا تكرار. وهو شرطٌ لا يظهر سقوطُه في الدرجةِ
+       لأنّ نصًّا من جملٍ ثنائيّةٍ يرسُب لطولِه أصلًا، فيُفحَص بندائِه. */
+    if (W.sims(['Technology is good','Technology is nice','I enjoy learning about computers and programming']).length)
+      E('المقياسُ يقيس جملًا أقلَّ من ثلاثِ كلماتٍ معجميّة — فيُحسَب الاشتراكُ المصادفُ تكرارًا');
+  }
+
   /* ٢) القواعدُ تُقرأ فعلًا */
   const BROKEN = 'Staying healthy are important because it help us feel energetic. First, we should ate healthy food such as fruits and vegetables. '+
     'A balanced diet give our body the nutrient we needs and help prevent illness. Second, regular exercise are important. '+

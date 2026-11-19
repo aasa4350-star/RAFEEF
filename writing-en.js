@@ -1019,6 +1019,34 @@ function grammarIssues(text){
   return out;
 }
 
+/* ═══ تشابهُ الجملِ: مقياسٌ متّصلٌ لا حكمٌ بنعم أو لا ═══════════════
+   كان الحسابُ محصورًا داخلَ gradeWriting يُخرِج عددَ الأزواجِ التي
+   بلغت العتبةَ وحدَها. وسؤالُ الأب (١٩ نوفمبر ٢٠٢٦): «كم معدّلُ
+   التكرارِ في الجمل؟» — والعتبةُ لا تجيبه: تقول «ما بلغ» ولا تقول
+   «كم». فصارت النسبُ كلُّها تُردُّ، والعتبةُ تُطبَّق عليها بعدُ.
+
+   والمقياسُ جاكار على مجموعاتِ الكلماتِ بعد طرحِ كلماتِ الوظيفة.
+   وتُستثنى الجملةُ التي أقلُّ من ثلاثِ كلماتٍ مُعجَميّة: جملتان
+   قصيرتان تتشابهان بالمصادفةِ لا بالتكرار. */
+var PAD_SIM = 0.6;
+function sentSims(sents){
+  if(!sents || sents.length < 3) return [];
+  var sets = sents.map(function(s){
+    var o = {}; String(s).toLowerCase().split(/\s+/).forEach(function(w){
+      var k = w.replace(/[^a-z]/g,""); if(k && !STOPSET[k]) o[k]=1; });
+    return o;
+  });
+  var out = [];
+  for(var i=0;i<sets.length;i++) for(var j=i+1;j<sets.length;j++){
+    var A=Object.keys(sets[i]), B=Object.keys(sets[j]);
+    if(A.length<3 || B.length<3) continue;
+    var inter=0; A.forEach(function(k){ if(sets[j][k]) inter++; });
+    var uni = A.length + B.length - inter;
+    if(uni) out.push(inter/uni);
+  }
+  return out;
+}
+
 function gradeWriting(text, level, targetOrCefr, prompt){
   var cef = (typeof targetOrCefr==="object" && targetOrCefr) ? targetOrCefr
           : (CEFR[targetOrCefr] || (level>=2 ? CEFR.A2 : CEFR.A1));
@@ -1068,23 +1096,8 @@ function gradeWriting(text, level, targetOrCefr, prompt){
      والقياسُ بتشابهِ مجموعاتِ الكلماتِ (جاكار) بين كلِّ جملتَين:
      ستّون بالمئةِ فأكثرُ تشابهٌ يُعَدُّ تكرارًا. والعتبةُ زوجان، فلا
      يسقط نصٌّ أعاد صياغةَ فكرةٍ مرّةً واحدةً للتأكيد. */
-  var padPairs = (function(){
-    if(sents.length < 3) return 0;
-    var sets = sents.map(function(s){
-      var o = {}; s.toLowerCase().split(/\s+/).forEach(function(w){
-        var k = w.replace(/[^a-z]/g,""); if(k && !STOPSET[k]) o[k]=1; });
-      return o;
-    });
-    var n = 0;
-    for(var i=0;i<sets.length;i++) for(var j=i+1;j<sets.length;j++){
-      var A=Object.keys(sets[i]), B=Object.keys(sets[j]);
-      if(A.length<3 || B.length<3) continue;
-      var inter=0; A.forEach(function(k){ if(sets[j][k]) inter++; });
-      var uni = A.length + B.length - inter;
-      if(uni && inter/uni >= 0.6) n++;
-    }
-    return n;
-  })();
+  var padSims = sentSims(sents);
+  var padPairs = padSims.filter(function(x){ return x >= PAD_SIM; }).length;
   orgChecks.push({ok: padPairs < 2,
     label: padPairs>=2 ? ("جملٌ مكرّرةٌ بمعناها: "+padPairs+" زوجًا") : "كلُّ جملةٍ فكرةٌ جديدة",
     hint:"أدواتُ الربطِ تَصِل أفكارًا مختلفة — لا تُعِد الجملةَ نفسَها بأداةٍ جديدة."});
@@ -1225,6 +1238,13 @@ function gradeWriting(text, level, targetOrCefr, prompt){
 
   return { subs:subs, total:totalBand, max:20, pass:pass, cefr:cef.name,
            words:words.length, sents:sents.length, conns:conns,
+           /* عددُ أزواجِ الجملِ المتشابهةِ ستّين بالمئةِ فأكثر — كان
+              محجوبًا داخلَ الحسابِ فلا يُقاس تكرارُ الطفلِ إلّا عند
+              بلوغِه العتبة. والرقمُ نفسُه يُسأل عنه (١٩ نوفمبر). */
+           pad:padPairs,
+           padMax:(padSims.length? Math.max.apply(null,padSims) : 0),
+           padAvg:(padSims.length? padSims.reduce(function(a,b){return a+b;},0)/padSims.length : 0),
+           padN:padSims.length,
            /* توافق مع النداءات القديمة */
            score:totalBand, checks:subs.reduce(function(a,s){ return a.concat(s.checks); },[]) };
 }
@@ -1852,5 +1872,5 @@ function render(el, ctx){
 /* grammarIssues مكشوفةٌ للفحصِ الآليّ: قواعدُها تُجرَّب على جملٍ
    صحيحةٍ وخاطئةٍ معًا، والإنذارُ الكاذبُ أسوأُ من السكوت. */
 window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN,
-                     grammar:grammarIssues, _rules:GRAMMAR };
+                     grammar:grammarIssues, _rules:GRAMMAR, sims:sentSims, PAD_SIM:PAD_SIM };
 })();
