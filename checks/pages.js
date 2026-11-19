@@ -381,6 +381,7 @@ function run(){
   issues.push(...teachStuckPath());
   issues.push(...microListenPath());
   issues.push(...listenBankPath());
+  issues.push(...longReadOptsPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -8096,6 +8097,67 @@ function microListenPath(){
       لا نسبةً، فيخرج الصوتُ أسرعَ ممّا قُصد (قِيس: ١٢٦٧٢ بايتًا مقابل
       ١٤١١٢ للنصِّ نفسِه).
    ════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+   حارسُ خياراتِ القطعِ الطويلة
+
+   قياسُ ١٨ نوفمبر ٢٠٢٦: قطعُ حسنٍ كلُّها ثلاثةُ خيارات، وحظُّ التخمينِ
+   فيها ٣٣٪ لا ٢٥٪ كاختبارِ ستيب — فدرجتُه تُقرأ أعلى ممّا هي. وضُمَّ
+   إليه بنكُ ستيبٍ الرباعيّ، ثمّ (١٩ نوفمبر) زِيد الخيارُ الرابعُ إلى
+   خمسةٍ وتسعين سؤالًا في قطعِه الطويلة.
+
+   والحارسُ يحفظ ثلاثةَ شروطٍ: أربعةُ خياراتٍ في الإنجليزيِّ لمن أُتمَّ
+   بنكُه، ولا خيارَ مكرَّرًا (فالمكرَّرُ يُنقص الاختيارَ إلى ثلاثةٍ من
+   حيث لا يُرى)، والصحيحُ أوّلٌ دائمًا لأنّ الصفحةَ تخلط وتعتمد ذلك.
+   ════════════════════════════════════════════════════════════════════ */
+function longReadOptsPath(){
+  const out = [], F = 'reading-long.js', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('الملفُّ غائب'); return out; }
+  const box = { window:{} };
+  vm.createContext(box);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), box); }
+  catch(e){ E('البنكُ لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  const L = box.window.READING_LONG || {};
+  /* من أُتمَّ بنكُه يبقى تامًّا: قائمةٌ صريحةٌ تمنع الانتكاس */
+  const FOUR = { 'hasan:en':1 };
+  Object.keys(L).forEach(who => Object.keys(L[who] || {}).forEach(lang => {
+    const P = (L[who][lang] || {}).pass || [];
+    let three = 0;
+    P.forEach((pas, pi) => (pas[1] || []).forEach((q, qi) => {
+      const o = (q && q[1]) || [], where = who + '/' + lang + ' ق' + (pi+1) + ' س' + (qi+1);
+      if (o.length === 3) three++;
+      else if (o.length !== 4) E(where + ': خياراتُه ' + o.length + ' — والمعمولُ به ثلاثةٌ أو أربعة');
+      const u = {}; o.forEach(x => { const k = String(x).trim().toLowerCase();
+        if (u[k]) E(where + ': خيارٌ مكرَّرٌ «' + String(x).slice(0,34) + '» — يُنقص الاختيارَ من حيث لا يُرى'); u[k] = 1; });
+      if (q && q[2] != null && q[2] !== 0)
+        E(where + ': الصحيحُ ليس أوّلَ الخيارات — والصفحةُ تخلط وتعتمد ذلك');
+    }));
+    if (FOUR[who + ':' + lang] && three)
+      E(who + '/' + lang + ': ' + three + ' سؤالًا رجع إلى ثلاثةِ خيارات — وقد أُتمَّ بنكُه إلى أربعة (حظُّ التخمينِ ٢٥٪ كستيب)');
+  }));
+
+  /* ═══ وسؤالُ المعنى المُولَّد ═══════════════════════════════════════
+     يُولَّد لكلِّ قطعةٍ ويقع خامسًا دائمًا. فبثلاثةِ خيارات كان وحدَه
+     يُبقي خُمسَ أسئلةِ القراءةِ بحظِّ تخمينٍ ٣٣٪ ولو أُتمَّت البنوكُ
+     كلُّها — وقِيس فإذا هو مصدرُ كلِّ ما بقي ثلاثيًّا عند حسنٍ بعد
+     إتمامِ بنكِه (١٢٪ من أسئلتِه على الشاشة). ولا يُرى في أيِّ بنك،
+     فلا يُمسَك إلّا بفحصِ مولِّده. */
+  const rh = path.join(ROOT, 'reading.html');
+  if (fs.existsSync(rh)){
+    const rs = fs.readFileSync(rh, 'utf8');
+    const RE = m => out.push({ sev:'خطأ', file:'reading.html', msg:m });
+    const en = /\[g2\[1\], others2\[0\]\[1\], others2\[1\]\[1\], others2\[2\]\[1\]\]/.test(rs);
+    const ar = /\[g\[1\], others\[0\]\[1\], others\[1\]\[1\], others\[2\]\[1\]\]/.test(rs);
+    if (!en) RE('سؤالُ «معنى الكلمة» الإنجليزيُّ المُولَّدُ بثلاثةِ خيارات — وهو خُمسُ أسئلةِ كلِّ قطعة');
+    if (!ar) RE('سؤالُ «معنى الكلمة» العربيُّ المُولَّدُ بثلاثةِ خيارات');
+    if (!/if\(others2\.length<3\) return \[\];/.test(rs))
+      RE('المولِّدُ الإنجليزيُّ لا يشترط ثلاثةَ مُلهياتٍ قبل التوليد — قد يخرج بخيارٍ ناقص');
+    if (!/if\(others\.length<3\) return \[\];/.test(rs))
+      RE('المولِّدُ العربيُّ لا يشترط ثلاثةَ مُلهياتٍ قبل التوليد');
+  }
+  return out;
+}
+
 function listenBankPath(){
   const out = [], F = 'listen-bank.js', p = path.join(ROOT, F);
   const E = m => out.push({ sev:'خطأ', file:F, msg:m });
