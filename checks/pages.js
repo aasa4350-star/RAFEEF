@@ -385,6 +385,7 @@ function run(){
   issues.push(...heardBoxPath());
   issues.push(...writingGraderPath());
   issues.push(...dictLenPath());
+  issues.push(...buildVerPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -8943,5 +8944,73 @@ function dictLenPath(){
     const empty = L.filter(x => !String(x).trim());
     if (empty.length) E('بندٌ فارغٌ في بنكِ إملاءِ ' + who);
   });
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   رقمُ البناءِ محدَّثٌ — وإلّا بقيت الأجهزةُ على الصفحةِ القديمة
+   ════════════════════════════════════════════════════════════════════
+   بلاغ الأب (٢٠ نوفمبر ٢٠٢٦) بصورةٍ من صفحةِ فهد: «ذي صفحة فهد ما
+   عنده» — والقسمُ منشورٌ، إنّما صورتُه ١٠:٣٧ والنشرُ ١٠:٥٣.
+   وGitHub Pages يُرسِل الصفحةَ بـmax-age=600 ولا تُغيَّر ترويسةُ
+   خادمِه. فصارت كلُّ صفحةٍ تحمل BUILD_VER وتسأل version.json.
+
+   والعطبُ هنا صامتٌ أشدَّ الصمتِ: من عدّل صفحةً ولم يُعِد توليدَ
+   البصمةِ بقي version.json يقول الرقمَ القديمَ، فتظنُّ الأجهزةُ أنّها
+   محدَّثةٌ وهي ليست — ولا يظهر شيءٌ أبدًا، لا في فحصٍ ولا في شاشة.
+   فتُحسَب البصمةُ هنا بالأداةِ نفسِها (tools/gen-build.js) ويُقال
+   الرقمُ المطلوبُ صراحةً، كما يفعل حارسُ الصوتِ بـAUDIO_SIG. */
+function buildVerPath(){
+  const out = [];
+  let G = null;
+  try { G = require(path.join(ROOT, 'tools', 'gen-build.js')); }
+  catch(e){ return [{ sev:'خطأ', file:'tools/gen-build.js', msg:'أداةُ بصمةِ البناءِ لا تُحمَّل: ' + String(e.message).slice(0,60) }]; }
+  const want = G.sig();
+  const vp = path.join(ROOT, 'version.json');
+  if (!fs.existsSync(vp))
+    return [{ sev:'خطأ', file:'version.json', msg:'الملفُّ غائب — فلا تعرف الصفحاتُ أنّ بناءً جديدًا نزل. شغّل: node tools/gen-build.js' }];
+  let got = null;
+  try { got = JSON.parse(fs.readFileSync(vp, 'utf8')).v; } catch(e){}
+  if (got !== want)
+    out.push({ sev:'خطأ', file:'version.json',
+      msg:'بصمةُ البناءِ «' + got + '» والمطلوبُ «' + want + '» — فتبقى الأجهزةُ على الصفحةِ القديمةِ ولا يظهر عطب. شغّل: node tools/gen-build.js' });
+
+  /* وكلُّ صفحةٍ تحمل الرقمَ نفسَه وتُحمّل الفاحص */
+  const bad = [], miss = [];
+  fs.readdirSync(ROOT).filter(f => /\.html$/.test(f)).sort().forEach(f => {
+    const s = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const m = /src="build-check\.js\?v=([0-9a-f]+)"/.exec(s);
+    if (!m) { miss.push(f); return; }
+    if (m[1] !== want) bad.push(f);
+  });
+  if (miss.length)
+    out.push({ sev:'خطأ', file:'reading.html',
+      msg:miss.length + ' صفحةً بلا رقمِ بناءٍ أو بلا build-check.js — تبقى قديمةً في الجهازِ بلا علم: ' + miss.slice(0,4).join(' · ') });
+  if (bad.length)
+    out.push({ sev:'خطأ', file:'version.json',
+      msg:bad.length + ' صفحةً رقمُها غيرُ رقمِ version.json — فتُعيد تحميلَ نفسِها بلا نهاية: ' + bad.slice(0,4).join(' · ') });
+
+  /* ولا دورانَ: لا بدَّ من قيدِ «جُرّب من قبل» ومن احترامِ ما يكتبه */
+  const bc = path.join(ROOT, 'build-check.js');
+  if (!fs.existsSync(bc))
+    out.push({ sev:'خطأ', file:'build-check.js', msg:'الفاحصُ غائب' });
+  else {
+    const c = fs.readFileSync(bc, 'utf8');
+    /* ⚠️ والرقمُ في رابطِ الفاحصِ لا في كتلةٍ داخليّة: كتلةٌ جديدةٌ
+       تصير «أوّلَ كتلة» في الصفحةِ فتكسر فحصَ think.html الذي يأخذ
+       أوّلَها — وقع ذلك عند أوّلِ تركيب. */
+    if (!/document\.currentScript/.test(c) || !/\[?&\]v=/.test(c))
+      out.push({ sev:'خطأ', file:'build-check.js',
+        msg:'الفاحصُ لا يقرأ رقمَه من رابطِه — فيلزم وسمٌ داخليٌّ في كلِّ صفحةٍ يُزاحِم ما فيها' });
+    if (!/function tried\(v\)[\s\S]{0,160}sessionStorage/.test(c) || !/tried\(v\)\)\s*return/.test(c))
+      out.push({ sev:'خطأ', file:'build-check.js',
+        msg:'لا قيدَ يمنع إعادةَ التحميلِ لرقمٍ جُرِّب — فصفحةٌ لا يتطابق رقمُها تدور بلا نهاية' });
+    if (!/if\(typing\(\)\)/.test(c))
+      out.push({ sev:'خطأ', file:'build-check.js',
+        msg:'يُعاد التحميلُ والطفلُ يكتب — فتُمحى إجابتُه' });
+    if (!/cache:\s*"no-store"/.test(c))
+      out.push({ sev:'خطأ', file:'build-check.js',
+        msg:'سؤالُ version.json يُخزَّن هو الآخر — فلا يُعرَف الجديدُ أبدًا' });
+  }
   return out;
 }
