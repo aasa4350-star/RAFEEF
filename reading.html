@@ -4402,7 +4402,24 @@ if(!META[who] || !DATA[who]){
                   .map(function(i){ return B[+i]; });
     var attId = (window.newAttId ? newAttId() : (Date.now().toString(36)+Math.random().toString(36).slice(2,7)));
     var total = items.reduce(function(s,x){ return s+x.q.length; }, 0);
-    var correct = 0, answered = 0, savedN = 0, t0 = Date.now();
+    /* ═══ والغيابُ يُرصَد كما يُرصَد في الإملاءِ والقراءة ══════════════
+       سؤالُ الأب (٢٠ نوفمبر ٢٠٢٦) عن فهمِ المسموعِ ومستواه. وعدّادُ هذا
+       القسمِ كان Date.now()-t0 وحدَه، بلا away ولا exits — بخلافِ
+       الإملاءِ والقراءةِ. فقرأتُ جلسةَ ١٩ نوفمبر «٧٤٤ ثانيةً لأربعةِ
+       مقاطع» وحسبتُ أنّه أبطأَ جدًّا، وكشف الحفظُ التدريجيُّ خطأي:
+       العدّادُ كان ٧١٦ عند السؤالِ الثاني ثمّ نما ثمانيًا وعشرينَ ثانيةً
+       في ستّةِ أسئلة. فالدقائقُ صفحةٌ مفتوحةٌ لا إبطاءٌ منه.
+       فمن لم يفصل زمنَ الجلوسِ من زمنِ الغيابِ حكم على الطفلِ بما ليس
+       منه — وقد وقعتُ فيه. */
+    var correct = 0, answered = 0, savedN = 0, t0 = Date.now(), aw0 = awaySnap();
+    wireExitWarn(sec);
+    /* ═══ وأيُّ النصوصِ سمعها يُحفَظ، لا عددُها وحدَه ═══════════════════
+       كان الصفُّ يحفظ clips عددًا مجرَّدًا. فلمّا سُئلتُ عن مستواه لم
+       أقدر أن أعرف أسمع نصًّا جديدًا أم أعاد محفوظًا — وبنكُ العشرينَ
+       كان قد سُمِع كلُّ نصٍّ فيه ثلاثَ مرّاتٍ وأربعةَ أعشارٍ وسطيًّا،
+       فبعضُ ثمانيةٍ وثمانينَ بالمئةِ ذاكرةٌ لا فهم. وهو نفسُ عيبِ قسمِ
+       الجملِ الذي ضُبِط بـaskKeys. */
+    var heardKeys = [];
     /* ═══ ويُرصَد أيُّ مهارةٍ تخذله، لا الدرجةُ وحدَها ═══════════════
        تشخيصُ أسامة (٢٩ أكتوبر ٢٠٢٦): فهمُ المسموعِ ٥٩٪، ولا جلسةَ
        واحدةً من أربعٍ تحمل تفصيلًا — فالقسمُ يقول «ضعيف» ولا يقول في
@@ -4453,8 +4470,11 @@ if(!META[who] || !DATA[who]){
     function save(){
       if(answered < 2 || answered <= savedN) return;
       savedN = answered;
+      var aw = awaySince(aw0);
       saveScore("فهم المسموع 🎧", correct, answered,
-        { dur:Math.round((Date.now()-t0)/1000), clips:items.length, pid:attId, lang:"en",
+        { dur:Math.round((Date.now()-t0)/1000), away:aw.away, exits:aw.exits,
+          trusted:(aw.exits===0), clips:items.length,
+          clipKeys:heardKeys.slice(0,12), pid:attId, lang:"en",
           skills:LSK });
     }
     sec.querySelectorAll("[data-li]").forEach(function(box){
@@ -4508,6 +4528,11 @@ if(!META[who] || !DATA[who]){
       playBtn.addEventListener("click", function(){
         if(plays >= 2){ return; }
         plays++;
+        /* ويُسجَّل النصُّ عند أوّلِ تشغيلٍ لا عند الإجابة: من سمع ثمّ
+           خرج قد سُمع له نصٌّ ولم يُسأل عنه — والمقصودُ أيَّ النصوصِ
+           بلغته أذنُه. والمفتاحُ أوّلُ ستّةٍ وثلاثينَ حرفًا من النصِّ
+           فيُعرَف ولا يُثقَل الصفّ. */
+        if(heardKeys.indexOf(it.t.slice(0,36)) < 0) heardKeys.push(it.t.slice(0,36));
         cnt.textContent = plays >= 2 ? "خلصت مرّاتك — جاوب من اللي سمعت" : "تبقّى لك مرّة واحدة";
         playBtn.textContent = "🔁 اسمع مرّة ثانية";
         if(plays >= 2) playBtn.disabled = true;
