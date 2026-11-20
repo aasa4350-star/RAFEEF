@@ -197,7 +197,82 @@
      الشبكةِ فيظنّ أحدَهما عطبًا. */
   var VOICES = ["en-GB-RyanNeural", "en-GB-SoniaNeural"];
 
-  window.MICRO_LISTEN = { rafeef: RAFEEF, hasan: HASAN, saud: SAUD };
+  /* ═══ فهد — ثالثٌ ثانويّ (٢٠ نوفمبر ٢٠٢٦) ════════════════════════════
+     طلبُ الأب: «حط لفهد في الإملاء تفكيك الجمل مثل حسن».
+     والشظايا من أخطائِه هو: قُوبِل ما كُتِب في ستِّ جلساتٍ بما قيل له
+     (تسعةٌ وثلاثون زوجًا في القاعدة)، فخرجت أربعُ عائلاتٍ منظومة:
+
+       ١) الباءُ والپاء: العربيّةُ لا /p/ فيها فيلتبسان. published صارت
+          «palpashent» و«foubshent»، وbeen صارت «peen»، وBy صارت «Pay»،
+          وproject صارت «brojicte»، وbridge صارت «prejst».
+       ٢) الفاءُ والڤاء: ولا /v/ في العربيّةِ كذلك. provided صارت
+          «brovinted»، وvalue صارت «faly»، وvariables صارت «firbo».
+       ٣) الثاءُ: theory صارت «feery» و«very»، وthat صارت «the».
+       ٤) وسقوطُ الخفيفِ: of وbeen وnor وfor تسقط أو تُبدَل —
+          «one of the variables» كتبها «one the firbo»، و«Neither …
+          nor» كتبها «Nine … no».
+
+     والصوتُ ينطق الصحيحَ دائمًا، والخطأُ خيارٌ مكتوبٌ يقابله بما سمع —
+     وأزواجُه مسموعةُ الفرقِ حقًّا (بخلافِ هجاءِ سعود)، فسؤالُه
+     «أيُّهما سمعتَ؟» كما هو. */
+  var FAHAD = [
+    { heard:"been published earlier", wrong:"been polished earlier",
+      why:"‏published أوّلُها /p/ ووسطُها /b/ — والعربيّةُ لا پاءَ فيها فيلتبسان. كتبتَها «palpashent» و«foubshent».",
+      from:"Had the results been published earlier" },
+    { heard:"one of the variables", wrong:"one the variables",
+      why:"‏of خفيفةٌ بين الاسمَين فتسقط من الأذن. أسقطتَها في ١١ نوفمبر: «one the firbo».",
+      from:"one of the variables" },
+    { heard:"was rejected", wrong:"was ejected",
+      why:"‏rejected أوّلُها /r/ مسموعةٌ ومعناها «رُفِض». كتبتَها «jacted» في ١٠ نوفمبر.",
+      from:"The proposal was rejected" },
+    { heard:"information provided", wrong:"information provider",
+      why:"‏provided فعلٌ آخرُه /d/، وprovider اسمٌ آخرُه /r/. وفيها /v/ لا /b/ — كتبتَها «brovinted».",
+      from:"The information provided in the brochure" },
+    { heard:"increasingly value", wrong:"increasingly falue",
+      why:"‏value أوّلُها /v/: الشفةُ على السنِّ لا شفةٌ على شفة. كتبتَها «faly» في ١٧ نوفمبر.",
+      from:"Employers increasingly value" },
+    { heard:"which was widely", wrong:"which was wildly",
+      why:"‏widely من wide «واسع»، وwildly من wild «جامح». كتبتَها «whay lattly» في ١٠ نوفمبر.",
+      from:"The theory, which was widely accepted" },
+    { heard:"nor the teacher", wrong:"no the teacher",
+      why:"‏nor آخرُها /r/ وهي قسيمةُ Neither. كتبتَها «no» في ١٧ نوفمبر فانقطع التركيب.",
+      from:"Neither the students nor the teacher" },
+    { heard:"long suspected", wrong:"long expected",
+      why:"‏suspected «يَشتبِه» وexpected «يَتوقَّع» — ضدَّان تقريبًا. كتبتَها «spcted».",
+      from:"Scientists have long suspected" },
+    { heard:"Under no circumstances", wrong:"Under the circumstances",
+      why:"«Under no» نفيٌ قاطعٌ، و«Under the» وصفُ حال — فرقٌ في المعنى كلِّه. كتبتَها «and noste more» و«An now soke».",
+      from:"Under no circumstances" },
+    { heard:"Were it not", wrong:"Where it not",
+      why:"‏Were هنا فعلٌ في شرطٍ مقلوبٍ لا ظرفَ مكان، وصوتُها /wɜː/ لا /weə/. كتبتَها «Worry» في ١٧ نوفمبر.",
+      from:"Were it not for his support" },
+    { heard:"for having kept", wrong:"for have kept",
+      why:"بعد for يأتي having لا have. كتبتَ «gais fugh keepion» في ١٣ نوفمبر.",
+      from:"He apologised for having kept us" },
+    { heard:"on the basis", wrong:"on the basic",
+      why:"‏basis اسمٌ «أساس» وbasic صفةٌ «أساسيّ». كتبتَها «crocet» في ١٧ نوفمبر.",
+      from:"on the basis" },
+    { heard:"The bridge is said", wrong:"The bridge is sold",
+      why:"‏said تُقال «سِدْ» قصيرةً، وsold غيرُها. كتبتَها «sante» و«see it» مرّتَين.",
+      from:"The bridge is said" },
+    { heard:"number of applicants", wrong:"number applicants",
+      why:"‏of تسقط هنا كما سقطت عندك في «one of the variables».",
+      from:"The number of applicants" },
+    { heard:"to have been built", wrong:"to have been build",
+      why:"‏built مبنيٌّ للمجهولِ آخرُه /t/، وbuild مصدرٌ. كتبتَها «peen» — والباءُ لا پاء.",
+      from:"to have been built" },
+    { heard:"has recently been", wrong:"has recent been",
+      why:"‏recently ظرفٌ بـly مسموعة، وrecent صفة.",
+      from:"has recently been challenged" },
+    { heard:"A great deal of", wrong:"A great deal",
+      why:"‏of لازمةٌ بعد deal، وهي خفيفةٌ فتسقط — وهذا بابُك.",
+      from:"A great deal of evidence" },
+    { heard:"be submitted before", wrong:"be submitted after",
+      why:"‏before وafter ضدّان، وأوّلُ before /b/. انتبه للمعنى لا للصوتِ وحدَه.",
+      from:"be submitted before Thursday" }
+  ];;
+
+  window.MICRO_LISTEN = { rafeef: RAFEEF, hasan: HASAN, saud: SAUD, fahad:FAHAD };
   /* ولكلِّ بنكٍ سطرُه: عطبُ حسنٍ ورفيفَ في الكلماتِ الوظيفيّةِ غيرِ
      المنبورة، وعطبُ سعودٍ في الصوائت. فلافتةٌ واحدةٌ مكتوبةٌ تكذب على
      أحدِهما — كما كذبت لافتةُ رفيفَ على حسنٍ قبلَ أن تُستخرَج. */
@@ -214,7 +289,8 @@
   window.MICRO_NOTE = {
     rafeef: "أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً",
     hasan:  "أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً",
-    saud:   "أخطاؤك في الصوائت — الحروفُ الساكنةُ تكتبها صح، والعلّةُ في a e i o u"
+    saud:   "أخطاؤك في الصوائت — الحروفُ الساكنةُ تكتبها صح، والعلّةُ في a e i o u",
+    fahad:  "أخطاؤك في الباءِ والپاءِ والفاءِ والڤاءِ وفي الخفيفِ الذي يسقط"
   };
   window.MICRO_VOICES = VOICES;
   window.MICRO_TAKE   = 6;     /* ستٌّ في الجلسةِ — دقيقتان أو ثلاث، لا تُترَك */

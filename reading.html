@@ -2469,7 +2469,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s10";  /* AUDIO_SIG: 60264526 */
+var AUDIO_VER = "s11";  /* AUDIO_SIG: 8164f5ed */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -2822,7 +2822,7 @@ if(!META[who] || !DATA[who]){
      بنكٌ واحدٌ مشترك: عطبُ حسنٍ في «has/was» و«it» و«been»، وعطبُ رفيفَ
      في «are/a» و«is/a» و«‑ed». فلو جُمعا في بنكٍ واحدٍ تدرّب كلٌّ منهما
      على عطبِ الآخر. */
-  var MICRO_FOR = { rafeef:1, hasan:1, saud:1 };
+  var MICRO_FOR = { rafeef:1, hasan:1, saud:1, fahad:1 };
   /* صيغةُ الخطاب: g("اكتبها","اكتبيها") */
   function g(m, f){ return (META[who] && META[who].fem) ? f : m; }
   var _microSt = null, _microOwner = {};
