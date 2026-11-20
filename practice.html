@@ -2344,11 +2344,40 @@ async function renderRemedial(){
 
      فصار الفرزُ في الخادم لا عندنا: لا نسحب إلّا الصفوفَ التي فيها
      مهاراتٌ أصلًا، فلا يزاحمها نطقٌ ولا محادثة مهما كثرت. */
+  /* ═══ نافذةٌ لكلِّ اختبارٍ لا نافذةٌ واحدةٌ يتزاحم فيها الجميع ═══════
+     كان السحبُ ستّين صفًّا لكلِّ ما فيه مهارات. وقِيس على صفوفِ فهد
+     (٢٠ نوفمبر ٢٠٢٦): ستّوه الأخيرةُ ٢٨ منها فهمُ مسموعٍ و١٨ تحصيليٌّ
+     و١٠ ستيبٌ و٤ قراءة. والتحصيليُّ اثنا عشرَ سؤالًا موزّعةً على ستّين
+     موضوعًا، فثمانيةَ عشرَ صفًّا تعطي الموضوعَ سؤالًا أو اثنَين —
+     والنصابُ ثلاثة. فما بلغه إلّا موضوعٌ رياضيٌّ واحد، وغاب الاشتقاقُ
+     (١٠٪) والنهاياتُ (٢٤٪) والإحداثيّاتُ القطبيّةُ (١٣٪) كلُّها، وهو
+     ضعيفٌ في الرياضياتِ كلِّها بثمانيةٍ وعشرينَ بالمئة.
+     فالدليلُ في القاعدةِ موجودٌ ونافذةُ السحبِ تحجبه: قسمٌ يُفتَح
+     كثيرًا (فهمُ المسموع) يُقصي قسمًا موضوعاتُه كثيرة (التحصيليّ).
+
+     فصار لكلِّ اختبارٍ ثقيلٍ نافذتُه: ستّون صفًّا من التحصيليِّ وستّون
+     من ستيبَ لا يُزاحِمهما غيرُهما، ثمّ النافذةُ العامّةُ لما بقي.
+     وسقفُ الاثنتَي عشرةَ جلسةً لكلِّ اختبارٍ باقٍ على حالِه بعدَها. */
   try{
-    var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+    var PER = ["تحصيلي", "STEP إنجليزي"], seenRow = {}, acc = [];
+    var pulls = PER.map(function(tn){
+      return fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+          "&meta->>test=eq."+encodeURIComponent(tn)+"&meta->skills=not.is.null&order=created_at.desc&limit=60",
+        {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
+        .then(function(x){ return x.json(); }).catch(function(){ return []; });
+    });
+    pulls.push(fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
         "&meta->skills=not.is.null&order=created_at.desc&limit=60",
-      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-    rows = await r.json(); if(!Array.isArray(rows)) rows=[];
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
+      .then(function(x){ return x.json(); }).catch(function(){ return []; }));
+    var parts = await Promise.all(pulls);
+    parts.forEach(function(j){ if(!Array.isArray(j)) return;
+      j.forEach(function(x){
+        var k = (x.meta && (x.meta.pid || x.meta.cid)) || (x.created_at + "|" + ((x.meta||{}).test||""));
+        if(seenRow[k]) return; seenRow[k] = 1; acc.push(x);
+      }); });
+    acc.sort(function(a2,b2){ return a2.created_at < b2.created_at ? 1 : -1; });
+    rows = acc;
     /* وإن رفض الخادمُ الفرزَ يومًا، نرجع إلى السحب العامّ فلا يُترك
        الطالبُ بلا علاجيٍّ بسببِ تغيُّرٍ في الواجهة. */
     if(!rows.length){
@@ -2370,9 +2399,20 @@ async function renderRemedial(){
        جلساتٍ تعطي سؤالًا أو سؤالين للموضوع، والحدُّ الأدنى ثلاثة.
        فما بلغ موضوعٌ النصابَ قطّ، وبقي فهد بلا درسٍ علاجيٍّ واحدٍ من
        الرياضيات وعنده صفرٌ في الاشتقاق والنهايات.
-       والاثنتا عشرةَ تكفي النصابَ ولا تُبعِد القياسَ عن الأحدث،
-       والسحبُ محدودٌ أصلًا بستّين صفًّا. */
-    var t=x.meta.test||"?"; byTest[t]=(byTest[t]||0)+1; if(byTest[t]>12) return;
+       ═══ ثمّ صارت خمسًا وأربعين (٢٠ نوفمبر ٢٠٢٦) ═══════════════════
+       والاثنتا عشرةَ لم تكفِ: قِيس على صفوفِ فهد عند كلِّ سقف، وعدُّ
+       مواضيعِ الرياضياتِ الضعيفةِ المكشوفةِ هو:
+         سقف ١٢ → موضوعٌ واحد · ٢٠ → أربعة · ٣٠ → تسعة · ٤٥ → أربعةَ
+         عشر · ٦٠ → ثلاثةَ عشر (لا تزيد).
+       وهو ضعيفٌ في الرياضياتِ كلِّها بثمانيةٍ وعشرينَ بالمئة، وكان
+       يُعرَض عليه موضوعٌ واحد. والعلّةُ حسابيّةٌ بحتة: الجلسةُ اثنا عشرَ
+       سؤالًا على ستّينَ موضوعًا، فاثنتا عشرةَ جلسةً تعطي الموضوعَ
+       سؤالَين وأربعةَ أعشارٍ والنصابُ ثلاثة.
+       فصار السقفُ خمسًا وأربعين: ستٌّ وخمسون مهارةً من ثمانٍ وخمسينَ
+       تبلغ النصاب. ولا يُبعِد هذا القياسَ عن الأحدث: السحبُ ستّون صفًّا
+       مرتَّبةً من الأحدث، واختباراتُ المدرسةِ خارجةٌ من هذا الحسابِ
+       أصلًا (kind غيرُ practice) فلا يمسُّها الرفع. */
+    var t=x.meta.test||"?"; byTest[t]=(byTest[t]||0)+1; if(byTest[t]>45) return;
     Object.keys(x.meta.skills).forEach(function(nm){ var v=x.meta.skills[nm]; if(!v||!v.t) return;
       var a=agg[nm]||(agg[nm]={c:0,t:0}); a.c+=(v.c||0); a.t+=v.t; });
   });
