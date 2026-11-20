@@ -272,7 +272,88 @@
       from:"be submitted before Thursday" }
   ];;
 
-  window.MICRO_LISTEN = { rafeef: RAFEEF, hasan: HASAN, saud: SAUD, fahad:FAHAD };
+  /* ═══ أسامة — خامسٌ ابتدائيّ (٢٠ نوفمبر ٢٠٢٦) ═══════════════════════
+     طلبُ الأب: «والأطفال الباقين نفسه».
+     وملفُّه غيرُ ملفِّ إخوتِه: إملاؤه أربعةٌ وسبعون بالمئةِ — فأذنُه
+     تعمل، والعطبُ في اليدِ لا في السمع. وأخطاؤه في القاعدةِ ثلاثُ
+     عائلات:
+       ١) ie / ei: friend صارت «freind» وscience صارت «sceince» —
+          وهذه قاعدةُ هجاءٍ لا تُسمَع أصلًا.
+       ٢) الصائتُ القصير: window صارت «Wendow» وyellow صارت «Yollow»
+          وmorning صارت «morneng» وelephant صارت «elaphant».
+       ٣) مقطعٌ يسقط: holiday صارت «holday» وmountain صارت «Montin».
+     وثلاثةٌ من أخطائِه زلّةُ لوحةِ مفاتيحَ لا أذنٍ ولا هجاء (sisyer ·
+     summet · Brothet — حرفٌ مجاورٌ للصحيح)، فتُركت خارجَ البنكِ إلّا
+     ما تكرّر منها.
+
+     وستَّ عشرةَ من عشرين من أزواجِه متطابقةٌ صوتيًّا تمامًا — قِيست
+     بمفتاحِ phKey من الصفحةِ نفسِها. فسؤالُه «أيُّهما الكتابةُ
+     الصحيحة؟» كسعود، لا «أيُّهما سمعت؟»: لو سُئل بالسمعِ لحوسب على
+     تمييزٍ لا وجودَ له. */
+  var OSAMA = [
+    { heard:"friend", wrong:"freind",
+      why:"‏i قبل e إلّا بعد c. كتبتَها «freind» في ١٢ أكتوبر.",
+      from:"friend" },
+    { heard:"science", wrong:"sceince",
+      why:"وهذي الاستثناء: بعد c تأتي ei لا ie. كتبتَها «sceince».",
+      from:"science" },
+    { heard:"window", wrong:"Wendow",
+      why:"‏wi لا we — الصائتُ i قصيرٌ هنا. كتبتَها «Wendow».",
+      from:"window" },
+    { heard:"yellow", wrong:"Yollow",
+      why:"‏ye لا yo. والصائتان متقاربان في الأذنِ ومختلفان في الكتابة.",
+      from:"yellow" },
+    { heard:"morning", wrong:"morneng",
+      why:"‏‑ing نهايةٌ ثابتةٌ في الإنجليزيّةِ لا ‑eng. كتبتَها «morneng».",
+      from:"morning" },
+    { heard:"elephant", wrong:"elaphant",
+      why:"‏ele لا ela، وph تُقرأ f. كتبتَها «elaphant».",
+      from:"elephant" },
+    { heard:"holiday", wrong:"holday",
+      why:"ثلاثةُ مقاطع: ho‑li‑day. أسقطتَ الأوسطَ فكتبتَ «holday».",
+      from:"holiday" },
+    { heard:"mountain", wrong:"montain",
+      why:"‏ou لا o، وain في آخرِها. كتبتَها «Montin».",
+      from:"mountain" },
+    { heard:"bottle", wrong:"buttle",
+      why:"‏o لا u. وآخرُها ‑tle لا ‑ter. كتبتَها «buttle» و«butter».",
+      from:"bottle" },
+    { heard:"juice", wrong:"juce",
+      why:"‏ui معًا: j‑ui‑ce. ولا تُسمَع الـi لكنّها تُكتَب.",
+      from:"juice" },
+    { heard:"bedroom", wrong:"bedrom",
+      why:"كلمتان مركّبتان: bed + room — وroom بـoo.",
+      from:"bedroom" },
+    { heard:"circle", wrong:"cercle",
+      why:"‏ci لا ce، وc الأولى تُقرأ s لأنّ بعدها i.",
+      from:"circle" },
+    { heard:"pencil", wrong:"pensil",
+      why:"‏c لا s — وتُقرأ s لأنّ بعدها i. كتبتَها «pensil».",
+      from:"pencil" },
+    { heard:"picture", wrong:"pictur",
+      why:"آخرُها ‑ure ولا تُسمَع الـe.",
+      from:"picture" },
+    { heard:"kitchen", wrong:"kitshen",
+      why:"صوتُ /tʃ/ يُكتَب tch بعد صائتٍ قصير، لا sh.",
+      from:"kitchen" },
+    { heard:"teacher", wrong:"techer",
+      why:"‏ea معًا تُقرأ طويلةً «تيـ». كتبتَ techer.",
+      from:"teacher" },
+    { heard:"banana", wrong:"bannana",
+      why:"‏n واحدةٌ في الوسطِ لا اثنتان: ba‑na‑na.",
+      from:"banana" },
+    { heard:"summer", wrong:"sumer",
+      why:"‏m مضاعفةٌ بعد الصائتِ القصير: sum‑mer.",
+      from:"summer" },
+    { heard:"sister", wrong:"sistar",
+      why:"آخرُها ‑er لا ‑ar. وانتبه: الـt مجاورةٌ للـy في اللوحةِ فكتبتَ «sisyer» مرّةً — اقرأ ما كتبتَ قبل «تحقّق».",
+      from:"sister" },
+    { heard:"brother", wrong:"brothar",
+      why:"آخرُها ‑er كذلك. وكتبتَها «Brothet» مرّةً — زلّةُ لوحةٍ لا هجاء، فراجِعها بعينك.",
+      from:"brother" }
+  ];
+
+  window.MICRO_LISTEN = { rafeef: RAFEEF, hasan: HASAN, saud: SAUD, fahad:FAHAD, osama:OSAMA };
   /* ولكلِّ بنكٍ سطرُه: عطبُ حسنٍ ورفيفَ في الكلماتِ الوظيفيّةِ غيرِ
      المنبورة، وعطبُ سعودٍ في الصوائت. فلافتةٌ واحدةٌ مكتوبةٌ تكذب على
      أحدِهما — كما كذبت لافتةُ رفيفَ على حسنٍ قبلَ أن تُستخرَج. */
@@ -284,13 +365,15 @@
      فسؤالُ «أيُّهما سمعت؟» يُحاسبه على تمييزٍ لا وجودَ له، والصوابُ
      «أيُّهما الكتابةُ الصحيحة؟». والصوتُ معينٌ لا مقياس. */
   window.MICRO_ASK = {
-    saud: { m:"أيُّهما الكتابةُ الصحيحة؟", f:"أيُّهما الكتابةُ الصحيحة؟" }
+    saud:  { m:"أيُّهما الكتابةُ الصحيحة؟", f:"أيُّهما الكتابةُ الصحيحة؟" },
+    osama: { m:"أيُّهما الكتابةُ الصحيحة؟", f:"أيُّهما الكتابةُ الصحيحة؟" }
   };
   window.MICRO_NOTE = {
     rafeef: "أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً",
     hasan:  "أخطاؤك كلُّها في كلماتٍ صغيرةٍ تُقال خفيفةً",
     saud:   "أخطاؤك في الصوائت — الحروفُ الساكنةُ تكتبها صح، والعلّةُ في a e i o u",
-    fahad:  "أخطاؤك في الباءِ والپاءِ والفاءِ والڤاءِ وفي الخفيفِ الذي يسقط"
+    fahad:  "أخطاؤك في الباءِ والپاءِ والفاءِ والڤاءِ وفي الخفيفِ الذي يسقط",
+    osama:  "سمعُك سليم — والعلّةُ في الكتابة: ie/ei والصوائتُ القصيرةُ ومقطعٌ يسقط"
   };
   window.MICRO_VOICES = VOICES;
   window.MICRO_TAKE   = 6;     /* ستٌّ في الجلسةِ — دقيقتان أو ثلاث، لا تُترَك */
