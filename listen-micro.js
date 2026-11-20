@@ -84,35 +84,35 @@
   var HASAN = [
     { heard:"They were", wrong:"the were",
       why:"«They» ضميرٌ فاعل و«the» أداةُ تعريف. كتبتَها «the were» مرّتين — في ٢٦ أكتوبر و١٧ نوفمبر.",
-      from:"They were watching TV when I arrived." },
+      from:"They were watching TV" },
     { heard:"has already finished", wrong:"was already finished",
       why:"«has» لا «was». سمعتَها «was ready» و«was a raudy» — والفعلُ المساعدُ هو الذي يحدّد الزمن.",
-      from:"He has already finished his work." },
+      from:"He has already finished his work" },
     { heard:"If it rains", wrong:"If rains",
       why:"«it» لازمةٌ قبل الفعلِ في الجوّ، وهي خفيفةٌ فتسقط من سمعك. كتبتَها «If rains» و«If a rinas».",
-      from:"If it rains, we will stay home." },
+      from:"If it rains" },
     { heard:"is spoken", wrong:"a spoken",
       why:"«is» تُقال خفيفةً فتُسمع «a» — وهي علامةُ المبنيِّ للمجهول.",
-      from:"English is spoken all over the world." },
+      from:"English is spoken" },
     { heard:"has been studying", wrong:"has studying",
       why:"«been» ساقطةٌ من سمعك. وبلا «been» لا يصحُّ المضارعُ التامُّ المستمرّ.",
-      from:"She has been studying for three hours." },
+      from:"She has been studying" },
     /* ⚠️ كانت «for three hours» فردّتها خدمةُ التعرّفِ «43 hours»: فـ«for»
        و«four» متماثلتان في النطق، والشظيّةُ مبتورةٌ قبل عددٍ فتلتبس حتى
        على السامعِ الأصليّ — فيُحاسَب الطفلُ على تمييزٍ لا يُمكِن. فضُمّ
        الفعلُ قبلها فزال اللبس: لا أحدَ يقول «studying four three». */
     { heard:"studying for three", wrong:"studying three",
       why:"«for» تدلُّ على المدّة، وهي خفيفةٌ فتسقط. أسقطتَها في ٣٠ سبتمبر.",
-      from:"She has been studying for three hours." },
+      from:"studying for three hours" },
     { heard:"by a famous", wrong:"by famous",
       why:"«a» قبل الصفةِ والمعدودِ المفرد. أسقطتَها في ١٤ نوفمبر.",
-      from:"The bridge was designed by a famous engineer." },
+      from:"by a famous engineer" },
     { heard:"take the bus", wrong:"take they bus",
       why:"«the» لا «they». الفرقُ صوتُ الياءِ في آخرها، وهي غيرُ منبورةٍ فيلتبسان.",
-      from:"I would rather walk than take the bus." },
+      from:"than take the bus" },
     { heard:"believe that reading", wrong:"believe thay reading",
       why:"«that» تربط الجملتَين. كتبتَها «thay» — فالصوتُ وصلك ناقصًا لا خطأً في القاعدة.",
-      from:"Many people believe that reading improves memory." }
+      from:"believe that reading improves memory" }
   ];
 
   /* ═══ سعودٌ — الصوائتُ لا الكلماتُ الوظيفيّة ═══════════════════════

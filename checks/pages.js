@@ -384,6 +384,7 @@ function run(){
   issues.push(...longReadOptsPath());
   issues.push(...heardBoxPath());
   issues.push(...writingGraderPath());
+  issues.push(...dictLenPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -7999,8 +8000,40 @@ function teachStuckPath(){
     E('مقامُ الدرجةِ المعروضُ يضمّ بطاقاتِ التعليم');
   if (!/if\(qEl\.dataset\.i == null\) return;/.test(src))
     E('حلقةُ الأسئلةِ لا تستثني بطاقةَ التعليم — ستُعطب الصفحةُ عند أوّلِ كلمةٍ عالقة');
-  if (!/teachL = teachL\.slice\(0, TEACH_PER_SESSION\)/.test(src))
+  /* ⚠️ والسقفُ يُفحَص بحدِّه لا بنصِّه: كان الفحصُ مثبَّتًا على
+     «slice(0, TEACH_PER_SESSION)» فسقط حين صار السقفُ يتبع كِبَرَ
+     الكومةِ والسلوكُ باقٍ — ومعه ثالثُ فحصٍ يسقط في هذه الجلسةِ لأنّه
+     يقرأ لفظًا لا يقيس أثرًا. */
+  if (!/teachL = teachL\.slice\(0, teachCap\)/.test(src))
     E('لا سقفَ لعددِ الدروسِ في الجلسة — قد تصير الجلسةُ كلُّها درسًا بلا اختبار');
+  {
+    const cm = /var teachCap = Math\.max\(TEACH_PER_SESSION, Math\.min\((\d+), Math\.ceil\(_stuckN \/ (\d+)\)\)\)/.exec(src);
+    if (!cm)
+      E('سقفُ التعليمِ لا يُقرأ — ولا بدَّ أن يكون محصورًا بين حدَّين فلا تصير الجلسةُ درسًا ولا يتجمّد العالقُ');
+    else {
+      /* الحدُّ الأعلى يبقى أقلَّ من ثلثِ جلسةِ المراجعةِ (ثلاثون بندًا) */
+      if (+cm[1] > 10)
+        E('أعلى سقفٍ للتعليمِ ' + cm[1] + ' من ثلاثين بندًا — أكثرُ من ثلثِ الجلسةِ درسًا بلا اختبار');
+      /* ويتبع الكومةَ: قاسمٌ كبيرٌ جدًّا يُجمّد صاحبَ الكومةِ الكبيرة */
+      if (+cm[2] > 10)
+        E('سقفُ التعليمِ يتبع الكومةَ بقاسمٍ ' + cm[2] + ' — فمن عنده أربعون كلمةً عالقةً يبقى على أربعٍ في الجلسةِ ويلزمه عشرةُ أسابيع');
+    }
+    if (!/_stuckN = \(function\(\)\{[\s\S]{0,260}ownedList\(getLearned\(\)\)/.test(src))
+      E('الكومةُ تُقاس بسحبةِ الجلسةِ لا بكلِّ ما يملكه — فالسقفُ لا يرتفع لمن كومتُه كبيرة');
+    /* ═══ وأثرُ المسارِ يُحفَظ ════════════════════════════════════════
+       سُئلتُ عن جمودِ عدّادِ كلماتِ فهدٍ (١٦٧ من ٩٩٣ عشرةَ أيّامٍ) فعجزتُ
+       عن القولِ أيعمل مسارُ «تُعلَّم لا تُختبر» أم لا، لأنّ الصفَّ لا
+       يحمل منه شيئًا. وهو ثالثُ عيبٍ من جنسٍ واحدٍ في يومٍ واحد
+       (askKeys ثمّ clipKeys ثمّ هذا): ما لا يُحفَظ لا يُقاس، وما لا
+       يُقاس لا يُعرَف أعمل أم عطب. */
+    ['taught:_taught', 'stuck:_stuckN', 'proofs:_proofs'].forEach(fld => {
+      const n = (src.match(new RegExp(fld.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+      if (n < 3)
+        E('«' + fld.split(':')[0] + '» يُحفَظ في ' + n + ' صفٍّ من ثلاثة (التامّ · الجزئيّ · المراجعة) — فجلسةٌ تضيع من القياس');
+    });
+    if (!/_proofs\+\+/.test(src))
+      E('الإثباتُ لا يُعَدُّ — فلا يُعرَف أكتب الطفلُ الكلمةَ من ذاكرتِه أم رآها وخرج');
+  }
   if (!/!isNew && srNeedsTeach/.test(src))
     E('التعليمُ يدخل بابَ الكلماتِ الجديدةِ — وعدّادُ «حفظت» يتقدّم بما اختُبر');
   return out;
@@ -8858,3 +8891,57 @@ const HASAN_REF = 'Staying healthy is important because it helps us feel energet
   'In addition, exercise helps reduce stress and improves our mood. Third, getting enough sleep every night is essential. '+
   'Sleep allows our bodies and minds to rest and recover, so we can concentrate better during the day. '+
   'In conclusion, healthy eating, regular exercise, and enough sleep are three important habits that help us stay healthy and live a better life.';
+
+/* ════════════════════════════════════════════════════════════════════
+   بندُ الإملاءِ داخلَ مدى الذاكرةِ العاملة
+   ════════════════════════════════════════════════════════════════════
+   تقريرُ فهد (٢٠ نوفمبر ٢٠٢٦): إملاؤه صفرٌ من واحدٍ وثلاثين في ستِّ
+   محاولات، وبنكُه أربعون جملةً أكاديميّةً من ثمانٍ إلى أربعَ عشرةَ
+   كلمةً تُملى دفعةً واحدة. وكتابتُه تشهد أنّ أذنَه تعمل: لـ«Had the
+   results been published earlier» كتب «hadreslte bin palpashent etaly
+   the point» — ستُّ كلماتٍ ثمّ انهيار.
+   وحسنٌ مثلُه: ثلاثةَ عشرَ بالمئةِ وخمسٌ وعشرون جملةً من ثلاثين فوق
+   الستّ، أطولُها إحدى عشرة.
+   ورفيفُ تُصيب ستّةً وسبعينَ بالمئةِ على بنكٍ أقصاه ثمانُ كلمات.
+
+   فالحدُّ ليس رأيًا: هو ما قِيس. ثمانٌ لمن أثبت أنّه يقدر عليها، وستٌّ
+   لمن سقط. والعطبُ صامتٌ تمامًا — الصفحةُ تعمل والصوتُ يُنطَق والدرجةُ
+   تُحفَظ، ولا يظهر إلّا صفرًا في تقريرِ أب. */
+function dictLenPath(){
+  const out = [], F = 'reading.html';
+  const src = fs.readFileSync(path.join(ROOT, F), 'utf8');
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  /* الحدُّ لكلِّ ابنٍ بما قِيس من أدائه؛ ومن لم يُقَس فستٌّ */
+  const CAP = { saud:6, osama:6, hasan:6, fahad:6, rafeef:8 };
+  const box = {}; vm.createContext(box);
+  Object.keys(CAP).forEach(who => {
+    const re = new RegExp('\\n  ' + who + ':\\{', 'g');
+    let m, at = -1;
+    while ((m = re.exec(src))){
+      if (/^\s*(en|ar):\s*\{/.test(src.slice(m.index + m[0].length, m.index + m[0].length + 40))){ at = m.index; break; }
+    }
+    if (at < 0) { E('لم أجد كتلةَ بياناتِ ' + who); return; }
+    const li = src.indexOf('en:{', at);
+    if (li < 0) return;
+    const j = src.indexOf('dictation:', li);
+    if (j < 0) { E('لا بنكَ إملاءٍ إنجليزيٍّ لـ' + who); return; }
+    const k = src.indexOf('[', j);
+    let d = 0, e = k;
+    for (; e < src.length; e++){ if (src[e] === '[') d++; else if (src[e] === ']'){ d--; if (!d) break; } }
+    let L = null;
+    try { L = vm.runInContext('(' + src.slice(k, e + 1) + ')', box); } catch(err){}
+    if (!Array.isArray(L) || !L.length) { E('بنكُ إملاءِ ' + who + ' لا يُقرأ أو فارغ'); return; }
+    const over = L.filter(x => String(x).trim().split(/\s+/).filter(Boolean).length > CAP[who]);
+    if (over.length){
+      const worst = over.map(x => String(x).trim().split(/\s+/).length).sort((a,b) => b-a)[0];
+      E(who + ': ' + over.length + ' بندَ إملاءٍ فوق ' + CAP[who] + ' كلماتٍ (أطولُها ' + worst +
+        ') — والإملاءُ دفعةً واحدةً فوق هذا المدى يقيس الذاكرةَ لا الهجاء، فيخرج صفرًا لا يُعلِّم شيئًا: «' +
+        String(over[0]).slice(0, 48) + '»');
+    }
+    if (L.length !== new Set(L.map(x => String(x))).size)
+      E('بندٌ مكرّرٌ في بنكِ إملاءِ ' + who);
+    const empty = L.filter(x => !String(x).trim());
+    if (empty.length) E('بندٌ فارغٌ في بنكِ إملاءِ ' + who);
+  });
+  return out;
+}
