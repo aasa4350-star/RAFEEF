@@ -387,6 +387,7 @@ function run(){
   issues.push(...dictLenPath());
   issues.push(...buildVerPath());
   issues.push(...seenCapPath());
+  issues.push(...pastePath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -9035,6 +9036,111 @@ function buildVerPath(){
        معرّفُه الصريح، فيُسجَّل بمفتاحٍ ويُبحَث بآخر.
      · ودورانُ التحصيليِّ على المواضيعِ صارمٌ: يُجبِر السحبَ من موضوعٍ
        نفدت بنودُه. وأحياءُ أوّلُ من ينفد (ثلاثون مولّدًا بلا أرقام). */
+/* ═══ الفقرةُ الملصوقةُ تُسجَّل ولا تُحسَب ════════════════════════════
+   طلب الأب (١٩ نوفمبر ٢٠٢٦) تسجيلَ مدّةِ الكتابةِ ومرّاتِ اللصق. فأمسك
+   العدّادُ في أوّلِ يومٍ له جلسةَ حسنٍ (٢٠ نوفمبر): زمنُ الكتابةِ ثانيةٌ
+   واحدة، ولصقةٌ واحدةٌ فيها ١١٧٢ حرفًا — وهو طولُ النصِّ كلِّه. وكانت
+   الدرجةُ ١٩ من ٢٠ وأوّلَ «B1+ نحو B2» في أربعٍ وثلاثين جلسة. وقُوبِل
+   النصُّ بنصوصِه الثمانيةِ السابقةِ في الموضوعِ نفسِه فأعلى تشابهٍ عشرةٌ
+   بالمئةِ في الخمسِ المتتابعة — فليس نصَّه القديم.
+
+   واختار الأب: لا يُمنَع اللصق، بل تُقال القاعدةُ قبل الكتابةِ وتُسجَّل
+   الجلسةُ غيرَ محتسبة. وهذا العطبُ صامتٌ لو انكسر: الصفحةُ تعمل،
+   والدرجةُ تُحفظ، والمتوسّطُ يرتفع بما ليس من كتابتِه — ولا يظهر شيء.
+   فالفحصُ يُشغّل دالّةَ الحكمِ نفسَها التي تستعملها الصفحةُ لا نسخةً
+   منها، ويتحقّق أنّ الصفحاتَ الأربعَ تستثني غيرَ المحتسبةِ من المتوسّط. */
+function pastePath(){
+  const out = [];
+  const F = 'writing-en.js', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('وحدةُ التعبيرِ غائبة'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+  const box = { window:{}, document:{ createElement:()=>({ style:{}, appendChild(){}, querySelector:()=>null, querySelectorAll:()=>[] }), addEventListener(){} },
+                localStorage:{ getItem:()=>null, setItem(){} }, console };
+  box.window.document = box.document; vm.createContext(box);
+  try { vm.runInContext(src, box); } catch(e){ E('لا تُقوَّم: ' + String(e.message).slice(0,60)); return out; }
+  const W = box.window.WritingEN;
+  if (!W || typeof W.pasteVerdict !== 'function') { E('حكمُ اللصقِ (pasteVerdict) غيرُ مُصدَّرٍ فلا يُقاس'); return out; }
+  const V = W.pasteVerdict;
+
+  if (!(W.PASTE_MAX > 0.3 && W.PASTE_MAX <= 0.7))
+    E('حدُّ اللصقِ ' + W.PASTE_MAX + ' — والقاعدةُ «أكثرُ النصِّ ملصوقًا»، فالحدُّ بين الثلثِ والثلثَين');
+
+  /* ١) الحالاتُ التي قِيست بالفعلِ في المتصفّح */
+  const CASES = [
+    ['النصُّ كلُّه ملصوقٌ (جلسةُ حسنٍ بعينِها)', [1172, 1, 1172, 1000], false],
+    ['اقتباسٌ صغيرٌ داخلَ نصٍّ كتبه بيده',        [800, 1, 80, 420000], true],
+    ['بلا لصقٍ البتّة، ولو كُتِب بسرعةٍ عجيبة',   [1172, 0, 0, 1000],   true],
+    ['لصقٌ والحافظةُ ممنوعةُ القراءةِ وسرعةٌ مستحيلة', [800, 1, 0, 2000], false],
+    ['لصقٌ والحافظةُ ممنوعةٌ لكنَّ السرعةَ بشريّة',    [800, 1, 0, 420000], true],
+    ['صندوقٌ فارغ',                              [0, 0, 0, 0],         true]
+  ];
+  CASES.forEach(c => {
+    let r = null; try { r = V.apply(null, c[1]); } catch(e){}
+    if (!r || typeof r.trusted !== 'boolean') { E('حكمُ اللصقِ لا يردُّ trusted في: ' + c[0]); return; }
+    if (r.trusted !== c[2])
+      E('حكمُ اللصقِ خطأٌ في «' + c[0] + '»: ردَّ ' + (r.trusted ? 'محتسبة' : 'غيرَ محتسبة') + ' والصوابُ ' + (c[2] ? 'محتسبة' : 'غيرَ محتسبة'));
+  });
+
+  /* ٢) والحكمُ مطّردٌ: كلُّ ما زادت نسبةُ الملصوقِ لا تعود الجلسةُ محتسبة */
+  let flip = 0, last = true;
+  for (let i = 0; i <= 10; i++){
+    const t = V(1000, 1, i * 100, 300000).trusted;
+    if (t !== last){ flip++; last = t; }
+  }
+  if (flip !== 1) E('الحكمُ غيرُ مطّردٍ مع نسبةِ الملصوق: تغيّر ' + flip + ' مرّةً والمنتظَرُ مرّةً واحدة');
+
+  /* ٣) والقسمُ يستعمل هذه الدالّةَ لا نسخةً ثانيةً تتفرّق عنها */
+  const calls = (src.match(/pasteVerdict\s*\(/g) || []).length;
+  if (calls < 3) E('القسمُ لا يستشير pasteVerdict في مواضعِ الحكمِ (وُجِد ' + calls + ' والمنتظَرُ ثلاثةٌ: التعريفُ وموضعا الحكم)');
+  if (!/why:\s*[^,;]*"paste"/.test(src)) E('سببُ عدمِ الاحتسابِ لا يُحفَظ في الصفّ — فيظهر «غير محتسبة» بلا سبب');
+  if (!/trusted:\s*v\.trusted/.test(src)) E('الصفُّ لا يحمل حكمَ اللصقِ في trusted — فالتقاريرُ لا تراه');
+
+  /* ٤) والحكمُ يُستنبَط من الصفِّ المحفوظِ أيضًا ═══════════════════════
+     ⚠️ صفُّ حسنٍ المكشوفُ محفوظٌ قبل القاعدةِ فلا trusted فيه، والمفتاحُ
+     المنشورُ لا يُعدّل صفًّا (RLS تمنع UPDATE). فلو اعتمدت التقاريرُ على
+     trusted وحدَه بقيت تلك الفقرةُ تُحسَب وهي ملصوقةٌ مئةً بالمئة — وكذا
+     صفٌّ يحفظه جهازٌ بنسخةٍ قديمةٍ مخزّنةٍ من الصفحة. فالحكمُ يُستنبَط من
+     الأرقامِ نفسِها، وهذه الحالاتُ تُقاس على دالّةِ التقاريرِ لا على نسخة. */
+  const rrP = path.join(ROOT, 'report-rules.js');
+  if (!fs.existsSync(rrP)) { E('report-rules.js غائب'); return out; }
+  const rb = { window:{}, document:{ addEventListener(){} }, localStorage:{ getItem:()=>null, setItem(){} }, console };
+  rb.window.document = rb.document; vm.createContext(rb);
+  let RR = null;
+  try { vm.runInContext(fs.readFileSync(rrP, 'utf8'), rb); RR = rb.window.RR; } catch(e){}
+  if (!RR || typeof RR.writingPasted !== 'function'){
+    out.push({ sev:'خطأ', file:'report-rules.js', msg:'RR.writingPasted غائبةٌ — فالتقاريرُ لا تعرف الفقرةَ الملصوقةَ المحفوظةَ قبل القاعدة' });
+  } else {
+    const row = m => ({ created_at:new Date().toISOString(), meta:m });
+    const RCASES = [
+      ['صفُّ حسنٍ بعينِه: لصقٌ كاملٌ وبلا حقلِ حكم', { paste:1, pasteCh:1172, wdur:1, text:'x'.repeat(1172) }, true],
+      ['اقتباسٌ صغيرٌ في نصٍّ كتبه بيده',            { paste:1, pasteCh:80, wdur:420, text:'y'.repeat(800) }, false],
+      ['بلا لصقٍ البتّة',                            { paste:0, wdur:1, text:'x'.repeat(1172) }, false],
+      ['حافظةٌ ممنوعةٌ وسرعةٌ مستحيلة',              { paste:1, wdur:2, text:'y'.repeat(800) }, true],
+      ['حافظةٌ ممنوعةٌ وسرعةٌ بشريّة',               { paste:1, wdur:420, text:'y'.repeat(800) }, false],
+      ['حكمٌ صريحٌ في الصفّ',                        { trusted:false }, true]
+    ];
+    RCASES.forEach(c => {
+      let got = null; try { got = RR.writingPasted(row(c[1])); } catch(e){}
+      if (got !== c[2])
+        out.push({ sev:'خطأ', file:'report-rules.js',
+          msg:'RR.writingPasted خطأٌ في «' + c[0] + '»: ردَّت ' + String(got) + ' والصوابُ ' + String(c[2]) });
+    });
+  }
+
+  /* والصفحاتُ الأربعُ تستشير هذه الدالّةَ في متوسّطِ المقاييس */
+  [['home.html', /if\(p\.meta\.bands && !RR\.writingPasted\(p\)\)/],
+   ['index.html', /if\(p\.meta\.bands && !RR\.writingPasted\(p\)\)/],
+   ['child.html', /if\(p\.meta\.bands && !RR\.writingPasted\(p\)\)/],
+   ['report.html', /if\(RR\.writingPasted\(r\)\)\{ aggSkip\+\+; return; \}/]].forEach(([f, re]) => {
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) return;
+    if (!re.test(fs.readFileSync(fp, 'utf8')))
+      out.push({ sev:'خطأ', file:f, msg:'متوسّطُ مقاييسِ التعبيرِ يَعُدُّ الفقرةَ الملصوقة — فيرتفع بما ليس من كتابتِه' });
+  });
+  return out;
+}
+
 function seenCapPath(){
   const out = [];
   const F = 'seen-cap.js', p = path.join(ROOT, F);

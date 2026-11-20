@@ -1430,6 +1430,38 @@ function _h32(str){
   for(var i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
   return h >>> 0;
 }
+/* ═══ حكمُ اللصق: دالّةٌ خالصةٌ يستعملها القسمُ ويقيسها الفحص ═══════
+   قرارُ الأب (٢٠ نوفمبر ٢٠٢٦): لا يُمنَع اللصق — المنعُ يُتحايَل عليه
+   بالنقلِ باليدِ من نافذةٍ أخرى ولا يُعلّم شيئًا — بل تُقال القاعدةُ قبل
+   الكتابةِ ومن لصق أكثرَ النصِّ سُجّلت جلستُه غيرَ محتسبة.
+
+   وحدُّ «أكثرِ النصِّ» ستّون في المئة: لصقُ اقتباسٍ أو اسمٍ داخلَ نصٍّ
+   كتبه بيده لا يُسقِط جلسته، ولصقُ النصِّ كلِّه يُسقطها. وجلسةُ حسنٍ
+   التي كُشفت كانت مئةً بالمئة.
+
+   ⚠️ وبابٌ خلفيٌّ كان سيبقى: الحافظةُ تُقرأ على معظمِ الأجهزةِ وتُمنَع
+   على بعضِها (getData في سفاري يرفع استثناءً) فيُعَدُّ حدثُ اللصقِ
+   وأحرفُه صفرٌ — فلو كان الحكمُ على الأحرفِ وحدَها نجا اللصقُ هناك.
+   فحينها يُحكَم بالسرعة: عشرون حرفًا في الثانيةِ مطّردةً ليست كتابةَ
+   إنسان (أسرعُ كاتبٍ مُقاسٍ في العالمِ دون ذلك بكثير). وقِيس في
+   المتصفّحِ بحدثِ لصقٍ حافظتُه ترفع استثناءً فسقطت الجلسةُ كما يجب.
+
+   ولا يُحكَم إلّا بوجودِ حدثِ لصق: الكتابةُ السريعةُ بلا لصقٍ لا تُمَسّ
+   مهما كانت سريعةً، فلا تُظلَم يدٌ مجتهدة. */
+var PASTE_MAX = 0.6;
+function pasteVerdict(len, pasteN, pasteCh, activeMs){
+  len = +len || 0; pasteN = +pasteN || 0; pasteCh = +pasteCh || 0;
+  var share = 0;
+  if(len && pasteN){
+    if(pasteCh) share = Math.min(1, pasteCh / len);
+    else {
+      var sec = Math.max(1, Math.round((+activeMs || 0) / 1000));
+      share = (len / sec > 20) ? 1 : 0;
+    }
+  }
+  return { share: share, trusted: share < PASTE_MAX };
+}
+
 function cycleOrder(n, seed){
   var a = [], i;
   for(i=0;i<n;i++) a.push(i);
@@ -1998,6 +2030,22 @@ function render(el, ctx){
         (prompts[pIdx].points||[]).map(function(pp){ return '<li>'+en(pp.q)+'</li>'; }).join('')+
         '</ol><div style="color:var(--muted);margin-top:6px">الطول المطلوب لمستوى '+cef.name+': <b>'+cef.minWords+'</b> كلمة على الأقل — '+cef.say+'.'+
         trs("Required length for "+cef.name+": at least "+cef.minWords+" words.")+'</div></div>'+
+      /* ═══ قاعدةٌ معلنةٌ لا بابٌ مغلق ══════════════════════════════════
+         قِيست جلسةُ حسنٍ (٢٠ نوفمبر ٢٠٢٦) بعدّادِ اللصقِ الذي طلبه الأب
+         أمسَ ذلك اليوم: مدّةُ الكتابةِ ثانيةٌ واحدة، ولصقةٌ واحدةٌ فيها
+         ١١٧٢ حرفًا — وهو طولُ النصِّ كلِّه، أي مئةٌ بالمئةِ ملصوق.
+         وقُوبِل النصُّ بنصوصِه الثمانيةِ السابقةِ في الموضوعِ نفسِه فأعلى
+         تشابهٍ عشرةٌ بالمئةِ في الخمسِ المتتابعة، فليس نصَّه القديم.
+         وكانت الدرجةُ أوّلَ «B1+ نحو B2» في أربعٍ وثلاثين جلسة.
+
+         واختار الأبُ ألّا يُمنَع اللصق: المنعُ يُتحايَل عليه بالنقلِ
+         باليدِ من نافذةٍ أخرى ولا يُعلّمه شيئًا. فاليدُ حرّةٌ، والقاعدةُ
+         تُقال له قبل أن يكتب، ومن لصق أكثرَ النصِّ سُجّلت جلستُه
+         trusted:false فلا تدخل معدّلَه — كما تُسجَّل جلسةُ المسموعِ حين
+         يغيب عن الصفحة. */
+      '<div style="border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 11px;margin-bottom:8px;font-size:.88rem">'+
+        '📋 <b>اكتبها بيدك.</b> إن كان أكثر النصّ ملصوقًا فالجلسة تُسجَّل ولا تُحسَب لك — ويظهر ذلك في تقريرك.'+
+        trs("Write it yourself. If most of the text is pasted, the session is recorded but not counted.")+'</div>'+
       '<textarea id="wtext" dir="ltr" placeholder="Write your paragraph here..." spellcheck="true"></textarea>'+
       '<div class="wmeter"><i id="wbar"></i></div>'+
       '<div id="wlive" style="font-size:.9rem;color:var(--muted)">0 كلمة · 0 جملة</div>'+
@@ -2116,10 +2164,24 @@ function render(el, ctx){
   document.addEventListener("visibilitychange", function(){
     if(document.hidden) _tick(); else _wSeen = Date.now();
   });
+  /* نصيبُ الملصوقِ من النصِّ النهائيّ. والحافظةُ تُقرأ على معظمِ
+     الأجهزةِ وتُمنَع على بعضِها (getData في سفاري أحيانًا) فيُعَدُّ حدثُ
+     اللصقِ بلا أحرف — فحينها يُقاس بالسرعة: عشرون حرفًا في الثانيةِ
+     مطّردةً ليست كتابةَ إنسان، وأسرعُ كاتبٍ في العالمِ دون ذلك. */
+  function _pasteShare(){
+    return pasteVerdict(_norm(ta.value).length, _pasteN, _pasteCh, _wActive).share;
+  }
+  function _pasted(){
+    return !pasteVerdict(_norm(ta.value).length, _pasteN, _pasteCh, _wActive).trusted;
+  }
   function _writeStats(){
     if(!_wStart) return {};
     _tick();
-    return { wdur: Math.round(_wActive/1000), paste: _pasteN, pasteCh: _pasteCh || undefined };
+    var v = pasteVerdict(_norm(ta.value).length, _pasteN, _pasteCh, _wActive);
+    return { wdur: Math.round(_wActive/1000), paste: _pasteN, pasteCh: _pasteCh || undefined,
+             pasteShare: _pasteN ? Math.round(v.share*100) : undefined,
+             trusted: v.trusted,
+             why: v.trusted ? undefined : "paste" };
   }
 
   /* بلاغ الأب (٤ سبتمبر ٢٠٢٦): «رفيف حاولت التعبير اليوم» — وقاعدة البيانات
@@ -2191,7 +2253,14 @@ function render(el, ctx){
             '<span class="wband '+(g.pass?"wb-hi":"wb-lo")+'">'+(g.pass?"✅ اجتزت":"⚠️ لم تجتز")+'</span>'+
           '</div>'+
           '<p style="color:var(--muted);font-size:.86rem;margin:4px 0 0">'+
-            'أربعة مقاييس، كلٌّ من 5 ووزنه 25٪ — والنجاح أن تبلغ <b>3</b> في كلٍّ منها (نظام كامبردج).</p>';
+            'أربعة مقاييس، كلٌّ من 5 ووزنه 25٪ — والنجاح أن تبلغ <b>3</b> في كلٍّ منها (نظام كامبردج).</p>'+
+          /* والقاعدةُ المعلنةُ تُنفَّذ أمامَه لا في صمت: يرى الدرجةَ
+             ويرى أنّها لا تُحسَب، فيعرف السببَ ويعرف العلاج. */
+          (_pasted()
+            ? '<div style="margin-top:10px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">'+
+              '📋 أكثر هذا النصّ ملصوق ('+Math.round(_pasteShare()*100)+'٪) — فالجلسة تُسجَّل ولا تُحسَب لك، وتظهر في تقريرك بهذه العلامة. '+
+              'اكتبها بيدك ولو أقصر، فالدرجة على كتابتك أنت.</div>'
+            : '');
 
     g.subs.forEach(function(s){
       var open = s.band<3 ? " open" : "";
@@ -2329,5 +2398,6 @@ function render(el, ctx){
 window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN,
                      grammar:grammarIssues, _rules:GRAMMAR, sims:sentSims, PAD_SIM:PAD_SIM,
                      reuse:reuseRatio, REUSE_MAX:REUSE_MAX,
-                     order:cycleOrder, hash:_h32 };
+                     order:cycleOrder, hash:_h32,
+                     pasteVerdict:pasteVerdict, PASTE_MAX:PASTE_MAX };
 })();

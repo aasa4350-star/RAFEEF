@@ -50,7 +50,7 @@
   #copyBox{width:100%;min-height:150px;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem;line-height:1.7;display:none}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=5c6ba562bb" defer></script>
+<script src="build-check.js?v=80943837f4" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -464,9 +464,15 @@ function writingCardHtml(student){
             ["Communicative Achievement","مناسبة الأسلوب","تجنّب لغة الدردشة (u, plz, lol...) واكتب جُملًا كاملة بأسلوبٍ رسمي.",
              "اسلوب الكتابة الرسمي في الانجليزي paragraph writing style"]];
   /* متوسّط كل مقياس عبر كل الفقرات — يكشف الضعف المتكرّر لا نتيجة يومٍ واحد */
-  var agg={}, aggN=0;
-  rows.forEach(function(r){ if(r.meta.bands){ aggN++;
-    SUBS.forEach(function(s){ agg[s[0]]=(agg[s[0]]||0)+(r.meta.bands[s[0]]||0); }); } });
+  /* ⚠️ والملصوقةُ تُعرَض ولا تُحسَب: قرارُ الأب (٢٠ نوفمبر ٢٠٢٦) حين
+     أمسك عدّادُ اللصقِ فقرةَ حسنٍ — ١١٧٢ حرفًا ملصوقةً، وهو النصُّ
+     كلُّه، ودرجتُها ١٩ من ٢٠. فتُرى كما هي ويُرى أنّها غيرُ محتسبة،
+     ولا تدخل متوسّطَ المقاييسِ ولا أضعفَها. */
+  var agg={}, aggN=0, aggSkip=0;
+  rows.forEach(function(r){ if(!r.meta.bands) return;
+    if(RR.writingPasted(r)){ aggSkip++; return; }
+    aggN++;
+    SUBS.forEach(function(s){ agg[s[0]]=(agg[s[0]]||0)+(r.meta.bands[s[0]]||0); }); });
 
   /* بلاغ الأب (٢ سبتمبر ٢٠٢٦): «التعبير مايطلع عندي في التقرير تاريخ
      ووقت الاختبار» — تاريخ ووقت آخر فقرةٍ مكتوبة يظهران هنا أعلى
@@ -487,7 +493,8 @@ function writingCardHtml(student){
              '<span class="nm">'+s[1]+'</span>'+
              '<span class="frac">'+s[0]+'</span></li>';
     }).join("")+'</ul>'+
-    '<p class="note">متوسّط '+aggN+' فقرة — أضعف مقياس هو الذي يستحقّ التدريب.</p>'+
+    '<p class="note">متوسّط '+aggN+' فقرة — أضعف مقياس هو الذي يستحقّ التدريب.'+
+      (aggSkip ? ' <span style="color:var(--bad);font-weight:700">و'+aggSkip+' فقرة خارج الحساب: نصّها ملصوق.</span>' : '')+'</p>'+
     (weakestS.avg<5 ? ('<div style="margin-top:8px;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.92rem">'+
       '👈 <b>أضعف مقياس:</b> '+weakestS.s[1]+' — '+weakestS.s[2]+
       '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(weakestS.s[3])+'" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800;font-size:.88rem">🎬 شاهد شرح '+weakestS.s[1]+'</a></div></div>') : '');
@@ -505,7 +512,22 @@ function writingCardHtml(student){
                  s[1]+' '+b+'</span>';
         }).join("")+'</div>';
     }
-    html += '<div style="border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:10px">'+
+    var _pasted = RR.writingPasted(r);
+    html += '<div style="border:1px solid '+(_pasted?'var(--bad)':'var(--line)')+';border-radius:12px;padding:11px 13px;margin-top:10px">'+
+      /* ويُقال للأبِ الرقمُ لا الحكمُ وحدَه: نصيبُ الملصوقِ ومدّةُ الكتابة */
+      (_pasted
+        ? '<div style="background:var(--bad-bg);color:var(--bad);border-radius:9px;padding:7px 10px;margin-bottom:8px;font-weight:700;font-size:.88rem">'+
+          '🚫 غير محتسبة — نصّها ملصوق'+
+          /* والصفوفُ المحفوظةُ قبل القاعدةِ لا تحمل النسبةَ، فتُحسَب من
+             أحرفِ اللصقِ وطولِ النصِّ كما تحسبها RR.writingPasted. */
+          (function(){
+            if(typeof m.pasteShare==="number") return ' ('+m.pasteShare+'٪ منه)';
+            var len=String(m.text||"").replace(/\s+/g," ").trim().length;
+            if(m.pasteCh && len) return ' ('+Math.min(100, Math.round(100*m.pasteCh/len))+'٪ منه)';
+            return '';
+          })()+
+          (typeof m.wdur==="number" ? ' · زمن الكتابة '+m.wdur+'ث' : '')+'</div>'
+        : '')+
       '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800">'+
         '<span>'+esc(m.topic||"—")+'</span>'+
         '<span class="pill '+cls(p)+'" dir="ltr">'+(m.total===20?((m.correct||0)+" / 20"):(p+"%"))+'</span>'+

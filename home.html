@@ -76,7 +76,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:28px}
 </style>
-<script src="build-check.js?v=5c6ba562bb" defer></script>
+<script src="build-check.js?v=80943837f4" defer></script>
 </head>
 <body>
 <div class="wrap"><div id="app"></div><div id="report"></div><footer id="foot"></footer></div>
@@ -655,7 +655,11 @@ async function loadReport(){
     if(writingAll.length || writingDrill.length){
       var WSUBS=[["Content","المحتوى"],["Organisation","الترتيب والربط"],["Language","اللغة"],["Communicative Achievement","مناسبة الأسلوب"]];
       var wAgg={}, wAggN=0;
-      writingAll.forEach(function(p){ if(p.meta.bands){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
+      /* ⚠️ والفقرةُ الملصوقةُ لا تدخل متوسّطَ المقاييس: قرارُ الأب (٢٠
+         نوفمبر ٢٠٢٦) أن تُسجَّل ولا تُحسَب، كجلسةِ المسموعِ حين يغيب.
+         ولو حُسِبت رفعت المتوسّطَ بما ليس من كتابتِه — وجلسةُ حسنٍ
+         تلك درجتُها ١٩ من ٢٠ ونصُّها ملصوقٌ كلُّه. */
+      writingAll.forEach(function(p){ if(p.meta.bands && !RR.writingPasted(p)){ wAggN++; WSUBS.forEach(function(s){ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
       var dc2=writingDrill.reduce(function(s,p){return s+(p.meta.correct||0);},0), dt2=writingDrill.reduce(function(s,p){return s+(p.meta.total||0);},0);
       /* بلاغ الأب: «التعبير والمحادثة ما يطلع لي التاريخ والوقت» */
       var wLast=writingAll.concat(writingDrill).map(function(p){return p.created_at;}).sort().pop();
@@ -856,7 +860,7 @@ async function loadReport(){
                 '<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">'+
                   String(p.meta.essay).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+
                 '</div></details></li>' : '';
-            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
+            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
             return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+RR.stamp(saTime(rowTime(p)))+'</span>'+un+'</li>'+ess; })+
           '</div>';
       });

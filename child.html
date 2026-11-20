@@ -73,7 +73,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=5c6ba562bb" defer></script>
+<script src="build-check.js?v=80943837f4" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"><p class="empty"><span class="spin"></span> جارٍ التحميل...</p></div>
@@ -604,7 +604,11 @@ async function main(){
                    ["Communicative Achievement","مناسبة الأسلوب","تجنّب لغة الدردشة (u, plz, lol...) واكتب جُملًا كاملة بأسلوبٍ رسمي.",
                     "اسلوب الكتابة الرسمي في الانجليزي paragraph writing style"]];
       const wAgg={}; let wAggN=0;
-      writingAll.forEach(p=>{ if(p.meta.bands){ wAggN++; WSUBS.forEach(s=>{ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
+      /* ⚠️ والفقرةُ الملصوقةُ لا تدخل متوسّطَ المقاييس: قرارُ الأب (٢٠
+         نوفمبر ٢٠٢٦) أن تُسجَّل ولا تُحسَب، كجلسةِ المسموعِ حين يغيب.
+         ولو حُسِبت رفعت المتوسّطَ بما ليس من كتابتِه — وجلسةُ حسنٍ
+         تلك درجتُها ١٩ من ٢٠ ونصُّها ملصوقٌ كلُّه. */
+      writingAll.forEach(p=>{ if(p.meta.bands && !RR.writingPasted(p)){ wAggN++; WSUBS.forEach(s=>{ wAgg[s[0]]=(wAgg[s[0]]||0)+(p.meta.bands[s[0]]||0); }); } });
       const dc2=writingDrill.reduce((s,p)=>s+(p.meta.correct||0),0), dt2=writingDrill.reduce((s,p)=>s+(p.meta.total||0),0);
       html+=`<div class="sec-title"><span class="dot"></span> ✍️ التعبير الإنجليزي</div><div class="card"><ul class="weak">`+
         /* بلاغ الأب: «التعبير ما يطلع لي التاريخ والوقت» — الفقرات تحتها مؤرَّخة،
@@ -779,7 +783,7 @@ async function main(){
               `<li style="list-style:none;margin-top:6px"><details style="background:var(--bg);border-radius:11px;padding:4px 11px">`+
               `<summary style="cursor:pointer;font-weight:800;padding:7px 0">📝 إجابتك في السؤال المقالي — وضعت لنفسك <b style="color:var(--accent)">${p.meta.essaySelf!=null?p.meta.essaySelf:'؟'} من ${p.meta.essayMax||6}</b></summary>`+
               `<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">${esc(p.meta.essay)}</div></details></li>` : ``;
-            const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
+            const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
             return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${RR.stamp(saTime(RR.when(p)))}</span>${un}</li>`+ess; })+
           `</div>`;
       });
