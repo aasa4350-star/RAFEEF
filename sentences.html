@@ -200,22 +200,54 @@
       .catch(function(){ return []; });
   }
 
-  /* ═══ المستوى: أوّلُ طولٍ فيه جملةٌ لم تُتقَن بعد ═══ */
+  /* ═══ المستوى: أوّلُ طولٍ فيه جملةٌ لم تُتقَن بعد ═══
+     ═══ ومستوًى بنكُه أصغرُ من الجرعةِ ليس مستوًى ══════════════════
+     شكا حسنٌ من تكرارِ الجملِ الأولى، فقِيس (١٩ نوفمبر ٢٠٢٦): كتابُه
+     ثالثُ متوسّطٍ فجملُه طويلة، ومستواه الأوّلُ (أربعُ كلماتٍ أو أقلّ)
+     فيه **أربعُ جملٍ** في الكتابِ كلِّه والجرعةُ خمس. فكان يرى البنكَ
+     كلَّه في كلِّ جلسةٍ حتى يُتقِن كلَّ واحدةٍ مرّتَين وهو يُصيب نصفَ
+       الوقت: خمسُ جلساتٍ في يومٍ واحدٍ على أربعِ جملٍ، وجلستان متتاليتان
+     بالجملتَين نفسِهما معكوستَين. وذاك حلقةٌ مقفلةٌ لا مستوى.
+
+     فيُشترَط في المستوى أن تكون سعتُه — لا باقيه — ضِعفَ الجرعةِ على
+     الأقلّ، وإلّا دُمِج بما فوقه. وجملُه القصيرةُ لا تضيع: مستوى الستِّ
+     يشمل ما دونَه، فتُخلَط الأربعُ بالثمانِ والثلاثينَ لا تكون هي
+     البنكَ كلَّه.
+
+     والسعةُ لا الباقي: الباقي يصغر في آخرِ الطريقِ طبعًا — من أتقن
+     أكثرَ كتابِه بقيت له جملٌ قليلةٌ وهذا سليم، وlevelOf يتجاوزه
+     وحدَه حين يفرغ. أمّا السعةُ فعيبُ بنيةٍ ثابتٌ لا يزول بالتقدّم.
+     والمستوى الأخيرُ يبقى مهما صَغُرت سعتُه، فلا يُترَك الطفلُ بلا
+     مستوى. */
+  var MINPOOL = DOSE * 2;
   function levelOf(all, credit){
     for(var i = 0; i < LEVELS.length; i++){
       var L = LEVELS[i];
+      var cap  = all.filter(function(s){ return s.n <= L; }).length;
       var left = all.filter(function(s){ return s.n <= L && (credit[s.en]||0) < RETIRE; });
-      if(left.length) return { lv: L, pool: left, i: i };
+      if(!left.length) continue;
+      if(cap < MINPOOL && i < LEVELS.length - 1) continue;   /* حلقةٌ مقفلةٌ: تُدمَج بما فوقها */
+      return { lv: L, pool: left, i: i };
     }
     return { lv: LEVELS[LEVELS.length-1], pool: [], i: LEVELS.length-1 };
   }
 
-  function save(pid, okKeys, asked, right, lv, t0, skills){
+  /* ═══ وما سُئل عنه يُحفَظ لا ما أصابه وحدَه ═══════════════════════
+     سأل الأبُ عن معدّلِ التكرارِ (١٩ نوفمبر ٢٠٢٦) فلم أقدر أن أُجيبه
+     إلّا بالتقدير: الصفُّ يحفظ okKeys — ما أصابه — وasked عددًا مجرّدًا.
+     فالجملُ التي يُخطئها (ثلاثٌ وخمسون من مئةٍ وعشرٍ عند حسن) لا هويّةَ
+     لها في القاعدة. وهي أكثرُ ما يتكرّر عليه: الترتيبُ يُقدّم من بدأه
+     ولم يُتقِنه، فما يُخطئه يعود أكثرَ من غيرِه بحكمِ التصميم — وهو
+     عينُ ما يشكو منه، وكان محجوبًا عن القياس.
+     فصار يُحفَظ askKeys: ما عُرِض عليه في الجلسةِ بعينِه. فيُقاس تكرارُ
+     كلِّ جملةٍ على حِدَةٍ لا بقسمةِ المجموعِ على حجمِ البنك. */
+  function save(pid, okKeys, asked, right, lv, t0, skills, askKeys){
     var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0,
       ma_correct:0, ma_total:0, wrong:[],
       meta:{ kind:"activity", sect:SECT, test:"جمل إنجليزي 🧩", pid:pid,
              at:new Date().toISOString(), asked:asked, right:right, level:lv,
-             okKeys:okKeys.slice(0,40), dur:Math.round((Date.now()-t0)/1000),
+             okKeys:okKeys.slice(0,40), askKeys:(askKeys||[]).slice(0,40),
+             dur:Math.round((Date.now()-t0)/1000),
              skills:skills, correct:0, total:0 } };
     try{
       if(window.AQ){ AQ.post(SUPA_URL+"/rest/v1/attempts", SUPA_KEY, body); return; }
@@ -291,7 +323,10 @@
 
       function finish(){
         if(saved) return; saved = true;
-        save(pid, okKeys, i, right, st.lv, t0, SK);
+        /* ما عُرِض عليه فعلًا: الأولى حتى التي بلغها، لا القائمةُ كلُّها
+           — من خرج في الثالثةِ لم يُعرَض عليه ما بعدها. */
+        save(pid, okKeys, i, right, st.lv, t0, SK,
+             list.slice(0, i).map(function(s){ return s.en; }));
       }
       function next(){
         if(i >= list.length) return done();
