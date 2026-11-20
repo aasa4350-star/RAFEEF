@@ -297,7 +297,125 @@ var PROMPTS = {
       {q:"Say what is in the room", k:["bed","desk","chair","window","door","book","books","shelf","lamp","carpet","wall","picture","cupboard"]},
       {q:"Say what you do there", k:["sleep","study","read","play","write","rest","listen","draw","homework"]},
       {q:"Say why you like it", k:["because","quiet","clean","big","comfortable","like","love","favourite","favorite","best"]}
-    ]}
+    ]},
+    /* ═══ اثنان وعشرون موضوعًا جديدًا (٢٠ نوفمبر ٢٠٢٦) ════════════════
+       العلّةُ هي علّةُ المستوى الثاني: ثمانيةُ مواضيعَ دورتُها ثمانيةُ
+       أيّامٍ تُحفَظ نصوصُها، وقد وقع فيها حسنٌ وقالها لأبيه. فوُسِّع هذا
+       البنكُ قبل أن يقع فيها سعودٌ وأسامة.
+       وهي من دنيا ابنِ الرابعِ والخامسِ: لعبُه وطريقُه إلى المدرسةِ
+       وفطورُه وجدُّه وجدّتُه — جملٌ قصيرةٌ عن معلومٍ لا إنشاءٌ عن مجهول.
+       وكلماتُها صيغٌ يقولها هو: play وgo وlike، ومعها صيغةُ الغائبِ
+       (plays · goes) لأنّ الفحصَ يقابل الكلمةَ بنصِّه كما كتبها. */
+    {t:"My favourite game", h:"What is the game? Who do you play it with? Why do you like it?", points:[
+      {q:"Name the game you like", k:["game","play","plays","football","chess","cards","hide","tag","video","phone","tablet","computer","ball","like","favourite","favorite"]},
+      {q:"Say who you play with and when", k:["with","brother","sister","friends","friend","cousins","father","dad","after school","evening","weekend","friday","every day","sometimes"]},
+      {q:"Say why you like it", k:["because","fun","funny","easy","exciting","happy","enjoy","win","together","best","love","like"]}
+    ]},
+    {t:"What I do after school", h:"What do you do first? What do you do next? What is the best part?", points:[
+      {q:"Say what you do first", k:["after school","home","first","eat","lunch","rest","sleep","wash","change","pray","sit","arrive","come"]},
+      {q:"Say what you do next", k:["then","next","homework","study","read","play","help","mother","watch","tv","go out","bike","ride"]},
+      {q:"Say which part you like best", k:["best","like","love","favourite","favorite","because","happy","fun","enjoy","part","most"]}
+    ]},
+    {t:"My favourite sport", h:"What sport is it? When do you do it? How do you feel after it?", points:[
+      {q:"Name the sport", k:["sport","football","swimming","swim","running","run","cycling","bike","basketball","volleyball","karate","tennis","walking","play","plays"]},
+      {q:"Say when and where you do it", k:["school","club","park","street","garden","home","every","week","day","friday","evening","morning","with","team","friends"]},
+      {q:"Say how you feel after it", k:["feel","happy","strong","tired","good","better","healthy","fit","because","like","love","enjoy"]}
+    ]},
+    {t:"A place I like to visit", h:"Where is it? Who do you go with? What do you do there?", points:[
+      {q:"Name the place", k:["place","park","mall","beach","farm","zoo","mosque","library","garden","city","village","grandfather","grandmother","house","visit","go"]},
+      {q:"Say who you go with and how", k:["with","family","father","dad","mother","mum","brother","sister","car","bus","walk","drive","every","sometimes","weekend"]},
+      {q:"Say what you do there", k:["play","eat","walk","run","swim","see","look","buy","sit","talk","pray","take","photos","fun","happy"]}
+    ]},
+    {t:"My brother or my sister", h:"Who is it? What does he or she like? What do you do together?", points:[
+      {q:"Say who it is and how old", k:["brother","sister","older","younger","big","small","years","old","name","he","she","my"]},
+      {q:"Say what he or she likes or does", k:["likes","like","loves","plays","play","studies","study","reads","read","works","school","football","draws","sings","cooks","watches"]},
+      {q:"Say what you do together", k:["together","we","play","go","eat","watch","talk","help","study","share","laugh","because","best","love"]}
+    ]},
+    {t:"My favourite thing", h:"What is it? Where did you get it? Why is it special?", points:[
+      {q:"Name the thing", k:["thing","toy","car","ball","bike","bicycle","watch","book","phone","tablet","game","bag","shoes","pen","box","favourite","favorite"]},
+      {q:"Say where you got it", k:["father","dad","mother","mum","grandfather","grandmother","uncle","gift","present","bought","buy","shop","birthday","eid","gave","got"]},
+      {q:"Say why it is special to you", k:["because","special","like","love","best","old","new","keep","always","use","happy","beautiful","nice"]}
+    ]},
+    {t:"How I go to school", h:"How do you travel? How long does it take? What do you see on the way?", points:[
+      {q:"Say how you travel", k:["bus","car","walk","walking","bike","bicycle","father","dad","drive","drives","take","takes","go","school"]},
+      {q:"Say how long it takes or when you leave", k:["minutes","minute","hour","early","morning","seven","six","eight","clock","long","short","near","far","leave"]},
+      {q:"Say what you see on the way", k:["see","road","street","shop","shops","mosque","trees","cars","people","friends","houses","park","sometimes","every"]}
+    ]},
+    {t:"What I eat for breakfast", h:"What do you eat? Who makes it? Why is breakfast important?", points:[
+      {q:"Name what you eat and drink", k:["breakfast","eat","eats","bread","eggs","cheese","milk","tea","juice","dates","honey","yogurt","fruit","banana","water","drink"]},
+      {q:"Say who makes it and when", k:["mother","mum","mom","father","dad","i make","makes","sister","brother","morning","early","before","school","together","table"]},
+      {q:"Say why breakfast is important", k:["because","important","strong","energy","hungry","healthy","study","school","feel","better","good","need"]}
+    ]},
+    {t:"My grandfather and my grandmother", h:"Where do they live? What do they do with you? How do you feel about them?", points:[
+      {q:"Say who they are and where they live", k:["grandfather","grandmother","grandpa","grandma","live","lives","house","village","city","near","far","visit","weekend","friday"]},
+      {q:"Say what they do with you", k:["tell","tells","story","stories","cook","cooks","give","gives","play","sit","talk","walk","take","teach","teaches","money","sweets"]},
+      {q:"Say how you feel about them", k:["love","happy","kind","good","best","because","miss","like","proud","lucky","always"]}
+    ]},
+    {t:"A party I went to", h:"What was the party for? Who was there? What did you do?", points:[
+      {q:"Say what the party was for", k:["party","birthday","eid","wedding","school","prize","new","house","baby","was","went","last","invited"]},
+      {q:"Say who was there", k:["family","friends","cousins","brother","sister","father","mother","uncle","aunt","children","everyone","many","people","with"]},
+      {q:"Say what you did and how you felt", k:["ate","eat","food","cake","played","play","sang","danced","laughed","gift","present","happy","fun","best","because"]}
+    ]},
+    {t:"My favourite story", h:"What is the story about? Who is in it? Why do you like it?", points:[
+      {q:"Say what the story is about", k:["story","book","cartoon","film","movie","about","boy","girl","animal","lion","prophet","hero","adventure","read","watch"]},
+      {q:"Name the people or animals in it", k:["he","she","they","boy","girl","man","woman","friend","friends","lion","bird","cat","dog","family","name","called"]},
+      {q:"Say why you like it", k:["because","like","love","funny","exciting","sad","happy","brave","kind","learn","best","favourite","favorite","again"]}
+    ]},
+    {t:"What I want to be when I grow up", h:"What job do you want? Why do you want it? What will you study?", points:[
+      {q:"Name the job you want", k:["want","be","become","doctor","teacher","engineer","pilot","police","nurse","driver","cook","chef","vet","big","grow"]},
+      {q:"Say why you want it", k:["because","help","helps","people","like","love","good","money","important","father","mother","fun","interesting","sick","children"]},
+      {q:"Say what you will study or do", k:["study","school","english","maths","math","science","read","learn","work","hard","university","will","must","need"]}
+    ]},
+    {t:"A rainy day", h:"When did it rain? What did you do? How did you feel?", points:[
+      {q:"Say when it rained", k:["rain","rained","raining","yesterday","last","winter","morning","evening","night","week","day","cold","sky","clouds"]},
+      {q:"Say what you did", k:["stayed","stay","home","inside","played","play","watched","watch","read","drank","tea","out","went","umbrella","jumped","water"]},
+      {q:"Say how you felt about it", k:["happy","cold","fun","beautiful","liked","like","love","because","nice","smell","school","closed","excited"]}
+    ]},
+    {t:"My friend's house", h:"Where is it? What is in it? What do you do there?", points:[
+      {q:"Say where the house is", k:["friend","house","near","next","far","street","same","our","my","neighbour","neighbor","live","lives","beside","behind"]},
+      {q:"Say what is in it or what it looks like", k:["big","small","garden","room","rooms","tree","trees","door","yard","new","old","beautiful","clean","two","three"]},
+      {q:"Say what you do there", k:["play","study","eat","watch","talk","sit","games","football","homework","together","we","go","visit","fun"]}
+    ]},
+    {t:"What I do on Friday", h:"What happens in the morning? What do you do with the family? What is the best part?", points:[
+      {q:"Say what you do in the morning", k:["friday","morning","sleep","wake","late","mosque","pray","prayer","breakfast","father","go","rest","no school"]},
+      {q:"Say what you do with the family", k:["family","lunch","eat","visit","grandfather","grandmother","uncle","cousins","park","mall","car","together","we","drive"]},
+      {q:"Say which part is best and why", k:["best","like","love","because","happy","fun","favourite","favorite","day","rest","together","free","enjoy"]}
+    ]},
+    {t:"My favourite fruit", h:"What fruit is it? What does it taste like? When do you eat it?", points:[
+      {q:"Name the fruit", k:["fruit","apple","banana","orange","grapes","dates","mango","watermelon","strawberry","peach","lemon","favourite","favorite","like"]},
+      {q:"Say what it tastes or looks like", k:["sweet","sour","red","green","yellow","orange","small","big","round","soft","juice","juicy","taste","tastes","colour","color"]},
+      {q:"Say when you eat it and why", k:["eat","eats","breakfast","after","lunch","school","morning","every","day","because","healthy","good","vitamins","strong","like"]}
+    ]},
+    {t:"A pet I have or want", h:"What animal is it? How do you take care of it? Why do you like it?", points:[
+      {q:"Name the animal", k:["pet","cat","dog","bird","birds","fish","rabbit","hamster","camel","sheep","horse","want","have","my"]},
+      {q:"Say how you take care of it", k:["feed","feeds","food","water","clean","wash","play","walk","cage","house","every day","give","gives","take care","look after"]},
+      {q:"Say why you like it", k:["because","like","love","cute","soft","friendly","quiet","funny","happy","friend","best","plays","beautiful"]}
+    ]},
+    {t:"My favourite lesson at school", h:"Which lesson is it? What do you do in it? Why do you like it?", points:[
+      {q:"Name the lesson", k:["lesson","subject","english","maths","math","science","arabic","islamic","art","sport","computer","history","favourite","favorite","like"]},
+      {q:"Say what you do in it", k:["read","write","draw","count","play","work","listen","speak","answer","questions","book","teacher","board","group","experiment"]},
+      {q:"Say why you like it", k:["because","easy","fun","interesting","teacher","kind","good","learn","like","love","best","understand","clever"]}
+    ]},
+    {t:"Helping my mother at home", h:"What do you help with? When do you help? How does she feel?", points:[
+      {q:"Say what you help with", k:["help","helps","mother","mum","mom","clean","wash","dishes","table","cook","kitchen","carry","bags","tidy","room","clothes"]},
+      {q:"Say when you help", k:["every day","after school","evening","morning","friday","weekend","before","after","lunch","dinner","sometimes","always","when"]},
+      {q:"Say how she feels and how you feel", k:["happy","glad","proud","smiles","says","thank","because","good","love","feel","like","better","easy"]}
+    ]},
+    {t:"The best food in Ramadan", h:"What food do you like? Who makes it? What happens at iftar?", points:[
+      {q:"Name the food you like", k:["ramadan","food","soup","dates","samosa","bread","rice","chicken","meat","juice","water","sweets","kunafa","best","like","favourite","favorite"]},
+      {q:"Say who makes it and when", k:["mother","mum","grandmother","father","family","makes","make","cook","cooks","before","iftar","sunset","evening","kitchen","together"]},
+      {q:"Say what happens at iftar", k:["iftar","table","sit","eat","pray","dates","water","family","together","happy","wait","azan","break","fast","after"]}
+    ]},
+    {t:"My school bag", h:"What is in it? What colour is it? Who gave it to you?", points:[
+      {q:"Say what is in your bag", k:["bag","books","book","pen","pens","pencil","ruler","notebook","water","bottle","lunch","box","copybook","colours","colors","eraser"]},
+      {q:"Say what it looks like", k:["colour","color","blue","red","black","green","big","small","new","old","heavy","light","pocket","pockets","strong","nice"]},
+      {q:"Say who gave it to you and how you keep it", k:["father","dad","mother","mum","uncle","gave","bought","gift","clean","tidy","keep","every day","carry","school","careful"]}
+    ]},
+    {t:"A day I helped someone", h:"Who did you help? What did you do? How did you feel after?", points:[
+      {q:"Say who you helped", k:["helped","help","friend","brother","sister","mother","father","teacher","neighbour","neighbor","old","man","woman","boy","girl","someone"]},
+      {q:"Say what you did", k:["carried","carry","gave","give","showed","show","taught","opened","cleaned","found","water","money","bag","homework","door","road"]},
+      {q:"Say how you felt after", k:["felt","feel","happy","good","proud","glad","because","smiled","thanked","thank","nice","better","again","love"]}
+    ]},
   ],
   2: [
     {t:"The benefits of reading", h:"Give two benefits, an example for each, and a short conclusion.", points:[
@@ -505,7 +623,130 @@ var PROMPTS = {
       {q:"State your position clearly", k:["should","should not","shouldn't","required","requirement","compulsory","must","agree","disagree","believe","opinion","view","argue"]},
       {q:"Support it with reasons and an example", k:["because","reason","responsibility","skills","community","experience","confidence","for example","for instance","such as","evidence","research","therefore","first","second"]},
       {q:"Answer the opposite view", k:["however","although","while","whereas","study","time","exams","pressure","admittedly","it is true that","on the other hand","nevertheless","critics","some","others"]}
-    ]}
+    ]},
+    /* ═══ ثلاثةٌ وعشرون موضوعًا جديدًا (٢٠ نوفمبر ٢٠٢٦) ═══════════════
+       العلّةُ هي علّةُ المستوى الثاني: بنكٌ من سبعةٍ دورتُه سبعةُ أيّامٍ
+       تُحفَظ نصوصُه. وُسِّع قبل أن يقع فيه فهد.
+       والنقطةُ الثالثةُ في كلِّ موضوعٍ هي الحجّةُ المضادّةُ وردُّها — وهي
+       ما يفرِّق المقالَ الناضجَ عن الفقرةِ المدرسيّة، وكلماتُها واحدةٌ
+       في المواضيعِ كلِّها لأنّها أدواتُ الجدلِ لا مفرداتُ الموضوع.
+       وكلماتُ النقطةِ الثانيةِ من مادّةِ الموضوعِ نفسِه، فيُقاس أغطّى
+       المسألةَ أم كتب إنشاءً عامًّا بأدواتِ ربطٍ حسنة. */
+    {t:"Should exams be replaced by continuous assessment?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["exam","exams","assessment","continuous","marks","grades","memorise","memorize","stress","pressure","coursework","projects","fair","measure","progress","term","year","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should students be allowed to use AI tools in their schoolwork?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["ai","artificial intelligence","tool","tools","homework","write","writing","answers","learn","learning","skills","cheat","cheating","think","thinking","depend","teacher","check","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is it better to study abroad or at home?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["abroad","overseas","home","country","university","culture","language","english","expensive","cost","scholarship","family","independence","experience","return","opportunity","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should the school day be shorter?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["school day","hours","shorter","longer","tired","concentration","focus","sleep","homework","activities","sport","family","teachers","curriculum","time","efficient","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should advertising for fast food be restricted?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["advertising","advertisement","adverts","fast food","restrict","ban","children","obesity","health","sugar","salt","companies","freedom","choice","government","law","influence","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Does working while studying help or harm students?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["work","working","part-time","job","studying","student","students","income","money","experience","responsibility","time","tired","grades","balance","skills","independence","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should public transport be free for everyone?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["public transport","bus","buses","metro","train","free","fares","tickets","traffic","congestion","pollution","cost","taxes","government","poor","access","city","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should schools teach financial skills instead of some traditional subjects?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["financial","finance","money","budget","budgeting","saving","debt","taxes","practical","skills","curriculum","traditional","subjects","useful","adult","life","economy","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is remote work better than working in an office?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["remote","home","office","work","working","commute","traffic","flexible","flexibility","productivity","team","teamwork","communication","isolated","lonely","balance","employer","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should sport be compulsory in high school?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["sport","compulsory","required","optional","physical","health","obesity","fitness","teamwork","discipline","time","academic","exams","choice","students","school","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should the government invest more in renewable energy than in oil?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["renewable","solar","wind","energy","oil","petroleum","invest","investment","economy","jobs","environment","pollution","climate","future","generations","vision","diversify","cost","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should smartphones be banned for children under twelve?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["smartphone","phone","phones","ban","banned","children","age","twelve","screen","addiction","sleep","social media","bullying","safety","parents","control","emergency","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is tourism good for a country's culture?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["tourism","tourists","culture","heritage","tradition","traditions","economy","jobs","income","crowded","prices","respect","identity","exchange","understanding","sites","preserve","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should school uniforms be required?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["uniform","uniforms","required","clothes","equal","equality","rich","poor","identity","discipline","expression","individuality","cost","parents","focus","appearance","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is competition between students useful?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["competition","compete","rank","ranking","marks","grades","motivation","motivate","pressure","anxiety","stress","cooperation","collaborate","confidence","weaker","effort","best","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should zoos be closed?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["zoo","zoos","animals","cages","captivity","wild","nature","conservation","protect","endangered","breeding","education","children","cruel","welfare","sanctuary","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should people be fined for wasting water?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["water","waste","wasting","fine","fines","penalty","law","desalination","scarce","shortage","desert","farms","irrigation","awareness","campaign","education","consumption","save","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Does technology make us less social?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["technology","phone","phones","social media","online","friends","face to face","conversation","family","isolated","lonely","connect","distance","relatives","screen","time","relationships","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should history be taught through stories rather than dates?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["history","stories","narrative","dates","facts","memorise","memorize","understand","causes","consequences","interest","boring","engaging","exam","accuracy","events","teacher","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is it right for cities to grow at the expense of farmland?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["city","cities","growth","expand","housing","farmland","agriculture","farms","food","security","imports","population","planning","vertical","desert","environment","balance","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should volunteering count towards university admission?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["volunteering","volunteer","community","service","admission","university","application","grades","character","responsibility","genuine","forced","pressure","unfair","time","experience","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Should students choose their own subjects from an early age?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["choose","choice","subjects","early","age","specialise","specialize","narrow","broad","interests","talent","mature","change","mind","career","flexible","curriculum","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
+    {t:"Is censorship of the internet ever justified?", h:"State your position, support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly in the first sentence", k:["should","should not","shouldn't","must","agree","disagree","believe","opinion","view","argue","maintain","favour","favor","oppose","convinced","essay","this essay"]},
+      {q:"Support it with reasons and evidence", k:["censorship","censor","internet","freedom","speech","expression","harmful","content","children","violence","misinformation","false","government","control","rights","protect","balance","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
+    ]},
   ]
 };
 
