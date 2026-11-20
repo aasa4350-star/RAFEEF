@@ -339,7 +339,132 @@ var PROMPTS = {
       {q:"Describe the problem", k:["problem","traffic","crowded","litter","rubbish","noise","pollution","water","parking","roads","dust"]},
       {q:"Explain its effect on people", k:["because","effect","affects","people","health","late","dangerous","difficult","hard","time","accident"]},
       {q:"Suggest a solution", k:["solution","solve","should","could","government","build","more","recycle","fine","fines","bus","metro","plant","clean"]}
-    ]}
+    ]},
+    /* ═══ اثنان وعشرون موضوعًا جديدًا (١٩ نوفمبر ٢٠٢٦) ════════════════
+       سأل الأبُ حسنًا كيف يأخذ الدرجةَ كاملةً فقال: «حفظتها من كثرةِ
+       التكرار». وكان البنكُ ثمانيةَ مواضيعَ واختيارُها dayIdx % 8 —
+       دورةٌ كلَّ ثمانيةِ أيّامٍ بترتيبٍ معلومٍ بالتقويم. فجاءه كلُّ موضوعٍ
+       تسعَ مرّاتٍ في سبعين يومًا، وقِيس تداخلُ خماسيّاتِ الكلماتِ بين
+       نصّيه في «The benefits of reading» بعد ستّةَ عشرَ يومًا: ٩٨٪.
+       فهو صادقٌ، والعيبُ عيبُ البنكِ لا عيبُه: ثمانيةُ مواضيعَ تدور كلَّ
+       ثمانيةِ أيّامٍ ليست تدريبَ كتابةٍ بل امتحانَ ذاكرة.
+
+       والمواضيعُ هنا من دنياه هو — مدرستُه وحيُّه ورمضانُ والاختباراتُ
+       والرياضةُ — فالكتابةُ عن معلومٍ أسهلُ من الكتابةِ عن مجهول، والعجزُ
+       عن المادّةِ يُحسَب خطأً في اللغةِ وهو ليس منها.
+       وكلماتُ النقاطِ صيغٌ يقولها ابنُ الثالثِ المتوسّطِ فعلًا، لا
+       مترادفاتٌ من معجم: الفحصُ يقابل بها نصَّه فلا تُفيده كلمةٌ لا
+       تأتي على لسانِه. */
+    {t:"The best day of my week", h:"Say which day, what makes it special, and how you feel about it.", points:[
+      {q:"Name the day and what you do", k:["friday","thursday","saturday","weekend","day","morning","evening","play","visit","sleep","family","go","meet","rest"]},
+      {q:"Explain what makes it different from other days", k:["because","no school","free","homework","busy","unlike","other days","while","different","relax","time"]},
+      {q:"Say how you feel and finish", k:["feel","happy","glad","enjoy","look forward","favourite","favorite","in conclusion","so","therefore","think"]}
+    ]},
+    {t:"A skill I want to learn", h:"Name the skill, say why you want it, and how you plan to learn it.", points:[
+      {q:"Name the skill you want to learn", k:["learn","skill","want","swim","swimming","cook","cooking","drive","program","programming","design","draw","play","guitar","language","french","photography","chess"]},
+      {q:"Give the reason you want it", k:["because","useful","help","helps","job","future","career","enjoy","interested","interesting","important","need"]},
+      {q:"Say how you will learn it and when", k:["plan","will","going to","practise","practice","course","videos","online","teacher","every day","week","step","start","first","then"]}
+    ]},
+    {t:"My favourite subject at school", h:"Name the subject, give two reasons, and say how it helps you.", points:[
+      {q:"Name the subject", k:["subject","favourite","favorite","maths","mathematics","science","english","arabic","history","geography","computer","physics","chemistry","biology","islamic"]},
+      {q:"Give two reasons why you like it", k:["because","reason","first","second","also","easy","interesting","useful","teacher","explains","enjoy","understand","challenge"]},
+      {q:"Say how it will help you later", k:["future","help","helps","job","career","university","study","need","later","life","in conclusion","therefore","believe"]}
+    ]},
+    {t:"Living in a city or in a village", h:"Compare the two, then say which you prefer and why.", points:[
+      {q:"Say one good thing about the city", k:["city","hospital","school","schools","shops","mall","work","jobs","transport","services","university","busy","crowded"]},
+      {q:"Say one good thing about the village", k:["village","countryside","quiet","clean","air","calm","nature","farm","neighbours","neighbors","cheap","safe","peaceful"]},
+      {q:"Say which you prefer and why", k:["prefer","i would","i think","because","in conclusion","better","choose","opinion","myself","personally"]}
+    ]},
+    {t:"How I prepare for an exam", h:"Describe your steps in order, and say what you avoid.", points:[
+      {q:"Say what you do first", k:["first","start","begin","plan","revise","review","read","notes","timetable","schedule","organise","organize","before"]},
+      {q:"Describe the next steps in order", k:["then","after that","second","next","practise","practice","questions","past papers","memorise","memorize","summary","ask","teacher","repeat"]},
+      {q:"Say what you avoid and finish", k:["avoid","not","never","should not","shouldn't","late","night","phone","distraction","tired","finally","in conclusion","advice"]}
+    ]},
+    {t:"The importance of sport in our life", h:"Give two benefits with an example, then conclude.", points:[
+      {q:"State the first benefit of sport", k:["sport","exercise","health","healthy","strong","fit","fitness","body","heart","weight","energy","muscles"]},
+      {q:"Give an example or a second benefit", k:["for example","such as","football","running","swimming","walking","cycling","team","friends","stress","mood","sleep","confidence","also","another"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","therefore","so","think","believe","opinion","should","everyone","important","daily"]}
+    ]},
+    {t:"A day I will never forget in Ramadan", h:"Describe when it was, what happened, and why you remember it.", points:[
+      {q:"Say when it was and who was with you", k:["ramadan","last year","last","night","evening","iftar","suhoor","family","grandfather","grandmother","uncle","cousins","mosque","home"]},
+      {q:"Describe what happened", k:["we","prayed","pray","ate","food","dates","table","together","laughed","talked","visited","gave","helped","after","then","while"]},
+      {q:"Say why you still remember it", k:["remember","never forget","special","happy","feel","felt","because","meant","important","unforgettable","in conclusion"]}
+    ]},
+    {t:"Should homework be reduced?", h:"Give your opinion, support it with reasons, mention the other view, then conclude.", points:[
+      {q:"State your opinion in the first sentence", k:["homework","should","should not","shouldn't","reduce","reduced","less","more","i think","believe","opinion","agree","disagree"]},
+      {q:"Support it with a reason or an example", k:["because","for example","time","tired","sleep","family","rest","practise","practice","remember","learn","revise","too much","hours"]},
+      {q:"Mention the other view, then conclude", k:["however","although","some people","on the other hand","but","still","in conclusion","therefore","overall","balance"]}
+    ]},
+    {t:"The person who taught me the most", h:"Say who it is, what they taught you, and how it changed you.", points:[
+      {q:"Say who the person is", k:["father","dad","mother","mum","mom","teacher","brother","sister","uncle","grandfather","grandmother","friend","coach","person","taught"]},
+      {q:"Say what they taught you", k:["taught","showed","told","learn","learned","patience","honesty","respect","hard work","responsibility","kindness","how to","advice","lesson"]},
+      {q:"Say how it changed you and finish", k:["changed","now","since then","because of","i became","i try","follow","in conclusion","grateful","thank","always","remember"]}
+    ]},
+    {t:"Why water must not be wasted", h:"Explain the problem, its effect, and what we should do.", points:[
+      {q:"State the problem", k:["water","waste","wasted","wasting","desert","rain","little","scarce","shortage","expensive","desalination","important","life"]},
+      {q:"Explain its effect on people or the country", k:["because","effect","affects","farms","farming","drinking","cost","energy","future","generations","health","crops","dry"]},
+      {q:"Say what we should do", k:["should","must","can","close","tap","shorter","shower","fix","leak","reuse","recycle","drip","irrigation","teach","save","in conclusion"]}
+    ]},
+    {t:"My first day at this school", h:"Describe how you felt, what happened, and how it ended.", points:[
+      {q:"Say how you felt at the beginning", k:["first day","felt","feel","nervous","worried","afraid","shy","excited","new","strange","did not know","nobody"]},
+      {q:"Describe what happened", k:["then","after","teacher","classroom","class","sat","met","asked","introduced","students","bell","break","lunch","showed"]},
+      {q:"Say how the day ended and what you learned", k:["by the end","finally","now","friends","better","happy","glad","learned","realised","realized","in conclusion","since then"]}
+    ]},
+    {t:"Is it better to work alone or in a team?", h:"Give both sides with examples, then state your preference.", points:[
+      {q:"Say one advantage of working alone", k:["alone","myself","on my own","concentrate","focus","quiet","decide","own pace","no one","quickly","independent"]},
+      {q:"Say one advantage of working in a team", k:["team","group","together","share","ideas","help","helps","faster","learn","others","divide","support","discuss"]},
+      {q:"State your preference with a reason", k:["prefer","i would","i think","because","depends","in conclusion","better","choose","opinion","for me"]}
+    ]},
+    {t:"A problem between friends and how I solved it", h:"Describe the problem, what you did, and the result.", points:[
+      {q:"Describe the problem", k:["friend","friends","problem","argued","argument","angry","upset","misunderstanding","disagreed","stopped","because","about"]},
+      {q:"Say what you did about it", k:["i","talked","spoke","apologised","apologized","listened","explained","asked","waited","sorry","called","met","decided","tried"]},
+      {q:"Say the result and what you learned", k:["now","after that","finally","again","better","forgave","learned","realised","realized","friendship","in conclusion","important"]}
+    ]},
+    {t:"The job I would like to have", h:"Name the job, give two reasons, and say what you need for it.", points:[
+      {q:"Name the job you want", k:["job","work","become","engineer","doctor","teacher","pilot","programmer","designer","lawyer","nurse","businessman","accountant","want","would like"]},
+      {q:"Give two reasons why you want it", k:["because","reason","first","second","also","help","people","enjoy","interested","interesting","money","respect","useful","love"]},
+      {q:"Say what you need to do to get it", k:["need","must","should","study","university","degree","english","maths","experience","train","practise","practice","hard work","in conclusion"]}
+    ]},
+    {t:"How technology changed the way we study", h:"Give a change with an example, a drawback, and your conclusion.", points:[
+      {q:"Describe one way studying has changed", k:["technology","now","before","internet","computer","laptop","tablet","online","videos","search","websites","apps","easier","faster"]},
+      {q:"Give an example or a drawback", k:["for example","such as","however","but","although","distraction","phone","games","copy","lazy","screen","eyes","depend","information"]},
+      {q:"Finish with your opinion", k:["in conclusion","therefore","so","i think","believe","opinion","balance","should","use","wisely","useful"]}
+    ]},
+    {t:"Why we should respect older people", h:"Give two reasons with examples, then conclude.", points:[
+      {q:"State the first reason", k:["older","old","elderly","grandparents","respect","experience","wisdom","taught","raised","helped","knowledge","years"]},
+      {q:"Give an example or a second reason", k:["for example","such as","grandfather","grandmother","parents","advice","story","stories","listen","visit","help","carry","also","another","religion","islam"]},
+      {q:"Finish with a conclusion", k:["in conclusion","therefore","so","should","must","everyone","duty","important","think","believe"]}
+    ]},
+    {t:"My favourite place in my city", h:"Describe the place, what you do there, and why you like it.", points:[
+      {q:"Name and describe the place", k:["place","park","library","mall","beach","mosque","stadium","garden","corniche","market","cafe","street","near","quiet","big"]},
+      {q:"Say what you do there", k:["i go","we go","play","walk","read","study","meet","friends","family","sit","eat","watch","every","usually","often"]},
+      {q:"Say why you like it and finish", k:["because","like","love","favourite","favorite","feel","calm","happy","relax","in conclusion","therefore","best"]}
+    ]},
+    {t:"Should school start later in the morning?", h:"State your view, support it, answer the other side, then conclude.", points:[
+      {q:"State your view in the first sentence", k:["school","start","later","earlier","should","should not","shouldn't","i think","believe","opinion","agree","disagree","morning"]},
+      {q:"Support it with a reason or an example", k:["because","for example","sleep","tired","early","concentrate","focus","breakfast","traffic","wake","hours","night","study","better"]},
+      {q:"Answer the other side, then conclude", k:["however","although","some","parents","work","on the other hand","but","still","finish","in conclusion","therefore","overall"]}
+    ]},
+    {t:"An invention that changed the world", h:"Name it, explain what it changed, and give your opinion.", points:[
+      {q:"Name the invention", k:["invention","invented","internet","phone","telephone","car","plane","aeroplane","airplane","computer","electricity","printing","wheel","medicine","camera","light"]},
+      {q:"Explain what it changed", k:["changed","before","now","people","travel","communicate","talk","work","faster","easier","far","distance","save","lives","allowed","made"]},
+      {q:"Give your opinion and finish", k:["in conclusion","therefore","so","i think","believe","opinion","important","greatest","however","although","useful"]}
+    ]},
+    {t:"How I spend my pocket money", h:"Say what you spend it on, what you save, and why.", points:[
+      {q:"Say what you spend it on", k:["money","pocket money","spend","buy","food","snacks","drinks","game","games","book","books","clothes","gift","phone","card"]},
+      {q:"Say what you save and how", k:["save","saving","keep","put","half","some","every week","month","box","account","until","for","later"]},
+      {q:"Say why you manage it that way", k:["because","reason","important","learn","need","expensive","parents","taught","waste","plan","in conclusion","think","better"]}
+    ]},
+    {t:"A mistake I learned from", h:"Describe the mistake, what happened, and what you do differently now.", points:[
+      {q:"Describe the mistake", k:["mistake","wrong","once","last","forgot","did not","didn't","late","failed","lost","broke","lied","exam","homework"]},
+      {q:"Say what happened because of it", k:["because","so","then","after","result","angry","upset","punished","lost","mark","marks","grade","learned","felt","sorry","regret"]},
+      {q:"Say what you do differently now", k:["now","since then","never again","always","i make sure","i check","i plan","in conclusion","lesson","better","changed","taught me"]}
+    ]},
+    {t:"Why learning English is important for me", h:"Give two reasons with examples, then conclude.", points:[
+      {q:"State the first reason", k:["english","learn","learning","important","language","school","exam","subject","university","study","travel","job","future","world"]},
+      {q:"Give an example or a second reason", k:["for example","such as","internet","videos","games","books","research","people","speak","talk","understand","abroad","also","another","science","computer"]},
+      {q:"Finish with a conclusion or a plan", k:["in conclusion","therefore","so","i think","believe","will","plan","practise","practice","improve","every day","important"]}
+    ]},
   ],
   /* المستوى ٣ — موضوعاتُ مقالٍ برأيٍ ودليلٍ ورأيٍ مضادّ، على نمطِ ما يُطلَب
      من طالبِ الثالثِ الثانويِّ في الكتابةِ الأكاديميّة. وثالثُ النقاطِ في
@@ -1047,6 +1172,54 @@ function sentSims(sents){
   return out;
 }
 
+/* ═══ إعادةُ النصِّ القديمِ في الموضوعِ نفسِه ════════════════════════
+   قال حسنٌ لأبيه إنّه يأخذ الدرجةَ كاملةً لأنّه «حفِظها من كثرةِ
+   التكرار». وقِيس تداخلُ خماسيّاتِ الكلماتِ بين نصّيه في «The benefits
+   of reading» بينهما ستّةَ عشرَ يومًا: ٩٨٪. فذاك استرجاعٌ لا كتابة.
+
+   والخماسيّةُ هي الوحدةُ: الثلاثيّةُ تتكرّر في كلِّ نصٍّ عن الموضوعِ
+   الواحدِ بطبيعتِه («the benefits of»)، والخماسيّةُ لا تتطابق إلّا
+   بإعادةِ الصياغةِ نفسِها.
+
+   والعتبةُ ستّون بالمئة: نصوصُه التي أخذت العشرينَ كاملةً أعادت بين
+   سبعةٍ وواحدٍ وثلاثين بالمئةٍ من سابقِها — وذاك بناءٌ على ما كتبه
+   وهو مشروعٌ بل مطلوب. فلا يُمنَع إلّا من أعاد أكثرَ من نصفِ نصِّه. */
+function _h32(str){
+  var h = 2166136261;
+  for(var i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h >>> 0;
+}
+function cycleOrder(n, seed){
+  var a = [], i;
+  for(i=0;i<n;i++) a.push(i);
+  /* فيشر–ييتس بمولّدٍ خطّيٍّ من البذرة: نفسُ البذرةِ نفسُ الترتيب */
+  var r = (seed || 1) >>> 0;
+  for(i=n-1;i>0;i--){
+    r = (r * 1664525 + 1013904223) >>> 0;
+    var j = r % (i + 1);
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+}
+  return a;
+}
+
+var REUSE_MAX = 0.6, REUSE_N = 5;
+function wNgrams(t, n){
+  var w = String(t||"").toLowerCase().replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean);
+  var o = {}, c = 0;
+  for(var i=0;i+n<=w.length;i++){ var k=w.slice(i,i+n).join(" "); if(!o[k]){ o[k]=1; c++; } }
+  return { set:o, n:c };
+}
+/* نسبةُ ما في «الجديد» موجودٌ في «القديم» — لا العكس: من أضاف فقرةً
+   إلى نصِّه القديمِ تنزل نسبتُه، وهو المطلوب. */
+function reuseRatio(fresh, old){
+  if(!fresh || !old) return 0;
+  var A = wNgrams(fresh, REUSE_N), B = wNgrams(old, REUSE_N);
+  if(!A.n || !B.n) return 0;
+  var hit = 0;
+  Object.keys(A.set).forEach(function(k){ if(B.set[k]) hit++; });
+  return hit / A.n;
+}
+
 function gradeWriting(text, level, targetOrCefr, prompt){
   var cef = (typeof targetOrCefr==="object" && targetOrCefr) ? targetOrCefr
           : (CEFR[targetOrCefr] || (level>=2 ? CEFR.A2 : CEFR.A1));
@@ -1532,9 +1705,23 @@ function render(el, ctx){
   var readDone = function(){ return READ_REQ; };   /* يُستبدل حين يُبنى الجزء الثالث */
   var cef = CEFR[ctx.cefr] || (level>=2 ? CEFR.A2 : CEFR.A1);
   var prompts = PROMPTS[level] || PROMPTS[1];
-  /* موضوع اليوم يتغيّر يوميًّا ولا يتغيّر بإعادة التحميل في اليوم نفسه */
+  /* ═══ موضوعُ اليوم: دورةٌ تستنفد البنكَ قبل أن تعود ════════════════
+     كان pIdx = dayIdx % prompts.length، والبنكُ ثمانيةٌ — فدورةٌ كلَّ
+     ثمانيةِ أيّامٍ بترتيبٍ واحدٍ يعرفه الطفلُ من التقويم. فحفِظ حسنٌ
+     نصوصَه وأخذ الدرجةَ كاملةً بالذاكرةِ لا بالكتابة، وقالها لأبيه.
+
+     والبنكُ الآن ثلاثون، والقسمةُ وحدَها تكفي لدورةٍ شهريّة — لكنّ
+     ترتيبَها يبقى واحدًا في كلِّ دورة. فيُخلَط ترتيبُ الدورةِ بمفتاحٍ
+     من اسمِ الطفلِ ورقمِ الدورة: كلُّ موضوعٍ مرّةً واحدةً في الدورةِ
+     (لا تكرارَ قبل استنفادِ البنك)، وترتيبٌ مختلفٌ في كلِّ دورةٍ (فلا
+     يُتوقَّع موضوعُ الغد)، وثابتٌ في اليومِ الواحدِ فلا يتبدّل بإعادةِ
+     التحميل. وبلا حالةٍ محفوظةٍ في المتصفّحِ أصلًا — فلا يضيع بتفريغِ
+     الذاكرةِ ولا يختلف بين جهازٍ وجهاز. */
   var dayIdx = Math.floor((Date.now()+3*3600*1000)/86400000);
-  var pIdx = dayIdx % prompts.length;
+  var _cycN = prompts.length;
+  var _cyc  = Math.floor(dayIdx / _cycN);
+  var _pos  = ((dayIdx % _cycN) + _cycN) % _cycN;
+  var pIdx  = cycleOrder(_cycN, _h32(String(ctx.who||"") + "|" + _cyc))[_pos];
   var items = genN(GENS[level]||GENS[1], 6);
 
   /* «أسئلة جديدة» يُعيد رسم التدريب، فنفكّ مستمعي النسخة السابقة لئلّا
@@ -1643,7 +1830,11 @@ function render(el, ctx){
 
   /* ---- الجزء الثاني ---- */
   var ta=el.querySelector("#wtext"), bar=el.querySelector("#wbar"), live=el.querySelector("#wlive");
-  var draftKey="wen_draft_"+ctx.who+"_"+pIdx;
+  /* ⚠️ المفتاحُ بالموضوعِ لا بموضعِه: الموضعُ يُخلَط في كلِّ دورةٍ،
+     فمسوّدةُ موضوعٍ محفوظةٌ تحت الموضعِ ٣ كانت تعود لموضوعٍ آخرَ في
+     الدورةِ التالية. */
+  var tKey = _h32(prompts[pIdx].t).toString(36);
+  var draftKey="wen_draft_"+ctx.who+"_"+tKey;
   try{ var d=localStorage.getItem(draftKey); if(d) ta.value=d; }catch(e){}
   function refresh(){
     var t=ta.value.replace(/\s+/g," ").trim();
@@ -1712,17 +1903,26 @@ function render(el, ctx){
      فصارت بصمةُ آخرِ ما حُفِظ تُخزَّن مع المسوّدةِ نفسِها، فتعيش بعد
      التحميل. والتقييمُ يُعرَض كما هو — إنّما لا يُضاف صفٌّ ما لم
      يتغيّر النصّ. */
-  var savedKey = "wen_saved_" + ctx.who + "_" + pIdx;
+  var savedKey = "wen_saved_" + ctx.who + "_" + tKey;
+  /* آخرُ نصٍّ سلّمه في هذا الموضوعِ بعينه — يُقابَل به الجديد */
+  var prevKey  = "wen_prev_"  + ctx.who + "_" + tKey;
+  var _prevText = "";
+  try{ _prevText = localStorage.getItem(prevKey) || ""; }catch(e){}
   var _lastSaved = "";
   try{ _lastSaved = localStorage.getItem(savedKey) || ""; }catch(e){}
   var MIN_AUTO_WORDS = 8;
   function _norm(x){ return String(x||"").replace(/\s+/g," ").trim(); }
+  /* نسبةُ ما أعاده من نصِّه القديمِ في هذا الموضوع */
+  function reuseNow(){ return reuseRatio(ta.value, _prevText); }
   function saveParagraph(g, auto){
     var now = _norm(ta.value);
     if(now && now === _lastSaved) return false;    /* نفسُ النصِّ: لا صفَّ جديد */
+    /* ولا يُحسَب عملًا جديدًا من أعاد أكثرَ من نصفِ نصِّه القديم */
+    if(reuseNow() >= REUSE_MAX) return false;
     var byName={}; g.subs.forEach(function(s){ byName[s.en]=s.band; });
     _lastSaved = now;
     try{ localStorage.setItem(savedKey, now); }catch(e){}
+    try{ localStorage.setItem(prevKey, ta.value); _prevText = ta.value; }catch(e){}
     ctx.save(Object.assign({ kind:"writing", correct:g.total, total:20, level:level, cefr:g.cefr, pass:g.pass,
                bands:byName, topic:prompts[pIdx].t, words:g.words, sents:g.sents,
                auto:(auto===true)||undefined,
@@ -1781,12 +1981,26 @@ function render(el, ctx){
     }
     /* ولا يُترَك في حَيرةٍ: إن لم يُحفَظ صفٌّ قيل له لماذا صراحةً —
        وإلّا ظنَّ أنّ عملَه ضاع، أو حسب أنّه سلّم عملًا جديدًا. */
+    var _re = reuseNow();
     if(!saveParagraph(g, false) && g.words > 0){
-      h += '<div style="margin-top:10px;background:var(--bg);border:1.5px solid var(--warn);border-radius:11px;'+
+      /* ويُفرَّق بين سببَين: نصٌّ لم يتغيّر أصلًا، ونصٌّ أعاد كتابتَه
+         القديمةَ في الموضوعِ نفسِه. والثاني هو ما وقع فيه حسنٌ. */
+      h += (_re >= REUSE_MAX)
+        ? ('<div style="margin-top:10px;background:var(--bg);border:1.5px solid var(--warn);border-radius:11px;'+
+           'padding:10px 12px;font-weight:700;color:var(--warn);font-size:.92rem">'+
+           '🔁 هذي كتابتُك القديمةُ في الموضوعِ نفسِه — أعدتَ '+Math.round(_re*100)+'٪ منها. '+
+           'والمقصودُ أن تكتب، لا أن تتذكّر ما كتبتَه. هاتِ أفكارًا غيرَها أو مثالًا جديدًا أو رأيًا آخر، '+
+           'والتقييمُ فوق لك تقرؤه — لكنّه لا يُحفَظ درجةً جديدة.'+
+           trs("This repeats "+Math.round(_re*100)+"% of your earlier text on this topic. Write new ideas — this attempt is not recorded.")+'</div>')
+        : ('<div style="margin-top:10px;background:var(--bg);border:1.5px solid var(--warn);border-radius:11px;'+
            'padding:10px 12px;font-weight:700;color:var(--warn);font-size:.92rem">'+
            '📝 هذي نفسُ الفقرةِ التي حُفظت آخرَ مرّة، فما أضفتُ عملًا جديدًا لوالدك. '+
            'عدّل فيها أو اكتب غيرَها ليُحسَب لك عملٌ جديد.'+
-           trs("Same text as last time — nothing new was recorded. Change it to log new work.")+'</div>';
+           trs("Same text as last time — nothing new was recorded. Change it to log new work.")+'</div>');
+    } else if(_re > 0.3 && g.words > 0){
+      /* وما دون العتبةِ لا يُمنَع، إنّما يُقال له الرقمُ ليعرف أين هو */
+      h += '<div style="margin-top:10px;color:var(--muted);font-weight:700;font-size:.88rem">'+
+           'ℹ️ بنيتَ على كتابتِك السابقةِ في هذا الموضوع ('+Math.round(_re*100)+'٪ منها) — وهذا جيّدٌ ما دام فيه جديد.</div>';
     }
     feed.innerHTML=h;
   });
@@ -1872,5 +2086,7 @@ function render(el, ctx){
 /* grammarIssues مكشوفةٌ للفحصِ الآليّ: قواعدُها تُجرَّب على جملٍ
    صحيحةٍ وخاطئةٍ معًا، والإنذارُ الكاذبُ أسوأُ من السكوت. */
 window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR, PROMPTS:PROMPTS, _gens:GENS, _genN:genN,
-                     grammar:grammarIssues, _rules:GRAMMAR, sims:sentSims, PAD_SIM:PAD_SIM };
+                     grammar:grammarIssues, _rules:GRAMMAR, sims:sentSims, PAD_SIM:PAD_SIM,
+                     reuse:reuseRatio, REUSE_MAX:REUSE_MAX,
+                     order:cycleOrder, hash:_h32 };
 })();

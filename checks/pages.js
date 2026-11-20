@@ -8565,6 +8565,95 @@ function writingGraderPath(){
   if (gRef.total < 20)
     E('نصُّ ١٤ نوفمبر كان ٢٠/٢٠ فصار ' + gRef.total + '/20 — التشديدُ أصاب من كتب جيّدًا');
 
+  /* ═══ ٨) بنكُ المواضيعِ وجدولُه ومانعُ الإعادة ═══════════════════
+     سأل الأبُ حسنًا كيف يأخذ الدرجةَ كاملةً فقال: «حفِظتها من كثرةِ
+     التكرار» (١٩ نوفمبر ٢٠٢٦). وكان البنكُ ثمانيةَ مواضيعَ واختيارُها
+     بالقسمةِ على عددِها — دورةٌ كلَّ ثمانيةِ أيّامٍ بترتيبٍ يعرفه من
+     التقويم، فجاءه كلُّ موضوعٍ تسعَ مرّاتٍ في سبعين يومًا. وقِيس تداخلُ
+     نصّيه في موضوعٍ واحدٍ بينهما ستّةَ عشرَ يومًا: ٩٨٪.
+     فبنكٌ صغيرٌ بجدولٍ متوقَّعٍ يحوّل تدريبَ الكتابةِ امتحانَ ذاكرة. */
+  (function(){
+    const L2 = (W.PROMPTS||{})[2] || [];
+    if (L2.length < 30)
+      E('مواضيعُ المستوى الثاني ' + L2.length + ' — ودورةُ موضوعٍ كلَّ ' + L2.length +
+        ' يومٍ تُحفَظ نصوصُها. الحدُّ ثلاثون، أي دورةٌ شهريّة');
+    const bad = L2.filter(x => !x || !x.t || !x.h || !Array.isArray(x.points) || x.points.length !== 3 ||
+      x.points.some(q => !q || !q.q || !Array.isArray(q.k) || q.k.length < 6));
+    if (bad.length)
+      E(bad.length + ' موضوعًا ناقصَ البنيةِ (عنوانٌ · تعليمةٌ · ثلاثُ نقاطٍ بستِّ كلماتٍ مفتاحيّةٍ على الأقلّ)' +
+        (bad[0] && bad[0].t ? ': «' + bad[0].t + '»' : ''));
+    const titles = L2.map(x => x && x.t);
+    if (new Set(titles).size !== titles.length) E('موضوعٌ مكرّرٌ في بنكِ المستوى الثاني');
+
+    /* الجدولُ: كلُّ موضوعٍ مرّةً في الدورةِ · ترتيبٌ يختلف بين الدورات ·
+       وثابتٌ في النداءِ الواحدِ فلا يتبدّل بإعادةِ تحميلِ الصفحة */
+    if (typeof W.order !== 'function' || typeof W.hash !== 'function')
+      E('جدولُ المواضيعِ غيرُ مُصدَّرٍ — فلا يُقاس أيَعود موضوعٌ قبل استنفادِ البنك');
+    else {
+      const N = Math.max(8, L2.length);
+      const seq = c => W.order(N, W.hash('hasan|' + c));
+      const a0 = seq(0);
+      if (new Set(a0).size !== N || a0.length !== N || a0.some(x => x < 0 || x >= N))
+        E('الدورةُ لا تحوي كلَّ موضوعٍ مرّةً واحدةً — فيعود موضوعٌ قبل أن تنفد المواضيع');
+      if (JSON.stringify(seq(0)) !== JSON.stringify(a0))
+        E('الجدولُ غيرُ ثابتٍ للنداءِ الواحدِ — فموضوعُ اليومِ يتبدّل بإعادةِ تحميلِ الصفحة');
+      let moved = 0;
+      for (let c = 1; c <= 4; c++){
+        const b2 = seq(c);
+        if (b2.filter((v, k) => v !== a0[k]).length > N / 2) moved++;
+      }
+      if (moved < 3)
+        E('ترتيبُ الدوراتِ لا يختلف — فيُتوقَّع موضوعُ الغدِ من التقويمِ كما كان');
+      /* ولا يُخلَط ولدٌ بولد: لكلٍّ ترتيبُه */
+      if (JSON.stringify(W.order(N, W.hash('hasan|0'))) === JSON.stringify(W.order(N, W.hash('rafeef|0'))))
+        E('ترتيبُ المواضيعِ واحدٌ لكلِّ الأولاد');
+    }
+
+    /* مانعُ الإعادة: يُقاس بالمقياسِ نفسِه الذي تمنع به الصفحة */
+    if (typeof W.reuse !== 'function') E('مقياسُ إعادةِ النصِّ غيرُ مُصدَّر');
+    else {
+      const M = W.REUSE_MAX;
+      if (!(M >= 0.4 && M <= 0.8)) E('عتبةُ الإعادةِ ' + M + ' خارجَ المعقول');
+      const OLDT = 'Reading gives us knowledge and improves our vocabulary every day. '+
+        'For example, reading stories helps us imagine new worlds and understand people. '+
+        'In conclusion, every student should read a book every week.';
+      if (W.reuse(OLDT, OLDT) < 0.99) E('المقياسُ لا يرى النصَّ عينَه إعادةً كاملة');
+      if (W.reuse(OLDT, '') !== 0) E('المقياسُ يرى إعادةً حيث لا نصَّ قديم');
+      /* نصٌّ أضاف إلى القديمِ فقرةً جديدةً: نسبتُه تنزل فلا يُمنَع —
+         ونصوصُ حسنٍ التي أخذت العشرينَ أعادت ٧٪ إلى ٣١٪. */
+      const GROWN = OLDT + ' Furthermore, libraries in my city organise weekly meetings where '+
+        'teenagers discuss novels, exchange opinions about characters, and practise speaking '+
+        'without fear of mistakes, which builds confidence far beyond the classroom walls.';
+      if (W.reuse(GROWN, OLDT) >= M)
+        E('من بنى على نصِّه القديمِ وأضاف فقرةً جديدةً يُمنَع — والبناءُ مطلوبٌ لا مَعيب');
+      /* ═══ ونافذةُ الخماسيّةِ تحمي من أطّرَ نصَّه كما يُدرَّس ═══════
+         الطفلُ يُعلَّم أن يبدأ بجملةِ موضوعٍ ويربط بـFirst وFor example
+         وIn addition ويختم بـIn conclusion. فنصّان أفكارُهما مختلفةٌ
+         تمامًا يتشاركان هذا الإطارَ كلَّه. وقِيس (١٩ نوفمبر): بنافذةِ
+         الخماسيّةِ ٢٤٪، وبالثنائيّةِ ٤٦٪ — فتصغيرُ النافذةِ يقترب من
+         منعِ من كتب جديدًا بإطارٍ صحيح. */
+      const FRAMED_OLD = 'Reading is very important for students. First, reading gives us knowledge and improves our vocabulary. '+
+        'For example, reading stories helps us understand other people. In addition, reading every day improves our concentration. '+
+        'In conclusion, I think every student should read a book every week.';
+      const FRAMED_NEW = 'Reading is very important for students. First, reading helps us sleep better than watching screens at night. '+
+        'For example, reading before bed calms the mind after a long day. In addition, reading in English improves our pronunciation when we read aloud. '+
+        'In conclusion, I think every student should read a book every week.';
+      const rFramed = W.reuse(FRAMED_NEW, FRAMED_OLD);
+      if (rFramed > 0.35)
+        E('نصٌّ أفكارُه جديدةٌ وإطارُه هو الإطارُ المُدرَّس يُقاس ' + Math.round(rFramed*100) +
+          '٪ إعادةً — ونافذةُ المقارنةِ أضيقُ من أن تُفرّق الإطارَ عن المضمون');
+
+      /* وتغييرُ كلمةٍ واحدةٍ لا يُنجي: هذا ما وقع فعلًا (٩٨٪) */
+      if (W.reuse(OLDT.replace('every day', 'every single day'), OLDT) < M)
+        E('إعادةُ النصِّ بتغييرِ كلمةٍ تمرّ — وهي عينُ ما وقع (٩٨٪ بعد ستّةَ عشرَ يومًا)');
+      const ws0 = fs.readFileSync(p, 'utf8');
+      if (!/if\(reuseNow\(\) >= REUSE_MAX\) return false;/.test(ws0))
+        E('المانعُ غيرُ مربوطٍ بالحفظِ — فيُقاس التداخلُ ولا يُمنَع صفٌّ');
+      if (!/wen_draft_"\+ctx\.who\+"_"\+tKey/.test(ws0) || !/wen_prev_"\s*\+ ctx\.who \+ "_" \+ tKey/.test(ws0))
+        E('مفاتيحُ المسوّدةِ بموضعِ الموضوعِ لا بالموضوعِ — والموضعُ يُخلَط كلَّ دورةٍ فتعود مسوّدةٌ لموضوعٍ آخر');
+    }
+  })();
+
   /* ═══ ٦) زمنُ الكتابةِ واللصقُ يُسجَّلان ═══════════════════════════
      طلبُ الأب (١٩ نوفمبر ٢٠٢٦). والعطبُ هنا صامتٌ تمامًا: الصفحةُ
      تعمل، والفقرةُ تُحفَظ، والدرجةُ تظهر — ولا حقلَ في الصفّ. فيقرأ
