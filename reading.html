@@ -112,7 +112,7 @@
   .hint{color:var(--muted);font-size:.85rem;margin:2px 4px 0}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=faac484a92" defer></script>
+<script src="build-check.js?v=5c6ba562bb" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -2482,7 +2482,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s12";  /* AUDIO_SIG: bf80f3dc */
+var AUDIO_VER = "s13";  /* AUDIO_SIG: c1bbe6f0 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -4575,10 +4575,25 @@ if(!META[who] || !DATA[who]){
       if(/^when|what day|which day/i.test(q)) return "يومٌ أو موعد";
       if(/^who|whose/i.test(q)) return "شخص";
       if(/^why|reason/i.test(q)) return "السبب";
-      if(/what is the problem|how does .* feel|what.*weather/i.test(q)) return "الحالُ أو المشكلة";
+      if(/main idea|mainly about|best title|what is the (talk|announcement|conversation) about|main point/i.test(q)) return "الفكرةُ العامّة";
+      /* ⚠️ والبنكُ وُسِّع (٢٠ نوفمبر ٢٠٢٦) من ستّين نصًّا إلى مئةٍ
+         وخمسين، فوقع مئةٌ وثلاثةٌ وعشرون سؤالًا من ثلاثِ مئةٍ — واحدٌ
+         وأربعون في المئة — في «تفصيلٌ آخر»، أي أنّ التشخيصَ يقول
+         «ضعيفٌ في المسموع» ولا يقول في أيِّ شيء. فأُضيفت أصنافٌ
+         حقيقيّةٌ لا حَشوٌ: الشرطُ ونتيجتُه، والمزيّةُ أو العيب، ورأيُ
+         المتكلّمِ وما انتهى إليه، والمتاحُ أو المشمول، والنتيجةُ أو ما
+         حدث، والنصيحة، والكيفيّةُ أو الإجراء. فنزل المجهولُ إلى اثنَي
+         عشرَ في المئةِ وصار أكبرُ صنفٍ أربعةَ عشرَ لا ستّةً وعشرين. */
+      if(/what happens (if|when)|what would have happened|can the .* be/i.test(q)) return "الشرطُ ونتيجتُه";
+      if(/advantage|disadvantage|benefit|drawback|what is wrong|problem with|what is the problem|what went wrong|what is worse|unwilling/i.test(q)) return "المزيّةُ أو العيب";
+      if(/how does .* feel|how did .* feel|what.*weather/i.test(q)) return "الحالُ أو المشكلة";
+      if(/\b(admit|conclude|conclusion|reveal|surpris|dislike|prefer|blame|praise|suspect|speaker'?s (view|point|answer))|what (does|did) .* (think|find|learn|realise|realize|notice|discover|decide|say about)|says? about|does .* say\b/i.test(q)) return "رأيُ المتكلّمِ أو ما انتهى إليه";
+      if(/\b(advise[sd]?|advice|recommend)/i.test(q)) return "النصيحة";
+      if(/what (is|are|will be) (available|offered|included|provided|required|wanted|needed|discussed)|include[sd]?\b|what may|which .* may|what will (stay|not be)/i.test(q)) return "المتاحُ أو المشمول";
+      if(/what (happened|was the result|will happen|happens to|happens after)|what (has|did) .* chang|what else has changed|what is happening/i.test(q)) return "النتيجةُ أو ما حدث";
       if(/(want|ask|order|need|suggest|request)s?\b/i.test(q)) return "الطلبُ أو المقصود";
-      if(/should|must|have to|do next|advice/i.test(q)) return "المطلوبُ عمله";
-      if(/main idea|mainly about|best title|what is the (talk|announcement|conversation) about/i.test(q)) return "الفكرةُ العامّة";
+      if(/should|must|have to|do next|what will .* do/i.test(q)) return "المطلوبُ عمله";
+      if(/^how\b/i.test(q)) return "الكيفيّةُ أو الإجراء";
       return "تفصيلٌ آخر";
     }
     function markL(qt, ok){

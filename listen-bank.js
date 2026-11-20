@@ -404,5 +404,549 @@ S("Please remember that the hall must be empty by five, because another group us
   ["What are two things they must do?",["Return the chairs and switch off the lights","Lock the door and leave the key","Clean the floor and close the windows","Move the tables and open the windows"],
    "‏Take your chairs back to the store room and switch off the lights."]]);
 
+/* ═══ توسيعُ ٢٠ نوفمبر ٢٠٢٦ — تسعون نصًّا ═══════════════════════
+   طلبُ الأب: «ما أبي التكرار يزيد عن مرّتين … وحتى التحصيلي».
+   وستّون نصًّا بسؤالَين سعتُها مئتان وأربعون عرضًا، والجلسةُ ستّةُ
+   أسئلة، فأربعون جلسةً ثمّ دورةٌ جديدة. فصارت مئةً وخمسين نصًّا
+   وثلاثَ مئةِ سؤالٍ — ستُّ مئةِ عرضٍ، أي مئةُ جلسةٍ قبل الدورةِ الثانية. */
+S("Good morning. This is a reminder that the school bus will not stop at the corner of King Street this week. The road is being repaired, so please wait at the mosque instead. The bus will come ten minutes earlier than usual.",
+ [["Where should students wait this week?",["At the mosque","At the corner of King Street","At the school gate","At the bus station"],
+   "قال: please wait at the mosque instead — بدلًا من الزاوية."],
+  ["What else has changed?",["The bus comes earlier","The bus comes later","There is no bus","The bus is bigger"],
+   "‏ten minutes earlier than usual — أبكرَ بعشرِ دقائق."]]);
+
+S("Hello, I bought these shoes last Thursday, but when I got home I found that one of them has a mark on the side. I still have the receipt. I would prefer another pair in the same size rather than my money back.",
+ [["What is wrong with the shoes?",["One has a mark on it","They are the wrong size","They are the wrong colour","They are too expensive"],
+   "‏a mark on the side — علامةٌ في الجانب."],
+  ["What does the customer want?",["Another pair the same size","His money returned","A larger size","A discount"],
+   "قال: another pair in the same size rather than my money back."]]);
+
+S("Attention passengers on flight six-two-one to Dubai. Boarding will begin at gate fourteen, not gate four as printed on your ticket. Passengers travelling with small children may board first. We expect to leave on time.",
+ [["Which gate should passengers use?",["Gate fourteen","Gate four","Gate six","Gate twenty-one"],
+   "‏gate fourteen, not gate four — والتصحيحُ بعد «not»."],
+  ["Who may board first?",["Passengers with small children","Passengers in the front rows","Passengers without luggage","Passengers over sixty"],
+   "‏travelling with small children may board first. — أصحابُ الأطفالِ الصغارِ يصعدون أوّلًا."]]);
+
+S("Thank you for calling the clinic. Doctor Salem is not available on Wednesday, but he can see you on Thursday at four, or on Saturday morning. If the pain becomes worse before then, please come to the emergency department.",
+ [["When can the patient see the doctor?",["On Thursday afternoon","On Wednesday afternoon","On Friday morning","On Saturday evening"],
+   "‏Thursday at four — أي بعد الظهر."],
+  ["What should the patient do if the pain gets worse?",["Go to the emergency department","Wait until Saturday","Call again on Wednesday","Take more medicine"],
+   "قال: please come to the emergency department."]]);
+
+S("Excuse me, I am looking for the city library. Walk straight to the end of this street, then turn left at the bank. It is the tall grey building opposite the post office. It takes about five minutes on foot.",
+ [["Where should the person turn?",["Left at the bank","Right at the bank","Left at the post office","Right at the library"],
+   "‏turn left at the bank. — يسارًا عند المصرف."],
+  ["What is the library opposite?",["The post office","The bank","A school","A hospital"],
+   "‏opposite the post office — مقابلَ مكتبِ البريد."]]);
+
+S("I am afraid your parcel has not arrived yet. According to our system it left the warehouse on Monday and is now in the city, but the driver could not find your address. Could you confirm the building number for me?",
+ [["What is the problem with the parcel?",["The driver could not find the address","It was never sent","It was damaged","It went to another city"],
+   "‏the driver could not find your address. — السائقُ لم يجد العنوان."],
+  ["What does the speaker ask for?",["The building number","A new address","Payment","A signature"],
+   "قال: confirm the building number."]]);
+
+S("Welcome to the museum. Photography is allowed in the main hall but not in the room with the old manuscripts, because the light damages the paper. Bags larger than a laptop must be left at the desk near the entrance.",
+ [["In which room is photography forbidden?",["In the manuscripts room","In the main hall","At the entrance","In the garden"],
+   "‏not in the room with the old manuscripts. — لا في غرفةِ المخطوطات."],
+  ["Why is it not allowed there?",["The light harms the paper","The room is too small","Visitors make noise","The objects are new"],
+   "‏the light damages the paper. — الضوءُ يُتلِف الورق."]]);
+
+S("Our meeting tomorrow will be shorter than planned. I have to leave at eleven for another appointment, so let us begin with the budget and leave the new website until next week. Please read the figures before you come.",
+ [["Why will the meeting be shorter?",["The speaker has another appointment","The room is needed","Fewer people will come","The subject is easy"],
+   "‏I have to leave at eleven for another appointment. — عنده موعدٌ آخرُ في الحاديةَ عشرة."],
+  ["What will be discussed tomorrow?",["The budget","The new website","Both equally","Neither"],
+   "‏begin with the budget and leave the website until next week. — الميزانيّةُ اليومَ والموقعُ الأسبوعَ القادم."]]);
+
+S("I have been studying English for three years, but I still find listening the hardest part. Reading is easier because I can go back and look again. When people speak quickly I lose the first word and then everything after it.",
+ [["Which skill does the speaker find hardest?",["Listening","Reading","Writing","Speaking"],
+   "قال: I still find listening the hardest part."],
+  ["Why is reading easier for the speaker?",["He can look again","It is shorter","He reads slowly","He likes the subject"],
+   "‏I can go back and look again. — في القراءةِ يرجع وينظر ثانيةً."]]);
+
+S("This is an announcement for all residents. The water will be cut off tomorrow between nine in the morning and two in the afternoon while the pipes are cleaned. Please fill a container tonight. We are sorry for the trouble.",
+ [["When will the water be cut off?",["From nine until two","From two until nine","All day","Tonight"],
+   "‏between nine in the morning and two in the afternoon. — من التاسعةِ صباحًا إلى الثانيةِ بعد الظهر."],
+  ["What are residents advised to do?",["Fill a container tonight","Leave the building","Call the office","Boil the water"],
+   "قال: please fill a container tonight."]]);
+
+S("The restaurant is full at the moment, but a table by the window will be free in about twenty minutes. If you prefer, we have seats outside now. The kitchen closes at ten thirty, so there is still plenty of time.",
+ [["What is offered immediately?",["Seats outside","A table by the window","A private room","A table upstairs"],
+   "‏we have seats outside now. — مقاعدُ في الخارجِ متاحةٌ الآن."],
+  ["When does the kitchen close?",["At ten thirty","At ten","At eleven","At twenty past ten"],
+   "‏The kitchen closes at ten thirty. — المطبخُ يُغلِق العاشرةَ والنصف."]]);
+
+S("Your essay was well organised and your examples were clear, but you used the same three words again and again. Next time choose different words for the same idea. Also check your last paragraph: you repeated the introduction.",
+ [["What did the teacher praise?",["The organisation and examples","The vocabulary","The length","The handwriting"],
+   "‏well organised and your examples were clear. — أثنى على التنظيمِ والأمثلة."],
+  ["What was wrong with the last paragraph?",["It repeated the introduction","It was too short","It had no examples","It was missing"],
+   "قال: you repeated the introduction."]]);
+
+S("I would like to open an account, please. I have my identity card and a letter from my employer, but I do not have a bill with my address on it. Can I bring that tomorrow, or must I wait until I have everything?",
+ [["What document is missing?",["A bill showing the address","The identity card","The employer's letter","A photograph"],
+   "قال: I do not have a bill with my address on it."],
+  ["What does the customer ask?",["Whether he can bring it tomorrow","Whether the account is free","How much to deposit","Where the branch is"],
+   "‏Can I bring that tomorrow. — سأل: أجيءُ بها غدًا؟"]]);
+
+S("Rain is expected from Thursday evening until Saturday morning, with strong wind on Friday. If you are travelling north, leave early: the mountain road is often closed when the wind is this strong. Sunday should be clear.",
+ [["When is the wind strongest?",["On Friday","On Thursday","On Saturday","On Sunday"],
+   "‏with strong wind on Friday. — الريحُ الشديدةُ يومَ الجمعة."],
+  ["Why should travellers leave early?",["The mountain road may close","The traffic is heavy","Petrol stations shut","Buses stop running"],
+   "‏the mountain road is often closed when the wind is this strong. — طريقُ الجبلِ يُغلَق مع هذه الريح."]]);
+
+S("My brother and I share a room, and he studies late while I like to sleep early. We argued about it for a month until we agreed on a rule: the big light goes off at ten, and after that he uses a small lamp at his desk.",
+ [["What was the disagreement about?",["When to turn off the light","Who cleans the room","The size of the room","Noise from outside"],
+   "الخلافُ على وقتِ النوم والضوء."],
+  ["How was it settled?",["The big light goes off at ten and he uses a lamp","The brother moved out","They stopped studying","They bought curtains"],
+   "‏the big light goes off at ten, and after that he uses a small lamp. — الضوءُ الكبيرُ يُطفأ العاشرةَ ثمّ مصباحٌ صغير."]]);
+
+S("Tickets bought online cost twenty-five, and tickets bought at the door cost thirty. Students pay half price with a valid card. The doors open at six, but the performance does not begin until seven, so come early for a good seat.",
+ [["How much is a ticket at the door?",["Thirty","Twenty-five","Fifteen","Seven"],
+   "‏at the door cost thirty. — على البابِ ثلاثون."],
+  ["What time does the performance begin?",["At seven","At six","At half past six","At half past seven"],
+   "‏the performance does not begin until seven. — العرضُ يبدأ السابعة."]]);
+
+S("I applied for the job three weeks ago and I have not heard anything. I am calling to ask whether the position has been filled, because I have another offer and I must answer it by Sunday. I would rather work with you.",
+ [["Why is the caller phoning?",["To ask whether the job is still open","To accept the job","To refuse the job","To ask about the salary"],
+   "‏to ask whether the position has been filled. — يسأل: هل شُغِلت الوظيفة؟"],
+  ["What is the caller's deadline?",["Sunday","Three weeks","Monday","Tomorrow"],
+   "‏I must answer it by Sunday. — عليه الجوابُ قبل الأحد."]]);
+
+S("The hotel has a room on the second floor with a view of the street, or a quieter room at the back with no view. Breakfast is included in both. If you want the quiet one, I should tell you that the lift does not reach that side.",
+ [["What is the disadvantage of the quiet room?",["The lift does not reach it","It has no breakfast","It costs more","It is on the street"],
+   "قال: the lift does not reach that side."],
+  ["What is included in both rooms?",["Breakfast","A street view","Lift access","Parking"],
+   "‏Breakfast is included in both. — الفطورُ في الغرفتَين كلتَيهما."]]);
+
+S("Please read the question twice before you answer. Last year many students lost marks not because they did not know the material but because they answered a different question from the one on the paper. Take two minutes to plan.",
+ [["Why did students lose marks last year?",["They answered the wrong question","They ran out of time","They did not study","They wrote too little"],
+   "‏they answered a different question from the one on the paper. — أجابوا سؤالًا غيرَ المكتوب."],
+  ["What does the speaker advise?",["Reading twice and planning","Writing quickly","Answering the easy questions first","Asking the teacher"],
+   "‏read the question twice … Take two minutes to plan. — اقرأه مرّتَين وخطِّط دقيقتَين."]]);
+
+S("I used to drive to work, but parking near the office became impossible and I was spending an hour looking for a space. Now I take the train and walk the last part. It takes the same time, but I arrive in a better mood.",
+ [["Why did the speaker stop driving?",["Parking was impossible","The car broke down","The train is cheaper","The office moved"],
+   "‏parking near the office became impossible. — الوقوفُ قربَ المكتبِ تعذّر."],
+  ["What does the speaker say about the journey now?",["It takes the same time but he feels better","It is much faster","It is much slower","It is more expensive"],
+   "‏It takes the same time, but I arrive in a better mood. — الوقتُ نفسُه والمِزاجُ أحسن."]]);
+
+S("The library will be closed for two weeks in July while the shelves are replaced. Books borrowed in June may be kept until August without a fine. The reading room upstairs will stay open for students with examinations.",
+ [["What will stay open in July?",["The reading room upstairs","The whole library","The borrowing desk","Nothing"],
+   "‏The reading room upstairs will stay open. — قاعةُ المطالعةِ في الأعلى تبقى مفتوحة."],
+  ["What happens to books borrowed in June?",["They may be kept until August","They must be returned in June","They are lost","A fine is charged"],
+   "‏may be kept until August without a fine. — تُبقى إلى أغسطس بلا غرامة."]]);
+
+S("Could you look at this photograph? We are trying to decide which one to put on the front page. The first one is sharper, but the second one shows the whole crowd. I think the crowd matters more than the detail here.",
+ [["What is the advantage of the second photograph?",["It shows the whole crowd","It is sharper","It is in colour","It is larger"],
+   "‏the second one shows the whole crowd. — الثانيةُ تُظهِر الحشدَ كلَّه."],
+  ["Which does the speaker prefer?",["The second one","The first one","Neither","Both equally"],
+   "‏the crowd matters more than the detail — فيُفضّل الثانية."]]);
+
+S("I need to return this book, but I have lost the receipt. I can show you the message that came to my phone when I paid. If a receipt is necessary, I understand, but I hope the message is enough because I paid by card.",
+ [["What has the customer lost?",["The receipt","The book","The card","The phone"],
+   "قال: I have lost the receipt."],
+  ["What can the customer show instead?",["A message on the phone","Another receipt","A bank statement","Nothing"],
+   "‏the message that came to my phone when I paid. — الرسالةُ التي وصلت هاتفَه عند الدفع."]]);
+
+S("Our team plays on Saturday at five. The pitch is the one behind the new school, not the old one near the market. Bring both shirts, because if the other team wears white we will have to change. Be there by half past four.",
+ [["Which pitch will be used?",["The one behind the new school","The one near the market","The school hall","The city stadium"],
+   "‏behind the new school, not the old one near the market. — خلفَ المدرسةِ الجديدةِ لا القديمة."],
+  ["Why should players bring both shirts?",["In case the other team wears white","Because it may rain","Because one is too small","For the photograph"],
+   "‏if the other team wears white we will have to change. — إن لبِس الخَصمُ الأبيضَ لزِم التغيير."]]);
+
+S("The course lasts eight weeks, with one evening class and one online session each week. There is no final examination, but you must hand in four short pieces of work. Students who miss more than three classes cannot receive the certificate.",
+ [["How is the course assessed?",["By four short pieces of work","By a final examination","By attendance only","By an interview"],
+   "‏no final examination, but … four short pieces of work. — لا اختبارَ نهائيٌّ بل أربعةُ أعمالٍ قصيرة."],
+  ["How many classes may a student miss?",["Three","Four","Eight","None"],
+   "‏more than three classes — فثلاثٌ هي الحدّ."]]);
+
+S("I am sorry, the price on the shelf was not changed after the offer ended last week. The correct price is forty. I understand that is annoying, and since the mistake was ours I will give you the lower price this time.",
+ [["Why was the price on the shelf wrong?",["The offer had ended and the label was not changed","The product was new","The customer misread it","The system failed"],
+   "‏the price on the shelf was not changed after the offer ended. — السعرُ لم يُحدَّث بعد انتهاءِ العرض."],
+  ["What will the customer pay?",["The lower price","Forty","Nothing","Double"],
+   "‏I will give you the lower price this time. — سيُعطيه السعرَ الأقلَّ هذه المرّة."]]);
+
+S("Before you use the machine, read the sticker on the side. It must be switched off at the wall before you open the top, and the filter has to be dry. Most of the problems we are called about come from a wet filter.",
+ [["What must be done before opening the top?",["Switch it off at the wall","Remove the filter","Fill it with water","Read the manual"],
+   "‏It must be switched off at the wall before you open the top. — يُفصَل من الحائطِ قبل فتحِ الغطاء."],
+  ["What causes most problems?",["A wet filter","A broken switch","Too much use","Old stickers"],
+   "‏Most of the problems … come from a wet filter. — أكثرُ الأعطالِ من مُرشِّحٍ رطب."]]);
+
+S("My grandfather left school at twelve and taught himself to read the newspaper. He used to say that the hardest part was not the words but believing that a man his age could still learn. He read every day until he was eighty.",
+ [["What did the grandfather teach himself?",["To read the newspaper","To write letters","A second language","Mathematics"],
+   "‏taught himself to read the newspaper. — علّم نفسَه قراءةَ الصحيفة."],
+  ["What did he find hardest?",["Believing he could still learn","The long words","Finding newspapers","His poor eyesight"],
+   "قال: not the words but believing that a man his age could still learn."]]);
+
+S("Please note that the lecture has moved to the hall on the ground floor because more students registered than expected. The slides will be online on Sunday, but the examples we do together in class will not be, so come if you can.",
+ [["Why did the lecture move?",["More students registered than expected","The room was damaged","The lecturer changed","It was too noisy"],
+   "‏more students registered than expected. — المسجّلون أكثرُ من المتوقَّع."],
+  ["What will not be online?",["The examples done in class","The slides","The reading list","The timetable"],
+   "‏the examples we do together in class will not be. — أمثلةُ الصفِّ لن تُنشَر."]]);
+
+S("I ordered the blue one, and the one that came is black. I do not mind the colour very much, but I bought it as a gift and the person asked for blue. Can you send the blue one and collect this at the same time?",
+ [["What is the problem with the order?",["The colour is wrong","The size is wrong","It arrived late","It is damaged"],
+   "‏I ordered the blue one, and the one that came is black. — طلب الأزرقَ فجاءه الأسود."],
+  ["What does the speaker ask the shop to do?",["An exchange at the same visit","A refund","A discount","An apology"],
+   "‏send the blue one and collect this at the same time. — تبديلٌ في الزيارةِ نفسِها."]]);
+
+S("The train to the airport leaves from platform three every twenty minutes. It is faster than the bus and the ticket costs the same, but there is no space for very large suitcases, so take the bus if you are carrying one.",
+ [["Why might someone choose the bus?",["To carry a very large suitcase","Because it is faster","Because it is cheaper","Because it is more frequent"],
+   "‏no space for very large suitcases, so take the bus if you are carrying one. — لا مكانَ للحقائبِ الكبيرةِ فالباصُ أولى."],
+  ["How often does the train run?",["Every twenty minutes","Every three minutes","Every hour","Twice a day"],
+   "‏every twenty minutes. — كلَّ عشرين دقيقة."]]);
+
+S("I have marked the test papers. The average was better than last time, and nobody failed. However, almost everyone lost marks on question seven, so we will go through that question together before we start the new chapter.",
+ [["What will the class do next?",["Go through question seven","Start the new chapter at once","Take the test again","Correct each other's papers"],
+   "‏we will go through that question together before we start the new chapter. — سؤالُ سبعةٍ قبل الفصلِ الجديد."],
+  ["What does the teacher say about the results?",["Better than last time, with no failures","Worse than last time","The same as last time","Only a few passed"],
+   "‏The average was better than last time, and nobody failed. — المعدّلُ أحسنُ ولا راسبَ فيهم."]]);
+
+S("Excuse me, is this seat taken? I have a ticket for seat fourteen but someone is sitting in it, and he says his ticket also says fourteen. I think one of us has yesterday's date. Could you check them both, please?",
+ [["What is the problem on the train?",["Two passengers have the same seat number","The seat is broken","The passenger lost his ticket","The train is full"],
+   "‏his ticket also says fourteen. — تذكرتُه أيضًا أربعةَ عشر — مقعدٌ واحدٌ لاثنَين."],
+  ["What does the passenger suspect?",["One ticket is for the wrong day","The other man is lying","The seat number is missing","The train changed"],
+   "‏one of us has yesterday's date. — يُرجّح أنّ إحدى التذكرتَين بتاريخِ أمس."]]);
+
+S("The shop opens at nine, but deliveries arrive at seven, so somebody must be here early. We take turns: one week each. If you cannot come on your week, swap with someone and tell me, and do not simply leave the door locked.",
+ [["How is the early duty arranged?",["Each person takes a week in turn","The manager always comes","Nobody comes early","Two people come together"],
+   "‏We take turns: one week each. — بالتناوبِ أسبوعًا لكلِّ واحد."],
+  ["What must someone do if they cannot come?",["Swap and tell the speaker","Stay at home","Call the delivery driver","Open the shop late"],
+   "‏swap with someone and tell me. — يُبادِل غيرَه ويُخبِر المسؤول."]]);
+
+S("I enjoyed the film, but it was half an hour too long. The first part was excellent and I forgot I was watching a screen, then the story stopped moving and the same point was made three times. The ending was worth waiting for.",
+ [["What did the speaker dislike?",["The middle, where the story stopped moving","The beginning","The ending","The sound"],
+   "‏the story stopped moving and the same point was made three times. — الوسطُ توقّفت فيه الحكايةُ وأُعيدت الفكرةُ ثلاثًا."],
+  ["What does the speaker say about the ending?",["It was worth waiting for","It was disappointing","It was too quick","It was confusing"],
+   "‏The ending was worth waiting for. — النهايةُ استحقّت الانتظار."]]);
+
+S("Do not put the medicine in the kitchen cupboard above the cooker: heat makes it weaker. Keep it somewhere cool and dark, and check the date on the box every few months. Anything older than the date should be taken to the pharmacy.",
+ [["Why is the cupboard above the cooker unsuitable?",["Heat weakens the medicine","It is too high","It is too dark","Children can reach it"],
+   "‏heat makes it weaker. — الحرارةُ تُضعِف الدواء."],
+  ["What should be done with old medicine?",["Take it to the pharmacy","Throw it in the bin","Keep it for later","Give it away"],
+   "‏should be taken to the pharmacy. — يُردُّ إلى الصيدليّة."]]);
+
+S("The new system saves time once you learn it, but the first week is slower than the old way. Nearly everyone who complained in the first week stopped complaining by the third. Please be patient and write down what confuses you.",
+ [["What does the speaker say about the first week?",["It is slower than the old way","It is faster","It is the same","It is the easiest"],
+   "‏the first week is slower than the old way. — الأسبوعُ الأوّلُ أبطأُ من القديم."],
+  ["What does the speaker ask people to do?",["Be patient and note what confuses them","Return to the old system","Work longer hours","Train each other"],
+   "‏be patient and write down what confuses you. — الصبرُ وتدوينُ ما يُلبِس."]]);
+
+S("My flight was cancelled and the next one was full, so I took a train instead and arrived six hours late. The airline paid for the train, which I did not expect. I was angry at the airport and much less angry by the evening.",
+ [["How did the speaker finally travel?",["By train","By a later flight","By car","By bus"],
+   "‏I took a train instead. — رَكِب القطارَ بدلًا من الطائرة."],
+  ["What surprised the speaker?",["The airline paid for the train","The train was empty","The flight left on time","Nobody apologised"],
+   "‏The airline paid for the train, which I did not expect. — الشركةُ دفعت ثمنَ القطارِ وهو لم يتوقّع ذلك."]]);
+
+S("If you are new to the gym, start with twenty minutes and add five minutes a week. People who begin with an hour usually stop within a month. The exercise you keep doing is worth more than the exercise you do perfectly once.",
+ [["What is advised for beginners?",["Twenty minutes, adding five a week","A full hour from the start","Three hours a week","Nothing for the first month"],
+   "‏start with twenty minutes and add five minutes a week. — عشرون دقيقةً ثمّ خمسٌ كلَّ أسبوع."],
+  ["What is the speaker's main point?",["Continuing matters more than doing it perfectly once","Short exercise is useless","Beginners should rest","The gym is too expensive"],
+   "‏The exercise you keep doing is worth more than the exercise you do perfectly once. — الدوامُ على القليلِ خيرٌ من كمالٍ مرّةً واحدة."]]);
+
+S("I am sorry to say the position has been given to someone else. Your interview was strong and the committee discussed you for a long time. If a similar job opens here in the next few months, I would like to call you first.",
+ [["What is the news?",["Someone else was given the job","The job is still open","The interview must be repeated","The job was cancelled"],
+   "‏the position has been given to someone else. — الوظيفةُ أُعطِيت غيرَه."],
+  ["What does the speaker offer?",["To call first about a similar job","A different job now","Advice on interviews","Money for travel"],
+   "‏I would like to call you first. — يَعِد بأن يتّصل به أوّلًا إن فُتِح مثلُها."]]);
+
+S("Please remember to bring your own water bottle on the trip. There is a tap at the site but nothing is sold there, and the walk from the car park takes half an hour in the sun. Wear a hat and comfortable shoes.",
+ [["What is available at the site?",["A tap","A shop","A restaurant","Nothing"],
+   "‏There is a tap at the site but nothing is sold there. — حَنفيّةٌ موجودةٌ ولا بيعَ هناك."],
+  ["How long is the walk from the car park?",["Half an hour","Ten minutes","An hour","Five minutes"],
+   "‏takes half an hour in the sun. — نصفُ ساعةٍ في الشمس."]]);
+
+S("The engine noise you described is probably the belt, not the gearbox. The belt is cheap and we can change it today. If the noise continues afterwards, bring the car back and we will look at the gearbox without charging you again.",
+ [["What does the mechanic think is wrong?",["The belt","The gearbox","The engine itself","The brakes"],
+   "‏probably the belt, not the gearbox. — الحزامُ لا ناقلُ الحركة."],
+  ["What happens if the noise continues?",["They will check the gearbox at no extra charge","The customer must pay again","The car will be replaced","Nothing can be done"],
+   "‏we will look at the gearbox without charging you again. — يُفحَص ناقلُ الحركةِ بلا أجرٍ ثانٍ."]]);
+
+S("I learned more from the month I spent helping in my uncle's shop than from a year of reading about business. Nobody explained anything; I watched what happened when a customer was unhappy, and I remembered it because it mattered.",
+ [["Where did the speaker learn most?",["In the uncle's shop","From books","At school","From a course"],
+   "‏I learned more from the month I spent helping in my uncle's shop. — شهرٌ في دكّانِ عمِّه أنفعُ من سنةِ قراءة."],
+  ["Why does the speaker remember the lessons?",["Because they mattered at the time","Because they were written down","Because they were repeated","Because they were simple"],
+   "‏I remembered it because it mattered. — ثبت في ذهنِه لأنّه كان ذا أثر."]]);
+
+S("Our office will move to the fourth floor at the end of the month. The lift is often slow in the morning, so the stairs may be quicker. The new space is smaller, which means we will share desks and book a desk the day before.",
+ [["What is the disadvantage of the new office?",["It is smaller, so desks are shared","It has no lift","It is further away","It is on the ground floor"],
+   "‏The new space is smaller, which means we will share desks. — المكانُ أصغرُ فتُشترَك المكاتب."],
+  ["How will desks be arranged?",["Booked the day before","First to arrive","By seniority","Not at all"],
+   "‏book a desk the day before. — يُحجَز المكتبُ قبلَه بيوم."]]);
+
+S("The recipe says thirty minutes, but in my oven it needs forty. Every oven is different, so look at the colour rather than the clock. When a knife comes out clean it is ready, and five minutes more will not improve it.",
+ [["What does the speaker advise watching?",["The colour rather than the clock","The clock only","The temperature","The recipe exactly"],
+   "‏look at the colour rather than the clock. — اللونُ لا الساعة."],
+  ["How can you tell it is ready?",["A knife comes out clean","It smells sweet","Thirty minutes have passed","It stops rising"],
+   "‏When a knife comes out clean it is ready. — إذا خرجت السكّينُ نظيفةً فقد استوى."]]);
+
+S("You may use a dictionary in the first part of the examination but not in the second. Phones must be switched off, not silent, and left in your bag at the front of the room. You will have ten minutes to read before you write.",
+ [["When is a dictionary allowed?",["In the first part only","In the second part only","Throughout","Never"],
+   "‏in the first part … but not in the second. — في الجزءِ الأوّلِ وحدَه."],
+  ["What must be done with phones?",["Switched off and left at the front","Set to silent","Kept in a pocket","Given to the teacher"],
+   "‏switched off, not silent, and left in your bag at the front. — مُطفأةٌ لا صامتةٌ وفي الحقيبةِ أمامًا."]]);
+
+S("I have been teaching this class for six years and the question I am asked most often is whether grammar matters. It matters less than people fear and more than they hope: nobody fails for one mistake, and nobody passes with fifty.",
+ [["What question is the speaker asked most?",["Whether grammar matters","How long the course is","How to pass","Which book to buy"],
+   "‏whether grammar matters. — هل للقواعدِ أثرٌ؟"],
+  ["What is the speaker's answer?",["Less than feared but more than hoped","It does not matter","It is the only thing that matters","It depends on the teacher"],
+   "‏It matters less than people fear and more than they hope. — أقلُّ مـمّا يخافون وأكثرُ مـمّا يرجون."]]);
+
+S("The parcel locker is behind the supermarket. You will get a code by message; type it on the screen and the door opens. If the locker is full the driver leaves the parcel at the desk inside instead, and the message will say so.",
+ [["How is the locker opened?",["By typing a code from a message","With a key","By the driver","With a card"],
+   "‏You will get a code by message; type it on the screen. — رمزٌ في رسالةٍ يُكتَب على الشاشة."],
+  ["What happens if the locker is full?",["The parcel is left at the desk inside","It is returned","It is delivered home","It waits a day"],
+   "‏the driver leaves the parcel at the desk inside. — يُترَك الطلبُ عند المكتبِ في الداخل."]]);
+
+S("I asked for a window seat and got one, but I did not think about the wing. I could see nothing for four hours except metal. Next time I will choose a row in front of it, even if it costs a little more.",
+ [["What was the problem with the seat?",["The wing blocked the view","It was by the aisle","It did not recline","It was at the back"],
+   "‏I could see nothing … except metal — الجناحُ حجب المنظر."],
+  ["What will the speaker do next time?",["Choose a row in front of the wing","Choose an aisle seat","Not take a window seat","Fly at night"],
+   "‏choose a row in front of it. — صفًّا أمامَ الجناح."]]);
+
+S("Our class is collecting books for the hospital. They must be in good condition and suitable for children, and please do not bring textbooks: the hospital asked for stories. The box is outside the staff room until Thursday.",
+ [["What kind of books are wanted?",["Children's stories in good condition","Textbooks","Any books at all","Books in English only"],
+   "‏suitable for children … the hospital asked for stories. — قصصٌ للأطفالِ لا كتبًا دراسيّة."],
+  ["Where should books be left?",["Outside the staff room","At the hospital","In the library","With the teacher"],
+   "‏The box is outside the staff room. — الصندوقُ خارجَ غرفةِ المعلّمين."]]);
+
+S("The bill includes service, so there is no need to add anything. If you would like to pay separately, tell us before we bring the machine, because afterwards we have to cancel the whole amount and start again.",
+ [["What does the bill include?",["Service","A discount","Delivery","Tax only"],
+   "‏The bill includes service. — الفاتورةُ فيها الخِدمة."],
+  ["When should separate payment be mentioned?",["Before the machine is brought","After paying","At the beginning of the meal","It cannot be done"],
+   "‏tell us before we bring the machine. — يُقال قبل إحضارِ جهازِ الدفع."]]);
+
+S("I signed up for the morning session because I thought I would be fresher, but I am not a morning person and I spent the first hour half asleep. I have moved to the evening group and I am learning twice as fast.",
+ [["Why did the speaker choose the morning?",["Expecting to be fresher","It was cheaper","It was the only one","A friend was in it"],
+   "‏I thought I would be fresher. — ظنّ أنّه أنشطُ في الصباح."],
+  ["What was the result of moving?",["Learning twice as fast","No difference","Missing more classes","Learning more slowly"],
+   "‏I am learning twice as fast. — صار تعلّمُه ضِعفَ ما كان."]]);
+
+S("Please do not reply to the message you received this morning asking for your password. It did not come from us. We never ask for a password by message, and anyone who does is not from this company, whatever the address looks like.",
+ [["What should people not do?",["Reply with their password","Change their password","Open the company website","Call the office"],
+   "‏do not reply to the message … asking for your password. — لا يُجاب من يطلب كلمةَ السِّرّ."],
+  ["What does the company say about passwords?",["They never ask for one by message","They ask once a year","They ask only by phone","They ask in writing"],
+   "‏We never ask for a password by message. — الشركةُ لا تطلبها برسالةٍ أبدًا."]]);
+
+S("The road will be one lane each way for six weeks. Journeys at eight in the morning may take twice as long, but after ten the delay is small. If you can start work later for these weeks, this is the time to ask.",
+ [["When is the delay worst?",["At eight in the morning","After ten","In the evening","At night"],
+   "‏at eight in the morning may take twice as long. — الثامنةُ صباحًا الضِّعف."],
+  ["What does the speaker suggest drivers do?",["Asking to start work later","Using another road","Walking","Working from home always"],
+   "‏If you can start work later for these weeks, this is the time to ask. — يُطلَب تأخيرُ بدايةِ الدوامِ هذه الأسابيع."]]);
+
+S("I kept a list of every word I looked up, and after two months I noticed that I had looked up the same forty words again and again. I made cards for those forty and the problem disappeared. The list was more useful than the dictionary.",
+ [["What did the list reveal?",["The same forty words were looked up repeatedly","The dictionary was wrong","Reading was too hard","Vocabulary was easy"],
+   "‏I had looked up the same forty words again and again. — أربعون كلمةً يرجع إليها دائمًا."],
+  ["What did the speaker do about it?",["Made cards for those forty words","Bought a better dictionary","Stopped looking words up","Read easier books"],
+   "‏I made cards for those forty. — صنع بطاقاتٍ لتلك الأربعين."]]);
+
+S("Visitors must sign in at reception and wear the badge where it can be seen. If you leave the building during the day, sign out and in again, even for a few minutes: in an emergency the list is what tells us who is inside.",
+ [["What must visitors do with the badge?",["Wear it visibly","Keep it in a pocket","Return it at lunch","Show it only once"],
+   "‏wear the badge where it can be seen. — البطاقةُ ظاهرةٌ لا مخفيّة."],
+  ["Why must visitors sign out and in?",["The list shows who is inside in an emergency","To record working hours","To collect post","For the car park"],
+   "‏in an emergency the list is what tells us who is inside. — في الطوارئِ القائمةُ تُبيّن مَن في المبنى."]]);
+
+S("My neighbour knocked on the door at midnight to say my car lights were on. I had been in a hurry and forgotten them. If he had not come, the battery would have been flat in the morning and I would have missed an interview.",
+ [["Why did the neighbour knock?",["The car lights were left on","The car was blocking the road","There was a noise","To borrow something"],
+   "‏my car lights were on. — أنوارُ سيّارتِه مُشعَلة."],
+  ["What would have happened otherwise?",["A flat battery and a missed interview","A fine","A stolen car","Nothing"],
+   "‏the battery would have been flat … I would have missed an interview. — لفَرَغت البطّاريّةُ وفاتته المقابلة."]]);
+
+S("The course fee can be paid in three parts, but the first part must be paid before the first class. If you stop attending after the second month there is no refund, so please be sure you can give the time before you start.",
+ [["When is the first payment due?",["Before the first class","After the first month","At the end","In three parts throughout"],
+   "‏the first part must be paid before the first class. — القِسطُ الأوّلُ قبل الحصّةِ الأولى."],
+  ["What happens if someone leaves after two months?",["No money is returned","Half is returned","All is returned","The place is held"],
+   "‏there is no refund. — لا تُردُّ النقود."]]);
+
+S("I used to think a good presentation needed many slides. Then I watched a colleague speak for ten minutes with one picture and hold everyone's attention. The slides were never the point: I was using them to avoid preparing properly.",
+ [["What changed the speaker's view?",["A colleague who used one picture","A book on presenting","A failed presentation","A training course"],
+   "‏I watched a colleague speak for ten minutes with one picture. — زميلٌ تكلّم عشرَ دقائقَ بصورةٍ واحدة."],
+  ["What does the speaker admit?",["Slides were a way to avoid preparing","Slides are always wrong","He cannot speak well","Pictures are better than words"],
+   "‏I was using them to avoid preparing properly. — كانت الشرائحُ هربًا من الإعدادِ الجيّد."]]);
+
+S("Please note the clinic no longer takes appointments by message. Call between eight and eleven, or use the website at any hour. If you have had an appointment with us in the last year, the website will already know your details.",
+ [["How can an appointment be made?",["By phone in the morning or online any time","By message only","In person only","By letter"],
+   "‏Call between eight and eleven, or use the website at any hour. — هاتفًا من الثامنةِ إلى الحاديةَ عشرةَ أو بالموقعِ أيَّ وقت."],
+  ["Who already has details on the website?",["Patients seen in the last year","New patients","Nobody","Patients over sixty"],
+   "‏had an appointment with us in the last year. — مَن زارهم في السنةِ الماضية."]]);
+
+S("The examination hall has no clock, so wear a watch. There will be an announcement when thirty minutes remain and again at ten. Do not ask the invigilators the time: they are told not to answer, and it wastes your minutes.",
+ [["How will students know the time?",["By their own watch and two announcements","From a clock in the hall","By asking the invigilators","They will not know"],
+   "لا ساعةَ في القاعة، فساعةُ اليد وإعلانان."],
+  ["When is the second announcement?",["When ten minutes remain","When thirty minutes remain","At the start","At the end"],
+   "‏again at ten — عند بقاءِ عشرِ دقائق."]]);
+
+S("I have looked at your application. The qualifications are fine, but you have left the second page empty, and we cannot process it without the dates of your previous jobs. Send that page and I will put it in this week's group.",
+ [["What is wrong with the application?",["The second page is empty","The qualifications are not enough","It arrived late","The name is missing"],
+   "‏you have left the second page empty. — الصفحةُ الثانيةُ فارغة."],
+  ["What will happen when it is complete?",["It joins this week's group","It is sent back","It waits a month","It is refused"],
+   "‏I will put it in this week's group. — تُضَمُّ إلى دفعةِ هذا الأسبوع."]]);
+
+S("We close at eight, but the kitchen takes its last order at half past seven. If you arrive after that we can still serve cold dishes and drinks. On Fridays the kitchen works until nine because the market stays open late.",
+ [["When is the last hot order taken on a normal day?",["At half past seven","At eight","At seven","At nine"],
+   "‏the kitchen takes its last order at half past seven. — آخرُ طلبٍ ساخنٍ السابعةَ والنصف."],
+  ["Why is Friday different?",["The market stays open late","More staff work","It is a holiday","The kitchen is cleaned"],
+   "‏because the market stays open late. — لأنّ السوقَ يتأخّر في الإغلاق."]]);
+
+S("I thought the problem was my pronunciation, but my teacher recorded me and we listened together. The sounds were fine; I was speaking so quietly that half the words disappeared. Now I practise standing up, and people understand me.",
+ [["What did the recording reveal?",["The speaker was too quiet","The pronunciation was poor","The grammar was wrong","The speed was too fast"],
+   "‏I was speaking so quietly that half the words disappeared. — صوتُه خفيضٌ فذهب نصفُ الكلمات."],
+  ["What does the speaker do now?",["Practises standing up","Speaks more slowly","Uses a microphone","Writes before speaking"],
+   "‏Now I practise standing up. — صار يتدرّب واقفًا."]]);
+
+S("The bus pass costs ninety for a month or nine hundred for a year. If you travel every working day the year pass saves two months. If you travel three days a week it is cheaper to buy single tickets, so count before you choose.",
+ [["How much does the year pass save a daily traveller?",["The cost of two months","Nothing","Half the price","One month"],
+   "‏the year pass saves two months. — اشتراكُ السنةِ يوفّر شهرَين."],
+  ["What is advised for someone travelling three days a week?",["Buying single tickets","The year pass","The month pass","Walking"],
+   "‏it is cheaper to buy single tickets. — التذاكرُ المفردةُ أرخصُ لثلاثةِ أيّام."]]);
+
+S("Thank you all for coming early. Two things before we begin: the fire door at the back must stay clear, and the recording will be shared with the group who could not attend, so please say your name before you ask a question.",
+ [["Why should people say their name?",["The session is being recorded for others","To register attendance","For the fire list","For the certificate"],
+   "‏the recording will be shared … so please say your name. — التسجيلُ يُرسَل للغائبين فيُذكَر الاسم."],
+  ["What must stay clear?",["The fire door at the back","The front row","The corridor","The car park"],
+   "‏the fire door at the back must stay clear. — بابُ الحريقِ في الخلفِ يبقى خاليًا."]]);
+
+S("My daughter refused to read anything for two years. Then she found a book about horses in a friend's house and finished it in three days. The subject was what mattered, not the reading. I had been buying her the wrong books.",
+ [["What changed the daughter's attitude?",["A book on a subject she loved","A new teacher","A reading course","A reward"],
+   "‏she found a book about horses … finished it in three days. — كتابٌ عن الخيلِ أتمّته في ثلاثةِ أيّام."],
+  ["What does the parent conclude?",["The subject mattered, not the reading itself","Reading cannot be taught","Children should choose nothing","Books are too expensive"],
+   "‏The subject was what mattered, not the reading. — الموضوعُ هو المهمُّ لا القراءةُ نفسُها."]]);
+
+S("If the machine shows a red light, do not press the button again. Wait thirty seconds and the light turns green by itself. Pressing twice sends two orders, and we have had people charged for two coffees they did not want.",
+ [["What should be done when the light is red?",["Wait thirty seconds","Press the button again","Call for help","Switch it off"],
+   "‏Wait thirty seconds and the light turns green by itself. — ثلاثون ثانيةً ويخضَرُّ من نفسِه."],
+  ["What happens if the button is pressed twice?",["Two orders are sent","Nothing happens","The machine stops","The money is returned"],
+   "‏Pressing twice sends two orders. — ضغطتان طلبان."]]);
+
+S("The hotel is two streets from the beach, not on it, which is why it costs less. The walk takes four minutes. The rooms at the front are noisy until about eleven because of the restaurants, so ask for the back if you sleep early.",
+ [["Why is the hotel cheaper?",["It is not directly on the beach","It is old","It has no breakfast","It is small"],
+   "‏two streets from the beach, not on it, which is why it costs less. — شارعان عن الشاطئِ فرَخُص."],
+  ["Who should ask for a room at the back?",["People who sleep early","Families","People with cars","Long-stay guests"],
+   "‏ask for the back if you sleep early. — الخلفُ لمن ينام مبكّرًا."]]);
+
+S("I was told the report had to be ten pages. I wrote ten pages and my manager asked me to cut it to four. She said nobody had ever read past the second page, and the length was a habit rather than a rule. The four-page version was better.",
+ [["What did the manager ask for?",["A four-page version","A longer report","More examples","A different subject"],
+   "‏asked me to cut it to four. — طلبت تقليصَه إلى أربع."],
+  ["What was the manager's reason?",["Nobody read past the second page","The printer was broken","Paper was expensive","The deadline was near"],
+   "‏nobody had ever read past the second page. — لا أحدَ قرأ بعد الصفحةِ الثانية."]]);
+
+S("All students taking the examination abroad must bring the original of their identity document, not a copy, and the printed confirmation. Candidates without both are turned away at the door, and the fee is not returned.",
+ [["What must candidates bring?",["The original document and the printed confirmation","A copy of the document","Only the confirmation","A photograph"],
+   "‏the original … not a copy, and the printed confirmation. — الأصلُ لا الصورةُ مع التأكيدِ المطبوع."],
+  ["What happens to candidates who lack them?",["They are turned away and lose the fee","They sit the test later","They pay again","They are allowed in"],
+   "‏turned away at the door, and the fee is not returned. — يُمنَع ولا تُردُّ الرسوم."]]);
+
+S("The leak is coming from the flat above, not from your pipes. I can stop the water at the main tap, but somebody must speak to your neighbour before the ceiling is repaired, or it will happen again in a month.",
+ [["Where is the leak coming from?",["The flat above","The speaker's pipes","The roof","The main tap"],
+   "‏from the flat above, not from your pipes. — من الشقّةِ العُلويّةِ لا من أنابيبِه."],
+  ["What must happen before the repair?",["Someone must speak to the neighbour","The flat must be emptied","New pipes must be bought","The water must be tested"],
+   "‏somebody must speak to your neighbour before the ceiling is repaired. — يُكلَّم الجارُ قبل إصلاحِ السقف."]]);
+
+S("I used to answer messages the moment they arrived, and I felt busy all day without finishing anything. Now I look at them three times: morning, after lunch and before I leave. People wait two hours and nobody has complained.",
+ [["What did the speaker change?",["Checking messages three set times a day","Answering faster","Ignoring messages","Working longer"],
+   "‏Now I look at them three times. — ثلاثُ مرّاتٍ في اليوم: صباحًا وبعد الغداءِ وقبل الخروج."],
+  ["What was the result?",["Nobody complained about waiting","People complained a lot","Work took longer","Messages increased"],
+   "‏People wait two hours and nobody has complained. — ينتظرون ساعتَين ولم يشتكِ أحد."]]);
+
+S("The gate code changes on the first of every month, and the new one is put on the notice board three days before. If you forget it, the guard will let you in during the day but not after ten at night, so write it down.",
+ [["Where is the new code announced?",["On the notice board","By message","At the gate","By the guard"],
+   "‏put on the notice board three days before. — في لوحةِ الإعلاناتِ قبلَه بثلاثةِ أيّام."],
+  ["When will the guard not help?",["After ten at night","During the day","At weekends","In the morning"],
+   "‏not after ten at night. — لا بعد العاشرةِ ليلًا."]]);
+
+S("The temperature will reach forty-three tomorrow, the highest this year. Outdoor work should stop between eleven and four. Drink before you feel thirsty: by the time you are thirsty your body has already lost too much.",
+ [["When should outdoor work stop?",["Between eleven and four","All day","Between four and eleven","Only at noon"],
+   "‏between eleven and four. — بين الحاديةَ عشرةَ والرابعة."],
+  ["What is the advice about drinking?",["Drink before feeling thirsty","Drink only when thirsty","Drink cold water only","Drink after work"],
+   "‏Drink before you feel thirsty. — اشرب قبل أن تعطَش."]]);
+
+S("I marked the same mistake in your work four times this term, and I realised I was writing the correction but never explaining the rule. That was my fault. Today we will spend the whole lesson on it and you will teach it back to me.",
+ [["What does the teacher admit?",["Correcting without explaining the rule","Marking too harshly","Forgetting the lesson","Teaching too fast"],
+   "‏I was writing the correction but never explaining the rule. — كان يُصحّح ولا يشرح القاعدة."],
+  ["What will the students do today?",["Spend the lesson on it and teach it back","Take a test","Write a new essay","Read silently"],
+   "‏you will teach it back to me. — يشرحونها له هم."]]);
+
+S("Please take the lift to the third floor and turn right. The waiting area is on the left and the nurse will call you by number, not by name. If your number is called and you have stepped out, you go to the end of the list.",
+ [["How are patients called?",["By number","By name","In order of arrival","By the doctor"],
+   "‏call you by number, not by name. — بالرقمِ لا بالاسم."],
+  ["What happens if a patient is absent when called?",["They go to the end of the list","They are called again","They lose the appointment","They are seen first"],
+   "‏you go to the end of the list. — يُؤخَّر إلى آخرِ القائمة."]]);
+
+S("The first time I spoke English on the phone I understood nothing and I put the phone down. The second time I said one sentence: please speak more slowly. It worked immediately, and I wished somebody had told me years earlier.",
+ [["What did the speaker do the first time?",["Ended the call","Asked for help","Spoke slowly","Wrote everything down"],
+   "‏I put the phone down. — أغلق المكالمةَ أوّلَ مرّة."],
+  ["What sentence helped?",["Please speak more slowly","I do not understand","Call me later","Say that again"],
+   "‏please speak more slowly. — جملةٌ واحدةٌ: تكلّم أبطأَ، فنفعت."]]);
+
+S("The books on the top two shelves may not be taken out of the room. You may photograph a page for study but not a whole chapter. The photocopier is for staff only, and the machine downstairs takes cards rather than coins.",
+ [["Which books may not be borrowed?",["Those on the top two shelves","All of them","The new ones","Those in English"],
+   "‏The books on the top two shelves may not be taken out. — كتبُ الرفَّين الأعلَيَين لا تُستعار."],
+  ["What does the machine downstairs accept?",["Cards","Coins","Notes","Nothing"],
+   "‏takes cards rather than coins. — بالبطاقةِ لا بالنقدِ المعدنيّ."]]);
+
+S("I have reduced the price twice and nobody has called. My brother says the photographs are the problem: they were taken in the evening and the rooms look dark. I am going to take new ones in the morning before I lower it again.",
+ [["What does the brother blame?",["The photographs","The price","The location","The season"],
+   "‏the photographs are the problem. — الصورُ هي العلّةُ عند أخيه."],
+  ["What will the speaker do next?",["Take new photographs in the morning","Reduce the price again at once","Stop selling","Change agent"],
+   "‏take new ones in the morning before I lower it again. — صورٌ جديدةٌ صباحًا قبل تخفيضٍ آخر."]]);
+
+S("Students who finish early may leave, but once you leave you cannot return, and you must hand in everything including the question paper. Those who stay should sit quietly: the last twenty minutes are when careless mistakes are found.",
+ [["What must a student who leaves hand in?",["Everything, including the question paper","Only the answers","Only the question paper","Nothing"],
+   "‏hand in everything including the question paper. — يُسلَّم كلُّ شيءٍ وورقةُ الأسئلةِ معه."],
+  ["Why does the speaker value the last twenty minutes?",["Careless mistakes are found then","The hall is quietest","Marks are doubled","Answers are given"],
+   "‏the last twenty minutes are when careless mistakes are found. — في العشرين الأخيرةِ تُكتشَف أخطاءُ السهو."]]);
+
+S("We received your complaint about the noise. The work is licensed until the end of next month and we cannot stop it, but the licence does not allow it before seven in the morning. If it starts earlier, note the time and call us.",
+ [["Can the work be stopped?",["No, it is licensed until next month","Yes, immediately","Only at weekends","Only at night"],
+   "‏we cannot stop it. — العملُ مُرخَّصٌ فلا يُوقَف."],
+  ["What should the resident do if work starts before seven?",["Note the time and call","Speak to the workers","Write a letter","Nothing can be done"],
+   "‏note the time and call us. — يُدوَّن الوقتُ ويُتَّصَل."]]);
+
+S("My first job interview went badly because I had prepared answers and the questions were different. The second time I prepared three stories instead and used whichever fitted. Stories are flexible; memorised answers are not.",
+ [["Why did the first interview go badly?",["The prepared answers did not fit the questions","The speaker arrived late","The job was wrong","The interviewer was unkind"],
+   "‏I had prepared answers and the questions were different. — حفَظ أجوبةً فجاءت أسئلةٌ غيرُها."],
+  ["What did the speaker prepare the second time?",["Three stories to adapt","Ten answers","Nothing","A written list"],
+   "‏I prepared three stories instead and used whichever fitted. — ثلاثُ حكاياتٍ يُنتقى منها ما يناسب."]]);
+
+S("The address is the same but the entrance has moved to the side street because of the building work. There is a small sign, but people walk past it, so look for the blue door beside the bakery. We are on the first floor.",
+ [["Where is the entrance now?",["On the side street, beside the bakery","At the front as before","Behind the building","On the first floor"],
+   "‏the entrance has moved to the side street … the blue door beside the bakery. — البابُ الأزرقُ في الشارعِ الجانبيِّ جانبَ المخبز."],
+  ["Why do people miss it?",["The sign is small","There is no sign","It is closed","It is dark"],
+   "‏There is a small sign, but people walk past it. — اللوحةُ صغيرةٌ فيمرُّ الناسُ عنها."]]);
+
+S("We are looking for someone who can work two evenings and one weekend day. Experience is useful but we will train the right person. What we cannot train is turning up on time, so please do not apply if the hours are difficult for you.",
+ [["What will the employer train?",["The work itself, for the right person","Timekeeping","Nothing","Only experienced staff"],
+   "‏we will train the right person. — يُدرَّب المناسبُ على العمل."],
+  ["What is the employer unwilling to overlook?",["Not arriving on time","Lack of experience","Lack of qualifications","Age"],
+   "‏What we cannot train is turning up on time. — الالتزامُ بالوقتِ لا يُدرَّب."]]);
+
+S("I planned to revise everything twice. After a week I saw that there was not enough time, so I chose the four topics that carry the most marks and left the rest. I scored higher than the year I tried to cover all of it.",
+ [["What was the original plan?",["To revise everything twice","To revise four topics","To study with a friend","To take a course"],
+   "‏I planned to revise everything twice. — كانت الخطّةُ مراجعةَ كلِّ شيءٍ مرّتَين."],
+  ["What was the result of the change?",["A higher score than before","A lower score","The same score","The exam was missed"],
+   "‏I scored higher than the year I tried to cover all of it. — درجتُه أعلى من سنةِ المراجعةِ الشاملة."]]);
+
+S("The train is running twelve minutes late because of a signal fault further down the line. Passengers changing at the junction should not worry: the connecting service has been told to wait. Those going to the end of the line are not affected.",
+ [["Why is the train late?",["A signal fault down the line","Bad weather","Too many passengers","A broken engine"],
+   "‏because of a signal fault further down the line. — عطبٌ في الإشارةِ أبعدَ في الخطّ."],
+  ["What has been arranged for passengers changing trains?",["The connecting service will wait","A bus will be provided","Tickets will be refunded","They must take a later train"],
+   "‏the connecting service has been told to wait. — القطارُ الموصِّلُ أُمِر بالانتظار."]]);
+
+S("If you cannot attend, tell us at least two days before and we will offer your place to someone on the waiting list. People who simply do not come are not given a place next term, because the list is long and the room is small.",
+ [["How much notice is required?",["At least two days","A week","One day","None"],
+   "‏at least two days before. — قبلَه بيومَين على الأقلّ."],
+  ["What happens to people who do not come without telling anyone?",["They are refused a place next term","They pay a fine","Nothing","They are called"],
+   "‏are not given a place next term. — لا مقعدَ لهم الفصلَ القادم."]]);
+
+S("The new phone is thinner and the picture is better, but the battery is smaller and mine lasts until the evening instead of the next morning. If you charge at your desk you will not notice. If you travel, keep the old one.",
+ [["What is worse about the new phone?",["The battery lasts less long","The picture quality","The weight","The price"],
+   "‏the battery is smaller and mine lasts until the evening instead of the next morning. — البطّاريّةُ أصغرُ فتنتهي مساءً لا صباحَ الغد."],
+  ["Who should keep the old phone?",["People who travel","People who charge at a desk","Everyone","Nobody"],
+   "‏If you travel, keep the old one. — المسافرُ يُبقي القديم."]]);
+
+S("I was invited to speak for forty minutes and I said yes without asking who the audience was. They turned out to be beginners and my talk was for specialists. Half of them left. Now the first question I ask is who will be listening.",
+ [["What went wrong?",["The talk did not match the audience","The talk was too short","The room was wrong","Nobody came"],
+   "‏They turned out to be beginners and my talk was for specialists. — الحضورُ مبتدئون والحديثُ للمختصّين."],
+  ["What does the speaker always ask now?",["Who will be listening","How long to speak","Where the room is","What the fee is"],
+   "‏the first question I ask is who will be listening. — أوّلُ سؤالٍ: مَن المستمعون؟"]]);
 window.LISTEN_BANK = L;
 })();

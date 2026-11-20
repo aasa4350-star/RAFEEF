@@ -75,7 +75,7 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=faac484a92" defer></script>
+<script src="build-check.js?v=5c6ba562bb" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -1480,6 +1480,8 @@ function stepWriteItems(n){
   var G = (window.WritingEN && window.WritingEN._gens && window.WritingEN._gens[3]) || [];
   if(!G.length) return [];
   var out = [], seen = {}, tries = 0;
+  /* ودورةٌ جديدةٌ في فضاءِ المولّدِ تُقال كما تُقال في فهمِ المقروء */
+  stepWriteItems.reset = false;
   while(out.length < n && tries++ < 300){
     var q = null;
     /* ⚠️ تسعةُ مولّداتٍ تُخرِج ثمانيةَ عشرَ جذعًا، فجاءه الجذعُ اثنتَي
@@ -1490,6 +1492,7 @@ function stepWriteItems(n){
        يُثبّت مولّدًا بعينِه فتُستنفَد بنودُه ويُردُّ المعاد، والفضاءُ
        كلُّه تسعةٌ وسبعون بندًا. */
     try{ q = window.SeenCap ? SeenCap.fresh(function(){ return gp(G)(); }) : gp(G)(); }catch(e){}
+    if(window.SeenCap && SeenCap.fresh.reset) stepWriteItems.reset = true;
     if(!q || seen[q[0]]) continue;
     seen[q[0]] = 1;
     /* ⚠️ والمعرّفُ الصريحُ يُمرَّر: كان البندُ يُعاد بناؤه بأربعةِ
@@ -2045,6 +2048,9 @@ function buildAll(){
         "<b>ما يتكرّر عليك سؤالٌ أكثر من مرّتين</b> — العدُّ محفوظ ولو بدّلت الجهاز. والتراكيب من بنكٍ فيه "+sN+" سؤالًا."+
         (stepReadItems.reset
           ? '<div style="margin-top:8px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">🔁 خلّصت قطع فهم المقروء كلّها مرّتين — بدينا دورة جديدة، فاللي يجيك اليوم قريته قبل. قلها لوالدك عشان يوسّع البنك.</div>'
+          : '')+
+        (stepWriteItems.reset
+          ? '<div style="margin-top:8px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">🔁 خلّصت أسئلة التحليل الكتابي كلّها مرّتين — بدينا دورة جديدة فيها. قلها لوالدك عشان يوسّع البنك.</div>'
           : '')+
         stepWeightsHtml()+
         '<div style="margin-top:8px;font-size:.9rem">🔊 <b>فهم المسموع (20%) ما هو هنا</b> — يحتاج صوتًا، وتدريبه في <a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع ← تبويب «فهم المسموع 🎧»</a>: تسمع حوارًا قصيرًا بلا نصّ مكتوب ثم تجاوب عنه، مثل الاختبار. لا تتركه: خُمس الدرجة.</div>',

@@ -137,15 +137,30 @@
      لا يُصادَف في أربعين. قِيس عند فهد: بأربعين خرج بندٌ سبعَ مرّاتٍ
      في ستّين جولةً والحدُّ عرضان. والنداءُ دالّةٌ خالصةٌ بلا شبكةٍ ولا
      قرص، فالمئةُ والخمسون لا تُكلِّف شيئًا يُحَسّ. */
+  /* ⚠️ والردُّ بالأقلِّ عرضًا وحدَه خرقٌ للحدِّ في صمت: قِيس في
+     المتصفّحِ مئةً وخمسين جلسةً فخرج فضاءُ التحليلِ الكتابيِّ أحدًا
+     وثمانين بندًا وسِعتُه مئةٌ واثنان وستّون سحبًا، والسحبُ ثلاثُ مئةٍ
+     — فبلغ البندُ أربعَ عرضاتٍ والحدُّ عرضان، ولا أحدَ يُخبِر الطفل.
+     فإن نفد الفضاءُ كلُّه فُتِحت دورةٌ جديدةٌ لهذا الفضاءِ وحدَه:
+     تُنسى مفاتيحُ ما وُلِّد في المحاولاتِ (والمحاولاتُ مئةٌ وخمسون
+     تغطّي فضاءً بهذا الضيقِ تغطيةً تامّة)، ويُرفَع fresh.reset ليُقال
+     له صراحةً — كما يفعل pick في البنوكِ المعدودة. */
   function fresh(gen, tries){
-    var t = tries || 150, best = null, bestC = Infinity;
+    var t = tries || 150, best = null, bestC = Infinity, space = {};
+    fresh.reset = false;
     for(var i=0;i<t;i++){
       var x = null;
       try{ x = gen(); }catch(e){}
       if(!x) continue;
-      var c = counts[keyOf(x)] || 0;
+      var k = keyOf(x), c = counts[k] || 0;
+      space[k] = 1;
       if(c < CAP) return x;
       if(c < bestC){ bestC = c; best = x; }
+    }
+    if(best){
+      fresh.reset = true;
+      for(var kk in space){ if(Object.prototype.hasOwnProperty.call(space, kk)) delete counts[kk]; }
+      save();
     }
     return best;
   }
