@@ -112,7 +112,7 @@
   .hint{color:var(--muted);font-size:.85rem;margin:2px 4px 0}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=4386cfe1e2" defer></script>
+<script src="build-check.js?v=faac484a92" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -1218,15 +1218,27 @@ function dictDoseAfter(lang, correct, total){
   if(p <  40) return dictDoseSet(lang, cur - 1);
   return cur;
 }
+/* ═══ ويُعَدُّ الدَوَرانُ لا يُكرَّر في صمت ═══════════════════════════
+   طلبُ الأب (٢٠ نوفمبر ٢٠٢٦): «ما أبي التكرار يزيد عن مرّتين». وهذه
+   الدالّةُ تلفُّ على البركةِ كلِّها قبل الإعادةِ — فلا تُكرِّر داخلَ
+   الدورة. لكنّها كانت تبدأ الدورةَ الثالثةَ والرابعةَ والعاشرةَ بلا
+   أن يدري أحد. وفهمُ المسموعِ عنده دورتان وشيءٌ (٢٫٢ عرضًا للنصّ).
+   فصار العدُّ ظاهرًا: pickFresh.cycle يحمل رقمَ الدورةِ التي بدأت،
+   فتقوله الصفحةُ للطفلِ صراحةً إن تجاوزت الحدَّ. */
 function pickFresh(pool, key, n){
   n = Math.min(n||8, pool.length);
-  var k = "seen_"+key+"_"+who;
+  var k = "seen_"+key+"_"+who, kc = "cyc_"+key+"_"+who;
   var seen; try{ seen=JSON.parse(localStorage.getItem(k)||"{}")||{}; }catch(e){ seen={}; }
+  var cyc = 0; try{ cyc = +(localStorage.getItem(kc)||0) || 0; }catch(e){}
   var remaining = pool.filter(function(x){ return !seen[x]; });
-  if(remaining.length < n){ seen={}; remaining = pool.slice(); }
+  if(remaining.length < n){
+    seen={}; remaining = pool.slice();
+    cyc++; try{ localStorage.setItem(kc, String(cyc)); }catch(e){}
+  }
   var pick = shuffle(remaining).slice(0, n);
   pick.forEach(function(x){ seen[x]=1; });
   try{ localStorage.setItem(k, JSON.stringify(seen)); }catch(e){}
+  pickFresh.cycle = cyc;              /* ٠ = الدورةُ الأولى */
   return pick;
 }
 // اختيار قطعة قراءة مختلفة كل مرة — نلفّ على كل القطع ثم نعيد
@@ -4523,6 +4535,7 @@ if(!META[who] || !DATA[who]){
     var N = 4;                                  /* أربعةُ نصوصٍ = ثمانيةُ أسئلة */
     var items = pickFresh(B.map(function(_,i){ return String(i); }), "listen_en", N)
                   .map(function(i){ return B[+i]; });
+    var lCycle = pickFresh.cycle || 0;   /* ٠ = أوّلُ مرور · ٢ فأكثر = تجاوزَ الحدّ */
     var attId = (window.newAttId ? newAttId() : (Date.now().toString(36)+Math.random().toString(36).slice(2,7)));
     var total = items.reduce(function(s,x){ return s+x.q.length; }, 0);
     /* ═══ والغيابُ يُرصَد كما يُرصَد في الإملاءِ والقراءة ══════════════
@@ -4573,7 +4586,13 @@ if(!META[who] || !DATA[who]){
       e.t++; if(ok) e.c++;
     }
     var html = '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> 🎧 فهم المسموع</div>'+
-      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس، وبعدها تنفتح لك الأسئلة. والنصّ يظهر لك بعد ما تجاوب، تقارن فيه.</p>';
+      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس، وبعدها تنفتح لك الأسئلة. والنصّ يظهر لك بعد ما تجاوب، تقارن فيه.</p>'+
+      /* ولا يُكرَّر عليه في صمت: إن بدأت الدورةُ الثالثةُ قيل له */
+      (lCycle >= 2
+        ? ('<p class="hint" style="border:1.5px solid var(--warn);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--warn)">'+
+           '🔁 خلّصت بنك الاستماع كلّه <b>'+lCycle+'</b> مرّات — فاللي يجيك اليوم سمعته قبل. '+
+           'قلها لوالدك عشان يوسّع البنك.</p>')
+        : '');
     items.forEach(function(it, i){
       html += '<div class="q" data-li="'+i+'">'+
         '<div class="num">مقطع '+(i+1)+' من '+items.length+'</div>'+

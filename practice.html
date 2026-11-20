@@ -74,7 +74,8 @@
   .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
   .fr .frd{padding:0 5px}
 </style>
-<script src="build-check.js?v=4386cfe1e2" defer></script>
+<script src="seen-cap.js"></script>
+<script src="build-check.js?v=faac484a92" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -113,6 +114,9 @@ var who = (qs("who")||"hasan").toLowerCase();
 var NAMES = {hasan:"حسن",rafeef:"رفيف",osama:"أسامة",saud:"سعود",fahad:"فهد"};
 var GRADES = {hasan:"ثالث متوسط",rafeef:"ثاني متوسط",osama:"خامس ابتدائي",saud:"رابع ابتدائي",fahad:"ثالث ثانوي"};
 var name = NAMES[who] || "الطالب";
+/* عدّادُ العرضِ لهذا الابنِ وحدَه: يُحمَّل من الجهازِ فورًا، ثمّ تُدمَج
+   جلساتُ الخادمِ فلا يضيع العدُّ بتبديلِ جهاز. */
+try{ if(window.SeenCap) SeenCap.init(who); }catch(e){}
 var YOUNG = (who==="saud" || who==="osama"); // الصغار: لفظي + STEP فقط (بدون كمي/تحصيلي)
 /* فهد: ثالث ثانوي — مسار علمي. التحصيلي وSTEP والقدرات كلّها في
    مستواه لا «فوق المستوى»، فتُحسب عليه وتدخل كشفَ الضعف والقسم
@@ -170,6 +174,9 @@ function saveScore(test, correct, total, wrongs, skills, pid, timing){
     var T = timing || {};
     var per = (T.dur && total) ? (T.dur/total) : null;
     var meta = { kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null };
+    /* ومفاتيحُ ما عُرِض في هذه الجلسة: بها يندمج العدُّ من الخادمِ فلا
+       يضيع بتبديلِ جهازٍ ولا بتفريغِ ذاكرة. */
+    try{ if(window.SeenCap){ var sk = SeenCap.sessionKeys(); if(sk.length) meta.seenKeys = sk; } }catch(e){}
     if(T.dur != null){
       meta.dur = T.dur; meta.fast = T.fast || 0; meta.secPerQ = per!=null ? Math.round(per*10)/10 : null;
       /* الوسمُ صريحٌ لا ضمنيّ: الصفُّ يحمل سببَ استبعاده فيقرؤه التقرير */
@@ -1260,14 +1267,31 @@ try{
 function subjGen(n, subj, TM, fallbackPool){
   if(!TM || !TM.topics || !TM.topics.length) return freshPick(fallbackPool||[], n, "t_"+subj);
   var tops = shuffle(TM.topics.slice()), out = [], seen = {}, tries = 0;
+  /* ═══ والدورانُ على المواضيعِ يتخطّى ما نفد ═══════════════════════
+     كان «tops[out.length % tops.length]» دورانًا صارمًا: إذا بلغت بنودُ
+     موضوعٍ حدَّ العرضَين أُجبِر السحبُ منه فخرج المعاد. وأحياءُ ثلاثون
+     مولّدًا على ثمانيةَ عشرَ موضوعًا وكلُّ مولّدٍ سؤالٌ ثابتٌ بلا أرقام،
+     فهي أوّلُ من ينفد — وقِيس: تسعةُ بنودٍ تجاوزت الحدَّ في أربعين
+     جولةً، ثمانيةٌ منها أحياء.
+     فالدورُ الآن يبدأ من موضعِه ثمّ يمضي إلى ما بعده حتى يجد موضوعًا
+     فيه بندٌ تحت الحدّ. وإن لم يبقَ في المادّةِ كلِّها بندٌ تحته
+     قُبِل المعادُ — فجلسةٌ ناقصةٌ أسوأُ من بندٍ ثالث، ويُقال له في
+     الواجهةِ إن تكرّر. */
+  var underCap = function(x){ return !window.SeenCap || SeenCap.count(x) < SeenCap.CAP; };
   while(out.length < n && tries < n*80){
     tries++;
-    var t = tops[out.length % tops.length];
-    var q = null;
-    try{ q = gp(t.gens)(); }catch(e){}
+    var q = null, t = null, started = out.length % tops.length;
+    for(var d = 0; d < tops.length; d++){
+      var cand = tops[(started + d) % tops.length], got = null;
+      try{ got = window.SeenCap ? SeenCap.fresh(function(){ return gp(cand.gens)(); }) : gp(cand.gens)(); }catch(e){}
+      if(!got) continue;
+      var item = ['<b>'+subj+' — '+cand.name+':</b> '+got[0], got[1], got[2], got[3], got[4]];
+      if(underCap(item)){ q = got; t = cand; break; }
+      if(!q){ q = got; t = cand; }          /* أفضلُ ما وُجِد إن نفد الكلّ */
+    }
     if(!q || seen[q[0]]) continue;
     seen[q[0]] = 1;
-    out.push(['<b>'+subj+' — '+t.name+':</b> '+q[0], q[1], q[2], q[3]]);
+    out.push(['<b>'+subj+' — '+t.name+':</b> '+q[0], q[1], q[2], q[3], q[4]]);
   }
   return out;
 }
@@ -1405,11 +1429,47 @@ var STEP_MIX_W = { read:6, struct:4, write:2 };
 function stepReadItems(n){
   var R = window.STEP_READING || [];
   if(!R.length) return [];
-  var out = [], order = shuffle(R.map(function(_,i){ return i; }));
+  /* ⚠️ كان خلطًا محضًا بلا ذاكرةٍ البتّة: ثلاثُ قطعٍ في الجلسةِ من
+     اثنتَين وثلاثين، فجاءته القطعةُ عشرَ مرّاتٍ ونصفًا وسطيًّا — وهي
+     أسوأُ بركةٍ عنده. فصار الترتيبُ بالعدّاد: ما لم يُعرَض أوّلًا. */
+  /* ⚠️ والمفتاحُ مفتاحُ البندِ المعروضِ لا نصُّ القطعةِ وحدَه: العدّادُ
+     يُثبّت ما عُرِض، وما يُعرَض هو «القطعةُ + السؤال». فرتّبتُ أوّلَ
+     مرّةٍ بنصِّ القطعةِ وحدَه فلم يُطابق مفتاحًا قطّ — وبقي الترتيبُ
+     عشوائيًّا، وكشفته التجربةُ في المتصفّح: قطعةٌ في جولتَين من
+     جولتَين. فصار ترتيبُ القطعةِ بمجموعِ عرضِ أسئلتِها. */
+  var mk = function(pas, q){
+    return '<b>فهم المقروء:</b><div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85">'+pas[0]+'</div>'+q[0];
+  };
+  var out = [], order;
+  stepReadItems.reset = false;
+  var qkey = function(p, q){ return [mk(p, q), q[1], q[2], q[3]]; };
+  if(window.SeenCap){
+    var left = function(p){
+      var k = 0;
+      (p[1] || []).forEach(function(q){ if(SeenCap.count(qkey(p, q)) < SeenCap.CAP) k++; });
+      return k;
+    };
+    /* ⚠️ والترتيبُ وحدَه لا يكفي: قطعةٌ بلغت أسئلتُها الحدَّ تبقى في
+       الطابورِ فتُسحَب حين يقصر ما قبلَها. فتُحجَب أوّلًا، وإن لم يبقَ
+       ما يكفي صُفِّر عدُّ هذه البركةِ وحدَها وأُعلِن ذلك. */
+    var avail = R.map(function(p, i){ return { i:i, k:left(p) }; }).filter(function(x){ return x.k > 0; });
+    if(avail.reduce(function(a, x){ return a + Math.min(2, x.k); }, 0) < n){
+      stepReadItems.reset = true;
+      R.forEach(function(p){ (p[1] || []).forEach(function(q){ SeenCap.forget(qkey(p, q)); }); });
+      avail = R.map(function(p, i){ return { i:i, k:(p[1]||[]).length }; });
+    }
+    shuffle(avail);
+    avail.sort(function(a, b){ return b.k - a.k; });
+    order = avail.map(function(x){ return x.i; });
+  } else order = shuffle(R.map(function(_, i){ return i; }));
   for(var i=0; i<order.length && out.length<n; i++){
-    var pas = R[order[i]], qs = shuffle(pas[1].slice()).slice(0, Math.min(2, n-out.length));
+    var pas = R[order[i]], pool = pas[1].slice();
+    if(window.SeenCap && !stepReadItems.reset){
+      pool = pool.filter(function(q){ return SeenCap.count(qkey(pas, q)) < SeenCap.CAP; });
+    }
+    var qs = shuffle(pool).slice(0, Math.min(2, n-out.length));
     qs.forEach(function(q){
-      out.push(['<b>فهم المقروء:</b><div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85">'+pas[0]+'</div>'+q[0],
+      out.push([mk(pas, q),
                 q[1].slice(), q[2],
                 'الجواب من نصّ القطعة نفسها — ارجع إليه وابحث عن الجملة التي تحمل المعنى، لا عن الكلمة نفسها.']);
     });
@@ -1422,10 +1482,21 @@ function stepWriteItems(n){
   var out = [], seen = {}, tries = 0;
   while(out.length < n && tries++ < 300){
     var q = null;
-    try{ q = gp(G)(); }catch(e){}
+    /* ⚠️ تسعةُ مولّداتٍ تُخرِج ثمانيةَ عشرَ جذعًا، فجاءه الجذعُ اثنتَي
+       عشرةَ مرّةً وأربعةَ أعشارٍ وسطيًّا. فيُعاد التوليدُ حتى يُعثَر على
+       ما لم يبلغ حدَّ العرضَين — وإن لم يُعثَر رُدَّ أقربُ ما وُجِد
+       فلا يُترَك البابُ فارغًا. */
+    /* ⚠️ والمولّدُ يُنتقى في كلِّ محاولةٍ لا مرّةً واحدة: تمريرُ gp(G)
+       يُثبّت مولّدًا بعينِه فتُستنفَد بنودُه ويُردُّ المعاد، والفضاءُ
+       كلُّه تسعةٌ وسبعون بندًا. */
+    try{ q = window.SeenCap ? SeenCap.fresh(function(){ return gp(G)(); }) : gp(G)(); }catch(e){}
     if(!q || seen[q[0]]) continue;
     seen[q[0]] = 1;
-    out.push(['<b>التحليل الكتابي:</b> '+q[0], q[1].slice(), q[2], q[3]]);
+    /* ⚠️ والمعرّفُ الصريحُ يُمرَّر: كان البندُ يُعاد بناؤه بأربعةِ
+       عناصرَ فيسقط q[4]، فيُسجّل العدّادُ مفتاحًا (الجذعُ والخيارات)
+       ويبحث المولّدُ بآخرَ (المعرّف) — فلا يلتقيان، ويبقى التكرارُ
+       كأنّ لا عدّادَ أصلًا. */
+    out.push(['<b>التحليل الكتابي:</b> '+q[0], q[1].slice(), q[2], q[3], q[4]]);
   }
   return out;
 }
@@ -1448,6 +1519,21 @@ function stepMix(n){
   /* القراءةُ أوّلًا كي تُقرأ بذهنٍ صافٍ، ثمّ التراكيبُ ثمّ التحليل */
   return read.concat(struct, write);
 }
+/* ═══ ودمجُ العدِّ من الخادمِ ══════════════════════════════════════
+   الصفوفُ تحمل seenKeys لكلِّ جلسةٍ ومعرّفَها، فتُجمَع ولا تُحسَب جلسةٌ
+   مرّتَين. والسحبُ من الأحدثِ: مئتان تكفي أربعةَ أشهرٍ من جلساتِه. */
+(function(){
+  if(!window.SeenCap) return;
+  try{
+    fetch(SUPA_URL + "/rest/v1/attempts?select=meta&student=eq." + encodeURIComponent(name) +
+        "&meta->seenKeys=not.is.null&order=created_at.desc&limit=200",
+      { headers:{ apikey:SUPA_KEY, Authorization:"Bearer " + SUPA_KEY } })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(j){ if(Array.isArray(j)) SeenCap.merge(j); })
+      .catch(function(){});
+  }catch(e){}
+})();
+
 var HEAD_EYE = VERBAL_ONLY ? 'تدريب لفظي' : (NO_GAT ? 'تحصيلي وSTEP · بأسلوب قياس' : 'اختبارات تجريبية · بأسلوب قياس');
 var HEAD_TTL = VERBAL_ONLY ? '📖 قدرات لفظي — ' : (NO_GAT ? '🧪 تحصيلي وSTEP — ' : '📊 قدرات وتحصيلي — ');
 app.innerHTML =
@@ -1512,25 +1598,27 @@ function fmt(s){ if(s<0)s=0; var m=Math.floor(s/60), r=s%60; return m+":"+String
    ممّا أعطاه في الأولى (وهو ما قِسناه: ٤٠٪ و٣٢٪). فنُقدّم ما لم
    يُعرَض بعدُ في هذه الزيارة، ولا نعود إلى المعروض إلّا إذا نفد
    البنك — فيرى الطفل بنكه كلّه قبل أن يتكرّر عليه شيء. */
-var _shown = {};
+/* ═══ من ذاكرةِ صفحةٍ إلى عدّادٍ ثابت ═══════════════════════════════
+   كان الاختيارُ على «_shown» وهو كائنٌ في الصفحةِ يُمحى مع كلِّ فتحة،
+   فالوعدُ «ما يتكرّر عليك شي قبل ٣٣ جولة» لا يُوفى عبرَ الفتحات.
+   وقِيس عند فهد: سؤالٌ أخطأ فيه تسعَ عشرةَ مرّةً.
+   فصار العدُّ في SeenCap: ثابتٌ في الجهازِ ومندمجٌ مع الخادم، وحدُّه
+   عرضان (طلبُ الأب ٢٠ نوفمبر ٢٠٢٦). */
+var _lastReset = {};
 function freshPick(bank, n, key){
-  var seen = _shown[key] || (_shown[key] = {});
-  var fresh = [], rest = [];
-  bank.forEach(function(q, i){ (seen[i] ? rest : fresh).push(i); });
-  shuffle(fresh); shuffle(rest);
-  var idx = fresh.slice(0, n);
-  if(idx.length < n){
-    /* نفد الجديد: نبدأ دورةً جديدة ونُكمل ممّا سبق عرضه */
-    _shown[key] = {}; seen = _shown[key];
-    idx = idx.concat(rest.slice(0, n - idx.length));
-  }
-  idx.forEach(function(i){ seen[i] = 1; });
-  return idx.map(function(i){ return bank[i]; });
+  if(!window.SeenCap) return shuffle((bank||[]).slice()).slice(0, n);
+  var r = SeenCap.pick(bank, n);
+  _lastReset[key || "_"] = r.reset;
+  return r.items;
 }
 
 function renderSet(id, items, intro, regen, label){
   var sec = document.getElementById(id);
   items = items.map(shuffleQ);
+  /* ═══ العدُّ عند العرضِ لا عند الإجابة ═══════════════════════════
+     من رأى السؤالَ فقد رآه، أجاب أو ترك. والعدُّ هنا موضعٌ واحدٌ تمرُّ
+     به الجولاتُ كلُّها (ستيبُ والتحصيليُّ والنماذجُ)، فلا يُنسى بابٌ. */
+  try{ if(window.SeenCap) SeenCap.markShown(items, null); }catch(e){}
   /* النموذجُ الكاملُ مؤقَّتٌ دائمًا ولو أطفأ المفتاحَ — فنموذجٌ بلا وقتٍ
      لا يقيس ما جاء لقياسه، وسؤالُ الأبِ إنّما هو عن الجهوزيّة. */
   /* ═══ موهبةُ موقوتةٌ دائمًا — طلبُ الأب (١٦ أكتوبر ٢٠٢٦) ═══════════
@@ -1949,12 +2037,20 @@ function buildAll(){
       var mix = stepMix(12), rc = mix.filter(function(q){ return /^<b>فهم المقروء/.test(q[0]); }).length;
       var wc = mix.filter(function(q){ return /^<b>التحليل الكتابي/.test(q[0]); }).length;
       renderSet("s", mix,
-        "STEP: 12 سؤال · 15 دقيقة"+tnote+" — <b>موزون بأوزان الاختبار</b>: "+rc+" فهم مقروء · "+(12-rc-wc)+" تراكيب · "+wc+" تحليل كتابي. <b>أسئلة جديدة كل مرة</b>، والتراكيب من بنكٍ فيه "+sN+" سؤالًا."+
+        "STEP: 12 سؤال · 15 دقيقة"+tnote+" — <b>موزون بأوزان الاختبار</b>: "+rc+" فهم مقروء · "+(12-rc-wc)+" تراكيب · "+wc+" تحليل كتابي. "+
+        /* ═══ وعدٌ يُوفى لا وعدٌ يُقال ═══════════════════════════════
+           كان النصُّ يقول «ما يتكرّر عليك شي قبل ٣٣ جولة» وهو غيرُ
+           صحيح: الذاكرةُ كانت تُمحى مع كلِّ فتحة. فصار الحدُّ محفوظًا
+           (عرضان لكلِّ سؤالٍ، في الجهازِ وفي الخادم) ويُقال كما هو. */
+        "<b>ما يتكرّر عليك سؤالٌ أكثر من مرّتين</b> — العدُّ محفوظ ولو بدّلت الجهاز. والتراكيب من بنكٍ فيه "+sN+" سؤالًا."+
+        (stepReadItems.reset
+          ? '<div style="margin-top:8px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">🔁 خلّصت قطع فهم المقروء كلّها مرّتين — بدينا دورة جديدة، فاللي يجيك اليوم قريته قبل. قلها لوالدك عشان يوسّع البنك.</div>'
+          : '')+
         stepWeightsHtml()+
         '<div style="margin-top:8px;font-size:.9rem">🔊 <b>فهم المسموع (20%) ما هو هنا</b> — يحتاج صوتًا، وتدريبه في <a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع ← تبويب «فهم المسموع 🎧»</a>: تسمع حوارًا قصيرًا بلا نصّ مكتوب ثم تجاوب عنه، مثل الاختبار. لا تتركه: خُمس الدرجة.</div>',
         function(){ return stepMix(12); }, "STEP إنجليزي");
     } else
-    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>أسئلة جديدة كل مرة</b>، من بنكٍ فيه "+sN+" سؤالًا، فما يتكرّر عليك شي قبل "+Math.floor(sN/12)+" جولة."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
+    renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>ما يتكرّر عليك سؤالٌ أكثر من مرّتين</b>، من بنكٍ فيه "+sN+" سؤالًا. والعدُّ محفوظٌ ولو بدّلت الجهاز."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
   }
 }
 var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
