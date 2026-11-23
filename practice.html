@@ -75,7 +75,7 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=80943837f4" defer></script>
+<script src="build-check.js?v=18a7deed5c" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -166,6 +166,24 @@ var FAST_ONE = 3;        /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ �
    والقياسُ يبقى يجري للجميع (dur و fast و secPerQ) فلا نفقد البيانات،
    وإنّما يُرفَع الحكمُ والتنبيهُ عمّن لم يُقَس عليه. */
 var PACE_ON = (who === "fahad");
+/* ═══ والحارسُ بالاختبارِ لا بالطفلِ وحدَه ═══════════════════════════
+   سؤالُ الأب (٢٢ نوفمبر ٢٠٢٦) عن حسنٍ في التحصيليّ. وقِيس: ١٧١ من ٣١٢
+   إجابةٍ أسرعُ من ثلاثِ ثوان، ووسيطُ السؤالِ مع خياراتِه أربعٌ وعشرون
+   كلمةً — وواحدٌ بالمئةِ من البنكِ فقط يُقرَأ في ثلاثِ ثوانٍ بأربعِ
+   كلماتٍ للثانية. فأكثرُ إجاباتِه أسرعُ من قراءةِ السؤال، ومعدّلُه
+   ثمانيةٌ وستّون بالمئةِ لا يدلُّ على معرفتِه.
+
+   وكان الحكمُ مرفوعًا عنه بطلبِ الأب (٦ أكتوبر) لمّا وقع على «قدرات —
+   لفظي»: معنى كلمةٍ يُجاب في ثانيتَين صدقًا لا تسرُّعًا. والعلّةُ كانت
+   في التعميمِ لا في الحارس — فصار الحكمُ بالاختبارِ: التحصيليُّ وستيبُ
+   أربعةُ خياراتٍ وحسابٌ (٧٣٪ من أسئلتِهما فيها أرقام، و٤٧٪ صيغةُ
+   حسابٍ صريحة)، فمن أجابهما في ثلاثِ ثوانٍ لم يقرأ. وأمّا اللفظيُّ
+   والمفرداتُ وموهبةُ فتبقى بلا حكمٍ كما أراد الأب.
+
+   وفهدٌ يبقى على الصفحةِ كلِّها كما كان — لا يُنقَص منه شيء. */
+function paceOn(test){
+  return PACE_ON || /تحصيلي|STEP/i.test(String(test || ""));
+}
 function saveScore(test, correct, total, wrongs, skills, pid, timing){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
@@ -185,7 +203,7 @@ function saveScore(test, correct, total, wrongs, skills, pid, timing){
          متوسّطُه فوقَ العتبةِ وهو لم يحلّ شيئًا — والعدُّ يكشفه.
          وهو معيارُ صفحاتِ المنهجِ نفسُه (أكثرُ من النصف متسرّعًا). */
       var tooMany = (T.fast||0) > Math.floor(total/2);
-      if(PACE_ON && per != null && (per < FAST_SEC || tooMany)){
+      if(paceOn(test) && per != null && (per < FAST_SEC || tooMany)){
         meta.trusted = false; meta.why = tooMany && per >= FAST_SEC ? "burst" : "fast";
       }
     }
@@ -1732,7 +1750,7 @@ function renderSet(id, items, intro, regen, label){
        برقمٍ لا يفهم من أين جاء. فيُعرَض السببُ والرقمُ ساعةَ وقوعِه،
        ومعه ما يُفعَل: أعِدها بتأنٍّ. */
     (function(){
-      if(!PACE_ON) return;
+      if(!paceOn(label)) return;
       var T = __timing(), per = total ? (T.dur/total) : 0;
       var box = sec.querySelector("[data-pace]");
       if(!box){ box = document.createElement("div"); box.setAttribute("data-pace",""); 
