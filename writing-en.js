@@ -271,9 +271,13 @@ var CONN2 = [
    والخمسةُ الباقيةُ من حدِّ الدورة: الترتيبُ يُخلَط في كلِّ دورةٍ خلطًا
    مستقلًّا، فموضوعٌ في آخرِ دورةٍ قد يقع في أوّلِ التي بعدها.
 
-   والمستوى الثالثُ باقٍ ثلاثين: لا يستعمله أحدٌ اليومَ (quiz.html يُسنِد
-   الثانيَ لحسنٍ ورفيفَ والأوّلَ لسعودٍ وأسامة)، فتوسيعُه لا ينفع أحدًا
-   حتى يُسنَد إلى أحد.
+   ── والمستوى الثالث (٢٣ نوفمبر ٢٠٢٦، بعد ساعات) ────────────────────
+   كنتُ تركتُه ثلاثين لأنّه لا يستعمله أحد. ثمّ قال الأبُ في مسائه:
+   «شف فهد في التعبير — ترى اليوم أوّل مرّة يجرّب». فهو مستعملٌ من
+   اليوم: practice.html تُسنِد إليه المستوى الثالثَ وهدفَ B2، وقد حلَّ
+   تدريبَ التحليلِ الكتابيِّ مرّتَين (٣/٦ ثمّ ٥/٦) ولم يكتب مقالًا بعد.
+   فزِيد ستّون موضوعًا جدليًّا على نمطِه (موقفٌ، ثمّ حجّتان بدليل، ثمّ
+   إقرارٌ بنقطةٍ للخصمِ وردُّها) فصار تسعين كأخويه.
 
    ⚠️ وفي التوسيعِ نفسِه زلّةٌ تستحقّ الذكر: فاصلةٌ زائدةٌ «]},,» خلّفت
    موضعًا خاليًا في الفهرسِ الثلاثين من كلِّ بنك، فصار العدُّ أحدًا
@@ -1252,6 +1256,246 @@ var PROMPTS = {
       {q:"Support it with reasons and evidence", k:["censorship","censor","internet","freedom","speech","expression","harmful","content","children","violence","misinformation","false","government","control","rights","protect","balance","because","reason","reasons","first","firstly","second","secondly","for example","for instance","such as","evidence","research","studies","shows","suggests","data","therefore","consequently"]},
       {q:"Answer the opposite view", k:["however","although","while","whereas","opponents","critics","some people","others","on the other hand","admittedly","nevertheless","it is true that","granted","even so","counter"]}
     ]},
+    {t:"Should homework be abolished in secondary school?", h:"Take one side. Give two arguments with examples, concede one point to the other side, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","homework","abolished","keep"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","practice","revision","memory","time","sleep","family","independent"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should cities invest in public transport rather than wider roads?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","transport","roads","invest","priority"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","traffic","pollution","cost","capacity","metro","bus","induced","demand"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is artificial intelligence a threat to future jobs?", h:"Take one side. Support it with two reasons and evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","threat","jobs","artificial","intelligence","replace"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","automation","factory","translation","skills","new","roles","productivity","training"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should school start later for teenagers?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","start","later","school","teenagers","earlier"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","sleep","concentration","body","clock","attendance","traffic","parents","work","grades"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should the government subsidise electric cars?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","subsidise","subsidize","electric","cars","government"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","pollution","oil","batteries","price","charging","industry","emissions","cost"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it better to specialise early or study broadly?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","specialise","specialize","broadly","early","better"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","depth","expertise","flexible","change","career","interests","skills","market"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should museums return objects taken during colonial times?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","return","museums","objects","heritage","keep"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","origin","access","comparison","preservation","justice","visitors","country","history"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does tourism damage the places it celebrates?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","tourism","damage","places","benefit","harm"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","crowds","prices","water","income","jobs","culture","heritage","local","economy"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should screen time for students be limited by law?", h:"Take one side. Give two arguments with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","screen","time","limited","law","families"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","sleep","eyes","attention","study","enforce","parents","freedom","health"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it fair to judge students mainly by final exams?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","fair","exams","final","judge","assessment"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","pressure","luck","memory","coursework","comparable","cheating","effort","year"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should water in desert countries be priced to reduce waste?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","water","priced","price","waste","subsidy"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","desalination","scarcity","consumption","poor","farming","leaks","meters","energy"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should universities admit students by interview as well as grades?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","interview","grades","admit","universities","selection"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","motivation","character","fair","bias","time","cost","predict","success"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does competition in school prepare students for real life?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","competition","prepare","real","life","cooperation"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","effort","confidence","stress","teamwork","workplace","ranking","motivation","failure"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should plastic packaging be banned for food?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","plastic","banned","packaging","food","alternative"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","waste","sea","recycling","hygiene","shelf","cost","paper","glass","pollution"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is reading fiction as useful as reading science?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","fiction","science","useful","reading","equally"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","empathy","language","imagination","facts","knowledge","vocabulary","thinking","perspective"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should students be paid for good grades?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","paid","grades","money","reward","students"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","motivation","short","term","interest","learning","effort","pressure","fairness"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does the internet make people better informed or more confused?", h:"Take one side. Support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","informed","confused","internet","better","worse"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","access","sources","rumour","rumors","checking","speed","quality","bias","search"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should high schools teach statistics instead of advanced algebra?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","statistics","algebra","teach","instead","curriculum"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","daily","decisions","probability","engineering","foundation","university","useful","risk"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is working from home better for families?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","working","home","families","better","office"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","commute","time","children","flexible","isolation","boundaries","meetings","productivity"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should cities limit the height of new buildings?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","height","buildings","limit","cities","towers"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","density","land","light","traffic","housing","prices","character","services"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does social media help or harm public debate?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","debate","help","harm","social","media"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","voices","reach","anger","short","nuance","rumour","rumors","access","audience"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should charity be organised by the state or by individuals?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","charity","state","individuals","organised","organized"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","scale","fairness","efficiency","compassion","waqf","zakat","local","needs","records"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it right to keep animals for food production?", h:"Take one side. Give two arguments with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","animals","food","production","right","welfare"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","nutrition","land","water","emissions","treatment","tradition","cost","alternatives"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should examinations allow the use of a dictionary?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","dictionary","examinations","allow","exams","use"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","vocabulary","meaning","skill","time","fair","memorising","memorizing","real","reading"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does studying abroad weaken a student's ties to his country?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","abroad","ties","country","weaken","strengthen"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","identity","language","return","skills","experience","family","culture","contribute"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should public libraries spend more on digital or printed books?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","digital","printed","libraries","spend","books"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","access","cost","storage","screens","reading","licence","license","remote","students"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it better to fail and learn than to succeed easily?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","fail","learn","succeed","easily","better"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","effort","resilience","confidence","feedback","risk","time","motivation","lesson"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should employers be allowed to read candidates' social media?", h:"Take one side. Give two arguments with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","employers","allowed","social","media","privacy"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","character","risk","judgement","judgment","context","bias","public","private","fair"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does a country need heavy industry to be prosperous?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","industry","prosperous","heavy","services","need"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","jobs","exports","technology","services","tourism","oil","diversify","investment"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should schools measure effort as well as achievement?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","effort","achievement","measure","schools","grades"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","motivation","fair","progress","starting","point","subjective","objective","report","growth"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should a second language be compulsory until the end of school?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","compulsory","language","second","school","optional"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","brain","travel","work","motivation","time","subjects","culture","opportunity"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it the duty of the rich to support the poor?", h:"State your position, support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","duty","rich","poor","support","obligation"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","zakat","justice","society","stability","charity","earned","taxes","need","effort"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should cars be banned from the centre of holy cities?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","banned","cars","centre","center","cities"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","crowds","safety","walking","pollution","elderly","transport","access","pilgrims","noise"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does technology widen or narrow the gap between rich and poor?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","widen","narrow","gap","technology","inequality"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","access","internet","skills","cost","education","jobs","remote","cheap","phones"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should schools be allowed to use surveillance cameras in classrooms?", h:"Take one side. Give two arguments with examples, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","surveillance","cameras","classrooms","allowed","privacy"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","safety","behaviour","behavior","trust","teachers","pressure","recordings","rights","monitor"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is a long holiday good for students?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","holiday","long","good","students","shorter"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","rest","forget","family","travel","revision","routine","summer","skills","work"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should scientists be allowed to edit human genes to prevent disease?", h:"State your position, support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","genes","edit","scientists","disease","prevent"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","suffering","inherited","safety","unknown","consent","limits","ethics","benefit","risk"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does watching sport have any value compared with playing it?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","watching","playing","sport","value","compared"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","health","community","inspiration","passive","hours","skills","teamwork","fitness","identity"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should a city build a stadium or a hospital first?", h:"Take one side. Support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","stadium","hospital","build","first","priority"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","health","lives","youth","economy","jobs","urgent","long","term","budget"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it better to learn from a teacher or from a video?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","teacher","video","learn","better","online"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","questions","feedback","pace","repeat","discipline","attention","cost","access","discussion"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should students be required to learn a craft or a trade?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","craft","trade","required","students","learn"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","skills","independent","jobs","respect","hands","time","academic","income","practical"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does advertising create needs that people do not have?", h:"Take one side. Support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","advertising","needs","create","wants","influence"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","children","desire","compare","information","choice","prices","pressure","brands","honest"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should the working week be four days?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","four","days","working","week","shorter"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","productivity","rest","family","output","services","cost","trials","health","hours"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it right to use animals in medical research?", h:"State your position, support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","animals","medical","research","right","testing"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","medicines","safety","suffering","alternatives","cells","computer","models","lives","regulation"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should schools rank students publicly?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","rank","publicly","schools","students","private"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","motivation","shame","confidence","transparent","effort","compare","weakest","privacy","pressure"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does a big city offer a better life than a small town?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","city","town","better","life","small"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","jobs","services","hospitals","traffic","cost","quiet","community","schools","pollution"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should exam results decide a student's whole future?", h:"Take one side. Give two arguments with examples, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","results","decide","future","whole","exam"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","one","day","illness","luck","effort","skills","chances","fair","measure","career"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is saving historic buildings worth the cost?", h:"Take one side. Support it with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","historic","buildings","saving","cost","worth"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","identity","tourism","memory","expense","housing","modern","repair","heritage","value"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should charity donations be anonymous?", h:"Take one side. Give two arguments with reasoning, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","anonymous","donations","charity","public","named"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","sincerity","dignity","example","encourage","pride","trust","accountability","receiver","reward"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does learning poetry by heart still have a purpose?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","poetry","heart","memorise","memorize","purpose"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","memory","language","rhythm","understanding","time","meaning","tradition","confidence","recite"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should food imports be reduced to support local farmers?", h:"State your position, support it with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","imports","reduced","local","farmers","support"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","prices","security","water","climate","jobs","choice","quality","cost","desert"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it better for a country to be self-sufficient or to trade widely?", h:"Take one side. Support it with reasoning, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","self","sufficient","trade","widely","country"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","security","cost","specialise","specialize","supply","crisis","prices","partners","industry"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should children be given smartphones before they finish primary school?", h:"Take one side. Give two arguments with evidence, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","children","smartphones","primary","given","before"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","safety","contact","sleep","content","attention","learning","control","age","apps"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does volunteering benefit the volunteer as much as the community?", h:"Take one side. Support it with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","volunteering","volunteer","community","benefit","equally"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","skills","confidence","perspective","time","need","service","experience","gratitude","work"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should every student learn to write computer code?", h:"Take one side. Give two arguments with examples, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","code","coding","student","learn","every"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","logic","jobs","problem","solving","future","interest","time","tools","thinking"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it acceptable to copy a design if you improve it?", h:"State your position, support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","copy","design","improve","acceptable","original"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","progress","credit","effort","rights","innovation","cheaper","users","fair","inspiration"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should sport stars earn more than doctors?", h:"Take one side. Support it with reasoning, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","sport","stars","earn","doctors","more"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","market","audience","value","lives","training","short","career","fair","demand"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Does a school need a library if every student has the internet?", h:"Take one side. Give two arguments with examples, concede one point, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","library","internet","school","need","still"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","quiet","guidance","quality","sources","screens","habit","cost","equal","access"]},
+      {q:"Concede a point to the other side", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Should students repeat a year if they fail?", h:"Take one side. Give two arguments with evidence, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","repeat","year","fail","students","promote"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","foundation","confidence","age","friends","gaps","support","summer","cost","progress"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]},
+    {t:"Is it right to measure a country's success by its income alone?", h:"State your position, support it with reasoning, answer the opposite view, then conclude.", points:[
+      {q:"State your position clearly", k:["should","should not","agree","disagree","believe","argue","opinion","view","think","must","convinced","position","measure","success","income","alone","country"]},
+      {q:"Give arguments with examples", k:["because","for example","for instance","such as","research","studies","shows","suggests","evidence","first","second","furthermore","therefore","data","health","education","happiness","equality","environment","simple","compare","number","wealth"]},
+      {q:"Answer the opposite view", k:["however","although","while","whereas","admittedly","it is true that","on the other hand","nevertheless","critics","some","others","granted"]}]}
   ]
 };
 
