@@ -9126,6 +9126,42 @@ function pastePath(){
   if (!/why:\s*[^,;]*"paste"/.test(src)) E('سببُ عدمِ الاحتسابِ لا يُحفَظ في الصفّ — فيظهر «غير محتسبة» بلا سبب');
   if (!/trusted:\s*v\.trusted/.test(src)) E('الصفُّ لا يحمل حكمَ اللصقِ في trusted — فالتقاريرُ لا تراه');
 
+  /* ٣٫٥) وتنبيهُ الترقيمِ قبل التقييم ═════════════════════════════════
+     قِيست نصوصُ حسنٍ الخمسةُ والثلاثون (٢٣ نوفمبر ٢٠٢٦) فكان نصُّ ذلك
+     اليومِ وحدَه بلا علامةِ وقفٍ قطّ — ثمانٍ وستّون كلمةً بلا نقطة، فعُدَّت
+     جملةً واحدةً والمطلوبُ ثمان، فسقطت ستُّ علاماتٍ من المقاييسِ الأربعة.
+     فطلب الأبُ تنبيهًا: «تنبيهٌ لا عقوبة، ولا يمسّ درجتَه». وهذا العطبُ
+     صامتٌ لو انكسر: الدرجةُ تنزل والطفلُ لا يعرف أنّ السببَ نقاطٌ لا لغة. */
+  if (typeof W.needsDots !== 'function') E('تنبيهُ الترقيمِ (needsDots) غيرُ مُصدَّرٍ فلا يُقاس');
+  else {
+    const N = W.needsDots;
+    const hasan = 'sport is very important in our daily life because it helps us stay healthy and happy First playing sport sports makes our bodies and improves our physical health it also helps us feel active and energetic throughout the day second sport teaches us teamwork patience and discipline';
+    const DCASES = [
+      ['نصُّ حسنٍ بعينِه: ٦٨ كلمةً بلا نقطة', hasan, true],
+      ['النصُّ نفسُه ونقطةٌ في آخره',          hasan + '.', false],
+      ['جملةٌ قصيرةٌ لم تُكمَل بعد (١٢ كلمةً)', 'sport is very important in our life and it helps us a lot', false],
+      ['نصٌّ طويلٌ مُنقَّط',                    'Sport is important. It keeps us healthy. First, it builds our bodies and improves our health every single day of the week.', false],
+      ['صندوقٌ فارغ',                          '', false],
+      ['علامةُ استفهامٍ تكفي ولا تُنبِّه',       'why is sport important in our daily life and how does it help us to stay healthy and happy every day?', false]
+    ];
+    DCASES.forEach(c => {
+      let got = null; try { got = N(c[1]); } catch(e){}
+      if (got !== c[2])
+        E('تنبيهُ الترقيمِ خطأٌ في «' + c[0] + '»: ردَّ ' + String(got) + ' والصوابُ ' + String(c[2]));
+    });
+    /* ولا يُنبَّه على نصٍّ فيه نقطةٌ واحدةٌ على الأقلّ، ولو كان طويلًا */
+    let wrong = 0;
+    for (let k = 25; k <= 200; k += 25){
+      const long = Array(k).fill('word').join(' ');
+      if (!N(long)) wrong++;                 /* بلا نقطةٍ: يلزم التنبيه */
+      if (N(long + '.')) wrong++;            /* بنقطةٍ: لا تنبيه */
+    }
+    if (wrong) E('تنبيهُ الترقيمِ غيرُ مطّردٍ مع الطول: ' + wrong + ' حالةً');
+  }
+  /* ويُعرَض في الموضعَين: وهو يكتبُ وعند النتيجة */
+  if ((src.match(/needsDots\s*\(/g) || []).length < 3)
+    E('تنبيهُ الترقيمِ لا يُعرَض في موضعَيه (وهو يكتبُ وعند النتيجة) — فيمرُّ السببُ عليه');
+
   /* ٤) والحكمُ يُستنبَط من الصفِّ المحفوظِ أيضًا ═══════════════════════
      ⚠️ صفُّ حسنٍ المكشوفُ محفوظٌ قبل القاعدةِ فلا trusted فيه، والمفتاحُ
      المنشورُ لا يُعدّل صفًّا (RLS تمنع UPDATE). فلو اعتمدت التقاريرُ على

@@ -1448,6 +1448,28 @@ function _h32(str){
 
    ولا يُحكَم إلّا بوجودِ حدثِ لصق: الكتابةُ السريعةُ بلا لصقٍ لا تُمَسّ
    مهما كانت سريعةً، فلا تُظلَم يدٌ مجتهدة. */
+/* ═══ تنبيهُ الترقيمِ قبل التقييم ═══════════════════════════════════
+   قِيست نصوصُ حسنٍ الخمسةُ والثلاثون (٢٣ نوفمبر ٢٠٢٦) فكان نصُّ ذلك
+   اليومِ وحدَه بلا علامةِ وقفٍ قطّ: ثمانٍ وستّون كلمةً بلا نقطة، فعدَّها
+   المصحّحُ جملةً واحدةً والمطلوبُ ثمان — فأسقطت الواحدةُ ستَّ علاماتٍ
+   من المقاييسِ الأربعة (لا افتتاحيّةَ ولا خاتمةَ ولا حرفًا كبيرًا ولا
+   تنوّعَ أطوالٍ ولا تنوّعَ فواتح). وإنجليزيّتُه أحسنُ من ترقيمِه: غطّى
+   نقاطَ الموضوعِ كلَّها وتنوّعُ مفرداتِه ستّةٌ وسبعون بالمئة.
+
+   فطلب الأبُ تنبيهًا قبل الضغطِ على «قيّم»: «تنبيهٌ لا عقوبة، ولا يمسّ
+   درجتَه». فهو لا يمنع التقييمَ ولا يُنقِص علامةً ولا يُحفَظ في الصفّ —
+   سطرٌ يُقال له وهو يكتب، ويُعاد عند النتيجةِ فلا يمرُّ السببُ عليه.
+
+   والحدُّ عشرون كلمةً: الجملةُ أو الجملتان قد يكتبهما ثمّ يُنقِّطهما،
+   فلا يُنبَّه على ما لم يُكمِله بعد. */
+function needsDots(text){
+  var t = String(text || "").replace(/\s+/g, " ").trim();
+  if(!t) return false;
+  var w = t.split(/\s+/).filter(function(x){ return /[A-Za-z]/.test(x); }).length;
+  if(w < 20) return false;
+  return !/[.!?]/.test(t);
+}
+
 var PASTE_MAX = 0.6;
 function pasteVerdict(len, pasteN, pasteCh, activeMs){
   len = +len || 0; pasteN = +pasteN || 0; pasteCh = +pasteCh || 0;
@@ -2129,7 +2151,12 @@ function render(el, ctx){
     var t=ta.value.replace(/\s+/g," ").trim();
     var w=t? t.split(/\s+/).filter(function(x){ return /[A-Za-z]/.test(x); }).length : 0;
     var s=splitSentences(t).length;
-    live.innerHTML=w+" كلمة · "+s+" جملة"+trI(w+" words · "+s+" sentences");
+    live.innerHTML=w+" كلمة · "+s+" جملة"+trI(w+" words · "+s+" sentences")+
+      (needsDots(ta.value)
+        ? '<div style="margin-top:6px;border:1.5px solid var(--bad);background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:7px 10px;font-weight:700">'+
+          '✋ '+w+' كلمة وما فيها ولا نقطة — راجِعها قبل التقييم. بلا نقاطٍ تُحسَب كلُّها جملةً واحدة.'+
+          trs("No full stops yet — without them this counts as one sentence.")+'</div>'
+        : '');
     bar.style.width=Math.min(100, Math.round(w/cef.minWords*100))+"%";
     try{ localStorage.setItem(draftKey, ta.value); }catch(e){}
   }
@@ -2256,6 +2283,11 @@ function render(el, ctx){
             'أربعة مقاييس، كلٌّ من 5 ووزنه 25٪ — والنجاح أن تبلغ <b>3</b> في كلٍّ منها (نظام كامبردج).</p>'+
           /* والقاعدةُ المعلنةُ تُنفَّذ أمامَه لا في صمت: يرى الدرجةَ
              ويرى أنّها لا تُحسَب، فيعرف السببَ ويعرف العلاج. */
+          (needsDots(ta.value)
+            ? '<div style="margin-top:10px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">'+
+              '✋ <b>ما في ولا نقطة في النصّ.</b> فحُسِبت فقرتُك جملةً واحدةً، وضاعت بذلك علاماتُ الافتتاحيّةِ والخاتمةِ والحرفِ الكبيرِ وتنوّعِ الجمل — '+
+              'وهي أربعُ علاماتٍ تأخذها بنقاطٍ فقط، لا بإنجليزيّةٍ أحسن. ضَعِ النقاطَ وأعِد التقييم.</div>'
+            : '')+
           (_pasted()
             ? '<div style="margin-top:10px;border:1.5px solid var(--bad);background:var(--bad-bg);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--bad)">'+
               '📋 أكثر هذا النصّ ملصوق ('+Math.round(_pasteShare()*100)+'٪) — فالجلسة تُسجَّل ولا تُحسَب لك، وتظهر في تقريرك بهذه العلامة. '+
@@ -2399,5 +2431,6 @@ window.WritingEN = { render:render, _howto:HOWTO, grade:gradeWriting, CEFR:CEFR,
                      grammar:grammarIssues, _rules:GRAMMAR, sims:sentSims, PAD_SIM:PAD_SIM,
                      reuse:reuseRatio, REUSE_MAX:REUSE_MAX,
                      order:cycleOrder, hash:_h32,
-                     pasteVerdict:pasteVerdict, PASTE_MAX:PASTE_MAX };
+                     pasteVerdict:pasteVerdict, PASTE_MAX:PASTE_MAX,
+                     needsDots:needsDots };
 })();
