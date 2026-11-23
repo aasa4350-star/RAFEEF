@@ -255,7 +255,32 @@ var CONN2 = [
 
 /* مواضيع الكتابة الحرّة.
    points = نقاط المهمّة (Content في مقياس كامبردج): لكلّ نقطة سؤالٌ موجِّه
-   ومجموعةُ كلماتٍ نستدلّ بها على أنّ الطفل تناولها فعلًا. */
+   ومجموعةُ كلماتٍ نستدلّ بها على أنّ الطفل تناولها فعلًا.
+
+   ── التوسيعُ (٢٣ نوفمبر ٢٠٢٦) ──────────────────────────────────────
+   طلبُ الأب: «وسّع بنك مواضيع التعبير». وأصلُ الشكوى أقدمُ: كان البنكُ
+   ثمانيةَ مواضيعَ فدارت عليه ثمانيةُ أيّامٍ بترتيبٍ واحد، فحفِظ حسنٌ
+   نصوصَه وأخذ الدرجةَ كاملةً بالذاكرةِ لا بالكتابةِ وقالها لأبيه. ثمّ
+   صار ثلاثين فصارت الدورةُ شهريّة.
+
+   فزِيد ستّون موضوعًا للمستوى الأوّلِ (سعودٌ وأسامة) وستّون للثاني
+   (حسنٌ ورفيف)، فصار كلٌّ منهما تسعين. وقِيس أثرُه على سنتَين بجدولِ
+   الصفحةِ نفسِه:
+       معدّلُ الفجوةِ بين إعادتَي الموضوع   ٣٠ يومًا ← ٨٩ يومًا
+       إعاداتٌ قبل ثلاثين يومًا               ٤٨٪  ← ٥٪
+   والخمسةُ الباقيةُ من حدِّ الدورة: الترتيبُ يُخلَط في كلِّ دورةٍ خلطًا
+   مستقلًّا، فموضوعٌ في آخرِ دورةٍ قد يقع في أوّلِ التي بعدها.
+
+   والمستوى الثالثُ باقٍ ثلاثين: لا يستعمله أحدٌ اليومَ (quiz.html يُسنِد
+   الثانيَ لحسنٍ ورفيفَ والأوّلَ لسعودٍ وأسامة)، فتوسيعُه لا ينفع أحدًا
+   حتى يُسنَد إلى أحد.
+
+   ⚠️ وفي التوسيعِ نفسِه زلّةٌ تستحقّ الذكر: فاصلةٌ زائدةٌ «]},,» خلّفت
+   موضعًا خاليًا في الفهرسِ الثلاثين من كلِّ بنك، فصار العدُّ أحدًا
+   وتسعين والبنودُ تسعين. ولم يمسكها فحصُ البنيةِ لأنّه بـfilter وهو
+   يتخطّى مواضعَ المصفوفةِ الخالية. فأُصلِحت، وأُضيف إلى الفحصِ عدُّ
+   الفجواتِ بالفهرسِ لا بالقيمة — ولو نُشِرت لصادف الجدولُ ذلك الموضعَ
+   يومًا من تسعين فطُلِب من الطفلِ موضوعٌ غيرُ موجود. */
 var PROMPTS = {
   1: [
     {t:"My family", h:"Who is in your family? What do they like to do? How do you feel about them?", points:[
@@ -416,6 +441,246 @@ var PROMPTS = {
       {q:"Say what you did", k:["carried","carry","gave","give","showed","show","taught","opened","cleaned","found","water","money","bag","homework","door","road"]},
       {q:"Say how you felt after", k:["felt","feel","happy","good","proud","glad","because","smiled","thanked","thank","nice","better","again","love"]}
     ]},
+    {t:"My favourite colour", h:"What colour do you like? What things have this colour? Why do you like it?", points:[
+      {q:"Say which colour you like", k:["red","blue","green","yellow","white","black","orange","brown","purple","pink","grey","favourite","colour","color","like"]},
+      {q:"Name things with that colour", k:["car","shirt","bag","wall","sky","sea","tree","flower","ball","door","book","pen","room","my"]},
+      {q:"Say why you like it", k:["because","beautiful","nice","happy","calm","bright","clean","like","love","makes","feel"]}]},
+    {t:"My neighbour", h:"Who is your neighbour? What does he or she do? How do you help each other?", points:[
+      {q:"Say who your neighbour is", k:["neighbour","neighbor","lives","next","house","family","man","woman","boy","girl","near","beside","our"]},
+      {q:"Say what your neighbour does", k:["teacher","driver","doctor","works","shop","school","engineer","police","nurse","farmer","sells","builds"]},
+      {q:"Say how you help each other", k:["help","helps","helped","give","gives","bring","brings","share","shares","kind","good","together","food"]}]},
+    {t:"The weather today", h:"What is the weather like? What do you wear? What do you do in this weather?", points:[
+      {q:"Say what the weather is like", k:["hot","cold","sunny","rainy","windy","cloudy","warm","cool","weather","today","dust","sand"]},
+      {q:"Say what you wear", k:["wear","wears","jacket","coat","shirt","cap","hat","shoes","sandals","clothes","thick","light"]},
+      {q:"Say what you do in this weather", k:["play","stay","go","drink","water","inside","outside","home","park","school","because","like"]}]},
+    {t:"My favourite drink", h:"What do you like to drink? When do you drink it? Why do you like it?", points:[
+      {q:"Say what you like to drink", k:["water","milk","juice","tea","laban","orange","apple","mango","drink","like","favourite","love"]},
+      {q:"Say when you drink it", k:["morning","breakfast","lunch","dinner","evening","night","school","after","before","every","day","hot","thirsty"]},
+      {q:"Say why you like it", k:["because","sweet","cold","good","healthy","tasty","nice","strong","like","makes","feel","body"]}]},
+    {t:"A book I read", h:"What is the book about? What did you like in it? Would you tell your friend about it?", points:[
+      {q:"Say what the book is about", k:["book","story","read","about","animals","boy","girl","school","science","history","prophet","adventure","pictures"]},
+      {q:"Say what you liked in it", k:["liked","like","best","part","funny","interesting","picture","pictures","end","nice","learned","new"]},
+      {q:"Say if you would tell a friend", k:["friend","tell","should","read","give","my","yes","also","because","good","everyone","class"]}]},
+    {t:"My teacher", h:"Who is your teacher? What does he or she teach? Why do you like your teacher?", points:[
+      {q:"Say who your teacher is", k:["teacher","my","class","school","name","teaches","teach","is","new","first"]},
+      {q:"Say what your teacher teaches", k:["english","math","maths","science","arabic","quran","islamic","sport","art","reading","writing","lesson"]},
+      {q:"Say why you like your teacher", k:["because","kind","good","helps","help","explains","patient","nice","smiles","never","angry","best","learn"]}]},
+    {t:"What I do before bed", h:"What do you do in the evening? When do you sleep? Why is sleep good?", points:[
+      {q:"Say what you do in the evening", k:["evening","night","brush","teeth","wash","read","pray","homework","drink","milk","family","sit","talk"]},
+      {q:"Say when you sleep", k:["sleep","bed","nine","ten","eight","early","late","oclock","clock","time","night","go"]},
+      {q:"Say why sleep is good", k:["because","rest","strong","body","brain","school","tired","energy","grow","healthy","morning","good"]}]},
+    {t:"My favourite day of the week", h:"Which day do you like? What happens on that day? How do you feel?", points:[
+      {q:"Say which day you like", k:["friday","thursday","saturday","sunday","monday","tuesday","wednesday","day","week","favourite","like","best"]},
+      {q:"Say what happens on that day", k:["no","school","sleep","play","visit","grandfather","grandmother","family","mosque","park","eat","rest","go"]},
+      {q:"Say how you feel on that day", k:["happy","free","rest","good","fun","because","love","like","enjoy","feel","excited"]}]},
+    {t:"A toy I like", h:"What is the toy? Who gave it to you? How do you play with it?", points:[
+      {q:"Say what the toy is", k:["toy","ball","car","bike","robot","doll","blocks","game","kite","puzzle","my","favourite"]},
+      {q:"Say who gave it to you", k:["father","mother","brother","sister","uncle","aunt","friend","grandfather","grandmother","gave","bought","gift","present"]},
+      {q:"Say how you play with it", k:["play","throw","build","ride","drive","push","make","with","friends","brother","home","outside","garden"]}]},
+    {t:"The shop near my house", h:"What is the shop? What do you buy there? Who works there?", points:[
+      {q:"Say what the shop is", k:["shop","store","market","bakery","near","house","street","small","big","our","beside"]},
+      {q:"Say what you buy there", k:["buy","bread","milk","rice","eggs","fruit","water","juice","sweets","book","pen","food"]},
+      {q:"Say who works there", k:["man","works","work","seller","owner","kind","gives","helps","knows","name","always","smiles"]}]},
+    {t:"My favourite vegetable", h:"Which vegetable do you like? How do you eat it? Why is it good for you?", points:[
+      {q:"Say which vegetable you like", k:["carrot","tomato","cucumber","potato","onion","lettuce","pepper","vegetable","like","favourite","eat"]},
+      {q:"Say how you eat it", k:["salad","soup","cooked","raw","rice","sandwich","mother","cooks","cook","with","eat","lunch","dinner"]},
+      {q:"Say why it is good for you", k:["because","healthy","good","body","strong","vitamins","grow","eyes","energy","clean","water"]}]},
+    {t:"A day at the hospital or clinic", h:"Why did you go? What did the doctor say? How did you feel after?", points:[
+      {q:"Say why you went", k:["sick","ill","pain","fever","tooth","cold","hurt","arm","leg","head","went","because","clinic","hospital"]},
+      {q:"Say what the doctor said", k:["doctor","said","gave","medicine","rest","drink","water","sleep","two","days","told","check"]},
+      {q:"Say how you felt after", k:["better","good","happy","well","strong","again","school","felt","feel","now","thank"]}]},
+    {t:"My favourite month", h:"Which month do you like? What happens in it? Why do you like it?", points:[
+      {q:"Say which month you like", k:["ramadan","january","march","june","july","december","month","favourite","like","best","eid"]},
+      {q:"Say what happens in it", k:["holiday","eid","fast","school","no","rain","cold","hot","travel","family","visit","gifts","play"]},
+      {q:"Say why you like it", k:["because","happy","fun","family","rest","food","free","love","like","together","best"]}]},
+    {t:"How I keep my room clean", h:"What do you do to clean it? When do you clean it? How does it look after?", points:[
+      {q:"Say what you do to clean it", k:["clean","tidy","bed","make","put","books","clothes","floor","sweep","wipe","shelf","away","bag"]},
+      {q:"Say when you clean it", k:["morning","every","day","week","friday","after","school","before","sleep","always","sometimes"]},
+      {q:"Say how it looks after", k:["clean","nice","tidy","good","better","happy","mother","feel","like","room","because"]}]},
+    {t:"A new word I learned", h:"What is the word? What does it mean? How did you learn it?", points:[
+      {q:"Say what the word is", k:["word","new","learned","learn","english","arabic","means","mean","is","my","today","class"]},
+      {q:"Say what it means", k:["means","mean","same","like","opposite","it","this","example","for","say","word","when"]},
+      {q:"Say how you learned it", k:["teacher","book","story","friend","father","mother","school","class","read","heard","video","lesson"]}]},
+    {t:"My favourite place at school", h:"Which place is it? What do you do there? Why do you like it?", points:[
+      {q:"Say which place it is", k:["library","playground","class","classroom","canteen","mosque","garden","hall","field","place","school","favourite"]},
+      {q:"Say what you do there", k:["read","play","eat","pray","sit","run","talk","study","friends","football","books","learn"]},
+      {q:"Say why you like it", k:["because","quiet","big","fun","clean","cool","friends","nice","like","love","best","happy"]}]},
+    {t:"Water in our life", h:"Where do we get water? What do we use it for? Why must we not waste it?", points:[
+      {q:"Say where we get water", k:["tap","well","rain","sea","desalination","bottle","pipe","water","comes","from","get"]},
+      {q:"Say what we use it for", k:["drink","wash","clean","cook","plants","trees","shower","wudu","garden","car","use","food"]},
+      {q:"Say why we must not waste it", k:["because","waste","important","life","desert","little","save","close","tap","need","everyone","plants"]}]},
+    {t:"A bird I saw", h:"Where did you see it? What did it look like? What was it doing?", points:[
+      {q:"Say where you saw it", k:["tree","garden","roof","sky","park","window","school","street","saw","see","yesterday","near"]},
+      {q:"Say what it looked like", k:["small","big","white","black","brown","grey","yellow","wings","beak","feathers","beautiful","colour","long"]},
+      {q:"Say what it was doing", k:["flying","eating","singing","sitting","drinking","building","nest","looking","water","seeds","was","jumped"]}]},
+    {t:"My father's work", h:"What does your father do? Where does he work? How do you feel about his work?", points:[
+      {q:"Say what your father does", k:["father","dad","works","work","teacher","driver","doctor","engineer","police","soldier","shop","office","builder"]},
+      {q:"Say where he works", k:["school","hospital","office","company","shop","city","near","far","every","day","goes","morning"]},
+      {q:"Say how you feel about it", k:["proud","happy","because","hard","helps","people","good","important","like","love","tired","respect"]}]},
+    {t:"The best gift I got", h:"What was the gift? Who gave it to you? Why was it special?", points:[
+      {q:"Say what the gift was", k:["gift","present","bike","watch","book","ball","phone","shoes","game","money","got","new"]},
+      {q:"Say who gave it to you", k:["father","mother","brother","sister","uncle","aunt","grandfather","grandmother","friend","gave","eid","birthday"]},
+      {q:"Say why it was special", k:["because","wanted","long","time","first","loved","happy","special","best","still","use","keep"]}]},
+    {t:"A time I was afraid", h:"What happened? Why were you afraid? What did you do?", points:[
+      {q:"Say what happened", k:["dark","night","alone","dog","noise","lost","fell","storm","thunder","was","were","happened","one"]},
+      {q:"Say why you were afraid", k:["afraid","scared","because","dark","loud","alone","big","noise","could","not","see","fear"]},
+      {q:"Say what you did", k:["ran","called","shouted","held","prayed","mother","father","brother","light","stayed","went","told","then"]}]},
+    {t:"How I learn English", h:"What do you do to learn? What is hard for you? What helps you most?", points:[
+      {q:"Say what you do to learn", k:["read","write","listen","speak","study","watch","videos","words","school","every","day","practise","practice"]},
+      {q:"Say what is hard for you", k:["hard","difficult","spelling","speaking","listening","words","writing","sometimes","forget","new","grammar","because"]},
+      {q:"Say what helps you most", k:["helps","help","teacher","father","mother","friend","book","app","repeat","practise","practice","cards","most"]}]},
+    {t:"My favourite kind of sweets", h:"What sweets do you like? When do you eat them? Why only a little?", points:[
+      {q:"Say what sweets you like", k:["chocolate","cake","dates","candy","ice","cream","biscuit","sweets","like","favourite","eat"]},
+      {q:"Say when you eat them", k:["eid","friday","party","after","lunch","dinner","sometimes","weekend","birthday","school","only","when"]},
+      {q:"Say why only a little", k:["because","teeth","sugar","healthy","not","many","little","bad","doctor","mother","says","good"]}]},
+    {t:"An animal I do not like", h:"Which animal is it? Why do you not like it? What do you do when you see it?", points:[
+      {q:"Say which animal it is", k:["snake","spider","mouse","rat","insect","fly","cockroach","dog","cat","not","like","animal"]},
+      {q:"Say why you do not like it", k:["because","afraid","scared","dirty","bite","bites","fast","ugly","dangerous","noise","small","moves"]},
+      {q:"Say what you do when you see it", k:["run","call","tell","mother","father","go","away","stay","far","shout","leave","room","then"]}]},
+    {t:"My school uniform", h:"What do you wear to school? What colour is it? Why is a uniform good?", points:[
+      {q:"Say what you wear to school", k:["uniform","shirt","trousers","thobe","shoes","socks","belt","wear","school","every","day","my"]},
+      {q:"Say what colour it is", k:["white","blue","grey","black","brown","green","colour","color","is","dark","light"]},
+      {q:"Say why a uniform is good", k:["because","same","all","students","clean","easy","tidy","no","think","clothes","equal","good","school"]}]},
+    {t:"The food my mother cooks best", h:"What does she cook? When do you eat it? How does it taste?", points:[
+      {q:"Say what she cooks", k:["kabsa","rice","chicken","meat","soup","fish","bread","eggs","pasta","mother","cooks","cook","best"]},
+      {q:"Say when you eat it", k:["friday","lunch","dinner","eid","guests","weekend","every","week","after","school","when","night"]},
+      {q:"Say how it tastes", k:["delicious","good","tasty","hot","sweet","best","like","love","eat","more","because","smell"]}]},
+    {t:"A friend who moved away", h:"Who was he or she? What did you do together? How do you feel now?", points:[
+      {q:"Say who the friend was", k:["friend","best","classmate","neighbour","neighbor","boy","girl","school","my","name","was","lived"]},
+      {q:"Say what you did together", k:["played","studied","walked","talked","football","sat","together","school","home","every","day","shared","laughed"]},
+      {q:"Say how you feel now", k:["miss","sad","sometimes","call","remember","happy","still","friend","because","hope","see","again","feel"]}]},
+    {t:"My favourite number", h:"Which number do you like? Where do you see it? Why do you like it?", points:[
+      {q:"Say which number you like", k:["number","seven","five","ten","three","nine","two","one","eight","favourite","like","best"]},
+      {q:"Say where you see it", k:["shirt","class","house","bus","door","phone","page","game","team","room","see","my"]},
+      {q:"Say why you like it", k:["because","easy","lucky","birthday","age","like","nice","remember","first","always","love"]}]},
+    {t:"How I help my father", h:"What do you do to help him? When do you help? How does he feel?", points:[
+      {q:"Say what you do to help", k:["help","carry","wash","car","clean","bring","water","garden","shop","bags","work","tools","hold"]},
+      {q:"Say when you help", k:["friday","weekend","evening","after","school","morning","always","sometimes","when","home","day","asks"]},
+      {q:"Say how he feels", k:["happy","proud","thanks","smiles","says","good","son","because","glad","love","feels","tells"]}]},
+    {t:"A day it rained", h:"When did it rain? What did you see? What did you do?", points:[
+      {q:"Say when it rained", k:["yesterday","last","week","night","morning","winter","friday","day","rained","rain","was","started"]},
+      {q:"Say what you saw", k:["water","street","puddles","clouds","sky","dark","trees","wet","thunder","lightning","cars","saw","grey"]},
+      {q:"Say what you did", k:["stayed","home","played","watched","window","walked","ran","school","umbrella","drank","tea","inside","then"]}]},
+    {t:"My bicycle", h:"Do you have a bicycle? Where do you ride it? How do you stay safe?", points:[
+      {q:"Say about your bicycle", k:["bicycle","bike","have","new","old","red","blue","small","big","my","got","father"]},
+      {q:"Say where you ride it", k:["street","park","garden","near","house","school","road","friend","ride","with","around","outside"]},
+      {q:"Say how you stay safe", k:["helmet","careful","slow","look","cars","road","not","fast","safe","side","stop","because"]}]},
+    {t:"A tree near my house", h:"What tree is it? What does it look like? Why are trees good?", points:[
+      {q:"Say what tree it is", k:["tree","palm","date","lemon","olive","neem","big","old","near","house","garden","street"]},
+      {q:"Say what it looks like", k:["tall","green","leaves","branches","trunk","wide","shade","fruit","dates","high","long","thick"]},
+      {q:"Say why trees are good", k:["because","shade","air","clean","oxygen","birds","fruit","beautiful","cool","good","give","help"]}]},
+    {t:"My favourite TV programme", h:"What do you watch? When do you watch it? What do you like in it?", points:[
+      {q:"Say what you watch", k:["cartoon","programme","program","show","match","football","film","movie","watch","like","favourite","channel"]},
+      {q:"Say when you watch it", k:["evening","night","after","school","friday","weekend","homework","every","day","before","sleep","sometimes"]},
+      {q:"Say what you like in it", k:["funny","exciting","because","story","player","hero","learn","new","interesting","like","best","part"]}]},
+    {t:"The mosque near us", h:"Where is it? When do you go? How do you feel there?", points:[
+      {q:"Say where the mosque is", k:["mosque","near","house","street","school","beside","next","our","small","big","walk","minutes"]},
+      {q:"Say when you go", k:["friday","maghrib","fajr","prayer","pray","every","day","father","with","morning","evening","go"]},
+      {q:"Say how you feel there", k:["quiet","calm","good","happy","clean","peace","because","feel","like","love","beautiful"]}]},
+    {t:"A day I was late", h:"Why were you late? What happened? What will you do next time?", points:[
+      {q:"Say why you were late", k:["late","slept","woke","alarm","bus","traffic","forgot","because","did","not","hear","early"]},
+      {q:"Say what happened", k:["teacher","said","class","started","ran","missed","lesson","door","sorry","walked","stood","then"]},
+      {q:"Say what you will do next time", k:["will","sleep","early","wake","alarm","ready","bag","night","before","next","time","not"]}]},
+    {t:"My favourite fish or sea animal", h:"Which one is it? Where does it live? What do you know about it?", points:[
+      {q:"Say which one it is", k:["fish","dolphin","shark","turtle","whale","crab","octopus","favourite","like","sea","animal"]},
+      {q:"Say where it lives", k:["sea","water","ocean","red","gulf","deep","lives","live","swims","salt","near","rocks"]},
+      {q:"Say what you know about it", k:["big","small","fast","eats","swims","breathes","clever","beautiful","teeth","shell","colour","long"]}]},
+    {t:"How I use a phone or tablet", h:"What do you use it for? How long do you use it? Why is too much bad?", points:[
+      {q:"Say what you use it for", k:["phone","tablet","games","videos","learn","english","call","read","homework","watch","play","use"]},
+      {q:"Say how long you use it", k:["hour","hours","minutes","half","after","homework","day","only","little","evening","sometimes","time"]},
+      {q:"Say why too much is bad", k:["because","eyes","sleep","head","tired","study","less","time","family","bad","health","not"]}]},
+    {t:"A thing I lost", h:"What did you lose? Where did you lose it? What happened after?", points:[
+      {q:"Say what you lost", k:["lost","pen","bag","book","watch","money","key","toy","phone","ball","shoe","my"]},
+      {q:"Say where you lost it", k:["school","class","bus","street","park","home","shop","playground","somewhere","room","friend","house"]},
+      {q:"Say what happened after", k:["found","looked","searched","teacher","mother","helped","gave","sad","happy","again","never","then","bought"]}]},
+    {t:"My classroom", h:"What is in it? Where do you sit? What do you like about it?", points:[
+      {q:"Say what is in it", k:["desk","desks","chair","chairs","board","window","door","books","wall","pictures","teacher","table","class"]},
+      {q:"Say where you sit", k:["sit","front","back","middle","near","window","door","beside","friend","my","place","row"]},
+      {q:"Say what you like about it", k:["because","clean","big","bright","quiet","friends","like","love","nice","light","learn","best"]}]},
+    {t:"A game I play with my family", h:"What game is it? Who plays with you? When do you play?", points:[
+      {q:"Say what game it is", k:["game","cards","chess","ball","football","hide","seek","board","play","favourite","kite","race"]},
+      {q:"Say who plays with you", k:["father","mother","brother","sister","cousin","uncle","family","all","we","together","with","plays"]},
+      {q:"Say when you play", k:["friday","evening","night","weekend","holiday","after","dinner","eid","visit","sometimes","every","week"]}]},
+    {t:"The street where I live", h:"What is on your street? Is it quiet or busy? What do you like about it?", points:[
+      {q:"Say what is on your street", k:["houses","shop","mosque","school","trees","cars","park","street","our","many","beside","near"]},
+      {q:"Say if it is quiet or busy", k:["quiet","busy","noisy","calm","cars","people","morning","evening","sometimes","night","traffic","very"]},
+      {q:"Say what you like about it", k:["because","friends","play","near","clean","safe","know","everyone","like","love","good","home"]}]},
+    {t:"My favourite smell", h:"What smell do you like? Where do you smell it? How does it make you feel?", points:[
+      {q:"Say what smell you like", k:["bread","oud","perfume","rain","coffee","food","flowers","smell","like","favourite","soap","mint"]},
+      {q:"Say where you smell it", k:["home","kitchen","mosque","shop","garden","street","mother","morning","bakery","after","near","when"]},
+      {q:"Say how it makes you feel", k:["happy","hungry","calm","good","because","remember","home","nice","makes","feel","love","warm"]}]},
+    {t:"Something I can do well", h:"What can you do well? How did you learn it? Who taught you?", points:[
+      {q:"Say what you can do well", k:["can","read","swim","draw","run","ride","cook","write","count","football","memorise","quran","well"]},
+      {q:"Say how you learned it", k:["practised","practice","tried","again","every","day","learned","learn","watched","slowly","hard","time","many"]},
+      {q:"Say who taught you", k:["father","mother","brother","sister","teacher","uncle","friend","taught","showed","helped","me","myself"]}]},
+    {t:"A visit to my grandmother", h:"When did you visit? What did you do there? What did she give you?", points:[
+      {q:"Say when you visited", k:["friday","yesterday","last","week","eid","holiday","weekend","visited","visit","went","day","with"]},
+      {q:"Say what you did there", k:["ate","played","talked","listened","stories","sat","helped","cousins","tea","garden","watched","slept"]},
+      {q:"Say what she gave you", k:["food","dates","sweets","money","gift","tea","bread","gave","love","prayed","hugged","kind"]}]},
+    {t:"My favourite subject in Arabic class", h:"What do you study? What is easy? What is hard?", points:[
+      {q:"Say what you study in Arabic class", k:["arabic","reading","writing","grammar","dictation","poem","story","spelling","letters","words","study","class"]},
+      {q:"Say what is easy for you", k:["easy","reading","speaking","listening","story","letters","because","know","can","like","simple","good"]},
+      {q:"Say what is hard for you", k:["hard","difficult","dictation","spelling","grammar","writing","hamza","because","forget","sometimes","need","practise","practice"]}]},
+    {t:"The clock and my day", h:"When do you wake up? What do you do at noon? When do you sleep?", points:[
+      {q:"Say when you wake up", k:["wake","woke","six","seven","five","morning","early","fajr","alarm","oclock","get","up"]},
+      {q:"Say what you do at noon", k:["noon","lunch","eat","pray","dhuhr","rest","home","school","come","back","after","then"]},
+      {q:"Say when you sleep", k:["sleep","bed","nine","ten","eight","night","early","after","isha","go","oclock","time"]}]},
+    {t:"A person who helped me", h:"Who helped you? What was the problem? What did he or she do?", points:[
+      {q:"Say who helped you", k:["teacher","friend","father","mother","brother","sister","neighbour","neighbor","man","helped","me","uncle"]},
+      {q:"Say what the problem was", k:["lost","fell","could","not","hard","homework","bag","heavy","sick","afraid","problem","because","late"]},
+      {q:"Say what he or she did", k:["helped","gave","showed","carried","explained","took","called","stayed","taught","kind","thank","then"]}]},
+    {t:"My favourite football team or player", h:"Who do you like? Why do you like them? When do you watch?", points:[
+      {q:"Say who you like", k:["team","player","hilal","nassr","ittihad","ahli","football","favourite","like","best","my","support"]},
+      {q:"Say why you like them", k:["because","good","fast","strong","wins","score","goals","plays","well","best","clever","team"]},
+      {q:"Say when you watch", k:["friday","evening","night","match","weekend","father","brother","watch","with","television","sometimes","every"]}]},
+    {t:"Keeping my teeth clean", h:"How do you clean your teeth? When do you do it? Why is it important?", points:[
+      {q:"Say how you clean your teeth", k:["brush","toothbrush","paste","water","clean","wash","siwak","mouth","twice","up","down","minutes"]},
+      {q:"Say when you do it", k:["morning","night","before","sleep","after","breakfast","every","day","twice","meals","always","then"]},
+      {q:"Say why it is important", k:["because","teeth","strong","healthy","pain","dentist","sugar","clean","smell","good","white","not"]}]},
+    {t:"A noise I do not like", h:"What noise is it? Where do you hear it? What do you do?", points:[
+      {q:"Say what noise it is", k:["noise","loud","horn","drill","thunder","shouting","dog","machine","car","alarm","sound","not","like"]},
+      {q:"Say where you hear it", k:["street","outside","night","school","near","house","morning","building","window","road","hear","sometimes"]},
+      {q:"Say what you do", k:["close","window","go","inside","room","cover","ears","wait","tell","mother","read","then","leave"]}]},
+    {t:"My favourite thing to draw", h:"What do you draw? What colours do you use? Who do you show it to?", points:[
+      {q:"Say what you draw", k:["draw","car","house","tree","animal","cat","bird","flower","face","map","mosque","sun","picture"]},
+      {q:"Say what colours you use", k:["colour","color","red","blue","green","yellow","brown","black","pencil","pen","many","use"]},
+      {q:"Say who you show it to", k:["mother","father","teacher","friend","brother","sister","class","show","gave","wall","room","proud"]}]},
+    {t:"Riding in a car", h:"Where do you go by car? Who drives? What do you do on the way?", points:[
+      {q:"Say where you go by car", k:["school","market","city","grandfather","mosque","park","far","near","go","travel","visit","trip"]},
+      {q:"Say who drives", k:["father","mother","brother","uncle","driver","drives","drive","sits","front","safe","slow","careful"]},
+      {q:"Say what you do on the way", k:["look","window","talk","listen","quran","music","sleep","count","cars","read","play","sometimes"]}]},
+    {t:"A day at the market", h:"When did you go? What did you see? What did you buy?", points:[
+      {q:"Say when you went", k:["friday","yesterday","morning","evening","last","week","with","mother","father","went","go","day"]},
+      {q:"Say what you saw", k:["fruit","vegetables","fish","meat","bread","people","shops","many","colours","saw","big","sellers"]},
+      {q:"Say what you bought", k:["bought","buy","apples","dates","rice","bread","milk","tomatoes","fish","money","bag","for"]}]},
+    {t:"My favourite season", h:"Which season do you like? What is the weather like? What do you do?", points:[
+      {q:"Say which season you like", k:["winter","summer","spring","autumn","season","favourite","like","best","my","love"]},
+      {q:"Say what the weather is like", k:["cold","hot","cool","warm","rain","wind","sun","sunny","nice","weather","dust","sky"]},
+      {q:"Say what you do in it", k:["play","travel","swim","walk","park","stay","home","picnic","desert","go","with","family"]}]},
+    {t:"Something old in my house", h:"What is it? Who does it belong to? Why do you keep it?", points:[
+      {q:"Say what it is", k:["old","box","clock","radio","sword","coffee","pot","carpet","picture","book","lamp","chest","thing"]},
+      {q:"Say who it belongs to", k:["grandfather","grandmother","father","mother","family","uncle","was","his","her","from","gave","old"]},
+      {q:"Say why you keep it", k:["because","remember","beautiful","family","history","special","still","works","love","keep","never","important"]}]},
+    {t:"A letter to my friend", h:"Who are you writing to? What is your news? What do you ask him or her?", points:[
+      {q:"Say who you are writing to", k:["dear","friend","cousin","brother","writing","write","hello","you","my","name","hope","well"]},
+      {q:"Say your news", k:["school","new","class","moved","learned","started","happy","busy","studying","english","today","now","week"]},
+      {q:"Say what you ask", k:["how","are","you","what","do","when","will","come","visit","please","write","tell","ask"]}]},
+    {t:"The last thing I ate", h:"What did you eat? Where did you eat it? Did you like it?", points:[
+      {q:"Say what you ate", k:["ate","eat","rice","bread","chicken","eggs","soup","fish","dates","fruit","sandwich","meat"]},
+      {q:"Say where you ate it", k:["home","school","kitchen","table","restaurant","garden","grandfather","house","with","family","there","sat"]},
+      {q:"Say if you liked it", k:["liked","like","good","delicious","tasty","not","much","best","because","want","again","more"]}]},
+    {t:"Waking up early", h:"When do you wake up? Who wakes you? Why is early good?", points:[
+      {q:"Say when you wake up", k:["wake","woke","five","six","seven","fajr","morning","early","alarm","get","up","oclock"]},
+      {q:"Say who wakes you", k:["mother","father","alarm","brother","myself","clock","phone","wakes","calls","sister","sometimes","me"]},
+      {q:"Say why early is good", k:["because","time","pray","school","breakfast","not","late","quiet","fresh","day","long","good"]}]},
+    {t:"A story my grandfather told me", h:"Who told the story? What was it about? What did you learn?", points:[
+      {q:"Say who told the story", k:["grandfather","grandmother","father","mother","uncle","told","tells","night","sat","us","me","story"]},
+      {q:"Say what it was about", k:["desert","camel","old","days","school","war","sea","rain","village","boy","man","about","long"]},
+      {q:"Say what you learned", k:["learned","learn","patience","work","hard","kind","help","never","should","important","because","respect","truth"]}]},
+    {t:"My school bus or my walk to school", h:"How do you get to school? How long does it take? Who is with you?", points:[
+      {q:"Say how you get to school", k:["bus","walk","car","bike","father","drives","ride","go","take","every","morning","school"]},
+      {q:"Say how long it takes", k:["minutes","five","ten","hour","half","short","long","takes","near","far","quick","about"]},
+      {q:"Say who is with you", k:["friend","brother","sister","cousin","neighbour","neighbor","alone","with","me","many","students","we"]}]}
   ],
   2: [
     {t:"The benefits of reading", h:"Give two benefits, an example for each, and a short conclusion.", points:[
@@ -583,6 +848,246 @@ var PROMPTS = {
       {q:"Give an example or a second reason", k:["for example","such as","internet","videos","games","books","research","people","speak","talk","understand","abroad","also","another","science","computer"]},
       {q:"Finish with a conclusion or a plan", k:["in conclusion","therefore","so","i think","believe","will","plan","practise","practice","improve","every day","important"]}
     ]},
+    {t:"Why reading the news matters", h:"Give one reason, an example, and a short conclusion.", points:[
+      {q:"State the first reason", k:["know","world","events","informed","understand","decisions","happening","important","aware","learn","knowledge","reason"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","weather","prices","election","health","report","newspaper","discuss","opinion"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","should","everyone","opinion","every","day","important","so"]}]},
+    {t:"The value of saving money", h:"Explain one benefit, give an example, then conclude.", points:[
+      {q:"State the first benefit", k:["save","saving","future","emergency","buy","need","independent","plan","money","without","borrow","benefit"]},
+      {q:"Give an example or a second benefit", k:["for example","such as","also","another","bicycle","book","gift","phone","little","every","month","riyals"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","should","habit","young","learn","so","opinion","important"]}]},
+    {t:"Is it better to read a book or watch a film?", h:"Give your view, support it with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["book","film","movie","better","prefer","because","imagination","detail","faster","easier","think","reason"]},
+      {q:"Give an example or mention the other side", k:["for example","however","on the other hand","although","some","people","while","story","picture","time","short","long"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","both","depends","opinion","so","prefer","still","overall"]}]},
+    {t:"The hardest subject for me and why", h:"Name the subject, explain why, then say what you will do about it.", points:[
+      {q:"Name the subject and say why it is hard", k:["math","maths","science","english","physics","chemistry","arabic","hard","difficult","because","understand","formulas","grammar"]},
+      {q:"Give an example of a difficulty", k:["for example","such as","when","problem","question","exam","forget","mistake","confused","chapter","lesson","part"]},
+      {q:"Say what you will do about it", k:["will","plan","practise","practice","ask","teacher","study","every","day","review","help","improve","try"]}]},
+    {t:"How a student can manage time", h:"Give one method, an example, then a conclusion.", points:[
+      {q:"State the first method", k:["plan","schedule","list","time","priority","first","important","divide","study","organise","organize","method","write"]},
+      {q:"Give an example or a second method", k:["for example","such as","also","another","hour","homework","before","break","phone","away","evening","morning"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","should","every","student","helps","so","opinion","better"]}]},
+    {t:"Should schools teach cooking and simple repairs?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["should","schools","teach","cooking","repairs","useful","life","skills","because","independent","everyone","need","think"]},
+      {q:"Give an example or the other side", k:["for example","such as","however","although","some","parents","time","subjects","already","full","instead","while"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","opinion","so","important","should","agree","overall","future"]}]},
+    {t:"A tradition in my family", h:"Describe the tradition, say when it happens, and why it matters.", points:[
+      {q:"Describe the tradition", k:["tradition","family","every","gather","coffee","dates","lunch","friday","eid","visit","grandfather","custom","together"]},
+      {q:"Say when it happens", k:["friday","eid","ramadan","weekend","month","year","after","prayer","every","week","night","summer"]},
+      {q:"Say why it matters", k:["because","family","close","love","remember","respect","children","learn","important","keeps","together","values"]}]},
+    {t:"The effects of not sleeping enough", h:"Give one effect, an example, then advice.", points:[
+      {q:"State the first effect", k:["tired","concentration","focus","memory","mood","angry","slow","health","effect","because","less","weak"]},
+      {q:"Give an example or a second effect", k:["for example","such as","also","another","exam","class","mistake","forget","headache","sick","school","morning"]},
+      {q:"Finish with advice or a conclusion", k:["in conclusion","therefore","should","sleep","hours","early","phone","advise","finally","think","better","so"]}]},
+    {t:"Is social media good for young people?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["social","media","good","bad","because","friends","learn","news","time","waste","compare","think","connect"]},
+      {q:"Give an example or the other side", k:["for example","however","on the other hand","although","some","hours","sleep","bullying","useful","while","instead","videos"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","balance","limit","opinion","so","should","overall","useful"]}]},
+    {t:"A change I would make in my school", h:"Say what you would change, why, and what the result would be.", points:[
+      {q:"Say what you would change", k:["would","change","add","library","break","longer","sport","lab","garden","class","schedule","new","improve"]},
+      {q:"Say why you would change it", k:["because","students","need","better","tired","small","old","help","learn","more","time","space","reason"]},
+      {q:"Say what the result would be", k:["result","would","better","happier","learn","improve","grades","less","more","students","then","so","benefit"]}]},
+    {t:"The importance of keeping promises", h:"Give one reason, an example, then conclude.", points:[
+      {q:"State the first reason", k:["trust","promise","keep","word","respect","people","believe","because","honest","important","reason","rely"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","friend","late","forgot","said","would","come","homework","help"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","should","only","promise","can","opinion","so","always"]}]},
+    {t:"How to deal with a difficult classmate", h:"Describe the problem, say what you do, then what you learned.", points:[
+      {q:"Describe the problem", k:["classmate","difficult","problem","noisy","angry","takes","laughs","does","not","listen","because","sits","annoying"]},
+      {q:"Say what you do", k:["talk","calm","ignore","tell","teacher","explain","ask","politely","away","patient","try","first","then"]},
+      {q:"Say what you learned", k:["learned","patience","understand","maybe","reason","home","kind","better","shout","not","respect","everyone","because"]}]},
+    {t:"My opinion about homework", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["homework","useful","too","much","because","practise","practice","remember","review","time","tired","think","helps"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","subjects","hours","evening","family","sport","while","instead","little"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","should","amount","quality","opinion","so","better","overall"]}]},
+    {t:"Why honesty is difficult sometimes", h:"Explain the difficulty, give an example, then your view.", points:[
+      {q:"Explain why it can be difficult", k:["honest","honesty","difficult","afraid","punishment","angry","hurt","feelings","because","easier","lie","hide","admit"]},
+      {q:"Give an example", k:["for example","such as","once","when","mistake","broke","forgot","exam","friend","told","said","truth","instead"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","better","always","respect","trust","should","finally","so","opinion"]}]},
+    {t:"A skill I taught someone", h:"Say what you taught, how you taught it, and how it went.", points:[
+      {q:"Say what you taught and to whom", k:["taught","teach","brother","sister","friend","cousin","read","ride","swim","english","maths","write","how"]},
+      {q:"Say how you taught it", k:["step","slowly","showed","explained","again","repeated","practised","practice","patient","example","first","then","together"]},
+      {q:"Say how it went", k:["learned","succeeded","happy","proud","difficult","time","finally","improved","could","thanked","result","because","now"]}]},
+    {t:"The best way to learn new words", h:"Give one way, an example, then a conclusion.", points:[
+      {q:"State the first way", k:["cards","read","write","repeat","sentence","use","listen","context","notebook","review","way","every","day"]},
+      {q:"Give an example or a second way", k:["for example","such as","also","another","story","song","speak","friend","app","test","myself","twenty"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","best","should","little","daily","opinion","so","works"]}]},
+    {t:"Should students have a part-time job?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["job","work","student","should","because","responsibility","money","experience","time","study","tired","think","learn"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","summer","holiday","weekend","hours","school","grades","while","instead"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","balance","opinion","so","short","should","overall","useful"]}]},
+    {t:"A problem in my school and how to solve it", h:"Describe the problem, its effect, and your solution.", points:[
+      {q:"Describe the problem", k:["problem","school","crowded","noise","litter","broken","small","library","hot","class","break","short","queue"]},
+      {q:"Say what effect it has", k:["because","students","cannot","hard","concentrate","learn","late","tired","dirty","unsafe","effect","result","less"]},
+      {q:"Give your solution", k:["solution","should","could","add","repair","clean","rule","organise","organize","divide","teacher","students","help","fix"]}]},
+    {t:"The role of libraries today", h:"Give one role, an example, then your view.", points:[
+      {q:"State the first role", k:["library","books","quiet","study","free","everyone","research","borrow","read","place","role","knowledge"]},
+      {q:"Give an example or a second role", k:["for example","such as","also","another","internet","computers","children","students","events","classes","poor","access"]},
+      {q:"Finish with your view", k:["in conclusion","finally","therefore","think","believe","still","important","should","opinion","so","even","digital"]}]},
+    {t:"How exercise changes the way you feel", h:"Give one effect, an example, then advice.", points:[
+      {q:"State the first effect", k:["exercise","energy","mood","happy","strong","sleep","stress","less","better","feel","because","health","effect"]},
+      {q:"Give an example or a second effect", k:["for example","such as","also","another","walk","football","running","minutes","morning","after","school","daily"]},
+      {q:"Finish with advice or a conclusion", k:["in conclusion","therefore","should","every","day","minutes","start","small","finally","think","so","advise"]}]},
+    {t:"A decision I had to make", h:"Describe the decision, the choices, and the result.", points:[
+      {q:"Describe the decision", k:["decision","had","choose","between","difficult","whether","should","time","important","was","two","options"]},
+      {q:"Say what the choices were", k:["first","second","one","other","could","either","or","option","choice","side","instead","while"]},
+      {q:"Say what the result was", k:["chose","decided","result","happy","regret","learned","better","right","wrong","finally","then","because","now"]}]},
+    {t:"Is competition between students useful?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["competition","useful","harmful","because","motivates","effort","stress","compare","best","push","think","improve","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","students","afraid","give","up","confidence","while","instead","cooperation"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","balance","opinion","so","should","fair","overall","both"]}]},
+    {t:"Something I changed my mind about", h:"Say what you thought before, what changed it, and what you think now.", points:[
+      {q:"Say what you thought before", k:["thought","before","used","believe","wrong","was","sure","opinion","first","did","not","like","idea"]},
+      {q:"Say what changed your mind", k:["then","read","saw","heard","tried","experience","teacher","friend","showed","explained","evidence","because","learned"]},
+      {q:"Say what you think now", k:["now","think","believe","understand","realise","realize","different","opinion","better","changed","so","today"]}]},
+    {t:"The difference between a friend and a classmate", h:"Explain the difference, give an example, then your view.", points:[
+      {q:"Explain the difference", k:["friend","classmate","difference","trust","choose","share","secrets","help","time","only","class","because","closer"]},
+      {q:"Give an example", k:["for example","such as","when","problem","sick","needed","called","stayed","while","another","once","helped"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","few","real","friends","better","many","opinion","so","finally"]}]},
+    {t:"How I would spend a free day", h:"Say what you would do, with whom, and why.", points:[
+      {q:"Say what you would do", k:["would","read","sleep","play","visit","travel","walk","swim","cook","draw","study","go","free"]},
+      {q:"Say who you would be with", k:["family","friend","brother","sister","father","mother","alone","cousin","with","together","we","myself"]},
+      {q:"Say why", k:["because","rest","enjoy","miss","need","love","happy","tired","week","time","important","so","reason"]}]},
+    {t:"Why some people are afraid of speaking English", h:"Explain the reason, give an example, then advice.", points:[
+      {q:"Explain the reason", k:["afraid","mistake","mistakes","laugh","shy","wrong","pronunciation","because","judge","perfect","fear","confidence","speak"]},
+      {q:"Give an example", k:["for example","such as","once","class","asked","could","not","answer","forgot","word","front","everyone"]},
+      {q:"Finish with advice or a conclusion", k:["in conclusion","therefore","should","practise","practice","mistakes","normal","part","learning","finally","think","start","small"]}]},
+    {t:"A place I would like to see", h:"Name the place, say why, and what you would do there.", points:[
+      {q:"Name the place and say where it is", k:["place","city","country","mountain","sea","museum","madinah","makkah","london","japan","visit","would","like"]},
+      {q:"Say why you would like to see it", k:["because","beautiful","history","learn","different","culture","read","about","saw","pictures","interesting","always"]},
+      {q:"Say what you would do there", k:["would","walk","visit","see","take","photos","try","food","museum","talk","people","learn","stay"]}]},
+    {t:"The best advice I ever received", h:"Say what the advice was, who gave it, and how it helped.", points:[
+      {q:"Say what the advice was", k:["advice","told","said","never","always","should","try","patient","honest","work","hard","listen","best"]},
+      {q:"Say who gave it", k:["father","mother","teacher","grandfather","grandmother","uncle","friend","gave","told","advised","was","once"]},
+      {q:"Say how it helped", k:["helped","because","remember","used","exam","problem","changed","better","still","follow","now","then","so"]}]},
+    {t:"Should pocket money be given for chores?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["pocket","money","chores","should","because","responsibility","value","work","family","duty","free","think","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","parents","help","without","payment","expect","while","instead","wash"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","opinion","so","balance","should","both","overall","fair"]}]},
+    {t:"How my city has changed", h:"Describe one change, give an example, then your view.", points:[
+      {q:"Describe one change", k:["city","changed","new","roads","buildings","shops","park","bigger","metro","trees","grew","before","now"]},
+      {q:"Give an example or a second change", k:["for example","such as","also","another","old","market","street","school","was","became","built","traffic"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","better","worse","miss","hope","opinion","so","future","finally"]}]},
+    {t:"Why wasting food is a problem", h:"Give one reason, an example, then advice.", points:[
+      {q:"State the first reason", k:["waste","food","problem","money","people","hungry","effort","water","farmers","because","throw","reason","resources"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","restaurant","party","bread","rice","plate","left","every","day"]},
+      {q:"Finish with advice or a conclusion", k:["in conclusion","therefore","should","take","less","share","keep","plan","finally","think","so","advise"]}]},
+    {t:"The hardest thing about growing up", h:"Explain the difficulty, give an example, then your view.", points:[
+      {q:"Explain the difficulty", k:["growing","responsibility","decisions","expect","harder","alone","pressure","because","difficult","change","school","future","myself"]},
+      {q:"Give an example", k:["for example","such as","when","exam","choose","friends","money","time","family","asked","must","now"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","still","learn","better","part","life","finally","so","opinion"]}]},
+    {t:"Is it important to learn a third language?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["third","language","important","because","work","travel","culture","brain","opportunity","think","useful","reason","learn"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","time","english","arabic","enough","difficult","while","instead","french"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","opinion","so","should","useful","overall","later","depends"]}]},
+    {t:"Someone in history I admire", h:"Name the person, say why, and what you learned.", points:[
+      {q:"Name the person and say when they lived", k:["admire","person","scientist","king","doctor","leader","teacher","lived","century","history","was","ago","famous"]},
+      {q:"Say why you admire them", k:["because","brave","patient","honest","helped","changed","discovered","built","worked","hard","people","never","gave"]},
+      {q:"Say what you learned from them", k:["learned","learn","should","patience","effort","courage","example","follow","important","teaches","me","so","lesson"]}]},
+    {t:"How to be a good listener", h:"Give one method, an example, then your view.", points:[
+      {q:"State the first method", k:["listen","eyes","interrupt","not","patient","attention","understand","questions","silent","wait","method","respect","speaking"]},
+      {q:"Give an example or a second method", k:["for example","such as","also","another","friend","problem","talking","phone","away","repeat","asked","said"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","important","skill","everyone","should","finally","so","opinion","better"]}]},
+    {t:"The advantages of living near the sea", h:"Give one advantage, an example, then your view.", points:[
+      {q:"State the first advantage", k:["sea","near","weather","air","fresh","fish","swim","work","port","beautiful","advantage","because","cool"]},
+      {q:"Give an example or a disadvantage", k:["for example","such as","however","although","humid","storms","expensive","while","instead","also","another","summer"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","would","like","prefer","opinion","so","finally","overall","still"]}]},
+    {t:"Should exams be replaced by projects?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["exams","projects","replaced","should","because","memory","understanding","stress","real","skills","think","fair","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","students","copy","time","teacher","mark","while","instead","both"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","balance","opinion","so","should","mixture","overall","better"]}]},
+    {t:"A time I worked in a team", h:"Describe the task, your role, and the result.", points:[
+      {q:"Describe the task", k:["team","group","project","task","class","school","together","had","clean","present","build","prepare","match"]},
+      {q:"Say what your role was", k:["role","my","job","wrote","drew","organised","organize","spoke","collected","helped","leader","part","did"]},
+      {q:"Say what the result was", k:["result","finished","succeeded","won","learned","difficult","argued","then","together","proud","mark","because","teacher"]}]},
+    {t:"Why respecting rules matters", h:"Give one reason, an example, then your view.", points:[
+      {q:"State the first reason", k:["rules","respect","safety","order","fair","everyone","because","chaos","protect","school","road","reason","important"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","traffic","queue","class","sport","game","without","accident","noise"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","should","even","small","opinion","so","finally","everyone","agree"]}]},
+    {t:"The most useful thing I own", h:"Name the thing, say how you use it, and why it is useful.", points:[
+      {q:"Name the thing", k:["useful","own","phone","bicycle","watch","bag","laptop","book","pen","most","my","thing","glasses"]},
+      {q:"Say how you use it", k:["use","every","day","school","study","read","call","carry","write","learn","travel","work","with"]},
+      {q:"Say why it is useful", k:["because","helps","saves","time","easier","without","difficult","need","important","always","so","useful"]}]},
+    {t:"How weather affects our mood", h:"Give one effect, an example, then your view.", points:[
+      {q:"State the first effect", k:["weather","mood","feel","happy","sad","tired","energy","sun","rain","heat","affects","because","effect"]},
+      {q:"Give an example or a second effect", k:["for example","such as","also","another","hot","stay","inside","cool","walk","winter","summer","dust"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","should","plan","opinion","so","finally","control","still","mind"]}]},
+    {t:"Is it better to live in a big family or a small one?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["big","small","family","better","because","help","noisy","attention","share","alone","think","many","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","brothers","sisters","room","money","quiet","while","instead","time"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","opinion","so","prefer","depends","overall","both","love"]}]},
+    {t:"Something I do better than last year", h:"Say what improved, how you improved it, and how you know.", points:[
+      {q:"Say what improved", k:["better","improved","last","year","now","english","reading","writing","maths","football","swimming","speaking","can"]},
+      {q:"Say how you improved it", k:["practised","practice","every","day","studied","asked","teacher","read","repeated","tried","slowly","effort","because"]},
+      {q:"Say how you know", k:["know","mark","grade","faster","easier","teacher","said","test","compare","before","now","result","can"]}]},
+    {t:"Why some people do not like change", h:"Explain the reason, give an example, then your view.", points:[
+      {q:"Explain the reason", k:["change","afraid","unknown","comfortable","used","habit","because","risk","safe","difficult","prefer","same","fear"]},
+      {q:"Give an example", k:["for example","such as","when","school","moved","new","house","teacher","system","phone","refused","first"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","necessary","grow","should","try","opinion","so","finally","better"]}]},
+    {t:"The best age to start learning a language", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["age","young","early","start","language","because","brain","easier","sounds","children","adults","think","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","adults","faster","grammar","understand","while","instead","motivated","still"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","any","opinion","so","never","late","overall","should"]}]},
+    {t:"How I deal with a bad mark", h:"Say what you feel, what you do, and what you learned.", points:[
+      {q:"Say what you feel", k:["sad","angry","disappointed","feel","bad","mark","low","upset","first","because","expected","was"]},
+      {q:"Say what you do", k:["review","look","mistakes","ask","teacher","study","again","plan","practise","practice","try","next","then"]},
+      {q:"Say what you learned", k:["learned","mistake","part","learning","improve","not","end","effort","patience","because","better","now","should"]}]},
+    {t:"Why cities need public parks", h:"Give one reason, an example, then your view.", points:[
+      {q:"State the first reason", k:["park","parks","city","air","trees","exercise","children","play","meet","free","green","because","reason"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","families","evening","walk","sport","shade","hot","summer","crowded"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","should","build","more","opinion","so","finally","every","neighbourhood"]}]},
+    {t:"A film or programme that taught me something", h:"Name it, say what it was about, and what you learned.", points:[
+      {q:"Name it and say what it was about", k:["film","movie","programme","program","documentary","about","watched","story","history","science","animals","was","saw"]},
+      {q:"Say what part affected you", k:["part","scene","moment","when","showed","explained","surprised","because","never","knew","most","interesting"]},
+      {q:"Say what you learned", k:["learned","learn","understand","should","important","realised","realize","now","think","lesson","so","changed"]}]},
+    {t:"Should students choose their own subjects?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["choose","subjects","students","should","because","interest","motivated","future","career","young","know","think","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","basic","maths","language","need","everyone","while","instead","later"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","balance","opinion","so","some","core","overall","should"]}]},
+    {t:"The hardest work I have ever done", h:"Describe the work, why it was hard, and how you felt after.", points:[
+      {q:"Describe the work", k:["work","carried","cleaned","helped","moved","built","studied","painted","garden","house","hours","day","hard"]},
+      {q:"Say why it was hard", k:["because","heavy","hot","long","tired","slow","difficult","alone","many","hours","back","sweat","pain"]},
+      {q:"Say how you felt after", k:["after","proud","tired","happy","satisfied","learned","respect","value","finished","felt","because","so"]}]},
+    {t:"Why mobile phones should or should not be in class", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["phones","class","should","because","distraction","research","dictionary","noise","cheat","useful","think","allow","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","teacher","lesson","search","games","messages","while","instead","emergency"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","rules","opinion","so","only","permission","overall","should"]}]},
+    {t:"A habit I want to stop", h:"Name the habit, say why it is bad, and your plan.", points:[
+      {q:"Name the habit", k:["habit","want","stop","late","phone","sweets","sleeping","forget","delay","nails","shouting","watching","my"]},
+      {q:"Say why it is bad", k:["because","time","health","teeth","study","tired","waste","angry","affects","bad","sleep","grades","family"]},
+      {q:"Give your plan", k:["plan","will","start","small","every","day","replace","ask","help","remind","myself","week","try"]}]},
+    {t:"The value of helping your neighbours", h:"Give one reason, an example, then your view.", points:[
+      {q:"State the first reason", k:["neighbours","neighbors","help","community","safe","trust","need","alone","because","together","reason","kindness","near"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","old","sick","travel","keys","food","carry","watch","house"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","should","everyone","small","opinion","so","finally","return","kind"]}]},
+    {t:"Is homework better in the morning or the evening?", h:"Give your view with a reason and an example, then conclude.", points:[
+      {q:"State your view and the first reason", k:["morning","evening","homework","better","because","fresh","tired","concentrate","quiet","time","think","mind","reason"]},
+      {q:"Give an example or the other side", k:["for example","however","although","some","people","early","late","school","family","while","instead","noise"]},
+      {q:"Finish with a conclusion or opinion", k:["in conclusion","finally","therefore","think","believe","depends","opinion","so","person","overall","should","own"]}]},
+    {t:"Something my parents taught me", h:"Say what they taught, how, and how it helps you now.", points:[
+      {q:"Say what they taught you", k:["parents","father","mother","taught","respect","honesty","patience","work","pray","save","help","others","how"]},
+      {q:"Say how they taught it", k:["example","showed","told","repeated","every","day","watched","them","explained","never","always","did","by"]},
+      {q:"Say how it helps you now", k:["now","helps","school","friends","decisions","remember","because","still","use","better","so","life"]}]},
+    {t:"The effect of noise on studying", h:"Give one effect, an example, then advice.", points:[
+      {q:"State the first effect", k:["noise","concentrate","focus","slower","mistakes","forget","tired","understand","because","effect","harder","read","distract"]},
+      {q:"Give an example or a second effect", k:["for example","such as","also","another","street","television","brothers","music","class","construction","evening","while"]},
+      {q:"Finish with advice or a conclusion", k:["in conclusion","therefore","should","quiet","room","library","close","window","finally","think","so","advise"]}]},
+    {t:"A tradition I would like to change", h:"Name the tradition, say why, and what you suggest.", points:[
+      {q:"Name the tradition", k:["tradition","custom","change","would","like","people","always","every","year","wedding","visit","gifts","habit"]},
+      {q:"Say why you would change it", k:["because","expensive","tiring","waste","time","money","old","no","longer","useful","difficult","reason","many"]},
+      {q:"Say what you suggest", k:["suggest","instead","could","should","simpler","smaller","keep","part","change","better","way","propose","then"]}]},
+    {t:"Why learning to write well matters", h:"Give one reason, an example, then your view.", points:[
+      {q:"State the first reason", k:["writing","write","clear","ideas","understand","work","study","exam","message","because","thinking","reason","express"]},
+      {q:"Give an example or a second reason", k:["for example","such as","also","another","letter","report","email","answer","teacher","job","application","test"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","should","practise","practice","every","opinion","so","finally","skill"]}]},
+    {t:"The best thing about my neighbourhood", h:"Name it, give an example, then your view.", points:[
+      {q:"Name the best thing", k:["neighbourhood","neighborhood","best","quiet","people","mosque","shops","park","near","school","safe","clean","trees"]},
+      {q:"Give an example", k:["for example","such as","when","neighbours","neighbors","help","children","play","evening","everyone","knows","together"]},
+      {q:"Finish with your view", k:["in conclusion","therefore","think","believe","lucky","would","not","move","opinion","so","finally","love"]}]},
+    {t:"How I would improve my English this year", h:"Give your plan, an example, then how you will measure it.", points:[
+      {q:"State your plan", k:["plan","will","read","write","listen","speak","every","day","words","minutes","practise","practice","improve"]},
+      {q:"Give an example of what you will do", k:["for example","such as","story","video","notebook","twenty","words","week","friend","record","myself","aloud"]},
+      {q:"Say how you will measure it", k:["measure","test","mark","compare","before","after","month","teacher","know","count","progress","result","because"]}]}
   ],
   /* المستوى ٣ — موضوعاتُ مقالٍ برأيٍ ودليلٍ ورأيٍ مضادّ، على نمطِ ما يُطلَب
      من طالبِ الثالثِ الثانويِّ في الكتابةِ الأكاديميّة. وثالثُ النقاطِ في
