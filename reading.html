@@ -115,7 +115,7 @@
   .hint{color:var(--muted);font-size:.85rem;margin:2px 4px 0}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=d2da689e95" defer></script>
+<script src="build-check.js?v=841c31ac3b" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -4628,6 +4628,16 @@ if(!META[who] || !DATA[who]){
        فمن لم يفصل زمنَ الجلوسِ من زمنِ الغيابِ حكم على الطفلِ بما ليس
        منه — وقد وقعتُ فيه. */
     var correct = 0, answered = 0, savedN = 0, t0 = Date.now(), aw0 = awaySnap();
+    /* ويُقال له في وجهِه لا في الصفِّ وحدَه: من خرج عن الشرطِ رأى سطرًا
+       ظاهرًا أنّ جلستَه تدريبٌ — فلا يُفاجأ بأنّها لم تُحسَب. */
+    function markTraining(){
+      var el = document.querySelector("[data-train]");
+      if(el && el.style.display === "none"){
+        el.style.display = "block";
+        el.innerHTML = '🏋️ <b>هذي الجلسة تدريب</b> — خرجت عن شرط الاختبار (سماعٌ مرّة واحدة، '+
+          'والسؤال مسموع). تنفعك ولا تُحسب في نسبتك، وجلستك الجاية على الشرط تُحسب.';
+      }
+    }
     wireExitWarn(sec);
     /* ═══ وأيُّ النصوصِ سمعها يُحفَظ، لا عددُها وحدَه ═══════════════════
        كان الصفُّ يحفظ clips عددًا مجرَّدًا. فلمّا سُئلتُ عن مستواه لم
@@ -4635,7 +4645,20 @@ if(!META[who] || !DATA[who]){
        كان قد سُمِع كلُّ نصٍّ فيه ثلاثَ مرّاتٍ وأربعةَ أعشارٍ وسطيًّا،
        فبعضُ ثمانيةٍ وثمانينَ بالمئةِ ذاكرةٌ لا فهم. وهو نفسُ عيبِ قسمِ
        الجملِ الذي ضُبِط بـaskKeys. */
-    var heardKeys = [], qReadN = 0;
+    /* ═══ شرطُ الاختبار: سماعٌ مرّةً واحدة ════════════════════════════
+       كُتيِّبُ المركزِ الوطنيِّ للقياسِ، بنصِّه:
+         «You will hear each dialogue one time only.
+          You will hear each question one time only.»
+       وكان القسمُ يُعطيه مرّتَين. وطلب الأب (٢٤ نوفمبر ٢٠٢٦): «أبدأ في
+       ب لهم كلهم» — أي تُطبَّق المرّةُ الواحدةُ على الأبناءِ جميعًا.
+
+       والمرّةُ الثانيةُ عونٌ تعليميٌّ حقيقيٌّ لمن في ثالثِ متوسّطٍ
+       ودونَه، فلا تُحذَف: تبقى بزرٍّ مكتوبٍ عليه أنّها خارجَ شروطِ
+       الاختبار، **ومن استعملها صارت جلستُه تدريبًا لا تدخل نسبتَه**.
+       فيبقى العونُ ويبقى الرقمُ صادقًا — وهو عينُ ما يفعله حارسُ النقرِ
+       في الأبوابِ الأخرى: لا يمنع الطفلَ، وإنّما لا يُحسَب له.
+       ومثلُها «اعرضه مكتوبًا» في السؤال. */
+    var heardKeys = [], qReadN = 0, replayN = 0;
     /* ═══ ويُرصَد أيُّ مهارةٍ تخذله، لا الدرجةُ وحدَها ═══════════════
        تشخيصُ أسامة (٢٩ أكتوبر ٢٠٢٦): فهمُ المسموعِ ٥٩٪، ولا جلسةَ
        واحدةً من أربعٍ تحمل تفصيلًا — فالقسمُ يقول «ضعيف» ولا يقول في
@@ -4681,7 +4704,8 @@ if(!META[who] || !DATA[who]){
       e.t++; if(ok) e.c++;
     }
     var html = '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> 🎧 فهم المسموع</div>'+
-      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس. وبعدها يجيك <b>سؤال واحد في كل مرّة</b>، و<b>السؤال نفسه مسموع ما هو مكتوب</b> — زي الاختبار بالضبط: تشوف الخيارات بس. وإن ما سمعته فيه زرّ يعرضه لك. والنصّ والسؤال يظهران بعد ما تجاوب، تقارن فيهما.</p>'+
+      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. و<b>تسمعه مرّة واحدة</b>: هذا شرط الاختبار نفسه. وبعدها يجيك <b>سؤال واحد في كل مرّة</b>، و<b>السؤال نفسه مسموع ما هو مكتوب</b> — تشوف الخيارات بس. وفيه زرّ يعيد لك السماع وزرّ يعرض السؤال مكتوبًا، لكنهما <b>خارج شروط الاختبار</b>: من استعملهما صارت جلسته تدريبًا ما تُحسب في نسبته. والنصّ والسؤال يظهران بعد ما تجاوب، تقارن فيهما.</p>'+
+      '<p data-train class="hint" style="display:none;border:1.5px solid var(--warn);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--warn)"></p>'+
       /* ولا يُكرَّر عليه في صمت: إن بدأت الدورةُ الثالثةُ قيل له */
       (lCycle >= 2
         ? ('<p class="hint" style="border:1.5px solid var(--warn);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--warn)">'+
@@ -4716,7 +4740,10 @@ if(!META[who] || !DATA[who]){
       var aw = awaySince(aw0);
       saveScore("فهم المسموع 🎧", correct, answered,
         { dur:Math.round((Date.now()-t0)/1000), away:aw.away, exits:aw.exits,
-          trusted:(aw.exits===0), clips:items.length, qRead:qReadN,
+          trusted:(aw.exits===0 && replayN===0 && qReadN===0),
+          why:(replayN ? "replay" : (qReadN ? "qread" : undefined)),
+          examCond:(replayN===0 && qReadN===0), replays:replayN,
+          clips:items.length, qRead:qReadN,
           clipKeys:heardKeys.slice(0,12), pid:attId, lang:"en",
           skills:LSK });
     }
@@ -4766,7 +4793,7 @@ if(!META[who] || !DATA[who]){
           qEl.querySelector("[data-qshow]").addEventListener("click", function(){
             qEl.querySelector("[data-qtext]").style.display = "block";
             this.style.display = "none";
-            qReadN++;
+            qReadN++; markTraining();
           });
           qEl.querySelectorAll(".opts button").forEach(function(btn){
             btn.addEventListener("click", function(){
@@ -4799,16 +4826,17 @@ if(!META[who] || !DATA[who]){
         });
       }
       playBtn.addEventListener("click", function(){
-        if(plays >= 2){ return; }
         plays++;
+        if(plays > 1){ replayN++; markTraining(); }
         /* ويُسجَّل النصُّ عند أوّلِ تشغيلٍ لا عند الإجابة: من سمع ثمّ
            خرج قد سُمع له نصٌّ ولم يُسأل عنه — والمقصودُ أيَّ النصوصِ
            بلغته أذنُه. والمفتاحُ أوّلُ ستّةٍ وثلاثينَ حرفًا من النصِّ
            فيُعرَف ولا يُثقَل الصفّ. */
         if(heardKeys.indexOf(it.t.slice(0,36)) < 0) heardKeys.push(it.t.slice(0,36));
-        cnt.textContent = plays >= 2 ? "خلصت مرّاتك — جاوب من اللي سمعت" : "تبقّى لك مرّة واحدة";
-        playBtn.textContent = "🔁 اسمع مرّة ثانية";
-        if(plays >= 2) playBtn.disabled = true;
+        cnt.textContent = plays === 1
+          ? "سمعته مرّة — وهذا شرط الاختبار. جاوب من اللي سمعت."
+          : ("سمعته "+plays+" مرّات — فهذي الجلسة تدريب، ما تُحسب في نسبتك.");
+        playBtn.textContent = "🔁 اسمع ثانيةً — خارج شروط الاختبار";
         openQs();
         /* ═══ المقطعُ المحفوظُ أوّلًا ══════════════════════════════════
            كان يُطلَب من أزور في كلِّ تشغيل، فينتظر الطفلُ في كلِّ بندٍ
