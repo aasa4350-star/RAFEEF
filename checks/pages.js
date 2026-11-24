@@ -9624,10 +9624,15 @@ function gdosePath(){
         box.SeenCap.markShown(it, 'r'+r);
       }
       if (over) E('الجرعةُ تخرق حدَّ العرضَين داخلَ الدورةِ الواحدة: ' + over + ' عرضًا ثالثًا في تسعِ جلسات');
-      /* وتُشبَع البنوكُ فتُعلَن دورةٌ جديدة: ستٌّ × عشرون × عرضان = ٢٤٠ سحبةً */
+      /* وتُشبَع البنوكُ فتُعلَن دورةٌ جديدة.
+         ⚠️ وعددُ الجولاتِ يُحسَب من سعةِ البنوكِ لا يُكتَب رقمًا: كان
+         ثلاثين، فلمّا زِيد البنكُ من عشرين بندًا للقاعدةِ إلى سبعةٍ
+         وأربعين صارت الثلاثون لا تُشبِعه فصاح الحارسُ ولا عطبَ. */
       box.SeenCap.init('cyc');
+      const cap6 = WANT.reduce((a, w) => a + (P[w] || []).length, 0) * box.SeenCap.CAP;
+      const rounds = Math.ceil(cap6 / 10) + 3;
       let res2 = 0;
-      for (let r=0;r<30;r++){
+      for (let r=0;r<rounds;r++){
         const it = box.gdoseItems(10);
         if (box.gdoseItems.reset) res2++;
         box.SeenCap.markShown(it, 'c'+r);
