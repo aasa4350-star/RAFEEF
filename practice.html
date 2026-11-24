@@ -75,7 +75,7 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=e2dab8f032" defer></script>
+<script src="build-check.js?v=d65fac01d7" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -1466,6 +1466,9 @@ if(!VERBAL_ONLY){
      وما جاء بعد التبويبِ الخامسِ لا يُفتَح. وهي لفهدٍ وحدَه — القياسُ
      قياسُه، ولا تُفرَض على من لم يُقَس. */
   if(GDOSE) TABS.push(["gd","جرعة قواعد 💊"]);
+  /* نموذجُ ستيبَ الكاملُ لمن يتدرّب بأوزانِ الاختبار — وهو موضعُ قياسِ
+     الجَلَدِ والسرعة، وقِيس أنّهما لم يُقاسا عنده قطُّ. */
+  if(STEP_WEIGHTED) TABS.push(["sf","ستيب — نموذج كامل ⏱️"]);
   if(window.STEP_BANK) TABS.push(["gr","قواعد مركّزة ✏️"]);
   if(WRITING) TABS.push(["w","تعبير ✍️"]);
   /* سأل الأب (٣٠ سبتمبر ٢٠٢٦): «متى نعطي فهد اختبارًا حقيقيًّا في
@@ -1714,6 +1717,7 @@ function renderSet(id, items, intro, regen, label){
   var MW_PACE = (id === "mw" || id === "mwf");  /* الإيقاعُ يُقاس في الاثنتَين */
   var secsAll = (id==="full") ? FULL_SECS
               : (id==="mwf") ? MWF_SECS
+              : (id==="sf") ? SF_SECS_CUR
               : MW_SOFT ? (SECS.mw || 0)
               : (TIMED ? (SECS[id] || 0) : 0);
   var MW_TARGET = (MW_PACE && items.length) ? Math.round(secsAll/items.length) : 0;
@@ -2181,6 +2185,128 @@ function gdIntro(){
     'من بنكٍ فيه '+n+' سؤالًا، و<b>ما يتكرّر عليك سؤالٌ أكثرَ من مرّتين</b>.</div>';
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   نموذجُ ستيبَ الكاملُ الموقوت ⏱️
+   ═══════════════════════════════════════════════════════════════════
+   الأرقامُ من كُتيِّبِ المركزِ الوطنيِّ للقياسِ نفسِه (Standardized Test
+   of English Proficiency — A Guide for Students، إدارةُ اختباراتِ
+   اللغة، ١٩ مارس ٢٠١٢)، بنصِّه:
+     «The actual STEP test has 100 questions distributed among the four
+      components previously mentioned. With additional time allotted for
+      non-scorable trial questions and instructions, the total test time
+      is 3 hours.»
+     «Reading Comprehension (RC – 40%), Structure (ST – 30%),
+      Listening Comprehension (LC – 20%), Compositional Analysis (CA – 10%).»
+   فالإيقاعُ ١٠٨ ثوانٍ للسؤال. ولا يذكر الكُتيِّبُ زمنًا لكلِّ قسمٍ على
+   حدة، فالورقةُ موقوتةٌ جملةً كما هي في الاختبار.
+
+   والمسموعُ (٢٠ سؤالًا) يحتاج صوتًا وليس في هذه الصفحة، فالورقةُ هنا
+   ثمانون سؤالًا بإيقاعِها نفسِه، ويُحال إلى المسموعِ صريحًا.
+
+   ═══ ولِمَ متدرّجُ الطولِ لا كاملٌ من أوّلِ يوم ═════════════════════
+   قِيس عند حسنٍ (٢٤ نوفمبر ٢٠٢٦): **صفرُ جلساتٍ** بثلاثين سؤالًا أو
+   أكثرَ بإيقاعٍ معقولٍ (ثماني ثوانٍ للسؤال وأكثر) — ولا جلسةٌ واحدةٌ
+   في تاريخِه كلِّه. وأطولُ ما جلسه فعلًا اثنتان وثلاثون سؤالًا في
+   سبعٍ وسبعين إلى ثلاثِ مئةٍ وأربعين ثانيةً (أي ٣–١٠ ثوانٍ للسؤال،
+   وهو استرجاعُ محفوظٍ لا حلّ). ونموذجُ موهبةَ الكاملُ (١٢٠ سؤالًا)
+   فتحه مرّةً في ١٧ أكتوبر فكان **صفرًا من مئةٍ وعشرين في ثلاثِ ثوانٍ**
+   — أي فتحه وتركه.
+
+   فإلقاءُ ثمانين سؤالًا عليه دفعةً واحدةً يُتَرك كما تُرك ذاك. والجَلَدُ
+   يُبنى كما تُبنى العضلة: أربعون ثمّ ستّةٌ وخمسون ثمّ اثنان وسبعون ثمّ
+   ثمانون، والدرجةُ تصعد بجلسةٍ تامّةٍ لا بيومٍ يمضي — فمن لم يُكمِل لم
+   يُطوَّل عليه.
+   ═══════════════════════════════════════════════════════════════════ */
+var SF_LABEL = "STEP — نموذج كامل ⏱️";
+var SF_SEC_PER_Q = 108;                 /* ١٨٠ دقيقةً ÷ ١٠٠ سؤالٍ */
+var SF_STEPS = [40, 56, 72, 80];        /* مضاعفاتُ ثمانيةٍ فتبقى النسبُ ٤:٣:١ صحيحةً */
+var SF_SECS_CUR = 0;
+function sfLen(done){
+  var i = Math.max(0, Math.min(SF_STEPS.length - 1, +done || 0));
+  return SF_STEPS[i];
+}
+/* النسبُ من الجدولِ الرسميِّ لا من أوزانِ الورقةِ القصيرة: تلك رُدَّت
+   إلى اثنَي عشرَ سؤالًا بتقريبٍ (٦ و٤ و٢)، وهذه ورقةٌ طويلةٌ تحتمل
+   النسبةَ الصحيحة: ٤٠ و٣٠ و١٠ من ثمانين. */
+function sfCounts(n){
+  var base = (STEP_W[0][1] + STEP_W[1][1] + STEP_W[3][1]);     /* ٤٠+٣٠+١٠ = ٨٠ */
+  var r = Math.round(n * STEP_W[0][1] / base);
+  var w = Math.round(n * STEP_W[3][1] / base);
+  return { read: r, write: w, struct: n - r - w };
+}
+function stepFullMix(n){
+  var c = sfCounts(n);
+  var read = stepReadItems(c.read), write = stepWriteItems(c.write);
+  var ns = n - read.length - write.length;
+  var pool4 = STEP.filter(function(q){ return q && q[1] && q[1].length >= 4; });
+  var struct = (pool4.length >= ns ? freshPick(pool4, ns, "sf4") : freshPick(STEP, ns, "sf"))
+                 .map(function(q){ return q.slice(); });
+  return read.concat(struct, write);
+}
+/* عدُّ النماذجِ التامّةِ من الخادم — والتامَّةُ وحدَها تُصعِّد الدرجة.
+   ولا تُحسَب جلسةُ النقر. */
+var SF_STAT = null;
+function sfFetch(){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+        "&meta->>test=eq."+encodeURIComponent(SF_LABEL)+"&order=created_at.desc&limit=200",
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      if(!Array.isArray(rows)) return;
+      var g = {};
+      rows.forEach(function(x){
+        var m = x.meta || {};
+        if(m.test !== SF_LABEL) return;
+        if(m.trusted === false) return;
+        var k = m.pid || m.cid || x.created_at;
+        if(!g[k] || (+m.total || 0) > (+g[k].total || 0)) g[k] = m;
+      });
+      var done = 0, best = 0, lastPct = null, lastN = 0;
+      Object.keys(g).forEach(function(k){
+        var m = g[k], t = +m.total || 0;
+        /* تامَّةٌ: أجاب ما لا يقلُّ عن تسعةِ أعشارِ ورقتِه */
+        if(t >= Math.round(0.9 * sfLen(done))) { done++; if(t > best) best = t; }
+        var p = t ? Math.round(100*(+m.correct||0)/t) : null;
+        if(lastPct === null){ lastPct = p; lastN = t; }
+      });
+      SF_STAT = { done:done, best:best, lastPct:lastPct, lastN:lastN, n:Object.keys(g).length };
+      var el = document.querySelector("[data-sf-banner]");
+      if(el) el.innerHTML = sfBanner();
+    }).catch(function(){});
+  }catch(e){}
+}
+function sfBanner(){
+  var s = SF_STAT;
+  if(!s) return '<div style="color:var(--muted)">⏳ نقرأ نماذجَك السابقةَ من الخادم…</div>';
+  var n = sfLen(s.done), full = SF_STEPS[SF_STEPS.length-1];
+  var head = (n >= full)
+    ? '<b>⏱️ الطولُ الكاملُ: '+n+' سؤالًا</b> — هذا طولُ ورقتِك في الاختبار (ومعه المسموعُ عشرون في صفحةِ الاستماع، فالمجموعُ مئةٌ).'
+    : '<b>⏱️ الورقةُ اليومَ '+n+' سؤالًا</b> — ونطوّلها بعد كلِّ نموذجٍ تُكمِله حتى تبلغ '+full+'، وهو طولُها في الاختبار.';
+  var hist = s.done
+    ? 'أكملتَ <b>'+s.done+'</b> نموذجًا'+(s.lastPct!=null ? ' · آخرُ نتيجةٍ '+s.lastPct+'٪ على '+s.lastN+' سؤالًا' : '')+'.'
+    : 'لم تُكمِل نموذجًا بعدُ — وهذا أوّلُ قياسٍ لجَلَدِك على ورقةٍ طويلة.';
+  return '<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;line-height:1.95">'+
+    head+'<br>'+hist+'</div>';
+}
+function sfIntro(){
+  var n = SF_LEN_CUR, c = sfCounts(n), mins = Math.round(n * SF_SEC_PER_Q / 60);
+  return '<div data-sf-banner>'+sfBanner()+'</div>'+
+    '<div style="margin-top:10px;line-height:2"><b>'+n+' سؤالًا · '+mins+' دقيقة</b> — '+
+    c.read+' فهم مقروء · '+c.struct+' تراكيب · '+c.write+' تحليل كتابي، '+
+    'بنسبِ الاختبارِ الرسميّةِ (٤٠٪ و٣٠٪ و١٠٪) وإيقاعِه (١٠٨ ثوانٍ للسؤال).<br>'+
+    '<b>والمؤقّتُ يعمل دائمًا هنا ولو أطفأتَه فوق، ويُقطَع عليك إذا انتهى الزمن</b> — '+
+    'بخلافِ جولةِ التدريب، لأنّ هذا موضعُ قياسِ جهوزيّتِك لا تدريب.<br>'+
+    'اجلسه كاملًا بلا انقطاع، ولا تُعِدْه في اليومِ نفسِه — نتيجتُه لا تعني شيئًا إن أُعيدت.</div>'+
+    stepWeightsHtml()+
+    '<div style="margin-top:8px;font-size:.9rem">🔊 <b>وفهمُ المسموعِ (٢٠ سؤالًا) ليس هنا</b> — يحتاج صوتًا، وتدريبُه في '+
+    '<a href="reading.html?who='+who+'" style="color:var(--accent);font-weight:800">القراءة والاستماع ← «فهم المسموع 🎧»</a>. '+
+    'واجلسه بعد هذه الورقةِ مباشرةً إن أردتَ أن تُحاكي الاختبارَ كلَّه.</div>'+
+    '<div style="margin-top:8px;font-size:.88rem;color:var(--muted)">الأرقامُ من كُتيِّبِ قياسٍ الرسميِّ '+
+    '«STEP — A Guide for Students»: مئةُ سؤالٍ في ثلاثِ ساعاتٍ، والأقسامُ ٤٠٪ و٣٠٪ و٢٠٪ و١٠٪.</div>';
+}
+var SF_LEN_CUR = SF_STEPS[0];
+
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
   if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". أبوابُ الاختبار الأربعة: <b>تناظر لفظي · إكمال جمل · خطأ سياقي · استيعاب مقروء</b> — أسئلة جديدة كل مرة.", function(){return genVerbal(13);}, "قدرات لفظي");
@@ -2323,6 +2449,22 @@ var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("ch
 buildAll();
 /* عدُّ الجرعةِ يُقرأ مرّةً واحدةً للصفحة، ثمّ تُحدَّث اللافتةُ في موضعِها */
 if(typeof GDOSE !== "undefined" && GDOSE) gdFetch();
+/* ═══ نموذجُ ستيبَ الكاملُ: يُبنى عند أوّلِ فتحةٍ لا عند تحميلِ الصفحة ═══
+   ثمانون سؤالًا فيها عشرون قطعةَ قراءةٍ تُثقِل الفتحَ على من لا يريدها.
+   والطولُ يُقرأ من عدِّ النماذجِ التامّةِ، فإن لم يصل العدُّ بعدُ بُني
+   بأقصرِ درجةٍ — وهي الصوابُ عند الشكّ: لا يُلقى عليه الطويلُ بالخطأ. */
+if(typeof STEP_WEIGHTED !== "undefined" && STEP_WEIGHTED){
+  sfFetch();
+  (function(){
+    var built = false;
+    window.renderStepFull = function(){
+      if(built) return; built = true;
+      SF_LEN_CUR = sfLen(SF_STAT ? SF_STAT.done : 0);
+      SF_SECS_CUR = SF_LEN_CUR * SF_SEC_PER_Q;
+      renderSet("sf", stepFullMix(SF_LEN_CUR), sfIntro, null, SF_LABEL);
+    };
+  })();
+}
 
 // نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
 if(document.getElementById("o")) (function(){
@@ -3400,6 +3542,7 @@ document.querySelectorAll(".tabs button").forEach(function(b){
     if(b.dataset.tab==="w"){ renderWriting(); }
     if(b.dataset.tab==="full" && typeof renderFullMock==="function"){ renderFullMock(); }
     if(b.dataset.tab==="mwf" && typeof renderMwFull==="function"){ renderMwFull(); }
+    if(b.dataset.tab==="sf" && typeof renderStepFull==="function"){ renderStepFull(); }
     if(typeof pan._enter === "function") pan._enter(); // ساعةُ القسمِ تبدأ من هنا
     if(typeof pan._start === "function") pan._start(); // يبدأ المؤقّت عند فتح القسم
   });
