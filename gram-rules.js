@@ -40,6 +40,8 @@ window.GRAM_RULES = [
    "القاعدة: be بزمنِ الجملة + التصريفُ الثالث. مضارع is done، ماضٍ was done، مستمرّ is being done، تامّ has been done، ماضٍ تامّ had been done، مستقبل will be done، وبعد الناقص modal + be done."],
   ["Capitalization / Punctuation","الحروف الكبيرة والترقيم","شرح capitalization punctuation rules commas apostrophe",
    "بحرفٍ كبير: أوّلُ الجملة وI والأسماءُ والمدنُ والدولُ واللغاتُ والشهورُ وأيّامُ الأسبوع — لا أسماءُ المواد العامّة. وفاصلةٌ بعد العبارةِ الاستهلاليّة وقبل but/and الرابطةِ لجملتين وحول المعترضة. وملكيّةُ المفرد 's وملكيّةُ الجمع s'."],
+  ["Reported Speech","الكلام المنقول","شرح الكلام المنقول reported speech indirect speech tense backshift",
+   "مع ناقلٍ ماضٍ (said, told) يتراجع الزمنُ خطوةً: مضارعٌ ⇐ ماضٍ، وماضٍ وحاضرٌ تامٌّ ⇐ ماضٍ تامّ، و‏will ⇐ would، و‏can ⇐ could، و‏must ⇐ had to. و‏tell يلزمها مفعولٌ (told me) و‏say لا (said that) أو say to me. وسؤالُ نعم/لا يُنقَل بـif أو whether، وسؤالُ الاستفهامِ يعود ترتيبُه خبريًّا بلا do. والأمرُ to + مصدر، والنهيُ not to + مصدر. وتتغيّر الظروف: now ⇐ then، today ⇐ that day، tomorrow ⇐ the next day، ago ⇐ before، here ⇐ there، this ⇐ that. ولا تراجعَ مع ناقلٍ مضارعٍ (says) ولا مع حقيقةٍ ثابتة."],
   ["Word Order / Error ID","ترتيب الجملة واكتشاف الخطأ","شرح ترتيب الجملة word order adverb position english",
    "الترتيب: فاعل + فعل + مفعول + مكان + زمان. وظرفُ التكرار (always, usually, never) قبل الفعلِ الرئيس وبعد المساعدِ وبعد be. ولا يُفصَل الفعلُ عن مفعوله بحال. وفي اكتشاف الخطأ: افحص تطابقَ الفعلِ مع الفاعل، ثمّ الزمن، ثمّ حرفَ الجرّ، ثمّ المعدود."]
 ];

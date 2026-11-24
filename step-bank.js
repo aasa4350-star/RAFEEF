@@ -51,7 +51,8 @@ var T = {
   pron:"Pronouns", count:"Countable / Uncountable", comp:"Comparative / Superlative",
   vform:"Verb + to / ing / base", modal:"Modal Auxiliaries",
   prep:"Prepositions / Articles", pass:"Passive Voice",
-  punct:"Capitalization / Punctuation", order:"Word Order / Error ID"
+  punct:"Capitalization / Punctuation", order:"Word Order / Error ID",
+  rep:"Reported Speech"
 };
 function S(t, stem, opts, expl){ return ["<b>Grammar — "+T[t]+":</b> "+stem, opts, 0, expl]; }
 
@@ -906,5 +907,61 @@ S("order","Identify the incorrect part: The amount / of mistakes / was smaller /
 S("order","Identify the incorrect part: Do you know / where is / the examination / hall?",["where is","Do you know","the examination","hall?"],"سؤالٌ داخليٌّ ⇐ where the examination hall is."),
 S("order","Identify the incorrect part: He plays / the football / every Friday / with friends.",["the football","He plays","every Friday","with friends"],"أسماءُ الرياضاتِ بلا the ⇐ plays football.")
 );
+
+/* ═══ ١٦) الكلام المنقول — Reported Speech ═══
+   زِيدت في ٢٤ نوفمبر ٢٠٢٦: كُتيِّبُ قياسٍ الرسميُّ يذكرها صريحًا في
+   قائمةِ التراكيب («verb tense (including irregular verb forms, the
+   conditional, passive/active voice, reported speech, and modals)»)،
+   وبنكُنا سبعُ مئةٍ وخمسةُ بنودٍ ولا بندَ فيها للكلامِ المنقول. */
+B.push(
+S("rep","He said that he ___ very tired after the trip.",["was","is","has been","were"],"الفعلُ الناقلُ ماضٍ ⇒ يتراجع الزمنُ خطوةً: is ⇐ was."),
+S("rep","She told me that she ___ the whole chapter the night before.",["had reviewed","reviewed","has reviewed","was reviewing"],"ماضٍ بسيطٌ في الأصلِ يتراجع إلى الماضي التامِّ: reviewed ⇐ had reviewed."),
+S("rep","They said they ___ call us as soon as they arrived.",["would","will","shall","are going"],"‏will تتراجع إلى would."),
+S("rep","He said he ___ swim when he was six.",["could","can","will","may"],"‏can تتراجع إلى could."),
+S("rep","The teacher said we ___ bring our own calculators.",["had to","have to","must to","are having to"],"‏must للإلزامِ تتراجع إلى had to."),
+S("rep","She ___ me that the office was closed.",["told","said","said to","spoke"],"‏tell يلزمها مفعولٌ ⇐ told me، وsay بلا مفعول."),
+S("rep","He ___ that the deadline had changed.",["said","told","told to","spoke"],"‏say بلا مفعولٍ ⇐ said that."),
+S("rep","He asked me ___ I had finished the form.",["whether","that","what","did"],"سؤالٌ بنعم/لا يُنقَل بـif أو whether."),
+S("rep","She asked me where ___.",["I lived","did I live","do I live","I did live"],"في السؤالِ المنقولِ يعود الترتيبُ خبريًّا بلا do."),
+S("rep","He asked what time ___.",["the class started","did the class start","does the class start","started the class"],"الترتيبُ خبريٌّ: فاعلٌ ثمّ فعل."),
+S("rep","The supervisor told us ___ during the test.",["not to talk","not talking","to not talk","don't talk"],"النهيُ يُنقَل بـtold + مفعولٌ + not to + مصدر."),
+S("rep","She told him ___ the window.",["to close","close","closing","that close"],"الأمرُ يُنقَل بـtold + مفعولٌ + to + مصدر."),
+S("rep","He said he had seen that film ___.",["before","ago","yesterday","last night"],"‏ago في المنقولِ تصير before."),
+S("rep","She said she would send the file ___.",["the next day","tomorrow","the day","next day"],"‏tomorrow تصير the next day."),
+S("rep","He said he was busy ___.",["that day","today","this day","the day"],"‏today تصير that day."),
+S("rep","She said she had been waiting ___ for an hour.",["there","here","in there","at here"],"‏here تصير there."),
+S("rep","She ___ to me that the result was ready.",["said","told","spoke","asked"],"‏say to somebody صحيحةٌ، وtell لا تُتبَع بـto، وspoke/asked لا تُتبَعان بـthat هكذا."),
+S("rep","She said she was reading a book ___.",["at that moment","now","at this moment","in now"],"‏now تصير then أو at that moment."),
+S("rep","The report says that water ___ at 100°C.",["boils","boiled","had boiled","was boiling"],"الفعلُ الناقلُ مضارعٌ وحقيقةٌ ثابتةٌ ⇒ لا تراجعَ في الزمن."),
+S("rep","He says that he ___ busy at the moment.",["is","was","had been","were"],"الناقلُ مضارعٌ (says) ⇒ لا تراجع، وat the moment تُلزِم الحاضر."),
+S("rep","She told us that the sun ___ in the east.",["rises","rose","had risen","was rising"],"حقيقةٌ علميّةٌ ثابتةٌ لا تتراجع ولو كان الناقلُ ماضيًا."),
+S("rep","He said that he ___ me the next week.",["would visit","will visit","visits","is visiting"],"‏will ⇐ would مع الزمنِ المنقول."),
+S("rep","They said they ___ already finished the first section.",["had","have","were","did"],"الحاضرُ التامُّ يتراجع إلى الماضي التامّ."),
+S("rep","She asked me ___ her with the last question.",["to help","helping","that I help","help"],"الطلبُ يُنقَل بـasked + مفعولٌ + to + مصدر."),
+S("rep","He asked ___ anyone had seen his notebook.",["if","that","what","whether that"],"سؤالٌ بنعم/لا ⇒ if أو whether، لا that."),
+S("rep","The clerk asked me how old ___.",["I was","was I","am I","I am being"],"الترتيبُ خبريٌّ في السؤالِ المنقول."),
+S("rep","She said she ___ never been to Abha before.",["had","has","was","did"],"الحاضرُ التامُّ يتراجع إلى الماضي التامّ: has never been ⇐ had never been."),
+S("rep","He explained that the result ___ announced the following week.",["would be","will be","is","was being"],"مجهولٌ مستقبليٌّ يتراجع: will be ⇐ would be."),
+S("rep","They admitted that they ___ the instructions.",["had not read","did not read it","have not read","were not reading"],"الماضي البسيطُ المنفيُّ يتراجع إلى الماضي التامّ."),
+S("rep","She suggested ___ the meeting to Sunday.",["moving","to move","that moving","move"],"‏suggest + v-ing، ولا تُتبَع بـto + مصدر."),
+S("rep","He offered ___ me to the centre.",["to drive","driving","that he drives","drive"],"‏offer + to + مصدر."),
+S("rep","She promised ___ late again.",["not to be","not being","to not be","that not be"],"‏promise + not to + مصدر."),
+S("rep","He warned us ___ the wet floor.",["about","that","to","of that"],"التحذيرُ من شيءٍ بـabout: warn somebody about something."),
+S("rep","She advised me ___ the rule twice before the exam.",["to review","reviewing","that I review","review"],"‏advise + مفعولٌ + to + مصدر."),
+S("rep","He reminded me ___ my name on the sheet.",["to write","writing","that write","write"],"‏remind + مفعولٌ + to + مصدر."),
+S("rep","\"I will wait here,\" she said. → She said she ___ wait there.",["would","will","is going to","shall"],"نقلُ will إلى would، وhere إلى there."),
+S("rep","\"Do you need help?\" he asked. → He asked ___ I needed help.",["if","that","do","what"],"سؤالُ نعم/لا ⇒ if."),
+S("rep","\"Don't touch the screen,\" the examiner said. → The examiner told us ___ the screen.",["not to touch","to not touch","not touching","don't touch"],"النهيُ ⇒ not to + مصدر."),
+S("rep","\"I am studying now,\" he said. → He said he ___ studying then.",["was","is","had been","were"],"المضارعُ المستمرُّ يتراجع إلى الماضي المستمرّ."),
+S("rep","\"We have moved,\" they said. → They said they ___ moved.",["had","have","were","did"],"الحاضرُ التامُّ ⇒ الماضي التامّ."),
+S("rep","She wondered ___ the result would be ready.",["when","that","if when","what time that"],"‏wonder تُتبَع بأداةِ استفهامٍ ثمّ ترتيبٍ خبريّ."),
+S("rep","He did not say ___ he had changed his mind.",["why","that why","what for","the reason that"],"أداةُ الاستفهامِ وحدَها بلا that."),
+S("rep","The nurse told the child ___ afraid.",["not to be","to not be","not being","no be"],"‏not to + مصدرٌ للنهي."),
+S("rep","He said that his brother ___ in Dammam for ten years before moving to Riyadh.",["had lived","has lived","lives","was living"],"حالةٌ انتهت قبل حدثٍ ماضٍ ⇒ الماضي التامّ: had lived."),
+S("rep","Yesterday she asked whether we ___ ready to start.",["were","are","have been","be"],"‏yesterday تقطع الصلةَ بالحاضرِ ⇒ are ⇐ were."),
+S("rep","He insisted that he ___ seen the message.",["had not","has not","did not","was not"],"الحاضرُ التامُّ المنفيُّ ⇒ الماضي التامّ."),
+S("rep","The notice says that phones ___ be switched off.",["must","have","should to","had"],"‏must في لافتةٍ وناقلٍ مضارعٍ (says) تبقى كما هي.")
+);
+
 window.STEP_BANK = B;
 })();
