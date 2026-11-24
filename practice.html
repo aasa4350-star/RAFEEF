@@ -75,7 +75,7 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=7ee5cafe89" defer></script>
+<script src="build-check.js?v=e2dab8f032" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -140,6 +140,30 @@ var SENIOR = (who==="fahad");
    وتصنيفَ «فوق المستوى» في التقريرِ والعلاجيّ)، وتبديلُها لحسنٍ يُغيّر
    ما لم يُطلَب تغييرُه. فهذا شرطٌ مستقلٌّ لستيبَ وحدَه. */
 var STEP_WEIGHTED = (who==="fahad" || who==="hasan");
+
+/* ═══ لكلِّ ابنٍ قواعدُه المقيسةُ هو ══════════════════════════════════
+   وقواعدُ حسنٍ قِيست في ٢٤ نوفمبر ٢٠٢٦ على بابَين لا بابٍ واحد: ستيبُ
+   نفسُه (meta.skills) و«قواعدُ مركّزة» (meta.skill) — وجمعُهما يرفع
+   العيّنةَ من ثمانيةِ بنودٍ إلى خمسةٍ وعشرينَ وستّين للمهارة، وبدونه
+   يُختار الخطأ: بالنافذةِ الضيّقةِ وحدَها خرجت أربعٌ منها اثنتان لا
+   محلَّ لهما.
+     المبنيُّ للمجهول   ٥٧٪ (٥٦ بندًا) · الفرقُ نصفًا لنصفٍ +١٨
+     الماضي            ٥٦٪ (٥٠)        · **−١٤ — ينحدر**
+     المعدود           ٥٨٪ (٥٩)        · +٩ يزحف
+     الشرط             ٥١٪ (٥٥)        · +٣٥ — التكرارُ يعمل فيه
+     جملُ الوصل        ٧٢٪ (٢٥)        · −٤ ثابتةٌ على حالها
+   والشرطُ أدنى نسبةً وأسرعُ تحسُّنًا، فأُدخِل لأنّه الأدنى ولا يُترَك
+   الأدنى بلا تعليمٍ، لا لأنّ التكرارَ عجز عنه. وجملُ الوصلِ ليست دونَ
+   الستّين لكنّها لم تتحرّك، وثبوتٌ فوقَ الضعفِ أَولى بالتعليمِ من
+   انحدارٍ لم يبدأ. */
+var GD_BY_CHILD = {
+  fahad: ["Present Tenses", "Past Tenses", "If Conditions",
+          "Comparative / Superlative", "Modal Auxiliaries", "For / Since / Used to"],
+  hasan: ["Past Tenses", "Countable / Uncountable", "Passive Voice",
+          "If Conditions", "Relative Clauses"]
+};
+var GD6 = GD_BY_CHILD[who] || [];
+var GD_LABEL = "قواعد ستيب — جرعة مركّزة 💊";
 
 // حفظ نتيجة الاختبار التجريبي لتظهر في لوحة ولي الأمر
 var SUPA_URL = APP_CONFIG.supaUrl;
@@ -1413,7 +1437,10 @@ if(!VERBAL_ONLY){
   /* جرعةُ حسنٍ الكمّيّة — بابُها من قياسِ أخطائِه هو لا من ترتيبِ البنك.
      وهي لحسنٍ وحدَه: القياسُ قياسُه، ولا تُفرَض على من لم يُقَس. */
   var QDOSE = (who === "hasan" && !YOUNG && !NO_GAT);
-  var GDOSE = (who === "fahad" && !!window.STEP_BANK);
+  /* الجرعةُ لمن قِيست قواعدُه فقط — والقائمةُ في GD_BY_CHILD، فمن لا
+     قائمةَ له لا تبويبَ له. ولا يُكتَب اسمٌ هنا مرّةً ثانية: موضعُ
+     القرارِ واحدٌ، وإلّا ظهر تبويبٌ بلا قواعدَ أو قواعدُ بلا تبويب. */
+  var GDOSE = (GD6.length > 0 && !!window.STEP_BANK);
   if(QDOSE) TABS.push(["qd","جرعة كمي 💊"]);
   if(!YOUNG) TABS.push(["t","تحصيلي 🧪"]);
   TABS.push(["s","STEP إنجليزي 🌍"]);
@@ -2016,9 +2043,8 @@ function mawhibaMix(n){
    وجلسةُ النقرِ لا تُحسَب في العدّ — حارسُ الإيقاعِ يعمل عند فهدٍ على
    الصفحةِ كلِّها.
    ═══════════════════════════════════════════════════════════════════ */
-var GD6 = ["Present Tenses", "Past Tenses", "If Conditions",
-           "Comparative / Superlative", "Modal Auxiliaries", "For / Since / Used to"];
-var GD_LABEL = "قواعد ستيب — جرعة مركّزة 💊";
+/* قائمةُ قواعدِ الجرعةِ وعنوانُها مُقدَّمان إلى أعلى الملفِّ: بناءُ
+   التبويباتِ يقرأ GD_BY_CHILD قبل أن يصل التنفيذُ إلى هنا. */
 function gdRule(en){
   var R = window.GRAM_RULES || [];
   for(var i=0;i<R.length;i++) if(R[i][0] === en) return { en:R[i][0], ar:R[i][1], yt:R[i][2], lesson:R[i][3] };
@@ -2103,7 +2129,7 @@ function gdBanner(){
   if(gdDone(s)){
     return '<div style="background:#064e3b;color:#d1fae5;border-radius:12px;padding:11px 13px;line-height:1.95">'+
       '<b>✅ تمّت الجرعة</b> — '+s.correct+' من '+s.total+' في '+s.sessions+' جلسات. '+
-      'القواعدُ الستُّ خرجت من دائرةِ الضعف، فارجع إلى <b>قواعدَ مركّزة ✏️</b> وبنكِك كلِّه. '+
+      'القواعدُ '+gdTheN()+' خرجت من دائرةِ الضعف، فارجع إلى <b>قواعدَ مركّزة ✏️</b> وبنكِك كلِّه. '+
       'وهذا التبويبُ يبقى مفتوحًا إن أردتَ تثبيتًا.</div>';
   }
   var pct = s.total ? Math.round(100*s.correct/s.total) : 0;
@@ -2112,7 +2138,7 @@ function gdBanner(){
   if(s.total < GD_NEED_Q) need.push((GD_NEED_Q - s.total)+' سؤالًا');
   if(s.total >= GD_NEED_Q && pct < 100*GD_NEED_PCT) need.push('رفعَ النسبةِ إلى ٨٠٪');
   return '<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;line-height:1.95">'+
-    '<b>💊 الجرعةُ المركّزة</b> — ستُّ قواعدَ مرّت عليك كثيرًا في ستيبَ ولم تُصلَح، فنبدأ بالشرح.<br>'+
+    '<b>💊 الجرعةُ المركّزة</b> — '+gdCount()+' مرّت عليك كثيرًا في ستيبَ ولم تُصلَح، فنبدأ بالشرح.<br>'+
     'تقدّمك: <b>'+pct+'٪</b> ('+s.correct+' من '+s.total+' في '+s.sessions+' جلسة) · الهدف ٨٠٪ في ثلاثِ جلسات'+
     (need.length ? ' — باقي '+need.join(' و')+'.' : '.')+'</div>';
 }
@@ -2131,13 +2157,27 @@ function gdLessons(){
   });
   return h;
 }
+/* عددُ القواعدِ يُقرأ من القائمةِ لا يُكتَب لفظًا: قائمةُ فهدٍ ستٌّ
+   وقائمةُ حسنٍ خمسٌ، فـ«الستُّ» في النصِّ كذبٌ على أحدِهما. والعربيّةُ
+   تُجمع من ثلاثٍ إلى عشرٍ وتُفرَد بعدها. */
+function gdCount(){
+  var n = GD6.length;
+  return n === 1 ? "قاعدةٌ واحدة" : n === 2 ? "قاعدتان"
+       : (n >= 3 && n <= 10) ? ({3:"ثلاثُ",4:"أربعُ",5:"خمسُ",6:"ستُّ",7:"سبعُ",8:"ثمانِ",9:"تسعُ",10:"عشرُ"}[n] + " قواعدَ")
+       : n + " قاعدةً";
+}
+function gdTheN(){
+  var n = GD6.length;
+  return n === 1 ? "القاعدةُ" : n === 2 ? "القاعدتان"
+       : ({3:"الثلاثُ",4:"الأربعُ",5:"الخمسُ",6:"الستُّ",7:"السبعُ",8:"الثمانِ",9:"التسعُ",10:"العشرُ"}[n] || ("الـ"+n));
+}
 function gdIntro(){
   var n = 0; GD6.forEach(function(en){ n += (gdPools()[en] || []).length; });
   return '<div data-gdose-banner>'+gdBanner()+'</div>'+
     (gdoseItems.reset ? '<div style="margin-top:8px;background:#78350f;color:#fde68a;border-radius:11px;padding:9px 12px">'+
-       '🔄 خلصتَ بنوكَ القواعدِ الستِّ كلَّها مرّتَين، فبدأنا دورةً جديدةً — فما يتكرّر عليك شيءٌ في صمت.</div>' : '')+
-    '<div style="margin-top:10px"><b>📖 اقرأ أوّلًا — القواعدُ الستُّ:</b>'+gdLessons()+'</div>'+
-    '<div style="margin-top:6px">ثمّ ١٠ أسئلةٍ من هذه الستِّ وحدَها — بندٌ من كلِّ قاعدةٍ بالدور، '+
+       '🔄 خلصتَ بنوكَ القواعدِ '+gdTheN()+' كلَّها مرّتَين، فبدأنا دورةً جديدةً — فما يتكرّر عليك شيءٌ في صمت.</div>' : '')+
+    '<div style="margin-top:10px"><b>📖 اقرأ أوّلًا — القواعدُ '+gdTheN()+':</b>'+gdLessons()+'</div>'+
+    '<div style="margin-top:6px">ثمّ ١٠ أسئلةٍ من هذه '+gdTheN()+' وحدَها — بندٌ من كلِّ قاعدةٍ بالدور، '+
     'من بنكٍ فيه '+n+' سؤالًا، و<b>ما يتكرّر عليك سؤالٌ أكثرَ من مرّتين</b>.</div>';
 }
 

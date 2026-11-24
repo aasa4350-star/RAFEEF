@@ -9542,104 +9542,131 @@ function gdosePath(){
     return d === 0 ? src.slice(m.index, i + 1) : null;
   };
 
-  /* ١) الستُّ هي الستُّ التي قِيست — لا تُزاد ولا تُنقَص */
-  const WANT = ['Present Tenses','Past Tenses','If Conditions',
-                'Comparative / Superlative','Modal Auxiliaries','For / Since / Used to'];
-  const m6 = /var GD6\s*=\s*\[([\s\S]*?)\];/.exec(src);
-  let GOT = [];
-  if (!m6) E('GD6 غائبة — فلا جرعةَ أصلًا');
+  /* ١) قواعدُ كلِّ ابنٍ هي المقيسةُ عليه — لا تُزاد ولا تُنقَص ═══════
+     وقائمةُ حسنٍ قِيست على بابَين (ستيبُ و«قواعدُ مركّزة») لا بابٍ
+     واحدٍ: بالنافذةِ الضيّقةِ وحدَها خرجت أربعُ قواعدَ منها اثنتان لا
+     محلَّ لهما، لأنّ العيّنةَ ثمانيةُ بنودٍ لا ستّون. */
+  const WANT_BY = {
+    fahad: ['Present Tenses','Past Tenses','If Conditions',
+            'Comparative / Superlative','Modal Auxiliaries','For / Since / Used to'],
+    hasan: ['Past Tenses','Countable / Uncountable','Passive Voice',
+            'If Conditions','Relative Clauses']
+  };
+  const mMap = /var GD_BY_CHILD = \{([\s\S]*?)\n\};/.exec(src);
+  if (!mMap) E('GD_BY_CHILD غائبة — فلا جرعةَ لأحد');
   else {
-    GOT = (m6[1].match(/"([^"]+)"/g) || []).map(x => x.slice(1,-1));
-    const miss = WANT.filter(w => GOT.indexOf(w) < 0);
-    const extra = GOT.filter(g => WANT.indexOf(g) < 0);
-    if (miss.length) E('الجرعةُ لا تدرّب ما قِيس: ناقصٌ ' + miss.join(' · '));
-    if (extra.length) E('الجرعةُ تدرّب ما لم يُقَس: زائدٌ ' + extra.join(' · ') + ' — فيُهدَر وقتُه في غيرِ ضعفِه');
-    /* وثغرةٌ تمرُّ بلا هذا: فاصلةٌ زائدةٌ تُخلِّف فُرجةً فيصير الطابورُ
-       خمسةً وهو يُقرَأ ستّةً. وfilter يتخطّى الفُرَج فلا تُرى. */
-    /* ⚠️ والفُرجةُ تُقاس بالموضعِ لا بالعدِّ بعد الترشيح: filter يتخطّى
-       الفارغَ فيستوي العددان ولا يُرى شيء — وقعتُ في هذا أوّلَ مرّةٍ
-       في بنكِ مواضيعِ التعبيرِ فسقط موضعٌ في صمت. والفاصلةُ الأخيرةُ
-       قبلَ القوسِ مشروعةٌ فتُستثنى. */
-    const parts = m6[1].split(',').map(x => x.trim());
-    const holes = parts.filter((x, i) => !x.length && i < parts.length - 1).length;
-    if (holes)
-      E('GD6 فيها ' + holes + ' موضعًا فارغًا (فاصلةٌ زائدة) — فالمصفوفةُ ذاتُ فُرجةٍ تتخطّاها forEach في صمت، وقاعدةٌ تسقط من الجرعة');
-    const slots = parts.filter(x => x.length).length;
-    if (GOT.length && slots !== GOT.length)
-      E('GD6 فيها موضعٌ ليس نصًّا (' + slots + ' موضعًا و' + GOT.length + ' نصًّا) — فقاعدةٌ تسقط من الجرعةِ صامتةً');
-    /* ولكلِّ قاعدةٍ شرحٌ مكتوبٌ في gram-rules.js ترجع إليه الجرعة */
+    Object.keys(WANT_BY).forEach(who => {
+      const mw = new RegExp(who + ':\\s*\\[([\\s\\S]*?)\\]').exec(mMap[1]);
+      if (!mw) { E('لا قائمةَ جرعةٍ لـ' + who + ' — وقد قِيست قواعدُه'); return; }
+      const got = (mw[1].match(/"([^"]+)"/g) || []).map(x => x.slice(1,-1));
+      const miss = WANT_BY[who].filter(w => got.indexOf(w) < 0);
+      const extra = got.filter(g => WANT_BY[who].indexOf(g) < 0);
+      if (miss.length) E('جرعةُ ' + who + ' لا تدرّب ما قِيس: ناقصٌ ' + miss.join(' · '));
+      if (extra.length) E('جرعةُ ' + who + ' تدرّب ما لم يُقَس: زائدٌ ' + extra.join(' · ') + ' — فيُهدَر وقتُه في غيرِ ضعفِه');
+      /* ⚠️ والفُرجةُ تُقاس بالموضعِ لا بالعدِّ بعد الترشيح: filter يتخطّى
+         الفارغَ فيستوي العددان ولا يُرى شيء. */
+      const parts = mw[1].split(',').map(x => x.trim());
+      const holes = parts.filter((x, i) => !x.length && i < parts.length - 1).length;
+      if (holes) E('قائمةُ ' + who + ' فيها ' + holes + ' موضعًا فارغًا (فاصلةٌ زائدة) — تتخطّاه forEach في صمتٍ فتسقط قاعدة');
+    });
+    /* ولا تُعرَض لمن لم تُقَس قواعدُه */
+    const others = (mMap[1].match(/^\s*([a-z]+):/gm) || []).map(x => x.replace(/[^a-z]/g,''));
+    others.forEach(w => { if (!WANT_BY[w]) E('قائمةُ جرعةٍ لـ«' + w + '» ولم يُقَس — فتُعرَض له بلا قياس'); });
+    /* والعددُ في النصِّ يُقرأ من القائمةِ لا يُكتَب لفظًا */
+    /* ⚠️ ولا يُكتَب العددُ لفظًا في نصِّ الجرعةِ أصلًا: كان «ستُّ قواعدَ»
+       وهو صدقٌ على فهدٍ كذبٌ على حسنٍ (خمسٌ). والفحصُ على أسماءِ العددِ
+       كلِّها لا على «الستُّ» وحدَها، فإبدالُها بـ«الخمسُ» عطبٌ مثلُها. */
+    {
+      const NUM = ['الثلاثُ','الأربعُ','الخمسُ','الستُّ','السبعُ','الثمانِ','التسعُ','العشرُ',
+                   'ثلاثُ قواعدَ','أربعُ قواعدَ','خمسُ قواعدَ','ستُّ قواعدَ','سبعُ قواعدَ','ثمانِ قواعدَ','تسعُ قواعدَ','عشرُ قواعدَ'];
+      const dose = (fn('gdIntro') || '') + (fn('gdBanner') || '');
+      const hit = NUM.filter(w => dose.indexOf(w) >= 0);
+      if (hit.length)
+        E('عددُ قواعدِ الجرعةِ مكتوبٌ لفظًا في نصِّها («' + hit[0] + '») — والقوائمُ تختلف طولًا، فالنصُّ كذبٌ على أحدِهم');
+    }
+    if (!/function gdTheN\(\)/.test(src) || !/gdTheN\(\)/.test(fn('gdIntro') || ''))
+      E('نصُّ الجرعةِ لا يقرأ عددَ القواعدِ من القائمة');
+  }
+  /* ولكلِّ قاعدةٍ في كلِّ قائمةٍ شرحٌ مكتوبٌ في gram-rules.js */
+  {
     const gr = fs.readFileSync(path.join(ROOT, 'gram-rules.js'), 'utf8');
-    GOT.forEach(g => { if (gr.indexOf('["' + g + '"') < 0) E('القاعدةُ «' + g + '» لا شرحَ لها في gram-rules.js — فتُدرَّب بلا تعليم'); });
+    Object.keys(WANT_BY).forEach(w => WANT_BY[w].forEach(g => {
+      if (gr.indexOf('["' + g + '"') < 0)
+        E('القاعدةُ «' + g + '» (جرعةُ ' + w + ') لا شرحَ لها في gram-rules.js — فتُدرَّب بلا تعليم');
+    }));
   }
 
-  /* ٢) والمولّدُ يُشغَّل: توزيعٌ بالدورِ وحدُّ عرضَين على ثلاثِ جلسات */
+  /* ٢) والمولّدُ يُشغَّل لكلِّ ابنٍ بقائمتِه: توزيعٌ بالدورِ وحدُّ عرضَين
+     ودورةٌ تُعلَن عند النفاد. والتشغيلُ لا القراءةُ: قائمةٌ صحيحةٌ لا
+     تَعِد بسحبٍ صحيح. */
   const sSeen = fs.readFileSync(path.join(ROOT, 'seen-cap.js'), 'utf8');
   const sBank = fs.readFileSync(path.join(ROOT, 'step-bank.js'), 'utf8');
-  const fPools = fn('gdPools'), fItems = fn('gdoseItems');
+  const fPools = fn('gdPools'), fItems = fn('gdoseItems'), fMap = /var GD_BY_CHILD = \{[\s\S]*?\n\};/.exec(src);
   if (!fItems) E('gdoseItems غائبة — فلا سحبَ للجرعة');
   if (!fPools) E('gdPools غائبة — فلا بنكَ للجرعة');
-  if (fItems && fPools && m6) {
+  if (fItems && fPools && fMap) Object.keys(WANT_BY).forEach(who => {
+    const WANT = WANT_BY[who];
     const box = { window:{}, localStorage:{ _d:{}, getItem(k){ return this._d[k]||null; }, setItem(k,v){ this._d[k]=v; } },
                   document:{ addEventListener(){}, querySelector:()=>null }, console };
     box.window.localStorage = box.localStorage; box.window.document = box.document;
     vm.createContext(box);
-    let ok = true;
     try {
       vm.runInContext(sSeen, box);
       vm.runInContext(sBank, box);
-      vm.runInContext('var who="fahad";\n' +
+      vm.runInContext('var who="' + who + '";\n' +
         'function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t; } return a; }\n' +
         'var SeenCap = window.SeenCap; SeenCap.init("gd");\n' +
-        m6[0] + '\n' + fPools + '\n' + fItems + '\n' +
+        fMap[0] + '\nvar GD6 = GD_BY_CHILD[who] || [];\n' + fPools + '\n' + fItems + '\n' +
         'var STEP_BANK = window.STEP_BANK;', box);
-    } catch(e){ ok = false; E('مولّدُ الجرعةِ لا يُشغَّل: ' + String(e.message).slice(0,70)); }
-    if (ok) {
-      const P = box.gdPools();
-      WANT.forEach(w => {
-        const n = (P[w] || []).length;
-        /* ثلاثُ جلساتٍ من عشرةٍ على ستٍّ = خمسُ سحباتٍ للقاعدة، وحدُّها
-           عرضان — فعشرةُ بنودٍ أدنى ما يُسلِّم من الدورانِ المبكّر. */
-        if (n < 10) E('بنكُ «' + w + '» ' + n + ' بندًا — ولا يكفي ثلاثَ جلساتٍ تحت حدِّ العرضَين، فتُفتَح دورةٌ من أوّلِ أسبوع');
-      });
-      /* التوزيعُ بالدور: لا تأكل قاعدةٌ الورقةَ */
-      let worst = 0, zero = 0;
-      for (let t=0;t<40;t++){
-        const it = box.gdoseItems(10);
-        if (it.length !== 10) { E('الورقةُ ' + it.length + ' سؤالًا والمطلوبُ عشرة'); break; }
-        const c = {};
-        it.forEach(q => { const m = /^<b>Grammar — ([^:<]+):<\/b>/.exec(String(q[0]||'')); const k = m?m[1].trim():'—'; c[k]=(c[k]||0)+1; });
-        const vals = WANT.map(w => c[w] || 0);
-        worst = Math.max(worst, Math.max.apply(null, vals));
-        zero += vals.filter(v => !v).length;
-      }
-      if (worst > 2) E('قاعدةٌ تأخذ ' + worst + ' أسئلةٍ من عشرةٍ — فالسحبُ ليس بالدورِ وتُترَك أختُها');
-      if (zero) E('قاعدةٌ تُغيَّب عن الورقةِ (' + zero + ' مرّةً في أربعين) — والستُّ سواءٌ في الضعف');
-      /* والحدُّ يُلزَم داخلَ الدورة */
-      box.SeenCap.init('cap');
-      let cyc = {}, over = 0, res = 0;
-      for (let r=0;r<9;r++){
-        const it = box.gdoseItems(10);
-        if (box.gdoseItems.reset){ res++; cyc = {}; }
-        it.forEach(q => { const k = box.SeenCap.keyOf(q); cyc[k] = (cyc[k]||0)+1; if (cyc[k] > box.SeenCap.CAP) over++; });
-        box.SeenCap.markShown(it, 'r'+r);
-      }
-      if (over) E('الجرعةُ تخرق حدَّ العرضَين داخلَ الدورةِ الواحدة: ' + over + ' عرضًا ثالثًا في تسعِ جلسات');
-      /* وتُشبَع البنوكُ فتُعلَن دورةٌ جديدة.
-         ⚠️ وعددُ الجولاتِ يُحسَب من سعةِ البنوكِ لا يُكتَب رقمًا: كان
-         ثلاثين، فلمّا زِيد البنكُ من عشرين بندًا للقاعدةِ إلى سبعةٍ
-         وأربعين صارت الثلاثون لا تُشبِعه فصاح الحارسُ ولا عطبَ. */
-      box.SeenCap.init('cyc');
-      const cap6 = WANT.reduce((a, w) => a + (P[w] || []).length, 0) * box.SeenCap.CAP;
-      const rounds = Math.ceil(cap6 / 10) + 3;
-      let res2 = 0;
-      for (let r=0;r<rounds;r++){
-        const it = box.gdoseItems(10);
-        if (box.gdoseItems.reset) res2++;
-        box.SeenCap.markShown(it, 'c'+r);
-      }
-      if (!res2) E('لا تُعلَن دورةٌ جديدةٌ حين تنفد بنوكُ الستِّ — فيُكرَّر عليه في صمتٍ وهو لا يدري');
+    } catch(e){ E('مولّدُ جرعةِ ' + who + ' لا يُشغَّل: ' + String(e.message).slice(0,70)); return; }
+    if (box.GD6.length !== WANT.length)
+      { E('قائمةُ ' + who + ' تُقرأ ' + box.GD6.length + ' قاعدةً والمقيسُ ' + WANT.length); return; }
+    const P = box.gdPools();
+    WANT.forEach(w => {
+      const n = (P[w] || []).length;
+      /* ثلاثُ جلساتٍ من عشرةٍ موزَّعةٍ بالدور ⇒ نحوَ ستِّ سحباتٍ للقاعدة،
+         وحدُّها عرضان — فعشرةُ بنودٍ أدنى ما يُسلِّم من الدورانِ المبكّر. */
+      if (n < 10) E('بنكُ «' + w + '» (جرعةُ ' + who + ') ' + n + ' بندًا — لا يكفي ثلاثَ جلساتٍ تحت حدِّ العرضَين، فتُفتَح دورةٌ من أوّلِ أسبوع');
+    });
+    /* التوزيعُ بالدور: لا تأكل قاعدةٌ الورقةَ ولا تُغيَّب أختُها */
+    const perMax = Math.ceil(10 / WANT.length);
+    let worst = 0, zero = 0, badLen = 0;
+    for (let t=0;t<40;t++){
+      const it = box.gdoseItems(10);
+      if (it.length !== 10) { badLen++; break; }
+      const c = {};
+      it.forEach(q => { const m = /^<b>Grammar — ([^:<]+):<\/b>/.exec(String(q[0]||'')); const k = m?m[1].trim():'—'; c[k]=(c[k]||0)+1; });
+      const vals = WANT.map(w => c[w] || 0);
+      worst = Math.max(worst, Math.max.apply(null, vals));
+      zero += vals.filter(v => !v).length;
     }
-  }
+    if (badLen) E('ورقةُ جرعةِ ' + who + ' ليست عشرَ أسئلة');
+    if (worst > perMax) E('قاعدةٌ في جرعةِ ' + who + ' تأخذ ' + worst + ' أسئلةٍ من عشرةٍ (والدورُ يقتضي ' + perMax + ' على الأكثر) — فتُترَك أختُها');
+    if (zero) E('قاعدةٌ تُغيَّب عن ورقةِ ' + who + ' (' + zero + ' مرّةً في أربعين) — وقواعدُ الجرعةِ سواءٌ في الاستحقاق');
+    /* والحدُّ يُلزَم داخلَ الدورة */
+    box.SeenCap.init('cap');
+    let cyc = {}, over = 0;
+    for (let r=0;r<9;r++){
+      const it = box.gdoseItems(10);
+      if (box.gdoseItems.reset){ cyc = {}; }
+      it.forEach(q => { const k = box.SeenCap.keyOf(q); cyc[k] = (cyc[k]||0)+1; if (cyc[k] > box.SeenCap.CAP) over++; });
+      box.SeenCap.markShown(it, 'r'+r);
+    }
+    if (over) E('جرعةُ ' + who + ' تخرق حدَّ العرضَين داخلَ الدورةِ الواحدة: ' + over + ' عرضًا ثالثًا في تسعِ جلسات');
+    /* وتُشبَع البنوكُ فتُعلَن دورةٌ جديدة.
+       ⚠️ وعددُ الجولاتِ يُحسَب من سعةِ البنوكِ لا يُكتَب رقمًا: كان
+       ثلاثين، فلمّا زِيد البنكُ من عشرين بندًا للقاعدةِ إلى سبعةٍ
+       وأربعين صارت الثلاثون لا تُشبِعه فصاح الحارسُ ولا عطبَ. */
+    box.SeenCap.init('cyc');
+    const capAll = WANT.reduce((a, w) => a + (P[w] || []).length, 0) * box.SeenCap.CAP;
+    let res2 = 0;
+    for (let r=0;r<Math.ceil(capAll/10)+3;r++){
+      const it = box.gdoseItems(10);
+      if (box.gdoseItems.reset) res2++;
+      box.SeenCap.markShown(it, 'c'+r);
+    }
+    if (!res2) E('لا تُعلَن دورةٌ جديدةٌ حين تنفد بنوكُ جرعةِ ' + who + ' — فيُكرَّر عليه في صمتٍ وهو لا يدري');
+  });
 
   /* ٣) وحدُّ التوقّفِ يُشغَّل لا يُقرَأ */
   const fDone = fn('gdDone');
@@ -9689,8 +9716,11 @@ function gdosePath(){
     E('الجرعةُ تُمرَّر تعليمتَها نصًّا لا دالّةً — فلافتتُها لا تحيا بعد جولة');
 
   /* ٦) وهي لمن قِيست عليه */
-  if (!/var GDOSE = \(who === "fahad"/.test(src))
-    E('الجرعةُ غيرُ مقصورةٍ على من قِيست أخطاؤه — فتُعرَض لغيرِه بلا قياس');
+  /* ⚠️ والبوّابةُ تُشتَقُّ من القائمةِ لا تُكتَب اسمًا ثانيًا: كان الشرطُ
+     «who === "fahad"» فلمّا أُضيف حسنٌ إلى القائمةِ لم يُفتَح له التبويبُ
+     ولا شيءَ يصيح — موضعُ القرارِ واحدٌ أو يتفرّق. */
+  if (!/var GDOSE = \(GD6\.length > 0 && !!window\.STEP_BANK\);/.test(src))
+    E('بوّابةُ الجرعةِ لا تُشتَقُّ من قائمةِ القواعدِ — فتُعرَض لمن لا قياسَ له أو تُحجَب عن مَن قِيس');
   if (!/if\(GDOSE\) TABS\.push\(\["gd"/.test(src))
     E('تبويبُ الجرعةِ يُدفَع بلا شرطٍ — فيظهر لأبناءٍ لا جرعةَ لهم');
 
