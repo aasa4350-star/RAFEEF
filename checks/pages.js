@@ -388,7 +388,9 @@ function run(){
   issues.push(...buildVerPath());
   issues.push(...seenCapPath());
   issues.push(...pastePath());
-  issues.push(...dosePath());
+  issues.push(...mathDosePath());
+  issues.push(...gdosePath());
+  issues.push(...guardNamesPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -1343,8 +1345,29 @@ function pacePath(){
     E(f, 'التنبيهُ على الشاشةِ لا يستشير paceOn');
   if (!/function __timing\(\)/.test(src) || !/__fastN\+\+/.test(src))
     E(f, 'زمنُ الجلسةِ لا يُقاس — فلا يُعرف أحلَّ أم نقر');
-  if ((src.match(/__timing\(\)\)/g) || []).length < 3)
-    E(f, 'الزمنُ لا يُمرَّر في كلّ مواضع الحفظ — جلسةٌ تُحفظ بلا زمنٍ تمرّ بلا فحص');
+  /* ⚠️ كان العدُّ على نصِّ «__timing())» بحرفِه، فلمّا زِيدت وسيطةٌ بعدَه
+     («__timing(), __seen)») صاح الحارسُ والزمنُ يُمرَّر في مواضعِه كلِّها.
+     وهذا الدرسُ تكرّر: حارسٌ معلَّقٌ على نصٍّ حرفيٍّ ينكسر بتغيُّرِ
+     الصياغةِ والسلوكُ سليم. فالمقياسُ الآن مواضعُ النداءِ أنفسُها. */
+  {
+    const calls = [];
+    {
+      const re = /saveScore\((?:[^()]|\([^()]*\))*\)/g;
+      let mm;
+      while ((mm = re.exec(src))) {
+        if (/function\s+$/.test(src.slice(Math.max(0, mm.index - 12), mm.index))) continue;  /* التعريفُ لا نداء */
+        calls.push(mm[0]);
+      }
+    }
+    if (calls.length < 3)
+      E(f, 'مواضعُ الحفظِ أقلُّ من ثلاثةٍ (' + calls.length + ') — فموضعٌ حُذِف، والحفظُ عند الإكمالِ وعند المغادرةِ وعند الجزءِ الناقص');
+    const noT = calls.filter(c => !/__timing\(\)/.test(c));
+    if (noT.length)
+      E(f, 'الزمنُ لا يُمرَّر في كلّ مواضع الحفظ (' + noT.length + ' من ' + calls.length + ') — جلسةٌ تُحفظ بلا زمنٍ تمرّ بلا فحص');
+    const noS = calls.filter(c => !/__seen/.test(c));
+    if (noS.length)
+      E(f, 'مفاتيحُ الورقةِ لا تُمرَّر في كلّ مواضع الحفظ (' + noS.length + ' من ' + calls.length + ') — فالصفُّ يحمل مفاتيحَ لوحةٍ غيرِ لوحتِه');
+  }
   if (!/meta\.trusted = false; meta\.why =/.test(src))
     E(f, 'الجلسةُ المتسرّعةُ لا تُوسَم — ستدخل المتوسّط');
   /* معياران: المتوسّطُ وعددُ المتسرّعة */
@@ -9100,7 +9123,7 @@ function buildVerPath(){
    وهذا العطبُ صامتٌ لو انكسر: الجرعةُ تُعرَض، والطفلُ يحلُّ، ولا شيء
    يصيح — إنّما يُدرَّب على غيرِ ما قِيس، أو لا تتوقّف فتصير طعامًا
    دائمًا بعد أن شُفي. فيُقاس الحدُّ بالسلوكِ لا بالنصّ. */
-function dosePath(){
+function mathDosePath(){
   const out = [], F = 'math9.html', p = path.join(ROOT, F);
   const E = m => out.push({ sev:'خطأ', file:F, msg:m });
   if (!fs.existsSync(p)) { E('صفحةُ رياضياتِ ثالثِ متوسّطٍ غائبة'); return out; }
@@ -9399,6 +9422,39 @@ function seenCapPath(){
     S.init('t');
   }
 
+  /* ٣.٥) العدُّ بالورقةِ لا بالزيارة، والمفاتيحُ مفاتيحُ ورقتِها
+     ═══ خرقان كانا هنا، وكلاهما قِيس ════════════════════════════════
+     ⚠️ الأوّل: كان العدُّ يُمنَع إن سبق المفتاحُ في الزيارةِ كلِّها، فمن
+     ضغط «أسئلة جديدة» رأى البندَ ثالثةً ورابعةً والعدّادُ واحدٌ أبدًا —
+     وحدُّ العرضَين (طلبُ الأب) مخروقٌ في أكثرِ ما يُفعَل.
+     ⚠️ والثاني: sessionKeys كانت تردّ مفاتيحَ الزيارةِ مجمَّعةً، فصفُّ
+     الجولةِ الثانيةِ يحمل مفاتيحَ الأولى بمعرّفٍ آخرَ فيعُدُّ merge
+     البندَ مرّتَين على جهازٍ ثانٍ. وقِيس في صفوفِ فهدٍ: ٣٦ من ٣٦. */
+  {
+    S.init('round');
+    const X = ['بندٌ واحد', ['a','b'], 0, ''];
+    const n = [];
+    for (let i=0;i<3;i++){ S.markShown([X], null); n.push(S.count(X)); }
+    if (!(n[0]===1 && n[1]===2 && n[2]===3))
+      E('العرضُ لا يُعَدُّ إلّا مرّةً في الزيارةِ كلِّها (' + n.join('·') + ') — فمن ضغط «أسئلة جديدة» يرى البندَ ثالثةً ورابعةً والعدّادُ واحدٌ، وحدُّ العرضَين مخروق');
+    S.init('round2');
+    const A = ['أ', ['a','b'], 0, ''], B2 = ['ب', ['c','d'], 0, ''];
+    const k1 = S.markShown([A], null) || [], k2 = S.markShown([B2], null) || [];
+    if (!k1.length || !k2.length) E('markShown لا يردُّ مفاتيحَ ورقتِه — فلا يقدر الراسمُ أن يحفظها للصفّ');
+    else {
+      const sh = k2.filter(k => k1.indexOf(k) >= 0).length;
+      if (sh) E('مفاتيحُ الورقةِ الثانيةِ تضمُّ الأولى (' + sh + ') — فيعُدُّ الدمجُ البندَ الواحدَ مرّتَين على جهازٍ ثانٍ فيتقاعد قبل وقتِه');
+      const sk = S.sessionKeys();
+      if (sk.length !== k2.length || sk.some((k,i) => k !== k2[i]))
+        E('sessionKeys لا تردُّ آخرَ ورقةٍ وحدَها — فالصفُّ يحمل مفاتيحَ لوحةٍ غيرِ لوحتِه');
+    }
+    /* وبندٌ مكرّرٌ في الورقةِ الواحدةِ عرضٌ واحدٌ لا عرضان */
+    S.init('round3');
+    S.markShown([X, X], null);
+    if (S.count(X) !== 1) E('بندٌ ورد مرّتَين في ورقةٍ واحدةٍ عُدَّ عرضَين (' + S.count(X) + ') — والمعروضُ مرّةً واحدةً عرضٌ واحد');
+    S.init('t');
+  }
+
   /* ٤) والعدُّ ثابتٌ ويندمج من الخادم */
   if (!/localStorage\.setItem\(LS/.test(src))
     E('العدُّ لا يُحفَظ في الجهاز — فيضيع مع كلِّ فتحة، وهي العلّةُ الأولى بعينها');
@@ -9412,6 +9468,17 @@ function seenCapPath(){
   if (!/SeenCap\.init\(who\)/.test(ph)) PR('العدّادُ لا يُهيَّأ باسمِ الابن — فيختلط عدُّ الإخوة');
   if (!/SeenCap\.markShown\(items, null\)/.test(ph)) PR('العرضُ لا يُسجَّل في renderSet — وهو الموضعُ الذي تمرُّ به الجولاتُ كلُّها');
   if (!/meta\.seenKeys = sk/.test(ph)) PR('مفاتيحُ الجلسةِ لا تُحفَظ في الصفّ — فلا يندمج العدُّ بين الأجهزة');
+  /* ⚠️ ومفاتيحُ الصفِّ من راسمِ ورقتِه لا من آخرِ نداءٍ في الصفحة:
+     buildAll يبني اللوحاتِ كلَّها في فتحةٍ واحدة، فآخرُ ما عُرِض عند
+     الحفظِ لوحةٌ أخرى. فيحفظ الراسمُ ما ردّه له العدّادُ ويُمرّره. */
+  if (!/__seen = SeenCap\.markShown\(items, null\) \|\| \[\]/.test(ph))
+    PR('الراسمُ لا يحفظ المفاتيحَ التي ردّها له العدّاد — فيُرسَل الصفُّ بمفاتيحِ لوحةٍ غيرِ لوحتِه');
+  if ((ph.match(/__timing\(\), __seen\)/g) || []).length < 2)
+    PR('مفاتيحُ الورقةِ لا تُمرَّر إلى الحفظِ في موضعَيه — والحفظُ موضعان: عند الإكمالِ وعند المغادرة');
+  if (!/function saveScore\(test, correct, total, wrongs, skills, pid, timing, seen\)/.test(ph))
+    PR('الحفظُ لا يقبل مفاتيحَ الورقة');
+  if (!/\(seen && seen\.length\) \? seen\.slice\(0, 60\) : SeenCap\.sessionKeys\(\)/.test(ph))
+    PR('الحفظُ لا يُقدّم مفاتيحَ الورقةِ على مفاتيحِ آخرِ نداء');
   if (/_shown\[/.test(ph)) PR('ذاكرةُ الصفحةِ القديمةُ (_shown) ما زالت تُستعمَل — وهي تُمحى مع كلِّ فتحة');
   if (!/stepReadItems\.reset = true;/.test(ph)) PR('قطعُ المقروءِ لا تُعلِن دورةً جديدةً عند النفاد');
   if (!/stepWriteItems\.reset = true;/.test(ph))
@@ -9435,5 +9502,241 @@ function seenCapPath(){
     out.push({ sev:'خطأ', file:'reading.html', msg:'pickFresh لا يعدُّ الدورات — فيُكرَّر بنكُ الاستماعِ في صمت' });
   if (!/lCycle >= 2/.test(rd))
     out.push({ sev:'خطأ', file:'reading.html', msg:'لا يُقال للطفلِ إنّ بنكَ الاستماعِ أُعيد — وهو شرطُ الصدقِ معه' });
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   جرعةُ قواعدِ ستيب عند فهد — فحصٌ سلوكيٌّ لا نصّيّ
+   ═══════════════════════════════════════════════════════════════════
+   قِيس (٢٤ نوفمبر ٢٠٢٦) أنّ ستَّ قواعدَ واقفةٌ عنده، وأنّ سببَ وقوفِها
+   أنّ «قواعدَ مركّزة» تَخدم ما أخطأه مؤخَّرًا لا ما هو أضعفُ فيه:
+   الماضي عشرُ جلساتٍ ومئةٌ وأربعةُ أسئلة، والشرطُ جلستان. فالجرعةُ
+   تُسوّي الحملَ على الستِّ بالدور.
+
+   ويُقاس هنا السلوكُ: المولّدُ يُشغَّل فعلًا فيُرى توزيعُه وحدُّه، وحدُّ
+   التوقّفِ يُشغَّل على حالاتٍ من بينها حالةٌ تعزل شرطَ عددِ الجلساتِ
+   وحدَه — فحذفُ الشرطِ لا يمرّ. ودرسٌ من جرعةِ الرياضيّات: وجودُ
+   الدالّةِ ليس نداءَها، فيُطلَب موضعُ النداءِ لا تعريفُها.
+   ═══════════════════════════════════════════════════════════════════ */
+function gdosePath(){
+  const out = [];
+  const F = 'practice.html', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('صفحةُ التدرّبِ غائبة'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* يقتطع تعريفَ دالّةٍ بعدِّ الأقواسِ المعقوفة */
+  const fn = (name) => {
+    const re = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{');
+    const m = re.exec(src);
+    if (!m) return null;
+    let i = m.index + m[0].length - 1, d = 0, s = null;
+    for (; i < src.length; i++) {
+      const ch = src[i], pv = src[i-1];
+      if (s) { if (ch === s && pv !== '\\') s = null; continue; }
+      if (ch === '"' || ch === "'" || ch === '`') { s = ch; continue; }
+      if (ch === '{') d++;
+      else if (ch === '}') { d--; if (!d) break; }
+    }
+    return d === 0 ? src.slice(m.index, i + 1) : null;
+  };
+
+  /* ١) الستُّ هي الستُّ التي قِيست — لا تُزاد ولا تُنقَص */
+  const WANT = ['Present Tenses','Past Tenses','If Conditions',
+                'Comparative / Superlative','Modal Auxiliaries','For / Since / Used to'];
+  const m6 = /var GD6\s*=\s*\[([\s\S]*?)\];/.exec(src);
+  let GOT = [];
+  if (!m6) E('GD6 غائبة — فلا جرعةَ أصلًا');
+  else {
+    GOT = (m6[1].match(/"([^"]+)"/g) || []).map(x => x.slice(1,-1));
+    const miss = WANT.filter(w => GOT.indexOf(w) < 0);
+    const extra = GOT.filter(g => WANT.indexOf(g) < 0);
+    if (miss.length) E('الجرعةُ لا تدرّب ما قِيس: ناقصٌ ' + miss.join(' · '));
+    if (extra.length) E('الجرعةُ تدرّب ما لم يُقَس: زائدٌ ' + extra.join(' · ') + ' — فيُهدَر وقتُه في غيرِ ضعفِه');
+    /* وثغرةٌ تمرُّ بلا هذا: فاصلةٌ زائدةٌ تُخلِّف فُرجةً فيصير الطابورُ
+       خمسةً وهو يُقرَأ ستّةً. وfilter يتخطّى الفُرَج فلا تُرى. */
+    /* ⚠️ والفُرجةُ تُقاس بالموضعِ لا بالعدِّ بعد الترشيح: filter يتخطّى
+       الفارغَ فيستوي العددان ولا يُرى شيء — وقعتُ في هذا أوّلَ مرّةٍ
+       في بنكِ مواضيعِ التعبيرِ فسقط موضعٌ في صمت. والفاصلةُ الأخيرةُ
+       قبلَ القوسِ مشروعةٌ فتُستثنى. */
+    const parts = m6[1].split(',').map(x => x.trim());
+    const holes = parts.filter((x, i) => !x.length && i < parts.length - 1).length;
+    if (holes)
+      E('GD6 فيها ' + holes + ' موضعًا فارغًا (فاصلةٌ زائدة) — فالمصفوفةُ ذاتُ فُرجةٍ تتخطّاها forEach في صمت، وقاعدةٌ تسقط من الجرعة');
+    const slots = parts.filter(x => x.length).length;
+    if (GOT.length && slots !== GOT.length)
+      E('GD6 فيها موضعٌ ليس نصًّا (' + slots + ' موضعًا و' + GOT.length + ' نصًّا) — فقاعدةٌ تسقط من الجرعةِ صامتةً');
+    /* ولكلِّ قاعدةٍ شرحٌ مكتوبٌ في gram-rules.js ترجع إليه الجرعة */
+    const gr = fs.readFileSync(path.join(ROOT, 'gram-rules.js'), 'utf8');
+    GOT.forEach(g => { if (gr.indexOf('["' + g + '"') < 0) E('القاعدةُ «' + g + '» لا شرحَ لها في gram-rules.js — فتُدرَّب بلا تعليم'); });
+  }
+
+  /* ٢) والمولّدُ يُشغَّل: توزيعٌ بالدورِ وحدُّ عرضَين على ثلاثِ جلسات */
+  const sSeen = fs.readFileSync(path.join(ROOT, 'seen-cap.js'), 'utf8');
+  const sBank = fs.readFileSync(path.join(ROOT, 'step-bank.js'), 'utf8');
+  const fPools = fn('gdPools'), fItems = fn('gdoseItems');
+  if (!fItems) E('gdoseItems غائبة — فلا سحبَ للجرعة');
+  if (!fPools) E('gdPools غائبة — فلا بنكَ للجرعة');
+  if (fItems && fPools && m6) {
+    const box = { window:{}, localStorage:{ _d:{}, getItem(k){ return this._d[k]||null; }, setItem(k,v){ this._d[k]=v; } },
+                  document:{ addEventListener(){}, querySelector:()=>null }, console };
+    box.window.localStorage = box.localStorage; box.window.document = box.document;
+    vm.createContext(box);
+    let ok = true;
+    try {
+      vm.runInContext(sSeen, box);
+      vm.runInContext(sBank, box);
+      vm.runInContext('var who="fahad";\n' +
+        'function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t; } return a; }\n' +
+        'var SeenCap = window.SeenCap; SeenCap.init("gd");\n' +
+        m6[0] + '\n' + fPools + '\n' + fItems + '\n' +
+        'var STEP_BANK = window.STEP_BANK;', box);
+    } catch(e){ ok = false; E('مولّدُ الجرعةِ لا يُشغَّل: ' + String(e.message).slice(0,70)); }
+    if (ok) {
+      const P = box.gdPools();
+      WANT.forEach(w => {
+        const n = (P[w] || []).length;
+        /* ثلاثُ جلساتٍ من عشرةٍ على ستٍّ = خمسُ سحباتٍ للقاعدة، وحدُّها
+           عرضان — فعشرةُ بنودٍ أدنى ما يُسلِّم من الدورانِ المبكّر. */
+        if (n < 10) E('بنكُ «' + w + '» ' + n + ' بندًا — ولا يكفي ثلاثَ جلساتٍ تحت حدِّ العرضَين، فتُفتَح دورةٌ من أوّلِ أسبوع');
+      });
+      /* التوزيعُ بالدور: لا تأكل قاعدةٌ الورقةَ */
+      let worst = 0, zero = 0;
+      for (let t=0;t<40;t++){
+        const it = box.gdoseItems(10);
+        if (it.length !== 10) { E('الورقةُ ' + it.length + ' سؤالًا والمطلوبُ عشرة'); break; }
+        const c = {};
+        it.forEach(q => { const m = /^<b>Grammar — ([^:<]+):<\/b>/.exec(String(q[0]||'')); const k = m?m[1].trim():'—'; c[k]=(c[k]||0)+1; });
+        const vals = WANT.map(w => c[w] || 0);
+        worst = Math.max(worst, Math.max.apply(null, vals));
+        zero += vals.filter(v => !v).length;
+      }
+      if (worst > 2) E('قاعدةٌ تأخذ ' + worst + ' أسئلةٍ من عشرةٍ — فالسحبُ ليس بالدورِ وتُترَك أختُها');
+      if (zero) E('قاعدةٌ تُغيَّب عن الورقةِ (' + zero + ' مرّةً في أربعين) — والستُّ سواءٌ في الضعف');
+      /* والحدُّ يُلزَم داخلَ الدورة */
+      box.SeenCap.init('cap');
+      let cyc = {}, over = 0, res = 0;
+      for (let r=0;r<9;r++){
+        const it = box.gdoseItems(10);
+        if (box.gdoseItems.reset){ res++; cyc = {}; }
+        it.forEach(q => { const k = box.SeenCap.keyOf(q); cyc[k] = (cyc[k]||0)+1; if (cyc[k] > box.SeenCap.CAP) over++; });
+        box.SeenCap.markShown(it, 'r'+r);
+      }
+      if (over) E('الجرعةُ تخرق حدَّ العرضَين داخلَ الدورةِ الواحدة: ' + over + ' عرضًا ثالثًا في تسعِ جلسات');
+      /* وتُشبَع البنوكُ فتُعلَن دورةٌ جديدة: ستٌّ × عشرون × عرضان = ٢٤٠ سحبةً */
+      box.SeenCap.init('cyc');
+      let res2 = 0;
+      for (let r=0;r<30;r++){
+        const it = box.gdoseItems(10);
+        if (box.gdoseItems.reset) res2++;
+        box.SeenCap.markShown(it, 'c'+r);
+      }
+      if (!res2) E('لا تُعلَن دورةٌ جديدةٌ حين تنفد بنوكُ الستِّ — فيُكرَّر عليه في صمتٍ وهو لا يدري');
+    }
+  }
+
+  /* ٣) وحدُّ التوقّفِ يُشغَّل لا يُقرَأ */
+  const fDone = fn('gdDone');
+  if (!fDone) E('gdDone غائبة — فالجرعةُ لا تتوقّف، وهي دواءٌ لا طعامٌ دائم');
+  else {
+    const mv = /var GD_NEED_SES[^\n]*\n/.exec(src);
+    let f = null;
+    try { const sb = {}; vm.createContext(sb); vm.runInContext((mv?mv[0]:'') + fDone + '\nvar f = gdDone;', sb); f = sb.f; } catch(e){}
+    if (!f) E('gdDone لا تُشغَّل');
+    else {
+      const C = [
+        ['بلا جلسات',                      { sessions:0, correct:0,  total:0   }, false],
+        ['جلستان بتسعين',                  { sessions:2, correct:18, total:20  }, false],
+        /* ⚠️ هذه تعزل شرطَ عددِ الجلساتِ وحدَه: مئةُ سؤالٍ بتسعين في
+           جلسةٍ واحدةٍ — فإن سقط الشرطُ قيل «تمّت» من أوّلِ يوم.
+           وبلا هذه الحالةِ مرّت الطفرةُ في جرعةِ الرياضيّاتِ أوّلًا. */
+        ['جلسةٌ واحدةٌ بتسعين ومئةِ سؤال',  { sessions:1, correct:90, total:100 }, false],
+        ['جلستان بتسعين ومئةِ سؤال',        { sessions:2, correct:90, total:100 }, false],
+        ['ثلاثُ جلساتٍ بستّين',             { sessions:3, correct:18, total:30  }, false],
+        ['ثلاثُ جلساتٍ بتسعٍ وسبعين',       { sessions:3, correct:79, total:100 }, false],
+        ['ثلاثُ جلساتٍ وأسئلةٌ قليلة',      { sessions:3, correct:18, total:20  }, false],
+        ['ثلاثُ جلساتٍ بثمانين',            { sessions:3, correct:24, total:30  }, true ],
+        ['أربعُ جلساتٍ بتسعين',             { sessions:4, correct:36, total:40  }, true ]
+      ];
+      C.forEach(c => {
+        let got = null; try { got = f(c[1]); }catch(e){}
+        if (got !== c[2]) E('حدُّ توقّفِ الجرعةِ خطأٌ في «' + c[0] + '»: ردَّ ' + String(got) + ' والصوابُ ' + String(c[2]));
+      });
+    }
+  }
+
+  /* ٤) وجلسةُ النقرِ لا تُحسَب، والصفوفُ حفظٌ تدريجيٌّ يُجمَع بالمعرّف */
+  const fFetch = fn('gdFetch') || '';
+  if (!/if\(m\.trusted === false\) return;/.test(fFetch))
+    E('عدُّ الجرعةِ يضمّ جلسةَ النقر — فيُقال له «تمّت» وهو لم يحلّ');
+  if (!/\(\+m\.total \|\| 0\) > \(\+g\[k\]\.total \|\| 0\)/.test(fFetch))
+    E('عدُّ الجرعةِ يجمع الحفظَ التدريجيَّ صفًّا صفًّا — فجلسةٌ واحدةٌ تُقرَأ ثلاثًا');
+
+  /* ٥) واللافتةُ تُحدَّث حين يصل العدّ، وتبقى بعد «أسئلة جديدة» */
+  if (!/\[data-gdose-banner\]/.test(src) || !/data-gdose-banner>/.test(src))
+    E('لافتةُ الجرعةِ لا تُحدَّث بعد وصولِ العدِّ من الخادمِ — فتبقى على «يُحسب…»');
+  /* ⚠️ والتعليمةُ تُمرَّر دالّةً لا نصًّا: النصُّ يُلتقَط مرّةً في
+     buildAll فتُمحى اللافتةُ عند أوّلِ «أسئلة جديدة» وترجع إلى «يُحسب…». */
+  if (!/typeof intro === "function" \? intro\(\) : intro/.test(src))
+    E('راسمُ الورقةِ لا يقبل تعليمةً دالّةً — فلافتةُ التقدّمِ تُمحى عند أوّلِ جولةٍ جديدة');
+  if (!/renderSet\("gd", gdoseItems\(10\), gdIntro,/.test(src))
+    E('الجرعةُ تُمرَّر تعليمتَها نصًّا لا دالّةً — فلافتتُها لا تحيا بعد جولة');
+
+  /* ٦) وهي لمن قِيست عليه */
+  if (!/var GDOSE = \(who === "fahad"/.test(src))
+    E('الجرعةُ غيرُ مقصورةٍ على من قِيست أخطاؤه — فتُعرَض لغيرِه بلا قياس');
+  if (!/if\(GDOSE\) TABS\.push\(\["gd"/.test(src))
+    E('تبويبُ الجرعةِ يُدفَع بلا شرطٍ — فيظهر لأبناءٍ لا جرعةَ لهم');
+
+  /* ٧) والشرحُ قبل السؤال — وموضعُ النداءِ لا تعريفُ الدالّة */
+  if (!fn('gdLessons')) E('لا شرحَ للقواعدِ — والجرعةُ تعليمٌ قبل أن تكون تدريبًا');
+  const fIntro = fn('gdIntro') || '';
+  if (!/gdLessons\(\)/.test(fIntro))
+    E('شرحُ القواعدِ لا يُعرَض فوقَ الورقة — والجرعةُ تعليمٌ قبل أن تكون تدريبًا');
+  if (!/gdBanner\(\)/.test(fIntro))
+    E('لافتةُ التقدّمِ لا تُرسَم في تعليمةِ الجرعة');
+  /* ولكلِّ قاعدةٍ رابطُ شرحٍ مرئيّ — بحثٌ لا معرّفَ فيديو، فلا ينكسر */
+  const fL = fn('gdLessons') || '';
+  if (!/data-eduvid/.test(fL)) E('لا رابطَ شرحٍ مرئيٍّ مع القاعدة');
+  if (/youtube\.com\/watch\?v=/.test(fL)) E('رابطُ الشرحِ معرّفُ فيديوٍ بعينه — يُحذَف فينكسر الزرُّ صامتًا، والبحثُ لا ينكسر');
+  /* ⚠️ وفتحُ الشرحِ غيابٌ في نظرِ المتصفّح، وهذه الصفحةُ تقذف من غاب
+     مرّتَين — فمن شاهد شرحَين يُقذَف وهو يتعلّم. وهو ما يفحصه
+     checks/eduvid.js في صفحاتِ الرياضيّاتِ وكانت هذه خارجَه. */
+  if (!/if\(window\.__eduExempt\)\{window\.__eduExempt=false;return;\}/.test(src))
+    E('حارسُ الغيابِ لا يُعفي فتحَ شرحِ القاعدة — فمن شاهد شرحَين قُذِف وهو يتعلّم');
+  if (!/closest\("\[data-eduvid\]"\)/.test(src))
+    E('الإعفاءُ لا يُرفَع عند ضغطِ رابطِ الشرح — فلا ينفع وجودُه');
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   حارسٌ على الحرّاسِ أنفسِهم: لا يُظلَّل حارسٌ بحارس
+   ═══════════════════════════════════════════════════════════════════
+   وقع هذا فعلًا: حارسُ جرعةِ الرياضيّاتِ سُمِّي dosePath وفي الملفِّ
+   dosePath قبلَه لجرعةِ english9 — فأُسقِط التعريفُ الأوّلُ (الأخيرُ
+   يغلب في جافاسكربت)، وبقي الاسمُ مسجَّلًا مرّتَين فجرى حارسُ
+   الرياضيّاتِ جريتَين وحارسُ english9 صفرًا. ولا شيءَ يصيح: العدُّ
+   يظهر سليمًا، والأخطاءُ صفرٌ، والبابُ المحروسُ بلا حارس.
+   ويُفحَص الملفُّ بنصِّه: تعريفان باسمٍ واحدٍ خطأٌ ولو كان مقصودًا.
+   ═══════════════════════════════════════════════════════════════════ */
+function guardNamesPath(){
+  const out = [];
+  const F = 'checks/pages.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) return out;
+  const src = fs.readFileSync(p, 'utf8');
+  const seen = {}, dup = [];
+  const re = /^function\s+([A-Za-z_$][\w$]*)\s*\(/gm;
+  let m;
+  while ((m = re.exec(src))) {
+    if (seen[m[1]]) { if (dup.indexOf(m[1]) < 0) dup.push(m[1]); }
+    else seen[m[1]] = 1;
+  }
+  dup.forEach(n => out.push({ sev:'خطأ', file:F,
+    msg:'حارسان باسمٍ واحد «' + n + '» — فالأوّلُ مُظلَّلٌ لا يجري أبدًا، والبابُ الذي يحرسه بلا حارسٍ في صمت' }));
+  /* وكلُّ حارسٍ معرَّفٍ يُنادى، فلا يُكتَب حارسٌ ثمّ يُنسى تسجيلُه */
+  Object.keys(seen).filter(n => /Path$/.test(n)).forEach(n => {
+    if (!new RegExp('\\.\\.\\.' + n + '\\(\\)').test(src))
+      out.push({ sev:'خطأ', file:F, msg:'الحارسُ «' + n + '» معرَّفٌ وغيرُ مسجَّلٍ في run — فهو حرفٌ لا عمل' });
+  });
   return out;
 }

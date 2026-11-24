@@ -167,22 +167,46 @@
 
   function shuf(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 
-  /* ما عُرِض في هذه الجلسة: يُعَدُّ مرّةً واحدةً لكلِّ مفتاحٍ ولو تكرّر
-     في الجلسةِ نفسِها، ويُحفَظ مفاتيحُه ليُرسَل مع الصفّ. */
-  var session = {}, sessionPid = null;
+  /* ما عُرِض في هذه الورقة: يُعَدُّ مرّةً واحدةً لكلِّ مفتاحٍ ولو تكرّر
+     في الورقةِ نفسِها، ويُردُّ مفاتيحُه ليُرسَل مع صفِّها.
+     ═══ خرقان كانا هنا، وكلاهما مقيسٌ لا مُتوهَّم ════════════════════
+     ⚠️ الأوّل: كان العدُّ يُمنَع إن سبق المفتاحُ في **الزيارة** لا في
+     الورقة («if(session[k]) return»). فالبندُ يُعرَض في جولةٍ فيصير
+     عدّادُه واحدًا، ثمّ يُعرَض في جولةٍ ثانيةٍ في الزيارةِ نفسِها فلا
+     يُعَدّ، ثمّ ثالثةً ورابعةً — والعدّادُ واحدٌ أبدًا. وقِيس في node:
+     ثلاثُ عرضاتٍ والعدّادُ ١. فحدُّ العرضَين — وهو طلبُ الأب — مخروقٌ
+     في وجهِ من يضغط «أسئلة جديدة» في جلسةٍ واحدة، وهو أكثرُ ما يُفعَل.
+     ⚠️ والثاني: sessionKeys كان يردّ مفاتيحَ الزيارةِ كلِّها مجمَّعةً،
+     فجولةٌ ثانيةٌ تُرسل مفاتيحَ الأولى معها في صفٍّ آخرَ بمعرّفٍ آخر —
+     فيعُدُّ merge البندَ الواحدَ مرّتَين أو ثلاثًا على جهازٍ ثانٍ،
+     فيتقاعد البندُ قبل وقتِه ويضيق البنكُ بلا سبب. وقِيس في صفوفِ
+     فهدٍ: في كلِّ زيارةٍ ذاتِ جولتَين كانت مفاتيحُ الثانيةِ تشمل
+     الأولى كلَّها — ٣٦ من ٣٦ مرّتَين. وهو أيضًا ما أوهمني أنّ بندَين
+     عُرِضا ثلاثًا وهما عرضان.
+     فالعدُّ الآن بالورقة، والمفاتيحُ تُردُّ من النداءِ نفسِه فيحمل كلُّ
+     صفٍّ ورقتَه وحدَها. */
+  var session = {}, sessionPid = null, lastRound = [];
   function markShown(stems, pid){
     if(pid && pid !== sessionPid){ session = {}; sessionPid = pid; }
+    var round = {}, keys = [];
     (stems || []).forEach(function(s){
       var k = keyOf(s);
-      if(session[k]) return;
+      if(round[k]) return;                 /* بندٌ مرّتَين في ورقةٍ = عرضٌ واحد */
+      round[k] = 1; keys.push(k);
       session[k] = 1;
       counts[k] = (counts[k] || 0) + 1;
     });
     if(pid) pids[pid] = 1;
     save();
+    lastRound = keys.slice(0, 60);
+    return lastRound;
   }
-  function sessionKeys(){ return Object.keys(session).slice(0, 60); }
-  function startSession(pid){ session = {}; sessionPid = pid || null; }
+  /* ورقةُ آخرِ نداءٍ — والمستدعي يُفضَّل أن يحفظ ما ردّه markShown له،
+     فصفحةٌ تبني لوحاتٍ كثيرةً في فتحةٍ واحدةٍ آخرُ نداءٍ فيها ليس
+     لوحةَ الصفِّ الذي يُحفَظ. */
+  function sessionKeys(){ return lastRound.slice(0, 60); }
+  function visitKeys(){ return Object.keys(session).slice(0, 60); }
+  function startSession(pid){ session = {}; lastRound = []; sessionPid = pid || null; }
 
   function forget(q){ delete counts[keyOf(q)]; }
 
@@ -190,7 +214,7 @@
     CAP: CAP, forget: forget,
     init: function(w){ who = String(w || ""); LS = "rafeef_seen_" + who; load(); },
     merge: merge, count: count, pick: pick, fresh: fresh,
-    markShown: markShown, sessionKeys: sessionKeys, startSession: startSession,
+    markShown: markShown, sessionKeys: sessionKeys, visitKeys: visitKeys, startSession: startSession,
     keyOf: keyOf,
     stats: function(){ var n=0, c2=0; for(var k in counts){ n++; if(counts[k]>=CAP) c2++; } return { keys:n, atCap:c2 }; }
   };

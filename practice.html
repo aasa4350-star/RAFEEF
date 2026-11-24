@@ -75,7 +75,7 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=d382592140" defer></script>
+<script src="build-check.js?v=8734e31cde" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -184,7 +184,7 @@ var PACE_ON = (who === "fahad");
 function paceOn(test){
   return PACE_ON || /تحصيلي|STEP/i.test(String(test || ""));
 }
-function saveScore(test, correct, total, wrongs, skills, pid, timing){
+function saveScore(test, correct, total, wrongs, skills, pid, timing, seen){
   try{
     // التحصيلي (SAAT) وSTEP اختباران لمرحلة الثانوي — فوق مستوى الابتدائي/المتوسط.
     // نوسمهما stretch حتى يفصلهما تقرير المستوى ولا يحسبهما ضدّ الطالب.
@@ -192,9 +192,19 @@ function saveScore(test, correct, total, wrongs, skills, pid, timing){
     var T = timing || {};
     var per = (T.dur && total) ? (T.dur/total) : null;
     var meta = { kind:"practice", test:test, correct:correct, total:total, wrong:(wrongs||[]), skills:(skills||{}), stretch:stretch, pid:pid||null };
-    /* ومفاتيحُ ما عُرِض في هذه الجلسة: بها يندمج العدُّ من الخادمِ فلا
-       يضيع بتبديلِ جهازٍ ولا بتفريغِ ذاكرة. */
-    try{ if(window.SeenCap){ var sk = SeenCap.sessionKeys(); if(sk.length) meta.seenKeys = sk; } }catch(e){}
+    /* ومفاتيحُ ما عُرِض في هذه الورقة: بها يندمج العدُّ من الخادمِ فلا
+       يضيع بتبديلِ جهازٍ ولا بتفريغِ ذاكرة.
+       ⚠️ ومفاتيحُ الورقةِ تأتي من راسمِها لا من آخرِ نداءٍ في الصفحة:
+       buildAll يبني اللوحاتِ كلَّها في فتحةٍ واحدة، فآخرُ ما عُرِض عند
+       الحفظِ لوحةٌ أخرى غيرُ لوحةِ هذا الصفّ. وكان الصفُّ يحمل مفاتيحَ
+       الزيارةِ كلِّها مجمَّعةً فيعُدُّ merge البندَ الواحدَ مرّتَين على
+       جهازٍ ثانٍ — وقِيس في صفوفِ فهدٍ: ٣٦ مفتاحًا من ٣٦ تُعاد. */
+    try{
+      if(window.SeenCap){
+        var sk = (seen && seen.length) ? seen.slice(0, 60) : SeenCap.sessionKeys();
+        if(sk.length) meta.seenKeys = sk;
+      }
+    }catch(e){}
     if(T.dur != null){
       meta.dur = T.dur; meta.fast = T.fast || 0; meta.secPerQ = per!=null ? Math.round(per*10)/10 : null;
       /* الوسمُ صريحٌ لا ضمنيّ: الصفُّ يحمل سببَ استبعاده فيقرؤه التقرير */
@@ -1385,6 +1395,7 @@ if(!VERBAL_ONLY){
   /* جرعةُ حسنٍ الكمّيّة — بابُها من قياسِ أخطائِه هو لا من ترتيبِ البنك.
      وهي لحسنٍ وحدَه: القياسُ قياسُه، ولا تُفرَض على من لم يُقَس. */
   var QDOSE = (who === "hasan" && !YOUNG && !NO_GAT);
+  var GDOSE = (who === "fahad" && !!window.STEP_BANK);
   if(QDOSE) TABS.push(["qd","جرعة كمي 💊"]);
   if(!YOUNG) TABS.push(["t","تحصيلي 🧪"]);
   TABS.push(["s","STEP إنجليزي 🌍"]);
@@ -1406,6 +1417,10 @@ if(!VERBAL_ONLY){
      فهذا قسمٌ يبني طابورَه من أخطائه هو، ولا يُسقِط السؤالَ من الطابور
      حتى يُجيبه صحيحًا — وإن أخطأه عاد إلى آخر الطابور في الجولةِ
      نفسِها، لا في جلسةٍ بعيدةٍ قد لا تأتي. */
+  /* الجرعةُ قبل «قواعدَ مركّزة» لا بعدَها: هي موضعُ جهدِه هذا الأسبوع،
+     وما جاء بعد التبويبِ الخامسِ لا يُفتَح. وهي لفهدٍ وحدَه — القياسُ
+     قياسُه، ولا تُفرَض على من لم يُقَس. */
+  if(GDOSE) TABS.push(["gd","جرعة قواعد 💊"]);
   if(window.STEP_BANK) TABS.push(["gr","قواعد مركّزة ✏️"]);
   if(WRITING) TABS.push(["w","تعبير ✍️"]);
   /* سأل الأب (٣٠ سبتمبر ٢٠٢٦): «متى نعطي فهد اختبارًا حقيقيًّا في
@@ -1639,7 +1654,8 @@ function renderSet(id, items, intro, regen, label){
   /* ═══ العدُّ عند العرضِ لا عند الإجابة ═══════════════════════════
      من رأى السؤالَ فقد رآه، أجاب أو ترك. والعدُّ هنا موضعٌ واحدٌ تمرُّ
      به الجولاتُ كلُّها (ستيبُ والتحصيليُّ والنماذجُ)، فلا يُنسى بابٌ. */
-  try{ if(window.SeenCap) SeenCap.markShown(items, null); }catch(e){}
+  var __seen = [];
+  try{ if(window.SeenCap) __seen = SeenCap.markShown(items, null) || []; }catch(e){}
   /* النموذجُ الكاملُ مؤقَّتٌ دائمًا ولو أطفأ المفتاحَ — فنموذجٌ بلا وقتٍ
      لا يقيس ما جاء لقياسه، وسؤالُ الأبِ إنّما هو عن الجهوزيّة. */
   /* ═══ موهبةُ موقوتةٌ دائمًا — طلبُ الأب (١٦ أكتوبر ٢٠٢٦) ═══════════
@@ -1657,7 +1673,10 @@ function renderSet(id, items, intro, regen, label){
               : (TIMED ? (SECS[id] || 0) : 0);
   var MW_TARGET = (MW_PACE && items.length) ? Math.round(secsAll/items.length) : 0;
   var paceLog = [];
-  var html = '<div class="intro">'+intro+'</div>';
+  /* التعليمةُ نصٌّ أو دالّة: الدالّةُ تُنادى عند كلِّ رسمٍ فتقرأ حالتَها
+     الحاضرة. وكان النصُّ يُلتقَط مرّةً في buildAll، فلافتةُ تقدّمٍ تأتي
+     من الخادمِ بعدَه تُمحى عند أوّلِ «أسئلة جديدة» وترجع إلى «يُحسب…». */
+  var html = '<div class="intro">'+(typeof intro === "function" ? intro() : intro)+'</div>';
   if(secsAll) html += '<div class="timer" data-timer>⏱️ الوقت المتبقّي: '+fmt(secsAll)+'</div>';
   items.forEach(function(q,i){
     html += '<div class="q" data-i="'+i+'"><div class="num">سؤال '+(i+1)+'</div>'+
@@ -1729,7 +1748,7 @@ function renderSet(id, items, intro, regen, label){
        ولا يمنع حفظ نتيجةٍ أكمل ممّا حُفظ. */
     if(ended && savedN >= total) return;
     if(tId){ clearInterval(tId); tId = null; }
-    if(ended){ if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing()); } return; }
+    if(ended){ if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing(), __seen); } return; }
     ended = true;
     if(auto){
       sec.querySelectorAll(".q").forEach(function(qEl){
@@ -1744,7 +1763,7 @@ function renderSet(id, items, intro, regen, label){
       scoreEl.textContent = correct+" / "+total;
     }
     if(tb){ tb.classList.remove("low"); tb.classList.add("done"); tb.textContent = auto ? "⏱️ انتهى الوقت — النتيجة "+correct+"/"+total : "✅ خلّصت — النتيجة "+correct+"/"+total; }
-    if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing()); }
+    if(label && savedN < total){ savedN = total; saveScore(label, correct, total, wrongs, skills, pid, __timing(), __seen); }
     /* ═══ يُقال له في وجهه، لا في تقريرِ أبيه وحدَه ═══════════════════
        لو استُبعدت جلستُه بصمتٍ لظنّ أنّه يعمل ويتقدّم، ولفوجئ أبوه
        برقمٍ لا يفهم من أين جاء. فيُعرَض السببُ والرقمُ ساعةَ وقوعِه،
@@ -1845,7 +1864,7 @@ function renderSet(id, items, intro, regen, label){
     if(n<3 || !label || n<=savedN){ saveTrace(n); return; }
     savedN = n;
     ended = true; if(tId){ clearInterval(tId); tId=null; }
-    saveScore(label, correct, n, wrongs, skills, pid, __timing());
+    saveScore(label, correct, n, wrongs, skills, pid, __timing(), __seen);
   }
   sec._leave = savePartial;
   sec._reopen = function(){ if(ended) renderSet(id, regen?regen():items, intro, regen, label); };
@@ -1953,6 +1972,157 @@ function mawhibaMix(n){
   });
   return shuffle(out);
 }
+/* ═══════════════════════════════════════════════════════════════════
+   جرعةُ قواعدِ ستيب 💊 — لفهدٍ وحدَه
+   ═══════════════════════════════════════════════════════════════════
+   سأل الأب (٢٤ نوفمبر ٢٠٢٦) عن مستوى فهدٍ في ستيب، فقِيست مئةٌ وثمانيةَ
+   عشرَ جلسةً محتسبةً: النسبةُ ترتفع ٥٩ ← ٨١٪، والرفعُ كلُّه من التحليلِ
+   الكتابيِّ (٣٩ ← ٨٠٪) ومن القواعدِ (٣٣ ← ٦٣٪)، وفهمُ المقروءِ سقفٌ
+   بلغه منذ أكتوبر (٩٤٪ على مئةٍ واثنَين وستّين سؤالًا). وبقيت ستٌّ من
+   القواعدِ واقفةً لم تتحرّك.
+
+   ولِمَ وقفت وعنده «قواعدُ مركّزة» سبعون جلسةً وستُّ مئةٍ واثنان وخمسون
+   سؤالًا؟ لأنّ طابورَ ذلك القسمِ يُبنى من أخطائه هو، وهذا صوابٌ في
+   نفسِه لكنّه يَخدم ما أخطأه مؤخَّرًا لا ما هو أضعفُ فيه. فقِيس توزيعُ
+   جلساتِه على القواعد: الماضي عشرُ جلساتٍ ومئةٌ وأربعةُ أسئلة، والفعلُ
+   الثاني تسع، وروابطُ الزمنِ تسع — في حين أنّ الشرطَ جلستان، والمقارنةَ
+   جلستان، والمضارعَ جلستان، وfor/since جلستان. فالأضعفُ أقلُّ ما دُرِّب.
+
+   فهذه جرعةٌ لا تنتظر خطأً: ستُّ قواعدَ بأعيانها، شرحُ كلِّ قاعدةٍ
+   مكتوبًا فوقَ الورقةِ ومعه رابطُ شرحٍ مرئيّ، ثمّ عشرةُ أسئلةٍ تُسحَب
+   بالدورِ من بنوكِها وحدَها — بندٌ من كلِّ قاعدةٍ ثمّ يُعاد الدور، فلا
+   تأكل قاعدةٌ الورقةَ وتُترَك أختُها.
+
+   وتتوقّف وحدَها: ثلاثُ جلساتٍ وثلاثون سؤالًا وثمانون بالمئة. فهي
+   دواءٌ لا طعامٌ دائم، ومتى تمّت رجع إلى «قواعدَ مركّزة» وبنكُه كلُّه.
+   وجلسةُ النقرِ لا تُحسَب في العدّ — حارسُ الإيقاعِ يعمل عند فهدٍ على
+   الصفحةِ كلِّها.
+   ═══════════════════════════════════════════════════════════════════ */
+var GD6 = ["Present Tenses", "Past Tenses", "If Conditions",
+           "Comparative / Superlative", "Modal Auxiliaries", "For / Since / Used to"];
+var GD_LABEL = "قواعد ستيب — جرعة مركّزة 💊";
+function gdRule(en){
+  var R = window.GRAM_RULES || [];
+  for(var i=0;i<R.length;i++) if(R[i][0] === en) return { en:R[i][0], ar:R[i][1], yt:R[i][2], lesson:R[i][3] };
+  return null;
+}
+/* بنكُ كلِّ قاعدةٍ من وسمِها في متنِ السؤال — وهو الوسمُ نفسُه الذي
+   يقرؤه skillOf، فما يُدرَّب عليه هو ما يُحتسَب في التقرير. */
+function gdPools(){
+  var B = window.STEP_BANK || [], out = {};
+  GD6.forEach(function(en){ out[en] = []; });
+  B.forEach(function(q){
+    var m = /^<b>Grammar — ([^:<]+):<\/b>/.exec(String((q && q[0]) || ""));
+    if(m && out[m[1].trim()]) out[m[1].trim()].push(q);
+  });
+  return out;
+}
+/* سحبٌ بالدورِ تحت حدِّ العرضَين. وإن نفد ما تحت الحدِّ في الستِّ كلِّها
+   فُتِحت دورةٌ جديدةٌ لهذه البنوكِ وحدَها وأُعلِن ذلك — كما في فهمِ
+   المقروءِ وفي التحليلِ الكتابيّ، فلا يُكرَّر عليه في صمت. */
+function gdoseItems(n){
+  var P = gdPools(), order = GD6.slice();
+  shuffle(order);
+  gdoseItems.reset = false;
+  var under = {}, tot = 0;
+  order.forEach(function(en){
+    under[en] = (P[en] || []).filter(function(q){ return !window.SeenCap || SeenCap.count(q) < SeenCap.CAP; });
+    shuffle(under[en]); tot += under[en].length;
+  });
+  if(tot < n){
+    gdoseItems.reset = true;
+    order.forEach(function(en){
+      (P[en] || []).forEach(function(q){ if(window.SeenCap) SeenCap.forget(q); });
+      under[en] = shuffle((P[en] || []).slice());
+    });
+  }
+  var out = [], guard = 0;
+  while(out.length < n && guard++ < n*20){
+    var took = 0;
+    for(var i=0;i<order.length && out.length<n;i++){
+      var L = under[order[i]];
+      if(L && L.length){ out.push(L.shift()); took++; }
+    }
+    if(!took) break;
+  }
+  return out;
+}
+/* ═══ العدُّ من الخادمِ لا من الجهاز ═══════════════════════════════
+   ولا تُحسَب جلسةٌ مرّتَين: الصفوفُ حفظٌ تدريجيٌّ، فتُجمَع بالمعرّفِ
+   ويُؤخَذ أكبرُ عددٍ في كلِّ معرّف. */
+var GD_STAT = null;
+function gdFetch(){
+  try{
+    fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
+        "&meta->>test=eq."+encodeURIComponent(GD_LABEL)+"&order=created_at.desc&limit=200",
+      {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      if(!Array.isArray(rows)) return;
+      var g = {};
+      rows.forEach(function(x){
+        var m = x.meta || {};
+        if(m.test !== GD_LABEL) return;
+        if(m.trusted === false) return;             /* لا تُحسَب جلسةُ النقر */
+        var k = m.pid || m.cid || x.created_at;
+        if(!g[k] || (+m.total || 0) > (+g[k].total || 0)) g[k] = m;
+      });
+      var ks = Object.keys(g), c = 0, t = 0;
+      ks.forEach(function(k){ c += (+g[k].correct || 0); t += (+g[k].total || 0); });
+      GD_STAT = { sessions:ks.length, correct:c, total:t };
+      var el = document.querySelector("[data-gdose-banner]");
+      if(el) el.innerHTML = gdBanner();
+    }).catch(function(){});
+  }catch(e){}
+}
+var GD_NEED_SES = 3, GD_NEED_Q = 30, GD_NEED_PCT = 0.8;
+function gdDone(s){
+  return !!(s && s.sessions >= GD_NEED_SES && s.total >= GD_NEED_Q && (s.correct / s.total) >= GD_NEED_PCT);
+}
+function gdBanner(){
+  var s = GD_STAT;
+  if(!s) return '<div style="color:var(--muted)">⏳ نحسب تقدّمك من الخادم…</div>';
+  if(gdDone(s)){
+    return '<div style="background:#064e3b;color:#d1fae5;border-radius:12px;padding:11px 13px;line-height:1.95">'+
+      '<b>✅ تمّت الجرعة</b> — '+s.correct+' من '+s.total+' في '+s.sessions+' جلسات. '+
+      'القواعدُ الستُّ خرجت من دائرةِ الضعف، فارجع إلى <b>قواعدَ مركّزة ✏️</b> وبنكِك كلِّه. '+
+      'وهذا التبويبُ يبقى مفتوحًا إن أردتَ تثبيتًا.</div>';
+  }
+  var pct = s.total ? Math.round(100*s.correct/s.total) : 0;
+  var need = [];
+  if(s.sessions < GD_NEED_SES) need.push((GD_NEED_SES - s.sessions)+' جلسة');
+  if(s.total < GD_NEED_Q) need.push((GD_NEED_Q - s.total)+' سؤالًا');
+  if(s.total >= GD_NEED_Q && pct < 100*GD_NEED_PCT) need.push('رفعَ النسبةِ إلى ٨٠٪');
+  return '<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;line-height:1.95">'+
+    '<b>💊 الجرعةُ المركّزة</b> — ستُّ قواعدَ مرّت عليك كثيرًا في ستيبَ ولم تُصلَح، فنبدأ بالشرح.<br>'+
+    'تقدّمك: <b>'+pct+'٪</b> ('+s.correct+' من '+s.total+' في '+s.sessions+' جلسة) · الهدف ٨٠٪ في ثلاثِ جلسات'+
+    (need.length ? ' — باقي '+need.join(' و')+'.' : '.')+'</div>';
+}
+/* الشرحُ من gram-rules.js نفسِه لا منسوخًا — فقاعدةٌ تُصحَّح هناك
+   تُصحَّح هنا وفي التقريرِ وفي بطاقةِ القاعدةِ معًا. */
+function gdLessons(){
+  var h = '';
+  GD6.forEach(function(en){
+    var g = gdRule(en);
+    if(!g) return;
+    h += '<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;line-height:2.05">'+
+      '<b>'+g.ar+'</b> <span dir="ltr" style="unicode-bidi:isolate;color:var(--muted)">('+g.en+')</span><br>'+
+      isoLatin(g.lesson)+
+      '<div style="margin-top:7px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(g.yt)+
+      '" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:7px 12px;border-radius:10px;font-weight:800;font-size:.92rem">🎬 شرح القاعدة</a></div></div>';
+  });
+  return h;
+}
+function gdIntro(){
+  var n = 0; GD6.forEach(function(en){ n += (gdPools()[en] || []).length; });
+  return '<div data-gdose-banner>'+gdBanner()+'</div>'+
+    (gdoseItems.reset ? '<div style="margin-top:8px;background:#78350f;color:#fde68a;border-radius:11px;padding:9px 12px">'+
+       '🔄 خلصتَ بنوكَ القواعدِ الستِّ كلَّها مرّتَين، فبدأنا دورةً جديدةً — فما يتكرّر عليك شيءٌ في صمت.</div>' : '')+
+    '<div style="margin-top:10px"><b>📖 اقرأ أوّلًا — القواعدُ الستُّ:</b>'+gdLessons()+'</div>'+
+    '<div style="margin-top:6px">ثمّ ١٠ أسئلةٍ من هذه الستِّ وحدَها — بندٌ من كلِّ قاعدةٍ بالدور، '+
+    'من بنكٍ فيه '+n+' سؤالًا، و<b>ما يتكرّر عليك سؤالٌ أكثرَ من مرّتين</b>.</div>';
+}
+
 function buildAll(){
   var tnote = TIMED ? "" : " (بدون توقيت)";
   if(!NO_GAT) renderSet("v", genVerbal(13), "القسم اللفظي: 13 سؤال"+(VERBAL_ONLY?"":" · 13 دقيقة")+tnote+". أبوابُ الاختبار الأربعة: <b>تناظر لفظي · إكمال جمل · خطأ سياقي · استيعاب مقروء</b> — أسئلة جديدة كل مرة.", function(){return genVerbal(13);}, "قدرات لفظي");
@@ -2075,10 +2245,16 @@ function buildAll(){
         function(){ return stepMix(12); }, "STEP إنجليزي");
     } else
     renderSet("s", freshPick(STEP,12,"s"), "STEP: 12 سؤال · 12 دقيقة"+tnote+". قواعد ومفردات وفهم مقروء"+(SENIOR?"":" (متقدّم)")+" — <b>ما يتكرّر عليك سؤالٌ أكثر من مرّتين</b>، من بنكٍ فيه "+sN+" سؤالًا. والعدُّ محفوظٌ ولو بدّلت الجهاز."+(SENIOR?stepWeightsHtml():""), function(){ return freshPick(STEP,12,"s"); }, "STEP إنجليزي");
+    /* ═══ الجرعةُ: تعليمةٌ دالّةٌ لا نصًّا ══════════════════════════
+       فاللافتةُ تأتي من الخادمِ بعد البناء، والنصُّ الملتقَطُ مرّةً
+       يُعيدها إلى «يُحسب…» عند أوّلِ «أسئلة جديدة». */
+    if(GDOSE) renderSet("gd", gdoseItems(10), gdIntro, function(){ return gdoseItems(10); }, GD_LABEL);
   }
 }
 var _tt=document.getElementById("timedToggle"); if(_tt) _tt.addEventListener("change", function(){ TIMED = this.checked; buildAll(); });
 buildAll();
+/* عدُّ الجرعةِ يُقرأ مرّةً واحدةً للصفحة، ثمّ تُحدَّث اللافتةُ في موضعِها */
+if(typeof GDOSE !== "undefined" && GDOSE) gdFetch();
 
 // نماذج رسمية من هيئة تقويم التعليم والتدريب (قياس)
 if(document.getElementById("o")) (function(){
@@ -3197,7 +3373,18 @@ if(document.querySelector("#w.panel.active")) renderWriting();
 function tst(){var t=document.getElementById("__extoast");if(!t){t=document.createElement("div");t.id="__extoast";t.setAttribute("style","position:fixed;top:0;left:0;right:0;z-index:2147483645;background:#b91c1c;color:#fff;padding:12px;text-align:center;font-weight:800;font-family:Tahoma,sans-serif;direction:rtl");document.body.appendChild(t);}t.innerHTML="⚠️ لا تخرج من الصفحة أثناء الحل! المرة الجاية تنتهي الجلسة.";t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},4000);}
 function ejc(){if(document.getElementById("__eject"))return;try{saveCurPanel();}catch(e){}   /* لا نقذفه ونحن نُضيّع ما حلّه */var ov=document.createElement("div");ov.id="__eject";ov.setAttribute("style","position:fixed;inset:0;z-index:2147483646;background:rgba(11,16,22,.97);color:#fff;display:flex;align-items:center;justify-content:center;direction:rtl;font-family:Tahoma,'Segoe UI',system-ui,sans-serif;padding:24px");ov.innerHTML='<div style="text-align:center;max-width:340px"><div style="font-size:3rem">🚫</div><h2 style="margin:12px 0 6px;font-size:1.4rem">انتهت الجلسة</h2><p style="opacity:.88;line-height:1.9">خرجت من صفحة الأسئلة <b>مرتين</b>. لازم تبقى داخل الصفحة أثناء الحل ولا تفتح أي تطبيق ثاني.<br>حدّث الصفحة وابدأ من جديد.</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;border:0;border-radius:12px;background:#3b5bdb;color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer">🔄 إعادة التحميل</button></div>';document.body.appendChild(ov);}
 function inWriting(){var p=document.querySelector(".panel.active");return !!(p&&p.id==="w");}
-document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(dur<=2000)return;if(inWriting())return;ex++;if(ex>=2)ejc();else tst();}});})();
+/* ═══ فتحُ شرحِ القاعدةِ ليس هروبًا من الورقة ══════════════════════
+   هذا الحارسُ يُنهي الجلسةَ عند الغيابِ مرّتَين، وفتحُ اليوتيوبِ غيابٌ
+   في نظرِ المتصفّح. وفي الصفحةِ أزرارُ شرحٍ كثيرةٌ (علاجيٌّ وبطاقاتُ
+   القواعدِ والجرعة) — فمن شاهد شرحَين يُقذَف وهو يتعلّم. وهو عينُ ما
+   يفحصه checks/eduvid.js في صفحاتِ الرياضيّات، وكانت هذه الصفحةُ
+   خارجَه. والإعفاءُ معلَّقٌ على المستندِ لا على زرٍّ بعينه، فيشمل كلَّ
+   data-eduvid حاضرًا وآتيًا، ويُستهلَك مرّةً واحدةً فلا يصير بابًا. */
+document.addEventListener("click",function(e){
+  var a = e.target && e.target.closest ? e.target.closest("[data-eduvid]") : null;
+  if(a) window.__eduExempt = true;
+}, true);
+document.addEventListener("visibilitychange",function(){if(document.hidden){h=Date.now();}else if(h!=null){var dur=Date.now()-h;h=null;if(window.__eduExempt){window.__eduExempt=false;return;}if(dur<=2000)return;if(inWriting())return;ex++;if(ex>=2)ejc();else tst();}});})();
 </script>
 </body>
 </html>
