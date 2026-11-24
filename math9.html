@@ -89,7 +89,7 @@
   .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
   .fr .frd{padding:0 5px}
 </style>
-<script src="build-check.js?v=7add26cd33" defer></script>
+<script src="build-check.js?v=d382592140" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -3331,7 +3331,130 @@ if(!NAMES[who]){
     '<div id="panels"></div>'+
     '<footer>الرياضيات · ثالث متوسط · مطابق للكتاب · أرقام جديدة كل مرة</footer>';
 
+  /* ═══ الجرعةُ المركَّزةُ لحسن — شرحٌ ثمّ تدريب ════════════════════════
+     طلبُ الأب (٢٣ نوفمبر ٢٠٢٦) بعد قياسِ مستواه في الرياضيات: «ابنها».
+
+     والخمسةُ ليست مختارةً بالرأي. الصفوفُ تحفظ لكلِّ بندٍ اسمَ مولّدِه
+     وزمنَه (meta.items)، فقِيست أربعةُ آلافٍ ومئةُ بندٍ من ثلاثِ مئةٍ
+     وثمانٍ وثلاثين جلسة: مئةٌ وسبعٌ وثلاثون صيغةً، ومعدّلُ عرضِ الصيغةِ
+     ثلاثون مرّة. ثمّ قُوبِل نصفُ عرضاتِه الأوّلُ بالنصفِ الثاني — هل
+     أصلح التكرارُ شيئًا؟ فأصلح الكثيرَ: معدّلُ التغيّرِ ١٨٪ ← ١٠٠٪،
+     والمقطعُ السينيُّ ٠٪ ← ٧٥٪، ومِقدارُ القيمةِ المطلقةِ ٣٦٪ ← ١٠٠٪.
+
+     وبقيت هؤلاء الخمسُ لم تتحرّك في مئتَين وإحدى وخمسين عرضًا:
+       gNthTermEq       ٤٥ عرضًا  ٢٧٪ ← ٣٥٪
+       gDistTimeGraph   ٣٢ عرضًا  ٣٨٪ ← ٣١٪
+       g31PlotPoint     ٣٦ عرضًا  ٦١٪ ← ٥٦٪
+       gConsecFamily    ٨٢ عرضًا  ٥٦٪ ← ٦١٪
+       gPerimeterEqual  ٤٧ عرضًا  ٧٤٪ ← ٥٠٪   ← انحدرت أربعًا وعشرين نقطة
+     والأخيرةُ انحدرت بعد تمكُّن، ومعنى ذلك أنّه ثبّت طريقةً خاطئةً
+     وصار يستعملها بثقة. فمزيدُ التدريبِ وحدَه يزيدها رسوخًا لا إصلاحًا.
+
+     فالجرعةُ تبدأ بالشرحِ لا بالسؤال: خمسةُ أمثلةٍ محلولةٍ خطوةً خطوةً،
+     واحدٌ من كلِّ صيغةٍ، تُولَّد من المولّدِ نفسِه فلا يختلف المثالُ عن
+     السؤال. ثمّ عشرةُ أسئلةٍ منها وحدَها.
+
+     وتتوقّف تلقائيًّا: متى بلغ ثمانين بالمئةِ في ثلاثِ جلساتٍ على
+     الأقلِّ وثلاثين سؤالًا قيل له «تمّت» ودُعِي إلى تركِها — فالجرعةُ
+     دواءٌ لا طعامٌ دائم. والعدُّ من الخادمِ لا من الجهازِ فلا يضيع.
+
+     وهي لحسنٍ وحدَه: قِيست على أخطائِه هو، فلا تُعرَض لغيرِه بلا قياس. */
+  var DOSE5 = [gNthTermEq, gDistTimeGraph, g31PlotPoint, gConsecFamily, gPerimeterEqual];
+  var DOSE_ON = (who === "hasan");
+  var DOSE_LABEL = "رياضيات م٣ — جرعة مركّزة 💊";
+  var DOSE_AR = { gNthTermEq:"معادلةُ الحدِّ النونيِّ للمتتابعة",
+                  gDistTimeGraph:"تمثيلُ المسافةِ مع الزمنِ وترجمتُه كلامًا",
+                  g31PlotPoint:"تعيينُ نقطةٍ على المستوى الإحداثيّ",
+                  gConsecFamily:"عائلةُ الأعدادِ المتتالية",
+                  gPerimeterEqual:"محيطا شكلَين متساويان" };
+  /* ═══ ولكلِّ مهارةٍ رابطُ شرحِها هي ═══════════════════════════════════
+     حارسُ الموقعِ يطلب رابطَ شرحٍ لكلِّ تبويب، وبحقّ. لكنّ الجرعةَ خمسُ
+     مهاراتٍ من فصولٍ مختلفةٍ لا درسٌ واحد، فرابطٌ واحدٌ لها يكون رابطًا
+     لا يخصُّ أربعًا منها. فلها خمسةُ روابطَ، كلٌّ بنصِّ بحثِ مهارتِه. */
+  var DOSE_YT = { gNthTermEq:"شرح معادلة الحد النوني للمتتابعة الحسابية ثالث متوسط",
+                  gDistTimeGraph:"شرح قراءة التمثيل البياني للمسافة والزمن",
+                  g31PlotPoint:"شرح تعيين النقاط على المستوى الإحداثي",
+                  gConsecFamily:"شرح مسائل الأعداد الصحيحة المتتالية والزوجية والفردية",
+                  gPerimeterEqual:"شرح مسائل تساوي محيطي شكلين معادلة" };
+
+  /* مثالٌ محلولٌ من كلِّ صيغة: السؤالُ وجوابُه وخطواتُه. ويُولَّد من
+     المولّدِ نفسِه، فلو تغيّر المولّدُ تغيّر المثالُ معه. */
+  function doseWorked(){
+    var out = '';
+    DOSE5.forEach(function(g){
+      var q = null;
+      for(var t=0; t<40 && !q; t++){ try{ q = g(); }catch(e){} }
+      if(!q) return;
+      out += '<div style="background:var(--bg);border-radius:12px;padding:11px 13px;margin-top:10px">'+
+        '<div style="font-weight:800;margin-bottom:6px">'+(DOSE_AR[g.name]||g.name)+'</div>'+
+        '<div style="margin-bottom:6px">'+q[0]+'</div>'+
+        '<div style="color:var(--good);font-weight:800;margin-bottom:6px">الجواب: '+q[1][q[2]]+'</div>'+
+        '<div style="line-height:2">'+q[3]+'</div>'+
+        '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+
+          encodeURIComponent(DOSE_YT[g.name] || (DOSE_AR[g.name] || g.name))+
+          '" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;'+
+          'background:#dc2626;color:#fff;padding:7px 12px;border-radius:10px;font-weight:800;font-size:.86rem">'+
+          '🎬 شرح هذي المهارة</a></div></div>';
+    });
+    return out;
+  }
+
+  /* عدُّ الجرعةِ من الخادم: كم جلسةً وكم صحيحًا من كم */
+  var DOSE_STAT = null;
+  function doseFetch(){
+    if(!DOSE_ON) return;
+    try{
+      fetch(SUPA_URL + "/rest/v1/attempts?select=meta,created_at&student=eq." +
+          encodeURIComponent(name) + "&order=created_at.desc&limit=400",
+        { headers:{ apikey:SUPA_KEY, Authorization:"Bearer " + SUPA_KEY } })
+        .then(function(r){ return r.ok ? r.json() : []; })
+        .then(function(j){
+          if(!Array.isArray(j)) return;
+          var byPid = {};
+          j.forEach(function(row){
+            var m = (row && row.meta) || {};
+            if(m.test !== DOSE_LABEL) return;
+            if(m.trusted === false) return;             /* لا تُحسَب جلسةُ النقر */
+            var id = m.pid || m.cid || row.created_at;
+            if(!byPid[id] || (m.total || 0) > (byPid[id].total || 0)) byPid[id] = m;
+          });
+          var v = Object.keys(byPid).map(function(k){ return byPid[k]; });
+          var c = 0, t = 0;
+          v.forEach(function(m){ c += (m.correct || 0); t += (m.total || 0); });
+          DOSE_STAT = { sessions:v.length, correct:c, total:t };
+          /* ⚠️ ولا يُعتمَد على _reopen: لوحاتُ هذه الصفحةِ لا تحمله
+             (هو في practice.html وحدَها)، فبقيت اللافتةُ على «يُحسب…»
+             بعد وصولِ العدِّ — قِيس في المتصفّحِ فظهر ذلك. فاللافتةُ
+             موسومةٌ بـdata-dose-banner ويُبدَّل محتواها وحدَه. */
+          var el = document.querySelector("[data-dose-banner]");
+          if(el) el.innerHTML = doseBanner();
+        })
+        .catch(function(){});
+    }catch(e){}
+  }
+
+  /* وهل تمّت؟ ثمانون بالمئةِ في ثلاثِ جلساتٍ وثلاثين سؤالًا */
+  function doseDone(s){ return !!(s && s.sessions >= 3 && s.total >= 30 && (s.correct / s.total) >= 0.8); }
+  function doseBanner(){
+    var s = DOSE_STAT;
+    if(!s) return '<div class="intro">💊 <b>الجرعة المركّزة</b> — يُحسب تقدّمك من الخادم…</div>';
+    var pct = s.total ? Math.round(100 * s.correct / s.total) : 0;
+    if(doseDone(s))
+      return '<div class="intro" style="border:1.5px solid var(--good);background:var(--good-bg);color:var(--good);font-weight:800;line-height:2">'+
+        '✅ <b>تمّت الجرعة.</b> بلغت <span dir="ltr">'+pct+'%</span> في '+s.sessions+' جلسة ('+s.correct+' من '+s.total+').'+
+        '<div style="font-weight:600;margin-top:6px">تقدر تتركها الآن وترجع لدروس الكتاب — الجرعةُ دواءٌ لا طعامٌ دائم. '+
+        'وإن حبّيت تثبّتها أكثر فافتحها متى شئت.</div></div>';
+    var need = s.sessions < 3 ? ('باقي '+(3 - s.sessions)+' جلسة على الأقلّ') :
+               (s.total < 30 ? ('باقي '+(30 - s.total)+' سؤالًا') : ('ارفع النسبة إلى <span dir="ltr">80%</span>'));
+    return '<div class="intro" style="border:1.5px solid var(--accent);line-height:2">'+
+      '💊 <b>الجرعة المركّزة</b> — خمسُ مهاراتٍ مرّت عليك كثيرًا ولم تُصلَح بالتكرار، فنبدأ بالشرح.'+
+      '<div style="margin-top:6px">تقدّمك: <b dir="ltr">'+pct+'%</b> ('+s.correct+' من '+s.total+' في '+s.sessions+' جلسة) · '+
+      '<b>الهدف <span dir="ltr">80%</span> في ثلاث جلسات</b> — '+need+'.</div></div>';
+  }
+
   var CFG = {
+    dose:{tab:"جرعة مركّزة 💊", gens:DOSE5, n:10, label:DOSE_LABEL,
+          intro:"<b>اقرأ الأمثلة فوق أوّلًا</b>، ثمّ حِلّ العشرة. وهي من الصيغ الخمس وحدها — لا من ترتيب الكتاب."},
     allh1:{tab:"اختبار شامل 📝", gens:ALLH1, n:12, intro:"<b>اختبار شامل</b> على دروس الفصل الأول الخمسة.", label:"رياضيات م٣ — شامل ف١"},
     h1:  {tab:"1-1 المعادلات", gens:H1, n:10, intro:"<b>الدرس <span class=en>1-1</span> — المعادلات:</b> مجموعة التعويض ما نجرّبه، ومجموعة الحلّ ما نجح منه. والمتطابقة صحيحةٌ لكلّ القيم، وما لا حلّ له مجموعة حلّه <span class=en>\u00d8</span>.", label:"رياضيات م٣ — 1-1 المعادلات"},
     h2:  {tab:"1-2 ذات الخطوة الواحدة", gens:H2, n:10, intro:"<b>الدرس <span class=en>1-2</span> — حلّ المعادلات ذات الخطوة الواحدة:</b> اعزل المتغيّر بالعملية العكسية، وطبّقها على الطرفين معًا.", label:"رياضيات م٣ — 1-2 ذات الخطوة الواحدة"},
@@ -3381,7 +3504,17 @@ if(!NAMES[who]){
          ids:["s1","s2","s3","s4","s5","alls5"]}
   };
 
-  var curCh = "c1", curId = "h1";
+  /* والجرعةُ أوّلُ فصلٍ في الشريطِ وأوّلُ ما يُفتَح: هي من قياسِ أخطائِه
+     هو لا من ترتيبِ الكتاب. وإن لم تكن له حُذِف بندُها من CFG أيضًا
+     فلا يبقى تبويبٌ معلَّقٌ بلا فصل. */
+  if(DOSE_ON){
+    CHAPS = Object.assign({ dose:{ name:"💊 الجرعة", ids:["dose"],
+      unit:'💊 <b>الجرعة المركّزة</b> — خمسُ مهاراتٍ قِيست من أخطائك أنت: شرحٌ ثمّ تدريب' } }, CHAPS);
+  } else {
+    delete CFG.dose;
+  }
+
+  var curCh = DOSE_ON ? "dose" : "c1", curId = DOSE_ON ? "dose" : "h1";
 
   function panelOf(id){
     var pan = document.getElementById("p_"+id);
@@ -3429,6 +3562,12 @@ if(!NAMES[who]){
     if(topic){
       html += '<div class="intro" style="border:1.5px solid var(--accent)"><b>📚 اتعلّم أولًا:</b> شاهد شرح الدرس من قناة عين، ثم ابدأ الحل تحت.'+
         '<div style="margin-top:8px"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent('عين دروس '+(topic.yt||topic.name))+'" target="_blank" rel="noopener" data-eduvid style="display:inline-block;text-decoration:none;background:#dc2626;color:#fff;padding:9px 14px;border-radius:11px;font-weight:800">🎬 شاهد شرح الدرس</a></div></div>';
+    }
+    /* الجرعةُ: العدُّ ثمّ خمسةُ أمثلةٍ محلولةٍ، ثمّ تعليمةُ الورقة */
+    if(id === "dose"){
+      html += '<div data-dose-banner>'+doseBanner()+'</div>';
+      html += '<div class="intro" style="border:1.5px solid var(--accent)">'+
+        '<b>📖 اقرأ أوّلًا — مثالٌ محلولٌ من كلِّ مهارة:</b>'+doseWorked()+'</div>';
     }
     html += '<div class="intro">'+c.intro+'</div>';
     /* سؤالان في الجولة يُكتب جوابُهما بدل الاختيار — انظر typed.js */
@@ -3673,6 +3812,9 @@ if(!NAMES[who]){
   }
 
   drawChap(); drawTabs(); showPanel(curId);   // يتبع curId لا اسمًا مكتوبًا
+  /* وعدُّ الجرعةِ يُجلَب بعد الرسمِ لا قبلَه: الورقةُ لا تنتظر الشبكةَ،
+     وحين يصل العدُّ يُعاد رسمُ لوحةِ الجرعةِ وحدَها إن كانت مفتوحة. */
+  doseFetch();
   document.addEventListener("visibilitychange", function(){ if(document.hidden){ leaveCur(); } });
   /* ═══ ومغادرةُ الصفحة ليست اختفاءً ═══════════════════════════════════
      بلاغ الأب (١٠ سبتمبر ٢٠٢٦): «رفيف تقول حلّت الرياضيات… وأنا ما طلع

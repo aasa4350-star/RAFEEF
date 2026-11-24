@@ -388,6 +388,7 @@ function run(){
   issues.push(...buildVerPath());
   issues.push(...seenCapPath());
   issues.push(...pastePath());
+  issues.push(...dosePath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
   issues.push(...storyBankPath());
@@ -9090,6 +9091,93 @@ function buildVerPath(){
    والدرجةُ تُحفظ، والمتوسّطُ يرتفع بما ليس من كتابتِه — ولا يظهر شيء.
    فالفحصُ يُشغّل دالّةَ الحكمِ نفسَها التي تستعملها الصفحةُ لا نسخةً
    منها، ويتحقّق أنّ الصفحاتَ الأربعَ تستثني غيرَ المحتسبةِ من المتوسّط. */
+/* ═══ جرعةُ الرياضياتِ المركَّزة ═══════════════════════════════════════
+   طلبُ الأب (٢٣ نوفمبر ٢٠٢٦): «ابنها» — بعد أن قِيس مستوى حسنٍ في
+   الرياضيات. والخمسُ ليست رأيًا: قِيست من meta.items (أربعةُ آلافٍ ومئةُ
+   بندٍ باسمِ مولّدِه)، وهي الصِّيَغُ التي لم يُصلِحها مئتان وإحدى وخمسون
+   عرضًا — وفيها واحدةٌ انحدرت أربعًا وعشرين نقطة.
+
+   وهذا العطبُ صامتٌ لو انكسر: الجرعةُ تُعرَض، والطفلُ يحلُّ، ولا شيء
+   يصيح — إنّما يُدرَّب على غيرِ ما قِيس، أو لا تتوقّف فتصير طعامًا
+   دائمًا بعد أن شُفي. فيُقاس الحدُّ بالسلوكِ لا بالنصّ. */
+function dosePath(){
+  const out = [], F = 'math9.html', p = path.join(ROOT, F);
+  const E = m => out.push({ sev:'خطأ', file:F, msg:m });
+  if (!fs.existsSync(p)) { E('صفحةُ رياضياتِ ثالثِ متوسّطٍ غائبة'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ١) الصِّيَغُ الخمسُ هي المقيسةُ بعينِها */
+  const WANT = ['gNthTermEq','gDistTimeGraph','g31PlotPoint','gConsecFamily','gPerimeterEqual'];
+  const m5 = /var DOSE5\s*=\s*\[([^\]]*)\]/.exec(src);
+  if (!m5) E('DOSE5 غائبة — فلا جرعةَ أصلًا');
+  else {
+    const got = m5[1].split(',').map(x => x.trim()).filter(Boolean);
+    const miss = WANT.filter(w => got.indexOf(w) < 0);
+    const extra = got.filter(g => WANT.indexOf(g) < 0);
+    if (miss.length) E('الجرعةُ لا تدرّب ما قِيس: ناقصٌ ' + miss.join(' · '));
+    if (extra.length) E('الجرعةُ تدرّب ما لم يُقَس: زائدٌ ' + extra.join(' · ') + ' — فيُهدَر وقتُه في غيرِ ضعفِه');
+    WANT.forEach(w => { if (!new RegExp('function ' + w + '\\s*\\(').test(src)) E('المولّدُ ' + w + ' مذكورٌ في الجرعةِ وغيرُ معرَّفٍ في الصفحة'); });
+  }
+
+  /* ٢) وحدُّ التوقّفِ يُشغَّل لا يُقرَأ */
+  const md = /function doseDone\(s\)\{([\s\S]*?)\n\s*\}/.exec(src) || /function doseDone\(s\)\{([^}]*)\}/.exec(src);
+  if (!md) E('doseDone غائبة — فالجرعةُ لا تتوقّف، وهي دواءٌ لا طعامٌ دائم');
+  else {
+    let fn = null;
+    try { const sb = {}; vm.createContext(sb); vm.runInContext('f=function(s){' + md[1] + '\n};', sb); fn = sb.f; } catch(e){}
+    if (!fn) E('doseDone لا تُشغَّل');
+    else {
+      const C = [
+        ['بلا جلسات',                 { sessions:0, correct:0,  total:0  }, false],
+        ['جلستان بتسعين بالمئة',      { sessions:2, correct:18, total:20 }, false],
+        ['ثلاثُ جلساتٍ بستّين',        { sessions:3, correct:18, total:30 }, false],
+        ['ثلاثُ جلساتٍ بتسعٍ وسبعين',  { sessions:3, correct:79, total:100 }, false],
+        ['ثلاثُ جلساتٍ وأسئلةٌ قليلة', { sessions:3, correct:18, total:20 }, false],
+        /* ⚠️ هذه الحالةُ تعزل شرطَ عددِ الجلساتِ وحدَه: مئةُ سؤالٍ بتسعين
+           بالمئةِ في جلسةٍ واحدةٍ — فإن سقط الشرطُ قيل «تمّت» من أوّلِ
+           يومٍ، والجرعةُ تثبيتٌ على أيّامٍ لا إصابةٌ في جلسة. */
+        ['جلسةٌ واحدةٌ بتسعين ومئةِ سؤال', { sessions:1, correct:90, total:100 }, false],
+        ['جلستان بتسعين ومئةِ سؤال',       { sessions:2, correct:90, total:100 }, false],
+        ['ثلاثُ جلساتٍ بثمانين',       { sessions:3, correct:24, total:30 }, true ],
+        ['أربعُ جلساتٍ بتسعين',        { sessions:4, correct:36, total:40 }, true ]
+      ];
+      C.forEach(c => {
+        let got = null; try { got = fn(c[1]); }catch(e){}
+        if (got !== c[2])
+          E('حدُّ توقّفِ الجرعةِ خطأٌ في «' + c[0] + '»: ردَّ ' + String(got) + ' والصوابُ ' + String(c[2]));
+      });
+    }
+  }
+
+  /* ٣) الجلسةُ غيرُ المحتسبةِ لا تُعَدُّ في التقدّم */
+  if (!/if\(m\.trusted === false\) return;/.test(src))
+    E('عدُّ الجرعةِ يضمّ جلسةَ النقر — فيُقال له «تمّت» وهو لم يحلّ');
+
+  /* ٤) واللافتةُ تُحدَّث حين يصل العدّ */
+  if (!/\[data-dose-banner\]/.test(src) || !/data-dose-banner>/.test(src))
+    E('لافتةُ الجرعةِ لا تُحدَّث بعد وصولِ العدِّ من الخادم — فتبقى على «يُحسب…»');
+  if (/open\._reopen\(\)/.test(src))
+    E('اللافتةُ تعتمد على _reopen وهو ليس في لوحاتِ هذه الصفحة');
+
+  /* ٥) وهي لمن قِيست عليه */
+  if (!/var DOSE_ON\s*=\s*\(who === "hasan"\)/.test(src))
+    E('الجرعةُ غيرُ مقصورةٍ على من قِيست أخطاؤه — فتُعرَض لغيرِه بلا قياس');
+  if (!/delete CFG\.dose;/.test(src))
+    E('بندُ الجرعةِ يبقى في CFG لغيرِ صاحبِها — فيظهر تبويبٌ بلا فصل');
+
+  /* ٦) والشرحُ قبل السؤال، ومن المولّدِ نفسِه لا منسوخًا */
+  if (!/function doseWorked\(\)/.test(src))
+    E('لا أمثلةَ محلولةً — والجرعةُ شرحٌ قبل أن تكون تدريبًا');
+  /* ⚠️ ووجودُ الدالّةِ ليس عرضَها: كان الشرطُ /doseWorked\(\)/ على الملفِّ
+     كلِّه فيصدُق على تعريفِ الدالّةِ نفسِه، فحذفُ سطرِ العرضِ لا يُمسَك.
+     فالمقياسُ الآن موضعُ النداء: داخلَ فرعِ الجرعةِ في الرسم. */
+  if (!/html \+= '<div data-dose-banner>'/.test(src))
+    E('عدُّ الجرعةِ لا يُرسَم فوقَ الورقة');
+  if (!/if\(id === "dose"\)\{[\s\S]{0,400}?doseWorked\(\)/.test(src))
+    E('الأمثلةُ المحلولةُ لا تُعرَض فوقَ الورقة — والجرعةُ شرحٌ قبل أن تكون تدريبًا');
+  return out;
+}
+
 function pastePath(){
   const out = [];
   const F = 'writing-en.js', p = path.join(ROOT, F);

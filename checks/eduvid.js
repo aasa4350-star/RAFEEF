@@ -141,11 +141,32 @@ module.exports = function eduvid() {
 
     /* ١) التغطية: كلّ درسٍ غير شاملٍ له نصّ بحث */
     const missing = [];
+    /* ═══ والجرعةُ تحمل روابطَها بنفسِها ═══════════════════════════════
+       الجرعةُ المركَّزةُ (٢٣ نوفمبر ٢٠٢٦) ليست درسًا واحدًا بل خمسُ
+       مهاراتٍ من فصولٍ مختلفةٍ قِيست من أخطاءِ الطفلِ نفسِه. فرابطٌ واحدٌ
+       لها رابطٌ لا يخصُّ أربعًا منها، ولذلك تحمل في لوحةِ شرحِها رابطًا
+       لكلِّ مهارةٍ على حدة (DOSE_YT). فتُقبَل بشرطِ أن تكون روابطُها
+       بعددِ مهاراتِها فعلًا — لا بمجرّدِ وجودِ الاسم. */
+    const doseN = (() => {
+      const m = /var DOSE5\s*=\s*\[([^\]]*)\]/.exec(src);
+      if (!m) return 0;
+      return m[1].split(',').map(x => x.trim()).filter(Boolean).length;
+    })();
+    const doseYt = (() => {
+      const m = /var DOSE_YT\s*=\s*\{([\s\S]*?)\n\s*\};/.exec(src) || /var DOSE_YT\s*=\s*\{([^}]*)\}/.exec(src);
+      if (!m) return 0;
+      return (m[1].match(/:\s*"/g) || []).length;
+    })();
     Object.keys(CFG).forEach(id => {
       if (/^all/.test(id)) return;           /* الاختبار الشامل ليس درسًا */
       lessons++;
-      if (yt[id]) linked++;
-      else missing.push(id + ' «' + CFG[id] + '»');
+      if (yt[id]) { linked++; return; }
+      if (id === 'dose'){
+        if (doseN && doseYt >= doseN) { linked++; return; }
+        missing.push(id + ' «' + CFG[id] + '» — الجرعةُ ' + doseN + ' مهاراتٍ ولها ' + doseYt + ' رابطًا');
+        return;
+      }
+      missing.push(id + ' «' + CFG[id] + '»');
     });
     if (missing.length) {
       issues.push({ sev: 'خطأ', msg: file + ' (' + who + ') — دروسٌ بلا رابط شرح: ' + missing.join(' · ') });
