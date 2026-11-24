@@ -914,12 +914,12 @@ S("order","Identify the incorrect part: He plays / the football / every Friday /
    conditional, passive/active voice, reported speech, and modals)»)،
    وبنكُنا سبعُ مئةٍ وخمسةُ بنودٍ ولا بندَ فيها للكلامِ المنقول. */
 B.push(
-S("rep","He said that he ___ very tired after the trip.",["was","is","has been","were"],"الفعلُ الناقلُ ماضٍ ⇒ يتراجع الزمنُ خطوةً: is ⇐ was."),
+S("rep","He said that he ___ very tired after the trip, but he is fine now.",["was","is","has been","were"],"«ما زال بخيرٍ الآن» تقطع الصلةَ بالحاضر ⇒ يتراجع الزمن: is ⇐ was."),
 S("rep","She told me that she ___ the whole chapter the night before.",["had reviewed","reviewed","has reviewed","was reviewing"],"ماضٍ بسيطٌ في الأصلِ يتراجع إلى الماضي التامِّ: reviewed ⇐ had reviewed."),
 S("rep","They said they ___ call us as soon as they arrived.",["would","will","shall","are going"],"‏will تتراجع إلى would."),
 S("rep","He said he ___ swim when he was six.",["could","can","will","may"],"‏can تتراجع إلى could."),
-S("rep","The teacher said we ___ bring our own calculators.",["had to","have to","must to","are having to"],"‏must للإلزامِ تتراجع إلى had to."),
-S("rep","She ___ me that the office was closed.",["told","said","said to","spoke"],"‏tell يلزمها مفعولٌ ⇐ told me، وsay بلا مفعول."),
+S("rep","The teacher said we ___ bring our own calculators.",["had to","has to","must to","are having to"],"‏must للإلزامِ تتراجع إلى had to."),
+S("rep","She ___ me that the office was closed.",["told","said","told to","spoke"],"‏tell يلزمها مفعولٌ ⇐ told me، وsay بلا مفعول."),
 S("rep","He ___ that the deadline had changed.",["said","told","told to","spoke"],"‏say بلا مفعولٍ ⇐ said that."),
 S("rep","He asked me ___ I had finished the form.",["whether","that","what","did"],"سؤالٌ بنعم/لا يُنقَل بـif أو whether."),
 S("rep","She asked me where ___.",["I lived","did I live","do I live","I did live"],"في السؤالِ المنقولِ يعود الترتيبُ خبريًّا بلا do."),
