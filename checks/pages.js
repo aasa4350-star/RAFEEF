@@ -392,6 +392,7 @@ function run(){
   issues.push(...gdosePath());
   issues.push(...stepWeightedPath());
   issues.push(...stepFullPath());
+  issues.push(...listenLongPath());
   issues.push(...guardNamesPath());
   issues.push(...reportChapPath());
   issues.push(...osamaReadPath());
@@ -10002,5 +10003,144 @@ function stepFullPath(){
   if (!ml) E('SF_LABEL غائب');
   else if (ml[1] === 'STEP إنجليزي')
     E('النموذجُ الكاملُ يُحفَظ باسمِ ورقةِ التدريب — فيختلط متوسّطُ ثمانين سؤالًا بمتوسّطِ اثنَي عشر');
+  return out;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   فهمُ المسموعِ على شروطِ الكُتيِّبِ الرسميّ
+   ═══════════════════════════════════════════════════════════════════
+   قُرئ كُتيِّبُ المركزِ الوطنيِّ للقياسِ، وفيه ثلاثُ شروطٍ كان قسمُنا
+   يخالف اثنَين منها:
+
+     «When you are taking the actual STEP test, you will NOT see the
+      printed dialogue OR the questions. You will only see the possible
+      answers: A, B, C, D.»
+     «Some dialogues are shorter than others… the first dialogue is
+      short and has only 2 questions whereas the second dialogue is
+      considerably longer and has 9 questions.»
+
+   فكان نصُّ السؤالِ معروضًا مكتوبًا — وهذا ليس تسهيلًا بل مهارةٌ أخرى:
+   من قرأ السؤالَ وهو يسمع يبحث عن جوابٍ يعرفه، ومن سمعه بعد الحوارِ
+   لزمه أن يُمسِك الحوارَ كلَّه ثمّ يُسأل. وكان البنكُ مئةً وخمسين نصًّا
+   **كلُّها سؤالان** وطولُها ٢٤–٤٩ كلمةً، فلم يَرَ الصورةَ الطويلةَ قطّ.
+
+   وأخطرُ ما يحرسه هذا: **مقطعُ السؤالِ إن غاب** فالسؤالُ لا يُسمَع ولا
+   يُقرَأ — فيبقى الطفلُ أمام أربعةِ خياراتٍ بلا سؤالٍ أصلًا. وهو عطبٌ
+   صامتٌ تمامًا: الصفحةُ تُرسَم والدرجةُ تُحفَظ.
+   ═══════════════════════════════════════════════════════════════════ */
+function listenLongPath(){
+  const out = [];
+  const E = (f, m) => out.push({ sev:'خطأ', file:f, msg:m });
+  const F = 'listen-long.js', p = path.join(ROOT, F);
+  if (!fs.existsSync(p)) { E(F, 'بنكُ الحواراتِ الطويلةِ غائب — فلا تُدرَّب الصورةُ الطويلةُ من الاختبار'); return out; }
+  let LB = [];
+  try {
+    const box = { window:{}, console };
+    vm.createContext(box);
+    vm.runInContext(fs.readFileSync(p, 'utf8'), box);
+    LB = box.window.LISTEN_LONG || [];
+  } catch(e){ E(F, 'لا يُقوَّم: ' + String(e.message).slice(0,70)); return out; }
+  if (LB.length < 8) E(F, 'الحواراتُ الطويلةُ ' + LB.length + ' — وبحدِّ العرضَين لا تكفي شهرًا من جلستَين في الأسبوع');
+
+  /* ولا يُدمَج في البنكِ القصير: حارسُه يُلزِم سؤالَين وستّين كلمةً */
+  const sbSrc = fs.readFileSync(path.join(ROOT, 'listen-bank.js'), 'utf8');
+  if (/LISTEN_LONG/.test(sbSrc))
+    E('listen-bank.js', 'الطويلُ مدموجٌ في القصير — فحارسُ القصيرِ (سؤالان · ستّون كلمةً) يصيح على ما ليس عطبًا أو يُرخى فيَفسُد الاثنان');
+
+  const VOK = ['en-GB-RyanNeural','en-GB-SoniaNeural','en-GB-ThomasNeural','en-GB-LibbyNeural'];
+  const seen = {};
+  LB.forEach((it, i) => {
+    const at = '#' + (i+1) + ' «' + String(it && it.t || '').slice(0,28) + '…»';
+    const t = String(it && it.t || '');
+    if (!t) { E(F, at + ' نصٌّ فارغ'); return; }
+    const k = t.replace(/\s+/g,' ').trim().toLowerCase();
+    if (seen[k]) E(F, at + ' حوارٌ مكرَّر'); else seen[k] = 1;
+    const w = t.split(/\s+/).filter(Boolean).length;
+    /* الكُتيِّبُ يقول «considerably longer» ولا يُعطي رقمًا؛ ومئةٌ وخمسون
+       أدنى ما يُسمّى طويلًا، ومئتان وعشرون فوقَ ما يحتمله مقطعٌ واحد. */
+    if (w < 150) E(F, at + ' ' + w + ' كلمةً — ليس طويلًا بالقدرِ الذي يُدرِّب على الصورةِ الطويلة');
+    if (w > 220) E(F, at + ' ' + w + ' كلمةً — أطولُ ممّا يُسمَع مرّةً واحدةً فيُقاس الإنصاتُ لا الفهم');
+    /* متحدّثان مسمَّيان، وكلُّ سطرٍ «الاسم: كلامُه» */
+    const lines = t.split('\n').map(x => x.trim()).filter(Boolean);
+    if (lines.length < 6) E(F, at + ' ' + lines.length + ' سطرًا — حوارٌ قصيرُ التبادل');
+    const who = [];
+    lines.forEach(l => {
+      const ci = l.indexOf(':');
+      if (ci <= 0) { E(F, at + ' سطرٌ بلا اسمِ متحدّثٍ: «' + l.slice(0,30) + '…»'); return; }
+      const nm = l.slice(0, ci).trim(), said = l.slice(ci+1).trim();
+      if (!said) E(F, at + ' متحدّثٌ بلا كلام: ' + nm);
+      if (who.indexOf(nm) < 0) who.push(nm);
+    });
+    if (who.length !== 2) E(F, at + ' متحدّثوه ' + who.length + ' (' + who.join('/') + ') — والحوارُ متحدّثان');
+    /* وصوتان متمايزان من المسموحِ به، فلا يَلتبِس القائلُ */
+    const v = it.v || [];
+    if (v.length !== 2) E(F, at + ' بلا صوتَين مُسنَدَين — فيُقرَأ بصوتٍ واحدٍ ويَلتبِس من يقول ماذا');
+    else {
+      if (v[0] === v[1]) E(F, at + ' صوتاه واحدٌ: ' + v[0]);
+      v.forEach(x => { if (VOK.indexOf(x) < 0) E(F, at + ' صوتٌ غيرُ معروف: ' + x); });
+    }
+    /* والأسئلةُ ستٌّ إلى تسعٍ، أربعةُ خياراتٍ متمايزةٍ وشرحٌ عربيّ */
+    const qs = (it && it.q) || [];
+    if (qs.length < 6 || qs.length > 9)
+      E(F, at + ' فيه ' + qs.length + ' سؤالًا — والكُتيِّبُ يصف الطويلَ بتسعةٍ، فالمدى ستٌّ إلى تسع');
+    const qseen = {};
+    qs.forEach(q => {
+      const o = (q && q[1]) || [];
+      if (o.length !== 4) E(F, at + ' سؤالٌ بـ' + o.length + ' خيارات لا أربعة: ' + String(q && q[0]).slice(0,34));
+      else if (new Set(o.map(x => String(x).trim())).size !== 4)
+        E(F, at + ' خيارٌ مكرَّرٌ في: ' + String(q[0]).slice(0,34));
+      if (!q || !q[2] || !/[؀-ۿ]/.test(String(q[2])))
+        E(F, at + ' سؤالٌ بلا شرحٍ عربيّ: ' + String(q && q[0]).slice(0,34));
+      const qk = String(q && q[0]).replace(/\s+/g,' ').trim().toLowerCase();
+      if (qseen[qk]) E(F, at + ' سؤالٌ مكرَّرٌ في الحوارِ نفسِه'); else qseen[qk] = 1;
+    });
+  });
+
+  /* ═══ وكلُّ سؤالٍ له مقطعُه، في البنكَين ══════════════════════════
+     هذا أخطرُ ما هنا: السؤالُ لا يُعرَض مكتوبًا بعد اليوم، فإن غاب
+     مقطعُه بقي الطفلُ أمام أربعةِ خياراتٍ بلا سؤال. */
+  const mp = path.join(ROOT, 'audio', 'manifest.json');
+  let man = null;
+  try { man = JSON.parse(fs.readFileSync(mp, 'utf8')).listen || {}; }
+  catch(e){ E('audio/manifest.json', 'فهرسُ الصوتِ لا يُقرأ'); }
+  if (man){
+    let SB = [];
+    try {
+      const box2 = { window:{}, console };
+      vm.createContext(box2);
+      vm.runInContext(sbSrc, box2);
+      SB = box2.window.LISTEN_BANK || [];
+    } catch(e){}
+    let noQ = 0, firstQ = '', noD = 0, firstD = '';
+    SB.concat(LB).forEach(it => ((it && it.q) || []).forEach(q => {
+      const t = String(q && q[0] || '');
+      if (t && !man['Q|' + t]) { noQ++; if (!firstQ) firstQ = t.slice(0,44); }
+    }));
+    LB.forEach(it => { if (!man['LD|' + String(it.t || '')]) { noD++; if (!firstD) firstD = String(it.t||'').slice(0,34); } });
+    if (noQ)
+      E('audio/manifest.json', noQ + ' سؤالًا بلا مقطعٍ منطوقٍ (مثلًا «' + firstQ + '») — والسؤالُ لا يُعرَض مكتوبًا، فيبقى الطفلُ أمام أربعةِ خياراتٍ بلا سؤال. شغّل: node tools/generate-listen.js ثمّ node tools/generate-long.js');
+    if (noD)
+      E('audio/manifest.json', noD + ' حوارًا طويلًا بلا مقطعٍ (مثلًا «' + firstD + '…») — فيُفتَح نصُّه قراءةً لا استماعًا');
+  }
+
+  /* ═══ والصفحةُ تُنفّذ الشروطَ ══════════════════════════════════════ */
+  const R = 'reading.html', rd = fs.readFileSync(path.join(ROOT, R), 'utf8');
+  const RE = m => out.push({ sev:'خطأ', file:R, msg:m });
+  if (!/<script src="listen-long\.js/.test(rd))
+    RE('بنكُ الحواراتِ الطويلةِ غيرُ محمَّلٍ في الصفحة — فلا يُسحَب منه شيء');
+  if (!/data-qtext[^>]*style="display:none/.test(rd))
+    RE('نصُّ السؤالِ معروضٌ مكتوبًا — والكُتيِّبُ: «you will NOT see … the questions. You will only see the possible answers»، وهو مهارةٌ أخرى لا تسهيلٌ');
+  if (!/function listenQSay\(/.test(rd) || !/listenQSay\(it\.q\[qi\]\[0\]/.test(rd))
+    RE('السؤالُ لا يُنطَق — فلا يُسمَع ولا يُقرَأ');
+  if (!/\(qi\?';display:none':''\)/.test(rd))
+    RE('أسئلةُ المقطعِ تُفتَح كلُّها دفعةً واحدةً — فيقرأ الثانيَ قبل أن يُجيب الأوّل ويستدلُّ بأحدهما على الآخر');
+  if (!/var nxt = qsEl\.querySelector\('\[data-qi="'\+\(qi\+1\)\+'"\]'\);/.test(rd))
+    RE('السؤالُ التاليَ لا يُكشَف بعد الإجابة — فتتوقّف الورقةُ عند الأوّل');
+  if (!/qRead:qReadN/.test(rd))
+    RE('لا يُسجَّل كم سؤالًا عُرِض مكتوبًا — فلا يُعرَف أقُرئت الجلسةُ أم سُمِعت');
+  if (!/items = items\.concat\(lg\);/.test(rd))
+    RE('الحوارُ الطويلُ لا يُضَمُّ إلى الورقة — فتبقى كلُّها قصيرةً كما كانت');
+  if (!/MANIFEST\.listen\["LD\|" \+ text\]/.test(rd))
+    RE('مقطعُ الحوارِ الطويلِ لا يُطلَب بمفتاحِه');
   return out;
 }

@@ -52,6 +52,16 @@ function fileOf(text, voice){
   return 'en/listen-' + crypto.createHash('sha1').update(voice + '|' + text).digest('hex').slice(0, 12) + '.mp3';
 }
 function keyOf(voice, text){ return voice + '|' + text; }
+/* ═══ وأسئلةُ كلِّ نصٍّ تُنطَق كذلك ═════════════════════════════════
+   الكُتيِّبُ الرسميُّ لقياس: «you will NOT see the printed dialogue OR
+   the questions. You will only see the possible answers: A, B, C, D.»
+   فالسؤالُ صوتٌ لا نصّ. وبصوتٍ واحدٍ لا صوتَين: في الاختبارِ يُقرَأ
+   السؤالُ مرّةً واحدةً، ولا معنى لتناوبِ الأصواتِ فيه كما في الحوار. */
+const QVOICE = VOICES[0];
+function qKeyOf(text){ return 'Q|' + text; }
+function qFileOf(text){
+  return 'en/listenq-' + crypto.createHash('sha1').update('Q|' + text).digest('hex').slice(0, 12) + '.mp3';
+}
 async function say(key, text, voice){
   const esc = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const ssml = '<speak version="1.0" xml:lang="en-GB"><voice name="' + voice +
@@ -94,9 +104,19 @@ async function say(key, text, voice){
   const want = [];
   L.forEach(it => VOICES.forEach(v => want.push({ t: it.t, v: v })));
   const missing = want.filter(x => !man.listen[keyOf(x.v, x.t)]);
+  /* وأسئلةُ النصوصِ كلُّها، بلا تكرارٍ لنصٍّ واحدٍ ورد في موضعَين */
+  const qAll = [];
+  L.forEach(it => (it.q || []).forEach(q => { if (q && q[0]) qAll.push(String(q[0])); }));
+  const qUniq = Array.from(new Set(qAll));
+  const qMissing = qUniq.filter(t => !man.listen[qKeyOf(t)]);
   console.log('نصوص: ' + L.length + ' × ' + VOICES.length + ' صوتًا = ' + want.length + ' مقطعًا · ناقص: ' + missing.length);
-  if (DRY){ missing.forEach(x => console.log('  - ' + x.v.replace('en-GB-','') + ' → ' + x.t.slice(0,54))); return; }
-  if (!missing.length){ console.log('✅ لا ناقص'); return; }
+  console.log('أسئلة: ' + qUniq.length + ' سؤالًا بصوتٍ واحد · ناقص: ' + qMissing.length);
+  if (DRY){
+    missing.forEach(x => console.log('  - ' + x.v.replace('en-GB-','') + ' → ' + x.t.slice(0,54)));
+    qMissing.forEach(t => console.log('  - سؤال → ' + t.slice(0,54)));
+    return;
+  }
+  if (!missing.length && !qMissing.length){ console.log('✅ لا ناقص'); return; }
 
   const key = azureKey();
   let done = 0;
@@ -109,6 +129,17 @@ async function say(key, text, voice){
     if (done % 10 === 0 || done === missing.length) console.log('  ✅ ' + done + ' / ' + missing.length);
     await new Promise(r => setTimeout(r, 350));
   }
+  let qDone = 0;
+  for (const t of qMissing){
+    const rel = qFileOf(t), abs = path.join(AUDIO, rel);
+    fs.mkdirSync(path.dirname(abs), { recursive:true });
+    fs.writeFileSync(abs, await say(key, t, QVOICE));
+    man.listen[qKeyOf(t)] = rel;
+    qDone++;
+    if (qDone % 20 === 0 || qDone === qMissing.length) console.log('  ❓ ' + qDone + ' / ' + qMissing.length);
+    await new Promise(r => setTimeout(r, 350));
+    if (qDone % 25 === 0) fs.writeFileSync(mp, JSON.stringify(man));   /* حفظٌ دوريٌّ: الانقطاعُ لا يُضيّع ما وُلّد */
+  }
   fs.writeFileSync(mp, JSON.stringify(man));
-  console.log('وُلّد ' + done + ' مقطعًا · والفهرسُ محدَّث');
+  console.log('وُلّد ' + done + ' مقطعًا و' + qDone + ' سؤالًا · والفهرسُ محدَّث');
 })().catch(e => { console.error('❌ ' + e.message); process.exit(1); });

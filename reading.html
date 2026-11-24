@@ -16,6 +16,9 @@
 <!-- قصصُ فهدٍ التاريخيّةُ والعلميّة — تُدمَج في STEP_READING (ملاحظةُ فهد ٢ نوفمبر ٢٠٢٦) -->
 <script src="step-reading-story.js"></script>
 <script src="listen-bank.js?v=20261005"></script>
+<!-- حواراتُ المسموعِ الطويلةُ: بنكٌ مستقلٌّ عن القصير — حارسُ القصيرِ
+     يُلزِم سؤالَين وستّين كلمةً وهو صوابٌ فيه، والطويلُ ٧–٩ أسئلةٍ. -->
+<script src="listen-long.js?v=20261124"></script>
 <script src="vocab-en4.js"></script>
 <script src="quran-who.js"></script>
 <script src="tajweed.js"></script>
@@ -112,7 +115,7 @@
   .hint{color:var(--muted);font-size:.85rem;margin:2px 4px 0}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=1dcefaf8af" defer></script>
+<script src="build-check.js?v=60f7b9a810" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -2482,7 +2485,7 @@ function voicesFor(isAr){
   var re = isAr ? /^ar/i : /^en/i;
   return speechSynthesis.getVoices().filter(function(x){return re.test(x.lang);});
 }
-var AUDIO_VER = "s13";  /* AUDIO_SIG: c1bbe6f0 */
+var AUDIO_VER = "s14";  /* AUDIO_SIG: eb8dc5f7 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
@@ -4523,6 +4526,70 @@ if(!META[who] || !DATA[who]){
     listenFellBack(text, f ? "throw" : "nomanifest");
     azureTTS(text, false, "-10%", null, 0.9);
   }
+  /* ═══ نصُّ السؤالِ يُسمَع ولا يُقرَأ ════════════════════════════════
+     كُتيِّبُ المركزِ الوطنيِّ للقياسِ، بنصِّه:
+       «When you are taking the actual STEP test, you will NOT see the
+        printed dialogue OR the questions. You will only see the
+        possible answers: A, B, C, D.»
+     وكان السؤالُ معروضًا مكتوبًا عندنا. وهذا ليس تسهيلًا بل **مهارةٌ
+     أخرى**: من قرأ السؤالَ وهو يسمع يبحث عن جوابٍ يعرفه، ومن سمعه بعد
+     الحوارِ لزمه أن يُمسِك الحوارَ كلَّه في ذاكرتِه ثمّ يُسأل. فنسبةُ
+     حسنٍ ٨١٪ كانت مقيسةً على الأولى والاختبارُ يقيس الثانية — وهو فرقٌ
+     لم يُقَس قطُّ لأنّ القسمَ لم يُجرَّب على الشرطِ الصحيح.
+
+     ولا يُشغَّل السؤالُ تلقائيًّا: الحوارُ قد يكون ما زال يُسمَع،
+     فيتراكب الصوتان. فالطفلُ يضغط «اسمع السؤال» بنفسِه.
+     وإن لم يسمع — صوتٌ معطَّلٌ أو مقطعٌ ناقصٌ — فله «اعرضه مكتوبًا»
+     كيلا يُحبَس عن سؤالٍ، ويُسجَّل العددُ في الصفِّ (qRead) فيُعرَف أنّ
+     الجلسةَ قُرئت لا سُمِعت ولا يُحسَب الرقمُ على الشرطِ الرسميّ. */
+  function listenQSay(text, note){
+    if(!MANI_DONE){ MANI_P.then(function(){ listenQSay(text, note); }); return; }
+    var f = MANIFEST && MANIFEST.listen && MANIFEST.listen["Q|" + text];
+    if(f){
+      try{
+        if(CUR_AUDIO) CUR_AUDIO.pause();
+        var a = new Audio("audio/" + f + "?v=" + AUDIO_VER);
+        CUR_AUDIO = a;
+        var pr = a.play();
+        if(pr && pr.catch) pr.catch(function(){ if(note) listenSrcNote(note, "net"); azureTTS(text, false, "-10%", null, 0.9); });
+        if(note) listenSrcNote(note, "file");
+        return;
+      }catch(e){}
+    }
+    if(note) listenSrcNote(note, "net");
+    azureTTS(text, false, "-10%", null, 0.9);
+  }
+  /* ═══ الحوارُ الطويلُ: مقطعٌ واحدٌ بصوتَين ════════════════════════
+     مقاطعُه مولَّدةٌ بـtools/generate-long.js: المتحدّثان صوتان
+     متناوبان، والأسماءُ لا تُقرَأ (الاختبارُ يُميّزهما بالصوت). */
+  function listenLongSay(text, note){
+    if(!MANI_DONE){ MANI_P.then(function(){ listenLongSay(text, note); }); return; }
+    var f = MANIFEST && MANIFEST.listen && MANIFEST.listen["LD|" + text];
+    if(f){
+      try{
+        if(CUR_AUDIO) CUR_AUDIO.pause();
+        var a = new Audio("audio/" + f + "?v=" + AUDIO_VER);
+        CUR_AUDIO = a;
+        var pr = a.play();
+        if(pr && pr.catch) pr.catch(function(){ if(note) listenSrcNote(note, "net"); });
+        if(note) listenSrcNote(note, "file");
+        return true;
+      }catch(e){}
+    }
+    /* ولا بديلَ شبكيًّا للطويل: azureTTS بصوتٍ واحدٍ يُفقِد تمييزَ
+       المتحدّثَين، وهو نصفُ الفائدةِ — فيُقال له الحقيقةُ ويُعرَض النصّ. */
+    return false;
+  }
+  /* أسطرُ الحوارِ الطويلِ مفصولةٌ بـ\n وفيها «الاسم:» — فتُعرَض أسطرًا
+     ليُعرَف من قال ماذا، والقصيرُ نصٌّ واحدٌ فيبقى كما هو. */
+  function scriptHtml(it){
+    var t = String(it && it.t || "");
+    if(t.indexOf("\n") < 0) return t;
+    return t.split("\n").map(function(l){
+      var i = l.indexOf(":");
+      return i > 0 ? ('<b>'+l.slice(0,i+1)+'</b>'+l.slice(i+1)) : l;
+    }).join("<br>");
+  }
   function renderListen(){
     var sec = document.getElementById("listen");
     if(!sec) return;
@@ -4532,10 +4599,23 @@ if(!META[who] || !DATA[who]){
       return;
     }
     if(!B.length){ sec.innerHTML = '<p class="hint">تعذّر تحميل بنك الاستماع. حدّث الصفحة.</p>'; return; }
-    var N = 4;                                  /* أربعةُ نصوصٍ = ثمانيةُ أسئلة */
-    var items = pickFresh(B.map(function(_,i){ return String(i); }), "listen_en", N)
+    /* ═══ ورقةٌ مختلطةٌ كالاختبار: قصيران وحوارٌ طويل ══════════════
+       كُتيِّبُ قياسٍ الرسميّ: «Some dialogues are shorter than others…
+       the first dialogue is short and has only 2 questions whereas the
+       second dialogue is considerably longer and has 9 questions.»
+       وكانت الورقةُ أربعةَ نصوصٍ قصيرةٍ = ثمانيةَ أسئلةٍ، فلم يَرَ
+       الطويلَ قطُّ — وهو الذي تُمتحَن فيه المتابعةُ والذاكرةُ معًا.
+       فصارت: قصيران (٤ أسئلة) + طويلٌ (٧ إلى ٩) ≈ ١٢ سؤالًا. */
+    var items = pickFresh(B.map(function(_,i){ return String(i); }), "listen_en", 2)
                   .map(function(i){ return B[+i]; });
     var lCycle = pickFresh.cycle || 0;   /* ٠ = أوّلُ مرور · ٢ فأكثر = تجاوزَ الحدّ */
+    var LB = window.LISTEN_LONG || [], lgCycle = 0;
+    if(LB.length){
+      var lg = pickFresh(LB.map(function(_,i){ return String(i); }), "listen_long_en", 1)
+                 .map(function(i){ return LB[+i]; });
+      lgCycle = pickFresh.cycle || 0;
+      items = items.concat(lg);          /* الطويلُ آخرًا: يبدأ بالأسهل */
+    }
     var attId = (window.newAttId ? newAttId() : (Date.now().toString(36)+Math.random().toString(36).slice(2,7)));
     var total = items.reduce(function(s,x){ return s+x.q.length; }, 0);
     /* ═══ والغيابُ يُرصَد كما يُرصَد في الإملاءِ والقراءة ══════════════
@@ -4555,7 +4635,7 @@ if(!META[who] || !DATA[who]){
        كان قد سُمِع كلُّ نصٍّ فيه ثلاثَ مرّاتٍ وأربعةَ أعشارٍ وسطيًّا،
        فبعضُ ثمانيةٍ وثمانينَ بالمئةِ ذاكرةٌ لا فهم. وهو نفسُ عيبِ قسمِ
        الجملِ الذي ضُبِط بـaskKeys. */
-    var heardKeys = [];
+    var heardKeys = [], qReadN = 0;
     /* ═══ ويُرصَد أيُّ مهارةٍ تخذله، لا الدرجةُ وحدَها ═══════════════
        تشخيصُ أسامة (٢٩ أكتوبر ٢٠٢٦): فهمُ المسموعِ ٥٩٪، ولا جلسةَ
        واحدةً من أربعٍ تحمل تفصيلًا — فالقسمُ يقول «ضعيف» ولا يقول في
@@ -4601,12 +4681,18 @@ if(!META[who] || !DATA[who]){
       e.t++; if(ok) e.c++;
     }
     var html = '<div class="block-title" style="font-size:.98rem"><span class="dot"></span> 🎧 فهم المسموع</div>'+
-      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس، وبعدها تنفتح لك الأسئلة. والنصّ يظهر لك بعد ما تجاوب، تقارن فيه.</p>'+
+      '<p class="hint">🎧 <b>خُمس درجة ستيب.</b> اضغط «اسمع» — ما فيه نصّ مكتوب، مثل الاختبار. تسمع <b>مرّتين</b> بس. وبعدها يجيك <b>سؤال واحد في كل مرّة</b>، و<b>السؤال نفسه مسموع ما هو مكتوب</b> — زي الاختبار بالضبط: تشوف الخيارات بس. وإن ما سمعته فيه زرّ يعرضه لك. والنصّ والسؤال يظهران بعد ما تجاوب، تقارن فيهما.</p>'+
       /* ولا يُكرَّر عليه في صمت: إن بدأت الدورةُ الثالثةُ قيل له */
       (lCycle >= 2
         ? ('<p class="hint" style="border:1.5px solid var(--warn);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--warn)">'+
            '🔁 خلّصت بنك الاستماع كلّه <b>'+lCycle+'</b> مرّات — فاللي يجيك اليوم سمعته قبل. '+
            'قلها لوالدك عشان يوسّع البنك.</p>')
+        : '')+
+      /* ولبنكِ الحواراتِ الطويلةِ دورتُه: وهو أرقُّ من القصيرِ فيُنفَد قبلَه */
+      (lgCycle >= 2
+        ? ('<p class="hint" style="border:1.5px solid var(--warn);border-radius:12px;padding:9px 11px;font-weight:700;color:var(--warn)">'+
+           '🔁 وخلّصت الحوارات الطويلة كلّها <b>'+lgCycle+'</b> مرّات — فالحوار الطويل اللي يجيك اليوم سمعته قبل. '+
+           'قلها لوالدك عشان يوسّع بنكها.</p>')
         : '');
     items.forEach(function(it, i){
       html += '<div class="q" data-li="'+i+'">'+
@@ -4630,7 +4716,7 @@ if(!META[who] || !DATA[who]){
       var aw = awaySince(aw0);
       saveScore("فهم المسموع 🎧", correct, answered,
         { dur:Math.round((Date.now()-t0)/1000), away:aw.away, exits:aw.exits,
-          trusted:(aw.exits===0), clips:items.length,
+          trusted:(aw.exits===0), clips:items.length, qRead:qReadN,
           clipKeys:heardKeys.slice(0,12), pid:attId, lang:"en",
           skills:LSK });
     }
@@ -4645,12 +4731,26 @@ if(!META[who] || !DATA[who]){
       function openQs(){
         if(opened) return; opened = true;
         var h = "";
+        /* ═══ سؤالٌ واحدٌ في وقتٍ واحد ═════════════════════════════════
+           الكُتيِّبُ الرسميّ: «The questions that relate to each dialogue
+           follow immediately after you have heard that dialogue… After
+           each question, some time is given for you to make your
+           response. You cannot review or return to the questions of a
+           previous dialogue.»
+           وكانت أسئلةُ المقطعِ تُفتَح كلُّها دفعةً واحدةً منشورةً أمامه —
+           فيقرأ الثانيَ قبل أن يُجيب الأوّل، ويستدلُّ بأحدهما على الآخر.
+           فصارت تُكشَف واحدًا بعد واحد، ولا رجوعَ إلى ما أُجيب. */
         it.q.forEach(function(q, qi){
           var pairs = q[1].map(function(o,ix){ return [o,ix]; });
           for(var z=pairs.length-1; z>0; z--){ var y=Math.floor(Math.random()*(z+1)); var tmp=pairs[z]; pairs[z]=pairs[y]; pairs[y]=tmp; }
           var ans = 0; var opts = pairs.map(function(p,ni){ if(p[1]===0) ans=ni; return p[0]; });
-          h += '<div class="q" data-qi="'+qi+'" data-ans="'+ans+'" style="box-shadow:none;margin:10px 0 0;padding:12px 14px">'+
-            '<div class="stem" dir="ltr" style="text-align:left;font-weight:700">'+q[0]+'</div>'+
+          h += '<div class="q" data-qi="'+qi+'" data-ans="'+ans+'" style="box-shadow:none;margin:10px 0 0;padding:12px 14px'+(qi?';display:none':'')+'">'+
+            '<div class="num">سؤال '+(qi+1)+' من '+it.q.length+'</div>'+
+            '<div class="row" style="margin:7px 0 4px;gap:8px;flex-wrap:wrap">'+
+              '<button class="say small" data-qsay>🔊 اسمع السؤال</button>'+
+              '<button class="say small" data-qshow style="background:transparent;border:1.5px solid var(--line);color:var(--muted)">👁️ ما سمعت؟ اعرضه مكتوبًا</button>'+
+            '</div>'+
+            '<div data-qtext class="stem" dir="ltr" style="display:none;text-align:left;font-weight:700;margin-top:4px">'+q[0]+'</div>'+
             '<div class="opts" style="display:flex;flex-direction:column;gap:7px;margin-top:9px">'+
             opts.map(function(o,j){ return '<button data-j="'+j+'" dir="ltr" style="text-align:left;background:transparent;border:1.5px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:11px;font-weight:700;cursor:pointer;font-family:inherit">'+o+'</button>'; }).join('')+
             '</div><div class="fb" data-ex style="display:none;margin-top:8px;font-weight:700"></div></div>';
@@ -4658,9 +4758,22 @@ if(!META[who] || !DATA[who]){
         qsEl.innerHTML = h; qsEl.style.display = "block";
         qsEl.querySelectorAll("[data-qi]").forEach(function(qEl){
           var qi = +qEl.dataset.qi, ans = +qEl.dataset.ans;
+          var srcN = box.querySelector("[data-src]");
+          qEl.querySelector("[data-qsay]").addEventListener("click", function(){
+            listenQSay(it.q[qi][0], srcN);
+          });
+          /* ولا يُحبَس عن سؤالٍ لعطبٍ في الصوت: يُعرَض مكتوبًا ويُعَدّ */
+          qEl.querySelector("[data-qshow]").addEventListener("click", function(){
+            qEl.querySelector("[data-qtext]").style.display = "block";
+            this.style.display = "none";
+            qReadN++;
+          });
           qEl.querySelectorAll(".opts button").forEach(function(btn){
             btn.addEventListener("click", function(){
               if(qEl.dataset.done) return; qEl.dataset.done = 1;
+              /* ونصُّ السؤالِ يُكشَف بعد الإجابةِ على كلِّ حالٍ ليتعلّم */
+              qEl.querySelector("[data-qtext]").style.display = "block";
+              var shb = qEl.querySelector("[data-qshow]"); if(shb) shb.style.display = "none";
               qEl.querySelectorAll(".opts button").forEach(function(b2){ b2.disabled = true; });
               var good = (+btn.dataset.j === ans);
               btn.style.borderColor = good ? "var(--good)" : "var(--bad)";
@@ -4672,10 +4785,13 @@ if(!META[who] || !DATA[who]){
               answered++; if(good) correct++;
               try{ markL(it.q[qi][0], good); }catch(e){}
               scoreEl.textContent = correct + " / " + total;
+              /* والسؤالُ التالي يُكشَف الآن لا قبلَ الآن */
+              var nxt = qsEl.querySelector('[data-qi="'+(qi+1)+'"]');
+              if(nxt) nxt.style.display = "block";
               /* النصُّ يظهر بعد أن تُجاب أسئلةُ المقطعِ كلُّها — لا قبلها */
               if(qsEl.querySelectorAll("[data-qi][data-done]").length === it.q.length){
                 scEl.style.display = "block";
-                scEl.innerHTML = '<b>📝 النصّ المسموع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+it.t+'</div>';
+                scEl.innerHTML = '<b>📝 النصّ المسموع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+scriptHtml(it)+'</div>';
               }
               save();
             });
@@ -4702,11 +4818,19 @@ if(!META[who] || !DATA[who]){
            والسرعةُ «-10%» لا -10: SSML يقرأ العددَ العاريَ مضاعِفًا لا
            نسبةً، فكان الصوتُ يخرج أسرعَ ممّا قُصد — قِيس على النصِّ
            الواحد: -10 أعطى ١٢٦٧٢ بايتًا و-10% أعطى ١٤١١٢. */
-        try{ listenSay(it.t, box.querySelector("[data-src]"), li + plays - 1); }
+        try{
+          /* الحوارُ الطويلُ مقطعٌ واحدٌ بصوتَين مخيطٌ مسبقًا، فله ناطقُه؛
+             والقصيرُ يتناوب صوتَين بموضعِ البطاقةِ وعددِ مرّاتِ السماع. */
+          if(it.v){
+            if(!listenLongSay(it.t, box.querySelector("[data-src]"))) throw new Error("no-clip");
+          } else {
+            listenSay(it.t, box.querySelector("[data-src]"), li + plays - 1);
+          }
+        }
         catch(e){
           /* لا صوتَ أصلًا: نفتح النصَّ ونقول له الحقيقة — قراءةٌ لا استماع */
           scEl.style.display = "block";
-          scEl.innerHTML = '<b style="color:var(--bad)">⚠️ الصوت ما اشتغل، فهذي قراءة مو استماع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+it.t+'</div>';
+          scEl.innerHTML = '<b style="color:var(--bad)">⚠️ الصوت ما اشتغل، فهذي قراءة مو استماع:</b><div dir="ltr" style="text-align:left;margin-top:6px">'+scriptHtml(it)+'</div>';
         }
       });
     });

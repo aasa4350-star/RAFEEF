@@ -122,7 +122,7 @@
   .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
   .fr .frd{padding:0 5px}
 </style>
-<script src="build-check.js?v=1dcefaf8af" defer></script>
+<script src="build-check.js?v=60f7b9a810" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -1294,7 +1294,7 @@ function pickVoice(lang){
   }catch(e){ return null; }
 }
 try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=function(){}; }catch(e){}
-var AUDIO_VER = "s28";  /* AUDIO_SIG: c1bbe6f0 */
+var AUDIO_VER = "s29";  /* AUDIO_SIG: eb8dc5f7 */
 var MANIFEST = null, MANI_DONE = false, CUR_AUDIO = null;
 var MANI_P = fetch("audio/manifest.json?v=" + AUDIO_VER)
   .then(function(r){ return r.ok ? r.json() : null; })
