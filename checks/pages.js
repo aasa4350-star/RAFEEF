@@ -1469,9 +1469,26 @@ function quicknessPath(){
 
   /* ٢) حالاتٌ مقيسةٌ من صفوفِ القاعدةِ لا مؤلَّفة */
   const CASES = [
-    { d:'نموذجُ فهدٍ ٢٥ نوفمبر ٠٧:٠٣ — ٥٢٧ث من ٥١٨٤ وفيها ١٢ قطعةَ قراءة',
-      in:{ dur:527, total:48, fast:19, correct:31, allot:5184 },
-      exp:{ any:true, why:'rush', rush:true, third:true } },
+    /* جولتا فهدٍ في ٢٥ نوفمبرَ، وأدنى زمنِ محتواهما محسوبٌ من البنوك:
+       ورقةُ ٤٨ ⇒ ٧٤٥ث، وورقةُ ٦٤ ⇒ ٩٩٤ث. والجولةُ الأولى أعطت ٧١٪ منه
+       والثانيةُ ٧٨٪ — سبعُ نقاطٍ. فالفاصلُ بينهما بابُ المتسرّعةِ
+       (٤٠٪ مقابلَ ٩٪) لا البابُ الزمنيّ، وهذه الحالتان تُثبّتان ذلك:
+       الأولى تُستبعَد بالثلثِ لا بالتسليمِ المبكّر، والثانيةُ تُحسَب. */
+    { d:'نموذجُ فهدٍ ٠٧:٠٣ — ١٩ متسرّعةً من ٤٨ (٤٠٪)',
+      in:{ dur:527, total:48, fast:19, correct:31, minSec:1240 },
+      exp:{ any:true, why:'burst', third:true, rush:false } },
+    { d:'نموذجُ فهدٍ ١٣:٥٩ — ٥٠/٦٤ · ٦ متسرّعاتٍ (٩٪) · ٧٧٣ث من أدنى ١٦٥٢',
+      in:{ dur:773, total:64, fast:6, correct:50, minSec:1652 },
+      exp:{ any:false, rush:false, third:false, burst:false } },
+    /* ولا بابَ زمنيًّا: ورقةٌ سُلّمت في عُشرِ حاجةِ محتواها ومتسرّعاتُها
+       قليلةٌ ومتوسّطُها فوقَ الثماني — تُحسَب. وهذا مقصودٌ لا سهو:
+       سقط الحدُّ الزمنيُّ ثلاثَ مرّاتٍ على جولةٍ محلولةٍ حقًّا. */
+    { d:'ورقةٌ في عُشرِ حاجةِ محتواها ومتوسّطُها فوقَ الثماني — لا بابَ زمنيًّا',
+      in:{ dur:600, total:64, fast:0, correct:50, minSec:6000 },
+      exp:{ any:false, rush:false } },
+    { d:'وورقةٌ متوسّطُها دونَ الثماني تُمسَك ببابِ البطءِ لا بالزمن',
+      in:{ dur:400, total:64, fast:0, correct:50, minSec:1652 },
+      exp:{ any:true, why:'fast', slow:true, rush:false } },
     { d:'تحصيليُّ فهدٍ ٢٥ نوفمبر ١١:٠٠ — ٦ من ١٢ دون ثلاثِ ثوانٍ ودرجةٌ ٥٨٪',
       in:{ dur:110, total:12, fast:6, correct:7 },
       exp:{ any:true, why:'burst', burst:true, rush:false, third:false } },
@@ -1491,23 +1508,21 @@ function quicknessPath(){
       in:{ dur:120, total:12, fast:6, correct:6 }, exp:{ burst:true } },
     { d:'وأقلُّ من النصفِ بواحدٍ لا يُستبعَد — ٥ من ١٢',
       in:{ dur:120, total:12, fast:5, correct:6 }, exp:{ burst:false, any:false } },
-    { d:'ربعُ الزمنِ بالضبطِ ليس تسليمًا مبكّرًا — ١٢٩٦ من ٥١٨٤',
-      in:{ dur:1296, total:48, fast:0, correct:40 }, exp:{ rush:false, any:false } },
-    { d:'ودونَ الربعِ بثانيةٍ يُستبعَد — ١٢٩٥ من ٥١٨٤',
-      in:{ dur:1295, total:48, fast:0, correct:40, allot:5184 }, exp:{ rush:true, any:true } },
+    { d:'الثلثُ هو الفاصلُ المقيس: ٩٪ متسرّعةً تمرّ، و٤٠٪ تسقط',
+      in:{ dur:773, total:64, fast:6, correct:40, minSec:1652 }, exp:{ third:false } },
     { d:'ثلثُ الورقةِ بالضبطِ ليس نقرًا — ١٦ من ٤٨',
-      in:{ dur:3000, total:48, fast:16, correct:40, allot:5184 }, exp:{ third:false, any:false } },
+      in:{ dur:3000, total:48, fast:16, correct:40, minSec:745 }, exp:{ third:false, any:false } },
     { d:'وفوقَ الثلثِ بواحدٍ نقرٌ — ١٧ من ٤٨',
-      in:{ dur:3000, total:48, fast:17, correct:40, allot:5184 }, exp:{ third:true, any:true } },
+      in:{ dur:3000, total:48, fast:17, correct:40, minSec:745 }, exp:{ third:true, any:true } },
     /* ═══ ورقةٌ بلا زمنٍ مرصودٍ لا يُحكَم عليها بحدِّ الربع ═══ */
-    { d:'ورقةٌ بلا زمنٍ مرصودٍ — بابا الموقوتةِ مغلقان',
+    { d:'ورقةٌ لم يُحسَب وزنُها — بابا المقيسةِ مغلقان',
       in:{ dur:1, total:48, fast:48, correct:48 }, exp:{ rush:false, third:false } },
     /* ═══ ومصيدةُ الصفر: Math.ceil(0/2) = 0 و0 >= 0 صحيحٌ ═══ */
     { d:'ورقةٌ فارغةٌ لا تُوسَم',
       in:{ dur:0, total:0, fast:0, correct:0 }, exp:{ burst:false, any:false } }
   ];
-  /* والحالةُ الأولى في القائمةِ ناقصةُ allot عمدًا في موضعَين أعلاه
-     لأنّ تحصيليَّ الصفحةِ بلا زمنٍ مرصود — فلو زِيد لصار الفحصُ كاذبًا. */
+  /* وحالاتُ التحصيليِّ ناقصةُ minSec عمدًا: ورقةُ التحصيليِّ لا يُحسَب
+     وزنُها، فبابا المقيسةِ مغلقان عليها — ولو زِيد لصار الفحصُ كاذبًا. */
   CASES.forEach(c => {
     let r = null;
     try { r = P.quickness(c.in); } catch(e){ E(F, 'quickness ترمي في «' + c.d + '»: ' + e.message); return; }
@@ -1553,16 +1568,93 @@ function quicknessPath(){
   const qargs = psrc.match(/PACE\.quickness\(\{[^}]*\}\)/g) || [];
   if (qargs.length < 2)
     E(PF, 'نداءاتُ PACE.quickness ' + qargs.length + ' والمطلوبُ موضعان: الحفظُ ولوحةُ التنبيه — فأحدُهما يحكم بغيرِ حكمِ الآخر، ويرى الولدُ «محسوبة» ويقرأ أبوه «مستبعَدة»');
-  const noAllot = qargs.filter(s => !/allot\s*:/.test(s));
-  if (noAllot.length)
-    E(PF, 'موضعٌ ينادي الحارسَ بلا زمنٍ مرصودٍ (' + noAllot.length + ' من ' + qargs.length + ') — فبابُ الورقةِ الموقوتةِ مغلقٌ هناك');
+  const noMin = qargs.filter(s => !/minSec\s*:/.test(s));
+  if (noMin.length)
+    E(PF, 'موضعٌ ينادي الحارسَ بلا وزنِ الورقةِ (' + noMin.length + ' من ' + qargs.length + ') — فبابا الورقةِ المقيسةِ مغلقان هناك');
   if (/Math\.(floor|ceil)\(\s*total\s*\/\s*2\s*\)/.test(psrc))
     E(PF, 'حسابُ نصفِ الورقةِ مكتوبٌ في الصفحةِ ثانيةً — وهذا عينُ البابِ الذي مرّ منه نصفُ ورقةٍ مخمَّنًا محسوبًا');
 
-  /* ٥) وزمنُ الورقةِ المرصودُ يُحمَل في التوقيتِ — ويُقاس بتشغيلِه */
+  /* ٤٫٥) وحسابُ وزنِ الورقةِ يُشغَّل على بنكِ القراءةِ الحقيقيّ ═══════
+     وأخطرُ ما فيه أنّ القطعةَ تُقرأ مرّةً وتخدم سؤالَين: فلو حُسِبت
+     مرّتَين تضخّم الأدنى فسقطت جولاتٌ محلولةٌ — وهو عينُ الخطأِ الذي
+     وقعتُ فيه بالتقديرِ باليد. فيُقاس بسؤالَين من قطعةٍ واحدة. */
+  {
+    const mpm = EXTRACT.literalAfter(psrc, /function paperMinSec\(items\)\s*/, '{', '}');
+    const mw1 = /var MIN_WPM = (\d+), MIN_ANS = (\d+);/.exec(psrc);
+    if (!mpm) E(PF, 'حسابُ وزنِ الورقةِ لا يُنتزَع');
+    else if (!mw1) E(PF, 'ثابتا الحسابِ (سرعةُ القراءةِ وزمنُ الإجابة) غيرُ معرَّفَين');
+    else {
+      const b = {};
+      vm.createContext(b);
+      let fn = null;
+      try {
+        vm.runInContext('var MIN_WPM = ' + mw1[1] + ', MIN_ANS = ' + mw1[2] + ';' +
+                        'f = function(items)' + mpm + ';', b);
+        fn = b.f;
+      } catch(e){}
+      if (!fn) E(PF, 'حسابُ وزنِ الورقةِ لا يُشغَّل');
+      else {
+        const rp2 = path.join(ROOT, 'step-reading.js');
+        if (fs.existsSync(rp2)){
+          const bx = { window:{} };
+          vm.createContext(bx);
+          try { vm.runInContext(fs.readFileSync(rp2, 'utf8'), bx, { timeout: 4000 }); } catch(e){}
+          const R = bx.window.STEP_READING || [];
+          if (!R.length) E('step-reading.js', 'بنكُ القطعِ لا يُحمَّل — فلا يُقاس وزنُ ورقةٍ');
+          else {
+            const pas = R[0], qs = (pas[1] || []).slice(0, 2);
+            const pasB = R[1];
+            if (qs.length < 2 || !pasB) E('step-reading.js', 'لا تكفي قطعتان بسؤالَين — لا يُقاس بها الاحتسابُ المزدوج');
+            else {
+              const mk = (p0, q) => ['<b>فهم المقروء:</b><div style="x">' + p0 + '</div>' + q[0], q[1], q[2], ''];
+              /* سؤالان من قطعةٍ واحدةٍ، وسؤالان من قطعتَين: الفرقُ بينهما
+                 قطعةٌ واحدةٌ بعينِها. فإن تساويا فالقطعةُ لا تُحسَب أصلًا،
+                 وإن زاد الفرقُ على قطعةٍ فهي تُحسَب أكثرَ من مرّة. */
+              const same = fn([mk(pas[0], qs[0]), mk(pas[0], qs[1])]);
+              const diff = fn([mk(pas[0], qs[0]), mk(pasB[0], (pasB[1] || [])[0] || qs[1])]);
+              const wB = String(pasB[0]).split(/\s+/).filter(Boolean).length / (+mw1[1]) * 60;
+              const gap = diff - same;
+              if (gap < wB * 0.6)
+                E(PF, 'قطعةٌ ثانيةٌ لا تزيد وزنَ الورقةِ (' + same + 'ث ← ' + diff + 'ث، والقطعةُ ' + Math.round(wB) + 'ث) — فالقطعُ لا تُحسَب، ويصغر الأدنى فيمرّ النقر');
+              if (gap > wB * 1.8)
+                E(PF, 'القطعةُ تُحسَب أكثرَ من مرّة (' + same + 'ث ← ' + diff + 'ث، والقطعةُ ' + Math.round(wB) + 'ث) — فيتضخّم الأدنى وتسقط جولةٌ محلولة');
+              const one = fn([mk(pas[0], qs[0])]);
+              if (!(same > one))
+                E(PF, 'سؤالٌ ثانٍ من القطعةِ نفسِها لا يزيد وزنَ الورقةِ — فالحسابُ لا يَعُدّ الأسئلة');
+              if (fn([]) !== 0) E(PF, 'ورقةٌ فارغةٌ وزنُها غيرُ صفر');
+              /* والخياراتُ تُقرأ كما يُقرأ الجذع: أربعةُ خياراتٍ في بندِ
+                 تراكيبَ وسيطُها ستَّ عشرةَ كلمةً — نحوُ خمسِ ثوانٍ للبند،
+                 أي ثلاثُ مئةِ ثانيةٍ في ورقةِ أربعٍ وستّين. فإسقاطُها
+                 يصغّر الأدنى فيمرّ النقر. */
+              const shortO = fn([['Stem here now', ['a', 'b', 'c', 'd'], 0, '']]);
+              const longO  = fn([['Stem here now', ['one two three four five six seven eight',
+                                                    'one two three four five six seven eight',
+                                                    'one two three four five six seven eight',
+                                                    'one two three four five six seven eight'], 0, '']]);
+              if (!(longO > shortO + 3))
+                E(PF, 'الخياراتُ لا تُحسَب في وزنِ الورقةِ (' + shortO + 'ث ← ' + longO + 'ث) — وهي ما يُقرأ ويُقارَن، وإسقاطُها يصغّر الأدنى نحوَ خمسِ ثوانٍ للبند');
+            }
+          }
+        }
+        /* والورقةُ الكاملةُ وزنُها في المدى المقيسِ: ٧٤٥ث لثمانيةٍ
+           وأربعين و٩٩٤ لأربعٍ وستّين. فإن خرج عن ضِعفٍ أو نصفٍ فالحسابُ
+           تغيّر تغيّرًا يُبطِل حالاتِ الحارسِ المبنيّةَ على الجولتَين. */
+        const fake = [];
+        for (let i = 0; i < 24; i++) fake.push(['<b>Grammar — X:</b> ' + 'word '.repeat(12), ['a','b','c','d'], 0, '']);
+        const g24 = fn(fake);
+        if (!(g24 > 24 * 4 && g24 < 24 * 30))
+          E(PF, 'وزنُ أربعةٍ وعشرين بندَ تراكيبَ ' + g24 + 'ث — خارجَ المدى المعقول، فحالاتُ الحارسِ المبنيّةُ على جولتَي ٢٥ نوفمبرَ لم تبقَ صادقة');
+      }
+    }
+  }
+
+  /* ٥) ووزنُ الورقةِ يُحمَل في التوقيتِ — ويُقاس بتشغيلِه */
   {
     const mr = /var RUSH_ON = ([^;]+);/.exec(psrc);
+    const mmin = /var __minSec = ([^;]+);/.exec(psrc);
     const mt = /function __timing\(\)\s*\{([\s\S]*?)\n  \}/.exec(psrc);
+    const mpm = EXTRACT.literalAfter(psrc, /function paperMinSec\(items\)\s*/, '{', '}');
+    if (!mmin) E(PF, 'وزنُ الورقةِ لا يُحسَب في راسمِها — فلا يُحمَل في التوقيت');
     if (!mr) E(PF, 'لا يُعرَف أيُّ ورقةٍ يُحكَم عليها بحدِّ الربع');
     else if (!mt) E(PF, '__timing غائبةٌ — فلا زمنَ ولا عدَّ متسرّعة');
     else ['sf', 's', 't', 'full', 'mwf'].forEach(id => {
@@ -1572,7 +1664,11 @@ function quicknessPath(){
       try {
         vm.runInContext('var id = ' + JSON.stringify(id) + ';' +
                         'var secsAll = 5184, __t0 = Date.now(), __fastN = 3;' +
+                        'var items = [["stem ".repeat(10), ["a","b","c","d"], 0, ""]];' +
+                        'var MIN_WPM = 200, MIN_ANS = 4;' +
+                        'function paperMinSec(items)' + (mpm || '{ return 0; }') + ';' +
                         'var RUSH_ON = ' + mr[1] + ';' +
+                        'var __minSec = ' + (mmin ? mmin[1] : '0') + ';' +
                         'f = function(){' + mt[1] + '\n};', b);
         fn = b.f;
       } catch(e){}
@@ -1581,10 +1677,24 @@ function quicknessPath(){
       try { t = fn(); } catch(e){ E(PF, '__timing ترمي عند «' + id + '»'); return; }
       if (t.dur == null || t.fast == null)
         E(PF, '__timing لا تحمل الزمنَ أو عددَ المتسرّعةِ عند «' + id + '»');
-      if (id === 'sf' && !(t.allot > 0))
-        E(PF, 'ورقةُ النموذجِ الكاملِ تُحفَظ بلا زمنٍ مرصود — فلا يُعرَف أنّ ٥٢٧ ثانيةً عُشرُ زمنِها، ويمرّ التسليمُ المبكّرُ محسوبًا');
-      if (id !== 'sf' && t.allot)
-        E(PF, 'زمنُ «' + id + '» المرصودُ يُحمَل وحدُّ الربعِ لم يُقَس عليه — ولا يُعمَّم حكمٌ قبلَ قياسِه');
+      if (id === 'sf' && !(t.minSec > 0))
+        E(PF, 'ورقةُ النموذجِ الكاملِ تُحفَظ بلا وزنٍ محسوب — فلا يُعرَف أنّ ٧٧٣ ثانيةً ٧٨٪ من حاجةِ محتواها، ويُحكَم عليها بالساعةِ وحدَها');
+      if (id !== 'sf' && t.minSec)
+        E(PF, 'وزنُ «' + id + '» يُحمَل ولم يُقَس عليه الحدُّ — ولا يُعمَّم حكمٌ قبلَ قياسِه');
+    });
+    /* ويُقال للولدِ في الورقةِ لا في تقريرِ أبيه وحدَه: الساعةُ قالت
+       لفهدٍ إنّ أمامه مئةً وثنتَين من الدقائقِ، ومحتواها يحتاج سبعَ عشرة.
+       فإن خُفي الرقمُ بقي يقيس نفسَه بساعةٍ لا تدلُّه. */
+    if (!/\[data-minsec\]/.test(psrc) && !/data-minsec/.test(psrc))
+      E(PF, 'وزنُ الورقةِ لا يُعرَض للولد — فيبقى يقيس نفسَه بساعةٍ أطولَ من حاجةِ ورقتِه بستّةِ أضعاف');
+    else {
+      const mshow = /if\(__minSec\) html \+=([\s\S]*?);\n/.exec(psrc);
+      if (!mshow)
+        E(PF, 'عرضُ وزنِ الورقةِ غيرُ مشروطٍ بحسابِه — فتظهر للولدِ ورقةٌ وزنُها صفر');
+      else if (!/data-minsec/.test(mshow[1]))
+        E(PF, 'عرضُ وزنِ الورقةِ بلا وسمٍ يُعرَف به — فلا يُقاس بقاؤه');
+    }
+    ([]).forEach(function(){
     });
   }
 
@@ -1624,7 +1734,7 @@ function quicknessPath(){
     if (!fn){ E(rf, 'نصُّ سببِ الاستبعادِ لا يُشغَّل'); return; }
     let tr = '', tf = '';
     try {
-      tr = String(fn({ meta:{ trusted:false, why:'rush', dur:527, allot:5184, total:48, secPerQ:11 } }) || '');
+      tr = String(fn({ meta:{ trusted:false, why:'rush', dur:400, minSec:994, allot:6912, total:64, secPerQ:6 } }) || '');
       tf = String(fn({ meta:{ trusted:false, why:'fast', dur:64,  total:12, secPerQ:5.3 } }) || '');
     } catch(e){ E(rf, 'نصُّ سببِ الاستبعادِ يرمي: ' + e.message); return; }
     if (!tr.trim())
@@ -1633,8 +1743,8 @@ function quicknessPath(){
       E(rf, 'التسليمُ المبكّرُ والنقرُ يُقالان بعبارةٍ واحدة — وعلاجُهما مختلف');
     if (/حلّ سريع ودرجة منخفضة/.test(tr))
       E(rf, 'التسليمُ المبكّرُ يُقال «حلّ سريع ودرجة منخفضة» — وهو كذبٌ: المتوسّطُ ١١ث للسؤالِ والدرجةُ ٦٥٪، والعلّةُ عُشرُ الزمن');
-    if (tr.indexOf('10') < 0 && tr.indexOf('١٠') < 0)
-      E(rf, 'لا تُقال نسبةُ ما استُهلك من زمنِ الورقة — وهي الرقمُ الذي يُفهَم منه الحكم');
+    if (tr.indexOf('40') < 0 && tr.indexOf('٤٠') < 0)
+      E(rf, 'لا تُقال نسبةُ ما استُهلك من حاجةِ الورقة — وهي الرقمُ الذي يُفهَم منه الحكم');
   });
 
   /* ٧) والحكمُ الأخيرُ: يُشغَّل الحفظُ نفسُه ويُقرأ الصفُّ الخارج.
@@ -1647,9 +1757,12 @@ function quicknessPath(){
     else if (!mpo) E(PF, 'paceOn لا تُنتزَع');
     else {
       const ROWS = [
-        { d:'النموذجُ الكاملُ المنقورُ (٥٢٧ث من ٥١٨٤)', test:'STEP — نموذج كامل ⏱️',
-          c:31, t:48, T:{ dur:527, fast:19, allot:5184 },
-          exp:{ trusted:false, why:'rush', allot:5184 } },
+        { d:'نموذجُ ٠٧:٠٣ (١٩ متسرّعةً من ٤٨)', test:'STEP — نموذج كامل ⏱️',
+          c:31, t:48, T:{ dur:527, fast:19, minSec:1240, allot:5184 },
+          exp:{ trusted:false, why:'burst', minSec:1240, allot:5184 } },
+        { d:'نموذجُ ١٣:٥٩ (٥٠/٦٤ · ٦ متسرّعاتٍ من ٦٤)', test:'STEP — نموذج كامل ⏱️',
+          c:50, t:64, T:{ dur:773, fast:6, minSec:1652, allot:6912 },
+          exp:{ trusted:undefined, minSec:1652 } },
         { d:'تحصيليُّ ١١:٠٠ (نصفُ الورقةِ متسرّعًا ودرجةٌ ٥٨٪)', test:'تحصيلي',
           c:7, t:12, T:{ dur:110, fast:6, allot:0 },
           exp:{ trusted:false, why:'burst' } },

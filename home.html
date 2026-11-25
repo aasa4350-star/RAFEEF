@@ -76,7 +76,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:28px}
 </style>
-<script src="build-check.js?v=ec802d2121" defer></script>
+<script src="build-check.js?v=d00f154bdf" defer></script>
 </head>
 <body>
 <div class="wrap"><div id="app"></div><div id="report"></div><footer id="foot"></footer></div>
@@ -435,7 +435,7 @@ async function loadReport(){
          ستٌّ وثمانون دقيقةً وسلّمها في تسع. */
       var why = (p.meta.why==="rush")
         ? (' <b style="color:var(--bad)">🚫 سلّمها في '+
-           (p.meta.allot&&p.meta.dur!=null?Math.round(p.meta.dur/p.meta.allot*100)+'٪ من وقتها':'جزءٍ من وقتها')+
+           (p.meta.minSec&&p.meta.dur!=null?Math.round(p.meta.dur/p.meta.minSec*100)+'٪ من حاجة محتواها':'جزءٍ من حاجة محتواها')+
            ' · غير محتسبة</b>')
         : (p.meta.why==="fast") ? (' <b style="color:var(--bad)">🚫 نقر — '+(p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':'')+' · غير محتسبة</b>') : null;
       if(why) return why;
@@ -869,7 +869,7 @@ async function loadReport(){
                 '<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">'+
                   String(p.meta.essay).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+
                 '</div></details></li>' : '';
-            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="rush"?"تسليمٌ مبكّر"+(p.meta.allot&&p.meta.dur!=null?" — "+Math.round(p.meta.dur/p.meta.allot*100)+"٪ من وقتها":""):p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
+            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="rush"?"تسليمٌ مبكّر"+(p.meta.minSec&&p.meta.dur!=null?" — "+Math.round(p.meta.dur/p.meta.minSec*100)+"٪ من حاجة محتواها":""):p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
             return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+RR.stamp(saTime(rowTime(p)))+'</span>'+un+'</li>'+ess; })+
           '</div>';
       });
