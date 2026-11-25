@@ -331,6 +331,7 @@ function run(){
   issues.push(...fragmentPath());
   issues.push(...pacePath());
   issues.push(...quicknessPath());
+  issues.push(...voidRowsPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
@@ -1449,6 +1450,164 @@ function pacePath(){
    (٩٢٪) ونصفُ ورقتِها متسرّعٌ — إن سقطت واحدةٌ منها فالحارسُ خطأٌ لا
    الجلسة.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   صفوفٌ أُبطِلت — والإبطالُ يَبلغ كلَّ بابٍ أو لا يَبلغ شيئًا
+   ═══════════════════════════════════════════════════════════════════
+   طلبُ الأبِ (٢٥ نوفمبرَ ٢٠٢٦): «احذف آخر اختبار الدرجة ٤٥ من ٦٤ —
+   أنا الي مختبر». ومفتاحُنا يُدخِل ويقرأ ولا يحذف: جُرِّب الحذفُ فأجاب
+   الخادمُ HTTP 200 ومصفوفةً فارغةً، والصفُّ باقٍ. فالإبطالُ من جهةِ
+   الموقع (void-rows.js).
+
+   وهذا عطبٌ صامتٌ من طبقتَين لو انكسر:
+     · الصفحةُ تعمل، والتقريرُ يُعرَض، ويدخل المتوسّطَ عملُ غيرِ صاحبِه
+       ولا شيءَ يصيح — ٤٥/٦٤ في ٥٢ دقيقةً ترفع معدَّلَه وتصعّد طولَ
+       ورقتِه القادمةِ على جهدٍ لم يبذله.
+     · والأسوأُ أن يَبلغ الإبطالُ بابًا ولا يَبلغ أخاه: فيقرأ الأبُ في
+       تقريرِه غيرَ ما يرى الولدُ في لافتةِ ورقتِه.
+
+   فيُفحَص بالتشغيل: تُنتزَع المصفاةُ وتُشغَّل، ويُتحقَّق أنّ كلَّ قراءةٍ
+   من جدولِ المحاولاتِ تمرُّ بها — في صفحةِ التدرّبِ وفي صفحاتِ
+   التقريرِ الأربع.
+   ═══════════════════════════════════════════════════════════════════ */
+function voidRowsPath(){
+  const out = [];
+  const F = 'void-rows.js', p = path.join(ROOT, F);
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  if (!fs.existsSync(p)) { E(F, 'قائمةُ الصفوفِ المبطَلةِ غائبة — فلا سبيلَ إلى إسقاطِ صفٍّ، والمفتاحُ لا يحذف'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ١) تُشغَّل المصفاةُ نفسُها لا تُقرأ */
+  const sb = { window:{} };
+  vm.createContext(sb);
+  try { vm.runInContext(src, sb, { timeout: 4000 }); }
+  catch(e){ E(F, 'void-rows.js لا تُشغَّل: ' + e.message); return out; }
+  const V = sb.window.VoidRows, LIST = sb.window.VOID_ROWS;
+  if (!V || typeof V.is !== 'function' || typeof V.strip !== 'function'){
+    E(F, 'VoidRows.is أو VoidRows.strip غائبة — فالصفحاتُ تنادي ما لا وجودَ له وتمرّ الصفوفُ كلُّها');
+    return out;
+  }
+  const keys = Object.keys(LIST || {});
+  if (!keys.length) out.push({ sev:'تنبيه', file:F, msg:'لا صفَّ مبطَلًا — فالمصفاةُ بلا عمل' });
+  /* وصفوفٌ أمر الأبُ بإبطالِها بعينِها — فلو سقط أحدُها من القائمةِ
+     رجع عملُ غيرِ صاحبِه إلى متوسّطِ الولدِ ولا شيءَ يصيح. ولا يُحذف
+     من هذه إلّا بطلبِه هو. */
+  const MUST = {
+    'mwwhm452_4iabfi': 'فهد · ٤٥/٦٤ في ٢٥ نوفمبر ٢٢:٥١ — طلبُ الأبِ: «أنا الي مختبر»'
+  };
+  Object.keys(MUST).forEach(k => {
+    if (!V.is({ meta:{ pid:k } }))
+      E(F, 'سقط من قائمةِ المبطَلِ صفٌّ أمر الأبُ بإبطالِه: ' + MUST[k]);
+  });
+
+  /* والصفُّ المبطَلُ يُعرَف بـmeta.pid وبرقمِه، ويُمرَّر صفًّا أو meta */
+  keys.forEach(k => {
+    if (!V.is({ meta:{ pid:k } }))  E(F, 'الصفُّ «' + k + '» لا يُعرَف بـmeta.pid — وقراءاتُ صفحةِ التدرّبِ لا تطلب غيرَ meta');
+    if (!V.is({ pid:k }))           E(F, 'الصفُّ «' + k + '» لا يُعرَف حين تُمرَّر meta وحدَها');
+    if (!V.is({ id:k }))            E(F, 'الصفُّ «' + k + '» لا يُعرَف برقمِ الصفّ — والصفوفُ القديمةُ بلا pid');
+    if (!String(V.why({ meta:{ pid:k } }) || '').trim())
+      E(F, 'الصفُّ «' + k + '» مبطَلٌ بلا سببٍ مكتوب — فمن قرأ البياناتَ بعدَ سنةٍ ظنّه ضائعًا');
+  });
+  /* ولا يُسقِط غيرَه */
+  if (V.is({ meta:{ pid:'سليم_لا_يُبطَل' } }) || V.is({}) || V.is(null))
+    E(F, 'المصفاةُ تُسقِط صفًّا غيرَ مبطَلٍ — فيختفي عملُ الولدِ في صمت');
+  {
+    const k0 = keys[0] || 'x';
+    const rows = [{ meta:{ pid:k0, total:64 } }, { meta:{ pid:'ok1', total:12 } }, { meta:{ total:5 } }];
+    const kept = V.strip(rows);
+    if (kept.length !== 2) E(F, 'strip أسقطت ' + (rows.length - kept.length) + ' من ثلاثةٍ والمنتظَرُ واحدًا');
+    if (V.count(rows) !== 1) E(F, 'عدُّ المبطَلِ خطأٌ — فلا يُقال في التقريرِ كم سقط');
+    if (!Array.isArray(V.strip(null)) && V.strip(null) !== null) E(F, 'strip ترمي على مدخلٍ غيرِ مصفوفة');
+  }
+
+  /* ٢) ومصفاةُ التقريرِ تستشيرها قبلَ كلِّ شيء */
+  {
+    const rr = 'report-rules.js', rp = path.join(ROOT, rr);
+    if (!fs.existsSync(rp)) E(rr, 'قواعدُ التقريرِ غائبة');
+    else {
+      const rsrc = fs.readFileSync(rp, 'utf8');
+      const body = EXTRACT.literalAfter(rsrc, /function excluded\(row\)\s*/, '{', '}');
+      if (!body) E(rr, 'excluded لا تُنتزَع — فلا يُقاس هل تستشير قائمةَ المبطَل');
+      else {
+        const b = {};
+        vm.createContext(b);
+        let fn = null;
+        try {
+          vm.runInContext('var g = { VoidRows: { is: function(r){ return !!(r && r.meta && r.meta.pid === "VD"); } } };' +
+                          'var MARKERS = {}, SKIP = [];' +
+                          'f = function(row)' + body + ';', b);
+          fn = b.f;
+        } catch(e){}
+        if (!fn) E(rr, 'excluded لا تُشغَّل');
+        else {
+          if (fn({ meta:{ pid:'VD', test:'x' } }) !== true)
+            E(rr, 'مصفاةُ التقريرِ لا تستشير قائمةَ المبطَل — فيدخل متوسّطَ الولدِ عملُ غيرِه، والصفحةُ تعمل ولا شيءَ يصيح');
+          if (fn({ meta:{ pid:'ok', test:'x' } }) !== false)
+            E(rr, 'مصفاةُ التقريرِ تُسقِط صفًّا سليمًا');
+        }
+      }
+    }
+  }
+
+  /* ٣) والصفحاتُ الخمسُ تحمّلها، ولا قراءةَ للجدولِ تُفلت منها */
+  ['index.html', 'home.html', 'child.html', 'report.html', 'practice.html'].forEach(f => {
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) return;
+    const fsrc = fs.readFileSync(fp, 'utf8');
+    if (!/<script src="void-rows\.js"><\/script>/.test(fsrc))
+      E(f, 'لا تحمّل void-rows.js — فالصفُّ المبطَلُ يُقرأ هنا ويُسقَط هناك، ويختلف ما يراه الأبُ عمّا يراه الولد');
+  });
+  {
+    const pf = 'practice.html', pp = path.join(ROOT, pf);
+    if (fs.existsSync(pp)){
+      const psrc = fs.readFileSync(pp, 'utf8');
+      /* ولا يكفي وجودُها: تُنتزَع وتُشغَّل على صفٍّ مبطَلٍ وآخرَ سليم.
+         فلو رجعت بما جاءها (return j) لمرّ كلُّ شيءٍ والصفحةُ تعمل. */
+      const ab = EXTRACT.literalAfter(psrc, /function atJson\(r\)\s*/, '{', '}');
+      if (!ab)
+        E(pf, 'مصفاةُ القراءةِ الواحدةُ غائبة — فكلُّ بابٍ يُرشّح بنفسِه أو لا يُرشّح');
+      else {
+        /* وعدٌ متزامنٌ في الصندوقِ: الفحصُ متزامنٌ والمصفاةُ وعدٌ، فلو
+           انتُظِرت دورةُ المهامِّ لم يُقرأ شيء. فيُستبدَل Promise بواحدٍ
+           ينفّذ then في حينِه — والسلوكُ المقيسُ هو الترشيحُ لا التزامن. */
+        const mk = 'function SyncP(v){ this.v = v; }' +
+          'SyncP.prototype.then = function(f, g){ try { return new SyncP(f ? f(this.v) : this.v); }' +
+          ' catch(e){ return g ? new SyncP(g(e)) : this; } };' +
+          'SyncP.resolve = function(v){ return (v && typeof v.then === "function") ? v : new SyncP(v); };' +
+          'var Promise = SyncP;';
+        const ctx = { Array:Array,
+          window:{ VoidRows:{ strip:function(j){
+            return Array.isArray(j) ? j.filter(function(r){ return !(r && r.meta && r.meta.pid === 'VD'); }) : j; } } } };
+        ctx.VoidRows = ctx.window.VoidRows;
+        vm.createContext(ctx);
+        let afn = null;
+        try { vm.runInContext(mk + 'f = function(r)' + ab + ';', ctx); afn = ctx.f; } catch(e){}
+        if (!afn) E(pf, 'مصفاةُ القراءةِ لا تُشغَّل');
+        else {
+          const rows = [{ meta:{ pid:'VD' } }, { meta:{ pid:'ok' } }];
+          let settled, ok = false;
+          try {
+            const got = afn({ json:function(){ return rows; } });
+            if (got && typeof got.then === 'function'){ got.then(function(v){ settled = v; ok = true; }); }
+          } catch(e){}
+          if (!ok) E(pf, 'مصفاةُ القراءةِ لا تُرجع وعدًا يُقرأ');
+          else if (!Array.isArray(settled) || settled.length !== 1 || settled[0].meta.pid !== 'ok')
+            E(pf, 'مصفاةُ القراءةِ لا تُسقِط الصفَّ المبطَل (رجعت ' +
+                  (Array.isArray(settled) ? settled.length : '؟') + ' من صفَّين) — فالورقةُ المبطَلةُ تحسب في لافتةِ النموذجِ الكاملِ وفي عدِّ ما عُرِض، والصفحةُ تعمل ولا شيءَ يصيح');
+        }
+      }
+      const re = /rest\/v1\/attempts\?select/g;
+      let m, n = 0, bare = 0;
+      while ((m = re.exec(psrc))){
+        n++;
+        if (!/atJson/.test(psrc.slice(m.index, m.index + 700))) bare++;
+      }
+      if (!n) E(pf, 'لا قراءةَ لجدولِ المحاولاتِ — فالصفحةُ لا تقرأ تاريخَه');
+      if (bare) E(pf, bare + ' من ' + n + ' قراءةً تقرأ جدولَ المحاولاتِ بلا مصفاةِ المبطَل — فالورقةُ المبطَلةُ تحسب في لافتةِ النموذجِ الكاملِ أو في عدِّ ما عُرِض');
+    }
+  }
+  return out;
+}
+
 function quicknessPath(){
   const out = [];
   const F = 'pace.js', p = path.join(ROOT, F);

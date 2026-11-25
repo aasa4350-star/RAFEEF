@@ -78,7 +78,9 @@
 <!-- حارسُ التأنّي: نسخةُ القاعدةِ الوحيدة. كانت مكتوبةً هنا مرّتَين
      (في الحفظِ وفي لوحةِ التنبيه) وهناك مرّةً، فتفرّقت وظهر العيب. -->
 <script src="pace.js"></script>
-<script src="build-check.js?v=d00f154bdf" defer></script>
+<!-- صفوفٌ أُبطِلت بطلبٍ صريح: المفتاحُ لا يحذف، فالإبطالُ هنا -->
+<script src="void-rows.js"></script>
+<script src="build-check.js?v=7e709166f7" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -240,6 +242,18 @@ var PACE_ON = (who === "fahad");
    وفهدٌ يبقى على الصفحةِ كلِّها كما كان — لا يُنقَص منه شيء. */
 function paceOn(test){
   return PACE_ON || /تحصيلي|STEP/i.test(String(test || ""));
+}
+/* ═══ كلُّ قراءةٍ من جدولِ المحاولاتِ تمرُّ بمصفاةٍ واحدة ═══════════
+   صفٌّ أُبطِل بطلبٍ صريحٍ (void-rows.js) لا يُقرأ في بابٍ: لا في لافتةِ
+   النموذجِ الكامل، ولا في عدِّ ما عُرِض، ولا في تشخيصِ المهارات. وكان
+   بعضُ الأبوابِ يُرشّح trusted===false وبعضُها لا، فلو أُبطِل صفٌّ في
+   موضعٍ وبقي في آخرَ اختلف ما يراه الأبُ عمّا يراه الولد.
+   وتُستعمَل مكانَ r.json() في كلِّ قراءةٍ — وفحصُ checks يتحقّق أنّه
+   لم يبقَ موضعٌ يقرأ الجدولَ بغيرِها. */
+function atJson(r){
+  return Promise.resolve(r && r.json ? r.json() : r).then(function(j){
+    return (window.VoidRows ? VoidRows.strip(j) : j);
+  }, function(){ return []; });
 }
 function saveScore(test, correct, total, wrongs, skills, pid, timing, seen){
   try{
@@ -1631,7 +1645,7 @@ function stepMix(n){
     fetch(SUPA_URL + "/rest/v1/attempts?select=meta&student=eq." + encodeURIComponent(name) +
         "&meta->seenKeys=not.is.null&order=created_at.desc&limit=200",
       { headers:{ apikey:SUPA_KEY, Authorization:"Bearer " + SUPA_KEY } })
-      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(atJson)
       .then(function(j){ if(Array.isArray(j)) SeenCap.merge(j); })
       .catch(function(){});
   }catch(e){}
@@ -2200,7 +2214,7 @@ function gdFetch(){
     fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
         "&meta->>test=eq."+encodeURIComponent(GD_LABEL)+"&order=created_at.desc&limit=200",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
-    .then(function(r){ return r.json(); })
+    .then(atJson)
     .then(function(rows){
       if(!Array.isArray(rows)) return;
       var g = {};
@@ -2371,7 +2385,7 @@ function sfFetch(){
     fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
         "&meta->>test=eq."+encodeURIComponent(SF_LABEL)+"&order=created_at.desc&limit=200",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
-    .then(function(r){ return r.json(); })
+    .then(atJson)
     .then(function(rows){
       if(!Array.isArray(rows)) return;
       var g = {};
@@ -2991,12 +3005,12 @@ async function renderRemedial(){
       return fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
           "&meta->>test=eq."+encodeURIComponent(tn)+"&meta->skills=not.is.null&order=created_at.desc&limit=60",
         {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
-        .then(function(x){ return x.json(); }).catch(function(){ return []; });
+        .then(atJson);
     });
     pulls.push(fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
         "&meta->skills=not.is.null&order=created_at.desc&limit=60",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}})
-      .then(function(x){ return x.json(); }).catch(function(){ return []; }));
+      .then(atJson));
     var parts = await Promise.all(pulls);
     parts.forEach(function(j){ if(!Array.isArray(j)) return;
       j.forEach(function(x){
@@ -3011,7 +3025,7 @@ async function renderRemedial(){
       var r2 = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
           "&order=created_at.desc&limit=200",
         {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-      var j2 = await r2.json(); if(Array.isArray(j2)) rows = j2;
+      var j2 = await atJson(r2); if(Array.isArray(j2)) rows = j2;
     }
   }catch(e){}
   // البند ٤: نقيس نسبة إتقان كل مهارة من meta.skills (آخر ٤ جلسات لكل اختبار)،
@@ -3464,7 +3478,7 @@ async function renderGrammar(){
     var r = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
         "&meta->>test=eq."+encodeURIComponent("STEP إنجليزي")+"&order=created_at.desc&limit=60",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-    rows = await r.json(); if(!Array.isArray(rows)) rows = [];
+    rows = await atJson(r); if(!Array.isArray(rows)) rows = [];
   }catch(e){}
   /* وإن تغيّر اسمُ الاختبارِ يومًا أو رفض الخادمُ الفرزَ، نرجع إلى
      النافذةِ العامّةِ فلا يُترك القسمُ فارغًا. */
@@ -3473,7 +3487,7 @@ async function renderGrammar(){
       var rF = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta,created_at&student=eq."+encodeURIComponent(name)+
           "&meta->skills=not.is.null&order=created_at.desc&limit=60",
         {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-      var jF = await rF.json(); if(Array.isArray(jF)) rows = jF;
+      var jF = await atJson(rF); if(Array.isArray(jF)) rows = jF;
     }catch(e){}
   }
   /* ما صحّحه سابقًا — من الخادمِ لا من الجهازِ وحده */
@@ -3481,7 +3495,7 @@ async function renderGrammar(){
     var r2 = await fetch(SUPA_URL+"/rest/v1/attempts?select=meta&student=eq."+encodeURIComponent(name)+
         "&meta->>sect=eq.gram&order=created_at.desc&limit=240",
       {headers:{apikey:SUPA_KEY, Authorization:"Bearer "+SUPA_KEY}});
-    gramRows = await r2.json(); if(!Array.isArray(gramRows)) gramRows = [];
+    gramRows = await atJson(r2); if(!Array.isArray(gramRows)) gramRows = [];
   }catch(e){}
   grBuilt = true;
   var fixed = grFixedLocal();

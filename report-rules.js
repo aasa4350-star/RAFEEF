@@ -79,6 +79,9 @@
 
   function excluded(row){
     if(!row) return false;
+    /* صفٌّ أُبطِل بطلبٍ صريحٍ — انظر void-rows.js. وهو أوّلُ ما يُفحَص
+       فلا يمرّ في بابٍ من أبوابِ التقريرِ ولا في متوسّط. */
+    if(g.VoidRows && g.VoidRows.is(row)) return true;
     var m = row.meta || {};
     if(m.kind && MARKERS[m.kind]) return true;
     var t = (m.at || row.created_at || "");
