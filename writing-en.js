@@ -14,6 +14,13 @@ function gp(a){ return a[Math.floor(Math.random()*a.length)]; }
 function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function en(s){ return '<span class="wen" dir="ltr">'+esc(s)+'</span>'; }
+/* كالسابقةِ غيرَ أنّها تسمح بالتسطير: ما بين [[ ]] يُسطَّر بعد الهروب،
+   فلا يُحقَن وسمٌ من البيانات. وبه يُعرَض سؤالُ «حدّد المسطَّرَ الخاطئ»
+   كما هو في كُتيِّبِ قياسٍ (ص ٢٢). */
+function enU(s){
+  return '<span class="wen" dir="ltr">' +
+    esc(s).replace(/\[\[/g, '<u>').replace(/\]\]/g, '</u>') + '</span>';
+}
 
 /* ═══ التعليمةُ نفسُها مادّةُ تعلّم ═══
    طلبُ الأب (٢٥ سبتمبر ٢٠٢٦): «الي مكتوب بالعربي حط تحته الترجمة
@@ -1860,8 +1867,144 @@ var SEQ3 = [
    "Finally, borrowing rose by more than a third within one term."]
 ];
 
+
+/* ═══ مواصفةُ «التحليلِ الكتابيِّ» من كُتيِّبِ قياسٍ الرسميِّ (ص ٢١) ═════
+   «The best response may depend upon capitalization, punctuation, the use
+   of correct word order at the sentence level, the correct placement of
+   information depending on the organization of a paragraph or … questions
+   that ask the test-taker to identify a structure or wording that is
+   INCORRECT.»
+
+   وأمثلتُه الأربعةُ: ترتيبُ جملةٍ كاملةٍ · ترقيمُ فقرةٍ كاملةٍ · واثنان
+   «حدّد المسطَّرَ الخاطئ». وكان قسمُنا يسأل عن الأطروحةِ (Thesis) وعن
+   الإيجاز — وليس واحدٌ منهما في الكُتيِّبِ البتّة، وهما من مهاراتِ كتابةِ
+   المقالِ لا تحليلِه. وكان يخلو من نوعَيه الرئيسَين. فأُخرِج الأوّلان
+   وأُدخِل النوعان في ٢٥ نوفمبرَ ٢٠٢٦ بعد مراجعةِ الكُتيِّب.
+
+   وبنودُ ترتيبِ الجملةِ مبنيّةٌ على مثالِ الكُتيِّبِ بعينِه: الصحيحةُ
+   ترتيبُها إنجليزيٌّ طبيعيّ، والثلاثُ الباقياتُ «offer a word order that
+   is foreign to English usage» — ولا خطأَ فيهنّ غيرُ الترتيب. */
+var WORDORD3 = [
+  ["Neither the students nor the teacher was aware of the change until Sunday.",
+   "Neither the students nor the teacher was until Sunday aware of the change.",
+   "Until Sunday neither aware of the change was the teacher nor the students.",
+   "The teacher neither nor the students was aware of the change until Sunday."],
+  ["The manager rarely answers emails after six o'clock in the evening.",
+   "The manager answers rarely emails after six o'clock in the evening.",
+   "Rarely the manager answers emails after six o'clock in the evening.",
+   "The manager answers emails rarely after in the evening six o'clock."],
+  ["She gave her brother a detailed explanation of the new rule yesterday.",
+   "She gave yesterday her brother a detailed explanation of the new rule.",
+   "She gave her brother yesterday of the new rule a detailed explanation.",
+   "Yesterday a detailed explanation she gave her brother of the new rule."],
+  ["We have never seen such a long queue at the registration office.",
+   "Never we have seen such a long queue at the registration office.",
+   "We have seen never such a long queue at the registration office.",
+   "At the registration office such a long queue never we have seen."],
+  ["The committee will probably announce the results early next week.",
+   "The committee will announce probably the results early next week.",
+   "Probably announce will the committee the results early next week.",
+   "The committee will announce the results next early week."],
+  ["Although he had studied for weeks, he found the last section difficult.",
+   "Although he had for weeks studied, he found difficult the last section.",
+   "Although studied he had for weeks, the last section he found difficult.",
+   "He found difficult the last section, although for weeks studied he had."],
+  ["I rarely find enough time to read a whole novel during the term.",
+   "I find rarely enough time to read during the term a whole novel.",
+   "Rarely I find enough time to read a whole novel during the term.",
+   "Enough time to read a whole novel I rarely during the term find."],
+  ["They have already sent the application to the admissions office.",
+   "They have sent already the application to the admissions office.",
+   "Already they have the application sent to the admissions office.",
+   "To the admissions office already have they sent the application."],
+  ["He explained to the students why the experiment had failed twice.",
+   "He explained the students to why the experiment had failed twice.",
+   "He explained why had the experiment failed twice to the students.",
+   "To the students why the experiment twice had failed he explained."],
+  ["The doctor told her patient to take the medicine after every meal.",
+   "The doctor told to her patient to take after every meal the medicine.",
+   "The doctor told her patient after every meal to take the medicine to.",
+   "After every meal told the doctor her patient the medicine to take."],
+  ["Most of the students had finished the first section before the bell rang.",
+   "Most of the students had the first section finished before rang the bell.",
+   "Before the bell rang had most of the students the first section finished.",
+   "Most of the students finished had before the bell rang the first section."],
+  ["The library will close early on Thursday because of the holiday.",
+   "The library will close on Thursday early because of the holiday.",
+   "Because of the holiday will the library close early on Thursday.",
+   "The library on Thursday will early close because of the holiday."]
+];
+
+/* «حدّد المسطَّرَ الخاطئ» — مثالا الكُتيِّبِ الثالثُ والرابع.
+   وصيغتُه هناك: جملةٌ فيها أربعُ كلماتٍ مسطَّرةٍ، واحدةٌ منها غيرُ
+   صحيحةٍ نحويًّا، ولا يُطلَب تصحيحُها بل تمييزُها. وما بين [[ ]] يُسطَّر.
+   وكلُّ بند: [الجملةُ, الخاطئةُ, ثلاثُ الصحيحات, الشرح]. */
+var UNDERL3 = [
+  ["The number of applicants [[have increased]] [[sharply]] [[since]] the new programme [[was announced]].",
+   "have increased", "sharply", "since", "was announced",
+   "the number of + جمعٌ فاعلُه مفردٌ ⇒ has increased."],
+  ["Each of the teachers [[were given]] a [[revised]] copy of the schedule [[before]] the term [[began]].",
+   "were given", "revised", "before", "began",
+   "each of + جمعٌ فاعلُه مفردٌ ⇒ was given."],
+  ["She has been working at the hospital [[since]] ten years, [[and]] she still [[enjoys]] [[it]].",
+   "since", "and", "enjoys", "it",
+   "مع المدّةِ (ten years) يلزم for، وsince لنقطةِ البداية."],
+  ["The report was [[wrote]] by two researchers who [[had studied]] the problem [[for]] [[several]] months.",
+   "wrote", "had studied", "for", "several",
+   "المبنيُّ للمجهولِ be + التصريفُ الثالث ⇒ was written."],
+  ["If the manager [[would have]] called earlier, we [[could]] have changed the [[booking]] [[without]] a fee.",
+   "would have", "could", "booking", "without",
+   "في جملةِ الشرطِ الثالثةِ: if + had + التصريفُ الثالث ⇒ had called."],
+  ["The teacher asked us [[to not]] [[write]] on the back of the [[sheet]] [[during]] the exam.",
+   "to not", "write", "sheet", "during",
+   "النهيُ المنقولُ: not to + مصدرٌ ⇒ not to write."],
+  ["He is [[interesting]] in [[joining]] the volunteer programme [[that]] the college [[announced]] last week.",
+   "interesting", "joining", "that", "announced",
+   "‏interested in = مهتمٌّ، وinteresting = مُشوِّق. والفاعلُ هنا هو المهتمّ."],
+  ["Neither the manager nor the employees [[was]] [[aware]] of the change [[until]] the email [[arrived]].",
+   "was", "aware", "until", "arrived",
+   "مع neither … nor يتبع الفعلُ أقربَ الاسمَين، وهو employees ⇒ were."],
+  ["There [[are]] [[less]] students in the evening section than [[there]] [[were]] last year.",
+   "less", "are", "there", "were",
+   "‏fewer مع المعدودِ الجمع، وless مع غيرِ المعدود."],
+  ["I [[have met]] him yesterday at the conference, [[but]] we [[did not speak]] [[for]] long.",
+   "have met", "but", "did not speak", "for",
+   "‏yesterday زمنٌ ماضٍ منتهٍ ⇒ الماضي البسيط met، ولا يصحّ الحاضرُ التامّ."],
+  ["Although she [[studied]] [[hardly]] for three weeks, she [[did not]] pass the [[final]] test.",
+   "hardly", "studied", "did not", "final",
+   "‏hard ظرفٌ بمعنى بجدٍّ، وhardly بمعنى بالكادِ فتنقلب الجملة."],
+  ["The equipment [[are]] [[kept]] in a locked room [[because]] [[it]] is expensive.",
+   "are", "kept", "because", "it",
+   "‏equipment غيرُ معدودٍ ⇒ is kept، ويعود عليه it."],
+  ["He suggested [[to postpone]] the meeting [[until]] the manager [[returns]] from [[his]] trip.",
+   "to postpone", "until", "returns", "his",
+   "‏suggest + v-ing ⇒ suggested postponing، ولا تُتبَع بـto + مصدر."],
+  ["This is the [[most easiest]] question [[in]] the whole [[paper]], [[according to]] the teacher.",
+   "most easiest", "in", "paper", "according to",
+   "لا يُجمَع بين most وer/est: التفضيلُ القصيرُ est وحدَه ⇒ the easiest."]
+];
+
 /* ─────────── مولّدات المستوى الثالث ─────────── */
 
+/* ترتيبُ الجملةِ الكامل — المثالُ الأوّلُ في كُتيِّبِ التحليل */
+function wWordOrder3(){
+  var p=gp(WORDORD3);
+  var o=pick4(p[0],[p[1],p[2],p[3]]); if(!o) return null;
+  return [tr("أيُّ جملةٍ <b>ترتيبُها صحيح</b>؟","Which of the following sentences has the correct word order?"),
+    o[0].map(en),o[1],
+    "الترتيبُ الإنجليزيُّ: فاعلٌ + فعلٌ + مفعولٌ + مكانٌ + زمان. ولا يُفصَل الفعلُ عن مفعولِه بظرف، وظرفُ التكرار قبلَ الفعلِ الرئيس وبعدَ المساعد. والباقياتُ ترتيبُها غريبٌ عن الإنجليزيّةِ ولا خطأَ فيهنّ سواه.",
+    "w3o:"+p[0].slice(0,24)];
+}
+/* «حدّد المسطَّرَ الخاطئ» — المثالان الثالثُ والرابع في الكُتيِّب */
+function wUnderlined3(){
+  var p=gp(UNDERL3);
+  var o=pick4(p[1],[p[2],p[3],p[4]]); if(!o) return null;
+  return [tr("حدّد الكلمةَ أو العبارةَ المسطَّرةَ <b>الخاطئة</b> — ولا يُطلَب تصحيحُها:",
+      "Identify the incorrect underlined word or words. No correction is needed.")+"<br>"+enU(p[0]),
+    o[0].map(en),o[1],
+    p[5]+" · واقرأ الجملةَ إلى آخرِها قبلَ أن تختار: المسطَّرُ الأخيرُ قد يكون هو الخطأ.",
+    "w3u:"+p[1]];
+}
 /* الأطروحة (thesis statement) — أعمّ من جملة الموضوع في المستوى الثاني */
 function wThesis(){
   var p=gp(TOPIC_SENT3);
@@ -1958,7 +2101,12 @@ function wOrderPara3(){
 var GENS = {
   1: [wOrder,wCapital,wCapitalI,wConnect,wTopicSentence,wOrderPara],
   2: [wTopicSentence,wOffTopic,wOrderPara,wRunOn,wConnector2,wConnect],
-  3: [wThesis,wOffTopic3,wRegister,wFragment,wWordy,wConnector3,wGrammar3,wOrderPara3,wRunOn3]
+  /* ⚠️ خرج wThesis وwWordy في ٢٥ نوفمبرَ ٢٠٢٦: الأطروحةُ والإيجازُ ليسا
+     في مواصفةِ «التحليلِ الكتابيِّ» بكُتيِّبِ قياسٍ البتّة، وهما من كتابةِ
+     المقالِ لا تحليلِه. ودخل نوعاه الرئيسان: ترتيبُ الجملةِ الكاملِ
+     وتمييزُ المسطَّرِ الخاطئ. والدالّتان باقيتان في الملفِّ لأنّهما
+     تنفعان في قسمِ التعبيرِ نفسِه إن طُلبتا يومًا. */
+  3: [wWordOrder3,wUnderlined3,wOffTopic3,wRegister,wFragment,wConnector3,wGrammar3,wOrderPara3,wRunOn3]
 };
 
 function genN(gens,n){

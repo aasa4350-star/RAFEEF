@@ -332,6 +332,7 @@ function run(){
   issues.push(...pacePath());
   issues.push(...quicknessPath());
   issues.push(...voidRowsPath());
+  issues.push(...bookletSpecPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
@@ -1469,6 +1470,203 @@ function pacePath(){
    من جدولِ المحاولاتِ تمرُّ بها — في صفحةِ التدرّبِ وفي صفحاتِ
    التقريرِ الأربع.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   مواصفةُ كُتيِّبِ قياسٍ الرسميِّ — القراءةُ والتحليلُ الكتابيّ
+   ═══════════════════════════════════════════════════════════════════
+   راجَعنا الكُتيِّبَ («Standardized Test of English Proficiency — A Guide
+   for Students») في ٢٥ نوفمبرَ ٢٠٢٦ فبان عطبان صامتان: الصفحةُ تعمل،
+   والطالبُ يحلُّ ويتقدّم، وهو يتدرّب على غيرِ ما سيُختبَر فيه.
+
+   ١) فهمُ المقروء: الكُتيِّبُ يعدّ مهاراتِه خمسًا وأوّلُها «Word Meaning»
+      (ص ٩)، وفي قطعتِه النموذجيّةِ سؤالان من تسعةٍ منها (٢٢٪) وسؤالٌ
+      واحدٌ لأفضلِ عنوان (١١٪) «always the last». وقِيس بنكُنا: ٥١٤
+      سؤالًا، منها من النوعَين **صفر**.
+
+   ٢) التحليلُ الكتابيّ: مواصفتُه في الكُتيِّبِ (ص ٢١) ترتيبُ الجملةِ
+      والترقيمُ وتنظيمُ الفقرةِ وتمييزُ المسطَّرِ الخاطئ. وكان قسمُنا
+      يسأل عن الأطروحةِ (Thesis) وعن الإيجاز — وليس واحدٌ منهما في
+      الكُتيِّبِ البتّة — ويخلو من نوعَيه الرئيسَين.
+
+   فيُفحَص بالتشغيلِ لا بالنصّ: تُحمَّل البنوكُ وتُعَدُّ الأنواعُ، وتُشغَّل
+   مولّداتُ التحليلِ ويُنظَر ما تُخرِجه.
+   ═══════════════════════════════════════════════════════════════════ */
+function bookletSpecPath(){
+  const out = [];
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  const W = (file, m) => out.push({ sev:'تنبيه', file:file, msg:m });
+
+  /* ١) بنكُ القراءةِ: النوعان موجودان وبنسبةٍ قريبةٍ من الكُتيِّب */
+  {
+    const F = 'step-reading-skills.js';
+    const need = ['step-reading.js', 'step-reading-story.js', F];
+    const miss = need.filter(f => !fs.existsSync(path.join(ROOT, f)));
+    if (miss.length){ E(F, 'ملفٌّ من بنكِ القراءةِ غائب: ' + miss.join(' · ')); return out; }
+    const sb = { window:{} };
+    vm.createContext(sb);
+    for (const f of need){
+      try { vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), sb, { timeout: 6000 }); }
+      catch(e){ E(f, 'لا يُشغَّل: ' + e.message); return out; }
+    }
+    const R = sb.window.STEP_READING || [];
+    if (!R.length){ E('step-reading.js', 'بنكُ القطعِ فارغ'); return out; }
+    let qs = 0, ctx = 0, ttl = 0;
+    const noCtx = [];
+    R.forEach(p => {
+      let c = 0;
+      (p[1] || []).forEach(q => {
+        qs++;
+        if (/closest in meaning/i.test(q[0])){ ctx++; c++; }
+        if (/best title|general meaning/i.test(q[0])) ttl++;
+      });
+      if (!c) noCtx.push(String(p[0]).slice(0, 40));
+      if (c > 1) E('step-reading-skills.js', 'قطعةٌ فيها ' + c + ' أسئلةَ معنًى — سؤالٌ واحدٌ لكلِّ قطعةٍ فلا تطغى على المهاراتِ الأربعِ الأخرى');
+    });
+    /* نسبةُ الكُتيِّب ٢٢٪ (٢ من ٩). ويُقبَل ما بين ١٢ و٣٢ — فالمقصودُ
+       ألّا تغيبَ المهارةُ ولا تطغى، لا أن يُطابَق الرقمُ حرفًا. */
+    const pc = Math.round(100 * ctx / qs);
+    if (!ctx)
+      E('step-reading-skills.js', 'لا سؤالَ لمعنى الكلمةِ في سياقِها — وهي أوّلُ مهاراتِ فهمِ المقروءِ الخمسِ في كُتيِّبِ قياسٍ و٢٢٪ من أسئلةِ قطعتِه، فيتدرّب على أربعٍ من خمس');
+    else if (pc < 12 || pc > 32)
+      E('step-reading-skills.js', 'أسئلةُ معنى الكلمةِ ' + pc + '٪ من البنكِ والكُتيِّبُ ٢٢٪ — خارجَ المدى المقبول (١٢–٣٢)');
+    if (noCtx.length > R.length * 0.25)
+      W('step-reading-skills.js', noCtx.length + ' قطعةً من ' + R.length + ' بلا سؤالِ معنًى — فجدولُ الكلماتِ لا يغطّيها');
+    if (!ttl)
+      E('step-reading-skills.js', 'لا سؤالَ لأفضلِ عنوانٍ — والكُتيِّبُ يجعله آخرَ أسئلةِ القطعةِ ويضعه في عيّنتِه');
+    /* وكلُّ سؤالٍ مُزادٍ شكلُه سليمٌ: أربعةُ خياراتٍ متمايزةٌ وجوابٌ في المدى */
+    R.forEach(p => (p[1] || []).forEach(q => {
+      if (!/closest in meaning|best title/i.test(q[0])) return;
+      const o = q[1] || [];
+      if (o.length !== 4) E('step-reading-skills.js', 'سؤالٌ مُزادٌ خياراتُه ' + o.length + ' لا أربعة: ' + String(q[0]).slice(0, 60));
+      if (new Set(o).size !== o.length) E('step-reading-skills.js', 'سؤالٌ مُزادٌ فيه خيارٌ مكرَّر: ' + String(q[0]).slice(0, 60));
+      if (!(q[2] >= 0 && q[2] < o.length)) E('step-reading-skills.js', 'فهرسُ الجوابِ خارجَ المدى: ' + String(q[0]).slice(0, 60));
+      if (String(q[3] || '').trim().length < 40)
+        E('step-reading-skills.js', 'سؤالٌ مُزادٌ شرحُه ' + String(q[3] || '').trim().length + ' حرفًا — والشرحُ هو ما يتعلّم منه إذا أخطأ: ' + String(q[0]).slice(0, 60));
+    }));
+    /* ولا عنوانَ مُعلَّقٌ على غيرِ قطعتِه */
+    const orph = sb.window.STEP_READING_TITLE_ORPHAN || [];
+    if (orph.length)
+      E('step-reading-skills.js', orph.length + ' عنوانًا لم يُطابِق قطعةً — فالعبارةُ المفتاحيّةُ تغيّرت، وقطعةٌ بلا عنوانٍ أو عنوانٌ على غيرِ قطعتِه');
+
+    /* والصفحتان تحمّلانه، وبعدَ بنكِ القصصِ لا قبلَه: بنكُ القصصِ يُلحِق
+       قطعَه الستَّ عشرةَ بـSTEP_READING، فمن حمّله قبلَها لم تنلها زيادة. */
+    ['practice.html', 'reading.html'].forEach(f => {
+      const fp = path.join(ROOT, f);
+      if (!fs.existsSync(fp)) return;
+      const fsrc = fs.readFileSync(fp, 'utf8');
+      const iSk = fsrc.indexOf('src="step-reading-skills.js"');
+      const iSt = fsrc.indexOf('src="step-reading-story.js"');
+      if (iSk < 0)
+        E(f, 'لا تحمّل step-reading-skills.js — فلا سؤالَ معنًى ولا عنوانٍ في هذه الصفحة، وتختلف ورقةٌ عن ورقة');
+      else if (iSt >= 0 && iSk < iSt)
+        E(f, 'تحمّل step-reading-skills.js قبلَ بنكِ القصص — فقطعُه الستَّ عشرةَ الطوالُ تبقى بلا سؤالِ معنًى ولا عنوان');
+    });
+
+    /* وسؤالُ العنوانِ آخرُ الأسئلةِ في الورقة — يُقاس بتشغيلِ السحبِ نفسِه */
+    /* ⚠️ كان الفحصُ ينتزع المقارِنَ ويُشغّله وحدَه، فمُطفَرًا بـif(0)
+       بقي المقارِنُ صحيحًا ولا يجري — ومرّت الطفرة. فيُشغَّل السحبُ
+       كلُّه (stepReadItems) ويُقرأ ترتيبُ ما أخرجه. */
+    const psrc = fs.readFileSync(path.join(ROOT, 'practice.html'), 'utf8');
+    const body = EXTRACT.literalAfter(psrc, /function stepReadItems\(n\)\s*/, '{', '}');
+    if (!body) E('practice.html', 'سحبُ أسئلةِ القراءةِ لا يُنتزَع');
+    else {
+      const b = { window:{ STEP_READING:R } };
+      vm.createContext(b);
+      let fn = null;
+      try {
+        /* ⚠️ تُسمّى باسمِها لا بـf: جسمُها يُسنِد إلى
+           stepReadItems.reset، فلو سُمّيت غيرَ اسمِها رمت في الصندوقِ
+           ورجعت فارغةً — فيصيح الفحصُ على نفسِه لا على الصفحة. */
+        vm.runInContext('var window = this.window;' +
+                        'function shuffle(a){ return a; }' +
+                        'function stepReadItems(n)' + body + '\n; f = stepReadItems;', b);
+        fn = b.f;
+      } catch(e){ E('practice.html', 'سحبُ القراءةِ لا يُشغَّل: ' + e.message); }
+      if (fn){
+        /* قطعةٌ مصنوعةٌ فيها سؤالان فقط: سؤالٌ عاديٌّ وسؤالُ عنوان.
+           وshuffle هنا هُويّةٌ، فالسحبُ يأخذهما بترتيبِ البنكِ — ثمّ
+           يلزم أن يُخرِجهما والعنوانُ آخرًا في الحالتَين. ولو كان
+           الفحصُ على القطعِ كما هي لم يُسحَب العنوانُ أصلًا (هو آخرُ
+           أسئلتِها) فلا يُقاس شيء، وبه مرّت الطفرة. */
+        const titleQ = ["What is the best title for this passage?", ["a","b","c","d"], 0, "x"];
+        const plainQ = ["What does paragraph (2) say?",             ["a","b","c","d"], 0, "x"];
+        let bad = 0, seen = 0;
+        [[plainQ, titleQ], [titleQ, plainQ]].forEach(function(order){
+          b.window.STEP_READING = [["A short made-up passage for the order test.", order.slice()]];
+          let got = null;
+          try { got = fn(2); } catch(e){ return; }
+          if (!got || got.length < 2) return;
+          const idx = got.findIndex(q => /best title/i.test(q[0]));
+          if (idx < 0) return;
+          seen++;
+          if (idx !== got.length - 1) bad++;
+        });
+        if (seen < 2) E('practice.html', 'سحبُ القراءةِ لا يُخرِج سؤالَ العنوانِ في تجربةِ الترتيب (' + seen + ' من ٢) — فلا يُقاس تأخيرُه');
+        else if (bad) E('practice.html', 'سؤالُ العنوانِ جاء قبلَ غيرِه في ' + bad + ' من ' + seen + ' — والكُتيِّبُ يجعله آخرَ أسئلةِ القطعةِ دائمًا');
+        b.window.STEP_READING = R;
+      }
+    }
+  }
+
+  /* ٢) مولّداتُ التحليلِ الكتابيِّ: تُشغَّل ويُنظَر ما تُخرِجه */
+  {
+    const F = 'writing-en.js', p2 = path.join(ROOT, F);
+    if (!fs.existsSync(p2)){ E(F, 'ملفُّ التعبيرِ غائب'); return out; }
+    const sb = { window:{}, document:{ createElement:() => ({ style:{}, appendChild(){}, setAttribute(){} }) } };
+    vm.createContext(sb);
+    try { vm.runInContext(fs.readFileSync(p2, 'utf8'), sb, { timeout: 8000 }); }
+    catch(e){ E(F, 'لا يُشغَّل: ' + e.message); return out; }
+    const G = (sb.window.WritingEN && sb.window.WritingEN._gens && sb.window.WritingEN._gens[3]) || [];
+    if (!G.length){ E(F, 'مولّداتُ التحليلِ الكتابيِّ غائبة'); return out; }
+    const stems = {}, full = [];
+    for (let i = 0; i < 400; i++) G.forEach(g => {
+      let q = null;
+      try { q = g(); } catch(e){ return; }
+      if (!q || !q[0]) return;
+      const plain = String(q[0]).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+      /* ⚠️ النصُّ كلُّه لا مفتاحًا مقتطعًا: الجذعُ عربيٌّ ثمّ إنجليزيٌّ،
+         فاقتطاعُ سبعين حرفًا يُسقِط الإنجليزيَّ ويكذب الفحص. */
+      full.push(plain);
+      /* ⚠️ والمفتاحُ q[4] (مفتاحُ المولّدِ) لا أوّلُ الجذع: بنودُ
+         «المسطَّرِ الخاطئ» كلُّها تبدأ بالتعليمةِ العربيّةِ نفسِها، فاقتطاعُ
+         سبعين حرفًا يجمع أربعةَ عشرَ بندًا في مفتاحٍ واحدٍ ويُفحَص
+         واحدٌ منها — وبه مرّت طفرتان. */
+      stems[String(q[4] || plain.slice(0, 70))] = q;
+      const o = q[1] || [];
+      if (o.length !== 4) E(F, 'بندُ تحليلٍ خياراتُه ' + o.length + ' لا أربعة: ' + plain.slice(0, 50));
+      if (new Set(o).size !== o.length) E(F, 'بندُ تحليلٍ فيه خيارٌ مكرَّر: ' + plain.slice(0, 50));
+      if (!(q[2] >= 0 && q[2] < o.length)) E(F, 'بندُ تحليلٍ فهرسُ جوابِه خارجَ المدى: ' + plain.slice(0, 50));
+    });
+    const all = full.join(' || ');
+    /* النوعان اللذان يوجبهما الكُتيِّبُ صريحًا */
+    if (!/correct word order/i.test(all))
+      E(F, 'لا بندَ لترتيبِ الجملةِ الكامل — وهو المثالُ الأوّلُ في مواصفةِ التحليلِ الكتابيِّ بكُتيِّبِ قياس');
+    if (!/incorrect underlined/i.test(all))
+      E(F, 'لا بندَ لتمييزِ المسطَّرِ الخاطئ — وهو مثالا الكُتيِّبِ الثالثُ والرابعُ، وله تعليمةٌ خاصّةٌ في الاختبار');
+    /* وما ليس في المواصفةِ لا يُسأل عنه في هذا القسم */
+    if (/Thesis Statement/i.test(all))
+      E(F, 'سؤالُ الأطروحةِ (Thesis) في قسمِ التحليلِ الكتابيّ — وليس في مواصفةِ الكُتيِّبِ البتّة، وهو من كتابةِ المقالِ لا تحليلِه');
+    if (/most concise/i.test(all))
+      E(F, 'سؤالُ الإيجازِ في قسمِ التحليلِ الكتابيّ — وليس في مواصفةِ الكُتيِّب');
+    /* ولبندِ المسطَّرِ أربعةُ مواضعَ مسطَّرةٍ في جملتِه، وخياراتُه منها.
+       ⚠️ وتُفحَص البنودُ كلُّها لا أوّلُ ما يُصادَف: أُطفِر بندٌ واحدٌ
+       بتسطيرٍ ناقصٍ فمرّ، لأنّ الفحصَ كان يقف على أوّلِ بندٍ يجده. */
+    {
+      const uns = Object.values(stems).filter(q => /incorrect underlined/i.test(String(q[0])));
+      if (!uns.length) E(F, 'لا بندَ مسطَّرًا يُفحَص شكلُه');
+      uns.forEach(un => {
+        const u = (String(un[0]).match(/<u>/g) || []).length;
+        const head = String(un[0]).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').slice(-70);
+        if (u !== 4) E(F, 'بندُ المسطَّرِ فيه ' + u + ' موضعًا مسطَّرًا لا أربعة («…' + head + '») — وصيغةُ الكُتيِّبِ أربعةُ خياراتٍ مسطَّرةٍ في الجملة');
+        const opts = (un[1] || []).map(x => String(x).replace(/<[^>]*>/g, '').trim());
+        const sent = String(un[0]).replace(/<[^>]*>/g, ' ');
+        const outside = opts.filter(o => sent.indexOf(o) < 0);
+        if (outside.length) E(F, 'خيارٌ في بندِ المسطَّرِ ليس في جملتِه: «' + outside[0] + '» («…' + head + '»)');
+      });
+    }
+  }
+  return out;
+}
+
 function voidRowsPath(){
   const out = [];
   const F = 'void-rows.js', p = path.join(ROOT, F);
