@@ -1577,7 +1577,11 @@ function bookletSpecPath(){
            stepReadItems.reset، فلو سُمّيت غيرَ اسمِها رمت في الصندوقِ
            ورجعت فارغةً — فيصيح الفحصُ على نفسِه لا على الصفحة. */
         vm.runInContext('var window = this.window;' +
-                        'function shuffle(a){ return a; }' +
+                        /* ⚠️ والمُخلِّطُ هنا يقلب الترتيبَ قلبًا لا يُبقيه: لو كان هُويّةً
+                           لما ظهر أثرُ خلطٍ أُدخِل على الصفحةِ، ومرّت طفرةُ
+                           «خلطُ أسئلةِ القطعة». والقلبُ حتميٌّ فيُقاس. */
+                        'function shuffle(a){ if(a && a.reverse) a.reverse(); return a; }' +
+                        'function stepReadLong(n){ return []; }' +
                         'function stepReadItems(n)' + body + '\n; f = stepReadItems;', b);
         fn = b.f;
       } catch(e){ E('practice.html', 'سحبُ القراءةِ لا يُشغَّل: ' + e.message); }
@@ -1603,6 +1607,180 @@ function bookletSpecPath(){
         if (seen < 2) E('practice.html', 'سحبُ القراءةِ لا يُخرِج سؤالَ العنوانِ في تجربةِ الترتيب (' + seen + ' من ٢) — فلا يُقاس تأخيرُه');
         else if (bad) E('practice.html', 'سؤالُ العنوانِ جاء قبلَ غيرِه في ' + bad + ' من ' + seen + ' — والكُتيِّبُ يجعله آخرَ أسئلةِ القطعةِ دائمًا');
         b.window.STEP_READING = R;
+      }
+    }
+  }
+
+  /* ١٫٥) الطبقةُ الطويلةُ — على مقاسِ العيّنةِ الرسميّة ═══════════════
+     قطعةُ الكُتيِّبِ ٤١٢ كلمةً · ٦ فقراتٍ مرقّمةٍ · ٩ أسئلةٍ منها خمسٌ
+     تُحيل إلى فقرةٍ واثنتان «closest in meaning» وواحدةٌ للعنوان. وأخطرُ
+     ما يُفقَد صامتًا: أن تُعرَض القطعةُ في كلِّ بطاقةٍ (أربعةُ آلافِ كلمةٍ
+     على الشاشة) أو ألّا تُعرَض البتّةَ (سؤالٌ بلا قطعة). */
+  {
+    const LF = 'step-reading-long.js', lp = path.join(ROOT, LF);
+    if (!fs.existsSync(lp)) E(LF, 'الطبقةُ الطويلةُ غائبة — فالقطعُ كلُّها ثمانٍ وخمسون كلمةً بسؤالَين، والبنكُ عند السقف');
+    else {
+      const lb = { window:{} };
+      vm.createContext(lb);
+      try { vm.runInContext(fs.readFileSync(lp, 'utf8'), lb, { timeout: 6000 }); }
+      catch(e){ E(LF, 'لا تُشغَّل: ' + e.message); }
+      const L = lb.window.STEP_READING_LONG || [];
+      if (!L.length) E(LF, 'لا قطعةَ طويلةً');
+      else {
+        L.forEach((pas, i) => {
+          const txt = String(pas[0] || ''), qs = pas[1] || [];
+          const words = txt.split(/\s+/).filter(Boolean).length;
+          const paras = txt.split('\n').length;
+          if (words < 300) E(LF, 'القطعةُ [' + i + '] ' + words + ' كلمةً — ودون ثلاثِ مئةٍ ليست «medium length» بمعيارِ الكُتيِّب (عيّنتُه ٤١٢)');
+          if (paras < 4) E(LF, 'القطعةُ [' + i + '] ' + paras + ' فقرةً — والأسئلةُ تُحيل إلى فقراتٍ مرقَّمة، فأقلُّ من أربعٍ لا تحمل الإحالات');
+          if (qs.length < 7) E(LF, 'القطعةُ [' + i + '] فيها ' + qs.length + ' أسئلةً — وعيّنةُ الكُتيِّبِ تسعة، ومن قرأ أربعَ مئةِ كلمةٍ لأقلَّ من سبعةٍ أهدر زمنَه');
+          let refs = 0, ctx = 0, ttl = 0;
+          qs.forEach((q, j) => {
+            const st = String(q[0] || '');
+            if (/paragraph \((\d)\)/.test(st)){
+              refs++;
+              const pn = +(/paragraph \((\d)\)/.exec(st)[1]);
+              if (pn > paras) E(LF, 'القطعةُ [' + i + '] سؤالٌ يُحيل إلى الفقرةِ (' + pn + ') وفقراتُها ' + paras + ' — إحالةٌ إلى فقرةٍ لا وجودَ لها');
+            }
+            if (/closest in meaning/i.test(st)) ctx++;
+            if (/best title|general meaning/i.test(st)){
+              ttl++;
+              if (j !== qs.length - 1) E(LF, 'القطعةُ [' + i + '] سؤالُ العنوانِ في الموضعِ ' + (j + 1) + ' لا آخرًا — والكُتيِّبُ يجعله آخرَ أسئلةِ القطعةِ دائمًا');
+            }
+            const o = q[1] || [];
+            if (o.length !== 4) E(LF, 'القطعةُ [' + i + '] سؤالٌ خياراتُه ' + o.length + ' لا أربعة');
+            if (new Set(o).size !== o.length) E(LF, 'القطعةُ [' + i + '] سؤالٌ فيه خيارٌ مكرَّر: ' + st.slice(0, 50));
+            if (!(q[2] >= 0 && q[2] < o.length)) E(LF, 'القطعةُ [' + i + '] فهرسُ الجوابِ خارجَ المدى');
+            if (String(q[3] || '').trim().length < 30) E(LF, 'القطعةُ [' + i + '] سؤالٌ بلا شرحٍ كافٍ: ' + st.slice(0, 50));
+          });
+          if (refs < 3) E(LF, 'القطعةُ [' + i + '] فيها ' + refs + ' إحالةً إلى فقرةٍ مرقَّمةٍ — وخمسٌ من تسعةٍ في عيّنةِ الكُتيِّب');
+          if (!ctx) E(LF, 'القطعةُ [' + i + '] بلا سؤالِ معنى كلمةٍ في سياقِها — واثنان من تسعةٍ في العيّنة');
+          if (!ttl) E(LF, 'القطعةُ [' + i + '] بلا سؤالِ عنوان');
+        });
+        /* والسحبُ يُشغَّل: القطعةُ مرّةً واحدةً في أوّلِ أسئلتِها، وما بعدَه
+           يُحال إليها، والترتيبُ محفوظٌ والعنوانُ آخرًا. */
+        const psrc2 = fs.readFileSync(path.join(ROOT, 'practice.html'), 'utf8');
+        const lbody = EXTRACT.literalAfter(psrc2, /function stepReadLong\(n\)\s*/, '{', '}');
+        const mkb = EXTRACT.literalAfter(psrc2, /function mkLong\(pas, q, first\)\s*/, '{', '}');
+        const mq = /var LONG_Q = (\d+)/.exec(psrc2), mm = /var LONG_MIN = (\d+)/.exec(psrc2);
+        if (!lbody || !mkb || !mq || !mm) E('practice.html', 'سحبُ الطبقةِ الطويلةِ لا يُنتزَع');
+        else if (+mq[1] < 7)
+          E('practice.html', 'سقفُ أسئلةِ القطعةِ الطويلةِ ' + mq[1] + ' — وعيّنةُ الكُتيِّبِ تسعةٌ، ومن قرأ أربعَ مئةِ كلمةٍ لسؤالَين رجع إلى عطبِ القصارِ نفسِه');
+        else {
+          const c = { window:{ STEP_READING_LONG:L } };
+          vm.createContext(c);
+          let fn2 = null;
+          try {
+            vm.runInContext('var window = this.window;' +
+                            /* ⚠️ والمُخلِّطُ هنا يقلب الترتيبَ قلبًا لا يُبقيه: لو كان هُويّةً
+                           لما ظهر أثرُ خلطٍ أُدخِل على الصفحةِ، ومرّت طفرةُ
+                           «خلطُ أسئلةِ القطعة». والقلبُ حتميٌّ فيُقاس. */
+                        'function shuffle(a){ if(a && a.reverse) a.reverse(); return a; }' +
+                            'var LONG_Q = ' + mq[1] + ', LONG_MIN = ' + mm[1] + ';' +
+                            'function mkLong(pas, q, first)' + mkb +
+                            '\nfunction stepReadLong(n)' + lbody + '\n; f = stepReadLong;', c);
+            fn2 = c.f;
+          } catch(e){ E('practice.html', 'سحبُ الطويلةِ لا يُشغَّل: ' + e.message); }
+          if (fn2){
+            let got = null;
+            try { got = fn2(27); } catch(e){ E('practice.html', 'سحبُ الطويلةِ يرمي: ' + e.message); }
+            if (!got || got.length < 9)
+              E('practice.html', 'سحبُ الطويلةِ أخرج ' + (got ? got.length : 0) + ' سؤالًا من ٢٧ مطلوبًا — فالطبقةُ لا تُستعمَل');
+            else {
+              const withPas = got.filter(q => /<div style="background/.test(q[0])).length;
+              const groups = Math.ceil(got.length / (+mq[1]));
+              if (withPas !== groups)
+                E('practice.html', 'نصُّ القطعةِ يظهر في ' + withPas + ' بطاقةً والمجموعاتُ ' + groups + ' — فإمّا يُكرَّر في كلِّ بطاقةٍ (آلافُ الكلماتِ على الشاشة) أو تُعرَض بلا قطعة');
+              if (!/Refer to the passage above/i.test(got.map(q => q[0]).join(' ')))
+                E('practice.html', 'الأسئلةُ التاليةُ لا تُحيل إلى القطعةِ أعلاه — فيظنُّها الطالبُ أسئلةً بلا نصّ');
+              const first = got[0];
+              if (!/<div style="background/.test(first[0]))
+                E('practice.html', 'أوّلُ سؤالٍ في المجموعةِ بلا نصِّ القطعة');
+              /* والعنوانُ آخرُ مجموعتِه */
+              for (let g = 0; g < groups; g++){
+                const seg = got.slice(g * (+mq[1]), (g + 1) * (+mq[1]));
+                const ti = seg.findIndex(q => /best title/i.test(q[0]));
+                if (ti >= 0 && ti !== seg.length - 1)
+                  E('practice.html', 'سؤالُ العنوانِ في الموضعِ ' + (ti + 1) + ' من مجموعةٍ طولُها ' + seg.length + ' — لا آخرًا');
+              }
+              /* وترتيبُ الأسئلةِ ترتيبُ الفقرات (ص ١٤): «Questions follow
+                 the paragraphs of a passage in sequence». فأرقامُ
+                 الإحالاتِ لا تتناقص داخلَ المجموعة. */
+              for (let g = 0; g < groups; g++){
+                const seg = got.slice(g * (+mq[1]), (g + 1) * (+mq[1]));
+                let last = 0, drop = 0;
+                seg.forEach(q => {
+                  const m2 = /paragraph \((\d)\)/.exec(String(q[0]));
+                  if (!m2) return;
+                  const v = +m2[1];
+                  if (v < last) drop++;
+                  last = v;
+                });
+                if (drop) E('practice.html', 'أرقامُ الفقراتِ تتناقص ' + drop + ' مرّةً في مجموعةٍ واحدة — والكُتيِّبُ: الأسئلةُ تتبع الفقراتِ بالتسلسل، فخلطُها يُفسِد المسحَ الذي يبني عليه الطالب');
+              }
+              /* والفقراتُ مرقَّمةٌ في المعروض */
+              if (!/>1\)</.test(first[0]) || !/>2\)</.test(first[0]))
+                E('practice.html', 'فقراتُ القطعةِ غيرُ مرقَّمةٍ في العرض — والأسئلةُ تُحيل إلى «paragraph (4)»، فلا يَعرف أيَّ فقرةٍ يقرأ');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* ١٫٧) وسحبُ القراءةِ يستعمل الطبقةَ الطويلةَ فعلًا، ويُمرّر الشرحَ
+     المؤلَّف. وكلاهما عطبٌ صامتٌ: الطبقةُ تبقى في الملفِّ ولا تُسحَب،
+     أو تُسحَب ويُرمى شرحُ كلِّ سؤالٍ ويوضع مكانَه سطرٌ عامّ. */
+  {
+    const pf2 = 'practice.html', pp2 = path.join(ROOT, pf2);
+    const psrc3 = fs.existsSync(pp2) ? fs.readFileSync(pp2, 'utf8') : '';
+    const sbody = EXTRACT.literalAfter(psrc3, /function stepReadItems\(n\)\s*/, '{', '}');
+    const lbody2 = EXTRACT.literalAfter(psrc3, /function stepReadLong\(n\)\s*/, '{', '}');
+    const mkb2 = EXTRACT.literalAfter(psrc3, /function mkLong\(pas, q, first\)\s*/, '{', '}');
+    const mkS = EXTRACT.literalAfter(psrc3, /var mk = function\(pas, q\)\s*\{/, '{', '}');
+    const mq2 = /var LONG_Q = (\d+)/.exec(psrc3), mm2 = /var LONG_MIN = (\d+)/.exec(psrc3);
+    const lpath = path.join(ROOT, 'step-reading-long.js');
+    if (!sbody || !lbody2 || !mkb2 || !mq2 || !mm2 || !fs.existsSync(lpath))
+      E(pf2, 'سحبُ القراءةِ لا يُنتزَع كاملًا — فلا يُقاس استعمالُ الطبقةِ الطويلة');
+    else {
+      const box = { window:{} };
+      vm.createContext(box);
+      try {
+        ['step-reading.js', 'step-reading-story.js', 'step-reading-skills.js', 'step-reading-long.js']
+          .forEach(f => vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), box, { timeout: 6000 }));
+        vm.runInContext('var window = this.window;' +
+                        /* ⚠️ والمُخلِّطُ هنا يقلب الترتيبَ قلبًا لا يُبقيه: لو كان هُويّةً
+                           لما ظهر أثرُ خلطٍ أُدخِل على الصفحةِ، ومرّت طفرةُ
+                           «خلطُ أسئلةِ القطعة». والقلبُ حتميٌّ فيُقاس. */
+                        'function shuffle(a){ if(a && a.reverse) a.reverse(); return a; }' +
+                        'var LONG_Q = ' + mq2[1] + ', LONG_MIN = ' + mm2[1] + ';' +
+                        'function mkLong(pas, q, first)' + mkb2 +
+                        '\nfunction stepReadLong(n)' + lbody2 +
+                        '\nfunction stepReadItems(n)' + sbody + '\n; f = stepReadItems;', box, { timeout: 6000 });
+      } catch(e){ E(pf2, 'سحبُ القراءةِ لا يُشغَّل مع الطبقةِ الطويلة: ' + e.message); }
+      if (typeof box.f === 'function'){
+        let got2 = null;
+        try { got2 = box.f(32); } catch(e){ E(pf2, 'سحبُ القراءةِ يرمي: ' + e.message); }
+        if (!got2 || !got2.length) E(pf2, 'سحبُ ٣٢ سؤالَ قراءةٍ أخرج فراغًا');
+        else {
+          const numbered = got2.filter(q => />1\)</.test(q[0]) && />2\)</.test(q[0])).length;
+          if (!numbered)
+            E(pf2, 'سحبُ القراءةِ لا يُخرِج قطعةً طويلةً واحدةً من ٣٢ سؤالًا — فالطبقةُ في الملفِّ ولا تُستعمَل، والقطعُ كلُّها ٥٨ كلمةً بسؤالَين كما كانت');
+          /* والشرحُ المؤلَّفُ يصل إلى الورقة: أسئلةُ المعنى والعنوانِ
+             شرحُها مكتوبٌ بعينِه، فلو رُمي لصار السطرُ العامَّ في كلِّها. */
+          /* ⚠️ والطبقتان تُفحَصان كلٌّ على حدة: لكلٍّ سطرُ شرحٍ احتياطيٌّ
+             خاصٌّ بها، فلو رُمي الشرحُ في القصارِ وحدَها بقي المؤلَّفُ
+             في الطوالِ فلا يَبين شيء — ومرّت طفرةٌ من هذا البابِ. */
+          const GEN = 'الجواب من نصّ القطعة نفسها';
+          const isLong = q => />1\)</.test(q[0]) || /Refer to the passage above/i.test(q[0]);
+          [['الطوال', got2.filter(isLong)], ['القصار', got2.filter(q => !isLong(q))]].forEach(([nm, set]) => {
+            const typed = set.filter(q => /closest in meaning|best title/i.test(q[0]));
+            if (!typed.length) return;
+            const generic = typed.filter(q => String(q[3] || '').indexOf(GEN) === 0);
+            if (generic.length === typed.length)
+              E(pf2, 'شرحُ أسئلةِ المعنى والعنوانِ في ' + nm + ' يُرمى ويوضع مكانَه سطرٌ عامّ (' + typed.length + ' سؤالًا) — والشرحُ هو ما يتعلّم منه إذا أخطأ');
+          });
+        }
       }
     }
   }

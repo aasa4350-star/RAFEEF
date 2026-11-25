@@ -80,7 +80,7 @@
 <script src="pace.js"></script>
 <!-- صفوفٌ أُبطِلت بطلبٍ صريح: المفتاحُ لا يحذف، فالإبطالُ هنا -->
 <script src="void-rows.js"></script>
-<script src="build-check.js?v=71ff558f95" defer></script>
+<script src="build-check.js?v=302e093d42" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -97,6 +97,8 @@
 <script src="step-reading.js"></script>
 <!-- قصصُ فهدٍ التاريخيّةُ والعلميّة — تُدمَج في STEP_READING (ملاحظةُ فهد ٢ نوفمبر ٢٠٢٦) -->
 <script src="step-reading-story.js"></script>
+<!-- الطبقةُ الطويلةُ على مقاسِ كُتيِّبِ قياس: ٤٠٠ كلمةٍ · ٦ فقراتٍ مرقّمةٍ · ٩ أسئلة -->
+<script src="step-reading-long.js"></script>
 <!-- مهارتا «معنى الكلمةِ في سياقِها» و«أفضلُ عنوان» — يوجبهما كُتيِّبُ قياسٍ ولم تكونا في البنك -->
 <script src="step-reading-skills.js"></script>
 <script src="mawhiba2.js"></script>
@@ -1542,6 +1544,68 @@ function stepWeightsHtml(){
    يقرأ ستَّ قطعٍ في جلسةٍ واحدة. ونصُّ القطعةِ يُعاد على بطاقتَي
    سؤالَيها لأنّ العارضَ بطاقةٌ لكلِّ سؤال. */
 var STEP_MIX_W = { read:6, struct:4, write:2 };
+/* ═══ الطبقةُ الطويلةُ — قطعةٌ واحدةٌ تُعطي تسعةَ أسئلةٍ لا سؤالَين ═══
+   قطعةُ العيّنةِ في كُتيِّبِ قياسٍ ٤١٢ كلمةً بتسعةِ أسئلة. ومن قرأ أربعَ
+   مئةِ كلمةٍ ليُجيبَ سؤالَين لم يُقِس فهمًا وأهدر زمنَه، فسقفُ القصارِ
+   (سؤالان) لا يصلح هنا.
+
+   والقطعةُ تُعرَض مرّةً واحدةً في أوّلِ أسئلتِها، وما بعدَه يُحال إليها:
+   تسعُ بطاقاتٍ كلُّ واحدةٍ فيها أربعُ مئةِ كلمةٍ = أربعةُ آلافِ كلمةٍ على
+   الشاشةِ لقطعةٍ واحدة. والاختبارُ الحقيقيُّ يعرضها مرّةً وتحتها أسئلتُها.
+   وأسئلةُ المجموعةِ متجاورةٌ مرتَّبةٌ لأنّ stepFullMix يضع القراءةَ أوّلًا
+   بترتيبِها وrenderSet لا يُعيد ترتيبَ البنود — يحرسه فحصُ checks. */
+var LONG_Q = 9;          /* أسئلةُ القطعةِ الطويلةِ كما في العيّنة */
+var LONG_MIN = 6;        /* ما دون هذا من أسئلةٍ باقيةٍ تحت السقفِ لا يُسحَب */
+function mkLong(pas, q, first){
+  if(!first) return '<b>فهم المقروء:</b><div style="color:var(--muted);font-size:.9rem;margin:6px 0">↑ ارجع إلى القطعة أعلاه · Refer to the passage above.</div>'+q[0];
+  var paras = String(pas[0]).split("\n").map(function(t, i){
+    return '<div style="margin:0 0 9px"><b style="color:var(--accent)">'+(i+1)+')</b> '+t+'</div>';
+  }).join("");
+  return '<b>فهم المقروء:</b><div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;direction:ltr;text-align:left;font-size:.95rem;line-height:1.85">'+paras+'</div>'+q[0];
+}
+function stepReadLong(n){
+  var L = window.STEP_READING_LONG || [];
+  stepReadLong.reset = false;
+  if(!L.length || n < LONG_MIN) return [];
+  var keyOf = function(p, q){ return [mkLong(p, q, true), q[1], q[2], q[3]]; };
+  var left = function(p){
+    if(!window.SeenCap) return (p[1] || []).length;
+    var k = 0;
+    (p[1] || []).forEach(function(q){ if(SeenCap.count(keyOf(p, q)) < SeenCap.CAP) k++; });
+    return k;
+  };
+  var avail = L.map(function(p, i){ return { i:i, k:left(p) }; }).filter(function(x){ return x.k >= LONG_MIN; });
+  var wantPas = Math.min(Math.floor(n / LONG_Q), L.length);
+  if(wantPas < 1) return [];
+  /* ودورةٌ جديدةٌ تُعلَن ولا تُخفى: إن لم يبقَ ما يكفي صُفِّر عدُّ هذه
+     الطبقةِ وحدَها، كما في بنكِ القصار. */
+  if(avail.length < wantPas && window.SeenCap){
+    stepReadLong.reset = true;
+    L.forEach(function(p){ (p[1] || []).forEach(function(q){ SeenCap.forget(keyOf(p, q)); }); });
+    avail = L.map(function(p, i){ return { i:i, k:(p[1] || []).length }; });
+  }
+  shuffle(avail);
+  avail.sort(function(a, b){ return b.k - a.k; });
+  var out = [];
+  for(var i = 0; i < avail.length && out.length + LONG_MIN <= n; i++){
+    var pas = L[avail[i].i], pool = pas[1].slice();
+    if(window.SeenCap && !stepReadLong.reset)
+      pool = pool.filter(function(q){ return SeenCap.count(keyOf(pas, q)) < SeenCap.CAP; });
+    if(pool.length < LONG_MIN) continue;
+    /* ترتيبُ البنكِ هو ترتيبُ القطعةِ — والكُتيِّبُ: الأسئلةُ تتبع
+       الفقراتِ بالتسلسل. فلا يُخلَط، وسؤالُ العنوانِ يُؤخَّر. */
+    var take = pool.slice(0, Math.min(LONG_Q, n - out.length));
+    take.sort(function(a, b){
+      return (/best title|general meaning/i.test(a[0]) ? 1 : 0) -
+             (/best title|general meaning/i.test(b[0]) ? 1 : 0);
+    });
+    take.forEach(function(q, j){
+      out.push([mkLong(pas, q, j === 0), q[1].slice(), q[2],
+                q[3] || 'الجواب من نصّ القطعة نفسها.']);
+    });
+  }
+  return out;
+}
 function stepReadItems(n){
   var R = window.STEP_READING || [];
   if(!R.length) return [];
@@ -1558,6 +1622,10 @@ function stepReadItems(n){
   };
   var out = [], order;
   stepReadItems.reset = false;
+  /* الطبقةُ الطويلةُ أوّلًا، ثمّ تُكمِل القصارُ ما بقي — فالكُتيِّبُ يجمع
+     بين «medium length» و«in some cases a short reading passage». */
+  var lg = stepReadLong(n);
+  if(lg.length) out = lg;
   var qkey = function(p, q){ return [mk(p, q), q[1], q[2], q[3]]; };
   if(window.SeenCap){
     var left = function(p){
@@ -1593,10 +1661,14 @@ function stepReadItems(n){
       return (/best title|general meaning/i.test(a[0]) ? 1 : 0) -
              (/best title|general meaning/i.test(b[0]) ? 1 : 0);
     });
+    /* ⚠️ وكان الشرحُ المؤلَّفُ لكلِّ سؤالٍ يُرمى ويوضع مكانَه سطرٌ عامّ،
+       فشرحُ «معنى الكلمةِ» وشرحُ «أفضلِ عنوانٍ» لا يُقرآن أبدًا — والشرحُ
+       هو ما يتعلّم منه إذا أخطأ. فيُقدَّم المؤلَّفُ ويُبقى العامُّ لمن
+       لا شرحَ له. */
     qs.forEach(function(q){
       out.push([mk(pas, q),
                 q[1].slice(), q[2],
-                'الجواب من نصّ القطعة نفسها — ارجع إليه وابحث عن الجملة التي تحمل المعنى، لا عن الكلمة نفسها.']);
+                q[3] || 'الجواب من نصّ القطعة نفسها — ارجع إليه وابحث عن الجملة التي تحمل المعنى، لا عن الكلمة نفسها.']);
     });
   }
   return out;
