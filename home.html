@@ -76,7 +76,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:28px}
 </style>
-<script src="build-check.js?v=841c31ac3b" defer></script>
+<script src="build-check.js?v=ec802d2121" defer></script>
 </head>
 <body>
 <div class="wrap"><div id="app"></div><div id="report"></div><footer id="foot"></footer></div>
@@ -428,7 +428,16 @@ async function loadReport(){
     var untrustedTxt=function(p){ if(p.meta.trusted!==false) return '';
       /* سببُ الاستبعادِ يُقال: «نقر» غيرُ «خرج من الصفحة» — وعلاجُهما مختلف.
          ووسمُ النقرِ لا يسقط بعد ٤٨ ساعة: هو حكمٌ على الجلسةِ لا تنبيهٌ عابر. */
-      var why = (p.meta.why==="fast") ? (' <b style="color:var(--bad)">🚫 نقر — '+(p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':'')+' · غير محتسبة</b>') : null;
+      /* ⚠️ و«rush» سببٌ ثالثٌ زِيد في ٢٥ نوفمبرَ ٢٠٢٦: ورقةٌ موقوتةٌ
+         سُلّمت في أقلَّ من ربعِ زمنِها. ولو لم يُفرَد لقيل عنها «حلّ
+         سريع ودرجة منخفضة» — وهو كذبٌ على ورقةِ فهدٍ: درجتُها ٦٥٪
+         ومتوسّطُها أحدَ عشرَ ثانيةً للسؤالِ، والعلّةُ أنّ الورقةَ لها
+         ستٌّ وثمانون دقيقةً وسلّمها في تسع. */
+      var why = (p.meta.why==="rush")
+        ? (' <b style="color:var(--bad)">🚫 سلّمها في '+
+           (p.meta.allot&&p.meta.dur!=null?Math.round(p.meta.dur/p.meta.allot*100)+'٪ من وقتها':'جزءٍ من وقتها')+
+           ' · غير محتسبة</b>')
+        : (p.meta.why==="fast") ? (' <b style="color:var(--bad)">🚫 نقر — '+(p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':'')+' · غير محتسبة</b>') : null;
       if(why) return why;
       return fresh(p) ? ' <b style="color:var(--bad)">🚫 غير محتسبة</b>' : ''; };
     var durTxt=function(p){ var s=''; var d=p.meta.dur; if(d!=null){ var spw=p.meta.total?Math.round(d/p.meta.total):d; var warn=(p.meta.total && spw<2 && fresh(p))?' <span style="color:var(--bad)">⚠️ سريع جدًا</span>':''; s+=' · ⏱️ '+d+'ث ('+spw+'ث/سؤال)'+warn; } if(p.meta.exits && fresh(p)){ s+=' · <span style="color:var(--bad)">🚪 خرج من الصفحة '+p.meta.exits+' مرة'+(p.meta.away?' (غاب '+p.meta.away+'ث)':'')+' ⚠️</span>'; } return s; };
@@ -860,7 +869,7 @@ async function loadReport(){
                 '<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">'+
                   String(p.meta.essay).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];})+
                 '</div></details></li>' : '';
-            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
+            var un = (p.meta.trusted===false) ? ' <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة ('+(p.meta.why==="rush"?"تسليمٌ مبكّر"+(p.meta.allot&&p.meta.dur!=null?" — "+Math.round(p.meta.dur/p.meta.allot*100)+"٪ من وقتها":""):p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة")+(p.meta.secPerQ!=null?' · <bdi dir="ltr">'+p.meta.secPerQ+'</bdi>ث/سؤال':'')+')</span>' : '';
             return '<li>'+lesson+': <b style="color:'+col+'">'+p.meta.correct+'/'+p.meta.total+' ('+pc+'%)</b> <span style="color:var(--muted);font-size:.8rem">'+RR.stamp(saTime(rowTime(p)))+'</span>'+un+'</li>'+ess; })+
           '</div>';
       });

@@ -73,7 +73,7 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:24px}
 </style>
-<script src="build-check.js?v=841c31ac3b" defer></script>
+<script src="build-check.js?v=ec802d2121" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"><p class="empty"><span class="spin"></span> جارٍ التحميل...</p></div>
@@ -319,6 +319,9 @@ async function main(){
     const fresh=p=> !window.RR || RR.freshFlag(p);
     const durTxt=p=>{ let s=``; const d=p.meta.dur; if(d!=null){ const spw=p.meta.total?Math.round(d/p.meta.total):d; const warn=(p.meta.total && spw<2 && fresh(p))?` <span style="color:var(--bad)">⚠️ سريع جدًا</span>`:``; s+=` · ⏱️ ${d}ث (${spw}ث/سؤال)${warn}`; } if(p.meta.exits && fresh(p)){ s+=` · <span style="color:var(--bad)">🚪 خرج من الصفحة ${p.meta.exits} مرة${p.meta.away?` (غاب ${p.meta.away}ث)`:``} ⚠️</span>`; } return s; };
     const untrustedTxt=p=>{ if(p.meta.trusted!==false) return ``;
+      /* و«rush» ورقةٌ موقوتةٌ سُلّمت في أقلَّ من ربعِ زمنِها — انظر
+         تعليقَ home.html: لا تُجمَع مع «حلٍّ سريعٍ ودرجةٍ منخفضة». */
+      if(p.meta.why==="rush") return ` <b style="color:var(--bad)">🚫 سلّمها في ${p.meta.allot&&p.meta.dur!=null?Math.round(p.meta.dur/p.meta.allot*100)+'٪ من وقتها':'جزءٍ من وقتها'} · غير محتسبة</b>`;
       if(p.meta.why==="fast") return ` <b style="color:var(--bad)">🚫 نقر — ${p.meta.secPerQ!=null?p.meta.secPerQ+'ث/سؤال':''} · غير محتسبة</b>`;
       return fresh(p) ? ` <b style="color:var(--bad)">🚫 غير محتسبة</b>` : ``; };
     /* بلاغ الأب (٣١ أغسطس ٢٠٢٦): «احذف قسم لغتي حق أسامة، لأنه حق صفّ
@@ -783,7 +786,7 @@ async function main(){
               `<li style="list-style:none;margin-top:6px"><details style="background:var(--bg);border-radius:11px;padding:4px 11px">`+
               `<summary style="cursor:pointer;font-weight:800;padding:7px 0">📝 إجابتك في السؤال المقالي — وضعت لنفسك <b style="color:var(--accent)">${p.meta.essaySelf!=null?p.meta.essaySelf:'؟'} من ${p.meta.essayMax||6}</b></summary>`+
               `<div style="padding:4px 0 10px;white-space:pre-wrap;line-height:2;font-size:.93rem">${esc(p.meta.essay)}</div></details></li>` : ``;
-            const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
+            const un = p.meta.trusted===false ? ` <span style="color:var(--bad);font-size:.8rem">🚫 غير محتسبة (${p.meta.why==="rush"?"تسليمٌ مبكّر"+(p.meta.allot&&p.meta.dur!=null?" — "+Math.round(p.meta.dur/p.meta.allot*100)+"٪ من وقتها":""):p.meta.why==="burst"?"نقر متتابع":p.meta.why==="paste"?"نصٌّ ملصوق":"حلّ سريع ودرجة منخفضة"}${p.meta.secPerQ!=null?` · <bdi dir="ltr">${p.meta.secPerQ}</bdi>ث/سؤال`:``})</span>` : ``;
             return `<li>${lesson}: <b style="color:${col}">${p.meta.correct}/${p.meta.total} (${pc}%)</b> <span style="color:var(--muted);font-size:.8rem">${RR.stamp(saTime(RR.when(p)))}</span>${un}</li>`+ess; })+
           `</div>`;
       });

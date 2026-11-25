@@ -54,26 +54,62 @@
   var FAST_SEC = 8;    /* متوسّطُ أقلَّ من هذا للسؤال = نقرٌ لا حلّ */
   var FAST_ONE = 3;    /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ تُعدّ متسرّعة */
   var MIN_PCT  = 70;   /* ومع السرعةِ درجةٌ دون هذا — فالسريعُ الصحيحُ يُحسب */
+  var RUSH_PCT = 25;   /* ورقةٌ موقوتةٌ سُلّمت في أقلَّ من هذا من زمنِها */
 
   /* الأبناءُ الذين يسري عليهم الحارسُ في صفحاتِ المنهج.
      وفهدٌ محكومٌ في practice.html بـPACE_ON هناك، لا هنا. */
   var ON = { hasan: 1, osama: 1 };
 
   window.PACE = {
-    FAST_SEC: FAST_SEC, FAST_ONE: FAST_ONE, MIN_PCT: MIN_PCT,
+    FAST_SEC: FAST_SEC, FAST_ONE: FAST_ONE, MIN_PCT: MIN_PCT, RUSH_PCT: RUSH_PCT,
     on: function(who){ return !!ON[String(who || "").toLowerCase()]; },
 
-    /* الحكمُ على الجلسة. يُعيد {trusted, why, per, quick, weak} */
+    /* ═══ أبوابُ النقرِ — نسخةٌ واحدةٌ تقرؤها الصفحاتُ كلُّها ═══════════
+       كانت القاعدةُ مكتوبةً ثلاثَ مرّات: هنا، وفي حفظِ practice.html،
+       وفي لوحةِ التنبيهِ التي تُعرَض للولد. وتفرّقت النسخُ فظهر العيبُ:
+       الشرطُ `fast > Math.floor(total/2)` في ورقةِ اثنَي عشرَ سؤالًا
+       يلزمه سبعةٌ — فستّةٌ من اثنَي عشرَ، أي نصفُ الورقةِ مخمَّنًا في
+       أقلَّ من ثلاثِ ثوانٍ، تمرّ محسوبة. وقِيس في جلساتِ فهدٍ: تحصيليُّ
+       ٢٥ نوفمبر ١١:٠٠ — ٧/١٢ في ١١٠ ثانيةً وستُّ متسرّعاتٍ — محسوبة.
+       فصار البابُ `>= Math.ceil(total/2)`، والحسابُ في موضعٍ واحد.
+
+       وأبوابٌ أربعة، ولكلٍّ علّتُه:
+         slow  : متوسّطُ السؤالِ دون ثماني ثوانٍ — لم يقرأ السؤال.
+         burst : نصفُ الورقةِ أو أكثرُ في أقلَّ من ثلاثِ ثوانٍ، ومع ضعفِ
+                 الدرجة. وشرطُ الدرجةِ لازمٌ: قِيس أنّ البابَ غيرَ
+                 المشروطِ يشطب ثلاثَ جلساتٍ لحسنٍ ١١/١٢ (٩٢٪) — وهو
+                 عينُ ما رفضه الأبُ في ٧ أكتوبرَ بصورةِ «١٣/١٣ في ٤٧
+                 ثانية». فالسريعُ الصحيحُ معرفةٌ لا تخمين.
+         third : ثلثُ الورقةِ متسرّعًا — في الورقةِ الموقوتةِ وحدَها.
+         rush  : سُلّمت في أقلَّ من ربعِ زمنِها المرصود.
+       والبابان الأخيران بلا شرطِ درجةٍ، وعلّتُه أنّهما حكمٌ على
+       استحالةٍ لا على تخمين: اثنتا عشرةَ قطعةَ قراءةٍ في ٥٢٧ ثانيةً =
+       أربعٌ وأربعون ثانيةً للقطعةِ لو لم يُجِب سؤالًا غيرَها — فالدرجةُ
+       مهما علت لا تقيس فهمًا. ولا يعملان إلّا إذا جاء allot، أي في
+       ورقةٍ لها زمنٌ مرصودٌ معلوم. */
+    quickness: function(o){
+      o = o || {};
+      var total = +o.total || 0, fast = +o.fast || 0, allot = +o.allot || 0;
+      var per  = (o.dur != null && total) ? (o.dur / total) : null;
+      var weak = total ? ((+o.correct || 0) / total) * 100 < MIN_PCT : false;
+      var slow  = (per != null && per < FAST_SEC);
+      var burst = (total > 0 && fast > 0 && fast >= Math.ceil(total / 2) && weak);
+      var third = (allot > 0 && total > 0 && fast > total / 3);
+      var rush  = (allot > 0 && o.dur != null && (o.dur / allot) * 100 < RUSH_PCT);
+      return { per:per, weak:weak, slow:slow, burst:burst, third:third, rush:rush,
+               any:(slow || burst || third || rush),
+               why:(rush ? "rush" : ((third || burst) ? "burst" : "fast")) };
+    },
+
+    /* الحكمُ على الجلسة. يُعيد {trusted, why, per, quick, weak}
+       وبابُ البطءِ هنا مشروطٌ بالدرجةِ — خلافًا لفهدٍ في practice.html،
+       وعلّتُه في صدرِ الملفّ: مادّةُ حسنٍ وأسامةَ سؤالُ سطرٍ لا حسابٌ. */
     judge: function(dur, total, fast, correct){
-      var per = (dur != null && total) ? (dur / total) : null;
-      if(per == null) return { trusted:true, per:null, quick:false, weak:false };
-      var tooMany = (fast || 0) > Math.floor(total / 2);
-      var quick = (per < FAST_SEC) || tooMany;
-      var weak  = total ? ((correct / total) * 100 < MIN_PCT) : false;
-      if(quick && weak)
-        return { trusted:false, why:(tooMany && per >= FAST_SEC ? "burst" : "fast"),
-                 per:per, quick:true, weak:true };
-      return { trusted:true, per:per, quick:quick, weak:weak };
+      var Q = this.quickness({ dur:dur, total:total, fast:fast, correct:correct });
+      if(Q.per == null) return { trusted:true, per:null, quick:false, weak:false };
+      if((Q.slow && Q.weak) || Q.burst || Q.third || Q.rush)
+        return { trusted:false, why:Q.why, per:Q.per, quick:true, weak:Q.weak };
+      return { trusted:true, per:Q.per, quick:(Q.slow || Q.any), weak:Q.weak };
     },
 
     /* ═══ يُقال له في وجهه، لا في تقريرِ أبيه وحدَه ═══════════════════

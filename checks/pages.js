@@ -330,6 +330,7 @@ function run(){
   issues.push(...listenPath());
   issues.push(...fragmentPath());
   issues.push(...pacePath());
+  issues.push(...quicknessPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
@@ -789,10 +790,12 @@ function paceCurriculum(){
   /* ═══ شرطُ الدرجةِ هو الفرقُ بين هذا الحارسِ وما رفضه الأب ═════════ */
   const mp = /var MIN_PCT\s*=\s*(\d+)/.exec(src);
   if (!mp) E(f, 'شرطُ الدرجةِ ساقط — فعاد الحكمُ على السرعةِ وحدَها، وهو ما رفضه الأبُ في ٧ أكتوبر');
-  if (!/var weak\s*=.*correct\s*\/\s*total.*MIN_PCT/.test(src))
-    E(f, 'weak لا تُحسب من الدرجة — فلا شرطَ درجةٍ فعليًّا مهما كانت MIN_PCT');
-  if (!/if\(quick && weak\)/.test(src))
-    E(f, 'الاستبعادُ لا يشترط الاثنَين معًا — فجلسةٌ سريعةٌ صحيحةٌ تُشطَب، وهي شكوى الأب «١٣/١٣ ما تُحسب لك»');
+  /* ⚠️ وكان هنا فحصان معلَّقان بنصَّين حرفيَّين: «var weak = … MIN_PCT»
+     و«if(quick && weak)». فلمّا نُقِل الحسابُ إلى PACE.quickness نسخةً
+     واحدةً — وهو إصلاحٌ يزيد الحمايةَ لا ينقصها — صاح الفحصان والسلوكُ
+     أصحُّ ممّا كان. وهذا الدرسُ تكرّر في هذا الملفِّ مرّاتٍ: الحارسُ
+     يقيس سلوكًا لا يَحفظ صياغة. فالشرطُ المزدوجُ وحدُّ الدرجةِ يُقاسان
+     الآن بتشغيلِ judge في quicknessPath — انظرها. */
   /* وأنّ لا طريقَ ثانيًا إلى trusted:false غيرَ ذلك الشرطِ المزدوج */
   const falses = (src.match(/trusted\s*:\s*false/g) || []).length;
   if (falses !== 1)
@@ -1303,8 +1306,31 @@ function pacePath(){
   if (!fs.existsSync(p)) return out;
   const src = fs.readFileSync(p, 'utf8');
   const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
-  if (!/var FAST_SEC = \d+/.test(src) || !/var FAST_ONE = \d+/.test(src))
-    E(f, 'عتبتا السرعة غير معرّفتَين — لا يُعرف النقرُ من الحلّ');
+  /* ⚠️ كان الفحصُ /var FAST_SEC = \d+/ بحرفِه — أي يشترط رقمًا مكتوبًا
+     في الصفحة. وهذا عينُ ما أورث العيبَ: رقمٌ هنا ورقمٌ في pace.js،
+     فإن غُيّر أحدُهما بقي الآخرُ ولا يصيح شيء. فالعتبةُ الآن تُقرأ من
+     pace.js، والمقياسُ أنّها تُقرأ فعلًا: يُشغَّل عدُّ المتسرّعةِ بعتبةٍ
+     مختلقةٍ في PACE ويُنظَر هل تَبِعها. */
+  {
+    const mo = /var FAST_ONE = ([^;]+);/.exec(src);
+    const mg = /if\(__gap < ([^)]+?)\) __fastN\+\+;/.exec(src);
+    if (!mo) E(f, 'عتبةُ الإجابةِ المتسرّعةِ غيرُ معرّفة — لا يُعرف النقرُ من الحلّ');
+    else if (!mg) E(f, 'عدُّ الإجاباتِ المتسرّعةِ غائبٌ — فمن نقر نصفَ الورقةِ ثمّ تركها مفتوحةً يُفلت');
+    else {
+      const sb = {};
+      vm.createContext(sb);
+      let fn = null;
+      try {
+        vm.runInContext('var PACE = { FAST_ONE: 7, FAST_SEC: 11 };' +
+                        'var FAST_ONE = ' + mo[1] + ';' +
+                        'f = function(__gap){ var __fastN = 0; if(__gap < ' + mg[1] + ') __fastN++; return __fastN; };', sb);
+        fn = sb.f;
+      } catch(e){}
+      if (!fn) E(f, 'عدُّ المتسرّعةِ لا يُشغَّل');
+      else if (fn(6999) !== 1 || fn(7001) !== 0)
+        E(f, 'عتبةُ المتسرّعةِ مكتوبةٌ في الصفحةِ لا مقروءةٌ من pace.js — فنسختان تتفرّقان، ومن هذا البابِ مرّ نصفُ ورقةٍ مخمَّنًا محسوبًا');
+    }
+  }
   /* ═══ الحكمُ بالاختبارِ لا بالطفلِ وحدَه ══════════════════════════
      كان الحارسُ على الصفحةِ كلِّها فوقع على حسنٍ ورفيفَ في «قدرات —
      لفظي»، فطلب الأب (٦ أكتوبر ٢٠٢٦) قصرَه على فهد — ومعنى كلمةٍ
@@ -1342,7 +1368,7 @@ function pacePath(){
       });
     }
   }
-  if (!/if\(paceOn\(test\) && per != null/.test(src))
+  if (!/if\(paceOn\(test\)/.test(src))
     E(f, 'الوسمُ لا يستشير paceOn — فيقع على جولةٍ رُفِع عنها أو يُفلت من جولةٍ تُحكَم');
   if (!/if\(!paceOn\(label\)\) return;/.test(src))
     E(f, 'التنبيهُ على الشاشةِ لا يستشير paceOn');
@@ -1373,9 +1399,8 @@ function pacePath(){
   }
   if (!/meta\.trusted = false; meta\.why =/.test(src))
     E(f, 'الجلسةُ المتسرّعةُ لا تُوسَم — ستدخل المتوسّط');
-  /* معياران: المتوسّطُ وعددُ المتسرّعة */
-  if (!/per < FAST_SEC \|\| tooMany/.test(src))
-    E(f, 'معيارٌ واحدٌ فقط — من نقر ثمّ ترك الصفحةَ مفتوحةً يُفلت');
+  /* والأبوابُ نفسُها صارت تُقاس بتشغيلِ الحفظِ في quicknessPath — فلا
+     يُعلَّق هنا نصٌّ حرفيٌّ لحسابٍ انتقل إلى pace.js. */
   /* ويُقال للطفلِ في وجهِه */
   /* ⚠️ كان الفحصُ /data-pace/ فيطابق data-paceX بعد الكسرِ فلا يصيح —
      وهي ثالثُ مرّةٍ يقع فيها هذا في هذا الملفّ. فالقوسان يلزمان. */
@@ -1395,6 +1420,277 @@ function pacePath(){
   }
   return out;
 }
+/* ═══════════════════════════════════════════════════════════════════
+   أبوابُ النقرِ — تُشغَّل لا تُوصَف
+   ═══════════════════════════════════════════════════════════════════
+   ورقةُ فهدٍ في ٢٥ نوفمبرَ ٢٠٢٦ (٠٧:٠٣): النموذجُ الكاملُ ثمانيةٌ
+   وأربعون سؤالًا، زمنُها المرصودُ ٥١٨٤ ثانيةً والعدّادُ ظاهرٌ أمامه،
+   سُلّمت في ٥٢٧ ثانيةً — عُشرَ الزمن — وفيها اثنتا عشرةَ قطعةَ قراءةٍ
+   أي أربعٌ وأربعون ثانيةً للقطعةِ لو لم يُجِب سؤالًا غيرَها. ومرّت
+   محسوبةً فدخلت المعدَّل، لأنّ العتبتَين معايَرتان لورقةِ تراكيبَ من
+   اثنَي عشرَ سؤالًا: أحدَ عشرَ ثانيةً للسؤالِ فوقَ الثماني، وتسعَ عشرةَ
+   متسرّعةً دونَ نصفِ الثمانيةِ والأربعين.
+
+   وانكشف معه عيبٌ ثانٍ أقدمُ وأوسعُ أثرًا: الشرطُ كان
+   `fast > Math.floor(total/2)`، فورقةُ اثنَي عشرَ سؤالًا تحتاج سبعًا —
+   أي أنّ ستًّا من اثنَي عشرَ، نصفَ الورقةِ مخمَّنًا في أقلَّ من ثلاثِ
+   ثوانٍ، تمرّ محسوبة. وقِيس: تحصيليُّ فهدٍ ٢٥ نوفمبرَ ١١:٠٠ — ٧/١٢ في
+   ١١٠ ثانيةً وستُّ متسرّعاتٍ — محسوبة.
+
+   وعلّةُ العيبَين واحدة: القاعدةُ كانت مكتوبةً ثلاثَ نسخٍ — في pace.js،
+   وفي حفظِ practice.html، وفي لوحةِ التنبيهِ التي تُعرَض للولد — فما
+   صُحِّح في واحدةٍ لا يَبلغ أختَها ولا يصيح شيء. فصارت نسخةً واحدةً
+   (PACE.quickness)، وهذا الحارسُ يُشغّلها ويُشغّل الحفظَ نفسَه على
+   صفوفٍ مقيسةٍ من قاعدةِ البيانات — لا يفحص نصًّا.
+
+   والخطُّ الأحمر: جلسةٌ سريعةٌ صحيحةٌ تُحسَب. أرسل الأبُ في ٧ أكتوبرَ
+   صورةَ «١٣/١٣ في ٤٧ ثانية — ما تُحسب لك» وقال: «شِلّ الخاصّية منهم
+   كلّهم ما عدا فهد». فمن حالاتِ هذا الحارسِ ثلاثُ جلساتٍ لحسنٍ ١١/١٢
+   (٩٢٪) ونصفُ ورقتِها متسرّعٌ — إن سقطت واحدةٌ منها فالحارسُ خطأٌ لا
+   الجلسة.
+   ═══════════════════════════════════════════════════════════════════ */
+function quicknessPath(){
+  const out = [];
+  const F = 'pace.js', p = path.join(ROOT, F);
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  if (!fs.existsSync(p)) { E(F, 'حارسُ التأنّي غائبٌ كلَّه'); return out; }
+  const src = fs.readFileSync(p, 'utf8');
+
+  /* ١) النسخةُ الواحدةُ تُشغَّل */
+  const sb = { window:{} };
+  vm.createContext(sb);
+  try { vm.runInContext(src, sb, { timeout: 4000 }); }
+  catch(e){ E(F, 'pace.js لا تُشغَّل: ' + e.message); return out; }
+  const P = sb.window.PACE;
+  if (!P || typeof P.quickness !== 'function'){
+    E(F, 'PACE.quickness غائبةٌ — فلا نسخةَ واحدةً للقاعدة، وتعود النسخُ تتفرّق');
+    return out;
+  }
+
+  /* ٢) حالاتٌ مقيسةٌ من صفوفِ القاعدةِ لا مؤلَّفة */
+  const CASES = [
+    { d:'نموذجُ فهدٍ ٢٥ نوفمبر ٠٧:٠٣ — ٥٢٧ث من ٥١٨٤ وفيها ١٢ قطعةَ قراءة',
+      in:{ dur:527, total:48, fast:19, correct:31, allot:5184 },
+      exp:{ any:true, why:'rush', rush:true, third:true } },
+    { d:'تحصيليُّ فهدٍ ٢٥ نوفمبر ١١:٠٠ — ٦ من ١٢ دون ثلاثِ ثوانٍ ودرجةٌ ٥٨٪',
+      in:{ dur:110, total:12, fast:6, correct:7 },
+      exp:{ any:true, why:'burst', burst:true, rush:false, third:false } },
+    { d:'ستيبُ فهدٍ ٢٥ نوفمبر ١١:٠٢ — ٥ متسرّعاتٍ ودرجةٌ ٨٣٪',
+      in:{ dur:133, total:12, fast:5, correct:10 }, exp:{ any:false } },
+    { d:'ستيبُ فهدٍ ٢٥ نوفمبر ٠٧:٤٤ — ١١/١٢ في ١٧٨ث',
+      in:{ dur:178, total:12, fast:4, correct:11 }, exp:{ any:false } },
+    /* ═══ الخطُّ الأحمر: سريعٌ صحيحٌ يُحسَب (٧ أكتوبر ٢٠٢٦) ═══ */
+    { d:'حسنٌ ١١/١٢ في ١١٩ث و٨ متسرّعات — سريعٌ صحيح',
+      in:{ dur:119, total:12, fast:8, correct:11 }, exp:{ any:false, burst:false } },
+    { d:'حسنٌ ١١/١٢ في ١٨١ث و١٠ متسرّعات — سريعٌ صحيح',
+      in:{ dur:181, total:12, fast:10, correct:11 }, exp:{ any:false, burst:false } },
+    { d:'فهدٌ ١١/١٢ في ١٧٥ث و٦ متسرّعات — سريعٌ صحيح',
+      in:{ dur:175, total:12, fast:6, correct:11 }, exp:{ any:false, burst:false } },
+    /* ═══ الحدودُ بعينِها ═══ */
+    { d:'نصفُ الورقةِ بالضبطِ مع ضعفِ الدرجةِ — ٦ من ١٢',
+      in:{ dur:120, total:12, fast:6, correct:6 }, exp:{ burst:true } },
+    { d:'وأقلُّ من النصفِ بواحدٍ لا يُستبعَد — ٥ من ١٢',
+      in:{ dur:120, total:12, fast:5, correct:6 }, exp:{ burst:false, any:false } },
+    { d:'ربعُ الزمنِ بالضبطِ ليس تسليمًا مبكّرًا — ١٢٩٦ من ٥١٨٤',
+      in:{ dur:1296, total:48, fast:0, correct:40 }, exp:{ rush:false, any:false } },
+    { d:'ودونَ الربعِ بثانيةٍ يُستبعَد — ١٢٩٥ من ٥١٨٤',
+      in:{ dur:1295, total:48, fast:0, correct:40, allot:5184 }, exp:{ rush:true, any:true } },
+    { d:'ثلثُ الورقةِ بالضبطِ ليس نقرًا — ١٦ من ٤٨',
+      in:{ dur:3000, total:48, fast:16, correct:40, allot:5184 }, exp:{ third:false, any:false } },
+    { d:'وفوقَ الثلثِ بواحدٍ نقرٌ — ١٧ من ٤٨',
+      in:{ dur:3000, total:48, fast:17, correct:40, allot:5184 }, exp:{ third:true, any:true } },
+    /* ═══ ورقةٌ بلا زمنٍ مرصودٍ لا يُحكَم عليها بحدِّ الربع ═══ */
+    { d:'ورقةٌ بلا زمنٍ مرصودٍ — بابا الموقوتةِ مغلقان',
+      in:{ dur:1, total:48, fast:48, correct:48 }, exp:{ rush:false, third:false } },
+    /* ═══ ومصيدةُ الصفر: Math.ceil(0/2) = 0 و0 >= 0 صحيحٌ ═══ */
+    { d:'ورقةٌ فارغةٌ لا تُوسَم',
+      in:{ dur:0, total:0, fast:0, correct:0 }, exp:{ burst:false, any:false } }
+  ];
+  /* والحالةُ الأولى في القائمةِ ناقصةُ allot عمدًا في موضعَين أعلاه
+     لأنّ تحصيليَّ الصفحةِ بلا زمنٍ مرصود — فلو زِيد لصار الفحصُ كاذبًا. */
+  CASES.forEach(c => {
+    let r = null;
+    try { r = P.quickness(c.in); } catch(e){ E(F, 'quickness ترمي في «' + c.d + '»: ' + e.message); return; }
+    Object.keys(c.exp).forEach(k => {
+      if (r[k] !== c.exp[k])
+        E(F, 'حكمٌ خطأٌ في «' + c.d + '»: ' + k + ' = ' + JSON.stringify(r[k]) +
+             ' والصوابُ ' + JSON.stringify(c.exp[k]));
+    });
+  });
+
+  /* ٣) وسياستا الضمِّ تختلفان عن قصدٍ: بابُ البطءِ مشروطٌ بالدرجةِ في
+     صفحاتِ المنهجِ (حسنٌ وأسامةُ: سؤالُ سطرٍ لا حساب) وغيرُ مشروطٍ
+     لفهدٍ في practice.html (تحصيليٌّ وستيبُ). فيُقاس الفرقُ لا يُوصَف. */
+  if (typeof P.judge !== 'function') E(F, 'PACE.judge غائبة — وصفحاتُ المنهجِ تنادِيها');
+  else {
+    const j1 = P.judge(100, 20, 0, 18);          /* ٥ث للسؤالِ ودرجةٌ ٩٠٪ */
+    if (j1.trusted !== true)
+      E(F, 'صفحاتُ المنهجِ تشطب جلسةً سريعةً صحيحةً (١٨/٢٠ في ١٠٠ث) — وهو عينُ ما رفعه الأبُ في ٧ أكتوبر');
+    const q1 = P.quickness({ dur:100, total:20, fast:0, correct:18 });
+    if (q1.any !== true)
+      E(F, 'بابُ البطءِ لا يفتح لفهدٍ في جلسةٍ ٥ث للسؤال — وحارسُه غيرُ مشروطٍ بالدرجةِ بطلبِ الأب');
+    const j2 = P.judge(100, 20, 0, 10);          /* بطيءٌ وضعيف */
+    if (j2.trusted !== false)
+      E(F, 'صفحاتُ المنهجِ لا تشطب جلسةً سريعةً ضعيفةً — فالحارسُ هناك معطَّل');
+    /* وحدُّ الدرجةِ نفسُه يُقاس بحدِّه: فلو صار weak ثابتًا — أو سقط
+       حسابُه من الدرجةِ — لمرّ الفحصان أعلاه ولم يَبِن شيء. */
+    const mp2 = /var MIN_PCT\s*=\s*(\d+)/.exec(src);
+    const pct = mp2 ? +mp2[1] : 70;
+    const at  = P.judge(500, 100, 0, pct);       /* على الحدِّ بالضبط */
+    const un  = P.judge(500, 100, 0, pct - 1);   /* دونه بنقطة */
+    if (at.trusted !== true)
+      E(F, 'الدرجةُ على حدِّ ' + pct + '٪ تُشطَب — والحدُّ «دونَه» لا «عندَه»');
+    if (un.trusted !== false)
+      E(F, 'حدُّ الدرجةِ لا أثرَ له: جلسةٌ بطيئةٌ درجتُها ' + (pct - 1) + '٪ تمرّ — فشرطُ الدرجةِ حرفٌ لا عمل');
+  }
+
+  /* ٤) والصفحةُ تنادِي النسخةَ الواحدةَ ولا تكتب حسابَها ثانية */
+  const PF = 'practice.html', pp = path.join(ROOT, PF);
+  if (!fs.existsSync(pp)) { E(PF, 'صفحةُ التدرّبِ غائبة'); return out; }
+  const psrc = fs.readFileSync(pp, 'utf8');
+  if (!/<script src="pace\.js">/.test(psrc))
+    E(PF, 'الصفحةُ لا تحمّل pace.js — فالقاعدةُ تُكتَب فيها نسخةً ثانيةً وتتفرّق كما تفرّقت');
+  const qargs = psrc.match(/PACE\.quickness\(\{[^}]*\}\)/g) || [];
+  if (qargs.length < 2)
+    E(PF, 'نداءاتُ PACE.quickness ' + qargs.length + ' والمطلوبُ موضعان: الحفظُ ولوحةُ التنبيه — فأحدُهما يحكم بغيرِ حكمِ الآخر، ويرى الولدُ «محسوبة» ويقرأ أبوه «مستبعَدة»');
+  const noAllot = qargs.filter(s => !/allot\s*:/.test(s));
+  if (noAllot.length)
+    E(PF, 'موضعٌ ينادي الحارسَ بلا زمنٍ مرصودٍ (' + noAllot.length + ' من ' + qargs.length + ') — فبابُ الورقةِ الموقوتةِ مغلقٌ هناك');
+  if (/Math\.(floor|ceil)\(\s*total\s*\/\s*2\s*\)/.test(psrc))
+    E(PF, 'حسابُ نصفِ الورقةِ مكتوبٌ في الصفحةِ ثانيةً — وهذا عينُ البابِ الذي مرّ منه نصفُ ورقةٍ مخمَّنًا محسوبًا');
+
+  /* ٥) وزمنُ الورقةِ المرصودُ يُحمَل في التوقيتِ — ويُقاس بتشغيلِه */
+  {
+    const mr = /var RUSH_ON = ([^;]+);/.exec(psrc);
+    const mt = /function __timing\(\)\s*\{([\s\S]*?)\n  \}/.exec(psrc);
+    if (!mr) E(PF, 'لا يُعرَف أيُّ ورقةٍ يُحكَم عليها بحدِّ الربع');
+    else if (!mt) E(PF, '__timing غائبةٌ — فلا زمنَ ولا عدَّ متسرّعة');
+    else ['sf', 's', 't', 'full', 'mwf'].forEach(id => {
+      const b = {};
+      vm.createContext(b);
+      let fn = null;
+      try {
+        vm.runInContext('var id = ' + JSON.stringify(id) + ';' +
+                        'var secsAll = 5184, __t0 = Date.now(), __fastN = 3;' +
+                        'var RUSH_ON = ' + mr[1] + ';' +
+                        'f = function(){' + mt[1] + '\n};', b);
+        fn = b.f;
+      } catch(e){}
+      if (!fn) { E(PF, '__timing لا تُشغَّل عند «' + id + '»'); return; }
+      let t = null;
+      try { t = fn(); } catch(e){ E(PF, '__timing ترمي عند «' + id + '»'); return; }
+      if (t.dur == null || t.fast == null)
+        E(PF, '__timing لا تحمل الزمنَ أو عددَ المتسرّعةِ عند «' + id + '»');
+      if (id === 'sf' && !(t.allot > 0))
+        E(PF, 'ورقةُ النموذجِ الكاملِ تُحفَظ بلا زمنٍ مرصود — فلا يُعرَف أنّ ٥٢٧ ثانيةً عُشرُ زمنِها، ويمرّ التسليمُ المبكّرُ محسوبًا');
+      if (id !== 'sf' && t.allot)
+        E(PF, 'زمنُ «' + id + '» المرصودُ يُحمَل وحدُّ الربعِ لم يُقَس عليه — ولا يُعمَّم حكمٌ قبلَ قياسِه');
+    });
+  }
+
+  /* ٦) والسببُ يُقال صادقًا في التقريرَين ═══════════════════════════
+     «rush» سببٌ ثالثٌ غيرُ «fast» و«burst». ولو وقع في فرعِ الآخرَين
+     قرأ الأبُ عن ورقةِ فهدٍ «حلّ سريع ودرجة منخفضة» — ودرجتُها ٦٥٪
+     ومتوسّطُها أحدَ عشرَ ثانيةً للسؤال، والعلّةُ أنّها ستٌّ وثمانون
+     دقيقةً سُلّمت في تسع. فيُشغَّل نصُّ التقريرِ على صفٍّ منقورٍ وآخرَ
+     مستعجلٍ ويُتحقَّق أنّهما لا يُقالان بعبارةٍ واحدة.
+
+     وثَمّ موضعٌ ثالثٌ للعبارةِ نفسِها (lessonLi في الصفحاتِ الثلاث)،
+     فيُفحَص بالنصِّ: لا تُنتزَع دالّةٌ مكتوبةٌ داخلَ قالبٍ نصّيٍّ. */
+  ['home.html', 'child.html', 'index.html'].forEach(rf => {
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) return;
+    const rsrc = fs.readFileSync(rp, 'utf8');
+    const cells = rsrc.match(/trusted===false[\s\S]{0,400}?حلّ سريع ودرجة منخفضة/g) || [];
+    cells.forEach(c => {
+      if (!/why===?"rush"/.test(c))
+        E(rf, 'موضعٌ يعرض سببَ الاستبعادِ ولا يعرف «التسليمَ المبكّر» — فيُقال عن ورقةِ فهدٍ «حلّ سريع ودرجة منخفضة» وهو كذب');
+    });
+  });
+  [['home.html', /var untrustedTxt=function\(p\)\s*/], ['child.html', /const untrustedTxt=p=>\s*/]].forEach(([rf, re]) => {
+    const rp = path.join(ROOT, rf);
+    if (!fs.existsSync(rp)) return;
+    const rsrc = fs.readFileSync(rp, 'utf8');
+    const body = EXTRACT.literalAfter(rsrc, re, '{', '}');
+    if (!body){ E(rf, 'نصُّ سببِ الاستبعادِ لا يُنتزَع — فلا يُقاس ما يقرؤه الأب'); return; }
+    const b = { window:{} };
+    vm.createContext(b);
+    let fn = null;
+    try {
+      vm.runInContext('var window = {}; var fresh = function(){ return true; }; var RR = null;' +
+                      'f = function(p)' + body + ';', b);
+      fn = b.f;
+    } catch(e){}
+    if (!fn){ E(rf, 'نصُّ سببِ الاستبعادِ لا يُشغَّل'); return; }
+    let tr = '', tf = '';
+    try {
+      tr = String(fn({ meta:{ trusted:false, why:'rush', dur:527, allot:5184, total:48, secPerQ:11 } }) || '');
+      tf = String(fn({ meta:{ trusted:false, why:'fast', dur:64,  total:12, secPerQ:5.3 } }) || '');
+    } catch(e){ E(rf, 'نصُّ سببِ الاستبعادِ يرمي: ' + e.message); return; }
+    if (!tr.trim())
+      E(rf, 'الورقةُ المسلَّمةُ مبكّرًا تُعرَض بلا سببٍ — فيختفي حكمُها بلا بيان');
+    if (tr === tf)
+      E(rf, 'التسليمُ المبكّرُ والنقرُ يُقالان بعبارةٍ واحدة — وعلاجُهما مختلف');
+    if (/حلّ سريع ودرجة منخفضة/.test(tr))
+      E(rf, 'التسليمُ المبكّرُ يُقال «حلّ سريع ودرجة منخفضة» — وهو كذبٌ: المتوسّطُ ١١ث للسؤالِ والدرجةُ ٦٥٪، والعلّةُ عُشرُ الزمن');
+    if (tr.indexOf('10') < 0 && tr.indexOf('١٠') < 0)
+      E(rf, 'لا تُقال نسبةُ ما استُهلك من زمنِ الورقة — وهي الرقمُ الذي يُفهَم منه الحكم');
+  });
+
+  /* ٧) والحكمُ الأخيرُ: يُشغَّل الحفظُ نفسُه ويُقرأ الصفُّ الخارج.
+     فلا يكفي أن تكون القاعدةُ صحيحةً والنداءُ موجودًا: بينهما سطورٌ
+     قد تُبطِل الوسمَ أو تُسقِط سببَه أو تنسى زمنَ الورقة. */
+  {
+    const body = EXTRACT.literalAfter(psrc, /function saveScore\([^)]*\)\s*/, '{', '}');
+    const mpo = /function paceOn\(test\)\{([\s\S]*?)\n\}/.exec(psrc);
+    if (!body) E(PF, 'saveScore لا تُنتزَع — فلا يُقاس الصفُّ الذي يُحفَظ');
+    else if (!mpo) E(PF, 'paceOn لا تُنتزَع');
+    else {
+      const ROWS = [
+        { d:'النموذجُ الكاملُ المنقورُ (٥٢٧ث من ٥١٨٤)', test:'STEP — نموذج كامل ⏱️',
+          c:31, t:48, T:{ dur:527, fast:19, allot:5184 },
+          exp:{ trusted:false, why:'rush', allot:5184 } },
+        { d:'تحصيليُّ ١١:٠٠ (نصفُ الورقةِ متسرّعًا ودرجةٌ ٥٨٪)', test:'تحصيلي',
+          c:7, t:12, T:{ dur:110, fast:6, allot:0 },
+          exp:{ trusted:false, why:'burst' } },
+        { d:'ستيبُ ١١:٠٢ (٨٣٪ و٥ متسرّعات)', test:'STEP إنجليزي',
+          c:10, t:12, T:{ dur:133, fast:5, allot:0 },
+          exp:{ trusted:undefined } },
+        { d:'جلسةُ حسنٍ السريعةُ الصحيحةُ ١١/١٢ في ١١٩ث', test:'STEP إنجليزي',
+          c:11, t:12, T:{ dur:119, fast:8, allot:0 },
+          exp:{ trusted:undefined } }
+      ];
+      ROWS.forEach(r => {
+        let captured = null;
+        const box = {
+          window:{}, PACE:P, SENIOR:true, who:'fahad', name:'فهد',
+          GRADES:{ fahad:'ثالث ثانوي' }, SUPA_URL:'x', SUPA_KEY:'y',
+          JSON:JSON, Date:Date, Math:Math, RegExp:RegExp,
+          fetch:function(){ },
+          AQ:{ post:function(u, k, b){ captured = b; } }
+        };
+        box.window.AQ = box.AQ;
+        vm.createContext(box);
+        try {
+          vm.runInContext('var PACE_ON = (who === "fahad");' +
+                          'function paceOn(test){' + mpo[1] + '\n}' +
+                          'function saveScore(test, correct, total, wrongs, skills, pid, timing, seen)' + body +
+                          'saveScore(' + JSON.stringify(r.test) + ',' + r.c + ',' + r.t +
+                          ',[],{}, "pid", ' + JSON.stringify(r.T) + ', []);', box, { timeout: 4000 });
+        } catch(e){ E(PF, 'الحفظُ يرمي في «' + r.d + '»: ' + e.message); return; }
+        if (!captured || !captured.meta){ E(PF, 'لا صفَّ يُحفَظ في «' + r.d + '»'); return; }
+        const m = captured.meta;
+        Object.keys(r.exp).forEach(k => {
+          if (m[k] !== r.exp[k])
+            E(PF, 'الصفُّ المحفوظُ خطأٌ في «' + r.d + '»: ' + k + ' = ' + JSON.stringify(m[k]) +
+                 ' والصوابُ ' + JSON.stringify(r.exp[k]));
+        });
+      });
+    }
+  }
+  return out;
+}
+
 function fragmentPath(){
   const out = [];
   const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
@@ -9586,9 +9882,15 @@ function gdosePath(){
      وقائمةُ حسنٍ قِيست على بابَين (ستيبُ و«قواعدُ مركّزة») لا بابٍ
      واحدٍ: بالنافذةِ الضيّقةِ وحدَها خرجت أربعُ قواعدَ منها اثنتان لا
      محلَّ لهما، لأنّ العيّنةَ ثمانيةُ بنودٍ لا ستّون. */
+  /* وقائمةُ فهدٍ أُعيد قياسُها في ٢٥ نوفمبرَ ٢٠٢٦ على نافذةِ منذ ١٠
+     نوفمبر: Modal 38٪ (37 بندًا) · If 40٪ (25) · Comparative 42٪ (24) ·
+     Past 49٪ (45) · Pronouns 51٪ (43) · Verb+to/ing 52٪ (52) · Present
+     54٪ (26) · For/Since 62٪ (26). فخرج «For / Since / Used to» وقد
+     ارتفع إلى أعلى القائمة، ودخل «Verb + to / ing / base» وهو ٥٢٪ على
+     عيّنةٍ ضِعفَي عيّنتِه وأخطأ فيه مرّتَين في نموذجِ ٢٥ نوفمبر. */
   const WANT_BY = {
     fahad: ['Present Tenses','Past Tenses','If Conditions',
-            'Comparative / Superlative','Modal Auxiliaries','For / Since / Used to'],
+            'Comparative / Superlative','Modal Auxiliaries','Verb + to / ing / base'],
     hasan: ['Past Tenses','Countable / Uncountable','Passive Voice',
             'If Conditions','Relative Clauses']
   };

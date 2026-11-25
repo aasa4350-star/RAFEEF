@@ -75,7 +75,10 @@
   .fr .frd{padding:0 5px}
 </style>
 <script src="seen-cap.js"></script>
-<script src="build-check.js?v=841c31ac3b" defer></script>
+<!-- حارسُ التأنّي: نسخةُ القاعدةِ الوحيدة. كانت مكتوبةً هنا مرّتَين
+     (في الحفظِ وفي لوحةِ التنبيه) وهناك مرّةً، فتفرّقت وظهر العيب. -->
+<script src="pace.js"></script>
+<script src="build-check.js?v=ec802d2121" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -157,8 +160,17 @@ var STEP_WEIGHTED = (who==="fahad" || who==="hasan");
    الستّين لكنّها لم تتحرّك، وثبوتٌ فوقَ الضعفِ أَولى بالتعليمِ من
    انحدارٍ لم يبدأ. */
 var GD_BY_CHILD = {
+  /* ═══ جرعةُ فهدٍ أُعيد قياسُها في ٢٥ نوفمبرَ ٢٠٢٦ ═══════════════════
+     القائمةُ تُبنى على القياسِ لا على الحفظ، فأُعيد القياسُ على نافذةِ
+     منذ ١٠ نوفمبر: Modal 38٪ (37 بندًا) · If 40٪ (25) · Comparative
+     42٪ (24) · Past 49٪ (45) · Pronouns 51٪ (43) · Verb+to/ing 52٪
+     (52) · Present 54٪ (26) · For/Since 62٪ (26).
+     فـ«For / Since» ارتفع إلى ٦٢٪ وهو أعلى القائمة، و«الفعلُ الثاني»
+     ٥٢٪ على عيّنةٍ ضِعفَي عيّنتِه وأخطأ فيه مرّتَين في نموذجِ ٢٥
+     نوفمبر — فبُدّل مكانَه. وأمّا Pronouns (٥١٪) فبينه وبين Present
+     (٥٤٪) ثلاثُ نقاطٍ وهي داخلُ الضجيج، فلا يُبدَّل على فرقٍ كهذا. */
   fahad: ["Present Tenses", "Past Tenses", "If Conditions",
-          "Comparative / Superlative", "Modal Auxiliaries", "For / Since / Used to"],
+          "Comparative / Superlative", "Modal Auxiliaries", "Verb + to / ing / base"],
   hasan: ["Past Tenses", "Countable / Uncountable", "Passive Voice",
           "If Conditions", "Relative Clauses"]
 };
@@ -192,8 +204,11 @@ function newPid(){ return Date.now().toString(36) + "_" + (++__PIDN) + Math.rand
    السجلّ ولا تدخل المتوسّط، كما يفعل حارسُ صفحات المنهج من قبل.
    والعتبةُ ثمانٍ لأنّها نصفُ ما يعطيه الاختبارُ الحقيقيُّ للسؤال
    (دقيقةٌ وربعٌ = خمسٌ وسبعون ثانية) — فمن نزل عنها لم يقرأ السؤال. */
-var FAST_SEC = 8;        /* دون هذا لكلّ سؤالٍ = نقرٌ لا حلّ */
-var FAST_ONE = 3;        /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ تُعدّ متسرّعة */
+/* والعتباتُ تُقرأ من pace.js لا تُكتب هنا ثانيةً: كانت مكتوبةً في
+   الموضعَين فلو غُيّرت هناك بقي العدُّ هنا على القديمِ بلا أن يصيح
+   شيء — وعيبُ النصفِ الذي ظهر اليومَ من هذا البابِ جاء. */
+var FAST_SEC = PACE.FAST_SEC;   /* دون هذا لكلّ سؤالٍ = نقرٌ لا حلّ */
+var FAST_ONE = PACE.FAST_ONE;   /* إجابةٌ أسرعُ من ثلاثِ ثوانٍ تُعدّ متسرّعة */
 /* ═══ الحارسُ لفهدٍ وحدَه — طلبُ الأب (٦ أكتوبر ٢٠٢٦) ════════════════
    أُطلق الحارسُ أمسَ على الصفحةِ كلِّها، فوقع على حسنٍ ورفيفَ في قسم
    «قدرات — لفظي» وهو أسئلةُ معاني كلماتٍ يعرفها الطفلُ أو لا يعرفها —
@@ -250,14 +265,16 @@ function saveScore(test, correct, total, wrongs, skills, pid, timing, seen){
     if(T.dur != null){
       meta.dur = T.dur; meta.fast = T.fast || 0; meta.secPerQ = per!=null ? Math.round(per*10)/10 : null;
       /* الوسمُ صريحٌ لا ضمنيّ: الصفُّ يحمل سببَ استبعاده فيقرؤه التقرير */
-      /* معياران لا واحد: متوسّطُ الجلسةِ، وعددُ الإجاباتِ المتسرّعة.
-         فمن نقر أحدَ عشرَ سؤالًا ثمّ تركَ الصفحةَ مفتوحةً دقيقتين يرتفع
-         متوسّطُه فوقَ العتبةِ وهو لم يحلّ شيئًا — والعدُّ يكشفه.
-         وهو معيارُ صفحاتِ المنهجِ نفسُه (أكثرُ من النصف متسرّعًا). */
-      var tooMany = (T.fast||0) > Math.floor(total/2);
-      if(paceOn(test) && per != null && (per < FAST_SEC || tooMany)){
-        meta.trusted = false; meta.why = tooMany && per >= FAST_SEC ? "burst" : "fast";
+      /* والأبوابُ في pace.js نسخةً واحدةً — انظر تعليقَ quickness هناك.
+         وبابُ البطءِ هنا بلا شرطِ درجةٍ كما كان (طلبُ الأب في فهدٍ
+         بعينه)، وبابُ النقرِ بشرطِها، والموقوتةُ بلا شرط. */
+      var Q = PACE.quickness({ dur:T.dur, total:total, fast:T.fast, correct:correct, allot:T.allot });
+      if(paceOn(test) && Q.per != null && Q.any){
+        meta.trusted = false; meta.why = Q.why;
       }
+      /* وزمنُ الورقةِ المرصودُ يُحفَظ: بلا هذا لا يُعرَف في التقريرِ
+         أنّ ٥٢٧ ثانيةً عُشرُ الزمنِ لا نصفُه. */
+      if(T.allot) meta.allot = T.allot;
     }
     var body = { student:name, grade:GRADES[who]||"", en_correct:0, en_total:0, ma_correct:0, ma_total:0, wrong:[], meta:meta };
     /* عبر الطابور: ما يفشل إرساله يُحفظ ويُعاد تلقائيًّا (attempts-queue.js) */
@@ -1757,7 +1774,21 @@ function renderSet(id, items, intro, regen, label){
      ويُقاس من أوّلِ فتحةٍ لا من كلِّ فتحة: من عاد إلى قسمٍ بدأه لا
      تُصفَّر ساعتُه، وإلّا صار الخروجُ والعودةُ بابًا لإخفاءِ النقر. */
   var __t0 = Date.now(), __lastTs = __t0, __fastN = 0, __entered = false;
-  function __timing(){ return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN }; }
+  /* ═══ زمنُ الورقةِ المرصودُ يسافر مع الزمنِ المقضيّ ═════════════════
+     ورقةُ فهدٍ في ٢٥ نوفمبرَ ٠٧:٠٣: ثمانيةٌ وأربعون سؤالًا، زمنُها
+     المرصودُ ستٌّ وثمانون دقيقةً والعدّادُ ظاهرٌ أمامه، سلّمها في ٨٫٨
+     دقيقة — عُشرَ الزمن — وفيها اثنتا عشرةَ قطعةَ قراءة. ومرّت محسوبةً
+     لأنّ العتبةَ معايَرةٌ لورقةِ تراكيبَ من اثنَي عشرَ سؤالًا: ١١ث
+     للسؤالِ فوقَ الثماني، و١٩ متسرّعةً دونَ نصفِ الثمانيةِ والأربعين.
+     فالمقياسُ الصحيحُ للورقةِ الموقوتةِ نسبةُ المستهلَكِ من زمنِها.
+
+     والحدُّ على تبويبِ النموذجِ الكاملِ (sf) وحدَه: وأمّا «full» و«mwf»
+     فلم يُقَس أثرُه عليهما بعدُ، ولا يُعمَّم حكمٌ قبلَ قياسِه. */
+  var RUSH_ON = (id === "sf");
+  function __timing(){
+    return { dur: Math.round((Date.now()-__t0)/1000), fast: __fastN,
+             allot: (RUSH_ON && secsAll) ? secsAll : 0 };
+  }
   var skills = {};   /* تسجيل تفصيلي: صح/خطأ لكل مهارة على حدة */
   function mark(i, ok){
     var g = skillOf(items[i]);
@@ -1823,14 +1854,21 @@ function renderSet(id, items, intro, regen, label){
       var box = sec.querySelector("[data-pace]");
       if(!box){ box = document.createElement("div"); box.setAttribute("data-pace",""); 
         var sb = sec.querySelector(".scorebar"); if(sb && sb.parentNode) sb.parentNode.insertBefore(box, sb.nextSibling); else sec.appendChild(box); }
-      var tooMany = T.fast > Math.floor(total/2);
-      if(per && (per < FAST_SEC || tooMany)){
+      /* ونفسُ الأبوابِ التي حُفظ بها الصفُّ — لا نسخةٌ ثانيةٌ تتفرّق عنها */
+      var Q = PACE.quickness({ dur:T.dur, total:total, fast:T.fast, correct:correct, allot:T.allot });
+      if(per && Q.any){
+        var mn = function(s){ return Math.round(s/60*10)/10; };
         box.innerHTML = '<div style="background:var(--bad-bg);border:1.5px solid var(--bad);color:var(--bad);border-radius:14px;padding:13px 15px;margin:10px 0;font-weight:800;line-height:1.9">'+
           '⚠️ <b>هذي الجولة ما تُحسب لك.</b><br>'+
-          (per < FAST_SEC
+          (Q.rush
+            ? 'الورقة لها <b dir="ltr" style="unicode-bidi:isolate">'+mn(T.allot)+'</b> دقيقة، وسلّمتها في <b dir="ltr" style="unicode-bidi:isolate">'+mn(T.dur)+'</b> دقيقة — <b dir="ltr" style="unicode-bidi:isolate">'+Math.round(T.dur/T.allot*100)+'٪</b> من وقتها.'
+            : Q.slow
             ? 'حلّيت '+total+' سؤال في <b dir="ltr" style="unicode-bidi:isolate">'+T.dur+'</b> ثانية — <b dir="ltr" style="unicode-bidi:isolate">'+(Math.round(per*10)/10)+'</b> ثانية للسؤال.'
             : '<b dir="ltr" style="unicode-bidi:isolate">'+T.fast+'</b> سؤالًا من '+total+' جاوبتها في أقلّ من ٣ ثوانٍ — ما قرأتها.')+
-          '<div style="font-weight:600;margin-top:6px">والاختبار الحقيقي يعطيك <b>٧٥ ثانية</b> للسؤال. اللي تحت ٨ ثوانٍ يعني ما قرأت السؤال.</div>'+
+          '<div style="font-weight:600;margin-top:6px">'+
+          (Q.rush
+            ? 'والاختبار الحقيقي ما فيه تسليم مبكّر: ١٠٠ سؤال في ٣ ساعات. والورقة اللي فيها قطع قراءة ما تُقرأ في عُشر وقتها.'
+            : 'والاختبار الحقيقي يعطيك <b>٧٥ ثانية</b> للسؤال. اللي تحت ٨ ثوانٍ يعني ما قرأت السؤال.')+'</div>'+
           '<div style="font-weight:600;margin-top:6px">تطلع لأبوك في التقرير مفصولة. أعِدها بتأنٍّ وتُحسب لك ✅</div></div>';
       } else if(per){
         box.innerHTML = '<div style="background:var(--good-bg);border:1px solid var(--good);color:var(--good);border-radius:14px;padding:11px 14px;margin:10px 0;font-weight:800">'+
