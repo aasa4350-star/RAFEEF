@@ -123,7 +123,27 @@
     ["common",       "widespread",               "rare",               "expensive",          "recent"],
     ["difference",   "a way in which things are unlike","a close similarity","a final total","a fixed rule"],
     ["cannot",       "is not able to",           "must not",           "need not",           "will not"],
-    ["energy",       "the power to do work",     "a written plan",     "a storage place",    "a fixed price"]
+    ["energy",       "the power to do work",     "a written plan",     "a storage place",    "a fixed price"],
+    /* زِيدت في ٢٦ نوفمبرَ ٢٠٢٦ بعد مراجعةِ ملفٍّ تدريبيٍّ خارجيّ: كلماتُه
+       الأكاديميّةُ ليست ملكًا لأحدٍ، وقِيس أيُّها يقع في قطعِنا فعلًا —
+       فستٌّ منها لا تقع فيها، وزيادتُها حرفٌ لا عمل، فلم تُزَد.
+       ⚠️ و«shift» مثالٌ على ما يحذّر منه الكُتيِّبُ نفسُه في «star»:
+       معناها الشائعُ «تحوُّل»، وهي في قطعتِنا الوحيدةِ «industrial
+       shifts» أي نوبةُ عمل. فالشرحُ على السياقِ لا على المعجم. */
+    ["preserve",     "keep from being lost",     "destroy completely", "sell quickly",       "measure carefully"],
+    ["accurate",     "exactly correct",          "roughly similar",    "very fast",          "widely known"],
+    ["reliable",     "able to be depended on",   "easily broken",      "recently made",      "very expensive"],
+    ["alternative",  "another choice",           "the only option",    "a final decision",   "a repeated mistake"],
+    ["occur",        "happen",                   "disappear",          "be forbidden",       "be measured"],
+    ["display",      "show",                     "hide",               "destroy",            "measure"],
+    ["adjust",       "make allowance for",       "ignore completely",  "repeat exactly",     "measure precisely"],
+    ["shift",        "a set period of working time", "a sudden change of mind", "a long holiday", "a written rule"],
+    /* وكلمتان أُخِذتا من القطعتَين اللتَين بقيتا بلا سؤالٍ بعد كلِّ ما
+       سبق — فالجدولُ يأخذ أوّلَ مطابقةٍ، وزيادةُ كلمةٍ في آخرِه لا تنفع
+       قطعةً غُطّيت. فالنافعُ أن تُؤخَذ الكلمةُ من القطعةِ المتروكةِ
+       بعينِها، وبها بلغت التغطيةُ ١٣٨ من ١٣٨. */
+    ["patient",      "showing calm persistence", "receiving medical care", "very quick",     "easily annoyed"],
+    ["pedestrians",  "people travelling on foot","drivers of cars",    "builders of roads",  "traffic officers"]
   ];
 
   var R = window.STEP_READING || [];
