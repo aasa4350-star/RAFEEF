@@ -52,7 +52,12 @@ var T = {
   vform:"Verb + to / ing / base", modal:"Modal Auxiliaries",
   prep:"Prepositions / Articles", pass:"Passive Voice",
   punct:"Capitalization / Punctuation", order:"Word Order / Error ID",
-  rep:"Reported Speech"
+  rep:"Reported Speech",
+  /* زِيدتا في ٢٦ نوفمبرَ ٢٠٢٦: كلتاهما بندٌ مستقلٌّ في قائمةِ التراكيبِ
+     بكُتيِّبِ قياسٍ الرسميِّ (ص ١٨): «subject/verb agreement» و«correct
+     use of adjectives, adverbs…»، ولم تكن لهما قاعدةٌ عندنا — وكان
+     التطابقُ مبثوثًا في «اكتشافِ الخطأ» والصفةُ والظرفُ عَرَضًا. */
+  sva:"Subject-Verb Agreement", advb:"Adjectives and Adverbs"
 };
 function S(t, stem, opts, expl){ return ["<b>Grammar — "+T[t]+":</b> "+stem, opts, 0, expl]; }
 
@@ -961,6 +966,116 @@ S("rep","He said that his brother ___ in Dammam for ten years before moving to R
 S("rep","Yesterday she asked whether we ___ ready to start.",["were","are","have been","be"],"‏yesterday تقطع الصلةَ بالحاضرِ ⇒ are ⇐ were."),
 S("rep","He insisted that he ___ seen the message.",["had not","has not","did not","was not"],"الحاضرُ التامُّ المنفيُّ ⇒ الماضي التامّ."),
 S("rep","The notice says that phones ___ be switched off.",["must","have","should to","had"],"‏must في لافتةٍ وناقلٍ مضارعٍ (says) تبقى كما هي.")
+);
+
+/* ═══ ١٧) تطابقُ الفاعلِ والفعل — Subject-Verb Agreement ═══
+   كُتيِّبُ قياسٍ (ص ١٨) يفردها بندًا مستقلًّا بين بنودِ التراكيب. وأخطأ
+   فيها الأبُ في ورقتِه (Everyone / were ready)، وهي من أكثرِ ما يُسأل
+   عنه لأنّ العربيّةَ لا تطابق فيها الفاعلَ بالطريقةِ نفسِها. */
+B.push(
+S("sva","Everyone in the two classes ___ already received the timetable.",["has","have","are","were"],"‏everyone وeverybody وsomeone ونحوُها مفردةٌ دائمًا مهما كثُر من بعدَها."),
+S("sva","Each of the applicants ___ asked to bring two photographs.",["was","were","have been","are"],"‏each of + جمعٍ: الفاعلُ each وهو مفردٌ ⇒ was."),
+S("sva","Neither of the two answers ___ completely correct.",["is","are","were","have been"],"‏neither of مفردةٌ في الاستعمالِ الرسميِّ ⇒ is."),
+S("sva","One of the teachers who ___ in the staff room is from Abha.",["are","is","was","has been"],"الفعلُ في جملةِ الوصلِ يتبع who وهي تعود على teachers الجمعِ ⇒ are."),
+S("sva","The number of applicants ___ risen sharply this year.",["has","have","are","were"],"‏the number of + جمعٍ: الفاعلُ number مفردٌ ⇒ has."),
+S("sva","A number of students ___ still waiting outside.",["are","is","has","was"],"‏a number of = many ⇒ الفعلُ جمعٌ، بخلاف the number of."),
+S("sva","There ___ three reasons for the delay.",["are","is","was","has been"],"مع there يتبع الفعلُ ما بعدَه، وهو reasons الجمع."),
+S("sva","There ___ very little evidence for that claim.",["is","are","were","have been"],"‏evidence غيرُ معدودٍ ⇒ مفرد."),
+S("sva","The box of old files ___ been moved to the second floor.",["has","have","are","were"],"الفاعلُ box لا files: ما بين الفاعلِ والفعلِ لا يغيّر العدد."),
+S("sva","The list of names ___ printed on the back of the sheet.",["is","are","were","have been"],"الفاعلُ list مفردٌ، وof names عبارةٌ وصفيّةٌ لا تغيّره."),
+S("sva","Neither the manager nor the employees ___ aware of the change.",["were","was","has been","is"],"مع neither … nor يتبع الفعلُ أقربَ الاسمَين، وهو employees."),
+S("sva","Neither the employees nor the manager ___ aware of the change.",["was","were","have been","are"],"بالقربِ نفسِه: الأقربُ هنا manager المفرد."),
+S("sva","Either the teacher or her assistants ___ going to open the hall.",["are","is","was","has been"],"‏either … or كذلك بالقرب: assistants جمع."),
+S("sva","The teacher, as well as her students, ___ invited to the ceremony.",["was","were","have been","are"],"‏as well as عبارةٌ معترضةٌ لا تجعل الفاعلَ جمعًا."),
+S("sva","The principal, along with two teachers, ___ attending the meeting.",["is","are","were","have been"],"‏along with مثلُ as well as: الفاعلُ principal وحدَه."),
+S("sva","Both the report and the summary ___ due on Sunday.",["are","is","was","has been"],"‏both … and تربط فاعلَين ⇒ جمع."),
+S("sva","Mathematics ___ never been his strongest subject.",["has","have","are","were"],"أسماءُ العلومِ المنتهيةِ بـics مفردةٌ: mathematics, physics, economics."),
+S("sva","The news from the committee ___ encouraging.",["is","are","were","have been"],"‏news مفردةٌ وإن انتهت بـs."),
+S("sva","The police ___ still looking for two witnesses.",["are","is","was","has been"],"‏police جمعٌ دائمًا في الإنجليزيّةِ البريطانيّةِ والرسميّة."),
+S("sva","The equipment in the two laboratories ___ checked every term.",["is","are","were","have been"],"‏equipment غيرُ معدودٍ ⇒ مفرد."),
+S("sva","The furniture in the new offices ___ arrived yesterday.",["has","have","are","were"],"‏furniture غيرُ معدودٍ ⇒ has."),
+S("sva","Ten kilometres ___ a long way to walk before sunrise.",["is","are","were","have been"],"المسافةُ والمدّةُ والمالُ إذا عُومِلت وحدةً واحدةً فهي مفرد."),
+S("sva","Two hours ___ enough for the whole paper.",["is","are","were","have been"],"المدّةُ وحدةٌ واحدة ⇒ مفرد."),
+S("sva","Fifty riyals ___ too much for a single notebook.",["is","are","were","have been"],"المبلغُ وحدةٌ واحدة ⇒ مفرد."),
+S("sva","Half of the water ___ already been used.",["has","have","are","were"],"مع النسبِ والكسورِ يتبع الفعلُ الاسمَ بعد of: water غيرُ معدود."),
+S("sva","Half of the students ___ already submitted the form.",["have","has","is","was"],"بالقاعدةِ نفسِها: students جمع."),
+S("sva","Most of the information ___ taken from one report.",["was","were","have been","are"],"‏most of + غيرِ معدودٍ ⇒ مفرد."),
+S("sva","Most of the applications ___ arrived before the deadline.",["have","has","is","was"],"‏most of + جمعٍ ⇒ جمع."),
+S("sva","Not one of the answers ___ acceptable to the committee.",["was","were","have been","are"],"‏not one of مفردةٌ قطعًا، بخلاف none of التي يقبل فيها الاستعمالُ الشائعُ الجمعَ — فلا تُبنى عليها مسألة."),
+S("sva","A pair of scissors ___ missing from the drawer.",["is","are","were","have been"],"الفاعلُ pair مفردٌ وإن كان scissors جمعًا في الشكل."),
+S("sva","The committee ___ its final decision last night.",["announced","announce","have announced","are announcing"],"اسمُ الجماعةِ إذا عُومِل كيانًا واحدًا فهو مفرد، ويعود عليه its."),
+S("sva","People in that district ___ asked for a new school.",["have","has","is","was"],"‏people جمعٌ ولا تأخذ s."),
+S("sva","Three children ___ waiting at the gate.",["are","is","was","has been"],"‏children جمعُ child ⇒ جمع."),
+S("sva","Every student and every teacher ___ a copy of the plan.",["has","have","are","were"],"‏every … and every … تبقى مفردة."),
+S("sva","Bread and butter ___ served with every meal here.",["is","are","were","have been"],"ما رُكِّب فصار شيئًا واحدًا يُعامَل مفردًا."),
+S("sva","The manager and the accountant ___ signed the form.",["have","has","is","was"],"فاعلان مختلفان بـand ⇒ جمع."),
+S("sva","Physics ___ taught in the laboratory on Tuesdays.",["is","are","were","have been"],"‏physics مفردةٌ كـmathematics."),
+S("sva","A lot of time ___ wasted on the first question.",["was","were","have been","are"],"‏a lot of + غيرِ معدودٍ ⇒ مفرد."),
+S("sva","A lot of students ___ joined the new programme.",["have","has","is","was"],"‏a lot of + جمعٍ ⇒ جمع."),
+S("sva","The results of the second experiment ___ not yet been published.",["have","has","is","was"],"الفاعلُ results جمعٌ، وof the experiment لا تغيّره."),
+S("sva","Each of the three answers ___ a different reason.",["gives","give","are giving","have given"],"‏each of مفردةٌ ⇒ gives."),
+S("sva","Somebody in the back rows ___ left a bag on the chair.",["has","have","are","were"],"‏somebody مفردةٌ مهما كان ما بعدَها."),
+S("sva","The members of staff ___ divided about the new timetable.",["are","is","has","was"],"الفاعلُ members جمعٌ صريحٌ، فلا يُترَك الحكمُ لاختلافِ الإنجليزيّتَين في staff وحدَها."),
+S("sva","Neither answer ___ acceptable.",["is","are","were","have been"],"‏neither بلا of تأخذ اسمًا مفردًا وفعلًا مفردًا."),
+S("sva","The only one of the students who ___ late was Salem.",["was","were","have been","are"],"‏the only one تُرجِع who إلى one المفردِ لا إلى students."),
+S("sva","Measles ___ now rare in the Kingdom.",["is","are","were","have been"],"أسماءُ الأمراضِ المنتهيةِ بـs مفردةٌ: measles, diabetes."),
+S("sva","Twenty per cent of the sample ___ incomplete.",["was","were","have been","are"],"النسبةُ تتبع ما بعد of: sample مفرد.")
+);
+
+/* ═══ ١٨) الصفةُ والظرف — Adjectives and Adverbs ═══
+   كُتيِّبُ قياسٍ (ص ١٨): «correct use of adjectives, adverbs, definite/
+   indefinite articles, prepositions…». وكانت عندنا عَرَضًا في أبوابٍ
+   أخرى ولا قاعدةَ لها. ومصائدُها ثلاثٌ: الفعلُ الرابطُ يأخذ صفةً لا
+   ظرفًا، وظروفٌ معناها يتغيّر بالـly (hard/hardly)، وصفاتٌ تنتهي بـly
+   أصلًا فلا تُصاغ ظرفًا (friendly). */
+B.push(
+S("advb","She answered the examiner's question ___ and sat down.",["quietly","quiet","more quiet","quietest"],"الظرفُ يصف الفعلَ answered ⇒ quietly."),
+S("advb","The new printer works ___ than the old one.",["better","gooder","more good","best"],"ظرفُ good هو well، وتفضيلُه better."),
+S("advb","He drives very ___ on the ring road.",["carefully","careful","care","carefulness"],"ما وصف الفعلَ drives فهو ظرف."),
+S("advb","The soup tastes ___ with a little salt.",["good","well","goodly","better than"],"الأفعالُ الرابطةُ (taste, smell, look, feel, seem, sound) تأخذ صفةً لا ظرفًا."),
+S("advb","After the long flight she felt ___.",["tired","tiredly","tiring","more tiredly"],"‏feel فعلٌ رابطٌ ⇒ صفة."),
+S("advb","The announcement sounded ___ to everyone in the hall.",["strange","strangely","stranger than","strangest"],"‏sound رابطٌ ⇒ صفة."),
+S("advb","The second question seemed ___ than the first.",["easier","more easily","easiest","easily"],"‏seem رابطٌ، والمقارنةُ بصفةٍ لا ظرف."),
+S("advb","He remained ___ even when the room grew noisy.",["calm","calmly","more calmly","calmness"],"‏remain رابطٌ ⇒ صفة."),
+S("advb","She has been ill, but she looks ___ again now.",["well","good","goodly","better looking"],"‏well صفةٌ بمعنى معافًى بعد الأفعالِ الرابطة، وgood لا تؤدّيها هنا."),
+S("advb","He speaks English very ___ for a beginner.",["well","good","best","goodly"],"ظرفُ الطريقةِ بعد الفعلِ speaks هو well."),
+S("advb","She studied ___ for three weeks before the test.",["hard","hardly","harder than","hardest"],"‏hard ظرفٌ بمعنى بجدٍّ، وhardly معناها بالكاد."),
+S("advb","He ___ ever misses a lesson.",["hardly","hard","harder","hardest"],"‏hardly ever = نادرًا جدًّا."),
+S("advb","I have not seen him ___.",["lately","late","later","latest"],"‏lately = مؤخّرًا، وlate = متأخّرًا."),
+S("advb","The bus arrived ten minutes ___.",["late","lately","later than","latest"],"‏late هنا ظرفُ وقتٍ بمعنى متأخّرًا."),
+S("advb","It is ___ ten o'clock; we should start.",["nearly","near","nearer","nearest"],"‏nearly = تقريبًا، وnear = قريبًا مكانًا."),
+S("advb","The committee was ___ concerned about the delay.",["deeply","deep","deeper","deepest"],"‏deeply للمعنى المجازيّ، وdeep للعمقِ الماديّ."),
+S("advb","The method proved ___ effective in the second trial.",["highly","high","higher","highest"],"‏highly للدرجةِ المعنويّة، وhigh للارتفاعِ الماديّ."),
+S("advb","Students may enter the exhibition ___ of charge this week.",["free","freely","freer","freest"],"‏free of charge = بلا مقابل، وهي عبارةٌ ثابتةٌ لا تدخلها ly."),
+S("advb","The audience was ___ made up of teachers.",["mostly","most","more","almost"],"‏mostly = في معظمِه، وmost صفةُ تفضيلٍ لا ظرفُ نسبة."),
+S("advb","She is a very ___ neighbour.",["friendly","friendlily","friend","friendlier than"],"‏friendly صفةٌ تنتهي بـly أصلًا، ولا ظرفَ لها بهذا البناء."),
+S("advb","He gave a ___ answer to a difficult question.",["lively","livelily","live","liveliest than"],"‏lively صفةٌ لا ظرف."),
+S("advb","The newspaper appears on a ___ basis.",["weekly","weeklily","week","weeks"],"‏weekly وdaily وmonthly صفاتٌ وظروفٌ بلا تغيير."),
+S("advb","The lecture was ___; half the row fell asleep.",["boring","bored","bore","boredly"],"‏-ing تصف مصدرَ الشعور، و-ed تصف من يشعر."),
+S("advb","By the end of the hour the students were ___.",["bored","boring","bore","boringly"],"الطلّابُ هم من يشعر ⇒ bored."),
+S("advb","The result was ___, since nobody had expected it.",["surprising","surprised","surprise","surprisingly bad"],"النتيجةُ مصدرُ الدهشة ⇒ surprising."),
+S("advb","She was ___ by the news from the committee.",["surprised","surprising","surprise","surprisingly"],"هي من يشعر ⇒ surprised، ومع by نحتاج اسمَ مفعول."),
+S("advb","The instructions were ___ and nobody knew what to do.",["confusing","confused","confuse","confusingly"],"التعليماتُ مصدرُ الحيرة ⇒ confusing."),
+S("advb","The paper was ___ difficult for a first attempt.",["too","so","very much","enough"],"‏too + صفةٌ = أكثرُ من اللازم، ويتبعها عادةً to + مصدر."),
+S("advb","The hall was not large ___ for all the candidates.",["enough","too","so","very"],"‏enough تأتي بعدَ الصفةِ لا قبلَها."),
+S("advb","It was ___ a long passage that few finished it.",["such","so","very","too"],"‏such + اسمٌ موصوف، وso + صفةٌ وحدَها."),
+S("advb","The passage was ___ long that few finished it.",["so","such","such a","too"],"‏so + صفةٌ مجرّدةٌ + that."),
+S("advb","He is ___ the best reader in the class.",["easily","easy","easier","easiest"],"‏easily هنا ظرفُ توكيدٍ بمعنى بلا منازع."),
+S("advb","They worked ___ than they had worked the week before.",["more carefully","more careful","carefully more","most carefully"],"مقارنةُ الظرفِ الطويلِ: more + الظرفُ بـly، لا more + الصفة، ولا صيغةُ التفضيلِ مع than."),
+S("advb","Of all the groups, hers finished ___.",["fastest","most fast","faster","the most fastly"],"‏fast ظرفٌ قصيرٌ وتفضيلُه fastest."),
+S("advb","The second draft was ___ better than the first.",["much","very","so","too"],"‏much وfar وa lot تُقوّي صيغةَ المقارنة، وvery لا تصحّ معها."),
+S("advb","She was ___ tired to check her answers again.",["too","very","so","enough"],"‏too + صفةٌ + to + مصدرٌ = أكثرُ من أن."),
+S("advb","He speaks ___ quickly for me to follow.",["too","very","so","enough"],"‏too مع الظرفِ كذلك."),
+S("advb","The design is ___ unique, so it needs no comparison.",["absolutely","very","more","most"],"الصفاتُ المطلقةُ (unique, perfect, impossible) تُقوّى بـabsolutely لا بـvery."),
+S("advb","It is a ___ old wooden table.",["big","bigly","more big","biggest"],"ترتيبُ الصفات: رأيٌ ثمّ حجمٌ ثمّ عمرٌ ثمّ مادّة ⇒ big old wooden."),
+S("advb","She bought a ___ silk scarf.",["beautiful red","red beautiful","beautifully red","red beautifully"],"الرأيُ قبلَ اللون: beautiful red."),
+S("advb","He answered ___ and then explained his reasoning.",["briefly","brief","briefer","briefest"],"ظرفٌ يصف answered."),
+S("advb","The two methods gave ___ different results.",["completely","complete","completer","completest"],"الظرفُ يصف الصفةَ different ⇒ completely."),
+S("advb","I could ___ hear the announcement over the noise.",["barely","bare","barer","barest"],"‏barely = بالكاد، وbare صفةٌ بمعنى عارٍ."),
+S("advb","The answer was ___ correct, but it lost a mark for spelling.",["perfectly","perfect","more perfect","perfectest"],"الظرفُ يصف الصفةَ correct."),
+S("advb","She explained the method ___ than her colleague did.",["more thoroughly","more thorough","thoroughly more","most thoroughly"],"‏more + الظرفِ المنتهي بـly، والصفةُ لا تصف الفعل، وصيغةُ التفضيلِ لا تُستعمَل مع than."),
+S("advb","The room was ___ quiet during the last ten minutes.",["unusually","unusual","more unusual","unusualest"],"الظرفُ يصف الصفةَ quiet."),
+S("advb","He felt ___ about forgetting the appointment.",["bad","badly","worse than","baddest"],"‏feel رابطٌ ⇒ صفة؛ وfeel badly تعني ضعفَ حاسّةِ اللمس.")
 );
 
 window.STEP_BANK = B;
