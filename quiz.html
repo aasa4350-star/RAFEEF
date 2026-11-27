@@ -7,6 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <title>اختبارات ومراجعات الأبناء</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="bidi-iso.js"></script>
 <script src="config.js"></script>
 <script src="gate.js"></script>
 <script src="mic-help.js?v=20260906-2"></script>
@@ -122,7 +123,7 @@
   .fr .frn{padding:0 5px;border-bottom:1.7px solid currentColor}
   .fr .frd{padding:0 5px}
 </style>
-<script src="build-check.js?v=695a546ef9" defer></script>
+<script src="build-check.js?v=13285b4538" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -189,7 +190,15 @@ function mdir(s){
 /* شرحُ السؤال: يُعزَل رياضيُّه ثمّ تُرسَم كسورُه */
 function expl(s){ return frx(mdir(s)); }
 function frx(s){
-  return String(s).replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
+  /* العزلُ أوّلًا — انظر bidi-iso.js. وبلا هذا تنقلب «[2 −7 ; 3 8]»
+     على الشاشةِ «]8 3 ; 7− 2[» وقد تسوق الطالبَ إلى صارفٍ موجود. */
+  var held = [], t = String(s).replace(/<\/?(?:sub|sup)>/g, function(m){ held.push(m); return ""; });
+  t = t.split(/(<[^>]*>)/).map(function(part, i){
+    return (i % 2) ? part : (window.bidiIso ? bidiIso(part) : part);
+  }).join('');
+  var k = 0;
+  t = t.replace(//g, function(){ return held[k++]; });
+  return t.replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
     function(m, sg, n, dg, d){
       return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
         '<span class="frb"><span class="frn">'+n+'</span>'+

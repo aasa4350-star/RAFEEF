@@ -333,6 +333,7 @@ function run(){
   issues.push(...quicknessPath());
   issues.push(...voidRowsPath());
   issues.push(...bookletSpecPath());
+  issues.push(...bidiIsoPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
@@ -1490,6 +1491,109 @@ function pacePath(){
    فيُفحَص بالتشغيلِ لا بالنصّ: تُحمَّل البنوكُ وتُعَدُّ الأنواعُ، وتُشغَّل
    مولّداتُ التحليلِ ويُنظَر ما تُخرِجه.
    ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   العبارةُ الرياضيّةُ في نصٍّ عربيٍّ تُعزَل، وإلّا انقلبت على الشاشة
+   ═══════════════════════════════════════════════════════════════════
+   بلاغُ الأب (٢٧ نوفمبرَ ٢٠٢٦) بصورةِ سؤالٍ من التحصيليّ:
+   «ما محدّد المصفوفة [2 −7 ; 3 8]؟» — ويُعرَض «]8 3 ; 7− 2[».
+
+   وقِيس في متصفّحٍ حقيقيٍّ بقراءةِ موضعِ كلِّ محرفٍ على الشاشة: ٢٢٠
+   ركضةً معطوبةً في سبعةَ عشرَ مولّدًا، منها خمسون مقلوبةً قلبًا تامًّا —
+   الأزواجُ المرتَّبةُ (5,−4) تُعرَض (4−,5) فتنقلب الإحداثيّات، والفتراتُ
+   [−2,3] تُعرَض [3,2−]، والمتّجهاتُ ⟨6,8⟩ كذلك.
+
+   وليس شكلًا: المصفوفةُ في الصورةِ محدّدُها ٣٧، ولو قُرئت كما عُرِضت
+   [8 3 ; 7 2] لكان −٥ — وهو خيارٌ موجودٌ في الورقة. فالعطبُ يسوق
+   الطالبَ إلى صارفٍ بعينِه.
+
+   وهذا عطبٌ صامتٌ تامّ: لا خطأَ في الحساب، ولا شيءَ يصيح، والصفحةُ
+   تعمل — إنّما المكتوبُ شيءٌ والمعروضُ شيءٌ آخر.
+
+   فيُفحَص بتشغيلِ العازلِ نفسِه على الحالاتِ المقيسةِ يومَها.
+   ═══════════════════════════════════════════════════════════════════ */
+function bidiIsoPath(){
+  const out = [];
+  const F = 'bidi-iso.js', p = path.join(ROOT, F);
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  if (!fs.existsSync(p)){ E(F, 'عازلُ الاتّجاهَين غائبٌ — فالعباراتُ الرياضيّةُ تنقلب في كلِّ نصٍّ عربيّ'); return out; }
+  const sb = { window:{} };
+  vm.createContext(sb);
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), sb, { timeout: 4000 }); }
+  catch(e){ E(F, 'لا يُشغَّل: ' + e.message); return out; }
+  const iso = sb.window.bidiIso;
+  if (typeof iso !== 'function'){ E(F, 'bidiIso غيرُ مُصدَّرة'); return out; }
+
+  const SPAN = /<span dir="ltr" style="unicode-bidi:isolate">([\s\S]*?)<\/span>/g;
+  const parts = t => { const a = []; let m; SPAN.lastIndex = 0; while ((m = SPAN.exec(t))) a.push(m[1]); return a; };
+
+  /* الحالاتُ من قياسِ ٢٧ نوفمبر: [الوصف, المدخل, ما يجب أن يُعزَل كتلةً واحدة] */
+  const CASES = [
+    ['مصفوفةُ الصورة',        'ما محدّد المصفوفة [2 −7 ; 3 8] ؟',        ['[2 −7 ; 3 8]']],
+    ['زوجان مرتَّبان',         'ميل المستقيم المارّ بالنقطتين (−5, −3) و(−10, −9)؟', ['(−5, −3)', '(−10, −9)']],
+    ['فترة',                  'الفترة [−2,3] تمثّل:',                     ['[−2,3]']],
+    ['متّجه',                 'المتّجه ⟨6,8⟩ طوله:',                      ['⟨6,8⟩']],
+    ['نقطةُ وسطٍ بفاصلة',      'منتصف القطعة هو (3,4) فما:',               ['(3,4)']],
+    ['جيبٌ وظرب',             'العبارة cos θ ÷ (tan θ · csc θ) تُكافئ:',   ['cos θ ÷ (tan θ · csc θ)']]
+  ];
+  CASES.forEach(([d, input, want]) => {
+    const got = parts(iso(input));
+    want.forEach(w => {
+      if (got.indexOf(w) < 0)
+        E(F, 'لا تُعزَل «' + w + '» كتلةً واحدةً في «' + d + '» — فتنقلب على الشاشةِ ويقرأ الطالبُ غيرَ المكتوب (المعزولُ فعلًا: ' + (got.length ? got.map(x => '«' + x + '»').join(' ') : 'لا شيء') + ')');
+    });
+  });
+  /* ولا يُلَفُّ نصٌّ عربيٌّ محض، ولا تُكسَر الوسوم */
+  const ar = iso('ما قيمة المتوسّط الحسابيّ لهذه الأعداد؟');
+  if (/unicode-bidi/.test(ar)) E(F, 'يُعزَل نصٌّ عربيٌّ محضٌ — عزلٌ بلا موجب');
+  const one = iso('العدد 7 فقط');
+  if (/unicode-bidi/.test(one)) E(F, 'يُعزَل رقمٌ مفردٌ لا ينقلب — عزلٌ بلا موجب');
+  /* والوسمُ الداخليُّ شفّافٌ: «log₃ 9 − log₃ 27» كتلةٌ واحدةٌ لا خمسُ جزر */
+  {
+    const pf = 'practice.html', pp = path.join(ROOT, pf);
+    if (!fs.existsSync(pp)) { E(pf, 'صفحةُ التدرّبِ غائبة'); return out; }
+    const psrc = fs.readFileSync(pp, 'utf8');
+    const body = EXTRACT.literalAfter(psrc, /function frx\(s\)\s*/, '{', '}');
+    if (!body) E(pf, 'frx لا تُنتزَع');
+    else {
+      const b = { window:{ bidiIso:iso }, bidiIso:iso };
+      vm.createContext(b);
+      let fx = null;
+      try { vm.runInContext('var window = this.window; function frx(s)' + body + '\n; f = frx;', b); fx = b.f; } catch(e){}
+      if (!fx) E(pf, 'frx لا تُشغَّل');
+      else {
+        const got = parts(fx('ما قيمة log<sub>3</sub> 9 − log<sub>3</sub> 27 ؟'));
+        const whole = got.filter(x => /log/.test(x) && /27/.test(x));
+        if (!whole.length)
+          E(pf, 'العبارةُ ذاتُ الدليلِ (<sub>) تُقطَّع جزرًا متفرّقةً فتتبعثر على الشاشة — وسمُ الأُسِّ والدليلِ يجب أن يكون شفّافًا لا فاصلًا (المعزولُ: ' + got.map(x => '«' + x + '»').join(' ') + ')');
+        /* ولا يُكسَر بناءُ الوسوم */
+        const t2 = fx('<b>س:</b> احسب [2 −7 ; 3 8] ثمّ <i>قارن</i>');
+        const open = (t2.match(/<span/g) || []).length, close = (t2.match(/<\/span>/g) || []).length;
+        if (open !== close) E(pf, 'frx تُخرِج وسومًا غيرَ متوازنة (' + open + ' فتحٍ و' + close + ' إغلاق)');
+        /* ⚠️ والمقياسُ أنّ لا جزيرةَ معزولةٍ تحوي وسمًا: كان الفحصُ على
+           شكلٍ بعينِه فمرّت طفرةٌ تلفُّ الوسومَ كلَّها. فالآن يُفحَص
+           مضمونُ كلِّ جزيرةٍ لا شكلُ واحدةٍ منها. وتُستثنى sub/sup
+           لأنّها شفّافةٌ بقصدٍ وتُردُّ داخلَ العزل. */
+        const inside = parts(t2).filter(x => /<(?!\/?(?:sub|sup)>)/.test(x));
+        if (inside.length)
+          E(pf, 'جزيرةٌ معزولةٌ تحوي وسمًا: «' + inside[0].slice(0, 60) + '» — والعزلُ للنصِّ لا للوسم، ولفُّه يُفسِد البناء');
+      }
+    }
+  }
+  /* والصفحتان تحمّلانه وتنادِيانه — نسخةٌ واحدةٌ لا نسختان */
+  ['practice.html', 'quiz.html'].forEach(f => {
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) return;
+    const fsrc = fs.readFileSync(fp, 'utf8');
+    if (!/<script src="bidi-iso\.js"><\/script>/.test(fsrc))
+      E(f, 'لا تحمّل bidi-iso.js — فالعباراتُ الرياضيّةُ تنقلب في هذه الصفحةِ وحدَها، ويختلف ما يراه الابنُ من بابٍ إلى باب');
+    if (!/bidiIso\(/.test(fsrc))
+      E(f, 'تحمّل العازلَ ولا تنادِيه — فهو حرفٌ لا عمل');
+    if (/var BIDI_OK/.test(fsrc))
+      E(f, 'نسخةٌ ثانيةٌ من مجموعةِ المحارفِ في الصفحة — وقاعدةٌ في نسختَين تتفرّق كما تفرّقت قاعدةُ الإيقاعِ من قبل');
+  });
+  return out;
+}
+
 function bookletSpecPath(){
   const out = [];
   const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
