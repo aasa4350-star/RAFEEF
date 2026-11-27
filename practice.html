@@ -82,7 +82,7 @@
 <!-- عزلُ العباراتِ الرياضيّةِ في نصٍّ عربيّ — نسخةٌ واحدةٌ للصفحتَين -->
 <script src="bidi-iso.js"></script>
 <script src="void-rows.js"></script>
-<script src="build-check.js?v=13285b4538" defer></script>
+<script src="build-check.js?v=7ee7a33c11" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"></div>
@@ -114,22 +114,25 @@
    السؤال وخياراته وشرحه — لا على سطر النتيجة، فـ«8/10» فيه درجةٌ لا
    كسرٌ يُرصَف. */
 function frx(s){
+  var held;
   /* ⚠️ وسومُ الأُسِّ والدليلِ شفّافةٌ لا فاصلة: الجذعُ قد يكون
      «log<sub>3</sub> 9 − log<sub>3</sub> 27»، فلو عُدَّ كلُّ وسمٍ حدًّا
      للركضةِ صارت خمسَ جزرٍ متفرّقةٍ تُرتَّب من اليمينِ لليسارِ فتتبعثر
      — وهو ما قِيس في المتصفّحِ قبل الإصلاح. فتُخبَّأ أوّلًا وتُردُّ بعدُ. */
-  var held = [], t = String(s).replace(/<\/?(?:sub|sup)>/g, function(m){ held.push(m); return ""; });
+  var mtx = [], t = (window.mtxHold ? mtxHold(s, mtx) : String(s));
+  held = [], t = t.replace(/<\/?(?:sub|sup)>/g, function(m){ held.push(m); return ""; });
   /* ثمّ يُعزَل النصُّ خارجَ بقيّةِ الوسومِ وحدَه، فلا يُلَفُّ وسمٌ ولا يُكسَر */
   t = t.split(/(<[^>]*>)/).map(function(part, i){
     return (i % 2) ? part : bidiIso(part);
   }).join('');
   var k = 0;
   var out = t.replace(//g, function(){ return held[k++]; });
-  return out.replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
+  var fin = out.replace(/(−|-)?\s*(\d+|س|ص)\s*\/\s*(−|-)?\s*(\d+|س|ص)/g,
     function(m, sg, n, dg, d){
       return '<span class="fr">'+(sg?'<span class="frs">−</span>':'')+
         '<span class="frb"><span class="frn">'+n+'</span>'+
         '<span class="frd">'+(dg?'−':'')+d+'</span></span></span>'; });
+  return (window.mtxFill ? mtxFill(fin, mtx) : fin);
 }
 function qs(k){ return new URLSearchParams(location.search).get(k); }
 var who = (qs("who")||"hasan").toLowerCase();

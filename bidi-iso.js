@@ -48,6 +48,47 @@ function bidiIso(t){
     return lead + '<span dir="ltr" style="unicode-bidi:isolate">' + core + '</span>' + tail;
   });
 }
+/* ——— المصفوفةُ تُرسَم صفَّين وقوسَين، لا سطرًا بفاصلةٍ منقوطة ———
+   «[2 −7 ; 3 8]» صيغةُ برمجةٍ لا صيغةُ رياضيّات، وهي التي انقلبت على
+   الشاشة. والمولِّدُ الآن يكتب علامةً قصيرةً ⟦2,−7;3,8⟧ — تُخزَّن في
+   قاعدةِ البيانات كما هي فتبقى مقروءةً — ويبنيها العرضُ شبكةً.
+   والصيغةُ القديمةُ تُترجَم أيضًا، لأنّ صفوفَ الأخطاءِ المحفوظةَ
+   قبلَ اليومِ تحملها، فتُعرَض في المراجعةِ مرسومةً لا مقلوبة. */
+var MTX_NEW = /⟦([^⟧]{1,80})⟧/g;
+var MTX_OLD = /\[\s*(−?-?\d+)\s+(−?-?\d+)\s*;\s*(−?-?\d+)\s+(−?-?\d+)\s*\]/g;
+function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function mtxHtml(inner){
+  var rows = String(inner).split(';').map(function(r){ return r.split(','); });
+  var cols = 0, i, j;
+  for(i = 0; i < rows.length; i++) if(rows[i].length > cols) cols = rows[i].length;
+  var cells = '';
+  for(i = 0; i < rows.length; i++)
+    for(j = 0; j < cols; j++)
+      cells += '<span>' + esc((rows[i][j] == null ? '' : rows[i][j]).trim()) + '</span>';
+  /* القوسُ شريطٌ بثلاثةِ حدودٍ، فله شُرفتاه أعلى وأسفل كقوسِ الكتاب */
+  var bar = 'width:.32em;border:1.6px solid currentColor';
+  return '<span class="mtx" dir="ltr" style="display:inline-flex;align-items:stretch;'+
+    'gap:.24em;vertical-align:middle;unicode-bidi:isolate;line-height:1.5;margin:0 .2em">'+
+    '<span style="' + bar + ';border-right:0"></span>'+
+    '<span style="display:inline-grid;grid-template-columns:repeat(' + cols + ',auto);'+
+    'gap:.08em .9em;text-align:center;padding:.14em .08em">' + cells + '</span>'+
+    '<span style="' + bar + ';border-left:0"></span>'+
+  '</span>';
+}
+/* تُخبَّأ قبل العزلِ وتُردُّ بعدَه: لو مرّت على العازلِ لتقطّعت أرقامُها
+   جزائرَ، ولو رُدَّت قبل مرصوفِ الكسورِ لمشى ذاك على وسومِها. */
+function mtxHold(s, held){
+  return String(s).replace(MTX_NEW, function(m, inner){ held.push(mtxHtml(inner)); return ""; })
+                  .replace(MTX_OLD, function(m, a, b, c, d){
+                    held.push(mtxHtml(a + ',' + b + ';' + c + ',' + d)); return ""; });
+}
+function mtxFill(s, held){
+  var k = 0;
+  return String(s).replace(//g, function(){ return held[k++] || ''; });
+}
   window.bidiIso = bidiIso;
+  window.mtxHold = mtxHold;
+  window.mtxFill = mtxFill;
+  window.mtxHtml = mtxHtml;
   window.BIDI_RUN_SRC = BIDI_RUN.source;
 })();

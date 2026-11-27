@@ -1555,7 +1555,8 @@ function bidiIsoPath(){
     const body = EXTRACT.literalAfter(psrc, /function frx\(s\)\s*/, '{', '}');
     if (!body) E(pf, 'frx لا تُنتزَع');
     else {
-      const b = { window:{ bidiIso:iso }, bidiIso:iso };
+      const b = { window:{ bidiIso:iso, mtxHold:sb.window.mtxHold, mtxFill:sb.window.mtxFill },
+                  bidiIso:iso, mtxHold:sb.window.mtxHold, mtxFill:sb.window.mtxFill };
       vm.createContext(b);
       let fx = null;
       try { vm.runInContext('var window = this.window; function frx(s)' + body + '\n; f = frx;', b); fx = b.f; } catch(e){}
@@ -1576,6 +1577,28 @@ function bidiIsoPath(){
         const inside = parts(t2).filter(x => /<(?!\/?(?:sub|sup)>)/.test(x));
         if (inside.length)
           E(pf, 'جزيرةٌ معزولةٌ تحوي وسمًا: «' + inside[0].slice(0, 60) + '» — والعزلُ للنصِّ لا للوسم، ولفُّه يُفسِد البناء');
+
+        /* ——— المصفوفةُ تُرسَم شبكةً بصفَّين وقوسَين ———
+           والقياسُ على الخلايا بترتيبِ ظهورِها في البناء: لو انقلبت
+           قرأ الطالبُ محدّدًا غيرَ الذي كُتِب، وجوابُ القلبِ معروضٌ
+           في الخيارات. وتُفحَص الصيغتان: الجديدةُ ⟦⟧ والقديمةُ
+           المحفوظةُ في صفوفِ الأخطاءِ قبلَ اليوم. */
+        const cellsOf = t => {
+          const box = t.match(/<span class="mtx"[\s\S]*?$/);
+          if (!box) return null;
+          return (box[0].match(/<span>([^<]*)<\/span>/g) || []).map(x => x.replace(/<\/?span>/g, ''));
+        };
+        [['الصيغةُ الجديدة', 'ما محدّد المصفوفة ⟦2,−7;3,8⟧ ؟'],
+         ['الصيغةُ القديمةُ المحفوظة', 'ما محدّد المصفوفة [2 −7 ; 3 8] ؟']].forEach(([d, stem]) => {
+          const r = fx(stem);
+          const cl = cellsOf(r);
+          if (!cl) { E(pf, d + ': المصفوفةُ لا تُرسَم شبكةً — تبقى سطرًا بفاصلةٍ منقوطةٍ وهي الصيغةُ التي تنقلب'); return; }
+          if (cl.join('|') !== '2|−7|3|8')
+            E(pf, d + ': ترتيبُ خلايا المصفوفةِ «' + cl.join('، ') + '» والمكتوبُ «2، −7، 3، 8» — فالمحدّدُ المقروءُ غيرُ المحدّدِ المطلوب');
+          if (//.test(r)) E(pf, d + ': علامةُ المصفوفةِ لم تُردَّ، فيظهر محرفٌ مبهمٌ مكانَها');
+          if (!/border-right:0/.test(r) || !/border-left:0/.test(r))
+            E(pf, d + ': قوسا المصفوفةِ ناقصان — تظهر أرقامًا بلا قوس');
+         });
       }
     }
   }
@@ -1590,7 +1613,35 @@ function bidiIsoPath(){
       E(f, 'تحمّل العازلَ ولا تنادِيه — فهو حرفٌ لا عمل');
     if (/var BIDI_OK/.test(fsrc))
       E(f, 'نسخةٌ ثانيةٌ من مجموعةِ المحارفِ في الصفحة — وقاعدةٌ في نسختَين تتفرّق كما تفرّقت قاعدةُ الإيقاعِ من قبل');
+    if (!/mtxHold\(/.test(fsrc) || !/mtxFill\(/.test(fsrc))
+      E(f, 'لا تبني المصفوفاتِ — فتظهر فيها سطرًا بفاصلةٍ منقوطةٍ وتنقلب، ويختلف ما يراه الابنُ من بابٍ إلى باب');
   });
+  /* والمولِّدُ يكتب العلامةَ القصيرةَ لا الوسوم: نصُّ السؤالِ يُحفَظ
+     في عمودِ الأخطاءِ بقاعدةِ البيانات، فلو حمل وسومًا لامتلأ بها. */
+  {
+    const F = 'tahsili-math.js', fp = path.join(ROOT, F);
+    if (fs.existsSync(fp)) {
+      const msrc = fs.readFileSync(fp, 'utf8');
+      const body = EXTRACT.literalAfter(msrc, /function mat\(a,b,c,d\)\s*/, '{', '}');
+      if (!body) E(F, 'mat لا تُنتزَع');
+      else {
+        if (/<span|<div/.test(body))
+          E(F, 'mat تكتب وسومَ HTML — ونصُّ السؤالِ يُحفَظ في قاعدةِ البيانات، فيمتلئ عمودُ الأخطاءِ بالوسومِ ويصير غيرَ مقروء');
+        const b2 = {}; vm.createContext(b2);
+        let mf = null;
+        try { vm.runInContext('function S(x){ return x < 0 ? "−" + (-x) : String(x); }\n'+
+          'function mat(a,b,c,d)' + body + '\n; f = mat;', b2); mf = b2.f; } catch(e){}
+        if (!mf) E(F, 'mat لا تُشغَّل');
+        else {
+          const got = mf(2, -7, 3, 8);
+          if (!/^⟦.*⟧$/.test(got) || got.indexOf('2') < 0 || got.indexOf('−7') < 0)
+            E(F, 'mat لا تكتب علامةَ المصفوفةِ ⟦⟧ — أخرجت «' + got + '»، والعرضُ لا يعرف أن يرسمَها شبكةً فتبقى مقلوبة');
+        }
+      }
+      const uses = (msrc.match(/mat\(/g) || []).length;
+      if (uses < 10) E(F, 'مسائلُ المصفوفاتِ لا تمرُّ كلُّها بـmat (' + uses + ' استعمالًا) — وما لا يمرُّ بها يبقى مقلوبًا');
+    }
+  }
   return out;
 }
 
