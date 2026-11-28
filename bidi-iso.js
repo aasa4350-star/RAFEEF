@@ -77,8 +77,19 @@ function mtxHtml(inner){
 }
 /* تُخبَّأ قبل العزلِ وتُردُّ بعدَه: لو مرّت على العازلِ لتقطّعت أرقامُها
    جزائرَ، ولو رُدَّت قبل مرصوفِ الكسورِ لمشى ذاك على وسومِها. */
+/* ——— معادلةٌ تنزل سطرًا مستقلًّا ———
+   العينُ العربيّةُ تدخل الجزيرةَ اللاتينيّةَ من يمينِها، فتقرأ
+   «log₂ 16 = 4» مقلوبةً. والمعادلةُ إذا أُفرِدت سطرًا وسُطّرت في
+   الوسطِ قُرئت صيغةً من اليسار، كما تُطبَع في الكتابِ المدرسيّ. */
+var BLK_RUN = /⟪([^⟫]{1,160})⟫/g;
+function blkHtml(inner){
+  var t = esc(inner).replace(/&lt;(\/?(?:sub|sup))&gt;/g, '<$1>');
+  return '<span dir="ltr" style="display:block;direction:ltr;text-align:center;'+
+    'unicode-bidi:isolate;margin:.55em 0;font-size:1.06em">' + t + '</span>';
+}
 function mtxHold(s, held){
-  return String(s).replace(MTX_NEW, function(m, inner){ held.push(mtxHtml(inner)); return ""; })
+  return String(s).replace(BLK_RUN, function(m, inner){ held.push(blkHtml(inner)); return ""; })
+                  .replace(MTX_NEW, function(m, inner){ held.push(mtxHtml(inner)); return ""; })
                   .replace(MTX_OLD, function(m, a, b, c, d){
                     held.push(mtxHtml(a + ',' + b + ';' + c + ',' + d)); return ""; });
 }
@@ -90,5 +101,6 @@ function mtxFill(s, held){
   window.mtxHold = mtxHold;
   window.mtxFill = mtxFill;
   window.mtxHtml = mtxHtml;
+  window.blkHtml = blkHtml;
   window.BIDI_RUN_SRC = BIDI_RUN.source;
 })();

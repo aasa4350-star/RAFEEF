@@ -598,12 +598,16 @@ function gCompose(){
   var order=gp(["fg","gf"]);
   var at=(Math.abs(a)===1?(a<0?'−x':'x'):S(a)+'x'), ct=(Math.abs(c)===1?(c<0?'−x':'x'):S(c)+'x');
   var stem='إذا كانت f(x) = '+at+' '+sgn(b)+Math.abs(b)+' و g(x) = '+ct+' '+sgn(d)+Math.abs(d)+'، فما ';
-  if(order==="fg") return Q(stem+'(f∘g)('+S(x)+') ؟',
+  /* ⚠️ كانت «(f∘g)(س)». تُقرأ مقلوبةً «(g∘f)» فيُحسَب العكس، والعكسُ
+     مموِّهٌ معروضٌ في ١٠٠٪ من الحالات. والصيغةُ المتداخلةُ f(g(س))
+     تنجو: من قرأها من اليمينِ قرأ «س ثمّ g ثمّ f» — وهو ترتيبُ الحلِّ
+     الصحيحُ نفسُه. والرمزُ ∘ يبقى مشروحًا في التفسيرِ ليعرفَه. */
+  if(order==="fg") return Q(stem+'قيمة f(g('+S(x)+')) ؟',
     S(fg), [S(gf), S(a*c*x+b+d), S(fg+1)],
-    '(f∘g)(x) = f(g(x)). أوّلًا g('+S(x)+') = '+S(g)+'، ثمّ f('+S(g)+') = '+S(a)+'×'+P(g)+' '+sgn(b)+Math.abs(b)+' = '+S(fg)+'.');
-  return Q(stem+'(g∘f)('+S(x)+') ؟',
+    'f(g(x)) هو التركيب (f∘g)(x) — نبدأ بالداخل. أوّلًا g('+S(x)+') = '+S(g)+'، ثمّ f('+S(g)+') = '+S(a)+'×'+P(g)+' '+sgn(b)+Math.abs(b)+' = '+S(fg)+'.');
+  return Q(stem+'قيمة g(f('+S(x)+')) ؟',
     S(gf), [S(fg), S(a*c*x+b+d), S(gf+1)],
-    '(g∘f)(x) = g(f(x)). أوّلًا f('+S(x)+') = '+S(a*x+b)+'، ثمّ g('+S(a*x+b)+') = '+S(c)+'×'+P(a*x+b)+' '+sgn(d)+Math.abs(d)+' = '+S(gf)+'.');
+    'g(f(x)) هو التركيب (g∘f)(x) — نبدأ بالداخل. أوّلًا f('+S(x)+') = '+S(a*x+b)+'، ثمّ g('+S(a*x+b)+') = '+S(c)+'×'+P(a*x+b)+' '+sgn(d)+Math.abs(d)+' = '+S(gf)+'.');
 }
 function gVertAsym(){
   var a=nz(-8,8), b=nz(-8,8);
@@ -973,10 +977,10 @@ function gLogForm(){
   var b=gp([2,3,4,5,10]), e=ri(2,4);
   var v=Math.pow(b,e);
   var dir=gp(["l2e","e2l"]);
-  if(dir==="l2e") return Q('اكتب المعادلة log<sub>'+b+'</sub> '+v+' = '+e+' بالصيغة الأسّيّة.',
+  if(dir==="l2e") return Q('اكتب المعادلة الآتية بالصيغة الأسّيّة:⟪log<sub>'+b+'</sub> '+v+' = '+e+'⟫',
     b+'^'+e+' = '+v, [e+'^'+b+' = '+v, v+'^'+e+' = '+b, b+'^'+v+' = '+e],
     'log<sub>أ</sub> ب = ج ⇔ أ^ج = ب ⇐ '+b+'^'+e+' = '+v+'.');
-  return Q('اكتب المعادلة '+b+'^'+e+' = '+v+' بالصيغة اللوغاريتميّة.',
+  return Q('اكتب المعادلة الآتية بالصيغة اللوغاريتميّة:⟪'+b+'^'+e+' = '+v+'⟫',
     'log<sub>'+b+'</sub> '+v+' = '+e, ['log<sub>'+b+'</sub> '+e+' = '+v, 'log<sub>'+v+'</sub> '+b+' = '+e, 'log<sub>'+e+'</sub> '+v+' = '+b],
     'أ^ج = ب ⇔ log<sub>أ</sub> ب = ج ⇐ log<sub>'+b+'</sub> '+v+' = '+e+'.');
 }
@@ -996,7 +1000,7 @@ function gLogLaws(){
   if(kind==="add") return Q('ما قيمة log<sub>'+b+'</sub> '+M+' + log<sub>'+b+'</sub> '+N+' ؟',
     m+n, [m*n, Math.abs(m-n), M+N],
     'جمعُ اللوغاريتمات = لوغاريتمُ الضرب: log '+M+' + log '+N+' = log('+M+'×'+N+') = '+(m+n)+'. (أو ببساطة '+m+' + '+n+'.)');
-  if(kind==="sub") return Q('ما قيمة log<sub>'+b+'</sub> '+M+' − log<sub>'+b+'</sub> '+N+' ؟',
+  if(kind==="sub") return Q('ما ناتج طرح log<sub>'+b+'</sub> '+N+' من log<sub>'+b+'</sub> '+M+' ؟',
     S(m-n), [S(n-m), S(m*n), S(M-N)],
     'طرحُ اللوغاريتمات = لوغاريتمُ القسمة: log '+M+' − log '+N+' = log('+M+'÷'+N+') = '+S(m-n)+'.');
   return Q('ما قيمة log<sub>'+b+'</sub> ('+b+'^'+m+') ؟',
@@ -1006,14 +1010,14 @@ function gLogLaws(){
 function gExpEq(){
   var b=gp([2,3,4,5]), x=ri(2,5), k=nz(-4,4);
   var v=Math.pow(b,x);
-  return Q('حلّ المعادلة: '+b+'^(x '+sgn(k)+Math.abs(k)+') = '+v,
+  return Q('حلّ المعادلة الآتية:⟪'+b+'^(x '+sgn(k)+Math.abs(k)+') = '+v+'⟫',
     S(x-k), [S(x+k), S(x), S(v)],
     'توحيدُ الأساس: '+b+'^(x '+sgn(k)+Math.abs(k)+') = '+b+'^'+x+' ⇐ x '+sgn(k)+Math.abs(k)+' = '+x+' ⇐ x = '+S(x-k)+'.');
 }
 function gLogEq(){
   var b=gp([2,3,5,10]), e=ri(1,4), k=nz(-9,9);
   var v=Math.pow(b,e);
-  return Q('حلّ المعادلة: log<sub>'+b+'</sub> (x '+sgn(k)+Math.abs(k)+') = '+e,
+  return Q('حلّ المعادلة الآتية:⟪log<sub>'+b+'</sub> (x '+sgn(k)+Math.abs(k)+') = '+e+'⟫',
     S(v-k), [S(v+k), S(e-k), S(v)],
     'نحوّل للصيغة الأسّيّة: x '+sgn(k)+Math.abs(k)+' = '+b+'^'+e+' = '+v+' ⇐ x = '+S(v-k)+'.');
 }
@@ -1054,14 +1058,17 @@ function gVecMag(){
 function gVecOp(){
   var a=nz(-8,8), b=nz(-8,8), c=nz(-8,8), d=nz(-8,8), k=nz(-4,4);
   var kind=gp(["add","sub","scal"]);
-  if(kind==="add") return Q('إذا كان u = '+vec(a,b)+' و v = '+vec(c,d)+'، فما u + v ؟',
+  /* ⚠️ كانت «فما u − v ؟». والعينُ العربيّةُ تدخل الجزيرةَ اللاتينيّةَ
+     من يمينِها فتقرأ «v − u»، والمقلوبُ معروضٌ مموِّهًا أوّلَ الخيارات
+     في ١٠٠٪ من الحالاتِ المقيسة — فيُعاقَب من حسب صحيحًا. فالترتيبُ
+     الآن في العربيّةِ نفسِها، ولا يبقى في الجزيرةِ إلا حرفٌ مفرد. */
+  if(kind==="add") return Q('إذا كان u = '+vec(a,b)+' و v = '+vec(c,d)+'، فما ناتج جمع u و v ؟',
     vec(a+c,b+d), [vec(a-c,b-d), vec(a*c,b*d), vec(a+d,b+c)],
     'نجمع المركّباتَ المتناظرة: '+vec(a+c,b+d)+'.');
-  if(kind==="sub") return Q('إذا كان u = '+vec(a,b)+' و v = '+vec(c,d)+'، فما u − v ؟',
+  if(kind==="sub") return Q('إذا كان u = '+vec(a,b)+' و v = '+vec(c,d)+'، فما ناتج طرح v من u ؟',
     vec(a-c,b-d), [vec(c-a,d-b), vec(a+c,b+d), vec(a*c,b*d)],
     'نطرح المركّباتَ المتناظرة: '+vec(a-c,b-d)+'.');
-  var kt=(k===1?'u':k===-1?'−u':S(k)+'u');
-  return Q('إذا كان u = '+vec(a,b)+'، فما '+kt+' ؟',
+  return Q('إذا كان u = '+vec(a,b)+'، فما ناتج ضرب u في '+S(k)+' ؟',
     vec(k*a,k*b), [vec(a+k,b+k), vec(k*a,b), vec(a,k*b)],
     'الضربُ في عددٍ قياسيٍّ يضرب كلَّ مركّبة: '+vec(k*a,k*b)+'.');
 }
@@ -1474,7 +1481,7 @@ function gTrigSimplify(){
         : kind==="b" ? ['sin θ · csc θ','1','sin θ × (1÷sin θ) = 1.']
         : kind==="c" ? ['tan θ · cot θ','1','tan θ × (1÷tan θ) = 1.']
         :              ['sin²θ + cos²θ','1','متطابقةُ فيثاغورس المثلّثيّة: sin²θ + cos²θ = 1.'];
-  return Q('العبارة '+q[0]+' تُكافئ:',
+  return Q('العبارة الآتية تُكافئ:⟪'+q[0]+'⟫',
     q[1], ['1','cos²θ','sin²θ','sin θ','cos θ','0'],
     q[2]);
 }

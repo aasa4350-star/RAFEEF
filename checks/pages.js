@@ -334,6 +334,7 @@ function run(){
   issues.push(...voidRowsPath());
   issues.push(...bookletSpecPath());
   issues.push(...bidiIsoPath());
+  issues.push(...rtlOrderPath());
   issues.push(...clickExclusion());
   issues.push(...paceCurriculum());
   issues.push(...ytPath());
@@ -1642,6 +1643,85 @@ function bidiIsoPath(){
       if (uses < 10) E(F, 'مسائلُ المصفوفاتِ لا تمرُّ كلُّها بـmat (' + uses + ' استعمالًا) — وما لا يمرُّ بها يبقى مقلوبًا');
     }
   }
+  return out;
+}
+
+/* ——— ترتيبُ القراءةِ في النصِّ العربيّ ———
+   العينُ العربيّةُ تدخل الجزيرةَ اللاتينيّةَ من يمينِها. فعبارةٌ ثنائيّةٌ
+   عاريةٌ مثل «u − v» تُقرأ «v − u»، وفي ١٠٠٪ من الحالاتِ المقيسة كان
+   الجوابُ المقلوبُ هو المموِّهَ الأوّل — فيُعاقَب الولدُ على حسابٍ صحيح.
+   فالترتيبُ يجب أن تحملَه العربيّةُ («ناتج طرح ب من أ»)، أو تنزلَ
+   المعادلةُ سطرًا مستقلًّا تُقرأ فيه صيغةً. */
+function rtlOrderPath(){
+  const out = [];
+  const E = (file, m) => out.push({ sev:'خطأ', file:file, msg:m });
+  const sb = { window:{}, console, Math, String, Number, Array, Object, JSON,
+               RegExp, parseInt, parseFloat, isNaN };
+  vm.createContext(sb);
+  for (const f of ['bidi-iso.js', 'tahsili-math.js', 'gat-quant.js']) {
+    const fp = path.join(ROOT, f);
+    if (!fs.existsSync(fp)) { E(f, 'غائب — لا يمكن قياسُ ترتيبِ القراءة'); return out; }
+    try { vm.runInContext(fs.readFileSync(fp, 'utf8'), sb, { timeout: 15000 }); }
+    catch(e){ E(f, 'لا يُشغَّل: ' + e.message); return out; }
+  }
+  const BARE = /(^|[\s(])([A-Za-z][A-Za-z0-9]?)\s*(−|÷|∘|\\)\s*([A-Za-z][A-Za-z0-9]?)($|[\s),؟.])/;
+  const bad = new Map(), circ = new Map(), eqn = new Map();
+  const note = (map, key, where, txt) => {
+    if (!map.has(key)) map.set(key, { n:0, where, ex:txt.slice(0, 95) }); map.get(key).n++;
+  };
+  function scan(t, where){
+    const raw = String(t == null ? '' : t);
+    const full = raw.replace(/<[^>]*>/g, '');
+    if (!/[\u0600-\u06FF]/.test(full)) return;         /* نصٌّ عربيٌّ فقط */
+    /* ما نزل سطرًا مستقلًّا يُقرأ صيغةً من اليسار، فلا تدخله العينُ
+       من يمينِها — وهو غرضُ السطر. فيُرفَع من الفحص. */
+    const plain = raw.replace(/⟪[^⟫]*⟫/g, ' ').replace(/<[^>]*>/g, '');
+    const m = plain.match(BARE);
+    if (m) note(bad, m[2] + m[3] + m[4], where, plain);
+    /* ⚠️ وطرفان مسمَّيان حول العامل: «log₂ 16 − log₂ 4» أفلتت من قاعدةِ
+       الرمزِ المفردِ لأنّ طرفَيها أطولُ من حرفَين، وهي تُقرأ مقلوبةً
+       فيُحسَب الطرحُ بالعكس — والمقلوبُ مموِّهٌ معروض. */
+    const nm = plain.match(/([A-Za-z]{2,})[^−÷]{0,24}(−|÷)[^−÷]{0,24}([A-Za-z]{2,})/);
+    if (nm) note(bad, nm[1] + ' ' + nm[2] + ' ' + nm[3], where, plain);
+    if (/∘/.test(full)) note(circ, '∘', where, full);   /* ∘ ممنوعٌ في السؤالِ ولو في سطرٍ مستقلّ */
+    /* معادلةٌ يتغيّر معناها بالقلب: طرفاها أُسٌّ أو لوغاريتم، فتبديلُ
+       ٢ و١٦ في «log₂ 16 = 4» جوابٌ آخرُ معروضٌ مموِّهًا. أمّا «x = 4»
+       فتُقرأ مقلوبةً بالمعنى نفسِه، فلا تُحسَب. */
+    if (/(\^|log)/.test(plain) && /[0-9A-Za-z)][\s]*=[\s]*[0-9A-Za-z(]/.test(plain))
+      note(eqn, 'معادلة', where, plain);
+  }
+  let n = 0;
+  const T = (sb.window.TAHSILI_MATH && sb.window.TAHSILI_MATH.topics) || [];
+  T.forEach(t => (t.gens || []).forEach(g => {
+    for (let i = 0; i < 160; i++){ let q = null;
+      try { q = g(); } catch(e){ break; }
+      if (!q) continue; n++;
+      scan(q[0], t.id); (q[1] || []).forEach(o => scan(o, t.id)); }
+  }));
+  const G = sb.window.GAT_QUANT || {};
+  ['CMP','CHART','MULTI'].forEach(k => (G[k] || []).forEach((g, i) => {
+    for (let j = 0; j < 80; j++){ let q = null;
+      try { q = g(); } catch(e){ break; }
+      if (!q) continue; n++;
+      [q.q, q.stem, q[0]].forEach(x => x && scan(x, k + i));
+      ((q.opts || q[1]) || []).forEach(o => scan(o, k + i)); }
+  }));
+  if (!n){ E('tahsili-math.js', 'لم يُولَّد سؤالٌ واحد — القياسُ لا يقول شيئًا'); return out; }
+  /* والسطرُ المستقلُّ سطرٌ فعلًا: لو بقي داخلَ السطرِ عادت العينُ تدخله من يمينِها */
+  const blk = sb.window.blkHtml;
+  if (typeof blk !== 'function') E('bidi-iso.js', 'blkHtml غيرُ مُصدَّرة — فالمعادلةُ لا تنزل سطرًا');
+  else {
+    const b2 = blk('log<sub>2</sub> 16 = 4');
+    if (!/display:block/.test(b2)) E('bidi-iso.js', 'المعادلةُ لا تنزل سطرًا مستقلًّا — تبقى داخلَ الجملةِ العربيّةِ فتُقرأ مقلوبة');
+    if (!/text-align:center/.test(b2)) E('bidi-iso.js', 'المعادلةُ لا تُسطَّر في الوسط — فلا تُقرأ صيغةً مفردة');
+    if (b2.indexOf('<sub>2</sub>') < 0) E('bidi-iso.js', 'السطرُ المستقلُّ يهرِّب وسمَ الدليل — فيظهر «&lt;sub&gt;» نصًّا');
+  }
+  bad.forEach((v, k) => E('tahsili-math.js',
+    'عبارةٌ ثنائيّةٌ عاريةٌ «' + k + '» في نصِّ السؤال [' + v.where + '] — تُقرأ مقلوبةً والمقلوبُ معروضٌ مموِّهًا: «' + v.ex + '»'));
+  circ.forEach((v, k) => E('tahsili-math.js',
+    'رمزُ التركيب ∘ في نصِّ السؤال [' + v.where + '] — يُقرأ معكوسًا، ومكانُه الشرحُ لا السؤال: «' + v.ex + '»'));
+  eqn.forEach((v, k) => E('tahsili-math.js',
+    'معادلةٌ لاتينيّةٌ داخلَ جملةٍ عربيّةٍ ولم تنزل سطرًا مستقلًّا [' + v.where + '] — تُقرأ مقلوبةً: «' + v.ex + '»'));
   return out;
 }
 
